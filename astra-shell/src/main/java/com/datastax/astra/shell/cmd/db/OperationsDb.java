@@ -371,8 +371,9 @@ public class OperationsDb {
      *      error code.
      */
     public static ExitCode downloadCloudSecureBundles(String databaseName, String dir, String file) {
-        if (dir == null && file == null) {
-            return downloadCloudSecureBundles(databaseName);
+        // Default path will be current location
+        if (dir == null && file == null) { 
+            dir = ".";
         }
         
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
