@@ -17,8 +17,10 @@ import com.datastax.astra.shell.cmd.db.DbCreateCli;
 import com.datastax.astra.shell.cmd.db.DbCreateKeyspaceCli;
 import com.datastax.astra.shell.cmd.db.DbDSBulkCli;
 import com.datastax.astra.shell.cmd.db.DbDeleteCli;
+import com.datastax.astra.shell.cmd.db.DbDownloadScbCli;
 import com.datastax.astra.shell.cmd.db.DbGetCli;
 import com.datastax.astra.shell.cmd.db.DbListCli;
+import com.datastax.astra.shell.cmd.db.DbResumeCli;
 import com.datastax.astra.shell.cmd.db.OperationsDb;
 import com.datastax.astra.shell.cmd.iam.OperationIam;
 import com.datastax.astra.shell.cmd.iam.RoleGetCli;
@@ -55,7 +57,9 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
                   DbGetCli.class,
                   DbListCli.class,
                   DbCreateKeyspaceCli.class,
-                  DbDSBulkCli.class
+                  DbDSBulkCli.class,
+                  DbResumeCli.class,
+                  DbDownloadScbCli.class
           }),
           @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
                   ConfigCreate.class,

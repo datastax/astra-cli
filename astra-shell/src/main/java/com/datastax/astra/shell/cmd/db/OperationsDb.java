@@ -14,6 +14,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 
 import com.datastax.astra.sdk.databases.DatabaseClient;
 import com.datastax.astra.sdk.databases.DatabasesClient;
@@ -21,7 +25,9 @@ import com.datastax.astra.sdk.databases.domain.CloudProviderType;
 import com.datastax.astra.sdk.databases.domain.Database;
 import com.datastax.astra.sdk.databases.domain.DatabaseCreationRequest;
 import com.datastax.astra.sdk.databases.domain.DatabaseRegionServerless;
+import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.datastax.astra.sdk.databases.domain.Datacenter;
+import com.datastax.astra.sdk.utils.ApiLocator;
 import com.datastax.astra.shell.AstraCli;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
@@ -33,6 +39,7 @@ import com.datastax.astra.shell.out.ShellTable;
 import com.datastax.astra.shell.utils.CqlShellOptions;
 import com.datastax.astra.shell.utils.CqlShellUtils;
 import com.datastax.astra.shell.utils.DsBulkUtils;
+import com.datastax.stargate.sdk.utils.Utils;
 
 /**
  * Utility class for command `db`
@@ -64,6 +71,9 @@ public class OperationsDb {
     
     /** Command constants. */
     public static final String CMD_DOWNLOAD_SCB      = "download-scb";
+    
+    /** Command constants. */
+    public static final String CMD_RESUME            = "resume";
     
     /** Default region. **/
     public static final String DEFAULT_REGION        = "us-east-1";
@@ -249,6 +259,55 @@ public class OperationsDb {
             ShellPrinter.outputSuccess("Deleting Database '" + databaseName + "' (async operation)");
             return ExitCode.SUCCESS;
         }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
+        return ExitCode.NOT_FOUND;
+    }
+    
+
+    /**
+     * Resume a dabatase if exist.
+     * 
+     * @param databaseName
+     *      db name or db id
+     * @return
+     *      status
+     */
+    public static ExitCode resumeDb(String databaseName) {
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (dbClient.isPresent()) {
+            Database db = dbClient.get().find().get();
+            if (db.getStatus().equals(DatabaseStatusType.HIBERNATED)) {
+                
+                try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                    // Forge request (minimal dependencies)
+                    StringBuilder keyspacesUrl = new StringBuilder(
+                            ApiLocator.getApiRestEndpoint(
+                                    db.getId(), 
+                                    db.getInfo().getRegion()));
+                    keyspacesUrl.append("/v2/schemas/keyspace");
+                    
+                    HttpUriRequestBase req = new HttpGet(keyspacesUrl.toString());
+                    req.addHeader("accept", "application/json");
+                    req.addHeader("X-Cassandra-Token", ShellContext.getInstance().getToken());
+                    httpClient.execute(req);
+                    LoggerShell.success("Database will be available soon, use astra db list to track progress");
+                    return ExitCode.SUCCESS;
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+                
+            } else if (db.getStatus().equals(DatabaseStatusType.RESUMING)) {
+                LoggerShell.warning("Database '" +databaseName + "'is already resuming, please wait");
+                return ExitCode.INVALID_PARAMETER;
+            } else if (db.getStatus().equals(DatabaseStatusType.ERROR)) {
+                LoggerShell.error("Your database is in status ERROR and cannot be resumed");
+                return ExitCode.INVALID_PARAMETER;
+            } else {
+                LoggerShell.error("Your database is not in status 'HIBERNATED'");
+                return ExitCode.INVALID_PARAMETER;
+            }
+        }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
         return ExitCode.NOT_FOUND;
     }
     
@@ -264,6 +323,7 @@ public class OperationsDb {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
             Database db = dbClient.get().find().get();
+            
             ShellTable sht = ShellTable.propertyTable(15, 40);
             sht.addPropertyRow(COLUMN_NAME, db.getInfo().getName());
             sht.addPropertyRow(COLUMN_ID, db.getId());
@@ -293,9 +353,59 @@ public class OperationsDb {
             }
             return ExitCode.SUCCESS;
         }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
         return ExitCode.NOT_FOUND;
     }
     
+    
+    /**
+     * Download SCB when needed.
+     *
+     * @param databaseName
+     *      database name.
+     * @param dir
+     *      directory to save the zip
+     * @param file
+     *      filenames
+     * @return
+     *      error code.
+     */
+    public static ExitCode downloadCloudSecureBundles(String databaseName, String dir, String file) {
+        if (dir == null && file == null) {
+            return downloadCloudSecureBundles(databaseName);
+        }
+        
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (dbClient.isPresent()) {
+            Database db = dbClient.get().find().get();
+            Set<Datacenter> dcs = db.getInfo().getDatacenters();
+            
+            if (dir != null) {
+                File targetFolder = new File (dir);
+                if (!targetFolder.exists() || !targetFolder.isDirectory() || !targetFolder.canWrite()) {
+                    LoggerShell.error("You provided an invalid folder, check the -d parameters");
+                    return ExitCode.INVALID_PARAMETER;
+                }
+                dbClient.get().downloadAllSecureConnectBundles(dir);
+                LoggerShell.success("Secure connect bundles have been downloaded.");
+                return ExitCode.SUCCESS;
+                
+            } else if (file != null) {
+                
+                if (dcs.size() > 1) {
+                    LoggerShell.error("You provided a filename but your database has multiple regions, use option -d instead");
+                    return ExitCode.INVALID_PARAMETER;
+                }
+                
+                // Download 1 file
+                Utils.downloadFile(dcs.iterator().next().getSecureBundleUrl(), file);
+                LoggerShell.success("Secure connect bundles have been downloaded.");
+            }
+            return ExitCode.SUCCESS;
+        }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
+        return ExitCode.NOT_FOUND;
+    }
     
     /**
      * Download the cloud secure bundles.
@@ -314,6 +424,7 @@ public class OperationsDb {
             LoggerShell.success("Secure connect bundles have been downloaded.");
             return ExitCode.SUCCESS;
         }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
         return ExitCode.NOT_FOUND;
     }
     

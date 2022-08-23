@@ -26,7 +26,7 @@ public class DatabasesCommandsTest extends AbstractAstraCliTest {
     
     @Test
     public void cqlSHDB()  throws Exception {
-        astraCli("db", "cqlsh", "foo", "-v");
+        astraCli("db", "cqlsh", "foo");
     }
     
     @Test
@@ -34,11 +34,22 @@ public class DatabasesCommandsTest extends AbstractAstraCliTest {
         astraCli("db", "create-keyspace", "foo", "-k", "ks3", "-v");
     }
     
+    
+    @Test
+    public void resumeDB()  throws Exception {
+        astraCli("db", "resume", "samplesgallery", "--config", "greg");
+    }
+   
+    
+    @Test
+    public void helpDL()  throws Exception {
+        astraCli("help", "db", "download-scb");
+    }
+   
+    
     @Test
     public void errorMessages() throws Exception {
         astraCli("xxx");
     }
-    
-    
     
 }

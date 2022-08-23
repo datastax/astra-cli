@@ -27,7 +27,7 @@ echo "  ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  �
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.1.alpha3"
+ASTRA_CLI_VERSION="0.1.alpha4"
 
 echo "Installing Astra Cli $ASTRA_CLI_VERSION, please wait...      "
 
@@ -134,7 +134,7 @@ echo "$(tput setaf 2)[OK]$(tput setaf 7) - Created $astra_scb_folder"
 
 echo ""
 echo "Downloading archive:"
-download_url="https://github.com/datastaxdevs/datastaxdevs.github.io/raw/master/cli/astra-cli-${ASTRA_CLI_VERSION}.zip"
+download_url="https://github.com/datastax/astra-cli/raw/main/releases/astra-cli-${ASTRA_CLI_VERSION}.zip"
 astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}.zip"
 if [ -f "$astra_zip_file" ]; then
 	echo "$(tput setaf 2)[OK]$(tput setaf 7) - Archive is already there"

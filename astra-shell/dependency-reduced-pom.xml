@@ -1,17 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>astra-sdk-parent</artifactId>
-    <groupId>com.datastax.astra</groupId>
-    <version>0.3.4-SNAPSHOT</version>
-    <relativePath>../pom.xml/pom.xml</relativePath>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
+  <groupId>com.datastax.astra</groupId>
   <artifactId>astra-shell</artifactId>
-  <name>+ astra-shell</name>
+  <name>AStra Cli</name>
   <version>0.1.alpha4</version>
+  <description>Command Line Interface for DataStax Astra</description>
+  <inceptionYear>2022</inceptionYear>
+  <developers>
+    <developer>
+      <id>clunven</id>
+      <name>Cedrick Lunven</name>
+      <email>cedrick.lunven@gmail.com</email>
+      <url>https://github.com/clun</url>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git@github.com:datastax/astra-cli.git</connection>
+    <developerConnection>scm:git:git@github.com:datastax/astra-cli.git</developerConnection>
+    <url>https://github.com/datastax/astra-cli</url>
+  </scm>
+  <organization>
+    <name>DataStax</name>
+    <url>http://datastax.com</url>
+  </organization>
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${version.maven.plugin.compiler}</version>
+        <configuration>
+          <source>${maven.plugin.compiler.source}</source>
+          <target>${maven.plugin.compiler.target}</target>
+          <showWarnings>false</showWarnings>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${version.maven.plugin.surefire}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${version.maven.plugin.javadoc}</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <source>${maven.plugin.javadoc.source}</source>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${version.maven.plugin.dependency}</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${version.maven.plugin.jar}</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>${version.maven.plugin.resources}</version>
+        <configuration>
+          <escapeString>\</escapeString>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.3.0</version>
@@ -178,14 +258,36 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
   <properties>
+    <version.maven.plugin.jar>3.2.0</version.maven.plugin.jar>
     <airline.version>2.8.5</airline.version>
-    <commons-cli.version>1.5.0</commons-cli.version>
     <maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
-    <jansi.version>2.4.0</jansi.version>
-    <commons-compress.version>1.21</commons-compress.version>
-    <astra-sdk.version>0.3.4-SNAPSHOT</astra-sdk.version>
-    <commons-lang.version>3.12.0</commons-lang.version>
+    <version.maven.plugin.resources>3.2.0</version.maven.plugin.resources>
     <native.maven.plugin.version>0.9.11</native.maven.plugin.version>
+    <version.maven.plugin.fmt>2.2.0</version.maven.plugin.fmt>
+    <slf4j.version>1.7.36</slf4j.version>
+    <jansi.version>2.4.0</jansi.version>
+    <maven.plugin.compiler.target>1.8</maven.plugin.compiler.target>
+    <version.maven.plugin.release>2.5.2</version.maven.plugin.release>
+    <version.maven.plugin.dependency>2.8</version.maven.plugin.dependency>
+    <version.maven.plugin.xml-format>3.0.7</version.maven.plugin.xml-format>
+    <commons-cli.version>1.5.0</commons-cli.version>
+    <maven.plugin.javadoc.source>8</maven.plugin.javadoc.source>
+    <commons-compress.version>1.21</commons-compress.version>
+    <version.maven.plugin.compiler>3.8.1</version.maven.plugin.compiler>
+    <astra-sdk.version>0.3.3</astra-sdk.version>
+    <commons-lang.version>3.12.0</commons-lang.version>
+    <maven.plugin.compiler.source>1.8</maven.plugin.compiler.source>
+    <junit-jupiter.version>5.8.2</junit-jupiter.version>
+    <junit-platform.version>1.8.2</junit-platform.version>
+    <version.maven.plugin.javadoc>2.10.3</version.maven.plugin.javadoc>
+    <version.maven.plugin.surefire>2.22.2</version.maven.plugin.surefire>
+    <version.maven.plugin.failsafe>2.22.2</version.maven.plugin.failsafe>
   </properties>
 </project>

@@ -15,13 +15,13 @@ import com.datastax.astra.sdk.databases.domain.Database;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.datastax.astra.sdk.streaming.StreamingClient;
-import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.datastax.astra.shell.cmd.BaseCliCommand;
 import com.datastax.astra.shell.cmd.BaseCommand;
 import com.datastax.astra.shell.cmd.BaseShellCommand;
 import com.datastax.astra.shell.out.LoggerShell;
 import com.datastax.astra.shell.out.OutputFormat;
 import com.datastax.astra.shell.out.ShellPrinter;
+import com.datastax.astra.shell.utils.AstraRcUtils;
 
 /**
  * Hold the context of CLI to know where we are.

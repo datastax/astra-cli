@@ -3,26 +3,43 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.datastax.astra</groupId>
 	<artifactId>astra-shell</artifactId>
-	<name>+ astra-shell</name>
+	<name>AStra Cli</name>
+	<description>Command Line Interface for DataStax Astra</description>
 	<packaging>jar</packaging>
+	<inceptionYear>2022</inceptionYear>
 	<version>0.1.alpha4</version>
 
-	<parent>
-		<groupId>com.datastax.astra</groupId>
-		<artifactId>astra-sdk-parent</artifactId>
-		<version>0.3.4-SNAPSHOT</version>
-	</parent>
-
 	<properties>
-		<astra-sdk.version>0.3.4-SNAPSHOT</astra-sdk.version>
+		<astra-sdk.version>0.3.3</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.8.5</airline.version>
+		<slf4j.version>1.7.36</slf4j.version>
+		<!-- commons -->
 		<commons-cli.version>1.5.0</commons-cli.version>
 		<commons-lang.version>3.12.0</commons-lang.version>
 		<commons-compress.version>1.21</commons-compress.version>
-		<maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
+		<!-- Junit -->
+		<junit-platform.version>1.8.2</junit-platform.version>
+		<junit-jupiter.version>5.8.2</junit-jupiter.version>
+		<!-- Java -->
+		<maven.plugin.compiler.source>1.8</maven.plugin.compiler.source>
+		<maven.plugin.compiler.target>1.8</maven.plugin.compiler.target>
+		<maven.plugin.javadoc.source>8</maven.plugin.javadoc.source>
+		<!-- Maven -->
 		<native.maven.plugin.version>0.9.11</native.maven.plugin.version>
+		<maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
+		<version.maven.plugin.resources>3.2.0</version.maven.plugin.resources>
+		<version.maven.plugin.failsafe>2.22.2</version.maven.plugin.failsafe>
+		<version.maven.plugin.surefire>2.22.2</version.maven.plugin.surefire>
+		<version.maven.plugin.release>2.5.2</version.maven.plugin.release>
+		<version.maven.plugin.javadoc>2.10.3</version.maven.plugin.javadoc>
+		<version.maven.plugin.jar>3.2.0</version.maven.plugin.jar>
+		<version.maven.plugin.compiler>3.8.1</version.maven.plugin.compiler>
+		<version.maven.plugin.dependency>2.8</version.maven.plugin.dependency>
+		<version.maven.plugin.xml-format>3.0.7</version.maven.plugin.xml-format>
+		<version.maven.plugin.fmt>2.2.0</version.maven.plugin.fmt>
 	</properties>
 
 	<dependencies>
@@ -39,9 +56,10 @@
 			<version>${jansi.version}</version>
 		</dependency>
 		<dependency>
-        	<groupId>org.slf4j</groupId>
-        	<artifactId>slf4j-nop</artifactId>
-    	</dependency> 
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
 
 		<!-- Leveraging SDK for Astra Accesses -->
 		<dependency>
@@ -51,11 +69,11 @@
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.pulsar</groupId>
-    				<artifactId>pulsar-client-admin</artifactId>
+					<artifactId>pulsar-client-admin</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.pulsar</groupId>
-		    		<artifactId>pulsar-client</artifactId>
+					<artifactId>pulsar-client</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>com.datastax.oss</groupId>
@@ -63,7 +81,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.everit.json</groupId>
-	    			<artifactId>org.everit.json.schema</artifactId>
+					<artifactId>org.everit.json.schema</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
@@ -71,11 +89,11 @@
 				</exclusion>
 				<exclusion>
 					<groupId>io.stargate.grpc</groupId>
-	        		<artifactId>grpc-proto</artifactId>
+					<artifactId>grpc-proto</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>io.grpc</groupId>
-	         		<artifactId>grpc-netty-shaded</artifactId>
+					<artifactId>grpc-netty-shaded</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -97,16 +115,19 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
 			<scope>compile</scope>
+			<version>${junit-jupiter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
+			<version>${junit-jupiter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-runner</artifactId>
 			<scope>test</scope>
+			<version>${junit-platform.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.rvesse</groupId>
@@ -120,18 +141,85 @@
 	<build>
 
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.maven.plugin.compiler}</version>
+				<configuration>
+					<source>${maven.plugin.compiler.source}</source>
+					<target>${maven.plugin.compiler.target}</target>
+					<showWarnings>false</showWarnings>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${version.maven.plugin.surefire}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.junit.jupiter</groupId>
+						<artifactId>junit-jupiter-engine</artifactId>
+						<version>${junit-jupiter.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${version.maven.plugin.javadoc}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<source>${maven.plugin.javadoc.source}</source>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${version.maven.plugin.dependency}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${version.maven.plugin.jar}</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${version.maven.plugin.resources}</version>
+				<configuration>
+					<escapeString>\</escapeString>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.3.0</version>
 				<configuration>
-				  <artifactSet>
-				  	<excludes>
-				  	 <exclude>*:junit-*</exclude>
-				  	 <exclude>*:opentest4j-*</exclude>
-				  	 <exclude>*:airline-help-bash*</exclude>
-				  	</excludes>
-				  </artifactSet>
+					<artifactSet>
+						<excludes>
+							<exclude>*:junit-*</exclude>
+							<exclude>*:opentest4j-*</exclude>
+							<exclude>*:airline-help-bash*</exclude>
+						</excludes>
+					</artifactSet>
 				</configuration>
 				<executions>
 					<execution>
@@ -197,49 +285,85 @@
 
 		</plugins>
 	</build>
-	
+
 	<profiles>
-    <profile>
-      <id>native</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.graalvm.buildtools</groupId>
-            <artifactId>native-maven-plugin</artifactId>
-            <version>${native.maven.plugin.version}</version>
-            <extensions>true</extensions>
-            <executions>
-              <execution>
-                <id>build-native</id>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-                <phase>package</phase>
-              </execution>
-            </executions>
-            <configuration>
-              <imageName>astra-native</imageName>
-  			  <useArgFile>false</useArgFile>
-              <quickBuild>false</quickBuild>
-              <skipNativeBuild>false</skipNativeBuild>
-              <mainClass>com.datastax.astra.shell.AstraCli</mainClass>
-  			  <fallback>false</fallback>
-              <verbose>true</verbose>
-              <buildArgs>
-              	<buildArg>-H:+ReportExceptionStackTraces</buildArg>
-				<buildArg>-H:EnableURLProtocols=http,https</buildArg>
-				<buildArg>--allow-incomplete-classpath</buildArg>
-				<buildArg>--report-unsupported-elements-at-runtime</buildArg>
-				<buildArg>--verbose</buildArg>
-			  </buildArgs>
-              <classpath>
-            	<param>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</param>
-        	  </classpath>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  
+		<profile>
+			<id>native</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>${native.maven.plugin.version}</version>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<id>build-native</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<imageName>astra-native</imageName>
+							<useArgFile>false</useArgFile>
+							<quickBuild>false</quickBuild>
+							<skipNativeBuild>false</skipNativeBuild>
+							<mainClass>com.datastax.astra.shell.AstraCli</mainClass>
+							<fallback>false</fallback>
+							<verbose>true</verbose>
+							<buildArgs>
+								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
+								<buildArg>-H:EnableURLProtocols=http,https</buildArg>
+								<buildArg>--allow-incomplete-classpath</buildArg>
+								<buildArg>--report-unsupported-elements-at-runtime</buildArg>
+								<buildArg>--verbose</buildArg>
+							</buildArgs>
+							<classpath>
+								<param>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</param>
+							</classpath>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<scm>
+		<connection>scm:git:git@github.com:datastax/astra-cli.git</connection>
+		<developerConnection>scm:git:git@github.com:datastax/astra-cli.git</developerConnection>
+		<url>https://github.com/datastax/astra-cli</url>
+		<tag>HEAD</tag>
+	</scm>
+	
+	<distributionManagement>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+	
+	<developers>
+		<developer>
+			<id>clunven</id>
+			<name>Cedrick Lunven</name>
+			<email>cedrick.lunven@gmail.com</email>
+			<url>https://github.com/clun</url>
+		</developer>
+	</developers>
+
+	<organization>
+		<name>DataStax</name>
+		<url>http://datastax.com</url>
+	</organization>
+	
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
 </project>
