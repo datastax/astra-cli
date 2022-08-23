@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.sdk.utils.AstraRc;
+import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
 import com.github.rvesse.airline.annotations.Option;
@@ -32,7 +32,7 @@ public abstract class BaseCliCommand extends BaseShellCommand {
     @Option(name = { "--config-file" }, 
             title = "CONFIG_FILE",
             description= "Configuration file (default = ~/.astrarc)")
-    protected String configFilename = AstraRc.getDefaultConfigurationFileName();
+    protected String configFilename = AstraRcUtils.getDefaultConfigurationFileName();
   
     /**
      * Section.
@@ -40,7 +40,7 @@ public abstract class BaseCliCommand extends BaseShellCommand {
     @Option(name = { "-conf","--config" }, 
             title = "CONFIG_SECTION",
             description= "Section in configuration file (default = ~/.astrarc)")
-    protected String configSectionName = AstraRc.ASTRARC_DEFAULT;
+    protected String configSectionName = AstraRcUtils.ASTRARC_DEFAULT;
     
     /**
      * No log but provide output as a JSON

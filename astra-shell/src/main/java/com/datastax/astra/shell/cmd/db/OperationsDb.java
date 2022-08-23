@@ -356,7 +356,7 @@ public class OperationsDb {
             return ExitCode.SUCCESS;
         }
         
-        // Db not found bummer !
+        LoggerShell.warning("Database '" + databaseName + "' has not been found, no operation.");
         return ExitCode.NOT_FOUND;
     }
     
@@ -369,6 +369,7 @@ public class OperationsDb {
      * @param database
      *      current db
      * @return
+     *      exit code
      */
     public static ExitCode startCqlShell(CqlShellOptions options, String database) {
         

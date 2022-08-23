@@ -1,6 +1,6 @@
 package com.datastax.astra.shell.cmd.config;
 
-import com.datastax.astra.sdk.utils.AstraRc;
+import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.out.ShellPrinter;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -32,7 +32,7 @@ public class ConfigUse extends BaseConfigCommand implements Runnable {
             ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Section '" + sectionName + "' has not been found in config.");
             ExitCode.INVALID_PARAMETER.exit();
         } else {
-            getAstraRc().copySection(sectionName, AstraRc.ASTRARC_DEFAULT);
+            getAstraRc().copySection(sectionName, AstraRcUtils.ASTRARC_DEFAULT);
             getAstraRc().save();
             ShellPrinter.outputSuccess("Section '" + sectionName + "' is set as default.");
         }

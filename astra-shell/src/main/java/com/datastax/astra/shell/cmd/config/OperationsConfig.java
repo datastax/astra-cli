@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.fusesource.jansi.Ansi;
 
 import com.datastax.astra.sdk.config.AstraClientConfig;
-import com.datastax.astra.sdk.utils.AstraRc;
+import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.datastax.astra.shell.out.ShellPrinter;
 import com.datastax.astra.shell.out.ShellTable;
 
@@ -37,7 +37,7 @@ public class OperationsConfig {
      * @param astraRc
      *      current AstraRc
      */
-    public static void listConfigurations(AstraRc astraRc) {
+    public static void listConfigurations(AstraRcUtils astraRc) {
         Map<String, Map<String, String>> sections = astraRc.getSections();
         List<String> orgs = listOrganizations(sections);
         ShellTable sht = new ShellTable();
@@ -66,8 +66,8 @@ public class OperationsConfig {
         List<String> returnedList = new ArrayList<>();
         Optional<String> defaultOrg = findDefaultOrganizationName(sections);
         for (Entry<String, Map<String, String>> section : sections.entrySet()) {
-            if (AstraRc.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
-                returnedList.add(AstraRc.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
+            if (AstraRcUtils.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
+                returnedList.add(AstraRcUtils.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
             } else {
                 returnedList.add(section.getKey());
             }
@@ -85,13 +85,13 @@ public class OperationsConfig {
      */
     public static Optional<String> findDefaultOrganizationName(Map<String, Map<String, String>> sections) {
         String defaultOrgName = null;
-        if (sections.containsKey(AstraRc.ASTRARC_DEFAULT)) {
+        if (sections.containsKey(AstraRcUtils.ASTRARC_DEFAULT)) {
             String defaultToken = sections
-                    .get(AstraRc.ASTRARC_DEFAULT)
+                    .get(AstraRcUtils.ASTRARC_DEFAULT)
                     .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
             if (defaultToken !=null) {
                 for (String sectionName : sections.keySet()) {
-                    if (!sectionName.equals(AstraRc.ASTRARC_DEFAULT)) {
+                    if (!sectionName.equals(AstraRcUtils.ASTRARC_DEFAULT)) {
                        if (defaultToken.equalsIgnoreCase(
                                sections.get(sectionName).get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
                            defaultOrgName = sectionName;

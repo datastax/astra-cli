@@ -5,7 +5,6 @@ import static com.datastax.astra.shell.ExitCode.INVALID_PARAMETER;
 
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
-import com.datastax.astra.sdk.utils.AstraRc;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.out.ShellPrinter;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -52,16 +51,11 @@ public class ConfigCreate extends BaseConfigCommand implements Runnable {
             if (sectionName == null) {
                 sectionName = o.getName();
             }
-            System.out.println("ABC");
-            
             getAstraRc().createSectionWithToken(sectionName, token);
-            System.out.println("DEF" + getAstraRc().getSections());
-            
             getAstraRc().save();
             ShellPrinter.outputSuccess("Configuration Saved.\n");
         } catch(Exception e) {
             ShellPrinter.outputError(CANNOT_CONNECT, "Token provided is invalid. It was not possible to connect to Astra.");
-            e.printStackTrace();
             INVALID_PARAMETER.exit();
         }
     }

@@ -15,7 +15,7 @@ import com.datastax.astra.sdk.databases.domain.Database;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.datastax.astra.sdk.streaming.StreamingClient;
-import com.datastax.astra.sdk.utils.AstraRc;
+import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.datastax.astra.shell.cmd.BaseCliCommand;
 import com.datastax.astra.shell.cmd.BaseCommand;
 import com.datastax.astra.shell.cmd.BaseShellCommand;
@@ -59,13 +59,13 @@ public class ShellContext {
     private String token;
     
     /** Configuration file name. */
-    private String configFilename = AstraRc.getDefaultConfigurationFileName();
+    private String configFilename = AstraRcUtils.getDefaultConfigurationFileName();
     
     /** Configuration section. */
-    private String configSection = AstraRc.ASTRARC_DEFAULT;
+    private String configSection = AstraRcUtils.ASTRARC_DEFAULT;
     
     /** Load Astra Rc in the context. */
-    private AstraRc astraRc;
+    private AstraRcUtils astraRc;
     
     // -- Clients --
     
@@ -161,10 +161,10 @@ public class ShellContext {
             // Overriding default config
             if (cli.getConfigFilename() != null) {
                 LoggerShell.debug("ConfigFilename: " + cli.getConfigFilename());
-                this.astraRc = new AstraRc(cli.getConfigFilename());
+                this.astraRc = new AstraRcUtils(cli.getConfigFilename());
             } else {
-                LoggerShell.debug("ConfigFilename: " + AstraRc.getDefaultConfigurationFileName());
-                this.astraRc = new AstraRc();
+                LoggerShell.debug("ConfigFilename: " + AstraRcUtils.getDefaultConfigurationFileName());
+                this.astraRc = new AstraRcUtils();
             }
             // Overriding default section
             if (!StringUtils.isEmpty(cli.getConfigSectionName())) {
@@ -401,7 +401,7 @@ public class ShellContext {
      * @return
      *       current value of 'astraRc'
      */
-    public AstraRc getAstraRc() {
+    public AstraRcUtils getAstraRc() {
         return astraRc;
     }
 

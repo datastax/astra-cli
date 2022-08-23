@@ -123,12 +123,15 @@ public class AstraCli {
                 .run();       // Run the command
             
         } catch(ParseArgumentsUnexpectedException ex) {
-            LoggerShell.error("Invalid command\n - try 'astra help' to get general help\n - try 'astra help <cmd>' to get help on a particular command (eg: astra help db create)\n - [TAB][TAB] help you with autocompletion." );
+            LoggerShell.error("Invalid command\n - try 'astra help' to get general help\n - "
+                    + "try 'astra help <cmd>' to get help on a particular command "
+                    + "(eg: astra help db create)\n - [TAB][TAB] help you with autocompletion." );
             
         } catch(Exception e) {
-            LoggerShell.error("Execution error:" + e.getMessage());
-            e.printStackTrace();
-            //e.printStackTrace();
+            LoggerShell.error("Invalid options or error execution:\n - try 'astra help' to get general help\n - "
+                    + "try 'astra help <cmd>' to get help on a particular command "
+                    + "(eg: astra help db create)\n - [TAB][TAB] help you with autocompletion.");
+            LoggerShell.error("\nError Message:" + e.getMessage());
         }
     }
     

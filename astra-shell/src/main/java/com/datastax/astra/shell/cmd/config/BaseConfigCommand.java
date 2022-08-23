@@ -1,7 +1,8 @@
 package com.datastax.astra.shell.cmd.config;
 
-import com.datastax.astra.sdk.utils.AstraRc;
+
 import com.datastax.astra.shell.cmd.BaseCommand;
+import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
@@ -20,12 +21,12 @@ public abstract class BaseConfigCommand extends BaseCommand {
     @Option(name = { "--config-file" }, 
             title = "CONFIG_FILE",
             description= "Configuration file (default = ~/.astrarc)")
-    protected String configFilename = AstraRc.getDefaultConfigurationFileName();
+    protected String configFilename = AstraRcUtils.getDefaultConfigurationFileName();
     
     /**
      * Configuration loaded
      */
-    protected AstraRc astraRc;
+    protected AstraRcUtils astraRc;
     
     /**
      * Getter for confifguration AstraRC.
@@ -33,12 +34,12 @@ public abstract class BaseConfigCommand extends BaseCommand {
      * @return
      *      configuration in AstraRc
      */
-    protected AstraRc getAstraRc() {
+    protected AstraRcUtils getAstraRc() {
         if (astraRc == null) {
             if (configFilename != null) {
-                astraRc = new AstraRc(configFilename);
+                astraRc = new AstraRcUtils(configFilename);
             } else {
-                astraRc = new AstraRc();
+                astraRc = new AstraRcUtils();
             }
         }
         return astraRc;
