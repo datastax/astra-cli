@@ -6,7 +6,7 @@
 	<artifactId>astra-shell</artifactId>
 	<name>+ astra-shell</name>
 	<packaging>jar</packaging>
-	<version>0.1.alpha3</version>
+	<version>0.1.alpha4</version>
 
 	<parent>
 		<groupId>com.datastax.astra</groupId>

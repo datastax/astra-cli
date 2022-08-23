@@ -10,7 +10,8 @@ echo "  ██║  ██║███████║   ██║   ██║  �
 echo "  ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝"
 echo " "
 
-ASTRA_CLI_VERSION="0.1.alpha3"
+ASTRA_CLI_VERSION="0.1.alpha4"
+RELEASE_FOLDER=$(dirname "$PWD")/releases/
 
 echo "Building Astra Cli"
 mvn versions:set -DnewVersion=${ASTRA_CLI_VERSION}
@@ -37,7 +38,7 @@ zip -d /tmp/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}.zip \*/.DS_Store
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Archive OK"
 
 echo "Moving Archive"
-cp /tmp/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}.zip /Users/cedricklunven/dev/workspaces/datastax/datastaxdevs.github.io/cli
+cp /tmp/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}.zip $RELEASE_FOLDER
 
 
 

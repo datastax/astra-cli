@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>astra-shell</artifactId>
   <name>+ astra-shell</name>
-  <version>0.1.alpha3</version>
+  <version>0.1.alpha4</version>
   <build>
     <plugins>
       <plugin>
