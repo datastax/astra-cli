@@ -13,7 +13,6 @@ import com.datastax.astra.shell.AstraCli;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.out.LoggerShell;
-import com.datastax.stargate.sdk.utils.Utils;
 
 /**
  * Utilities to work with DSBulk.
@@ -57,7 +56,7 @@ public class DsBulkUtils {
         if (!isDsBulkInstalled()) {
             LoggerShell.info("DSBulk has not been found, downloading, please wait...");
             String destination = AstraCli.ASTRA_HOME + File.separator + DSBULK_TARBALL;
-            Utils.downloadFile(DSBULK_DOWNLOAD, destination);
+            FileUtils.downloadFile(DSBULK_DOWNLOAD, destination);
             File dsbulkTarball = new File (destination);
             if (dsbulkTarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
@@ -73,7 +72,7 @@ public class DsBulkUtils {
                         dsBulkFile.setReadable(true, false);
                         dsBulkFile.setWritable(true, false);
                         
-                        LoggerShell.success("DSBulk is installed");
+                        LoggerShell.success("DSBulk has been installed");
                         dsbulkTarball.delete();
                     }
                 } catch (IOException e) {

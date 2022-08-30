@@ -16,6 +16,7 @@
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.8.5</airline.version>
 		<slf4j.version>1.7.36</slf4j.version>
+		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
 		<commons-cli.version>1.5.0</commons-cli.version>
 		<commons-lang.version>3.12.0</commons-lang.version>
@@ -68,6 +69,10 @@
 			<version>${astra-sdk.version}</version>
 			<exclusions>
 				<exclusion>
+			    	<groupId>com.datastax.oss</groupId>
+					<artifactId>java-driver-core</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>org.apache.pulsar</groupId>
 					<artifactId>pulsar-client-admin</artifactId>
 				</exclusion>
@@ -76,24 +81,12 @@
 					<artifactId>pulsar-client</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.datastax.oss</groupId>
-					<artifactId>java-driver-core</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.everit.json</groupId>
 					<artifactId>org.everit.json.schema</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>io.stargate.grpc</groupId>
-					<artifactId>grpc-proto</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>io.grpc</groupId>
-					<artifactId>grpc-netty-shaded</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -109,25 +102,30 @@
 			<artifactId>commons-compress</artifactId>
 			<version>${commons-compress.version}</version>
 		</dependency>
+		<dependency>
+    		<groupId>org.apache.httpcomponents.client5</groupId>
+  			<artifactId>httpclient5</artifactId>
+  			<version>${httpclient.version}</version>
+		</dependency>
 
 		<!-- Unit tests -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<scope>compile</scope>
 			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
 			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-runner</artifactId>
-			<scope>test</scope>
 			<version>${junit-platform.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.rvesse</groupId>
@@ -329,7 +327,8 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
+
 	<scm>
 		<connection>scm:git:git@github.com:datastax/astra-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:datastax/astra-cli.git</developerConnection>

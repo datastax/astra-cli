@@ -14,14 +14,15 @@ import com.datastax.astra.shell.cmd.config.ConfigList;
 import com.datastax.astra.shell.cmd.config.ConfigSetup;
 import com.datastax.astra.shell.cmd.db.DbCqlShellCli;
 import com.datastax.astra.shell.cmd.db.DbCreateCli;
-import com.datastax.astra.shell.cmd.db.DbCreateKeyspaceCli;
 import com.datastax.astra.shell.cmd.db.DbDSBulkCli;
 import com.datastax.astra.shell.cmd.db.DbDeleteCli;
 import com.datastax.astra.shell.cmd.db.DbDownloadScbCli;
 import com.datastax.astra.shell.cmd.db.DbGetCli;
 import com.datastax.astra.shell.cmd.db.DbListCli;
 import com.datastax.astra.shell.cmd.db.DbResumeCli;
+import com.datastax.astra.shell.cmd.db.DbStatusCli;
 import com.datastax.astra.shell.cmd.db.OperationsDb;
+import com.datastax.astra.shell.cmd.db.keyspace.DbCreateKeyspaceCli;
 import com.datastax.astra.shell.cmd.iam.OperationIam;
 import com.datastax.astra.shell.cmd.iam.RoleGetCli;
 import com.datastax.astra.shell.cmd.iam.RoleListCli;
@@ -59,7 +60,8 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
                   DbCreateKeyspaceCli.class,
                   DbDSBulkCli.class,
                   DbResumeCli.class,
-                  DbDownloadScbCli.class
+                  DbDownloadScbCli.class,
+                  DbStatusCli.class
           }),
           @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
                   ConfigCreate.class,

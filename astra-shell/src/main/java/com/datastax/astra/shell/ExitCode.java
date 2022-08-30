@@ -12,12 +12,17 @@ public enum ExitCode {
     
     /** code. */
     PARSE_ERROR(1),
+    
+    /** code. */
+    UNAVAILABLE(1),
+    
     /** code. */
     INVALID_PARAMETER(10),
     
     /** code. */
     NOT_FOUND(20),
     /** conflict. */
+    
     CONFLICT(21),
     /** conflict. */
     ALREADY_EXIST(22),

@@ -61,12 +61,10 @@ public class LoggerShell {
             logToFile("INFO", text);
         }
         
-        if (ShellContext.getInstance().isVerbose()) {
-            if (ShellContext.getInstance().isNoColor()) {
-                System.out.println("[ OK  ] - " + text);
-            } else {
-                System.out.println(ansi().fg(GREEN).a("[ OK  ] - ").reset().a(text));
-            }
+        if (ShellContext.getInstance().isNoColor()) {
+            System.out.println("[ INFO ] - " + text);
+        } else {
+            System.out.println(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text));
         }
     }
     

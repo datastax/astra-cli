@@ -46,7 +46,7 @@ public class SetupCommandsTest extends AbstractAstraCliTest {
     
     @Test
     public void should_delete_config()  throws Exception {
-        astraCli("config", "delete", "saucisson");
+        astraCli("config", "delete", "celpjus@gmail.com");
     }
     
     @Test

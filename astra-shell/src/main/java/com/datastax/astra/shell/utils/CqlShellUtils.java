@@ -13,7 +13,6 @@ import com.datastax.astra.shell.AstraCli;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.out.LoggerShell;
-import com.datastax.stargate.sdk.utils.Utils;
 
 /**
  * Download and start cqlShell is needed.
@@ -43,7 +42,7 @@ public class CqlShellUtils {
         if (!isCqlShellInstalled()) {
             LoggerShell.info("CqlSh has not been found, downloading, please wait...");
             String destination = AstraCli.ASTRA_HOME + File.separator + CQLSH_TARBALL;
-            Utils.downloadFile(CQLSH_URL, destination);
+            FileUtils.downloadFile(CQLSH_URL, destination);
             File cqlshtarball = new File (destination);
             if (cqlshtarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
@@ -59,7 +58,7 @@ public class CqlShellUtils {
                         cqlshFile.setReadable(true, false);
                         cqlshFile.setWritable(true, false);
                         
-                        LoggerShell.success("Cqlsh is installed");
+                        LoggerShell.success("Cqlsh has been installed");
                         cqlshtarball.delete();
                     }
                 } catch (IOException e) {

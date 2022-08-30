@@ -213,7 +213,21 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>5.8.2</version>
-      <scope>compile</scope>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>opentest4j</artifactId>
+          <groupId>org.opentest4j</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-platform-commons</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>apiguardian-api</artifactId>
+          <groupId>org.apiguardian</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -224,6 +238,10 @@
         <exclusion>
           <artifactId>junit-platform-engine</artifactId>
           <groupId>org.junit.platform</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>apiguardian-api</artifactId>
+          <groupId>org.apiguardian</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -249,6 +267,10 @@
           <artifactId>junit-platform-suite-commons</artifactId>
           <groupId>org.junit.platform</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>apiguardian-api</artifactId>
+          <groupId>org.apiguardian</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -270,6 +292,7 @@
     <maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
     <version.maven.plugin.resources>3.2.0</version.maven.plugin.resources>
     <native.maven.plugin.version>0.9.11</native.maven.plugin.version>
+    <httpclient.version>5.1.2</httpclient.version>
     <version.maven.plugin.fmt>2.2.0</version.maven.plugin.fmt>
     <slf4j.version>1.7.36</slf4j.version>
     <jansi.version>2.4.0</jansi.version>

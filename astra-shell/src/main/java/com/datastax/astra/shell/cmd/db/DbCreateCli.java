@@ -1,8 +1,10 @@
 package com.datastax.astra.shell.cmd.db;
 
+import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.cmd.BaseCliCommand;
 import com.datastax.astra.shell.cmd.BaseCommand;
+import com.datastax.astra.shell.out.LoggerShell;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -18,11 +20,6 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 @Command(name = BaseCommand.CREATE, description = "Create a database with cli")
 public class DbCreateCli extends BaseCliCommand {
     
-    /** Cqlsh Options. */
-    @Option(name = { "--if-not-exist" }, 
-            description = "will create a new DB only if none with same name")
-    protected boolean ifNotExist = false;
-    
     /**
      * Database name or identifier
      */
@@ -30,6 +27,13 @@ public class DbCreateCli extends BaseCliCommand {
     @Arguments(title = "DB_NAME", description = "Database name (not unique)")
     protected String databaseName;
     
+    /** 
+     * Database or keyspace are created when needed
+     **/
+    @Option(name = { "--if-not-exist", "--if-not-exists" }, 
+            description = "will create a new DB only if none with same name")
+    protected boolean ifNotExist = false;
+
     /**
      * Cloud provider region to provision
      */
@@ -44,10 +48,32 @@ public class DbCreateCli extends BaseCliCommand {
             description = "Default keyspace created with the Db")
     protected String defaultKeyspace;
     
+    /** 
+     * Will wait until the database become ACTIVE.
+     */
+    @Option(name = { "--wait" }, 
+            description = "Will wait until the database become ACTIVE")
+    protected boolean wait = false;
+    
+    /** 
+     * Provide a limit to the wait period in seconds, default is 180s. 
+     */
+    @Option(name = { "--timeout" }, 
+            description = "Provide a limit to the wait period in seconds, default is 180s.")
+    protected int timeout = 180;
+    
     /** {@inheritDoc} */
     @Override
     public ExitCode execute() {
-        return OperationsDb.createDb(databaseName, databaseRegion, defaultKeyspace, ifNotExist);
+        ExitCode code = OperationsDb.createDb(databaseName, databaseRegion, defaultKeyspace, ifNotExist);
+        // Creation request is a success but waiting for proper status
+        if (ExitCode.SUCCESS.equals(code) && wait) {
+            code = OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout);
+            if (ExitCode.SUCCESS.equals(code)) {
+                LoggerShell.success("Database '"+ databaseName + "' is now ACTIVE");
+            }
+        }
+        return code;
     }
     
 }

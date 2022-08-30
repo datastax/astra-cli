@@ -39,7 +39,7 @@ import com.datastax.astra.shell.out.ShellTable;
 import com.datastax.astra.shell.utils.CqlShellOptions;
 import com.datastax.astra.shell.utils.CqlShellUtils;
 import com.datastax.astra.shell.utils.DsBulkUtils;
-import com.datastax.stargate.sdk.utils.Utils;
+import com.datastax.astra.shell.utils.FileUtils;
 
 /**
  * Utility class for command `db`
@@ -56,6 +56,9 @@ public class OperationsDb {
     
     /** Command constants. */
     public static final String CMD_INFO              = "info";
+    
+    /** Command constants. */
+    public static final String CMD_STATUS            = "status";
     
     /** Command constants. */
     public static final String CMD_CREATE_KEYSPACE   = "create-keyspace";
@@ -122,6 +125,7 @@ public class OperationsDb {
         // Try with the id (fastest)
         DatabaseClient dbClient = dbsClient.database(db);
         if (dbClient.exist()) {
+            LoggerShell.debug("Database found id=" + dbClient.getDatabaseId());
             return Optional.ofNullable(dbClient);
         }
         
@@ -132,17 +136,52 @@ public class OperationsDb {
         
         // Multiple db with this name
         if (dbs.size() > 1) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "There are '" + dbs.size() + "' dbs with this name, try with id.");
+            LoggerShell.warning("There are more than 1 db named '" + db + "' (" + dbs.size() + ")");
             return Optional.empty();
         }
         
         // Db Found
         if (1 == dbs.size()) {
+            LoggerShell.debug("Database found id=" + dbs.get(0).getId());
             return Optional.ofNullable(dbsClient.database(dbs.get(0).getId()));
         }
-        
         LoggerShell.warning("Database " + db + " has not been found");
         return Optional.empty();
+    }
+    
+    /**
+     * Wait for a DB status.
+     *
+     * @param databaseName
+     *      database name
+     * @param status
+     *      expected status
+     * @param timeout
+     *      timeout number of loop to wait
+     * @return
+     *      db is in correct status
+     */
+    public static ExitCode waitForDbStatus(String databaseName, DatabaseStatusType status, int timeout) {
+        
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (dbClient.isPresent()) {
+           Database db = dbClient.get().find().get();
+           int retries = 0;
+           LoggerShell.success("Database '" + databaseName + "' is '" + db.getStatus() + "' waiting to be '" + status + "' ⏳ ");
+           while (retries++ < timeout && !db.getStatus().equals(status)) {
+               try {
+                Thread.sleep(1000);
+                db = dbClient.get().find().get();
+                LoggerShell.debug("Waiting for db to become " + status + 
+                        " but was " + db.getStatus() + " retrying (" + retries + "/" + timeout + ")");
+               } catch (InterruptedException e) {}
+               
+           }
+           // Success if you did not reach the timeout (meaning status is good)
+           return (retries < timeout) ? ExitCode.SUCCESS :  ExitCode.UNAVAILABLE;
+        }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
+        return ExitCode.NOT_FOUND;
     }
     
     /**
@@ -191,8 +230,7 @@ public class OperationsDb {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         
         if (!ifNotExist || !dbClient.isPresent()) {
-            // We are ok to proceed
-            String dbId = ShellContext.getInstance().getApiDevopsDatabases()
+            ShellContext.getInstance().getApiDevopsDatabases()
                     .createDatabase(DatabaseCreationRequest.builder()
                             .name(databaseName)
                             .tier(OperationsDb.DEFAULT_TIER)
@@ -203,9 +241,9 @@ public class OperationsDb {
                             .cloudRegion(databaseRegion)
                             .keyspace(keyspace)
                             .build());
-            ShellPrinter.outputSuccess("Database [" + dbId + "] created.");
+            ShellPrinter.outputSuccess("Database '" + databaseName + "' has been created.");
         } else {
-            LoggerShell.info("Database already exist id is [" + dbClient.get().getDatabaseId() + "]");
+            LoggerShell.info("Database '" + databaseName + "' already exist id is [" + dbClient.get().getDatabaseId() + "]");
             Set<String> existingkeyspace = dbClient.get().find().get().getInfo().getKeyspaces();
             if (!existingkeyspace.contains(keyspace)) {
                 LoggerShell.info("Keyspace '"+ keyspace + "' does not exist ... creating");
@@ -285,12 +323,11 @@ public class OperationsDb {
                                     db.getId(), 
                                     db.getInfo().getRegion()));
                     keyspacesUrl.append("/v2/schemas/keyspace");
-                    
                     HttpUriRequestBase req = new HttpGet(keyspacesUrl.toString());
                     req.addHeader("accept", "application/json");
                     req.addHeader("X-Cassandra-Token", ShellContext.getInstance().getToken());
                     httpClient.execute(req);
-                    LoggerShell.success("Database will be available soon, use astra db list to track progress");
+                    LoggerShell.success("Database \'" + databaseName +  "' is resuming");
                     return ExitCode.SUCCESS;
                 } catch (IOException e) {
                     throw new IllegalArgumentException(e);
@@ -303,9 +340,28 @@ public class OperationsDb {
                 LoggerShell.error("Your database is in status ERROR and cannot be resumed");
                 return ExitCode.INVALID_PARAMETER;
             } else {
-                LoggerShell.error("Your database is not in status 'HIBERNATED'");
+                LoggerShell.warning("Your database is not in status 'HIBERNATED'");
                 return ExitCode.INVALID_PARAMETER;
             }
+        }
+        LoggerShell.error("Database '" + databaseName + "' has not been found.");
+        return ExitCode.NOT_FOUND;
+    }
+    
+    /**
+     * Display status of a database.
+     * 
+     * @param databaseName
+     *      database name
+     * @return
+     *      exit code
+     */
+    public static ExitCode showDbStatus(String databaseName) {
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (dbClient.isPresent()) {
+            Database db = dbClient.get().find().get();
+            ShellPrinter.outputSuccess("Database '" + databaseName + "' is '" + db.getStatus() + "'");
+            return ExitCode.SUCCESS;
         }
         LoggerShell.error("Database '" + databaseName + "' has not been found.");
         return ExitCode.NOT_FOUND;
@@ -388,7 +444,7 @@ public class OperationsDb {
                     return ExitCode.INVALID_PARAMETER;
                 }
                 dbClient.get().downloadAllSecureConnectBundles(dir);
-                LoggerShell.success("Secure connect bundles have been downloaded.");
+                LoggerShell.info("Secure connect bundles have been downloaded.");
                 return ExitCode.SUCCESS;
                 
             } else if (file != null) {
@@ -399,8 +455,8 @@ public class OperationsDb {
                 }
                 
                 // Download 1 file
-                Utils.downloadFile(dcs.iterator().next().getSecureBundleUrl(), file);
-                LoggerShell.success("Secure connect bundles have been downloaded.");
+                FileUtils.downloadFile(dcs.iterator().next().getSecureBundleUrl(), file);
+                LoggerShell.info("Secure connect bundles have been downloaded.");
             }
             return ExitCode.SUCCESS;
         }
@@ -422,7 +478,7 @@ public class OperationsDb {
             dbClient
                 .get()
                 .downloadAllSecureConnectBundles(AstraCli.ASTRA_HOME + File.separator + AstraCli.SCB_FOLDER);
-            LoggerShell.success("Secure connect bundles have been downloaded.");
+            LoggerShell.info("Secure connect bundles have been downloaded.");
             return ExitCode.SUCCESS;
         }
         LoggerShell.error("Database '" + databaseName + "' has not been found.");

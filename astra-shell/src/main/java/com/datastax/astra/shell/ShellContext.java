@@ -209,7 +209,7 @@ public class ShellContext {
         
         try {
             this.organization = apiDevopsOrganizations.organization();
-            LoggerShell.success("Cli successfully initialized");
+            LoggerShell.info("Cli successfully initialized");
         } catch(Exception e) {
             ShellPrinter.outputError(CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
             INVALID_PARAMETER.exit();
