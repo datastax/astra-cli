@@ -1,17 +1,22 @@
 # Changelog
 
-## v0.1.alpha5 (8/30/2022)
-- [X] - Adding a CHANGELOG to the solution
-- [x] - Remove Stargate dependency (-300KB)
-- [X] - Output on success / human
-- [X] - Wait with --wait for create and resume
-- [ ] - New command DB status
+## v0.1.alpha4 
+
+### In Progress
+- [ ] - Change create keyspace `astra db keyspace create workshops -k XXX`
 - [ ] - Version should no fail if no config
-- [ ] - Remove DSBulk warning on credentials
 - [ ] - Delete keyspace
 - [ ] - List keyspaces
+- [ ] - `astra db keyspace backup workshops -k xxx`
 
-## v0.1.alpha4 (8/22/2022)
+### 8/30/2022
+- [X] - Adding a CHANGELOG to the solution
+- [X] - Output [INFO] on success / human
+- [X] - Wait for async operation to complete with `--wait` for create, resume
+- [X] - New command: `db status`
+- [X] - Remove DSBulk warning on credentials (0 is too low, 1 is too high)
+ 
+###  8/22/2022
 - New commands `db resume`, `db download-scb`
 - Moved to dedicated repository
 

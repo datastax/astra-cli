@@ -6,6 +6,7 @@ import com.datastax.astra.shell.AstraShell;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.cmd.BaseCliCommand;
+import com.datastax.astra.shell.out.LoggerShell;
 import com.datastax.astra.shell.out.ShellPrinter;
 import com.datastax.astra.shell.utils.CommandLineUtils;
 import com.github.rvesse.airline.annotations.Command;
@@ -24,6 +25,21 @@ public class ShellCommand extends BaseCliCommand {
      **/
     @Option(name = { "--version" }, description = "Show version")
     protected boolean version = false;
+    
+    /** {@inheritDoc} */
+    @Override
+    public void run() {
+       // for the command --version configuration is NOT mandatory
+       if (!ctx().isInitialized() && !version) {
+           System.out.println("OVERRIDE");
+           ShellPrinter.outputError(ExitCode.CONFLICT, "A shell command should have the connection set");
+       } else {
+           ctx().setCurrentShellCommand(this);
+           LoggerShell.info("Shell : " + ShellContext.getInstance().getRawShellCommand());
+           LoggerShell.info("Class : " + getClass().getName());
+           execute();
+       }
+    }
     
     /** {@inheritDoc} */
     public ExitCode execute() {

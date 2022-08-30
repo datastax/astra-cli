@@ -21,7 +21,7 @@ public class DbResumeCli extends BaseCliCommand {
      */
     @Required
     @Arguments(title = "DB", description = "Database name or identifier")
-    public String databaseId;
+    public String databaseName;
     
     /** 
      * Will wait until the database become ACTIVE.
@@ -39,10 +39,9 @@ public class DbResumeCli extends BaseCliCommand {
     
     /** {@inheritDoc} */
     public ExitCode execute() {
-        ExitCode code = OperationsDb.resumeDb(databaseId);
-        // Creation request is a success but waiting for proper status
+        ExitCode code = OperationsDb.resumeDb(databaseName);
         if (ExitCode.SUCCESS.equals(code) && wait) {
-            return OperationsDb.waitForDbStatus(databaseId, DatabaseStatusType.ACTIVE, timeout);
+            return OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout);
         }
         return code;
     }

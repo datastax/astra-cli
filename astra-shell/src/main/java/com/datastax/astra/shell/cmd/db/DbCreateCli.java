@@ -4,7 +4,6 @@ import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.cmd.BaseCliCommand;
 import com.datastax.astra.shell.cmd.BaseCommand;
-import com.datastax.astra.shell.out.LoggerShell;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -66,12 +65,8 @@ public class DbCreateCli extends BaseCliCommand {
     @Override
     public ExitCode execute() {
         ExitCode code = OperationsDb.createDb(databaseName, databaseRegion, defaultKeyspace, ifNotExist);
-        // Creation request is a success but waiting for proper status
         if (ExitCode.SUCCESS.equals(code) && wait) {
-            code = OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout);
-            if (ExitCode.SUCCESS.equals(code)) {
-                LoggerShell.success("Database '"+ databaseName + "' is now ACTIVE");
-            }
+            return OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout);
         }
         return code;
     }

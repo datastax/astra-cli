@@ -23,12 +23,14 @@ public class DsbulkTests extends AbstractAstraCliTest {
     public void should_run() {
         astraCli("db", "dsbulk", "workshops", 
                 "load",
-                "-url", "/Users/cedricklunven/Downloads/wh.csv",  
+                "-url", "/Users/cedricklunven/dev/workspaces/datastax-workshops/workshop-introduction-to-machine-learning/jupyter/data/ratings.csv",  
                 "-k", "machine_learning",
-                "-t", "book_by_id",
-                "-delim", "|",
-                "--schema.allowMissingFields", "true"
-                );
+                "-t", "movieratings",
+                "-m", "\"userid,movieid,rating,timestamp\"",
+                "-header", "false",
+                "-delim", ",",
+                "-c", "csv");
+        
     }
 
 }

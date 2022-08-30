@@ -162,23 +162,31 @@ public class OperationsDb {
      *      db is in correct status
      */
     public static ExitCode waitForDbStatus(String databaseName, DatabaseStatusType status, int timeout) {
-        
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
            Database db = dbClient.get().find().get();
            int retries = 0;
+           long start = System.currentTimeMillis();
            LoggerShell.success("Database '" + databaseName + "' is '" + db.getStatus() + "' waiting to be '" + status + "' ⏳ ");
            while (retries++ < timeout && !db.getStatus().equals(status)) {
                try {
                 Thread.sleep(1000);
                 db = dbClient.get().find().get();
-                LoggerShell.debug("Waiting for db to become " + status + 
+                LoggerShell.debug("Waiting for database to become " + status + 
                         " but was " + db.getStatus() + " retrying (" + retries + "/" + timeout + ")");
                } catch (InterruptedException e) {}
-               
            }
            // Success if you did not reach the timeout (meaning status is good)
-           return (retries < timeout) ? ExitCode.SUCCESS :  ExitCode.UNAVAILABLE;
+           if (retries < timeout) {
+               LoggerShell.success("Database '"
+                       + databaseName + "' is now '"  +  status 
+                       + "' (took " + (System.currentTimeMillis() - start) + " millis)");
+               return ExitCode.SUCCESS;
+           }
+           LoggerShell.warning("Timeout (" + timeout + "s) : "
+                   + "Database '" + databaseName + "' status is not yet '" + status 
+                   + "' (current status '" + db.getStatus() + "')");
+           return ExitCode.UNAVAILABLE;
         }
         LoggerShell.error("Database '" + databaseName + "' has not been found.");
         return ExitCode.NOT_FOUND;
@@ -360,7 +368,7 @@ public class OperationsDb {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
             Database db = dbClient.get().find().get();
-            ShellPrinter.outputSuccess("Database '" + databaseName + "' is '" + db.getStatus() + "'");
+            ShellPrinter.outputSuccess("Database '" + databaseName + "' has status '" + db.getStatus() + "'");
             return ExitCode.SUCCESS;
         }
         LoggerShell.error("Database '" + databaseName + "' has not been found.");

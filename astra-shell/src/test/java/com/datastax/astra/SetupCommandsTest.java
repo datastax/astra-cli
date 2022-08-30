@@ -10,6 +10,11 @@ import org.junit.jupiter.api.Test;
 public class SetupCommandsTest extends AbstractAstraCliTest {
     
     @Test
+    public void should_display_version()  throws Exception {
+        astraCli("--version");
+    }
+    
+    @Test
     public void should_display_config()  throws Exception {
         astraCli("config", "list");
     }

@@ -120,6 +120,9 @@ public class DsBulkUtils {
             ExitCode.NOT_FOUND.exit();
         }
         commandDsbulk.add(scb.getAbsolutePath());
+        // Reducing log level
+        commandDsbulk.add("--log.verbosity");
+        commandDsbulk.add("1");
         LoggerShell.info("RUNNING: " + StringUtils.join(commandDsbulk, " "));
         ProcessBuilder pb =  new ProcessBuilder(commandDsbulk.toArray(new String[0]));
         pb.inheritIO();
