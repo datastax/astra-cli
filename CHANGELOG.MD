@@ -8,10 +8,18 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 ## v0.1.alpha4 
 
 ### In Progress
-- [ ] - Change create keyspace `astra db keyspace create workshops -k XXX`
-- [ ] - Delete keyspace
-- [ ] - List keyspaces
-- [ ] - `astra db keyspace backup workshops -k xxx`
+- [ ] - Keyspace as an group option `astra db keyspace create <myDb> -k <myKeyspace>`
+- [ ] - Delete keyspace `astra db keyspace delete <myDb> -k <myKeyspace>`
+- [ ] - List keyspaces `astra db keyspace list <myDb>`
+- [ ] - Show current organization `astra org`
+- [ ] - Add a region to a db `astra db regions create <myDb> -r <regionName>`
+- [ ] - Remove a region to a db `astra db regions delete  <myDb> -r <regionName>`
+- [ ] - List db regions `astra db regions list <myDb>`
+- [ ] - Parking a DB (Astra Classic) `astra db park 
+- [ ] - UnParking a DB (Astra Classic)
+- [ ] - Keyspace backup (leveraging dsbulk) `astra db keyspace backup <myDb> -k <myKeyspace>`
+- [ ] - Keyspace restore (leveraging dsbulk) `astra db keyspace restore <myDb> -k <myKeyspace> -input <folder>`
+
 
 ### 8/30/2022
 - [X] - Adding a CHANGELOG files to check changes
@@ -23,18 +31,25 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 - [X] - Remove DSBulk warning on credentials (0 is too low, 1 is too high)
  
 ###  8/22/2022
-- New commands `db resume`, `db download-scb`
-- Moved to dedicated repository `/datastax/astra-cli`
+- [X] - Moved to dedicated repository `/datastax/astra-cli`
+- [X] - Commands to resume a db `db resume`
+- [X] - Commands to download secure bundles `db download-scb`
+- [X] - Update Setup to be straight forward
 
 ## v0.1.alpha3 (August 2022)
-- New commands: DSBulk Integration
-- Proper installation script
+- [X] - DSBulk Integration `astra db dsbulk dbID load ...`
+- [X] - Release and Installation script
+- [X] - Log file
 
 ## v0.1.alpha2 (July 2022)
-- New commands: CqlSh Integration
-- `astra setup` with token save
+- [X] - CqlSh Integration `astra db cqlsh XX`
+- [X] - Role commands `astra roles`: `list`, `get`
+- [X] - User commands `astra users`: `list`, `get`, `invite`, `delete`
+- `astra setup` with token saved in `~/.astrarc`
+- [X] - option `--no-color`
+- [X] - output `-o csv`
 
 ## v0.1.alpha1 (June 2022)
-- Basics `astra db` CRUD.
-- Configuration Management with `astra config`
-
+- [X] - Basics `astra db` CRUD
+- [X] - Astra Shell with interactive shell
+- [X] - Configuration Management with `astra config`
