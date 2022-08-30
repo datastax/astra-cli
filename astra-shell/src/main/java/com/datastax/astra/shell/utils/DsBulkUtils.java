@@ -22,7 +22,7 @@ import com.datastax.astra.shell.out.LoggerShell;
 public class DsBulkUtils {
 
     /** Version Number. */
-    public static final String DSBULK_VERSION = "1.9.1";
+    public static final String DSBULK_VERSION = "1.10.0";
     
     /** Archive name. */
     public static final String DSBULK_TARBALL = "dsbulk-" + DSBULK_VERSION + ".tar.gz";
@@ -122,7 +122,7 @@ public class DsBulkUtils {
         commandDsbulk.add(scb.getAbsolutePath());
         // Reducing log level
         commandDsbulk.add("--log.verbosity");
-        commandDsbulk.add("1");
+        commandDsbulk.add("normal");
         LoggerShell.info("RUNNING: " + StringUtils.join(commandDsbulk, " "));
         ProcessBuilder pb =  new ProcessBuilder(commandDsbulk.toArray(new String[0]));
         pb.inheritIO();

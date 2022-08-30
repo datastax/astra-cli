@@ -31,7 +31,6 @@ public class ShellCommand extends BaseCliCommand {
     public void run() {
        // for the command --version configuration is NOT mandatory
        if (!ctx().isInitialized() && !version) {
-           System.out.println("OVERRIDE");
            ShellPrinter.outputError(ExitCode.CONFLICT, "A shell command should have the connection set");
        } else {
            ctx().setCurrentShellCommand(this);
