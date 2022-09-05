@@ -12,7 +12,7 @@ import com.datastax.astra.sdk.organizations.domain.User;
 import com.datastax.astra.sdk.utils.IdUtils;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
-import com.datastax.astra.shell.cmd.BaseCommand;
+import com.datastax.astra.shell.cmd.AbstractCmd;
 import com.datastax.astra.shell.out.JsonOutput;
 import com.datastax.astra.shell.out.ShellPrinter;
 import com.datastax.astra.shell.out.ShellTable;
@@ -76,7 +76,7 @@ public class OperationIam {
      * @return
      *      returned code
      */
-    public static ExitCode listUsers(BaseCommand cmd) {
+    public static ExitCode listUsers(AbstractCmd cmd) {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_USER_ID, 37);
         sht.addColumn(COLUMN_USER_EMAIL, 20);
@@ -136,7 +136,7 @@ public class OperationIam {
                 break;
                 case json:
                     ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                            OperationIam.COMMAND_ROLE + " " + BaseCommand.GET + " " + role, r));
+                            OperationIam.COMMAND_ROLE + " " + AbstractCmd.GET + " " + role, r));
                 break;
                 case human:
                 default:
@@ -267,7 +267,7 @@ public class OperationIam {
      * @return
      *      status
      */
-    public static ExitCode deleteUser(BaseCommand cmd, String user) {
+    public static ExitCode deleteUser(AbstractCmd cmd, String user) {
         try {
             OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
             

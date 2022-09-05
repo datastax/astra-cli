@@ -1,7 +1,7 @@
 package com.datastax.astra.shell.cmd.config;
 
 
-import com.datastax.astra.shell.cmd.BaseCommand;
+import com.datastax.astra.shell.cmd.AbstractCmd;
 import com.datastax.astra.shell.utils.AstraRcUtils;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -10,7 +10,7 @@ import com.github.rvesse.airline.annotations.Option;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public abstract class BaseConfigCommand extends BaseCommand {
+public abstract class BaseConfigCommand extends AbstractCmd {
     
     /** worki with roles. */
     public static final String COMMAND_CONFIG = "config";

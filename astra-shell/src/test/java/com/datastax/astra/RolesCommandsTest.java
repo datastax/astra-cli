@@ -2,7 +2,7 @@ package com.datastax.astra;
 
 import org.junit.jupiter.api.Test;
 
-import com.datastax.astra.shell.cmd.BaseCommand;
+import com.datastax.astra.shell.cmd.AbstractCmd;
 
 /**
  * Testing CRUD for roles.
@@ -19,17 +19,17 @@ public class RolesCommandsTest extends AbstractAstraCliTest {
     
     @Test
     public void listRoles()  throws Exception {
-        astraCli("role", BaseCommand.LIST, "-f", "json" , "--verbose");
+        astraCli("role", AbstractCmd.LIST, "-f", "json" , "--verbose");
     }
     
     @Test
     public void showRole() throws Exception {
-        astraCli("role", BaseCommand.GET, "dde8a0e9-f4ae-4b42-b642-9f257436c8da");
+        astraCli("role", AbstractCmd.GET, "dde8a0e9-f4ae-4b42-b642-9f257436c8da");
     }
     
     @Test
     public void showRoleCsv() throws Exception {
-        astraCli("role", BaseCommand.GET, "dde8a0e9-f4ae-4b42-b642-9f257436c8da", "-f", "csv");
+        astraCli("role", AbstractCmd.GET, "dde8a0e9-f4ae-4b42-b642-9f257436c8da", "-f", "csv");
     }
     
     @Test

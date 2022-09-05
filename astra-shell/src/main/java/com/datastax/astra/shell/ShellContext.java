@@ -15,9 +15,9 @@ import com.datastax.astra.sdk.databases.domain.Database;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.datastax.astra.sdk.streaming.StreamingClient;
-import com.datastax.astra.shell.cmd.BaseCliCommand;
-import com.datastax.astra.shell.cmd.BaseCommand;
-import com.datastax.astra.shell.cmd.BaseShellCommand;
+import com.datastax.astra.shell.cmd.BaseCmd;
+import com.datastax.astra.shell.cmd.AbstractCmd;
+import com.datastax.astra.shell.cmd.BaseSh;
 import com.datastax.astra.shell.out.LoggerShell;
 import com.datastax.astra.shell.out.OutputFormat;
 import com.datastax.astra.shell.out.ShellPrinter;
@@ -81,10 +81,10 @@ public class ShellContext {
     // -- Selection --
     
     /** Current command. */
-    private BaseCliCommand startCommand;
+    private BaseCmd startCommand;
     
     /** Current shell command (overriding Cli eventually). */
-    private BaseShellCommand currentShellCommand;
+    private BaseSh currentShellCommand;
     
     /** Raw command. */
     private List<String> rawCommand = new ArrayList<>();
@@ -93,7 +93,7 @@ public class ShellContext {
     private String rawShellCommand;
     
     /** History of commands in shell. */
-    private List<BaseShellCommand> history = new ArrayList<>();
+    private List<BaseSh> history = new ArrayList<>();
     
     /** Organization informations (prompt). */
     private Organization organization;
@@ -112,7 +112,7 @@ public class ShellContext {
      * @return
      *      section is valid
      */
-    private boolean isSectionValid(BaseCommand cmd) {
+    private boolean isSectionValid(AbstractCmd cmd) {
         if (!this.astraRc.isSectionExists(this.configSection)) {
             ShellPrinter.outputError(CANNOT_CONNECT, "No token provided (-t), no config provided (--config), section '" + this.configSection 
                     + "' has not been found in config file '" 
@@ -130,7 +130,7 @@ public class ShellContext {
      * @return
      *      error
      */
-    private boolean isSectionTokenValid(BaseCommand cmd) {
+    private boolean isSectionTokenValid(AbstractCmd cmd) {
         if (StringUtils.isEmpty(this.astraRc
                 .getSection(this.configSection)
                 .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
@@ -149,7 +149,7 @@ public class ShellContext {
      * @param cli
      *      command line cli
      */
-    public void init(BaseCliCommand cli) {
+    public void init(BaseCmd cli) {
         this.startCommand = cli;
         LoggerShell.info("-----------------------------------------------------");
         LoggerShell.info("Command : " + ShellContext.getInstance().getRawCommandString());
@@ -301,8 +301,8 @@ public class ShellContext {
      *      if no color flag is toggled.
      */
     public boolean isNoColor() {
-        BaseShellCommand sh   = getCurrentShellCommand();
-        BaseCliCommand   cli  = getStartCommand();
+        BaseSh sh   = getCurrentShellCommand();
+        BaseCmd   cli  = getStartCommand();
         if (cli == null) return false;
         return (cli.isNoColor() || (sh != null && sh.isNoColor()));
     }
@@ -314,8 +314,8 @@ public class ShellContext {
      *      if verbose
      */
     public boolean isVerbose() {
-        BaseShellCommand sh  = getCurrentShellCommand();
-        BaseCliCommand   cli = getStartCommand();
+        BaseSh sh  = getCurrentShellCommand();
+        BaseCmd   cli = getStartCommand();
         if (cli == null) return false;
         return (cli.isVerbose() || (sh != null && sh.isVerbose()));
     }
@@ -327,7 +327,7 @@ public class ShellContext {
      *      check if logger is enabled
      */
     public boolean isFileLoggerEnabled() {
-        BaseCliCommand  cli = getStartCommand();
+        BaseCmd  cli = getStartCommand();
         return (cli != null && cli.getLogFileWriter() != null);
     }
     
@@ -338,8 +338,8 @@ public class ShellContext {
      *      output format
      */
     public OutputFormat getOutputFormat() {
-        BaseCliCommand  cli = getStartCommand();
-        BaseShellCommand sh = getCurrentShellCommand();
+        BaseCmd  cli = getStartCommand();
+        BaseSh sh = getCurrentShellCommand();
         if (cli == null) return OutputFormat.human;
         if (sh != null)  return sh.getOutput();
         return cli.getOutput();
@@ -411,7 +411,7 @@ public class ShellContext {
      * @return
      *       current value of 'startCommand'
      */
-    public BaseCliCommand getStartCommand() {
+    public BaseCmd getStartCommand() {
         return startCommand;
     }
     
@@ -421,7 +421,7 @@ public class ShellContext {
      * @return
      *       current value of 'currentShellCommand'
      */
-    public BaseShellCommand getCurrentShellCommand() {
+    public BaseSh getCurrentShellCommand() {
         return currentShellCommand;
     }
 
@@ -430,7 +430,7 @@ public class ShellContext {
      * @param currentShellCommand
      * 		new value for 'currentShellCommand '
      */
-    public void setCurrentShellCommand(BaseShellCommand currentShellCommand) {
+    public void setCurrentShellCommand(BaseSh currentShellCommand) {
         this.currentShellCommand = currentShellCommand;
         this.history.add(currentShellCommand);
     }
@@ -441,7 +441,7 @@ public class ShellContext {
      * @return
      *       current value of 'history'
      */
-    public List<BaseShellCommand> getHistory() {
+    public List<BaseSh> getHistory() {
         return history;
     }
 

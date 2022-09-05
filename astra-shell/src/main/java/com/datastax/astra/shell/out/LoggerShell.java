@@ -12,7 +12,7 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.astra.shell.ShellContext;
-import com.datastax.astra.shell.cmd.BaseCliCommand;
+import com.datastax.astra.shell.cmd.BaseCmd;
 
 /**
  * Work with terminal.
@@ -35,7 +35,7 @@ public class LoggerShell {
      *      text to log
      */
     private static void logToFile(String level, String text) {
-        BaseCliCommand  cli = ShellContext.getInstance().getStartCommand();
+        BaseCmd  cli = ShellContext.getInstance().getStartCommand();
         if (cli.getLogFileWriter() != null) {
             try {
                 cli.getLogFileWriter().write(new Date().toString() 
@@ -57,14 +57,16 @@ public class LoggerShell {
      */
     public static void success(String text) {
         
-        if (ShellContext.getInstance().isFileLoggerEnabled()) {
-            logToFile("INFO", text);
+        if (ctx().getOutputFormat().equals(OutputFormat.human)) {
+            if (ShellContext.getInstance().isNoColor()) {
+                System.out.println("[ INFO ] - " + text);
+            } else {
+                System.out.println(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text));
+            }
         }
         
-        if (ShellContext.getInstance().isNoColor()) {
-            System.out.println("[ INFO ] - " + text);
-        } else {
-            System.out.println(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text));
+        if (ShellContext.getInstance().isFileLoggerEnabled()) {
+            logToFile("INFO", text);
         }
     }
     
@@ -75,7 +77,7 @@ public class LoggerShell {
      *       text to be displayed
      */
     public static void error(String text) {
-        if (ctx().isNoColor()) {
+        if (ctx().isNoColor() && ctx().getOutputFormat().equals(OutputFormat.human)) {
             System.out.println("[ERROR] - " + text);
         } else {
             System.out.println(ansi().fg(RED).a("[ERROR] - ").reset().a(text));
@@ -93,14 +95,11 @@ public class LoggerShell {
      *       text to be displayed
      */
     public static void warning(String text) {
-        if (ctx().isVerbose()) {
-            if (ctx().isNoColor()) {
-                System.out.println("[WARN ] - " + text);
-            } else {
-                System.out.println(ansi().fg(YELLOW).a("[WARN ] - ").reset().a(text));
-            }
+        if (ctx().isNoColor() && ctx().getOutputFormat().equals(OutputFormat.human)) {
+            System.out.println("[WARN ] - " + text);
+        } else {
+             System.out.println(ansi().fg(YELLOW).a("[WARN ] - ").reset().a(text));
         }
-        
         if (ctx().isFileLoggerEnabled()) {
             logToFile("WARN", text);
         }
@@ -113,7 +112,7 @@ public class LoggerShell {
      *      text to show in success
      */
     public static void debug(String text) {
-        if (ctx().isVerbose()) {
+        if (ctx().isVerbose() && ctx().getOutputFormat().equals(OutputFormat.human)) {
             if (ctx().isNoColor()) {
                 System.out.println("[DEBUG] - " + text);
             } else {
@@ -133,8 +132,7 @@ public class LoggerShell {
      *      text to show in success
      */
     public static void info(String text) {
-        
-        if (ctx().isVerbose()) {
+        if (ctx().isVerbose() && ctx().getOutputFormat().equals(OutputFormat.human)) {
             if (ctx().isNoColor()) {
                 System.out.println("[INFO ] - " + text);
             } else {

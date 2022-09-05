@@ -22,8 +22,15 @@ public class DatabasesCommandsTest extends AbstractAstraCliTest {
     }
     
     @Test
+    public void resumeWithWait()  throws Exception {
+        astraCli("db", "resume", "test4", "--wait");
+    }
+    
+    @Test
     public void createDb()  throws Exception {
-        astraCli("db", "create", "test", "-r", "eu-central-1", "-ks", "ks1");
+        astraCli("db", "create", "\"Feedly Clone\"", 
+                    "-k", "test4", 
+                    "--if-not-exist", "--wait");
     }
     
     @Test
