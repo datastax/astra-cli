@@ -2,6 +2,7 @@ package com.datastax.astra.shell.cmd.shell;
 
 import java.util.Scanner;
 
+import com.datastax.astra.shell.AstraShell;
 import com.datastax.astra.shell.ExitCode;
 import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.cmd.BaseCmd;

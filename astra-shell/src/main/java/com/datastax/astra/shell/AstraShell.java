@@ -1,4 +1,4 @@
-package com.datastax.astra.shell.cmd.shell;
+package com.datastax.astra.shell;
 
 import com.datastax.astra.shell.cmd.ExitCmd;
 import com.datastax.astra.shell.cmd.HelpCmd;
@@ -19,6 +19,8 @@ import com.datastax.astra.shell.cmd.iam.UserDeleteSh;
 import com.datastax.astra.shell.cmd.iam.UserGetSh;
 import com.datastax.astra.shell.cmd.iam.UserInviteSh;
 import com.datastax.astra.shell.cmd.iam.UserListSh;
+import com.datastax.astra.shell.cmd.shell.ConnectSh;
+import com.datastax.astra.shell.cmd.shell.EmptySh;
 import com.datastax.astra.shell.out.LoggerShell;
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Group;

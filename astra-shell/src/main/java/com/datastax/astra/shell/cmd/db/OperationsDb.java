@@ -551,8 +551,6 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      status code
      */
     public static void downloadCloudSecureBundles(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {

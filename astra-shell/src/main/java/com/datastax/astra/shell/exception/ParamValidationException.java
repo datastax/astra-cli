@@ -21,8 +21,8 @@ public class ParamValidationException extends Exception {
     /**
      * Constructor with dbName
      * 
-     * @param dbName
-     *      db name
+     * @param msg
+     *      error message
      */
     public ParamValidationException(String msg) {
         super(msg);

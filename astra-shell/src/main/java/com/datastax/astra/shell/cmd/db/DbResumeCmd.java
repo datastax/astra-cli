@@ -41,8 +41,7 @@ public class DbResumeCmd extends BaseCmd {
             description = "Provide a limit to the wait period in seconds, default is 180s.")
     protected int timeout = 180;
     
-    /** {@inheritDoc} 
-     * @throws DatabaseNameNotUniqueException */
+    /** {@inheritDoc} */
     public ExitCode execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
         ExitCode code = OperationsDb.resumeDb(databaseName);
