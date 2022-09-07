@@ -5,6 +5,7 @@ import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.shell.exception.DatabaseNotFoundException;
 import com.datastax.astra.shell.exception.ParamValidationException;
+import com.datastax.astra.shell.exception.TenantAlreadyExistExcepion;
 import com.datastax.astra.shell.out.LoggerShell;
 import com.datastax.astra.shell.out.ShellPrinter;
 
@@ -36,6 +37,9 @@ public abstract class BaseSh extends AbstractCmd {
            } catch (DatabaseNotFoundException nfex) {
                ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
                ExitCode.NOT_FOUND.exit();
+           } catch (TenantAlreadyExistExcepion e) {
+               ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
+               ExitCode.ALREADY_EXIST.exit();
            }
        }
     }
@@ -51,11 +55,14 @@ public abstract class BaseSh extends AbstractCmd {
      *      error with parameters
      * @return
      *      returned code by the command
+     * @throws TenantAlreadyExistExcepion 
+     *      tenant was already existing
      */
     public abstract ExitCode execute() 
     throws DatabaseNameNotUniqueException, 
            DatabaseNotFoundException, 
-           ParamValidationException;
+           ParamValidationException, 
+           TenantAlreadyExistExcepion;
     
     /**
      * Get current context.

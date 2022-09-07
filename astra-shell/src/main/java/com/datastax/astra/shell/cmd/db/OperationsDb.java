@@ -34,6 +34,7 @@ import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.cmd.BaseCmd;
 import com.datastax.astra.shell.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.shell.exception.DatabaseNotFoundException;
+import com.datastax.astra.shell.exception.KeyspaceNotFoundException;
 import com.datastax.astra.shell.exception.ParamValidationException;
 import com.datastax.astra.shell.out.JsonOutput;
 import com.datastax.astra.shell.out.LoggerShell;
@@ -68,6 +69,9 @@ public class OperationsDb {
     
     /** Command constants. */
     public static final String CMD_DELETE_KEYSPACE   = "delete-keyspace";
+    
+    /** Command constants. */
+    public static final String CMD_LIST_KEYSPACES   = "list-keyspaces";
     
     /** Command constants. */
     public static final String CMD_CREATE_REGION     = "create-region";
@@ -293,21 +297,12 @@ public class OperationsDb {
         
         // Create keyspace on existing DB when needed
         if (dbStatus.equals(DatabaseStatusType.ACTIVE)) {
-            Set<String> existingkeyspace = db.getInfo().getKeyspaces();
-            if (!existingkeyspace.contains(keyspace)) {
-                LoggerShell.success("Keyspace '"+ keyspace + "' does not exist, creating keyspace.");
-                dbClient.get().createKeyspace(keyspace);
-            } else if (ifNotExist) {
-                LoggerShell.success("Keyspace '" + keyspace + "' already exists. Connecting to keyspace.");
-            } else {
-                LoggerShell.error("Keyspace '" + keyspace + "' already exists. Cannot create another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.");
-            }
+            return OperationsDb.createKeyspace(databaseName, keyspace, ifNotExist);
         } else {
             LoggerShell.error("Database '" + databaseName + "' already exists "
                     + "but was neither ACTIVE not HIBERNATED but '" + dbStatus + "', cannot create keyspace.");
             return ExitCode.UNAVAILABLE;
         }
-        return ExitCode.SUCCESS;
     }
      
     /**
@@ -332,6 +327,40 @@ public class OperationsDb {
                 rf.put(COLUMN_DEFAULT_REGION, db.getInfo().getRegion());
                 rf.put(COLUMN_STATUS,  db.getStatus().name());
                 sht.getCellValues().add(rf);
+        });
+        ShellPrinter.printShellTable(sht);
+        return ExitCode.SUCCESS;
+    }
+    
+    /**
+     * List keyspaces of a database.
+     *
+     * @param databaseName
+     *      database name
+     * @return
+     *      error code
+     * @throws DatabaseNameNotUniqueException
+     *      multiple databases with the name.
+     * @throws DatabaseNotFoundException
+     *      database name has not been found.
+     */
+    public static ExitCode listKeyspaces(String databaseName)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (!dbClient.isPresent()) {
+            throw new DatabaseNotFoundException(databaseName);
+        }
+        Database db = dbClient.get().find().get();
+        ShellTable sht = new ShellTable();
+        sht.addColumn(COLUMN_NAME,    20);
+        db.getInfo().getKeyspaces().forEach(ks -> {
+            Map <String, String> rf = new HashMap<>();
+            if (db.getInfo().getKeyspace().equals(ks)) {
+                rf.put(COLUMN_NAME, ks + " (default)");
+            } else {
+                rf.put(COLUMN_NAME, ks);
+            }
+            sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
         return ExitCode.SUCCESS;
@@ -564,6 +593,40 @@ public class OperationsDb {
     }
     
     /**
+     * Delete a keyspace if exist
+     * 
+     * @param databaseName
+     *      db name
+     * @param keyspaceName
+     *      ks name
+     * @return
+     *      exit code
+     * @throws DatabaseNameNotUniqueException 
+     *      error if db name is not unique
+     * @throws DatabaseNotFoundException 
+     *      error is db is not found
+     * @throws KeyspaceNotFoundException
+     *      keyspace has not been found.
+     */
+    public static ExitCode deleteKeyspace(String databaseName, String keyspaceName)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, KeyspaceNotFoundException {
+        // Validate db Name
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (!dbClient.isPresent()) {
+            throw new DatabaseNotFoundException(databaseName);
+        }
+        
+        Set<String> existingkeyspaces = dbClient.get().find().get().getInfo().getKeyspaces();
+        if (!existingkeyspaces.contains(keyspaceName)) {
+            throw new KeyspaceNotFoundException(keyspaceName);
+        }
+        
+        ShellPrinter.outputWarning(ExitCode.NOT_IMPLEMENTED, "Astra does not provide endpoint to delete a keyspace");
+        return ExitCode.SUCCESS; 
+    }
+    
+    
+    /**
      * Create a keyspace if not exist.
      * 
      * @param ifNotExist
@@ -584,24 +647,24 @@ public class OperationsDb {
     public static ExitCode createKeyspace(String databaseName, String keyspaceName, boolean ifNotExist)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException { 
         
-        // Validate keyspace
-        if (!keyspaceName.matches(OperationsDb.KEYSPACE_NAME_PATTERN)) {
-            throw new ParamValidationException("The keyspace name is not valid, please use snake_case: [a-z0-9_]");
-        }
-        
         // Validate db Name
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (!dbClient.isPresent()) {
             throw new DatabaseNotFoundException(databaseName);
         }
         
+        // Validate keyspace names
+        if (!keyspaceName.matches(OperationsDb.KEYSPACE_NAME_PATTERN)) {
+            throw new ParamValidationException("The keyspace name is not valid, please use snake_case: [a-z0-9_]");
+        }
+        
         Set<String> existingkeyspaces = dbClient.get().find().get().getInfo().getKeyspaces();
         if (existingkeyspaces.contains(keyspaceName)) {
             if (ifNotExist) {
-                LoggerShell.info("Keyspace '" + keyspaceName + "' already exists.");
+                LoggerShell.success("Keyspace '" + keyspaceName + "' already exists. Connecting to keyspace.");
                 return ExitCode.SUCCESS;
             } else {
-                LoggerShell.error("Keyspace '" + keyspaceName + "' already exists");
+                LoggerShell.error("Keyspace '" + keyspaceName + "' already exists. Cannot create another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.");
                 return ExitCode.ALREADY_EXIST;
             }
         } else {

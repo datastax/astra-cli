@@ -7,11 +7,11 @@ import org.fusesource.jansi.AnsiConsole;
 import com.datastax.astra.shell.cmd.HelpCmd;
 import com.datastax.astra.shell.cmd.config.BaseConfigCommand;
 import com.datastax.astra.shell.cmd.config.ConfigCreateCmd;
-import com.datastax.astra.shell.cmd.config.ConfigUseCmd;
 import com.datastax.astra.shell.cmd.config.ConfigDeleteCmd;
 import com.datastax.astra.shell.cmd.config.ConfigGetCmd;
 import com.datastax.astra.shell.cmd.config.ConfigListCmd;
 import com.datastax.astra.shell.cmd.config.ConfigSetupCmd;
+import com.datastax.astra.shell.cmd.config.ConfigUseCmd;
 import com.datastax.astra.shell.cmd.db.DbCqlShellCmd;
 import com.datastax.astra.shell.cmd.db.DbCreateCmd;
 import com.datastax.astra.shell.cmd.db.DbDSBulkCmd;
@@ -23,6 +23,7 @@ import com.datastax.astra.shell.cmd.db.DbResumeCmd;
 import com.datastax.astra.shell.cmd.db.DbStatusCmd;
 import com.datastax.astra.shell.cmd.db.OperationsDb;
 import com.datastax.astra.shell.cmd.db.keyspace.DbCreateKeyspaceCmd;
+import com.datastax.astra.shell.cmd.db.keyspace.DbListKeyspacesCmd;
 import com.datastax.astra.shell.cmd.iam.OperationIam;
 import com.datastax.astra.shell.cmd.iam.RoleGetCmd;
 import com.datastax.astra.shell.cmd.iam.RoleListCmd;
@@ -52,17 +53,22 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
   },
   groups = {
           @Group(name = OperationsDb.DB, description = "Manage databases", commands = { 
-                  DbCreateCmd.class,
-                  DbCqlShellCmd.class,
-                  DbDeleteCmd.class,
-                  DbGetCmd.class,
-                  DbListCmd.class,
-                  DbCreateKeyspaceCmd.class,
-                  DbDSBulkCmd.class,
-                  DbResumeCmd.class,
-                  DbDownloadScbCmd.class,
-                  DbStatusCmd.class
+                  // CRUD
+                  DbCreateCmd.class, DbGetCmd.class, DbDeleteCmd.class,
+                  // Infos
+                  DbListCmd.class, DbStatusCmd.class,
+                  // Operations
+                  DbResumeCmd.class, DbDownloadScbCmd.class,
+                  // External Tools
+                  DbCqlShellCmd.class, DbDSBulkCmd.class,
+                  // Keyspaces
+                  DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class
           }),
+          /*
+          @Group(name = OperationsStreaming.STREAMING, description = "Manage Streaming tenants", commands = { 
+                  StreamCreateCmd.class
+          }),
+          */
           @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
                   ConfigCreateCmd.class,
                   ConfigUseCmd.class,
@@ -138,6 +144,7 @@ public class AstraCli {
                     + "try 'astra help <cmd>' to get help on a particular command "
                     + "(eg: astra help db create)\n - [TAB][TAB] help you with autocompletion.");
             LoggerShell.error("\nError Message:" + e.getMessage());
+            e.printStackTrace();
         }
     }
     

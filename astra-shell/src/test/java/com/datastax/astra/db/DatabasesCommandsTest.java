@@ -53,6 +53,11 @@ public class DatabasesCommandsTest extends AbstractAstraCliTest {
         astraCli("db", "create-keyspace", "foo", "-k", "ks3", "-v");
     }
     
+    @Test
+    public void listKeyspaces()  throws Exception {
+        astraCli("db", "list-keyspaces", "mtg");
+    }
+    
     
     @Test
     public void resumeDB()  throws Exception {

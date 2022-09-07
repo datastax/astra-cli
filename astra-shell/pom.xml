@@ -14,16 +14,16 @@
 	<properties>
 		<astra-sdk.version>0.3.3</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
-		<airline.version>2.8.5</airline.version>
-		<slf4j.version>1.7.36</slf4j.version>
+		<airline.version>2.9.0</airline.version>
+		<slf4j.version>2.0.0</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
 		<commons-cli.version>1.5.0</commons-cli.version>
 		<commons-lang.version>3.12.0</commons-lang.version>
 		<commons-compress.version>1.21</commons-compress.version>
 		<!-- Junit -->
-		<junit-platform.version>1.8.2</junit-platform.version>
-		<junit-jupiter.version>5.8.2</junit-jupiter.version>
+		<junit-platform.version>1.9.0</junit-platform.version>
+		<junit-jupiter.version>5.9.0</junit-jupiter.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>1.8</maven.plugin.compiler.source>
 		<maven.plugin.compiler.target>1.8</maven.plugin.compiler.target>
@@ -68,17 +68,35 @@
 			<artifactId>astra-sdk</artifactId>
 			<version>${astra-sdk.version}</version>
 			<exclusions>
+			<!-- 
+				<exclusion>
+			    	<groupId>com.datastax.stargate</groupId>
+					<artifactId>stargate-sdk</artifactId>
+				</exclusion>
+				-->
+				<exclusion>
+					<groupId>io.grpc</groupId>
+  					<artifactId>grpc-netty-shaded</artifactId>
+				</exclusion>
+				<exclusion>
+	        		<groupId>io.stargate.grpc</groupId>
+	        		<artifactId>grpc-proto</artifactId>
+   				</exclusion>
+				<exclusion>
+			    	<groupId>com.datastax.oss</groupId>
+					<artifactId>java-driver-core</artifactId>
+				</exclusion>
 				<exclusion>
 			    	<groupId>com.datastax.oss</groupId>
 					<artifactId>java-driver-core</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.pulsar</groupId>
-					<artifactId>pulsar-client-admin</artifactId>
+					<artifactId>pulsar-client</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.pulsar</groupId>
-					<artifactId>pulsar-client</artifactId>
+					<artifactId>pulsar-client-admin</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.everit.json</groupId>

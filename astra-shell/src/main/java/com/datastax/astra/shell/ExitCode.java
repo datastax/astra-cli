@@ -14,7 +14,10 @@ public enum ExitCode {
     PARSE_ERROR(1),
     
     /** code. */
-    UNAVAILABLE(1),
+    UNAVAILABLE(2),
+    
+    /** code. */
+    NOT_IMPLEMENTED(3),
     
     /** code. */
     INVALID_PARAMETER(10),

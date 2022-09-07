@@ -11,6 +11,7 @@ import com.datastax.astra.shell.ShellContext;
 import com.datastax.astra.shell.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.shell.exception.DatabaseNotFoundException;
 import com.datastax.astra.shell.exception.ParamValidationException;
+import com.datastax.astra.shell.exception.TenantAlreadyExistExcepion;
 import com.datastax.astra.shell.out.ShellPrinter;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -93,6 +94,9 @@ public abstract class BaseCmd extends BaseSh {
        }  catch (DatabaseNotFoundException nfex) {
            ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
            ExitCode.NOT_FOUND.exit();
+       } catch (TenantAlreadyExistExcepion e) {
+           ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
+           ExitCode.ALREADY_EXIST.exit();
        }
     }
     

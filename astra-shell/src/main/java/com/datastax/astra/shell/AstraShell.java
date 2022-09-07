@@ -12,6 +12,7 @@ import com.datastax.astra.shell.cmd.db.DbListSh;
 import com.datastax.astra.shell.cmd.db.DbUseSh;
 import com.datastax.astra.shell.cmd.db.OperationsDb;
 import com.datastax.astra.shell.cmd.db.keyspace.DbCreateKeyspaceSh;
+import com.datastax.astra.shell.cmd.db.keyspace.DbListKeyspacesSh;
 import com.datastax.astra.shell.cmd.iam.OperationIam;
 import com.datastax.astra.shell.cmd.iam.RoleGetCmd;
 import com.datastax.astra.shell.cmd.iam.RoleListSh;
@@ -55,11 +56,11 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
                   DbListSh.class,
                   DbGetSh.class, 
                   DbInfoSh.class, 
-                  DbUseSh.class
+                  DbUseSh.class,
+                  // Keyspaces
+                  DbCreateKeyspaceSh.class, DbListKeyspacesSh.class
           }),
-          @Group(name = OperationsDb.CMD_KEYSPACE, description = "Manage keyspaces (db must be selected)", commands = {
-                  DbCreateKeyspaceSh.class,
-          }),
+          
           @Group(name= OperationIam.COMMAND_ROLE, description = "Manage roles (RBAC)", commands = {
                   RoleListSh.class,
                   RoleGetCmd.class

@@ -29,24 +29,26 @@ public class ShellCmd extends BaseCmd {
     /** {@inheritDoc} */
     @Override
     public void run() {
-       // for the command --version configuration is NOT mandatory
-       if (!ctx().isInitialized() && !version) {
-           ShellPrinter.outputError(ExitCode.CONFLICT, "A shell command should have the connection set");
-       } else {
-           ctx().setCurrentShellCommand(this);
-           LoggerShell.info("Shell : " + ShellContext.getInstance().getRawShellCommand());
-           LoggerShell.info("Class : " + getClass().getName());
-           execute();
+        
+       // With version no need to init
+       if (version) {
+           ShellPrinter.outputData("version", ShellPrinter.version());
+           ExitCode.SUCCESS.exit();
        }
+        
+       // Initialization of context
+       ShellContext.getInstance().init(this);
+        
+       ctx().setCurrentShellCommand(this);
+       LoggerShell.info("Shell : " + ShellContext.getInstance().getRawShellCommand());
+       LoggerShell.info("Class : " + getClass().getName());
+       execute();
     }
     
     /** {@inheritDoc} */
     public ExitCode execute() {
         
-        if (version) {
-            ShellPrinter.outputData("version", ShellPrinter.version());
-            ExitCode.SUCCESS.exit();
-        }
+        
         
         // Show Banner
         ShellPrinter.banner();

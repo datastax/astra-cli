@@ -13,4 +13,9 @@ public class ShellCommands extends AbstractAstraCliTest {
     public void startInteractive() throws Exception {
         astraCli();
     }
+    
+    @Test
+    public void showVersion() throws Exception {
+        astraCli("--version");
+    }
 }

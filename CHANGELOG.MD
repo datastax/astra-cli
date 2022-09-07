@@ -7,19 +7,28 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 
 ## v0.1.alpha4 
 
-### In Progress
-- [ ] - Keyspace as an group option `astra db keyspace create <myDb> -k <myKeyspace>`
-- [ ] - Delete keyspace `astra db keyspace delete <myDb> -k <myKeyspace>`
-- [ ] - List keyspaces `astra db keyspace list <myDb>`
+### BACKLOG
 - [ ] - Show current organization `astra org`
 - [ ] - Add a region to a db `astra db regions create <myDb> -r <regionName>`
 - [ ] - Remove a region to a db `astra db regions delete  <myDb> -r <regionName>`
 - [ ] - List db regions `astra db regions list <myDb>`
 - [ ] - Parking a DB (Astra Classic) `astra db park 
 - [ ] - UnParking a DB (Astra Classic)
+- [ ] - Delete keyspace `astra db delete-keyspace <myDb> -k <myKeyspace>`
 - [ ] - Keyspace backup (leveraging dsbulk) `astra db keyspace backup <myDb> -k <myKeyspace>`
 - [ ] - Keyspace restore (leveraging dsbulk) `astra db keyspace restore <myDb> -k <myKeyspace> -input <folder>`
 
+- [In progress] - Astra Streaming integration `astra streaming create <my_tenant>`
+- [In progress] - Reduce size of the deliverable
+
+
+### 9/7/2022
+- [X] - Update versions: `slf4j`, `junit`, `airline`
+- [X] - Fix interactive shell
+- [X] - List keyspaces `astra db keyspace list <myDb>`
+- [X] - Implement guardrail to work with 2 db of same name
+- [X] - Mutualisations of exceptions for DatabaseNotFound, DatabaseNotUnique and invalida params
+- [X] - Keyspace as an group option `astra db create-keyspace <myDb> -k <myKeyspace>`
 
 ### 8/30/2022
 - [X] - Adding a CHANGELOG files to check changes
