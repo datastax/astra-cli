@@ -12,7 +12,7 @@
 	<version>0.1.alpha4</version>
 
 	<properties>
-		<astra-sdk.version>0.3.3</astra-sdk.version>
+		<astra-sdk.version>0.3.4-SNAPSHOT</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.0</slf4j.version>

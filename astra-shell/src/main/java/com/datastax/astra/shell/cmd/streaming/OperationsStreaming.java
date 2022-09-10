@@ -49,8 +49,7 @@ public class OperationsStreaming {
     public static ExitCode createStreamingTenant(CreateTenant ct) 
     throws TenantAlreadyExistExcepion {
         StreamingClient streamingClient = ShellContext.getInstance().getApiDevopsStreaming();
-        
-        if (streamingClient.tenant(ct.getPlan()).exist()) {
+        if (streamingClient.tenant(ct.getTenantName()).exist()) {
             throw new TenantAlreadyExistExcepion(ct.getTenantName());
         }
         streamingClient.createTenant(ct);

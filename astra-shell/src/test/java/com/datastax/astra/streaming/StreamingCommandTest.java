@@ -1,4 +1,4 @@
-package com.datastax.astra.db;
+package com.datastax.astra.streaming;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class StreamingCommandTest extends AbstractAstraCliTest {
     
     @Test
     public void should_create_tenant() {
-        astraCli("streaming", "create", "cedrick-20220907");
+        astraCli("streaming", "create", "cedrick-20220910");
     }
 
 }

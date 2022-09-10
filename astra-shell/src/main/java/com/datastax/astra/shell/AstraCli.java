@@ -5,6 +5,7 @@ import java.io.File;
 import org.fusesource.jansi.AnsiConsole;
 
 import com.datastax.astra.shell.cmd.HelpCmd;
+import com.datastax.astra.shell.cmd.UpdateCmd;
 import com.datastax.astra.shell.cmd.config.BaseConfigCommand;
 import com.datastax.astra.shell.cmd.config.ConfigCreateCmd;
 import com.datastax.astra.shell.cmd.config.ConfigDeleteCmd;
@@ -32,6 +33,8 @@ import com.datastax.astra.shell.cmd.iam.UserGetCmd;
 import com.datastax.astra.shell.cmd.iam.UserInviteCmd;
 import com.datastax.astra.shell.cmd.iam.UserListCmd;
 import com.datastax.astra.shell.cmd.shell.ShellCmd;
+import com.datastax.astra.shell.cmd.streaming.OperationsStreaming;
+import com.datastax.astra.shell.cmd.streaming.StreamingCreateCmd;
 import com.datastax.astra.shell.out.LoggerShell;
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Group;
@@ -49,7 +52,8 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
   commands       = { 
     ConfigSetupCmd.class,
     HelpCmd.class,
-    ShellCmd.class
+    ShellCmd.class,
+    UpdateCmd.class
   },
   groups = {
           @Group(name = OperationsDb.DB, description = "Manage databases", commands = { 
@@ -64,11 +68,9 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
                   // Keyspaces
                   DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class
           }),
-          /*
           @Group(name = OperationsStreaming.STREAMING, description = "Manage Streaming tenants", commands = { 
-                  StreamCreateCmd.class
+                  StreamingCreateCmd.class
           }),
-          */
           @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
                   ConfigCreateCmd.class,
                   ConfigUseCmd.class,
@@ -138,7 +140,7 @@ public class AstraCli {
             LoggerShell.error("Invalid command\n - try 'astra help' to get general help\n - "
                     + "try 'astra help <cmd>' to get help on a particular command "
                     + "(eg: astra help db create)\n - [TAB][TAB] help you with autocompletion." );
-            
+            ex.printStackTrace();
         } catch(Exception e) {
             LoggerShell.error("Invalid options or error execution:\n - try 'astra help' to get general help\n - "
                     + "try 'astra help <cmd>' to get help on a particular command "

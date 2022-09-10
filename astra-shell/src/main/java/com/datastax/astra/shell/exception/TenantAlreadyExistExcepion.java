@@ -1,7 +1,5 @@
 package com.datastax.astra.shell.exception;
 
-import com.datastax.astra.shell.out.LoggerShell;
-
 /**
  * Tenant already existing exception
  *
@@ -27,7 +25,6 @@ public class TenantAlreadyExistExcepion extends Exception {
      */
     public TenantAlreadyExistExcepion(String tenantName) {
         super("Tenant name '" + tenantName + "' already exist and must be unique for the cluster.");
-        LoggerShell.warning(getMessage());
     }
     
 }

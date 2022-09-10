@@ -25,7 +25,6 @@ public class FileUtils {
      * Hide Default Constructor
      */
     private FileUtils() {}
-
     
     /**
      * Un Tar file.
@@ -91,6 +90,10 @@ public class FileUtils {
                 if (null!= bis)  bis.close();
             } catch (IOException e) {}
         }
+    }
+    
+    public static void saveFile(String content, String path) {
+        
     }
     
 }

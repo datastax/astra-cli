@@ -23,7 +23,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.CREATE, description = "Create a tenant in streaming with cli")
-public class StreamCreateCmd extends BaseCmd {
+public class StreamingCreateCmd extends BaseCmd {
     /**
      * Database name or identifier
      */

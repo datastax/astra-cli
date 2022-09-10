@@ -11,7 +11,7 @@ import com.github.rvesse.airline.help.Help;
  * @param <T>
  *      generic for the Help Command
  */
-@Command(name = "help", description = "View help for any command")
+@Command(name = "help", description = "Print this help text and exit")
 public class HelpCmd<T> extends Help<T> {
    
     /** {@inheritDoc} */
