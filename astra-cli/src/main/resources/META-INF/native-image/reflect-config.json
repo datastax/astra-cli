@@ -1,0 +1,553 @@
+[
+{
+  "name":"[B"}
+,
+{
+  "name":"[Ljava.lang.String;"}
+,
+{
+  "name":"[Lsun.security.pkcs.SignerInfo;"}
+,
+{
+  "name":"apple.security.AppleProvider",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.CloudProviderType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.Database",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setAvailableActions","parameterTypes":["java.util.Set"] }, 
+    {"name":"setCost","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseCost"] }, 
+    {"name":"setCqlshUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setCreationTime","parameterTypes":["java.lang.String"] }, 
+    {"name":"setDataEndpointUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setGrafanaUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setGraphqlUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setId","parameterTypes":["java.lang.String"] }, 
+    {"name":"setInfo","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseInfo"] }, 
+    {"name":"setMetrics","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseMetrics"] }, 
+    {"name":"setOrgId","parameterTypes":["java.lang.String"] }, 
+    {"name":"setOwnerId","parameterTypes":["java.lang.String"] }, 
+    {"name":"setStatus","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseStatusType"] }, 
+    {"name":"setStorage","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseStorage"] }, 
+    {"name":"setStudioUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setTerminationTime","parameterTypes":["java.lang.String"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.DatabaseCost",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setCostPerDayCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerDayMRCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerDayParkedCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerHourCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerHourMRCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerHourParkedCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerMinCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerMinMRCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerMinParkedCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerMonthCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerMonthMRCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerMonthParkedCents","parameterTypes":["double"] }, 
+    {"name":"setCostPerNetworkGbCents","parameterTypes":["double"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.DatabaseInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setAdditionalKeyspaces","parameterTypes":["java.util.Set"] }, 
+    {"name":"setCapacityUnits","parameterTypes":["int"] }, 
+    {"name":"setCloudProvider","parameterTypes":["com.datastax.astra.sdk.databases.domain.CloudProviderType"] }, 
+    {"name":"setDatacenters","parameterTypes":["java.util.Set"] }, 
+    {"name":"setKeyspace","parameterTypes":["java.lang.String"] }, 
+    {"name":"setKeyspaces","parameterTypes":["java.util.Set"] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setRegion","parameterTypes":["java.lang.String"] }, 
+    {"name":"setTier","parameterTypes":["java.lang.String"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.DatabaseMetrics",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setErrorsTotalCount","parameterTypes":["int"] }, 
+    {"name":"setLiveDataSizeBytes","parameterTypes":["int"] }, 
+    {"name":"setReadRequestsTotalCount","parameterTypes":["int"] }, 
+    {"name":"setWriteRequestsTotalCount","parameterTypes":["int"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.DatabaseStatusType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.DatabaseStorage",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setNodeCount","parameterTypes":["int"] }, 
+    {"name":"setReplicationFactor","parameterTypes":["int"] }, 
+    {"name":"setTotalStorage","parameterTypes":["int"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.databases.domain.Datacenter",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setCapacityUnits","parameterTypes":["int"] }, 
+    {"name":"setCloudProvider","parameterTypes":["com.datastax.astra.sdk.databases.domain.CloudProviderType"] }, 
+    {"name":"setId","parameterTypes":["java.lang.String"] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setRegion","parameterTypes":["java.lang.String"] }, 
+    {"name":"setRegionClassification","parameterTypes":["java.lang.String"] }, 
+    {"name":"setRegionZone","parameterTypes":["java.lang.String"] }, 
+    {"name":"setSecureBundleInternalUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setSecureBundleMigrationProxyInternalUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setSecureBundleMigrationProxyUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setSecureBundleUrl","parameterTypes":["java.lang.String"] }, 
+    {"name":"setTier","parameterTypes":["java.lang.String"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.organizations.domain.ResponseAllUsers",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setOrgId","parameterTypes":["java.lang.String"] }, 
+    {"name":"setOrgName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setUsers","parameterTypes":["java.util.List"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.organizations.domain.Role",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setId","parameterTypes":["java.lang.String"] }, 
+    {"name":"setName","parameterTypes":["java.lang.String"] }, 
+    {"name":"setPolicy","parameterTypes":["com.datastax.astra.sdk.organizations.domain.RolePolicy"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.organizations.domain.RolePolicy",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setActions","parameterTypes":["java.util.List"] }, 
+    {"name":"setDescription","parameterTypes":["java.lang.String"] }, 
+    {"name":"setEffect","parameterTypes":["java.lang.String"] }, 
+    {"name":"setResources","parameterTypes":["java.util.List"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.organizations.domain.User",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[
+    {"name":"<init>","parameterTypes":[] }, 
+    {"name":"setEmail","parameterTypes":["java.lang.String"] }, 
+    {"name":"setRoles","parameterTypes":["java.util.List"] }, 
+    {"name":"setStatus","parameterTypes":["com.datastax.astra.sdk.organizations.domain.UserStatus"] }, 
+    {"name":"setUserId","parameterTypes":["java.lang.String"] }
+  ]}
+,
+{
+  "name":"com.datastax.astra.sdk.organizations.domain.UserStatus",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.BaseCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.ExitCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.HelpCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.QuitCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.AbstractConfigCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.ConfigCreateCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.ConfigDefaultCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.ConfigDeleteCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.ConfigListCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.ConfigShowCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.config.SetupCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.CreateDatabaseCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.CreateDatabaseCommand$CreateDatabaseCommandAlias1",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.DeleteDatabaseCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.DeleteDatabaseCommand$DeleteDatabaseCommandAlias1",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.ShowDatabaseCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.ShowDatabasesCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.ShowDatabasesCommand$ShowDatabasesCommandBis",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.db.UseDatabaseCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.iam.ShowRoleCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.iam.ShowRolesCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.iam.ShowUserCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.iam.ShowUsersCommands",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.shell.ConnectCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.shell.CqlShCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.shell.EmptyCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.shell.ShellCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.show.ShowConfigCommand",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.datastax.astra.shell.cmd.show.ShowConfigsCommand",
+  "allDeclaredFields":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.github.rvesse.airline.help.Help",
+  "allDeclaredFields":true}
+,
+{
+  "name":"com.github.rvesse.airline.types.DefaultTypeConverterProvider",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.AESCipher$General",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.ARCFOURCipher",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.DESCipher",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.DESedeCipher",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.DHParameters",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.TlsKeyMaterialGenerator",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.TlsMasterSecretGenerator",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"com.sun.crypto.provider.TlsPrfGenerator$V12",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"java.io.Serializable",
+  "queryAllDeclaredMethods":true}
+,
+{
+  "name":"java.lang.String"}
+,
+{
+  "name":"java.security.AlgorithmParametersSpi"}
+,
+{
+  "name":"java.security.KeyStoreSpi"}
+,
+{
+  "name":"java.security.SecureRandomParameters"}
+,
+{
+  "name":"java.security.interfaces.ECPrivateKey"}
+,
+{
+  "name":"java.security.interfaces.ECPublicKey"}
+,
+{
+  "name":"java.security.interfaces.RSAPrivateKey"}
+,
+{
+  "name":"java.security.interfaces.RSAPublicKey"}
+,
+{
+  "name":"java.util.Date"}
+,
+{
+  "name":"java.util.HashSet",
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"javax.security.auth.x500.X500Principal",
+  "fields":[{"name":"thisX500Name"}],
+  "methods":[{"name":"<init>","parameterTypes":["sun.security.x509.X500Name"] }]}
+,
+{
+  "name":"sun.security.pkcs12.PKCS12KeyStore",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.DSA$SHA224withDSA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.DSA$SHA256withDSA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.JavaKeyStore$JKS",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.NativePRNG",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.SHA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.SHA2$SHA224",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.SHA2$SHA256",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.SHA5$SHA384",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.SHA5$SHA512",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.X509Factory",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.provider.certpath.PKIXCertPathValidator",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.rsa.PSSParameters",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.rsa.RSAKeyFactory$Legacy",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.rsa.RSAPSSSignature",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.rsa.RSASignature$SHA224withRSA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.rsa.RSASignature$SHA256withRSA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.rsa.RSASignature$SHA512withRSA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.ssl.SSLContextImpl$TLSContext",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+  "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+{
+  "name":"sun.security.util.ObjectIdentifier"}
+,
+{
+  "name":"sun.security.x509.AuthorityInfoAccessExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.AuthorityKeyIdentifierExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.BasicConstraintsExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.CRLDistributionPointsExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.CertificateExtensions"}
+,
+{
+  "name":"sun.security.x509.CertificatePoliciesExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.ExtendedKeyUsageExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.IssuerAlternativeNameExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.KeyUsageExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.NetscapeCertTypeExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.PrivateKeyUsageExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.SubjectAlternativeNameExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+,
+{
+  "name":"sun.security.x509.SubjectKeyIdentifierExtension",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Boolean","java.lang.Object"] }]}
+
+]

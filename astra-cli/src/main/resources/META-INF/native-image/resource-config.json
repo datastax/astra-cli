@@ -1,0 +1,33 @@
+{
+  "resources":{
+  "includes":[
+    {
+      "pattern":"\\QMETA-INF/services/com.github.rvesse.airline.help.sections.factories.HelpSectionFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.github.rvesse.airline.restrictions.factories.ArgumentsRestrictionFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.github.rvesse.airline.restrictions.factories.GlobalRestrictionFactory\\E"
+    }, 
+    {
+      "pattern":"\\QMETA-INF/services/com.github.rvesse.airline.restrictions.factories.OptionRestrictionFactory\\E"
+    }, 
+    {
+      "pattern":"\\Qmozilla/public-suffix-list.txt\\E"
+    }, 
+    {
+      "pattern":"\\Qorg/apache/hc/client5/version.properties\\E"
+    }, 
+    {
+      "pattern":"\\Qorg/fusesource/jansi/internal/native/Mac/x86_64/libjansi.jnilib\\E"
+    }, 
+    {
+      "pattern":"\\Qorg/fusesource/jansi/jansi.properties\\E"
+    }, 
+    {
+      "pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"
+    }
+  ]},
+  "bundles":[]
+}
