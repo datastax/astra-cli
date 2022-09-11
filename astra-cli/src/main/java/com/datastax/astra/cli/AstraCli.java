@@ -4,39 +4,41 @@ import java.io.File;
 
 import org.fusesource.jansi.AnsiConsole;
 
-import com.datastax.astra.cli.cmd.HelpCmd;
-import com.datastax.astra.cli.cmd.UpdateCmd;
-import com.datastax.astra.cli.cmd.config.BaseConfigCommand;
-import com.datastax.astra.cli.cmd.config.ConfigCreateCmd;
-import com.datastax.astra.cli.cmd.config.ConfigDeleteCmd;
-import com.datastax.astra.cli.cmd.config.ConfigGetCmd;
-import com.datastax.astra.cli.cmd.config.ConfigListCmd;
-import com.datastax.astra.cli.cmd.config.ConfigSetupCmd;
-import com.datastax.astra.cli.cmd.config.ConfigUseCmd;
-import com.datastax.astra.cli.cmd.db.DbCreateCmd;
-import com.datastax.astra.cli.cmd.db.DbDeleteCmd;
-import com.datastax.astra.cli.cmd.db.DbDownloadScbCmd;
-import com.datastax.astra.cli.cmd.db.DbGetCmd;
-import com.datastax.astra.cli.cmd.db.DbListCmd;
-import com.datastax.astra.cli.cmd.db.DbResumeCmd;
-import com.datastax.astra.cli.cmd.db.DbStatusCmd;
-import com.datastax.astra.cli.cmd.db.OperationsDb;
-import com.datastax.astra.cli.cmd.db.cqlsh.DbCqlShellCmd;
-import com.datastax.astra.cli.cmd.db.dsbulk.DbDSBulkCmd;
-import com.datastax.astra.cli.cmd.db.keyspace.DbCreateKeyspaceCmd;
-import com.datastax.astra.cli.cmd.db.keyspace.DbListKeyspacesCmd;
-import com.datastax.astra.cli.cmd.iam.OperationIam;
-import com.datastax.astra.cli.cmd.iam.RoleGetCmd;
-import com.datastax.astra.cli.cmd.iam.RoleListCmd;
-import com.datastax.astra.cli.cmd.iam.UserDeleteCmd;
-import com.datastax.astra.cli.cmd.iam.UserGetCmd;
-import com.datastax.astra.cli.cmd.iam.UserInviteCmd;
-import com.datastax.astra.cli.cmd.iam.UserListCmd;
-import com.datastax.astra.cli.cmd.shell.ShellCmd;
-import com.datastax.astra.cli.cmd.streaming.OperationsStreaming;
-import com.datastax.astra.cli.cmd.streaming.StreamingCreateCmd;
-import com.datastax.astra.cli.cmd.streaming.pulsarshell.PulsarShellCmd;
-import com.datastax.astra.cli.out.LoggerShell;
+import com.datastax.astra.cli.config.BaseConfigCommand;
+import com.datastax.astra.cli.config.ConfigCreateCmd;
+import com.datastax.astra.cli.config.ConfigDeleteCmd;
+import com.datastax.astra.cli.config.ConfigGetCmd;
+import com.datastax.astra.cli.config.ConfigListCmd;
+import com.datastax.astra.cli.config.ConfigSetupCmd;
+import com.datastax.astra.cli.config.ConfigUseCmd;
+import com.datastax.astra.cli.core.HelpCmd;
+import com.datastax.astra.cli.core.UpdateCmd;
+import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.core.shell.ShellCmd;
+import com.datastax.astra.cli.db.DbCreateCmd;
+import com.datastax.astra.cli.db.DbDeleteCmd;
+import com.datastax.astra.cli.db.DbDownloadScbCmd;
+import com.datastax.astra.cli.db.DbGetCmd;
+import com.datastax.astra.cli.db.DbListCmd;
+import com.datastax.astra.cli.db.DbResumeCmd;
+import com.datastax.astra.cli.db.DbStatusCmd;
+import com.datastax.astra.cli.db.OperationsDb;
+import com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd;
+import com.datastax.astra.cli.db.dsbulk.DbDSBulkCmd;
+import com.datastax.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
+import com.datastax.astra.cli.db.keyspace.DbListKeyspacesCmd;
+import com.datastax.astra.cli.iam.OperationIam;
+import com.datastax.astra.cli.iam.RoleGetCmd;
+import com.datastax.astra.cli.iam.RoleListCmd;
+import com.datastax.astra.cli.iam.UserDeleteCmd;
+import com.datastax.astra.cli.iam.UserGetCmd;
+import com.datastax.astra.cli.iam.UserInviteCmd;
+import com.datastax.astra.cli.iam.UserListCmd;
+import com.datastax.astra.cli.streaming.OperationsStreaming;
+import com.datastax.astra.cli.streaming.StreamingCreateCmd;
+import com.datastax.astra.cli.streaming.StreamingGetCmd;
+import com.datastax.astra.cli.streaming.StreamingListCmd;
+import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
@@ -57,6 +59,15 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
     UpdateCmd.class
   },
   groups = {
+          
+          @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
+                  ConfigCreateCmd.class,
+                  ConfigUseCmd.class,
+                  ConfigDeleteCmd.class,
+                  ConfigGetCmd.class,
+                  ConfigListCmd.class
+          }),
+          
           @Group(name = OperationsDb.DB, description = "Manage databases", commands = { 
                   // CRUD
                   DbCreateCmd.class, DbGetCmd.class, DbDeleteCmd.class,
@@ -69,28 +80,19 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
                   // Keyspaces
                   DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class
           }),
+          
           @Group(name = OperationsStreaming.STREAMING, description = "Manage Streaming tenants", commands = { 
                   StreamingCreateCmd.class,
+                  StreamingGetCmd.class,
+                  StreamingListCmd.class,
                   PulsarShellCmd.class
           }),
-          @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
-                  ConfigCreateCmd.class,
-                  ConfigUseCmd.class,
-                  ConfigDeleteCmd.class,
-                  ConfigGetCmd.class,
-                  ConfigListCmd.class
-          }),
+          
           @Group(name= OperationIam.COMMAND_ROLE, description = "Manage roles (RBAC)", commands = {
                   RoleListCmd.class,
                   RoleGetCmd.class
           }),
-          /*
-          @Group(name= OperationsStreaming.STREAMING, description = "Manage Astra Streaming", commands = {
-                  PulsarClientCli.class,
-                  PulsarAdminCli.class,
-                  PulsarPerfCli.class
-          }),
-          */
+         
           @Group(name= OperationIam.COMMAND_USER, description = "Manage users", commands = {
                   UserListCmd.class,
                   UserGetCmd.class,

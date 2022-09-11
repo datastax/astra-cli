@@ -2,7 +2,7 @@ package com.datastax.astra;
 
 import org.junit.jupiter.api.Test;
 
-import com.datastax.astra.cli.cmd.AbstractCmd;
+import com.datastax.astra.cli.core.AbstractCmd;
 
 /**
  * Testing CRUD for roles.

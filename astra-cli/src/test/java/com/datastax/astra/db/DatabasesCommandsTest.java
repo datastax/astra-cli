@@ -76,4 +76,14 @@ public class DatabasesCommandsTest extends AbstractAstraCliTest {
         astraCli("xxx");
     }
     
+    @Test
+    public void getDbKey()  throws Exception {
+        astraCli("db", "get","mtg", "--key", "region");
+    }
+    
+    @Test
+    public void helpDbGet()  throws Exception {
+        astraCli("help","db", "get");
+    }
+    
 }

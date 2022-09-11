@@ -1,0 +1,10 @@
+webServiceUrl=https://pulsar-/Users/cedricklunven/.astra/lunastreaming-shell-2.10.1.1/conf:client-aws-useast2-trollsquad-2022.conf-aws.api.streaming.datastax.com
+brokerServiceUrl=pulsar+ssl://pulsar-/Users/cedricklunven/.astra/lunastreaming-shell-2.10.1.1/conf:client-aws-useast2-trollsquad-2022.conf-aws.streaming.datastax.com:6651
+authPlugin=org.apache.pulsar.client.impl.auth.AuthenticationToken
+authParams=token:useast2
+tlsAllowInsecureConnection=false
+tlsEnableHostnameVerification=true
+useKeyStoreTls=false
+tlsTrustStoreType=JKS
+tlsTrustStorePath=
+tlsTrustStorePassword=

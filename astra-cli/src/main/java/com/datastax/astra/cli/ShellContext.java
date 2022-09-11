@@ -9,12 +9,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.cli.cmd.AbstractCmd;
-import com.datastax.astra.cli.cmd.BaseCmd;
-import com.datastax.astra.cli.cmd.BaseSh;
-import com.datastax.astra.cli.out.LoggerShell;
-import com.datastax.astra.cli.out.OutputFormat;
-import com.datastax.astra.cli.out.ShellPrinter;
+import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.core.out.OutputFormat;
+import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.DatabasesClient;

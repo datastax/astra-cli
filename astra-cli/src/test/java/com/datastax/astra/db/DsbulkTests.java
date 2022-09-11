@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.datastax.astra.AbstractAstraCliTest;
-import com.datastax.astra.cli.cmd.db.dsbulk.DsBulkUtils;
+import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 
 /**
  * Tests DSBulk.

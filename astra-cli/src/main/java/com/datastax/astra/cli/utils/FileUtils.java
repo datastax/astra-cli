@@ -72,7 +72,7 @@ public class FileUtils {
         try {
             url = new URL(urlStr);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("Accept", "bytes");
+            //urlConnection.setRequestProperty("Accept", "bytes");
             bis = new BufferedInputStream(urlConnection.getInputStream());
             fis = new FileOutputStream(file);
             byte[] buffer = new byte[1024];

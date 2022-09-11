@@ -3,7 +3,7 @@ package com.datastax.astra;
 import org.fusesource.jansi.Ansi;
 
 import com.datastax.astra.cli.AstraCli;
-import com.datastax.astra.cli.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.ShellPrinter;
 
 /**
  * Super class for tests.
