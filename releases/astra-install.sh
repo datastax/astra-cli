@@ -27,7 +27,7 @@ echo "  ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  �
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.1.alpha4"
+ASTRA_CLI_VERSION="0.1.alpha5"
 
 echo "Installing Astra Cli $ASTRA_CLI_VERSION, please wait...      "
 
