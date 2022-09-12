@@ -52,6 +52,9 @@
             <version>${junit-jupiter.version}</version>
           </dependency>
         </dependencies>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>

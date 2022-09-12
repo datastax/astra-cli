@@ -20,7 +20,21 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public class DbGetCmd extends BaseCmd {
 
     /** Enum for db get. */
-    public static enum DbGetKeys { id, status, cloud, keyspace, keyspaces, region, regions};
+    public static enum DbGetKeys { 
+        /* db unique identifier */
+        id, 
+        /* db status */
+        status, 
+        /* cloud provider */
+        cloud, 
+        /* default keyspace */
+        keyspace, 
+        /* all keyspaces */
+        keyspaces, 
+        /* default region */
+        region, 
+        /* all regions */
+        regions};
     
     /** name of the DB. */
     @Required

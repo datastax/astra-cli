@@ -5,10 +5,7 @@ To get the latest version:
 curl -Ls "https://dtsx.io/get-astra-cli" | bash
 ```
 
-## v0.1.alpha4 
-
 ### BACKLOG
-- [`ACTIVE`] - Astra Streaming integration `astra streaming create <my_tenant>`. SDK needs update to get rid of pulsar client dependency and keep the library small
 - [ ] - Show current organization `astra org`
 - [ ] - Add a region to a db `astra db create-region <myDb> -r <regionName>`
 - [ ] - Remove a region to a db `astra db delete-region <myDb> -r <regionName>`
@@ -17,6 +14,25 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 - [ ] - UnParking a DB (Astra Classic) `astra db unpark <myDb>`
 - [ ] - Keyspace backup (leveraging dsbulk) `astra db backup-keyspace <myDb> -k <myKeyspace>`
 - [ ] - Keyspace restore (leveraging dsbulk) `astra db restore-keyspace <myDb> -k <myKeyspace> -input <folder>`
+
+
+## v0.1.alpha5
+
+### 9/12/2022
+
+- [x] - Support for PulsarShell (yeah!) `astra streaming pulsar-shell <my_tenant>`
+- [x] - Test Tenant existence `astra streaming exist <my_tenant>`
+- [x] - Decoupling PulsarClient from SDK (0.3.4)
+- [x] - Tenant creation `astra streaming create <my_tenant>`
+- [x] - List Tenants `astra streaming list`
+- [x] - Delete Tenants `astra streaming delete <my_tenant>`
+- [x] - Get Tenant details `astra streaming get <my_tenant>`
+- [x] - Get Tenant token `astra streaming pulsar-token <my_tenant>`
+- [x] - Get Tenant status `astra streaming status <my_tenant> `
+- [x] - Get Raw Tenant property `astra streaming get <my_tenant> --key cloud`
+
+
+## v0.1.alpha4
 
 ### 9/7/2022
 - [x] - Reduce size of the deliverable

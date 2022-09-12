@@ -36,8 +36,12 @@ import com.datastax.astra.cli.iam.UserInviteCmd;
 import com.datastax.astra.cli.iam.UserListCmd;
 import com.datastax.astra.cli.streaming.OperationsStreaming;
 import com.datastax.astra.cli.streaming.StreamingCreateCmd;
+import com.datastax.astra.cli.streaming.StreamingDeleteCmd;
+import com.datastax.astra.cli.streaming.StreamingExistCmd;
 import com.datastax.astra.cli.streaming.StreamingGetCmd;
 import com.datastax.astra.cli.streaming.StreamingListCmd;
+import com.datastax.astra.cli.streaming.StreamingPulsarTokenCmd;
+import com.datastax.astra.cli.streaming.StreamingStatusCmd;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Group;
@@ -82,9 +86,12 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
           }),
           
           @Group(name = OperationsStreaming.STREAMING, description = "Manage Streaming tenants", commands = { 
-                  StreamingCreateCmd.class,
-                  StreamingGetCmd.class,
-                  StreamingListCmd.class,
+                  // CRUD
+                  StreamingCreateCmd.class, StreamingGetCmd.class, StreamingDeleteCmd.class,
+                  // Infos
+                  StreamingExistCmd.class, StreamingListCmd.class, 
+                  StreamingStatusCmd.class, StreamingPulsarTokenCmd.class,
+                  // External Tools
                   PulsarShellCmd.class
           }),
           

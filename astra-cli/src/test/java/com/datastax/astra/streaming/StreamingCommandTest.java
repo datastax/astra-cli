@@ -35,5 +35,31 @@ public class StreamingCommandTest extends AbstractAstraCliTest {
     public void should_get_tenant() {
         astraCli("streaming", "get", "trollsquad-2022");
     }
+    
+    @Test
+    public void should_get_tenant_cloud() {
+        astraCli("streaming", "get", "trollsquad-2022", "--key", "cloud");
+    }
+    
+    @Test
+    public void should_get_tenant_pulsar_token() {
+        astraCli("streaming", "pulsar-token", "trollsquad-2022");
+    }
+    
+    @Test
+    public void should_get_status() {
+        astraCli("streaming", "status", "trollsquad-2022");
+    }
+    
+    @Test
+    public void should_delete_tenant() {
+        astraCli("streaming", "delete", "cedrick-20220911");
+    }
+    
+    @Test
+    public void should_exist_tenant() {
+        astraCli("streaming", "exist", "cedrick-20220910");
+    }
+    
 
 }

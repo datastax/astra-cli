@@ -12,11 +12,13 @@ import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.core.out.ShellTable;
+import com.datastax.astra.cli.streaming.StreamingGetCmd.StreamingGetKeys;
 import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellUtils;
 import com.datastax.astra.sdk.streaming.StreamingClient;
+import com.datastax.astra.sdk.streaming.TenantClient;
 import com.datastax.astra.sdk.streaming.domain.CreateTenant;
 import com.datastax.astra.sdk.streaming.domain.Tenant;
 
@@ -27,6 +29,13 @@ import com.datastax.astra.sdk.streaming.domain.Tenant;
  */
 public class OperationsStreaming {
 
+    /** Command constants. */
+    public static final String CMD_STATUS    = "status";
+    /** Command constants. */
+    public static final String CMD_EXIST     = "exist";
+    /** Command constants. */
+    public static final String CMD_GET_TOKEN = "pulsar-token";
+    
     /** Command constants. */
     public static final String STREAMING = "streaming";
     /** default cloud.*/
@@ -47,6 +56,53 @@ public class OperationsStreaming {
     /** columns. */
     public static final String COLUMN_STATUS = "Status";
     
+    /** limit resource usage by caching tenant clients. */
+    private static Map<String, TenantClient> cacheTenantClient = new HashMap<>();
+    
+    /**
+     * Syntax Sugar to work with Streaming Devops Apis.
+     * 
+     * @return
+     *      streaming tenant.
+     */
+    private static StreamingClient streamingClient() {
+        return  ShellContext.getInstance().getApiDevopsStreaming();
+    }
+    
+    /**
+     * Syntax sugar and caching for tenant clients.
+     * 
+     * @param tenantName
+     *      current tenant name.
+     * @return
+     *      tenant client or error
+     */
+    private static TenantClient tenantClient(String tenantName) {
+        if (!cacheTenantClient.containsKey(tenantName)) {
+            cacheTenantClient.put(tenantName, streamingClient().tenant(tenantName));
+        }
+        return cacheTenantClient.get(tenantName);
+    }
+    
+    /**
+     * Get tenant informations.
+     *
+     * @param tenantName
+     *      tenant name
+     * @return
+     *      tenant when exist
+     * @throws TenantNotFoundException
+     *      tenant has not been foind 
+     */
+    private static Tenant getTenant(String tenantName) 
+    throws TenantNotFoundException {
+        Optional<Tenant> optTenant = tenantClient(tenantName).find();
+        if (!optTenant.isPresent()) {
+            throw new TenantNotFoundException(tenantName);
+        }
+        return optTenant.get();
+    }
+    
     /**
      * List Tenants.
      * 
@@ -59,8 +115,7 @@ public class OperationsStreaming {
         sht.addColumn(COLUMN_CLOUD,   10);
         sht.addColumn(COLUMN_REGION,  15);
         sht.addColumn(COLUMN_STATUS,  15);
-        ShellContext.getInstance()
-           .getApiDevopsStreaming()
+        streamingClient()
            .tenants()
            .forEach(tnt -> {
                 Map <String, String> rf = new HashMap<>();
@@ -79,37 +134,126 @@ public class OperationsStreaming {
      *
      * @param tenantName
      *      tenant name
+     * @param key
+     *      display only one key
      * @throws TenantNotFoundException 
      *      error is tenant is not found
      * @return
      *      status code
      */
-    public static ExitCode showTenant(String tenantName)
+    public static ExitCode showTenant(String tenantName, StreamingGetKeys key)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
-        ShellTable sht = ShellTable.propertyTable(15, 40);
-        sht.addPropertyRow("Name", tnt.getTenantName());
-        sht.addPropertyRow("Status", tnt.getStatus());
-        sht.addPropertyRow("Cloud Provider", tnt.getCloudProvider());
-        sht.addPropertyRow("Cloud region", tnt.getCloudRegion());
-        sht.addPropertyRow("ClusterName", tnt.getClusterName());
-        sht.addPropertyRow("PulsarVersion", tnt.getPulsarVersion());
-        sht.addPropertyRow("JvmVersion", tnt.getJvmVersion());
-        sht.addPropertyRow("Plan", tnt.getPlan());
-        sht.addPropertyRow("WebServiceUrl", tnt.getWebServiceUrl());
-        sht.addPropertyRow("BrokerServiceUrl", tnt.getBrokerServiceUrl());
-        sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
-        switch(ShellContext.getInstance().getOutputFormat()) {
-            case json:
-                ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                            STREAMING + " " + BaseCmd.GET + " " + tenantName, sht));
-            break;
-            case csv:
-            case human:
-            default:
-                ShellPrinter.printShellTable(sht);
-            break;
-         }
+        if (key == null) {
+            ShellTable sht = ShellTable.propertyTable(15, 40);
+            sht.addPropertyRow("Name", tnt.getTenantName());
+            sht.addPropertyRow("Status", tnt.getStatus());
+            sht.addPropertyRow("Cloud Provider", tnt.getCloudProvider());
+            sht.addPropertyRow("Cloud region", tnt.getCloudRegion());
+            sht.addPropertyRow("Cluster Name", tnt.getClusterName());
+            sht.addPropertyRow("Pulsar Version", tnt.getPulsarVersion());
+            sht.addPropertyRow("Jvm Version", tnt.getJvmVersion());
+            sht.addPropertyRow("Plan", tnt.getPlan());
+            sht.addPropertyRow("WebServiceUrl", tnt.getWebServiceUrl());
+            sht.addPropertyRow("BrokerServiceUrl", tnt.getBrokerServiceUrl());
+            sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
+            switch(ShellContext.getInstance().getOutputFormat()) {
+                case json:
+                    ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
+                                STREAMING + " " + BaseCmd.GET + " " + tenantName, sht));
+                break;
+                case csv:
+                case human:
+                default:
+                    ShellPrinter.printShellTable(sht);
+                break;
+             }
+        }  else {
+            switch(key) {
+                case cloud:
+                    System.out.println(tnt.getCloudProvider());
+                break;
+                case pulsar_token:
+                    System.out.println(tnt.getPulsarToken());
+                break;
+                case region:
+                    System.out.println(tnt.getCloudRegion());
+                break;
+                case status:
+                    System.out.println(tnt.getStatus());
+                break;
+             
+            }
+        }
+        
+        return ExitCode.SUCCESS;
+    }
+    
+    /**
+     * Delete a dabatase if exist.
+     * 
+     * @param tenantName
+     *      tenant name
+     * @return
+     *      status
+     * @throws TenantNotFoundException 
+     *      error if tenant name is not unique
+     */
+    public static ExitCode deleteTenant(String tenantName) 
+    throws TenantNotFoundException {
+        getTenant(tenantName);
+        tenantClient(tenantName).delete();
+        ShellPrinter.outputSuccess("Deleting Tenant '" + tenantName + "'");
+        return ExitCode.SUCCESS;
+    }
+    
+    /**
+     * Display status of a tenant.
+     * 
+     * @param tenantName
+     *      tenant name
+     * @throws TenantNotFoundException 
+     *      error if tenant is not found
+     * @return
+     *      exit code
+     */
+    public static ExitCode showTenantStatus(String tenantName)
+    throws TenantNotFoundException {
+        Tenant tnt = getTenant(tenantName);
+        ShellPrinter.outputSuccess("Tenant '" + tenantName + "' has status '" + tnt.getStatus() + "'");
+        return ExitCode.SUCCESS;
+    }
+    
+    /**
+     * Display existence of a tenant.
+     * 
+     * @param tenantName
+     *      tenant name
+     * @return
+     *      exit code
+     */
+    public static ExitCode showTenantExistence(String tenantName) {
+        if (tenantClient(tenantName).exist()) {
+            ShellPrinter.outputSuccess("Tenant '" + tenantName + "' exists.");
+        } else {
+            ShellPrinter.outputSuccess("Tenant '" + tenantName + "' does not exist.");
+        }
+        return ExitCode.SUCCESS;
+    }
+    
+    /**
+     * Display token of a tenant.
+     * 
+     * @param tenantName
+     *      database name
+     * @throws TenantNotFoundException 
+     *      error if tenant is not found
+     * @return
+     *      exit code
+     */
+    public static ExitCode showTenantPulsarToken(String tenantName)
+    throws TenantNotFoundException {
+        System.out.println(getTenant(tenantName).getPulsarToken());
         return ExitCode.SUCCESS;
     }
     
@@ -125,34 +269,15 @@ public class OperationsStreaming {
      */
     public static ExitCode createStreamingTenant(CreateTenant ct) 
     throws TenantAlreadyExistExcepion {
-        StreamingClient streamingClient = ShellContext.getInstance().getApiDevopsStreaming();
-        if (streamingClient.tenant(ct.getTenantName()).exist()) {
+        if (tenantClient(ct.getTenantName()).exist()) {
             throw new TenantAlreadyExistExcepion(ct.getTenantName());
         }
-        streamingClient.createTenant(ct);
+        streamingClient().createTenant(ct);
         ShellPrinter.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
         return ExitCode.SUCCESS;
     }
     
-    /**
-     * Get tenant informations.
-     *
-     * @param tenantName
-     *      tenant name
-     * @return
-     *      tenant when exist
-     * @throws TenantNotFoundException
-     *      tenant has not been foind 
-     */
-    private static Tenant getTenant(String tenantName) 
-    throws TenantNotFoundException {
-        StreamingClient streamingClient = ShellContext.getInstance().getApiDevopsStreaming();
-        Optional<Tenant> optTenant = streamingClient.tenant(tenantName).find();
-        if (!optTenant.isPresent()) {
-            throw new TenantNotFoundException(tenantName);
-        }
-        return optTenant.get();
-    }
+    
    
     /**
      * Provide path of the pulsar conf for a tenant.
