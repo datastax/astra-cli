@@ -20,6 +20,10 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 
 ### 9/12/2022
 
+**DB:**
+- [x] - Show property of db `astra db get --key id`
+
+**STREAMING:**
 - [x] - Support for PulsarShell (yeah!) `astra streaming pulsar-shell <my_tenant>`
 - [x] - Test Tenant existence `astra streaming exist <my_tenant>`
 - [x] - Decoupling PulsarClient from SDK (0.3.4)
