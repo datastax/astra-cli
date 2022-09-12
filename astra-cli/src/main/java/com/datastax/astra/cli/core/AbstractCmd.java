@@ -25,6 +25,9 @@ public abstract class AbstractCmd implements Runnable {
     /** Command constants. */
     public static final String USE       = "use";
     
+    /** Command constants. */
+    public static final String ORG       = "org";
+    
     // --- Flags ---
     
     /** 

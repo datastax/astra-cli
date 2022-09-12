@@ -11,6 +11,7 @@ import com.datastax.astra.cli.config.ConfigGetCmd;
 import com.datastax.astra.cli.config.ConfigListCmd;
 import com.datastax.astra.cli.config.ConfigSetupCmd;
 import com.datastax.astra.cli.config.ConfigUseCmd;
+import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.HelpCmd;
 import com.datastax.astra.cli.core.UpdateCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
@@ -34,6 +35,11 @@ import com.datastax.astra.cli.iam.UserDeleteCmd;
 import com.datastax.astra.cli.iam.UserGetCmd;
 import com.datastax.astra.cli.iam.UserInviteCmd;
 import com.datastax.astra.cli.iam.UserListCmd;
+import com.datastax.astra.cli.org.OrgGetCmd;
+import com.datastax.astra.cli.org.OrgIdCmd;
+import com.datastax.astra.cli.org.OrgListRegionsClassicCmd;
+import com.datastax.astra.cli.org.OrgListRegionsServerlessCmd;
+import com.datastax.astra.cli.org.OrgNameCmd;
 import com.datastax.astra.cli.streaming.OperationsStreaming;
 import com.datastax.astra.cli.streaming.StreamingCreateCmd;
 import com.datastax.astra.cli.streaming.StreamingDeleteCmd;
@@ -60,9 +66,17 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
     ConfigSetupCmd.class,
     HelpCmd.class,
     ShellCmd.class,
-    UpdateCmd.class
+    UpdateCmd.class,
+    OrgGetCmd.class
   },
   groups = {
+          
+          @Group(name = AbstractCmd.ORG, defaultCommand = OrgGetCmd.class,  description = "Display Organization Info", commands = { 
+                 OrgIdCmd.class, 
+                 OrgNameCmd.class,
+                 OrgListRegionsClassicCmd.class, 
+                 OrgListRegionsServerlessCmd.class
+          }),
           
           @Group(name = BaseConfigCommand.COMMAND_CONFIG, description = "Manage configuration file", commands = { 
                   ConfigCreateCmd.class,
