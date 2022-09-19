@@ -11,7 +11,6 @@ import com.datastax.astra.cli.core.AbstractCmd;
  */
 public class RolesCommandsTest extends AbstractAstraCliTest {
 
-
     @Test
     public void interactive()  throws Exception {
         astraCli();

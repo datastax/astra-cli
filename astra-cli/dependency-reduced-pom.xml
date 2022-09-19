@@ -53,7 +53,9 @@
           </dependency>
         </dependencies>
         <configuration>
-          <skipTests>true</skipTests>
+          <configuration>
+            <argLine>-agentlib:native-image-agent=config-output-dir=META-INF/native-image</argLine>
+          </configuration>
         </configuration>
       </plugin>
       <plugin>
@@ -176,7 +178,7 @@
           <plugin>
             <groupId>org.graalvm.buildtools</groupId>
             <artifactId>native-maven-plugin</artifactId>
-            <version>${native.maven.plugin.version}</version>
+            <version>0.9.11</version>
             <extensions>true</extensions>
             <executions>
               <execution>
@@ -185,6 +187,25 @@
                 <goals>
                   <goal>build</goal>
                 </goals>
+                <configuration>
+                  <imageName>astra-native</imageName>
+                  <useArgFile>false</useArgFile>
+                  <quickBuild>false</quickBuild>
+                  <skipNativeBuild>false</skipNativeBuild>
+                  <mainClass>com.datastax.astra.cli.AstraCli</mainClass>
+                  <fallback>false</fallback>
+                  <verbose>true</verbose>
+                  <buildArgs>
+                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                    <buildArg>-H:EnableURLProtocols=http,https</buildArg>
+                    <buildArg>--allow-incomplete-classpath</buildArg>
+                    <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                    <buildArg>--verbose</buildArg>
+                  </buildArgs>
+                  <classpath>
+                    <param>/Users/cedricklunven/dev/workspaces/datastax/astra-cli/astra-cli/target/astra-cli-0.1.alpha5-shaded.jar</param>
+                  </classpath>
+                </configuration>
               </execution>
             </executions>
             <configuration>
@@ -203,7 +224,7 @@
                 <buildArg>--verbose</buildArg>
               </buildArgs>
               <classpath>
-                <param>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</param>
+                <param>/Users/cedricklunven/dev/workspaces/datastax/astra-cli/astra-cli/target/astra-cli-0.1.alpha5-shaded.jar</param>
               </classpath>
             </configuration>
           </plugin>

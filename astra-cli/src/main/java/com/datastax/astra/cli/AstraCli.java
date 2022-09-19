@@ -67,7 +67,7 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
     HelpCmd.class,
     ShellCmd.class,
     UpdateCmd.class,
-    OrgGetCmd.class
+    OrgGetCmd.class,
   },
   groups = {
           

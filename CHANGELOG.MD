@@ -6,7 +6,6 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 ```
 
 ### BACKLOG
-- [ ] - Show current organization `astra org`
 - [ ] - Add a region to a db `astra db create-region <myDb> -r <regionName>`
 - [ ] - Remove a region to a db `astra db delete-region <myDb> -r <regionName>`
 - [ ] - List db regions `astra db list-regions`
@@ -17,6 +16,13 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 
 
 ## v0.1.alpha5
+
+### 9/13/2022
+- [x] - Show current organization `astra org`
+- [x] - Show current organization `astra org id`
+- [x] - Show current organization `astra org name`
+- [x] - Show current organization `astra org list-regions-serverless`
+- [x] - Show current organization `astra org list-regions-classic`
 
 ### 9/12/2022
 
