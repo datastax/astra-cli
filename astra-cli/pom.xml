@@ -9,7 +9,7 @@
 	<description>Command Line Interface for DataStax Astra</description>
 	<packaging>jar</packaging>
 	<inceptionYear>2022</inceptionYear>
-	<version>0.1.alpha5</version>
+	<version>0.1.alpha6</version>
 
 	<properties>
 		<astra-sdk.version>0.3.4-SNAPSHOT</astra-sdk.version>

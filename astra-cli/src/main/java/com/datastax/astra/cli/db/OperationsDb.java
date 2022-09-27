@@ -413,9 +413,8 @@ public class OperationsDb {
             case HIBERNATED:
                 resumeDbRequest(db);
             case RESUMING:
-                LoggerShell.warning("Database '" + databaseName + "'is already resuming, please wait");
-                throw new InvalidDatabaseStateException(databaseName, 
-                        DatabaseStatusType.HIBERNATED, db.getStatus());
+                LoggerShell.warning("Database '" + databaseName + "'is already resuming");
+            break;
             default:
                 LoggerShell.warning("Your database has not 'HIBERNATED' status.");
                 throw new InvalidDatabaseStateException(databaseName, 
