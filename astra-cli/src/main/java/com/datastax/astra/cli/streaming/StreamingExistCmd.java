@@ -1,7 +1,6 @@
 package com.datastax.astra.cli.streaming;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -12,7 +11,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsStreaming.CMD_EXIST, description = "Show existence of a tenant")
-public class StreamingExistCmd extends BaseCmd {
+public class StreamingExistCmd extends AbstractConnectedCmd {
 
     /** name of the DB. */
     @Required
@@ -20,8 +19,8 @@ public class StreamingExistCmd extends BaseCmd {
     public String tenant;
     
     /** {@inheritDoc} */
-    public ExitCode execute() {
-        return OperationsStreaming.showTenantExistence(tenant);
+    public void execute() {
+        OperationsStreaming.showTenantExistence(tenant);
     }
 
 }

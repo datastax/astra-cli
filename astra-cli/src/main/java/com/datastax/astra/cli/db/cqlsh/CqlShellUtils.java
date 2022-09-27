@@ -7,10 +7,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.cli.AstraCli;
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.db.exception.SecureBundleNotFoundException;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.domain.Database;
@@ -38,20 +39,24 @@ public class CqlShellUtils {
     
     /**
      * Download targz and unzip.
+     *
+     * @throws FileSystemException
+     *      error when accessing file system 
      */
-    public static void installCqlShellAstra() {
+    public static void installCqlShellAstra() 
+    throws FileSystemException {
         if (!isCqlShellInstalled()) {
             LoggerShell.info("CqlSh has not been found, downloading, please wait...");
-            String destination = AstraCli.ASTRA_HOME + File.separator + CQLSH_TARBALL;
+            String destination = AstraCliUtils.ASTRA_HOME + File.separator + CQLSH_TARBALL;
             FileUtils.downloadFile(CQLSH_URL, destination);
             File cqlshtarball = new File (destination);
             if (cqlshtarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
                 try {
-                    FileUtils.extactTargz(cqlshtarball, new File (AstraCli.ASTRA_HOME));
+                    FileUtils.extactTargz(cqlshtarball, new File (AstraCliUtils.ASTRA_HOME));
                     if (isCqlShellInstalled()) {
                         // Change file permission
-                        File cqlshFile = new File(AstraCli.ASTRA_HOME + File.separator  
+                        File cqlshFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  
                                 + CQLSH_FOLDER + File.separator 
                                 + "bin" + File.separator  
                                 + "cqlsh");
@@ -64,7 +69,7 @@ public class CqlShellUtils {
                     }
                 } catch (IOException e) {
                     LoggerShell.error("Cannot extract tar archive:" + e.getMessage());
-                    ExitCode.PARSE_ERROR.exit();
+                    throw new FileSystemException("Cannot extract tar archive:" + e.getMessage(), e);
                 }
             }
         } else {
@@ -83,12 +88,14 @@ public class CqlShellUtils {
      *      unix process for cqlsh
      * @throws IOException
      *      errors occured
+     * @throws SecureBundleNotFoundException
+     *      secure connec bundle has not been found
      */
     public static Process runCqlShellAstra(CqlShellOptions options, Database db) 
-    throws IOException {
+    throws IOException, SecureBundleNotFoundException {
         List<String> commandCqlSh = new ArrayList<>();
         commandCqlSh.add(new StringBuilder()
-                .append(AstraCli.ASTRA_HOME + File.separator + CQLSH_FOLDER)
+                .append(AstraCliUtils.ASTRA_HOME + File.separator + CQLSH_FOLDER)
                 .append(File.separator + "bin")
                 .append(File.separator + "cqlsh")
                 .toString());
@@ -98,12 +105,12 @@ public class CqlShellUtils {
         commandCqlSh.add(ShellContext.getInstance().getToken());
         commandCqlSh.add("-b");
         File scb = new File(new StringBuilder()
-                .append(AstraCli.ASTRA_HOME + File.separator + AstraCli.SCB_FOLDER + File.separator)
+                .append(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator)
                 .append(AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()))
                 .toString());
         if (!scb.exists()) {
             LoggerShell.error("Cloud Secure Bundle '" + scb.getAbsolutePath() + "' has not been found.");
-            ExitCode.NOT_FOUND.exit();
+                    throw new SecureBundleNotFoundException(scb.getAbsolutePath());
         }
         commandCqlSh.add(scb.getAbsolutePath());
         
@@ -145,7 +152,7 @@ public class CqlShellUtils {
      *      if the folder exist
      */
     private static boolean isCqlShellInstalled() {
-       File cqlshAstra = new File(AstraCli.ASTRA_HOME + File.separator + CQLSH_FOLDER);
+       File cqlshAstra = new File(AstraCliUtils.ASTRA_HOME + File.separator + CQLSH_FOLDER);
        return cqlshAstra.exists() && cqlshAstra.isDirectory();
     }
    

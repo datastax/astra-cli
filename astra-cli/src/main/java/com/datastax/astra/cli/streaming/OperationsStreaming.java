@@ -7,7 +7,9 @@ import java.util.Optional;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.CannotStartProcessException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellPrinter;
@@ -105,11 +107,8 @@ public class OperationsStreaming {
     
     /**
      * List Tenants.
-     * 
-     * @return
-     *      returned code
      */
-    public static ExitCode listTenants() {
+    public static void listTenants() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_CLOUD,   10);
@@ -126,7 +125,6 @@ public class OperationsStreaming {
                 sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -138,10 +136,8 @@ public class OperationsStreaming {
      *      display only one key
      * @throws TenantNotFoundException 
      *      error is tenant is not found
-     * @return
-     *      status code
      */
-    public static ExitCode showTenant(String tenantName, StreamingGetKeys key)
+    public static void showTenant(String tenantName, StreamingGetKeys key)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
         if (key == null) {
@@ -160,7 +156,7 @@ public class OperationsStreaming {
             switch(ShellContext.getInstance().getOutputFormat()) {
                 case json:
                     ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                                STREAMING + " " + BaseCmd.GET + " " + tenantName, sht));
+                                STREAMING + " " + AbstractConnectedCmd.GET + " " + tenantName, sht));
                 break;
                 case csv:
                 case human:
@@ -185,8 +181,6 @@ public class OperationsStreaming {
              
             }
         }
-        
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -199,12 +193,11 @@ public class OperationsStreaming {
      * @throws TenantNotFoundException 
      *      error if tenant name is not unique
      */
-    public static ExitCode deleteTenant(String tenantName) 
+    public static void deleteTenant(String tenantName) 
     throws TenantNotFoundException {
         getTenant(tenantName);
         tenantClient(tenantName).delete();
         ShellPrinter.outputSuccess("Deleting Tenant '" + tenantName + "'");
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -214,14 +207,11 @@ public class OperationsStreaming {
      *      tenant name
      * @throws TenantNotFoundException 
      *      error if tenant is not found
-     * @return
-     *      exit code
      */
-    public static ExitCode showTenantStatus(String tenantName)
+    public static void showTenantStatus(String tenantName)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
         ShellPrinter.outputSuccess("Tenant '" + tenantName + "' has status '" + tnt.getStatus() + "'");
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -229,16 +219,13 @@ public class OperationsStreaming {
      * 
      * @param tenantName
      *      tenant name
-     * @return
-     *      exit code
      */
-    public static ExitCode showTenantExistence(String tenantName) {
+    public static void showTenantExistence(String tenantName) {
         if (tenantClient(tenantName).exist()) {
             ShellPrinter.outputSuccess("Tenant '" + tenantName + "' exists.");
         } else {
             ShellPrinter.outputSuccess("Tenant '" + tenantName + "' does not exist.");
         }
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -248,13 +235,10 @@ public class OperationsStreaming {
      *      database name
      * @throws TenantNotFoundException 
      *      error if tenant is not found
-     * @return
-     *      exit code
      */
-    public static ExitCode showTenantPulsarToken(String tenantName)
+    public static void showTenantPulsarToken(String tenantName)
     throws TenantNotFoundException {
         System.out.println(getTenant(tenantName).getPulsarToken());
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -264,20 +248,15 @@ public class OperationsStreaming {
      *      tenant creation request
      * @throws TenantAlreadyExistExcepion
      *      already exist exception 
-     * @return
-     *      returned code.
      */
-    public static ExitCode createStreamingTenant(CreateTenant ct) 
+    public static void createStreamingTenant(CreateTenant ct) 
     throws TenantAlreadyExistExcepion {
         if (tenantClient(ct.getTenantName()).exist()) {
             throw new TenantAlreadyExistExcepion(ct.getTenantName());
         }
         streamingClient().createTenant(ct);
         ShellPrinter.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
-        return ExitCode.SUCCESS;
     }
-    
-    
    
     /**
      * Provide path of the pulsar conf for a tenant.
@@ -322,13 +301,15 @@ public class OperationsStreaming {
      *      options from the comman dline
      * @param tenantName
      *      current tenant name
-     * @return
-     *      error code
      * @throws TenantNotFoundException
      *      error if tenant is not found 
+     * @throws CannotStartProcessException
+     *      cannot start the process 
+     * @throws FileSystemException
+     *      cannot access configuration file
      */
-    public static ExitCode startPulsarShell(PulsarShellOptions options, String tenantName) 
-    throws TenantNotFoundException {
+    public static void startPulsarShell(PulsarShellOptions options, String tenantName) 
+    throws TenantNotFoundException, CannotStartProcessException, FileSystemException {
         
         // Retrieve tenant information from devops Apis or exception
         Tenant tenant = getTenant(tenantName);
@@ -343,14 +324,13 @@ public class OperationsStreaming {
             System.out.println("Pulsar-shell is starting please wait for connection establishment...");
             Process cqlShProc = PulsarShellUtils.runPulsarShell(options, tenant, getPulsarConfFile(tenant));
             if (cqlShProc == null) {
-                ExitCode.INTERNAL_ERROR.exit();
+                throw new CannotStartProcessException("pulsar-shell");
             }
             cqlShProc.waitFor();
         } catch (Exception e) {
             LoggerShell.error("Cannot start Pulsar Shel :" + e.getMessage());
-            ExitCode.INTERNAL_ERROR.exit();
+            throw new CannotStartProcessException("pulsar-shell", e);
         }
-        return ExitCode.SUCCESS;
     }
     
 }

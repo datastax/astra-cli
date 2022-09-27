@@ -20,21 +20,40 @@ public enum ExitCode {
     NOT_IMPLEMENTED(3),
     
     /** code. */
-    INVALID_PARAMETER(10),
+    INVALID_PARAMETER(4),
     
     /** code. */
-    NOT_FOUND(20),
-    /** conflict. */
+    NOT_FOUND(5),
     
-    CONFLICT(21),
     /** conflict. */
-    ALREADY_EXIST(22),
+    CONFLICT(6),
+    
+    /** conflict. */
+    ALREADY_EXIST(7),
     
     /** code. */
-    CANNOT_CONNECT(30), 
+    CANNOT_CONNECT(8), 
+    
+    /** code. */
+    CONFIGURATION(9), 
+    
+    /** code. */
+    ILLEGAL_STATE(10), 
+    
+    /** code. */
+    INVALID_ARGUMENT(11),
+    
+    /** code. */
+    INVALID_OPTION(12),
+    
+    /** code. */
+    INVALID_OPTION_VALUE(13),
+    
+    /** code. */
+    UNRECOGNIZED_COMMAND(14),
     
     /** Internal error. */
-    INTERNAL_ERROR(40);
+    INTERNAL_ERROR(100);
     
     /* Exit code. */
     private int code;
@@ -58,14 +77,5 @@ public enum ExitCode {
     public int getCode() {
         return code;
     }
-    
-    /**
-     * Exit the prgram.
-     */
-    public void exit() {
-        System.exit(code);
-    }
-     
-    
 
 }

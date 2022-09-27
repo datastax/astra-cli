@@ -1,9 +1,8 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -16,7 +15,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.DELETE, description = "Delete an existing database")
-public class DbDeleteCmd extends BaseCmd {
+public class DbDeleteCmd extends AbstractConnectedCmd {
     
     /**
      * Database name or identifier
@@ -26,9 +25,9 @@ public class DbDeleteCmd extends BaseCmd {
     public String databaseId;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        return OperationsDb.deleteDb(databaseId);
+    public void execute()
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
+        OperationsDb.deleteDb(databaseId);
     }
     
 }

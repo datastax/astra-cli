@@ -1,8 +1,7 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -17,7 +16,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsDb.CMD_DOWNLOAD_SCB, description = "Delete an existing database")
-public class DbDownloadScbCmd extends BaseCmd {
+public class DbDownloadScbCmd extends AbstractConnectedCmd {
     
     /**
      * Database name or identifier
@@ -40,9 +39,9 @@ public class DbDownloadScbCmd extends BaseCmd {
     
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        return OperationsDb.downloadCloudSecureBundles(databaseId, outputDirectory, outputFile);
+    public void execute()
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
+        OperationsDb.downloadCloudSecureBundles(databaseId, outputDirectory, outputFile);
     }
     
 }

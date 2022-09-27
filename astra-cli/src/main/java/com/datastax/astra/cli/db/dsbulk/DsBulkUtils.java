@@ -7,10 +7,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.cli.AstraCli;
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.db.exception.SecureBundleNotFoundException;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.domain.Database;
@@ -46,26 +47,29 @@ public class DsBulkUtils {
      *      if the folder exist
      */
     public static boolean isDsBulkInstalled() {
-       File dsbulkFolder = new File(AstraCli.ASTRA_HOME + File.separator + DSBULK_FOLDER);
+       File dsbulkFolder = new File(AstraCliUtils.ASTRA_HOME + File.separator + DSBULK_FOLDER);
        return dsbulkFolder.exists() && dsbulkFolder.isDirectory();
     }
     
     /**
      * Download targz and unzip.
+     *
+     * @throws FileSystemException
+     *      cannot untar archive on disk;
      */
-    public static void installDsBulk() {
+    public static void installDsBulk() throws FileSystemException {
         if (!isDsBulkInstalled()) {
             LoggerShell.success("dsbulk first launch, downloading (~25MB), please wait...");
-            String destination = AstraCli.ASTRA_HOME + File.separator + DSBULK_TARBALL;
+            String destination = AstraCliUtils.ASTRA_HOME + File.separator + DSBULK_TARBALL;
             FileUtils.downloadFile(DSBULK_DOWNLOAD, destination);
             File dsbulkTarball = new File (destination);
             if (dsbulkTarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
                 try {
-                    FileUtils.extactTargz(dsbulkTarball, new File (AstraCli.ASTRA_HOME));
+                    FileUtils.extactTargz(dsbulkTarball, new File (AstraCliUtils.ASTRA_HOME));
                     if (isDsBulkInstalled()) {
                         // Change file permission
-                        File dsBulkFile = new File(AstraCli.ASTRA_HOME + File.separator  
+                        File dsBulkFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  
                                 + DSBULK_FOLDER + File.separator 
                                 + "bin" + File.separator  
                                 + "dsbulk");
@@ -78,7 +82,7 @@ public class DsBulkUtils {
                     }
                 } catch (IOException e) {
                     LoggerShell.error("Cannot extract tar archive:" + e.getMessage());
-                    ExitCode.PARSE_ERROR.exit();
+                        throw new FileSystemException("Cannot extract tar archive:" + e.getMessage(), e);
                 }
             }
         } else {
@@ -97,12 +101,14 @@ public class DsBulkUtils {
      *      unix process for cqlsh
      * @throws IOException
      *      errors occured
+     * @throws SecureBundleNotFoundException
+     *      cannot access secure bundle
      */
     public static Process runDsBulk(Database db, List<String> dsbulkParams) 
-    throws IOException {
+    throws IOException, SecureBundleNotFoundException {
         List<String> commandDsbulk = new ArrayList<>();
         commandDsbulk.add(new StringBuilder()
-                .append(AstraCli.ASTRA_HOME + File.separator + DSBULK_FOLDER)
+                .append(AstraCliUtils.ASTRA_HOME + File.separator + DSBULK_FOLDER)
                 .append(File.separator + "bin")
                 .append(File.separator + "dsbulk")
                 .toString());
@@ -113,12 +119,12 @@ public class DsBulkUtils {
         commandDsbulk.add(ShellContext.getInstance().getToken());
         commandDsbulk.add("-b");
         File scb = new File(new StringBuilder()
-                .append(AstraCli.ASTRA_HOME + File.separator + AstraCli.SCB_FOLDER + File.separator)
+                .append(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator)
                 .append(AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()))
                 .toString());
         if (!scb.exists()) {
             LoggerShell.error("Cloud Secure Bundle '" + scb.getAbsolutePath() + "' has not been found.");
-            ExitCode.NOT_FOUND.exit();
+            throw new SecureBundleNotFoundException(scb.getAbsolutePath());
         }
         commandDsbulk.add(scb.getAbsolutePath());
         // Reducing log level

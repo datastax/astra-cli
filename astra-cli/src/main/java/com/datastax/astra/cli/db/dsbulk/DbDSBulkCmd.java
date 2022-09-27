@@ -2,12 +2,9 @@ package com.datastax.astra.cli.db.dsbulk;
 
 import java.util.List;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.OperationsDb;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 
@@ -17,19 +14,18 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "dsbulk", description = "Load data leveraging DSBulk")
-public class DbDSBulkCmd extends BaseCmd {
+public class DbDSBulkCmd extends AbstractConnectedCmd {
 
     @Arguments(description = "Use DSBulk arguments")
     private List<String> dsbulkArguments;
     
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
+    public void execute() throws Exception {
         if (dsbulkArguments.size() < 3) {
-            throw new IllegalArgumentException("Please use format astra db dsbulk <DB_NAME> [dsbulk options]");
+            throw new InvalidArgumentException("Please use format astra db dsbulk <DB_NAME> [dsbulk options]");
         }
-        return OperationsDb.runDsBulk(dsbulkArguments);
+        OperationsDb.runDsBulk(dsbulkArguments);
     }
     
 }

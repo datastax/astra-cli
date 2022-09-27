@@ -1,11 +1,7 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -14,12 +10,11 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.LIST, description = "Display the list of Databases in an organization")
-public class DbListCmd extends BaseCmd {
+public class DbListCmd extends AbstractConnectedCmd {
    
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        return OperationsDb.listDb();
+    public void execute() throws Exception {
+        OperationsDb.listDb();
     }
 
 }

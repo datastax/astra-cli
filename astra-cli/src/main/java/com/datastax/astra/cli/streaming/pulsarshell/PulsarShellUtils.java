@@ -9,9 +9,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.cli.AstraCli;
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.streaming.domain.Tenant;
 
@@ -86,7 +87,7 @@ public class PulsarShellUtils {
      *      folder for configuration
      */
     public static String getConfigurationFolder() {
-        return AstraCli.ASTRA_HOME + 
+        return AstraCliUtils.ASTRA_HOME + 
                 File.separator + LUNA_FOLDER + 
                 File.separator + "conf";
     }
@@ -98,26 +99,30 @@ public class PulsarShellUtils {
      *      if the folder exist
      */
     public static boolean isPulsarShellInstalled() {
-       File pulsarShellFolder = new File(AstraCli.ASTRA_HOME + File.separator + LUNA_FOLDER);
+       File pulsarShellFolder = new File(AstraCliUtils.ASTRA_HOME + File.separator + LUNA_FOLDER);
        return pulsarShellFolder.exists() && pulsarShellFolder.isDirectory();
     }
     
     /**
      * Download targz and unzip.
+     *
+     * @throws FileSystemException
+     *      file system exception 
      */
-    public static void installPulsarShell() {
+    public static void installPulsarShell() 
+    throws FileSystemException {
         if (!isPulsarShellInstalled()) {
             LoggerShell.success("pulsar-shell first launch, downloading (~ 60MB), please wait...");
-            String destination = AstraCli.ASTRA_HOME + File.separator + LUNA_TARBALL;
+            String destination = AstraCliUtils.ASTRA_HOME + File.separator + LUNA_TARBALL;
             FileUtils.downloadFile(LUNA_URL, destination);
             File pulsarShelltarball = new File (destination);
             if (pulsarShelltarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait it can take a minute...");
                 try {
-                    FileUtils.extactTargz(pulsarShelltarball, new File (AstraCli.ASTRA_HOME));
+                    FileUtils.extactTargz(pulsarShelltarball, new File (AstraCliUtils.ASTRA_HOME));
                     if (isPulsarShellInstalled()) {
                         // Change file permission
-                        File pulsarShellFile = new File(AstraCli.ASTRA_HOME + File.separator  
+                        File pulsarShellFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  
                                 + LUNA_FOLDER + File.separator 
                                 + "bin" + File.separator  
                                 + "pulsar-shell");
@@ -130,7 +135,7 @@ public class PulsarShellUtils {
                     }
                 } catch (IOException e) {
                     LoggerShell.error("Cannot extract tar archive:" + e.getMessage());
-                    ExitCode.PARSE_ERROR.exit();
+                    throw new FileSystemException("Cannot extract tar archive:" + e.getMessage(), e);
                 }
             }
         } else {
@@ -151,18 +156,20 @@ public class PulsarShellUtils {
      *      unix process for pulsar-shell
      * @throws IOException
      *      errors occured
+     * @throws ConfigurationException
+     *      starting pulsar shell 
      */
     public static Process runPulsarShell(PulsarShellOptions options, Tenant tenant, File configFile) 
-    throws IOException {
+    throws IOException, ConfigurationException {
         
         if (!configFile.exists()) {
             LoggerShell.error("Client.conf '" + configFile.getAbsolutePath() + "' has not been found.");
-            ExitCode.NOT_FOUND.exit();
+            throw new ConfigurationException(configFile.getAbsolutePath());
         }
         
         List<String> pulsarShCommand = new ArrayList<>();
         pulsarShCommand.add(new StringBuilder()
-                .append(AstraCli.ASTRA_HOME + File.separator + LUNA_FOLDER)
+                .append(AstraCliUtils.ASTRA_HOME + File.separator + LUNA_FOLDER)
                 .append(File.separator + "bin")
                 .append(File.separator + "pulsar-shell")
                 .toString());

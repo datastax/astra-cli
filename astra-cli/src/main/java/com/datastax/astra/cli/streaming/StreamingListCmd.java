@@ -1,9 +1,8 @@
 package com.datastax.astra.cli.streaming;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
@@ -14,12 +13,12 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.LIST, description = "Display the list of Tenant in an organization")
-public class StreamingListCmd extends BaseCmd {
+public class StreamingListCmd extends AbstractConnectedCmd {
    
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        return OperationsStreaming.listTenants();
+    public void execute()
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
+        OperationsStreaming.listTenants();
     }
 
 }

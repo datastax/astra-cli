@@ -1,7 +1,8 @@
 package com.datastax.astra.cli.iam;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
+import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
 import com.datastax.astra.sdk.organizations.domain.DefaultRoles;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -30,8 +31,8 @@ public class UserInviteSh extends BaseSh {
     
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute() {
-        return OperationIam.inviteUser(user, role);
+    public void execute() throws UserAlreadyExistException, RoleNotFoundException {
+        OperationIam.inviteUser(user, role);
     }
 
 }

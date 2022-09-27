@@ -1,8 +1,7 @@
 package com.datastax.astra.cli.iam;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -11,11 +10,11 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.LIST, description = "Display the list of Roles in an organization")
-public class RoleListCmd extends BaseCmd {
+public class RoleListCmd extends AbstractConnectedCmd {
     
     /** {@inheritDoc} */
-    public ExitCode execute() {
-        return OperationIam.listRoles();
+    public void execute() {
+        OperationIam.listRoles();
     }
     
 }

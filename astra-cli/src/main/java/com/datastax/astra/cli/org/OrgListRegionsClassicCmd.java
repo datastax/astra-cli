@@ -1,7 +1,6 @@
 package com.datastax.astra.cli.org;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -10,11 +9,11 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsOrganization.CMD_REGIONS, description = "Show available regions (classic).")
-public class OrgListRegionsClassicCmd extends BaseCmd {
+public class OrgListRegionsClassicCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
-    public ExitCode execute() {
-        return OperationsOrganization.listRegions();
+    public void execute() {
+        OperationsOrganization.listRegions();
     }
 
 }

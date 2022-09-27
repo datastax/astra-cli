@@ -1,8 +1,8 @@
 package com.datastax.astra.cli.iam;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.iam.exception.UserNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -13,7 +13,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.DELETE, description = "Delete an existing user")
-public class UserDeleteCmd extends BaseCmd {
+public class UserDeleteCmd extends AbstractConnectedCmd {
     
     /**
      * Database name or identifier
@@ -22,10 +22,9 @@ public class UserDeleteCmd extends BaseCmd {
     @Arguments(title = "EMAIL", description = "User email or identifier")
     public String user;
     
-    
     /** {@inheritDoc} */
-    public ExitCode execute() {
-        return OperationIam.deleteUser(this, user);
+    public void execute() throws UserNotFoundException {
+        OperationIam.deleteUser(this, user);
     }
     
 }

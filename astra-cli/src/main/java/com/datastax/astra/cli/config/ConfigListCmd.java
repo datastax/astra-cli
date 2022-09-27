@@ -5,18 +5,17 @@ import com.github.rvesse.airline.annotations.Command;
 /**
  * Show the list of available configurations.
  * 
- * astra list XXX
+ * astra config list
  *
  * @author Cedrick LUNVEN (@clunven)
- *
  */
 @Command(name = "list", description = "Show the list of available configurations.")
-public class ConfigListCmd extends BaseConfigCommand {
-    
+public class ConfigListCmd extends AbstractConfigCmd {
+
     /** {@inheritDoc} */
-    public void run() {
-        OperationsConfig.listConfigurations(getAstraRc());
+    @Override
+    public void execute() throws Exception {
+        OperationsConfig.listConfigurations();
     }
-    
     
 }

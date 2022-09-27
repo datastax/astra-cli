@@ -1,11 +1,9 @@
 package com.datastax.astra.cli.db.cqlsh;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.CannotStartProcessException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.db.OperationsDb;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -19,7 +17,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "cqlsh", description = "Start Cqlsh")
-public class DbCqlShellCmd extends BaseCmd {
+public class DbCqlShellCmd extends AbstractConnectedCmd {
 
     /**
      * Database name or identifier
@@ -61,9 +59,10 @@ public class DbCqlShellCmd extends BaseCmd {
             description = "Authenticate to the given keyspace.")
     protected String cqlshOptionKeyspace;
     
-    /** {@inheritDoc} */
-    public ExitCode execute()  
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
+    /** {@inheritDoc} 
+     * @throws FileSystemException 
+     * @throws CannotStartProcessException */
+    public void execute() throws Exception {
         CqlShellOptions options = new CqlShellOptions();
         options.setDebug(cqlShOptionDebug);
         options.setEncoding(cqlshOptionEncoding);
@@ -71,7 +70,7 @@ public class DbCqlShellCmd extends BaseCmd {
         options.setFile(cqlshOptionFile);
         options.setKeyspace(cqlshOptionKeyspace);
         options.setVersion(cqlShOptionVersion);
-        return OperationsDb.startCqlShell(options, database);
+        OperationsDb.startCqlShell(options, database);
     }
     
 }

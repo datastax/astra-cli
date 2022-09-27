@@ -1,8 +1,7 @@
 package com.datastax.astra.cli.streaming;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -15,7 +14,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.GET, description = "Show details of a tenant")
-public class StreamingGetCmd extends BaseCmd {
+public class StreamingGetCmd extends AbstractConnectedCmd {
 
     /** Enum for db get. */
     public static enum StreamingGetKeys { 
@@ -40,9 +39,9 @@ public class StreamingGetCmd extends BaseCmd {
     protected StreamingGetKeys key;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws TenantNotFoundException {    
-        return OperationsStreaming.showTenant(tenant, key);
+    public void execute()
+    throws TenantNotFoundException {
+        OperationsStreaming.showTenant(tenant, key);
     }
 
 }

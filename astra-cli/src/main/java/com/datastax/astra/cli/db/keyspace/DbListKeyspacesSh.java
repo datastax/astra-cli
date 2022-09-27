@@ -1,12 +1,11 @@
 package com.datastax.astra.cli.db.keyspace;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.BaseSh;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -18,12 +17,11 @@ import com.github.rvesse.airline.annotations.Command;
 public class DbListKeyspacesSh extends BaseSh {
   
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        if (!dbSelected()) {
-            return ExitCode.CONFLICT;
-        }
-        return OperationsDb.listKeyspaces(ShellContext.getInstance().getDatabase().getId());
+    public void execute()
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           DatabaseNotSelectedException, InvalidArgumentException {
+        assertDbSelected();
+        OperationsDb.listKeyspaces(ctx().getDatabase().getId());
     }
 
 }

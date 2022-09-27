@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.fusesource.jansi.Ansi;
 
+import com.datastax.astra.cli.ShellContext;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.utils.AstraRcUtils;
@@ -21,6 +23,9 @@ import com.datastax.astra.sdk.config.AstraClientConfig;
  */
 public class OperationsConfig {
 
+    /** worki with roles. */
+    public static final String COMMAND_CONFIG = "config";
+    
     /**
      * Title of the table.
      */
@@ -32,13 +37,21 @@ public class OperationsConfig {
     private OperationsConfig() {}
     
     /**
+     * Syntax sugar.
+     * @return
+     */
+    private static ShellContext ctx() {
+        return ShellContext.getInstance();
+    }
+    
+    /**
      * Show configuration in the output.
      * 
      * @param astraRc
      *      current AstraRc
      */
-    public static void listConfigurations(AstraRcUtils astraRc) {
-        Map<String, Map<String, String>> sections = astraRc.getSections();
+    public static void listConfigurations() {
+        Map<String, Map<String, String>> sections = ctx().getAstraRc().getSections();
         List<String> orgs = listOrganizations(sections);
         ShellTable sht = new ShellTable();
         sht.setColumnTitlesColor(Ansi.Color.YELLOW);
@@ -101,5 +114,20 @@ public class OperationsConfig {
             }
         }
         return Optional.ofNullable(defaultOrgName);
+    }
+    
+    /**
+     * Test existence of section in document.
+     * 
+     * @param sectionName
+     *      section name
+     * @throws ConfigurationException
+     *      configuration exception
+     */
+    public static void assertSectionExist(String sectionName) 
+    throws ConfigurationException {
+        if (!ctx().getAstraRc().isSectionExists(sectionName)) {
+            throw new ConfigurationException("Section '" + sectionName + "' has not been found in config.");
+        } 
     }
 }

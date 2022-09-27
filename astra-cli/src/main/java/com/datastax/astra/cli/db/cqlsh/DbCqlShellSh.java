@@ -1,12 +1,8 @@
 package com.datastax.astra.cli.db.cqlsh;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.BaseSh;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
 import com.datastax.astra.cli.db.OperationsDb;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -49,11 +45,8 @@ public class DbCqlShellSh extends BaseSh {
     protected String cqlshOptionKeyspace;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        if (!dbSelected()) {
-            return ExitCode.CONFLICT;
-        }
+    public void execute() throws Exception {
+        assertDbSelected();
         CqlShellOptions options = new CqlShellOptions();
         options.setDebug(cqlShOptionDebug);
         options.setEncoding(cqlshOptionEncoding);
@@ -61,7 +54,7 @@ public class DbCqlShellSh extends BaseSh {
         options.setFile(cqlshOptionFile);
         options.setKeyspace(cqlshOptionKeyspace);
         options.setVersion(cqlShOptionVersion);
-        return OperationsDb.startCqlShell(options, ShellContext.getInstance().getDatabase().getId());
+        OperationsDb.startCqlShell(options, ShellContext.getInstance().getDatabase().getId());
     }
 
 }

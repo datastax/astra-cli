@@ -12,6 +12,9 @@ import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.core.out.ShellTable;
+import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
+import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
+import com.datastax.astra.cli.iam.exception.UserNotFoundException;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Role;
 import com.datastax.astra.sdk.organizations.domain.User;
@@ -45,11 +48,8 @@ public class OperationIam {
     
     /**
      * List Roles.
-     * 
-     * @return
-     *      returned code
      */
-    public static ExitCode listRoles() {
+    public static void listRoles() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_ROLE_ID, 37);
         sht.addColumn(COLUMN_ROLE_NAME, 20);
@@ -65,7 +65,6 @@ public class OperationIam {
              sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -73,10 +72,8 @@ public class OperationIam {
      * 
      * @param cmd
      *      current command
-     * @return
-     *      returned code
      */
-    public static ExitCode listUsers(AbstractCmd cmd) {
+    public static void listUsers(AbstractCmd cmd) {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_USER_ID, 37);
         sht.addColumn(COLUMN_USER_EMAIL, 20);
@@ -91,7 +88,6 @@ public class OperationIam {
              sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -99,59 +95,51 @@ public class OperationIam {
      *
      * @param role
      *      role name
-     * @return
-     *      exit code
+     * @throws RoleNotFoundException
+     *      role has not been found
      */
-    public static ExitCode showRole(String role) {
-        try {
-            Optional<Role> optRole = ShellContext
-                    .getInstance()
-                    .getApiDevopsOrganizations()
-                    .findRoleByName(role);
+    public static void showRole(String role) throws RoleNotFoundException {
+        Optional<Role> optRole = ShellContext
+                .getInstance()
+                .getApiDevopsOrganizations()
+                .findRoleByName(role);
             
-            if (!optRole.isPresent() && IdUtils.isUUID(role)) {
-                optRole = ShellContext
-                        .getInstance()
-                        .getApiDevopsOrganizations()
-                        .role(role)
-                        .find();
+        if (!optRole.isPresent() && IdUtils.isUUID(role)) {
+            optRole = ShellContext
+                 .getInstance()
+                 .getApiDevopsOrganizations()
+                 .role(role)
+                 .find();
             }
             
-            if (!optRole.isPresent()) {
-                ShellPrinter.outputError(ExitCode.NOT_FOUND, "Role '" + role + "' has not been found.");
-                return ExitCode.NOT_FOUND;
-            }
-            
-            Role r = optRole.get();
-            ShellTable sht = ShellTable.propertyTable(15, 40);
-            sht.addPropertyRow("Identifier",    r.getId());
-            sht.addPropertyRow("Name",          r.getName());
-            sht.addPropertyRow("Description",   r.getPolicy().getDescription());
-            sht.addPropertyRow("Effect",        r.getPolicy().getEffect());
-            switch(ShellContext.getInstance().getOutputFormat()) {
-                case csv:
-                    sht.addPropertyRow("Resources", r.getPolicy().getResources().toString());
-                    sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
-                    ShellPrinter.printShellTable(sht);
-                break;
-                case json:
-                    ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                            OperationIam.COMMAND_ROLE + " " + AbstractCmd.GET + " " + role, r));
-                break;
-                case human:
-                default:
-                    sht.addPropertyListRows("Resources", r.getPolicy().getResources());
-                    sht.addPropertyListRows("Actions",   r.getPolicy().getActions());
-                    ShellPrinter.printShellTable(sht);
-                break;
-            }
-            
-        } catch(RuntimeException e) {
-            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR,"Cannot show role, technical error " + e.getMessage());
-            return ExitCode.INTERNAL_ERROR;
+        if (!optRole.isPresent()) {
+            ShellPrinter.outputError(ExitCode.NOT_FOUND, "Role '" + role + "' has not been found.");
+            throw new RoleNotFoundException(role);
         }
-        
-        return ExitCode.SUCCESS;
+            
+        Role r = optRole.get();
+        ShellTable sht = ShellTable.propertyTable(15, 40);
+        sht.addPropertyRow("Identifier",    r.getId());
+        sht.addPropertyRow("Name",          r.getName());
+        sht.addPropertyRow("Description",   r.getPolicy().getDescription());
+        sht.addPropertyRow("Effect",        r.getPolicy().getEffect());
+        switch(ShellContext.getInstance().getOutputFormat()) {
+            case csv:
+                sht.addPropertyRow("Resources", r.getPolicy().getResources().toString());
+                sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
+                ShellPrinter.printShellTable(sht);
+            break;
+            case json:
+                ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
+                            OperationIam.COMMAND_ROLE + " " + AbstractCmd.GET + " " + role, r));
+            break;
+            case human:
+            default:
+                sht.addPropertyListRows("Resources", r.getPolicy().getResources());
+                sht.addPropertyListRows("Actions",   r.getPolicy().getActions());
+                ShellPrinter.printShellTable(sht);
+            break;
+        }
     }
     
     /**
@@ -159,61 +147,53 @@ public class OperationIam {
      *
      * @param user
      *      user email
-     * @return
-     *      exit code
+     * @throws UserNotFoundException
+     *      user has not been found
      */
-    public static ExitCode showUser(String user) {
-        try {
-            Optional<User> optUser = ShellContext
-                    .getInstance()
-                    .getApiDevopsOrganizations()
-                    .findUserByEmail(user);
+    public static void showUser(String user) throws UserNotFoundException {
+       Optional<User> optUser = ShellContext
+               .getInstance()
+               .getApiDevopsOrganizations()
+               .findUserByEmail(user);
             
-            if (!optUser.isPresent() && IdUtils.isUUID(user)) {
-                optUser = ShellContext
-                        .getInstance()
-                        .getApiDevopsOrganizations()
-                        .user(user)
-                        .find();
-            }
+       if (!optUser.isPresent() && IdUtils.isUUID(user)) {
+           optUser = ShellContext
+                .getInstance()
+                .getApiDevopsOrganizations()
+                .user(user)
+                .find();
+       }
             
-            if (!optUser.isPresent()) {
-                ShellPrinter.outputError(ExitCode.NOT_FOUND, "User '" + user + "' has not been found.");
-                return ExitCode.NOT_FOUND;
-            }
+       if (!optUser.isPresent()) {
+           ShellPrinter.outputError(ExitCode.NOT_FOUND, "User '" + user + "' has not been found.");
+           throw new UserNotFoundException(user);
+       }
+       
+       User r = optUser.get();
+       ShellTable sht = ShellTable.propertyTable(15, 40);
+       sht.addPropertyRow("Identifier",   r.getUserId());
+       sht.addPropertyRow("Email",        r.getEmail());
+       sht.addPropertyRow("Status",       r.getStatus().name());
+       
+       List<String> roleNames =  r.getRoles()
+               .stream()
+               .map(Role::getName)
+               .collect(Collectors.toList());
             
-            User r = optUser.get();
-            ShellTable sht = ShellTable.propertyTable(15, 40);
-            sht.addPropertyRow("Identifier",   r.getUserId());
-            sht.addPropertyRow("Email",        r.getEmail());
-            sht.addPropertyRow("Status",       r.getStatus().name());
-            
-            List<String> roleNames =  r.getRoles()
-                    .stream()
-                    .map(Role::getName)
-                    .collect(Collectors.toList());
-            
-            switch(ShellContext.getInstance().getOutputFormat()) {
-                case csv:
-                    sht.addPropertyRow("Roles", roleNames.toString());
-                    ShellPrinter.printShellTable(sht);
-                break;
-                case json:
-                    ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, "user show " + user, r));
-                break;
-                case human:
-                default:
-                    sht.addPropertyListRows("Roles", roleNames);
-                    ShellPrinter.printShellTable(sht);
-                break;
-            }
-            
-        } catch(RuntimeException e) {
-            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR,"Cannot show user, technical error " + e.getMessage());
-            return ExitCode.INTERNAL_ERROR;
-        }
-        
-        return ExitCode.SUCCESS;
+       switch(ShellContext.getInstance().getOutputFormat()) {
+           case csv:
+               sht.addPropertyRow("Roles", roleNames.toString());
+               ShellPrinter.printShellTable(sht);
+           break;
+           case json:
+               ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, "user show " + user, r));
+           break;
+           case human:
+           default:
+               sht.addPropertyListRows("Roles", roleNames);
+               ShellPrinter.printShellTable(sht);
+           break;
+       }
     }
     
     /**
@@ -223,38 +203,28 @@ public class OperationIam {
      *      user email
      * @param role
      *      target role for the user
-     * @return
-     *      exit code
+     * @throws UserAlreadyExistException 
+     *      user does not exist
+     * @throws RoleNotFoundException
+     *      role does not exist 
      */
-    public static ExitCode inviteUser(String user, String role) {
-        try {
-            OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
-            Optional<User> optUser = oc.findUserByEmail(user);
-            
-            if (optUser.isPresent()) {
-                ShellPrinter.outputWarning(ExitCode.ALREADY_EXIST, "User '" + user + "' already exist in the organization.");
-                return ExitCode.ALREADY_EXIST;
-            }
-            
-            Optional<Role> optRole = oc.findRoleByName(role);
-            if (!optRole.isPresent() && IdUtils.isUUID(role)) {
-                optRole = oc.role(role).find();
-            }
-            
-            if (!optRole.isPresent()) {
-                ShellPrinter.outputError(ExitCode.NOT_FOUND, "Role '" + role + "' has not been found");
-                return ExitCode.NOT_FOUND;
-            }
-            
-            oc.inviteUser(user, optRole.get().getId());
-            
-            ShellPrinter.outputSuccess(role);
-            
-        } catch(RuntimeException e) {
-            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR,"Cannot invite user, technical error " + e.getMessage());
-            return ExitCode.INTERNAL_ERROR;
+    public static void inviteUser(String user, String role) throws UserAlreadyExistException, RoleNotFoundException {
+        OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
+        Optional<User> optUser = oc.findUserByEmail(user);
+        if (optUser.isPresent()) {
+            ShellPrinter.outputWarning(ExitCode.ALREADY_EXIST, "User '" + user + "' already exist in the organization.");
+            throw new UserAlreadyExistException(user);
         }
-        return ExitCode.SUCCESS;          
+        Optional<Role> optRole = oc.findRoleByName(role);
+        if (!optRole.isPresent() && IdUtils.isUUID(role)) {
+            optRole = oc.role(role).find();
+        }
+        if (!optRole.isPresent()) {
+            ShellPrinter.outputError(ExitCode.NOT_FOUND, "Role '" + role + "' has not been found");
+            throw new RoleNotFoundException(role);
+        }
+        oc.inviteUser(user, optRole.get().getId());
+        ShellPrinter.outputSuccess(role);
     }
 
     /**
@@ -266,31 +236,22 @@ public class OperationIam {
      *      user email of technial identifier
      * @return
      *      status
+     * @throws UserNotFoundException
+     *      user not found
      */
-    public static ExitCode deleteUser(AbstractCmd cmd, String user) {
-        try {
-            OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
-            
-            Optional<User> optUser = oc.findUserByEmail(user);
-            
-            if (!optUser.isPresent() && IdUtils.isUUID(user)) {
-                optUser = oc.user(user).find();
-            }
-            
-            if (!optUser.isPresent()) {
-                ShellPrinter.outputError(ExitCode.NOT_FOUND, "User '" + user + "' has not been found.");
-                return ExitCode.NOT_FOUND;
-            }
-            
-            oc.user(optUser.get().getUserId()).delete();
-            ShellPrinter.outputSuccess("Deleting user '" + user + "' (async operation)");
-            
-        } catch(RuntimeException e) {
-            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR,"Cannot delete user, technical error " + e.getMessage());
-            return ExitCode.INTERNAL_ERROR;
+    public static void deleteUser(AbstractCmd cmd, String user) 
+    throws UserNotFoundException {
+        OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
+        Optional<User> optUser = oc.findUserByEmail(user);
+        if (!optUser.isPresent() && IdUtils.isUUID(user)) {
+            optUser = oc.user(user).find();
         }
-        
-        return ExitCode.SUCCESS;
+        if (!optUser.isPresent()) {
+            ShellPrinter.outputError(ExitCode.NOT_FOUND, "User '" + user + "' has not been found.");
+            throw new UserNotFoundException(user);
+        }
+        oc.user(optUser.get().getUserId()).delete();
+        ShellPrinter.outputSuccess("Deleting user '" + user + "' (async operation)");
     }
     
 }

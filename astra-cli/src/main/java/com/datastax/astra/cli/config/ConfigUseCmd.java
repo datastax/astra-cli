@@ -1,6 +1,5 @@
 package com.datastax.astra.cli.config;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -15,26 +14,36 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 @Command(
     name="use", 
     description="Make a section the one used by default")
-public class ConfigUseCmd extends BaseConfigCommand implements Runnable {
+public class ConfigUseCmd extends AbstractConfigCmd implements Runnable {
    
     /**
      * Section in configuration file to as as default.
      */
     @Required
     @Arguments(
-       title = "section", 
-       description = "Section in configuration file to as as defulat.")
+       title = "sectionName", 
+       description = "Section in configuration file to as as default.")
     protected String sectionName;
     
     /** {@inheritDoc} */
-    public void run() {
-        if (!getAstraRc().isSectionExists(sectionName)) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Section '" + sectionName + "' has not been found in config.");
-            ExitCode.INVALID_PARAMETER.exit();
-        } else {
-            getAstraRc().copySection(sectionName, AstraRcUtils.ASTRARC_DEFAULT);
-            getAstraRc().save();
-            ShellPrinter.outputSuccess("Section '" + sectionName + "' is set as default.");
-        }
+    @Override
+    public void execute() throws Exception {
+        OperationsConfig.assertSectionExist(sectionName);
+        ctx().getAstraRc().copySection(sectionName, AstraRcUtils.ASTRARC_DEFAULT);
+        ctx().getAstraRc().save();
+        ShellPrinter.outputSuccess("Section '" + sectionName + "' is set as default.");
+    }
+    
+    /**
+     * Update property.
+     * 
+     * @param t
+     *      current section
+     * @return
+     *      current reference
+     */
+    public ConfigUseCmd sectionName(String s) {
+        this.sectionName = s;
+        return this;
     }
 }

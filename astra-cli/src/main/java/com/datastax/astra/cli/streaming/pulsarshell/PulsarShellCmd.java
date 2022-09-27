@@ -1,9 +1,7 @@
 package com.datastax.astra.cli.streaming.pulsarshell;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.streaming.OperationsStreaming;
-import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -18,7 +16,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "pulsar-shell", description = "Start pulsar admin against your tenant")
-public class PulsarShellCmd extends BaseCmd {
+public class PulsarShellCmd extends AbstractConnectedCmd {
     
     /**
      * Database name or identifier
@@ -47,14 +45,14 @@ public class PulsarShellCmd extends BaseCmd {
             description= "Display raw output of the commands without the fancy progress visualization. ")
     protected boolean noProgress = false;
     
-    /** {@inheritDoc} */
-    public ExitCode execute() throws TenantNotFoundException {
+    /** {@inheritDoc}  */
+    public void execute() throws Exception {
         PulsarShellOptions options = new PulsarShellOptions();
         options.setExecute(execute);
         options.setFailOnError(failOnError);
         options.setFileName(fileName);
         options.setNoProgress(noProgress);
-        return OperationsStreaming.startPulsarShell(options, tenant);
+        OperationsStreaming.startPulsarShell(options, tenant);
     }
     
 }

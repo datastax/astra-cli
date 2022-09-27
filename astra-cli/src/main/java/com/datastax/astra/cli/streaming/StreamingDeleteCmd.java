@@ -1,8 +1,7 @@
 package com.datastax.astra.cli.streaming;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -14,7 +13,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.DELETE, description = "Delete an existing tenant")
-public class StreamingDeleteCmd extends BaseCmd {
+public class StreamingDeleteCmd extends AbstractConnectedCmd {
     
     /** name of the DB. */
     @Required
@@ -22,9 +21,9 @@ public class StreamingDeleteCmd extends BaseCmd {
     public String tenant;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
+    public void execute()
     throws TenantNotFoundException {
-        return OperationsStreaming.deleteTenant(tenant);
+        OperationsStreaming.deleteTenant(tenant);
     }
     
 }

@@ -12,7 +12,7 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractCmd;
 
 /**
  * Work with terminal.
@@ -35,7 +35,7 @@ public class LoggerShell {
      *      text to log
      */
     private static void logToFile(String level, String text) {
-        BaseCmd  cli = ShellContext.getInstance().getStartCommand();
+        AbstractCmd cli = ShellContext.getInstance().getStartCommand();
         if (cli.getLogFileWriter() != null) {
             try {
                 cli.getLogFileWriter().write(new Date().toString() 
@@ -59,7 +59,7 @@ public class LoggerShell {
         
         if (ctx().getOutputFormat().equals(OutputFormat.human)) {
             if (ShellContext.getInstance().isNoColor()) {
-                System.out.println("[ INFO ] - " + text);
+                System.out.println("[INFO ] - " + text);
             } else {
                 System.out.println(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text));
             }
@@ -86,6 +86,26 @@ public class LoggerShell {
         if (ctx().isFileLoggerEnabled()) {
             logToFile("ERROR", text);
         }
+    }
+    
+    /**
+     * Log error.
+     * 
+     * @param e
+     *      exception
+     * @param customMessage
+     *      current error message
+     */
+    public static void exception (Exception e, String cmd, String customMessage) {
+       if (customMessage != null) {
+           error(customMessage);
+       }
+       error(e.getMessage() + " ("+ e.getClass().getSimpleName() + ")");
+       
+       error("Try 'astra help " + cmd + "' to get help");
+       if (ctx().isVerbose()) {
+           e.printStackTrace();
+       }
     }
     
     /**

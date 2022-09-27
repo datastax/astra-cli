@@ -1,8 +1,8 @@
 package com.datastax.astra.cli.iam;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -13,7 +13,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.GET, description = "Show role details")
-public class RoleGetCmd extends BaseCmd {
+public class RoleGetCmd extends AbstractConnectedCmd {
     
     /** Role name or id. */
     @Required
@@ -21,8 +21,8 @@ public class RoleGetCmd extends BaseCmd {
     public String role;
     
     /** {@inheritDoc} */
-    public ExitCode execute() {
-        return OperationIam.showRole(role);
+    public void execute() throws RoleNotFoundException {
+        OperationIam.showRole(role);
     }
     
 }

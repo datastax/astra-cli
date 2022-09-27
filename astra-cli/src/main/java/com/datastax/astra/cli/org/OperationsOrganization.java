@@ -56,33 +56,22 @@ public class OperationsOrganization {
     
     /**
      * Return organization id.
-     *
-     * @return
-     *      success
      */
-    public static ExitCode getId() {
+    public static void getId() {
         System.out.print(orgClient().organizationId());
-        return ExitCode.SUCCESS;
     }
     
     /**
      * Return organization name.
-     *
-     * @return
-     *      success
      */
-    public static ExitCode getName() {
+    public static void getName() {
         System.out.print(orgClient().organization().getName());
-        return ExitCode.SUCCESS;
     }
     
     /**
      * Return organization infos.
-     *
-     * @return
-     *      success
      */
-    public static ExitCode showOrg() {
+    public static void showOrg() {
         Organization org = orgClient().organization();
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
@@ -96,17 +85,13 @@ public class OperationsOrganization {
             default:
                 ShellPrinter.printShellTable(sht);
             break;
-         }
-        return ExitCode.SUCCESS;
+        }
     }
     
     /**
      * Show organization regions.
-     *
-     * @return
-     *      status code
      */
-    public static ExitCode listRegions() {
+    public static void listRegions() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
@@ -120,16 +105,12 @@ public class OperationsOrganization {
                 sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }
          
     /**
      * Show serverless regions
-     *     
-     * @return
-     *      status code
      */
-    public static ExitCode listRegionsServerless() {
+    public static void listRegionsServerless() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
@@ -143,7 +124,6 @@ public class OperationsOrganization {
                 sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }  
 
 }

@@ -1,11 +1,11 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.BaseSh;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
+import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -47,11 +47,35 @@ public class DbCreateSh extends BaseSh {
             description = "Default keyspace created with the Db")
     protected String defaultKeyspace;
     
+    /** 
+     * Will wait until the database become ACTIVE.
+     */
+    @Option(name = { "--wait" }, 
+            description = "Will wait until the database become ACTIVE")
+    protected boolean wait = false;
+    
+    /** 
+     * Provide a limit to the wait period in seconds, default is 180s. 
+     */
+    @Option(name = { "--timeout" }, 
+            description = "Provide a limit to the wait period in seconds, default is 180s.")
+    protected int timeout = 180;
+    
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute() 
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        return OperationsDb.createDb(databaseName, databaseRegion, defaultKeyspace, ifNotExist);
+    public void execute() throws Exception {
+        OperationsDb.createDb(databaseName, databaseRegion, defaultKeyspace, ifNotExist);
+        if (wait) {
+            switch(OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout)) {
+                case NOT_FOUND:
+                    throw new DatabaseNotFoundException(databaseName);
+                case UNAVAILABLE:
+                    throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,  DatabaseStatusType.PENDING);
+                default:
+                    LoggerShell.success("Database \'" + databaseName +  "' has been created.");
+                break;  
+            }
+        }
     }
     
 }

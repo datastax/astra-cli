@@ -61,7 +61,7 @@
 			<artifactId>slf4j-nop</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-
+		
 		<!-- Leveraging SDK for Astra Accesses -->
 		<dependency>
 			<groupId>com.datastax.astra</groupId>

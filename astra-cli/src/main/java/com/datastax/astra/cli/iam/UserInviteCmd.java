@@ -1,7 +1,8 @@
 package com.datastax.astra.cli.iam;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
+import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
 import com.datastax.astra.sdk.organizations.domain.DefaultRoles;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -14,7 +15,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "invite", description = "Invite a user to an organization")
-public class UserInviteCmd extends BaseCmd {
+public class UserInviteCmd extends AbstractConnectedCmd {
 
     /** identifier or email. */
     @Required
@@ -30,8 +31,8 @@ public class UserInviteCmd extends BaseCmd {
     
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute() {
-        return OperationIam.inviteUser(user, role);
+    public void execute() throws UserAlreadyExistException, RoleNotFoundException {
+        OperationIam.inviteUser(user, role);
     }
 
 }

@@ -1,11 +1,7 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.BaseSh;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -17,9 +13,8 @@ import com.github.rvesse.airline.annotations.Command;
 public class DbListSh extends BaseSh {
    
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        return OperationsDb.listDb();
+    public void execute() throws Exception {
+        OperationsDb.listDb();
     }
 
 }

@@ -12,13 +12,11 @@ import com.github.rvesse.airline.annotations.Command;
 @Command(name = "exit", description = "Exit program.")
 public class ExitCmd extends BaseSh {
 
-   /** {@inheritDoc} */
+    /** {@inheritDoc} */
     @Override
-    public ExitCode execute() {
-       ShellPrinter.outputSuccess("Exiting Astra Cli");
-       ExitCode.SUCCESS.exit();
-       // Nerver reachede
-       return ExitCode.SUCCESS;
+    public void execute() throws Exception {
+        ShellPrinter.outputSuccess("Exiting Astra Cli");
+        System.exit(ExitCode.SUCCESS.getCode());
     }
 
 }

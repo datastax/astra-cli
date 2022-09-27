@@ -1,7 +1,6 @@
 package com.datastax.astra.cli.streaming;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -13,7 +12,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsStreaming.CMD_STATUS, description = "Show status of a tenant")
-public class StreamingStatusCmd extends BaseCmd {
+public class StreamingStatusCmd extends AbstractConnectedCmd {
 
     /** name of the DB. */
     @Required
@@ -21,9 +20,9 @@ public class StreamingStatusCmd extends BaseCmd {
     public String tenant;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws  TenantNotFoundException {
-        return OperationsStreaming.showTenantStatus(tenant);
+    public void execute()
+    throws TenantNotFoundException {
+        OperationsStreaming.showTenantStatus(tenant);
     }
 
 }

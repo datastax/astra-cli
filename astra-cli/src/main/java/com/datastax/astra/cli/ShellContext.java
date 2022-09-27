@@ -10,8 +10,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.exception.InvalidTokenException;
+import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.OutputFormat;
 import com.datastax.astra.cli.core.out.ShellPrinter;
@@ -81,7 +83,7 @@ public class ShellContext {
     // -- Selection --
     
     /** Current command. */
-    private BaseCmd startCommand;
+    private AbstractCmd startCommand;
     
     /** Current shell command (overriding Cli eventually). */
     private BaseSh currentShellCommand;
@@ -105,21 +107,79 @@ public class ShellContext {
     private String databaseRegion;
     
     /**
+     * Init AstraRc.
+     *
+     * @param configFileName
+     *      configuration file name
+     */
+    private void initAstraRc(String configFileName) {
+        if (configFileName == null) {
+            configFileName = AstraRcUtils.getDefaultConfigurationFileName();
+        }
+        LoggerShell.debug("ConfigFilename: " + configFileName);
+        this.astraRc = new AstraRcUtils(configFileName);
+    }
+    
+    /**
+     * Should initialized the client based on provided parameters.
+     *
+     * @param cli
+     *      command line cli
+     * @throws TokenNotFoundException 
+     *      cannot initialize if not token
+     * @throws InvalidTokenException 
+     *      invalid token providede,
+     */
+    public void init(AbstractCmd cli) 
+    throws TokenNotFoundException, InvalidTokenException {
+        
+        this.startCommand = cli;
+        initAstraRc(cli.getConfigFilename());
+        
+        LoggerShell.info("-----------------------------------------------------");
+        LoggerShell.info("Command : " + ShellContext.getInstance().getRawCommandString());
+        LoggerShell.info("Class   : " + cli.getClass());
+        
+        if (cli instanceof AbstractConnectedCmd) {
+            AbstractConnectedCmd ccli = (AbstractConnectedCmd) cli;
+            this.token  = ccli.getToken();
+            if (this.token == null) {
+                if (!StringUtils.isEmpty(ccli.getConfigSectionName())) {
+                    this.configSection = ccli.getConfigSectionName();
+                    LoggerShell.debug("ConfigSectionName: " + configSection);
+                }
+                assertSection(ccli);
+                assertTokenInSection(ccli);
+                token = this.astraRc
+                            .getSection(this.configSection)
+                            .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
+            }
+            
+            if (token != null) {
+                LoggerShell.debug("Token: " + token.substring(0, 20) + "...");
+                connect(token);
+            }
+        }
+    }
+    
+    /**
      * Valid section.
      *
      * @param cmd
      *      current command with options
      * @return
      *      section is valid
+     * @throws TokenNotFoundException
+     *      token not found in section
      */
-    private boolean isSectionValid(AbstractCmd cmd) {
+    private void assertSection(AbstractCmd cmd) 
+    throws TokenNotFoundException {
         if (!this.astraRc.isSectionExists(this.configSection)) {
             ShellPrinter.outputError(CANNOT_CONNECT, "No token provided (-t), no config provided (--config), section '" + this.configSection 
                     + "' has not been found in config file '" 
                     + this.astraRc.getConfigFile().getPath() + "'. Try [astra setup]");
-            return false;
+           throw new TokenNotFoundException();
         }
-        return true;
     }
     
     /**
@@ -129,8 +189,11 @@ public class ShellContext {
      *      command.
      * @return
      *      error
+     * @throws TokenNotFoundException
+     *      token not found
      */
-    private boolean isSectionTokenValid(AbstractCmd cmd) {
+    private void assertTokenInSection(AbstractCmd cmd) 
+    throws TokenNotFoundException {
         if (StringUtils.isEmpty(this.astraRc
                 .getSection(this.configSection)
                 .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
@@ -138,52 +201,7 @@ public class ShellContext {
                     INVALID_PARAMETER, 
                     "Key '" + AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN + 
                     "' has not found been in config [section '" + this.configSection + "']");
-            return false;
-        }
-        return true;
-    }
-    
-    /**
-     * Should initialized the client based on provided parameters.
-     *
-     * @param cli
-     *      command line cli
-     */
-    public void init(BaseCmd cli) {
-        this.startCommand = cli;
-        LoggerShell.info("-----------------------------------------------------");
-        LoggerShell.info("Command : " + ShellContext.getInstance().getRawCommandString());
-        LoggerShell.info("Class   : " + cli.getClass());
-        this.token        = cli.getToken();
-        
-        // No token = use configuration file
-        if (this.token == null) {
-            // Overriding default config
-            if (cli.getConfigFilename() != null) {
-                LoggerShell.debug("ConfigFilename: " + cli.getConfigFilename());
-                this.astraRc = new AstraRcUtils(cli.getConfigFilename());
-            } else {
-                LoggerShell.debug("ConfigFilename: " + AstraRcUtils.getDefaultConfigurationFileName());
-                this.astraRc = new AstraRcUtils();
-            }
-            // Overriding default section
-            if (!StringUtils.isEmpty(cli.getConfigSectionName())) {
-                this.configSection = cli.getConfigSectionName();
-                LoggerShell.debug("ConfigSectionName: " + configSection);
-            }
-            
-            if (isSectionValid(cli) && isSectionTokenValid(cli)) {
-                token = this.astraRc
-                        .getSection(this.configSection)
-                        .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
-            }
-        }
-        
-        if (token != null) {
-            LoggerShell.debug("Token: " + token.substring(0, 20) + "...");
-            connect(token);
-        } else {
-            INVALID_PARAMETER.exit();
+            throw new TokenNotFoundException();
         }
     }
     
@@ -192,15 +210,17 @@ public class ShellContext {
      * 
      * @param token
      *      token loaded from param
+     * @throws InvalidTokenException 
      */
-    public void connect(String token) {
+    public void connect(String token) 
+    throws InvalidTokenException {
 
         // Persist Token
         this.token = token;
         
         if (!token.startsWith(token)) {
             ShellPrinter.outputError(INVALID_PARAMETER, "Token provided is invalid. It should start with 'AstraCS:...'. Try [astra setup]");
-            INVALID_PARAMETER.exit();
+            throw new InvalidTokenException(token);
         }
 
         apiDevopsOrganizations  = new OrganizationsClient(token);
@@ -212,7 +232,7 @@ public class ShellContext {
             LoggerShell.info("Cli successfully initialized");
         } catch(Exception e) {
             ShellPrinter.outputError(CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
-            INVALID_PARAMETER.exit();
+            throw new InvalidTokenException(token);
         }
     }
     
@@ -301,10 +321,9 @@ public class ShellContext {
      *      if no color flag is toggled.
      */
     public boolean isNoColor() {
-        BaseSh sh   = getCurrentShellCommand();
-        BaseCmd   cli  = getStartCommand();
-        if (cli == null) return false;
-        return (cli.isNoColor() || (sh != null && sh.isNoColor()));
+        BaseSh sh = getCurrentShellCommand();
+        if (sh != null) return sh.isNoColor();
+        return getStartCommand().isNoColor();
     }
     
     /**
@@ -314,10 +333,9 @@ public class ShellContext {
      *      if verbose
      */
     public boolean isVerbose() {
-        BaseSh sh  = getCurrentShellCommand();
-        BaseCmd   cli = getStartCommand();
-        if (cli == null) return false;
-        return (cli.isVerbose() || (sh != null && sh.isVerbose()));
+        BaseSh sh = getCurrentShellCommand();
+        if (sh != null) return sh.isVerbose();
+        return getStartCommand().isVerbose();
     }
     
     /**
@@ -327,8 +345,9 @@ public class ShellContext {
      *      check if logger is enabled
      */
     public boolean isFileLoggerEnabled() {
-        BaseCmd  cli = getStartCommand();
-        return (cli != null && cli.getLogFileWriter() != null);
+        BaseSh sh = getCurrentShellCommand();
+        if (sh != null) return (sh.getLogFileWriter() != null);
+        return getStartCommand().getLogFileWriter() != null;
     }
     
     /**
@@ -338,11 +357,9 @@ public class ShellContext {
      *      output format
      */
     public OutputFormat getOutputFormat() {
-        BaseCmd  cli = getStartCommand();
         BaseSh sh = getCurrentShellCommand();
-        if (cli == null) return OutputFormat.human;
-        if (sh != null)  return sh.getOutput();
-        return cli.getOutput();
+        if (sh != null) return sh.getOutput();
+        return getStartCommand().getOutput();
     }
     
     /**
@@ -411,7 +428,7 @@ public class ShellContext {
      * @return
      *       current value of 'startCommand'
      */
-    public BaseCmd getStartCommand() {
+    public AbstractCmd getStartCommand() {
         return startCommand;
     }
     

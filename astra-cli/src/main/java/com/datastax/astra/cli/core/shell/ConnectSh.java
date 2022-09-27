@@ -2,8 +2,8 @@ package com.datastax.astra.cli.core.shell;
 
 import java.util.Optional;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -31,9 +31,9 @@ public class ConnectSh extends BaseSh {
     
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute() {
+    public void execute() throws Exception {
         if (!ctx().getAstraRc().isSectionExists(configName)) {
-            LoggerShell.error("Config '" + configName + "' has not been found in configuration file.");
+            throw new ConfigurationException("Config '" + configName + "' has not been found in configuration file.");
         } else {
             Optional<String> newToken = ctx()
                     .getAstraRc()
@@ -44,6 +44,5 @@ public class ConnectSh extends BaseSh {
                 LoggerShell.error("Token not found for '" + configName + "'");
             }
         }
-        return ExitCode.SUCCESS;
     }
 }

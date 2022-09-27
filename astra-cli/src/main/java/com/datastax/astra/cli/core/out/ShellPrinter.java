@@ -27,18 +27,12 @@ public class ShellPrinter {
 	/** Start Banner. */
     public static void banner() {
         System.out.println();
-        System.out.print("  █████╗ ███████╗████████╗██████╗  █████╗   ");
-        System.out.println("  ███████╗██╗  ██╗███████╗██╗     ██╗     ");
-        System.out.print(" ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ");
-        System.out.println("  ██╔════╝██║  ██║██╔════╝██║     ██║  ");
-        System.out.print(" ███████║███████╗   ██║   ██████╔╝███████║  ");
-        System.out.println("  ███████╗███████║█████╗  ██║     ██║   ");
-        System.out.print(" ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║  ");
-        System.out.println("  ╚════██║██╔══██║██╔══╝  ██║     ██║");
-        System.out.print(" ██║  ██║███████║   ██║   ██║  ██║██║  ██║  ");
-        System.out.println("  ███████║██║  ██║███████╗███████╗███████╗");
-        System.out.print(" ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝  ");
-        System.out.println("  ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝");
+        System.out.println("  █████╗ ███████╗████████╗██████╗  █████╗   ");
+        System.out.println(" ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ");
+        System.out.println(" ███████║███████╗   ██║   ██████╔╝███████║  ");
+        System.out.println(" ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║  ");
+        System.out.println(" ██║  ██║███████║   ██║   ██║  ██║██║  ██║  ");
+        System.out.println(" ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝  ");
         System.out.println("");
         System.out.print(" Version: " + version() + "\n");
     }

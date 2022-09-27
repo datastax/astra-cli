@@ -1,12 +1,13 @@
 package com.datastax.astra.cli.db.keyspace;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.BaseSh;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
+import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -33,12 +34,13 @@ public class DbCreateKeyspaceSh extends BaseSh {
     protected boolean ifNotExist = false;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        if (!dbSelected()) {
-            return ExitCode.CONFLICT;
-        }
-        return OperationsDb.createKeyspace(ShellContext.getInstance().getDatabase().getId(), keyspace, ifNotExist);
+    public void execute() 
+    throws DatabaseNotSelectedException, DatabaseNameNotUniqueException, 
+           DatabaseNotFoundException, InvalidArgumentException, 
+           KeyspaceAlreadyExistException {
+        assertDbSelected();
+        OperationsDb.createKeyspace(
+                ShellContext.getInstance().getDatabase().getId(), keyspace, ifNotExist);
     }
     
 }

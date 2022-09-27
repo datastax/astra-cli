@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -17,15 +18,15 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * astra show config default 
  */
 @Command(name = AbstractCmd.GET, description = "Show details for a configuration.")
-public class ConfigGetCmd extends BaseConfigCommand implements Runnable {
+public class ConfigGetCmd extends AbstractConfigCmd implements Runnable {
     
     /**
      * Section in configuration file to as as default.
      */
     @Required
     @Arguments(
-       title = "section", 
-       description = "Section in configuration file to as as defulat.")
+       title = "sectionName", 
+       description = "Section in configuration file to as as default.")
     protected String sectionName;
     
     /** Authentication token used if not provided in config. */
@@ -33,22 +34,35 @@ public class ConfigGetCmd extends BaseConfigCommand implements Runnable {
     protected String key;
     
     /** {@inheritDoc} */
-    public void run() {
-        if (!getAstraRc().isSectionExists(sectionName)) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Section '" + sectionName + "' has not been found in config.");
-            ExitCode.INVALID_PARAMETER.exit();
-        } else if (key != null) {
-            Optional<String> optKey = getAstraRc().getSectionKey(sectionName, key);
+    @Override
+    public void execute() throws Exception {
+        OperationsConfig.assertSectionExist(sectionName);
+        if (key != null) {
+            Optional<String> optKey = ctx().getAstraRc().getSectionKey(sectionName, key);
             if (!optKey.isPresent()) {
-                ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, 
+                ShellPrinter.outputError(
+                        ExitCode.INVALID_PARAMETER, 
                         "Key '" + key + "' has not been found in config section '" + sectionName + "'");
-                ExitCode.INVALID_PARAMETER.exit();
+                throw new ConfigurationException("Key '" + key + "' has not been found in config section '" + sectionName + "'");
             } else {
                 System.out.print(optKey.get());
             }
         } else {
-            System.out.print(getAstraRc().renderSection(sectionName));
+            System.out.print(ctx().getAstraRc().renderSection(sectionName));
         }
      }
+    
+    /**
+     * Update property.
+     * 
+     * @param t
+     *      current section
+     * @return
+     *      current reference
+     */
+    public ConfigGetCmd sectionName(String s) {
+        this.sectionName = s;
+        return this;
+    }
 
 }

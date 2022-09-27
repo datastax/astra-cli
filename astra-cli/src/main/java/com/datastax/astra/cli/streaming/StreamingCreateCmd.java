@@ -5,10 +5,9 @@ import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD
 import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD_TENANT;
 import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_EMAIL;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
@@ -23,7 +22,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.CREATE, description = "Create a tenant in streaming with cli")
-public class StreamingCreateCmd extends BaseCmd {
+public class StreamingCreateCmd extends AbstractConnectedCmd {
     /**
      * Database name or identifier
      */
@@ -49,8 +48,8 @@ public class StreamingCreateCmd extends BaseCmd {
     
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute() 
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException, TenantAlreadyExistExcepion {
+    public void execute() 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException, TenantAlreadyExistExcepion {
         CreateTenant ct = new CreateTenant();
         ct.setCloudProvider(cloudProvider);
         ct.setCloudRegion(cloudRegion);
@@ -62,7 +61,6 @@ public class StreamingCreateCmd extends BaseCmd {
         //throw new ParameterException(cloudProvider)
         // Does the tenant exist ?
         OperationsStreaming.createStreamingTenant(ct);
-        return ExitCode.SUCCESS;
     }
     
 

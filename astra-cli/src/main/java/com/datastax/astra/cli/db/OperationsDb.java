@@ -19,11 +19,12 @@ import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 
-import com.datastax.astra.cli.AstraCli;
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.CannotStartProcessException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellPrinter;
@@ -34,7 +35,12 @@ import com.datastax.astra.cli.db.cqlsh.CqlShellUtils;
 import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
+import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.datastax.astra.cli.db.exception.KeyspaceNotFoundException;
+import com.datastax.astra.cli.utils.AstraCliUtils;
+import com.datastax.astra.cli.utils.EnvFile;
+import com.datastax.astra.cli.utils.EnvFile.EnvKey;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.databases.DatabaseClient;
 import com.datastax.astra.sdk.databases.DatabasesClient;
@@ -44,6 +50,7 @@ import com.datastax.astra.sdk.databases.domain.DatabaseCreationRequest;
 import com.datastax.astra.sdk.databases.domain.DatabaseRegionServerless;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.datastax.astra.sdk.databases.domain.Datacenter;
+import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.datastax.astra.sdk.utils.ApiLocator;
 
 /**
@@ -224,17 +231,20 @@ public class OperationsDb {
      *      db ks
      * @param ifNotExist
      *      will create if needed
-     * @return
-     *      exit code
      * @throws DatabaseNameNotUniqueException 
      *      db name not unique
-     * @throws ParamValidationException
+     * @throws InvalidArgumentException
      *      error in params 
      * @throws DatabaseNotFoundException
      *      error when db not found (when createing keyspace)
+     * @throws KeyspaceAlreadyExistException
+     *      keyspace already exist for this db
+     * @throws DatabaseNotAvailableException
+     *      database is hibernating or error state, cannot proceed 
      */
-    public static ExitCode createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist) 
-    throws DatabaseNameNotUniqueException, ParamValidationException, DatabaseNotFoundException {
+    public static void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist) 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException {
         
         // Parameter Validations
         Map<String, DatabaseRegionServerless> regionMap = ShellContext.getInstance()
@@ -246,11 +256,14 @@ public class OperationsDb {
             keyspace = databaseName.toLowerCase().replaceAll(" ", "_");
         }
         if (!keyspace.matches(OperationsDb.KEYSPACE_NAME_PATTERN)) {
-            throw new ParamValidationException("The keyspace name is not valid, please use snake_case: [a-z0-9_]");
+            throw new InvalidArgumentException("Keyspace should contain alphanumerics[a-z0-9_]");
         }
         if (!regionMap.containsKey(databaseRegion)) {
-            throw new ParamValidationException("Database region '" + databaseRegion + "' is invalid.");
-        }  
+            throw new InvalidArgumentException("Database region '" + databaseRegion + "' has not been found.");
+        } 
+        if (databaseName.length() < 3 || databaseName.length() > 50) {
+            throw new InvalidArgumentException("Database name '" + databaseName + "' should have between 2 and 50 characters");
+        }
         
         // if multiple databases with same name => error
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
@@ -272,9 +285,7 @@ public class OperationsDb {
                     .keyspace(keyspace)
                     .build());
             ShellPrinter.outputSuccess("Database '" + databaseName + "' and keyspace '" + keyspace + "'are being created.");
-            return ExitCode.SUCCESS;
         }
-        
         
         // A single instance of the DB exist
         LoggerShell.success("Database '" + databaseName + "' already exist. Connecting to database.");
@@ -288,31 +299,26 @@ public class OperationsDb {
         Database db = dbClient.get().find().get();
         DatabaseStatusType dbStatus = db.getStatus();
         if (dbStatus.equals(DatabaseStatusType.HIBERNATED)) {
-            if (ExitCode.SUCCESS.equals(OperationsDb.resumeDb(databaseName))) {
-                OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
-            }
-            // Important to reload db
+            OperationsDb.resumeDb(databaseName);
+            OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
             db = dbClient.get().find().get();
             dbStatus = db.getStatus();
         }
         
         // Create keyspace on existing DB when needed
         if (dbStatus.equals(DatabaseStatusType.ACTIVE)) {
-            return OperationsDb.createKeyspace(databaseName, keyspace, ifNotExist);
+            OperationsDb.createKeyspace(databaseName, keyspace, ifNotExist);
         } else {
             LoggerShell.error("Database '" + databaseName + "' already exists "
                     + "but was neither ACTIVE not HIBERNATED but '" + dbStatus + "', cannot create keyspace.");
-            return ExitCode.UNAVAILABLE;
+            throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
         }
     }
      
     /**
      * List Databases.
-     * 
-     * @return
-     *      returned code
      */
-    public static ExitCode listDb() {
+    public static void listDb() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_ID,      37);
@@ -330,7 +336,6 @@ public class OperationsDb {
                 sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -338,14 +343,12 @@ public class OperationsDb {
      *
      * @param databaseName
      *      database name
-     * @return
-     *      error code
      * @throws DatabaseNameNotUniqueException
      *      multiple databases with the name.
      * @throws DatabaseNotFoundException
      *      database name has not been found.
      */
-    public static ExitCode listKeyspaces(String databaseName)
+    public static void listKeyspaces(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (!dbClient.isPresent()) {
@@ -364,7 +367,6 @@ public class OperationsDb {
             sht.getCellValues().add(rf);
         });
         ShellPrinter.printShellTable(sht);
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -372,14 +374,12 @@ public class OperationsDb {
      * 
      * @param databaseName
      *      db name or db id
-     * @return
-     *      status
      * @throws DatabaseNameNotUniqueException 
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
      */
-    public static ExitCode deleteDb(String databaseName) 
+    public static void deleteDb(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (!dbClient.isPresent()) {
@@ -387,7 +387,6 @@ public class OperationsDb {
         }
         dbClient.get().delete();
         ShellPrinter.outputSuccess("Deleting Database '" + databaseName + "' (async operation)");
-        return ExitCode.SUCCESS;
     }
   
     /**
@@ -399,11 +398,12 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      status
+     * @throws InvalidDatabaseStateException
+     *      database is in invalid state
      */
-    public static ExitCode resumeDb(String databaseName)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+    public static void resumeDb(String databaseName)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           InvalidDatabaseStateException {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (!dbClient.isPresent()) {
             throw new DatabaseNotFoundException(databaseName);
@@ -412,13 +412,14 @@ public class OperationsDb {
         switch(db.getStatus()) {
             case HIBERNATED:
                 resumeDbRequest(db);
-                return ExitCode.SUCCESS;
             case RESUMING:
                 LoggerShell.warning("Database '" + databaseName + "'is already resuming, please wait");
-                return ExitCode.INVALID_PARAMETER;
+                throw new InvalidDatabaseStateException(databaseName, 
+                        DatabaseStatusType.HIBERNATED, db.getStatus());
             default:
                 LoggerShell.warning("Your database has not 'HIBERNATED' status.");
-                return ExitCode.INVALID_PARAMETER;
+                throw new InvalidDatabaseStateException(databaseName, 
+                        DatabaseStatusType.HIBERNATED, db.getStatus());
         }
     }
     
@@ -454,10 +455,8 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      exit code
      */
-    public static ExitCode showDbStatus(String databaseName)
+    public static void showDbStatus(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (!dbClient.isPresent()) {
@@ -465,7 +464,6 @@ public class OperationsDb {
         }
         Database db = dbClient.get().find().get();
         ShellPrinter.outputSuccess("Database '" + databaseName + "' has status '" + db.getStatus() + "'");
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -503,7 +501,7 @@ public class OperationsDb {
      * @return
      *      status code
      */
-    public static ExitCode showDb(String databaseName, DbGetKeys key)
+    public static void showDb(String databaseName, DbGetKeys key)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         Database db = getDatabase(databaseName);
         if (key == null) {
@@ -525,7 +523,7 @@ public class OperationsDb {
                 break;
                 case json:
                     ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                                OperationsDb.DB + " " + BaseCmd.GET + " " + databaseName, db));
+                                OperationsDb.DB + " " + AbstractConnectedCmd.GET + " " + databaseName, db));
                 break;
                 case human:
                 default:
@@ -563,7 +561,6 @@ public class OperationsDb {
             }
             
          }
-         return ExitCode.SUCCESS;
     }
     
     /**
@@ -579,11 +576,11 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      error code.
+     * @throws InvalidArgumentException
+     *      invalid argument to download sb. 
      */
-    public static ExitCode downloadCloudSecureBundles(String databaseName, String dir, String file)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+    public static void downloadCloudSecureBundles(String databaseName, String dir, String file)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
         // Default path will be current location
         if (dir == null && file == null) { 
             dir = ".";
@@ -595,24 +592,23 @@ public class OperationsDb {
             File targetFolder = new File (dir);
             if (!targetFolder.exists() || !targetFolder.isDirectory() || !targetFolder.canWrite()) {
                 LoggerShell.error("You provided an invalid folder, check the -d parameters");
-                return ExitCode.INVALID_PARAMETER;
+                throw new InvalidArgumentException("Destination folder cannot be found or written.");
             }
             getDatabaseClient(databaseName).get().downloadAllSecureConnectBundles(dir);
             LoggerShell.info("Secure connect bundles have been downloaded.");
-            return ExitCode.SUCCESS;
-                
+            
         } else if (file != null) {
             
             if (dcs.size() > 1) {
                 LoggerShell.error("You provided a filename but your database has multiple regions, use option -d instead");
-                return ExitCode.INVALID_PARAMETER;
+                throw new InvalidArgumentException("\"You provided a filename but your database has multiple regions, "
+                        + "use option -d instead\"");
             }
             
             // Download 1 file
             FileUtils.downloadFile(dcs.iterator().next().getSecureBundleUrl(), file);
             LoggerShell.info("Secure connect bundles have been downloaded.");
         }
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -630,7 +626,7 @@ public class OperationsDb {
         getDatabase(databaseName);
         getDatabaseClient(databaseName)
             .get()
-            .downloadAllSecureConnectBundles(AstraCli.ASTRA_HOME + File.separator + AstraCli.SCB_FOLDER);
+            .downloadAllSecureConnectBundles(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER);
         LoggerShell.info("Secure connect bundles have been downloaded.");
     }
     
@@ -650,23 +646,19 @@ public class OperationsDb {
      * @throws KeyspaceNotFoundException
      *      keyspace has not been found.
      */
-    public static ExitCode deleteKeyspace(String databaseName, String keyspaceName)
+    public static void deleteKeyspace(String databaseName, String keyspaceName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, KeyspaceNotFoundException {
         // Validate db Name
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (!dbClient.isPresent()) {
             throw new DatabaseNotFoundException(databaseName);
         }
-        
         Set<String> existingkeyspaces = dbClient.get().find().get().getInfo().getKeyspaces();
         if (!existingkeyspaces.contains(keyspaceName)) {
             throw new KeyspaceNotFoundException(keyspaceName);
         }
-        
         ShellPrinter.outputWarning(ExitCode.NOT_IMPLEMENTED, "Astra does not provide endpoint to delete a keyspace");
-        return ExitCode.SUCCESS; 
     }
-    
     
     /**
      * Create a keyspace if not exist.
@@ -677,37 +669,36 @@ public class OperationsDb {
      *      db name
      * @param keyspaceName
      *      ks name
-     * @return
-     *      exit code
      * @throws DatabaseNameNotUniqueException 
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @throws ParamValidationException
+     * @throws InvalidArgumentException
      *      invalid parameter
+     * @throws KeyspaceAlreadyExistException
+     *      keyspace exist and --if-not-exist option not provided
      */
-    public static ExitCode createKeyspace(String databaseName, String keyspaceName, boolean ifNotExist)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException { 
+    public static void createKeyspace(String databaseName, String keyspaceName, boolean ifNotExist)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException, KeyspaceAlreadyExistException { 
         
         // Validate keyspace names
         if (!keyspaceName.matches(OperationsDb.KEYSPACE_NAME_PATTERN)) {
-            throw new ParamValidationException("The keyspace name is not valid, please use snake_case: [a-z0-9_]");
+            throw new InvalidArgumentException("The keyspace name is not valid, please use snake_case: [a-z0-9_]");
         }
         
         Set<String> existingkeyspaces = getDatabase(databaseName).getInfo().getKeyspaces();
         if (existingkeyspaces.contains(keyspaceName)) {
             if (ifNotExist) {
                 LoggerShell.success("Keyspace '" + keyspaceName + "' already exists. Connecting to keyspace.");
-                return ExitCode.SUCCESS;
             } else {
-                LoggerShell.error("Keyspace '" + keyspaceName + "' already exists. Cannot create another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.");
-                return ExitCode.ALREADY_EXIST;
+                LoggerShell.error("Keyspace '" + keyspaceName + "' already exists. Cannot create "
+                        + "another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.");
+                throw new KeyspaceAlreadyExistException(keyspaceName, databaseName);
             }
         } else {
             getDatabaseClient(databaseName).get().createKeyspace(keyspaceName);
             LoggerShell.info("Keyspace '"+ keyspaceName + "' is creating.");
         }
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -721,11 +712,14 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      exit code
+     * @throws CannotStartProcessException
+     *      cannot start third party process
+     * @throws FileSystemException
+     *      cannot access file system 
      */
-    public static ExitCode startCqlShell(CqlShellOptions options, String database)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+    public static void startCqlShell(CqlShellOptions options, String database)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           CannotStartProcessException, FileSystemException {
         
         // Install Cqlsh for Astra and set permissions
         installCqlShellAstra();
@@ -737,15 +731,12 @@ public class OperationsDb {
             System.out.println("\nCqlsh is starting please wait for connection establishment...");
             Process cqlShProc = CqlShellUtils.runCqlShellAstra(options, getDatabase(database));
             if (cqlShProc == null) {
-                ExitCode.INTERNAL_ERROR.exit();
+                throw new CannotStartProcessException("cqlsh");
             }
             cqlShProc.waitFor();
         } catch (Exception e) {
-            LoggerShell.error("Cannot start CqlSh :" + e.getMessage());
-            ExitCode.INTERNAL_ERROR.exit();
+            throw new CannotStartProcessException("cqlsh", e);
         }
-        
-        return ExitCode.SUCCESS;
     }
     
     /**
@@ -757,11 +748,14 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      exit code
+     * @throws CannotStartProcessException
+     *      cannot start the ds bulk third party process 
+     * @throws FileSystemException
+     *      cannot untar on file system
      */
-    public static ExitCode runDsBulk(List<String> options)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+    public static void runDsBulk(List<String> options)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           CannotStartProcessException, FileSystemException {
         String database = options.get(0);
         
         // Install dsbulk for Astra and set permissions
@@ -776,16 +770,70 @@ public class OperationsDb {
                     getDatabase(database), 
                     options.subList(1, options.size()));
             if (dsbulkProc == null) {
-                ExitCode.INTERNAL_ERROR.exit();
+                throw new CannotStartProcessException("dsbulk");
             }
             dsbulkProc.waitFor();
            
-        } catch (IOException e) {
+        } catch (Exception e) {
             LoggerShell.error("Cannot start DsBulk:" + e.getMessage());
-            ExitCode.INTERNAL_ERROR.exit();
-        } catch (InterruptedException e) {
-            
+            throw new CannotStartProcessException("dsbulk", e);
         }
-        return ExitCode.SUCCESS;
     }
-}
+    
+    /**
+     * Generation configuration File.
+     * 
+     * @param dbName
+     *      database name or identifier
+     * @param ks
+     *      keyspace
+     * @param region
+     *      region
+     * @param dest
+     *      destinations
+     * @return
+     *      error code
+     * @throws DatabaseNotFoundException 
+     *      error db not found
+     * @throws DatabaseNameNotUniqueException
+     *      error db not unique
+     * @throws InvalidArgumentException
+     *      invalid argument
+     */
+    public static void generateDotEnvFile(String dbName, String ks, String region, String dest) 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
+        EnvFile envFile = new EnvFile(dest);
+        // Organization Block
+        Organization org = ShellContext.getInstance().getApiDevopsOrganizations().organization();
+        envFile.getKeys().put(EnvKey.ASTRA_ORG_ID, org.getId());
+        envFile.getKeys().put(EnvKey.ASTRA_ORG_NAME, org.getName());
+        envFile.getKeys().put(EnvKey.ASTRA_ORG_TOKEN, ShellContext.getInstance().getToken());
+        
+        // Database
+        Database db = getDatabase(dbName);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_ID, db.getId());
+        envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, db.getInfo().getRegion());
+        if (region != null) {
+            // Parameter Validations
+            Set<String> availableRegions = ShellContext.getInstance()
+                    .getApiDevopsOrganizations()
+                    .regionsServerless()
+                    .map(DatabaseRegionServerless::getName)
+                    .collect(Collectors.toSet());
+            if (!availableRegions.contains(region)) {
+                throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
+            }
+            Set <String> dbRegions = db.getInfo().getDatacenters()
+                    .stream().map(Datacenter::getRegion).collect(Collectors.toSet());
+            if (!dbRegions.contains(region)) {
+                throw new InvalidArgumentException("Database is not deployed in provided region");
+            }
+            envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, region);
+        }
+        
+        // keep adding keys
+        
+        
+        envFile.save();
+    }
+ }

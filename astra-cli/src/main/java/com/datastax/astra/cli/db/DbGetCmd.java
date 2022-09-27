@@ -1,11 +1,7 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseCmd;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -17,7 +13,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.GET, description = "Show details of a database")
-public class DbGetCmd extends BaseCmd {
+public class DbGetCmd extends AbstractConnectedCmd {
 
     /** Enum for db get. */
     public static enum DbGetKeys { 
@@ -48,9 +44,8 @@ public class DbGetCmd extends BaseCmd {
     protected DbGetKeys key;
     
     /** {@inheritDoc} */
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {    
-        return OperationsDb.showDb(database, key);
+    public void execute() throws Exception {    
+        OperationsDb.showDb(database, key);
     }
 
 }

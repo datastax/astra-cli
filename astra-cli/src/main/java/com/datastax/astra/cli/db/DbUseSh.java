@@ -2,12 +2,9 @@ package com.datastax.astra.cli.db;
 
 import java.util.Optional;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.BaseSh;
-import com.datastax.astra.cli.core.exception.ParamValidationException;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.sdk.databases.DatabaseClient;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -29,9 +26,7 @@ public class DbUseSh extends BaseSh {
 
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, ParamValidationException {
-        // We want the use command to be verbose
+    public void execute() throws Exception {
         this.verbose = true;
         Optional<DatabaseClient> dbClient = OperationsDb.getDatabaseClient(database);
         if (!dbClient.isPresent()) {
@@ -39,7 +34,6 @@ public class DbUseSh extends BaseSh {
         }
         ctx().useDatabase(dbClient.get().find().get());
         LoggerShell.info("Selecting Database '" + database + "'");
-        return ExitCode.SUCCESS;
     } 
     
 }

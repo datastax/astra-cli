@@ -1,6 +1,6 @@
 package com.datastax.astra.cli.core;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -13,12 +13,10 @@ public class QuitCmd extends BaseSh {
 
     /** {@inheritDoc} */
     @Override
-    public ExitCode execute() {
-        if (!dbSelected()) {
-            return ExitCode.CONFLICT;
-        }
+    public void execute() 
+    throws DatabaseNotSelectedException {
+        assertDbSelected();
         ctx().exitDatabase();
-        return ExitCode.SUCCESS;
     }
 
 }

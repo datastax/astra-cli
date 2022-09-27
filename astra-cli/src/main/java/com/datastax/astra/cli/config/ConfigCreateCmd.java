@@ -1,9 +1,8 @@
 package com.datastax.astra.cli.config;
 
-import static com.datastax.astra.cli.ExitCode.CANNOT_CONNECT;
-import static com.datastax.astra.cli.ExitCode.INVALID_PARAMETER;
-
 import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.exception.InvalidTokenException;
+import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
@@ -20,13 +19,11 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "create", description = "Create a new section in configuration")
-public class ConfigCreateCmd extends BaseConfigCommand implements Runnable {
+public class ConfigCreateCmd extends AbstractConfigCmd {
     
-    /**
-     * Section in configuration file to as as default.
-     */
+    /** Section in configuration file to as as default. */
     @Required
-    @Arguments(title = "section", description = "Section in configuration file to as as default.")
+    @Arguments(title = "sectionName", description = "Section in configuration file to as as default.")
     protected String sectionName;
    
     /** Authentication token used if not provided in config. */
@@ -35,28 +32,49 @@ public class ConfigCreateCmd extends BaseConfigCommand implements Runnable {
     
     /** {@inheritDoc} */
     @Override
-    public void run() {
+    public void execute() throws Exception {
         if (token == null) {
             ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Please Provide a token with option -t, --token");
-            ExitCode.INVALID_PARAMETER.exit();
+            throw new TokenNotFoundException();
         }
         if (!token.startsWith("AstraCS:")) {
             ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
-            ExitCode.INVALID_PARAMETER.exit();
+            throw new InvalidTokenException();
         }
-        
-        try {
-            OrganizationsClient apiOrg  = new OrganizationsClient(token);
-            Organization o = apiOrg.organization();
-            if (sectionName == null) {
-                sectionName = o.getName();
-            }
-            getAstraRc().createSectionWithToken(sectionName, token);
-            getAstraRc().save();
-            ShellPrinter.outputSuccess("Configuration Saved.\n");
-        } catch(Exception e) {
-            ShellPrinter.outputError(CANNOT_CONNECT, "Token provided is invalid. It was not possible to connect to Astra.");
-            INVALID_PARAMETER.exit();
+        OrganizationsClient apiOrg  = new OrganizationsClient(token);
+        Organization o = apiOrg.organization();
+        if (sectionName == null) {
+            sectionName = o.getName();
         }
+        ctx().getAstraRc().createSectionWithToken(sectionName, token);
+        ctx().getAstraRc().save();
+        ShellPrinter.outputSuccess("Configuration Saved.\n");
     }
+    
+    /**
+     * Update property.
+     * 
+     * @param t
+     *      current section
+     * @return
+     *      current reference
+     */
+    public ConfigCreateCmd sectionName(String s) {
+        this.sectionName = s;
+        return this;
+    }
+    
+    /**
+     * Update property.
+     * 
+     * @param t
+     *      current token
+     * @return
+     *      current reference
+     */
+    public ConfigCreateCmd token(String t) {
+        this.token = t;
+        return this;
+    }
+    
 }
