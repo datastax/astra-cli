@@ -1,13 +1,15 @@
 package com.datastax.astra.cli.test;
 
+import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 
 import com.datastax.astra.cli.AstraCli;
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.shell.ShellCmd;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.stargate.sdk.utils.Utils;
@@ -18,6 +20,11 @@ import com.datastax.stargate.sdk.utils.Utils;
  * @author Cedrick LUNVEN (@clunven)
  */
 public abstract class AbstractCmdTest {
+    
+    @BeforeAll
+    public static void init() {
+        runCli("--version");
+    }
     
     /**
      * Syntaxic sugar to read environment variables.
@@ -64,57 +71,35 @@ public abstract class AbstractCmdTest {
     protected ShellContext ctx() {
         return ShellContext.getInstance();
     }
-    
-    /**
-     * Help tests.
-     * 
-     * @return
-     *      utils
-     */
+   
     protected AstraRcUtils astraRc() {
         return ctx().getAstraRc();
     }
     
-    /**
-     * Syntax sugar test.
-     * @param cmd
-     *      current command.
-     */
-    protected void assertOK(AbstractCmd cmd) {
-        assertCode(ExitCode.SUCCESS, cmd);
+    protected static ExitCode runCli(String cmd) {
+        ExitCode code = AstraCli.parseCli(AstraCli.class, cmd.split(" "));
+        if (ExitCode.SUCCESS.equals(code)) {
+            // Run only if parsing is successful
+            code = AstraCli.runCli();
+        }
+        return code;
     }
     
-    /**
-     * Test returned code.
-     *
-     * @param code
-     *      returned code
-     * @param cmd
-     *      current command.
-     */
-    protected void assertCode(ExitCode code, AbstractCmd cmd) {
-        Assertions.assertEquals(code, cmd.runCmd());
+    protected void assertSuccessCli(String cmd) {
+        assertExitCodeCli(ExitCode.SUCCESS, cmd);
     }
     
-    /**
-     * Command line interface.
-     * 
-     * @return
-     *      return codes
-     */
-    protected ExitCode astraCli(String cmd) {
-        return AstraCli.runCli(AstraCli.class, cmd.split(" "));
+    protected void assertExitCodeCli(ExitCode code, String cmd) {
+        Assertions.assertEquals(code, runCli(cmd));
     }
     
-    
-    /**
-     * Command line interface.
-     * 
-     * @return
-     *      return codes
-     */
-    protected ExitCode astraCli(String... cmd) {
-        return AstraCli.runCli(AstraCli.class, cmd);
+    protected void assertExitCodeInteractive(ExitCode code, String cmd) {
+        System.setIn(new ByteArrayInputStream((cmd + "\n").getBytes()));
+        Assertions.assertEquals(code, new ShellCmd().interactive(false));
+    }
+   
+    protected void assertSuccessInteractive(String cmd) {
+        assertExitCodeInteractive(ExitCode.SUCCESS, cmd);
     }
 
 }

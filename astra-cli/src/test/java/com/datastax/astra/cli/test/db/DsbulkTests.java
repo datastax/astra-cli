@@ -21,12 +21,14 @@ public class DsbulkTests extends AbstractCmdTest {
     
     @Test
     public void should_run() {
-        astraCli("db dsbulk workshops "
-                + "load -url /Users/cedricklunven/dev/workspaces/datastax-workshops/workshop-introduction-to-machine-learning/jupyter/data/ratings.csv "
-                + "-k machine_learning "
-                + "-t movieratings "
-                + "-m \"userid,movieid,rating,timestamp\" "
-                + "-header false -delim -c csv");
+        assertSuccessCli("""
+                db dsbulk workshops
+                   load -url /Users/cedricklunven/dev/workspaces/datastax-workshops/workshop-introduction-to-machine-learning/jupyter/data/ratings.csv
+                   -k machine_learning
+                   -t movieratings 
+                   -m "userid,movieid,rating,timestamp"
+                   -header false -delim -c csv
+                """);
     }
 
 }

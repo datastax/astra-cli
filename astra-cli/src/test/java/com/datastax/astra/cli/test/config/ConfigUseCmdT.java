@@ -29,8 +29,8 @@ public class ConfigUseCmdT extends AbstractCmdTest {
         createCmd.sectionName("test-cli").token(getToken()).runCmd();
         Assertions.assertNotNull(astraRc().getSection("test-cli"));
         // When
-        ConfigUseCmd getCmd = new ConfigUseCmd().exit(false).verbose();
-        assertOK(getCmd.sectionName("test-cli"));
+        ConfigUseCmd getCmd = new ConfigUseCmd().verbose();
+        assertSuccess(getCmd.sectionName("test-cli"));
     }
     
     @Test
@@ -38,7 +38,7 @@ public class ConfigUseCmdT extends AbstractCmdTest {
     @DisplayName("Use with invalid section")
     public void should_use_fail_invalidsection() {
         // Given
-        ConfigUseCmd useCmd = new ConfigUseCmd().exit(false).verbose();
+        ConfigUseCmd useCmd = new ConfigUseCmd().verbose();
         // When
         ExitCode code = useCmd.sectionName("does-not-exist").runCmd();
         //Then

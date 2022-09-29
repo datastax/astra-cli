@@ -27,8 +27,8 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
         createCmd.sectionName("test-cli").token(getToken()).runCmd();
         Assertions.assertNotNull(astraRc().getSection("test-cli"));
         // When
-        ConfigGetCmd getCmd = new ConfigGetCmd().exit(false).verbose();
-        assertOK(getCmd.sectionName("test-cli"));
+        ConfigGetCmd getCmd = new ConfigGetCmd().verbose();
+        assertSuccess(getCmd.sectionName("test-cli"));
     }
     
     @Test
@@ -36,7 +36,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
     public void should_get_fail_invalidsection() {
         // Given
         // When
-        ConfigGetCmd getCmd = new ConfigGetCmd().exit(false).verbose();
+        ConfigGetCmd getCmd = new ConfigGetCmd().verbose();
         ExitCode code = getCmd.sectionName("does-not-exist").runCmd();
         Assertions.assertNull(astraRc().getSection("does-not-exist"));
         Assertions.assertEquals(ExitCode.CONFIGURATION, code);

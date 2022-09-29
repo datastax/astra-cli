@@ -63,13 +63,9 @@ public class DbCqlShellCmd extends AbstractConnectedCmd {
      * @throws FileSystemException 
      * @throws CannotStartProcessException */
     public void execute() throws Exception {
-        CqlShellOptions options = new CqlShellOptions();
-        options.setDebug(cqlShOptionDebug);
-        options.setEncoding(cqlshOptionEncoding);
-        options.setExecute(cqlshOptionExecute);
-        options.setFile(cqlshOptionFile);
-        options.setKeyspace(cqlshOptionKeyspace);
-        options.setVersion(cqlShOptionVersion);
+        CqlShellOption options = new CqlShellOption(
+                cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
+                cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace);
         OperationsDb.startCqlShell(options, database);
     }
     

@@ -14,7 +14,13 @@ import com.datastax.astra.cli.config.ConfigUseCmd;
 import com.datastax.astra.cli.config.OperationsConfig;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.HelpCmd;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
+import com.datastax.astra.cli.core.exception.InvalidTokenException;
+import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.core.shell.ShellCmd;
 import com.datastax.astra.cli.db.DbCreateCmd;
 import com.datastax.astra.cli.db.DbDeleteCmd;
@@ -27,6 +33,9 @@ import com.datastax.astra.cli.db.DbStatusCmd;
 import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.datastax.astra.cli.db.dsbulk.DbDSBulkCmd;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
 import com.datastax.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.datastax.astra.cli.db.keyspace.DbListKeyspacesCmd;
 import com.datastax.astra.cli.iam.OperationIam;
@@ -49,8 +58,10 @@ import com.datastax.astra.cli.streaming.StreamingGetCmd;
 import com.datastax.astra.cli.streaming.StreamingListCmd;
 import com.datastax.astra.cli.streaming.StreamingPulsarTokenCmd;
 import com.datastax.astra.cli.streaming.StreamingStatusCmd;
+import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
+import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellCmd;
-import com.github.rvesse.airline.annotations.Cli;
+import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
@@ -70,7 +81,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Cli(
+@com.github.rvesse.airline.annotations.Cli(
   name = "astra", 
   description = "CLI for DataStax Astra™ including an interactive mode",
   defaultCommand = ShellCmd.class, // no command => interactive
@@ -184,35 +195,37 @@ public class AstraCli {
         
         // Persist command line to log it later
         ShellContext.getInstance().setRawCommand(args);
-        
-        // Parse and execute
-        ExitCode code = runCli(AstraCli.class, args);
+       
+        // Parse command
+        ExitCode code = parseCli(AstraCli.class, args);
+        if (ExitCode.SUCCESS.equals(code)) {
+            // Run only if parsing is successful
+            code = runCli();
+        }
         
         // Exit with proper to code
         System.exit(code.getCode());
     }
-   
+    
     /**
-     * Run CLI and process exceptions.
-     *
+     * Parsing command and error relative to command.
      * @param clazz
-     *      current class.
+     *      class name to marshall
      * @param args
-     *      exception management
+     *      command line arguments
+     * @return
+     *      code for the parsing
      */
-    public static ExitCode runCli(Class<?> clazz, String[] args) {
+    public static ExitCode parseCli(Class<?> clazz, String[] args) {
         try {
-
-            new com.github.rvesse.airline.Cli<Runnable>(clazz)
-               .parse(args)  // Find the processor for the command 
-               .run();       // Run the command
-            
+            // Parse
+            AbstractCmd cmd = new Cli<AbstractCmd>(clazz).parse(args);
+            // Save command in the context
+            ShellContext.getInstance().init(cmd);
             return ExitCode.SUCCESS;
-            
         } catch(ParseArgumentsMissingException ex) {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.INVALID_ARGUMENT;
-            //todo
         } catch(ParseArgumentsUnexpectedException ex) {
             LoggerShell.exception(ex, getInvalidCmd(args), null);
             return ExitCode.INVALID_ARGUMENT;
@@ -246,8 +259,56 @@ public class AstraCli {
         } catch(ParseException ex) {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch(Exception ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
+        } catch (InvalidTokenException e) {
+            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, e.getMessage());
+            return ExitCode.INVALID_PARAMETER;
+        } catch (TokenNotFoundException e) {
+            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
+            return ExitCode.CONFIGURATION;
+        } 
+    }
+    
+    /**
+     * Run CLI and process exceptions.
+     *
+     * @param clazz
+     *      current class.
+     * @param args
+     *      exception management
+     */
+    public static ExitCode runCli() {
+        try {
+            // Execute command
+            ShellContext.getInstance().getStartCommand().initLog();
+            ShellContext.getInstance().getStartCommand().init();
+            ShellContext.getInstance().getStartCommand().execute();
+            return ExitCode.SUCCESS;
+        } catch (DatabaseNameNotUniqueException dex) {
+            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
+            return  ExitCode.INVALID_PARAMETER;
+        } catch (InvalidArgumentException pex) {
+            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, pex.getMessage());
+            return ExitCode.INVALID_PARAMETER;
+        } catch (DatabaseNotFoundException nfex) {
+            ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
+            return ExitCode.NOT_FOUND;
+        } catch (TenantAlreadyExistExcepion e) {
+            ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
+            return ExitCode.ALREADY_EXIST;
+        } catch (TenantNotFoundException e) {
+            ShellPrinter.outputError(ExitCode.NOT_FOUND, e.getMessage());
+            return ExitCode.NOT_FOUND;
+        } catch (FileSystemException e) {
+            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
+            return ExitCode.CONFIGURATION;
+        } catch (DatabaseNotSelectedException e) {
+            ShellPrinter.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
+            return ExitCode.ILLEGAL_STATE;
+        } catch (ConfigurationException ex) {
+            ShellPrinter.outputError(ExitCode.CONFIGURATION, ex.getMessage());
+            return ExitCode.CONFIGURATION;
+        } catch (Exception ex) {
+            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
             return ExitCode.INTERNAL_ERROR;
         }
     }

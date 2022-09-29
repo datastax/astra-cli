@@ -86,11 +86,6 @@ public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
             ccc.token = token;
             ccc.sectionName = new OrganizationsClient(token).organization().getName();
             ccc.run();
-            
-            ConfigGetCmd configs    = new ConfigGetCmd();
-            configs.sectionName     = ccc.sectionName;
-            configs.run();
-            
         } catch(Exception e) {
             LoggerShell.error("Token provided is invalid. Please enter a valid token or quit with CTRL+C");
             throw new InvalidTokenException(token, e);

@@ -18,20 +18,20 @@ public class HelpCommandsTest extends AbstractCmdTest {
     @Test
     @Order(1)
     public void should_show_help() {
-        astraCli("help");
+        assertSuccessCli("help");
     }
     
     
     @Test
     @Order(2)
     public void should_show_help_db() {
-        astraCli("help db");
+        assertSuccessCli("help db");
     }
     
     @Test
     @Order(3)
     public void should_show_help_db_create() {
-        astraCli("help db create");
+        assertSuccessCli("help db create");
     }
     
 }

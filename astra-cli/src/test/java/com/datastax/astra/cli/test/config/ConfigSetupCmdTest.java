@@ -25,10 +25,10 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
     @Test
     @Order(1)
     public void should_create_with_user_input()  throws Exception {
-        ConfigSetupCmd cmdSetup = new ConfigSetupCmd().exit(false).verbose();
+        ConfigSetupCmd cmdSetup = new ConfigSetupCmd().verbose();
         InputStream in = new ByteArrayInputStream((getToken() + "\n").getBytes());
         System.setIn(in);
-        assertOK(cmdSetup);
+        assertSuccess(cmdSetup);
         Assertions.assertNotNull(astraRc()
                 .getSection(AstraRcUtils.ASTRARC_DEFAULT));
         Assertions.assertEquals(
@@ -42,8 +42,8 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
     public void should_create_with_tokenParam()  throws Exception {
         ConfigSetupCmd cmdSetup = new ConfigSetupCmd()
                 .token(getToken())
-                .exit(false).verbose();
-        assertOK(cmdSetup);
+                .verbose();
+        assertSuccess(cmdSetup);
         Assertions.assertNotNull(astraRc()
                 .getSection(AstraRcUtils.ASTRARC_DEFAULT));
         Assertions.assertEquals(

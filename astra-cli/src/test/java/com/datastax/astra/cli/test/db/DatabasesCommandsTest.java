@@ -2,6 +2,7 @@ package com.datastax.astra.cli.test.db;
 
 import org.junit.jupiter.api.Test;
 
+import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -13,85 +14,80 @@ public class DatabasesCommandsTest extends AbstractCmdTest {
     
     @Test
     public void invalidCommand ()  throws Exception {
-        astraCli("db list X");
-    }
-    
-    @Test
-    public void should_Create_dot_evn()  throws Exception {
-        astraCli("db create-dotenv mtg");
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "titi invalid");
     }
     
     @Test
     public void showDbs()  throws Exception {
-        astraCli("db list");
+        assertSuccessCli("db list");
     }
     
     @Test
     public void createDbTest()  throws Exception {
-        astraCli("db create test5 --wait");
+        assertSuccessCli("db create test5 --wait");
     }
     
     @Test
     public void resumeWithWait()  throws Exception {
-        astraCli("db resume test4 --wait");
+        assertSuccessCli("db resume test4 --wait");
     }
     
     @Test
     public void createDb()  throws Exception {
-        astraCli("db create \"Feedly Clone\" -k test4 --if-not-exist --wait");
+        assertSuccessCli("db create \"Feedly Clone\" -k test4 --if-not-exist --wait");
     }
     
     @Test
     public void getStatus()  throws Exception {
-        astraCli("db status test4");
+        assertSuccessCli("db status test4");
     }
     
     @Test
     public void getDb()  throws Exception {
-        astraCli("db get foo");
+        assertSuccessCli("db get foo");
     }
     
     @Test
     public void cqlSHDB()  throws Exception {
-        astraCli("db cqlsh foo");
+        assertSuccessCli("db cqlsh foo");
     }
     
     @Test
     public void createKeyspace()  throws Exception {
-        astraCli("db create-keyspace foo -k ks3 -v");
+        assertSuccessCli("db create-keyspace foo -k ks3 -v");
     }
     
     @Test
     public void listKeyspaces()  throws Exception {
-        astraCli("db list-keyspaces mtg");
+        assertSuccessCli("db list-keyspaces mtg");
     }
     
     
     @Test
     public void resumeDB()  throws Exception {
-        astraCli("db resume samplesgallery --config greg");
+        assertSuccessCli("db resume samplesgallery --config greg");
     }
    
     
     @Test
     public void helpDL()  throws Exception {
-        astraCli("help db download-scb");
+        assertSuccessCli("help db download-scb");
     }
    
     
     @Test
     public void errorMessages() throws Exception {
-        astraCli("xxx");
+        assertSuccessCli("xxx");
     }
     
     @Test
     public void getDbKey()  throws Exception {
-        astraCli("db get mtg --key region");
+        assertSuccessCli("db get mtg --key region");
     }
     
     @Test
     public void helpDbGet()  throws Exception {
-        astraCli("help db get");
+        assertSuccessCli("help db get");
     }
     
 }

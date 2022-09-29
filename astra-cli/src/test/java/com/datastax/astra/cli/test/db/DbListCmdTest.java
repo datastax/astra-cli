@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.datastax.astra.cli.core.out.OutputFormat;
-import com.datastax.astra.cli.db.DbListCmd;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -17,45 +15,39 @@ import com.datastax.astra.cli.test.AbstractCmdTest;
 @TestMethodOrder(OrderAnnotation.class)
 public class DbListCmdTest extends AbstractCmdTest {
     
-    /**
-     * Init Command.
-     * 
-     * @return
-     *      current command
-     */
-    private DbListCmd cmd() {
-        return new DbListCmd().exit(false);
-    }
-    
     @Test
     @Order(1)
     public void should_list_db() {
-        assertOK(cmd());
+        assertSuccessCli("db list");
     }
     
     @Test
     @Order(2)
     public void should_list_db_verbose() {
-        assertOK(cmd().verbose());
+        assertSuccessCli("db list -v");
     }
     
     @Test
     @Order(3)
     public void should_list_db_nocolor() {
-        assertOK(cmd().noColor());
-    }
-    
-    @Test
-    @Order(3)
-    public void should_list_db_csv() 
-    throws Exception {
-        assertOK(cmd().output(OutputFormat.csv));
+        assertSuccessCli("db list --no-color");
     }
     
     @Test
     @Order(4)
-    public void should_list_db_json() 
-    throws Exception {
-        assertOK(cmd().output(OutputFormat.json));
+    public void should_list_db_csv() {
+        assertSuccessCli("db list -o csv");
+    }
+    
+    @Test
+    @Order(5)
+    public void should_list_db_json()  {
+        assertSuccessCli("db list -o json");
+    }
+    
+    @Test
+    @Order(6)
+    public void should_list_db_interactive(){
+        assertSuccessInteractive("db list");
     }
 }

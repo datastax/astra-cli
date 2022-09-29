@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
@@ -14,7 +13,6 @@ import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.OutputFormat;
-import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
@@ -84,11 +82,6 @@ public abstract class AbstractCmd implements Runnable {
             title = "CONFIG_FILE",
             description= "Configuration file (default = ~/.astrarc)")
     protected String configFilename = AstraRcUtils.getDefaultConfigurationFileName();
-    
-    /**
-     * Decide if exit after running.
-     */
-    protected boolean exit = true;
      
     /**
      * Reference to write data into log file.
@@ -150,58 +143,7 @@ public abstract class AbstractCmd implements Runnable {
            Exception; 
     
     /** {@inheritDoc} */
-    public void run() {
-        ExitCode code = runCmd();
-        if (exit) {
-            System.exit(code.getCode());
-        }
-    }
-    
-    /**
-     * Run command without exiting.
-     *
-     * @return
-     *      execution code
-     */
-    public ExitCode runCmd() {
-        ExitCode code = ExitCode.SUCCESS;
-        try {
-            initLog();
-            init();
-            execute();
-        } catch (DatabaseNameNotUniqueException dex) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
-            code =  ExitCode.INVALID_PARAMETER;
-        } catch (InvalidArgumentException pex) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, pex.getMessage());
-            code =  ExitCode.INVALID_PARAMETER;
-        } catch (DatabaseNotFoundException nfex) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
-            code = ExitCode.NOT_FOUND;
-        } catch (TenantAlreadyExistExcepion e) {
-            ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
-            code = ExitCode.ALREADY_EXIST;
-        } catch (TenantNotFoundException e) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, e.getMessage());
-            code =  ExitCode.NOT_FOUND;
-        } catch (InvalidTokenException e) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, e.getMessage());
-            code =  ExitCode.INVALID_PARAMETER;
-        } catch (FileSystemException e) {
-            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
-            code =  ExitCode.CONFIGURATION;
-        } catch (DatabaseNotSelectedException e) {
-            ShellPrinter.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
-            code =  ExitCode.ILLEGAL_STATE;
-        } catch (ConfigurationException ex) {
-            ShellPrinter.outputError(ExitCode.CONFIGURATION, ex.getMessage());
-            code =  ExitCode.CONFIGURATION;
-        } catch (Exception e) {
-            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR, e.getMessage());
-            code =  ExitCode.INTERNAL_ERROR;
-        }
-        return code;
-    }
+    public void run() {}
     
     /**
      * Initialize logger when needed.
@@ -209,7 +151,7 @@ public abstract class AbstractCmd implements Runnable {
      * @throws FileSystemException
      *      error accessing file system
      */
-    private void initLog() 
+    public void initLog() 
     throws FileSystemException {
         if (!StringUtils.isEmpty(logFile)) {
             try {
@@ -248,29 +190,7 @@ public abstract class AbstractCmd implements Runnable {
      */
     public boolean isNoColor() {
         return noColor;
-    }
-
-    /**
-     * Getter accessor for attribute 'exit'.
-     *
-     * @return
-     *       current value of 'exit'
-     */
-    public boolean shouldExit() {
-        return exit;
-    }
-
-    /**
-     * Enable flag.
-     * 
-     * @return
-     *      current reference
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends AbstractCmd> T exit(boolean shouldExit) {
-        this.exit = shouldExit;
-        return (T) this;
-    }
+    }    
     
     /**
      * Enable flag.

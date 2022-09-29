@@ -25,9 +25,9 @@
 		<junit-platform.version>1.9.0</junit-platform.version>
 		<junit-jupiter.version>5.9.0</junit-jupiter.version>
 		<!-- Java -->
-		<maven.plugin.compiler.source>1.8</maven.plugin.compiler.source>
-		<maven.plugin.compiler.target>1.8</maven.plugin.compiler.target>
-		<maven.plugin.javadoc.source>8</maven.plugin.javadoc.source>
+		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
+		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
+		<maven.plugin.javadoc.source>17</maven.plugin.javadoc.source>
 		<!-- Maven -->
 		<native.maven.plugin.version>0.9.11</native.maven.plugin.version>
 		<maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
@@ -41,6 +41,8 @@
 		<version.maven.plugin.dependency>2.8</version.maven.plugin.dependency>
 		<version.maven.plugin.xml-format>3.0.7</version.maven.plugin.xml-format>
 		<version.maven.plugin.fmt>2.2.0</version.maven.plugin.fmt>
+		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
+		<version.maven.plugin.jacoco>0.8.8</version.maven.plugin.jacoco>
 	</properties>
 
 	<dependencies>
@@ -299,6 +301,55 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			 <!-- Coveralls.io -->
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${version.maven.plugin.coveralls}</version>
+                <configuration>
+      				<repoToken>C6a5Wv1zSLqjPTMwUEEbpjLatkGDyg4yl</repoToken>
+			   </configuration>
+			   <dependencies>
+				<dependency>
+				    <groupId>javax.xml.bind</groupId>
+				    <artifactId>jaxb-api</artifactId>
+				    <version>2.3.1</version>
+				</dependency>  
+			   </dependencies>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${version.maven.plugin.jacoco}</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-prepare-agent-integration</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report-integration</id>
+                        <goals>
+                            <goal>report-integration</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>  
 
 		</plugins>
 	</build>

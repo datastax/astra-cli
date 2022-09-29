@@ -23,6 +23,8 @@ public class ShellCmd extends AbstractConnectedCmd {
     @Option(name = { "--version" }, description = "Show version")
     protected boolean version = false;
     
+    protected boolean interactive = true;
+    
     /** {@inheritDoc} */
     public void execute() throws Exception {
        // With version no need to init
@@ -34,17 +36,29 @@ public class ShellCmd extends AbstractConnectedCmd {
            LoggerShell.info("Class : " + getClass().getName());
            ShellPrinter.banner();
            try(Scanner scanner = new Scanner(System.in)) {
-               while(true) {
+               do {
                    ShellPrinter.prompt();
                    String readline = scanner.nextLine();
                    ShellContext.getInstance().setRawShellCommand(readline);
                    if (null!= readline) {
-                       // run AstraShell
                        InteractiveShell.main(CommandLineUtils.parseCommand(readline.trim()));
                    }
-               }
+               } while(interactive);
            }
        }
+    }
+    
+    /**
+     * Enable version.
+     * 
+     * @param
+     *      to disable interactive (default is false)
+     * @return
+     *      targaet version.
+     */
+    public ShellCmd interactive(boolean b) {
+        interactive = b;
+        return this;
     }
 
 }

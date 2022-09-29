@@ -30,7 +30,7 @@ import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.db.DbGetCmd.DbGetKeys;
-import com.datastax.astra.cli.db.cqlsh.CqlShellOptions;
+import com.datastax.astra.cli.db.cqlsh.CqlShellOption;
 import com.datastax.astra.cli.db.cqlsh.CqlShellUtils;
 import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -716,7 +716,7 @@ public class OperationsDb {
      * @throws FileSystemException
      *      cannot access file system 
      */
-    public static void startCqlShell(CqlShellOptions options, String database)
+    public static void startCqlShell(CqlShellOption options, String database)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
            CannotStartProcessException, FileSystemException {
         

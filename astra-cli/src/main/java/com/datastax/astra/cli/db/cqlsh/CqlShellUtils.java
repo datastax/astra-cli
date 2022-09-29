@@ -91,7 +91,7 @@ public class CqlShellUtils {
      * @throws SecureBundleNotFoundException
      *      secure connec bundle has not been found
      */
-    public static Process runCqlShellAstra(CqlShellOptions options, Database db) 
+    public static Process runCqlShellAstra(CqlShellOption options, Database db) 
     throws IOException, SecureBundleNotFoundException {
         List<String> commandCqlSh = new ArrayList<>();
         commandCqlSh.add(new StringBuilder()
@@ -116,27 +116,27 @@ public class CqlShellUtils {
         
         // -- Custom options of Cqlsh itself
         
-        if (options.isDebug()) {
+        if (options.debug()) {
             commandCqlSh.add("--debug");
         }
-        if (options.isVersion()) {
+        if (options.version()) {
             commandCqlSh.add("--version");
         }
-        if (options.getExecute() != null) {
+        if (options.execute() != null) {
             commandCqlSh.add("-e");
-            commandCqlSh.add(options.getExecute());
+            commandCqlSh.add(options.execute());
         }
-        if (options.getFile() != null) {
+        if (options.file() != null) {
             commandCqlSh.add("-f");
-            commandCqlSh.add(options.getFile());
+            commandCqlSh.add(options.file());
         }
-        if (options.getKeyspace() != null) {
+        if (options.keyspace() != null) {
             commandCqlSh.add("-k");
-            commandCqlSh.add(options.getKeyspace());
+            commandCqlSh.add(options.keyspace());
         }
-        if (options.getEncoding() != null) {
+        if (options.encoding() != null) {
             commandCqlSh.add("--encoding");
-            commandCqlSh.add(options.getEncoding() );
+            commandCqlSh.add(options.encoding() );
         }
         
         LoggerShell.info("RUNNING: " + StringUtils.join(commandCqlSh, " "));

@@ -10,8 +10,7 @@ curl -Ls "https://dtsx.io/get-astra-cli" | bash
 - [ ] - Speed up setup with `astra setup --token <token>`
 - [ ] - Improved and specialized error messages
 - [ ] - Native compilation with GraalVM
-
-
+ 
 - [ ] - Add a region to a db `astra db create-region <myDb> -r <regionName>`
 - [ ] - Remove a region to a db `astra db delete-region <myDb> -r <regionName>`
 - [ ] - List db regions `astra db list-regions`

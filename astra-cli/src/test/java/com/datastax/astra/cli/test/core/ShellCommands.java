@@ -17,15 +17,9 @@ public class ShellCommands extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void startInteractive() throws Exception {
-        //InputStream in = new ByteArrayInputStream("exit\n".getBytes());
-        //System.setIn(in);
-        //AstraCli.runCli(AstraCli.class, new String[] {});
+    public void showVersion() throws Exception {
+        assertSuccessCli("--version");
     }
     
-    @Test
-    @Order(2)
-    public void showVersion() throws Exception {
-        astraCli("--version");
-    }
+    
 }

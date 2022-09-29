@@ -19,14 +19,14 @@ public class ExceptionTest extends AbstractCmdTest {
     public void should_fail_unregognized_command() {
         Assertions.assertThrows(
                 ParseCommandUnrecognizedException.class,
-                () -> astraCli("db create2"));
+                () -> runCli("db create2"));
     }
     
     @Test
     public void should_fail_argument_missing() {
         Assertions.assertThrows(
                 ParseArgumentsMissingException.class,
-                () -> astraCli("db create"));
+                () -> runCli("db create"));
     }
     
 
@@ -34,7 +34,7 @@ public class ExceptionTest extends AbstractCmdTest {
     public void should_fail_argument_count() {
         Assertions.assertThrows(
                 ParseArgumentsUnexpectedException.class,
-                () -> astraCli("db create A B"));
+                () -> runCli("db create A B"));
     }
     
     

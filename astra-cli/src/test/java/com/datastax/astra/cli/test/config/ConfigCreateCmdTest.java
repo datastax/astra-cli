@@ -2,13 +2,11 @@ package com.datastax.astra.cli.test.config;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-
-import com.datastax.astra.cli.config.ConfigCreateCmd;
-import com.datastax.astra.cli.test.AbstractCmdTest;
-
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+
+import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
  * Test command to list configurations.
@@ -21,8 +19,7 @@ public class ConfigCreateCmdTest extends AbstractCmdTest {
     @Test
     @Order(1)
     public void should_create_config() {
-        ConfigCreateCmd cmd = new ConfigCreateCmd().exit(false).verbose();
-        assertOK(cmd.sectionName("test-cli").token(getToken()));
+        assertSuccessCli("config create test-cli -t " + getToken());
         Assertions.assertNotNull(astraRc().getSection("test-cli"));
     }
 }

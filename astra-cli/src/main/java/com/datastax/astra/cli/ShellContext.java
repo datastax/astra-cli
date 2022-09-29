@@ -68,7 +68,7 @@ public class ShellContext {
     
     /** Load Astra Rc in the context. */
     private AstraRcUtils astraRc;
-    
+     
     // -- Clients --
     
     /** Hold a reference for the Api Devops. */
@@ -510,4 +510,5 @@ public class ShellContext {
     public void setRawShellCommand(String rawShellCommand) {
         this.rawShellCommand = rawShellCommand;
     }
+  
 }
