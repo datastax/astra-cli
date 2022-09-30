@@ -2,6 +2,7 @@ package com.datastax.astra.cli.test.org;
 
 import org.junit.jupiter.api.Test;
 
+import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -13,27 +14,24 @@ public class OrgCommandTest extends AbstractCmdTest {
     
     @Test
     public void should_display_org()  throws Exception {
-        astraCli("org");
+        assertSuccessCli("org");
+        assertSuccessCli("org -o json");
+        assertSuccessCli("org -o csv");
+        assertSuccessCli("org id");
+        assertSuccessCli("org name");
+        assertSuccessCli("org list-regions-classic");
+        assertSuccessCli("org list-regions-classic -o json");
+        assertSuccessCli("org list-regions-classic -o csv");
+        assertSuccessCli("org list-regions-serverless");
+        assertSuccessCli("org list-regions-serverless -o csv");
+        assertSuccessCli("org list-regions-serverless -o json");
     }
     
     @Test
-    public void should_display_id()  throws Exception {
-        astraCli("org", "id");
-    }
-    
-    @Test
-    public void should_display_name()  throws Exception {
-        astraCli("org", "name");
-    }
-    
-    @Test
-    public void should_display_classic()  throws Exception {
-        astraCli("org", "list-regions-classic");
-    }
-    
-    @Test
-    public void should_display_serverless()  throws Exception {
-        astraCli("org", "list-regions-serverless");
+    public void should_org_errors() {
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "organe");
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "org invalid");
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "org -o yaml");
     }
 
 }

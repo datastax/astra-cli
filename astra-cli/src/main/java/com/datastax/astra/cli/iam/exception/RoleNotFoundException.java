@@ -1,7 +1,5 @@
 package com.datastax.astra.cli.iam.exception;
 
-import com.datastax.astra.cli.core.out.LoggerShell;
-
 /**
  * Role not found
  *
@@ -25,7 +23,6 @@ public class RoleNotFoundException extends Exception {
      */
     public RoleNotFoundException(String roleName) {
         super("Role '" + roleName + "' has not been found.");
-        LoggerShell.warning(getMessage());
     }
 
 }

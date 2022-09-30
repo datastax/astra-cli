@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.config.ConfigCreateCmd;
-import com.datastax.astra.cli.config.ConfigUseCmd;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -25,12 +23,10 @@ public class ConfigUseCmdT extends AbstractCmdTest {
     @DisplayName("Use with existing section")
     public void should_get_config() {
         // Given a config
-        ConfigCreateCmd createCmd = new ConfigCreateCmd().verbose();
-        createCmd.sectionName("test-cli").token(getToken()).runCmd();
+        assertSuccessCli("config create test-cli -t " + getToken());
         Assertions.assertNotNull(astraRc().getSection("test-cli"));
         // When
-        ConfigUseCmd getCmd = new ConfigUseCmd().verbose();
-        assertSuccess(getCmd.sectionName("test-cli"));
+        assertSuccessCli("config use test-cli");
     }
     
     @Test
@@ -38,11 +34,8 @@ public class ConfigUseCmdT extends AbstractCmdTest {
     @DisplayName("Use with invalid section")
     public void should_use_fail_invalidsection() {
         // Given
-        ConfigUseCmd useCmd = new ConfigUseCmd().verbose();
-        // When
-        ExitCode code = useCmd.sectionName("does-not-exist").runCmd();
-        //Then
         Assertions.assertNull(astraRc().getSection("does-not-exist"));
-        Assertions.assertEquals(ExitCode.CONFIGURATION, code);
+        // Then
+        assertExitCodeCli(ExitCode.CONFIGURATION, "config use does-not-exist");
     }
 }

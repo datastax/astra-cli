@@ -13,7 +13,6 @@ import com.datastax.astra.cli.config.ConfigSetupCmd;
 import com.datastax.astra.cli.config.ConfigUseCmd;
 import com.datastax.astra.cli.config.OperationsConfig;
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.HelpCmd;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
@@ -45,6 +44,8 @@ import com.datastax.astra.cli.iam.UserDeleteCmd;
 import com.datastax.astra.cli.iam.UserGetCmd;
 import com.datastax.astra.cli.iam.UserInviteCmd;
 import com.datastax.astra.cli.iam.UserListCmd;
+import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
+import com.datastax.astra.cli.iam.exception.UserNotFoundException;
 import com.datastax.astra.cli.org.OrgCmd;
 import com.datastax.astra.cli.org.OrgIdCmd;
 import com.datastax.astra.cli.org.OrgListRegionsClassicCmd;
@@ -63,16 +64,14 @@ import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
-import com.github.rvesse.airline.parser.errors.ParseCommandMissingException;
-import com.github.rvesse.airline.parser.errors.ParseCommandUnrecognizedException;
 import com.github.rvesse.airline.parser.errors.ParseException;
+import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
 import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
 import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingValueException;
-import com.github.rvesse.airline.parser.errors.ParseOptionOutOfRangeException;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 
@@ -86,7 +85,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
   description = "CLI for DataStax Astra™ including an interactive mode",
   defaultCommand = ShellCmd.class, // no command => interactive
   commands = { 
-    ConfigSetupCmd.class, HelpCmd.class, 
+    ConfigSetupCmd.class, Help.class, 
     ShellCmd.class
   },
   groups = {
@@ -223,37 +222,22 @@ public class AstraCli {
             // Save command in the context
             ShellContext.getInstance().init(cmd);
             return ExitCode.SUCCESS;
-        } catch(ParseArgumentsMissingException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
-            return ExitCode.INVALID_ARGUMENT;
-        } catch(ParseArgumentsUnexpectedException ex) {
+        } catch(ClassCastException ce) {
+            // Help does its own things
+            new Cli<Runnable>(clazz).parse(args).run();
+            return ExitCode.SUCCESS;
+        } catch(ParseArgumentsUnexpectedException |
+                ParseArgumentsMissingException    |
+                ParseTooManyArgumentsException    |
+                ParseOptionGroupException ex) {
             LoggerShell.exception(ex, getInvalidCmd(args), null);
             return ExitCode.INVALID_ARGUMENT;
-        } catch(ParseCommandMissingException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
-            return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch(ParseCommandUnrecognizedException ex) {
-            LoggerShell.exception(ex, getInvalidCmd(args), null);
-            return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch(ParseTooManyArgumentsException ex) {
-            LoggerShell.exception(ex, getInvalidCmd(args), null);
-            return ExitCode.INVALID_ARGUMENT;
-        } catch(ParseOptionGroupException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
-            return ExitCode.INVALID_ARGUMENT;
-        } catch(ParseOptionIllegalValueException ex) {
+        } catch(ParseOptionIllegalValueException | 
+                ParseOptionMissingException ex) {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.INVALID_OPTION;
-        } catch(ParseOptionMissingException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
-            return ExitCode.INVALID_OPTION;
-        } catch(ParseOptionMissingValueException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
-            return ExitCode.INVALID_OPTION_VALUE;
-        } catch(ParseOptionOutOfRangeException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
-            return ExitCode.INVALID_OPTION_VALUE;
-        } catch(ParseRestrictionViolatedException ex) {
+        } catch(ParseRestrictionViolatedException |
+                ParseOptionConversionException ex) {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.INVALID_OPTION_VALUE;
         } catch(ParseException ex) {
@@ -283,28 +267,23 @@ public class AstraCli {
             ShellContext.getInstance().getStartCommand().init();
             ShellContext.getInstance().getStartCommand().execute();
             return ExitCode.SUCCESS;
-        } catch (DatabaseNameNotUniqueException dex) {
+        } catch (DatabaseNameNotUniqueException |
+                 InvalidArgumentException dex) {
             ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
             return  ExitCode.INVALID_PARAMETER;
-        } catch (InvalidArgumentException pex) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, pex.getMessage());
-            return ExitCode.INVALID_PARAMETER;
-        } catch (DatabaseNotFoundException nfex) {
+        } catch (DatabaseNotFoundException  |
+                 TenantNotFoundException    | 
+                 RoleNotFoundException      |
+                 UserNotFoundException nfex) {
             ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
             return ExitCode.NOT_FOUND;
         } catch (TenantAlreadyExistExcepion e) {
             ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
             return ExitCode.ALREADY_EXIST;
-        } catch (TenantNotFoundException e) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, e.getMessage());
-            return ExitCode.NOT_FOUND;
-        } catch (FileSystemException e) {
-            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
-            return ExitCode.CONFIGURATION;
         } catch (DatabaseNotSelectedException e) {
             ShellPrinter.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
             return ExitCode.ILLEGAL_STATE;
-        } catch (ConfigurationException ex) {
+        } catch (FileSystemException | ConfigurationException ex) {
             ShellPrinter.outputError(ExitCode.CONFIGURATION, ex.getMessage());
             return ExitCode.CONFIGURATION;
         } catch (Exception ex) {

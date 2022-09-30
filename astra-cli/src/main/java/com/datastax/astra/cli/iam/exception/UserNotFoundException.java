@@ -1,7 +1,5 @@
 package com.datastax.astra.cli.iam.exception;
 
-import com.datastax.astra.cli.core.out.LoggerShell;
-
 /**
  * User not found
  *
@@ -24,8 +22,7 @@ public class UserNotFoundException extends Exception {
      *      user name
      */
     public UserNotFoundException(String userName) {
-        super("User" + userName + "' has not been found.");
-        LoggerShell.warning(getMessage());
+        super("User " + userName + "' has not been found.");
     }
 
 }

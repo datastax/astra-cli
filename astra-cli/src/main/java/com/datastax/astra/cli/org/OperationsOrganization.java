@@ -3,10 +3,7 @@ package com.datastax.astra.cli.org;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
@@ -76,16 +73,7 @@ public class OperationsOrganization {
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
         sht.addPropertyRow(COLUMN_ID, org.getId());
-        switch(ShellContext.getInstance().getOutputFormat()) {
-            case json:
-                ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, AbstractCmd.ORG , sht));
-            break;
-            case csv:
-            case human:
-            default:
-                ShellPrinter.printShellTable(sht);
-            break;
-        }
+        ShellPrinter.printShellTable(sht);
     }
     
     /**

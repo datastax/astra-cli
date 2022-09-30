@@ -113,7 +113,6 @@ public class OperationIam {
             }
             
         if (!optRole.isPresent()) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, "Role '" + role + "' has not been found.");
             throw new RoleNotFoundException(role);
         }
             
@@ -165,7 +164,6 @@ public class OperationIam {
        }
             
        if (!optUser.isPresent()) {
-           ShellPrinter.outputError(ExitCode.NOT_FOUND, "User '" + user + "' has not been found.");
            throw new UserNotFoundException(user);
        }
        
@@ -212,7 +210,6 @@ public class OperationIam {
         OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
         Optional<User> optUser = oc.findUserByEmail(user);
         if (optUser.isPresent()) {
-            ShellPrinter.outputWarning(ExitCode.ALREADY_EXIST, "User '" + user + "' already exist in the organization.");
             throw new UserAlreadyExistException(user);
         }
         Optional<Role> optRole = oc.findRoleByName(role);
@@ -220,7 +217,6 @@ public class OperationIam {
             optRole = oc.role(role).find();
         }
         if (!optRole.isPresent()) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, "Role '" + role + "' has not been found");
             throw new RoleNotFoundException(role);
         }
         oc.inviteUser(user, optRole.get().getId());
@@ -247,7 +243,6 @@ public class OperationIam {
             optUser = oc.user(user).find();
         }
         if (!optUser.isPresent()) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, "User '" + user + "' has not been found.");
             throw new UserNotFoundException(user);
         }
         oc.user(optUser.get().getUserId()).delete();

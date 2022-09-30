@@ -22,7 +22,7 @@ public class TenantNotFoundException extends Exception {
      *      tenant name
      */
     public TenantNotFoundException(String tenantName) {
-        super("Tenant" + tenantName + "' has not been found.");
+        super("Tenant '" + tenantName + "' has not been found.");
     }
 
 }

@@ -12,10 +12,14 @@ import com.datastax.astra.cli.test.AbstractCmdTest;
  */
 public class DatabasesCommandsTest extends AbstractCmdTest {
     
+    static String DB_TEST = "astra-cli-test";
+    
     @Test
     public void invalidCommand ()  throws Exception {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "titi invalid");
     }
+    
+    /*
     
     @Test
     public void showDbs()  throws Exception {
@@ -88,6 +92,6 @@ public class DatabasesCommandsTest extends AbstractCmdTest {
     @Test
     public void helpDbGet()  throws Exception {
         assertSuccessCli("help db get");
-    }
+    }*/
     
 }

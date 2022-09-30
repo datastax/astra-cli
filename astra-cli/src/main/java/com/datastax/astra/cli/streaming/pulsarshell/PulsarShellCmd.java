@@ -47,6 +47,7 @@ public class PulsarShellCmd extends AbstractConnectedCmd {
     
     /** {@inheritDoc}  */
     public void execute() throws Exception {
+        System.out.println(tenant);
         PulsarShellOptions options = new PulsarShellOptions();
         options.setExecute(execute);
         options.setFailOnError(failOnError);

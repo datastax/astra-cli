@@ -34,7 +34,7 @@ public abstract class AbstractCmdTest {
      * @return
      *      if the value is there
      */
-    public static Optional<String> readEnvVariable(String key) {
+    protected Optional<String> readEnvVariable(String key) {
         if (Utils.hasLength(System.getProperty(key))) {
             return Optional.ofNullable(System.getProperty(key));
         } else if (Utils.hasLength(System.getenv(key))) {
@@ -47,8 +47,7 @@ public abstract class AbstractCmdTest {
      * Astra Client to get a token
      */
     protected String getToken() {
-        Optional<String> t2 = 
-                readEnvVariable( AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
+        Optional<String> t2 = readEnvVariable(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
         /** Env var is always first. */
         if (t2.isPresent()) { 
             return t2.get();
@@ -77,9 +76,12 @@ public abstract class AbstractCmdTest {
     }
     
     protected static ExitCode runCli(String cmd) {
-        ExitCode code = AstraCli.parseCli(AstraCli.class, cmd.split(" "));
+        return runCli(cmd.split(" "));
+    }
+    
+    protected static ExitCode runCli(String[] cmd) {
+        ExitCode code = AstraCli.parseCli(AstraCli.class, cmd);
         if (ExitCode.SUCCESS.equals(code)) {
-            // Run only if parsing is successful
             code = AstraCli.runCli();
         }
         return code;
@@ -89,7 +91,15 @@ public abstract class AbstractCmdTest {
         assertExitCodeCli(ExitCode.SUCCESS, cmd);
     }
     
+    protected void assertSuccessCli(String[] cmd) {
+        assertExitCodeCli(ExitCode.SUCCESS, cmd);
+    }
+    
     protected void assertExitCodeCli(ExitCode code, String cmd) {
+        Assertions.assertEquals(code, runCli(cmd));
+    }
+    
+    protected void assertExitCodeCli(ExitCode code, String[] cmd) {
         Assertions.assertEquals(code, runCli(cmd));
     }
     

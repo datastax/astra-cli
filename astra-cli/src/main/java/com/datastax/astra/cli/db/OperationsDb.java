@@ -253,7 +253,9 @@ public class OperationsDb {
                 .collect(Collectors
                 .toMap(DatabaseRegionServerless::getName, Function.identity()));
         if (StringUtils.isEmpty(keyspace)) {
-            keyspace = databaseName.toLowerCase().replaceAll(" ", "_");
+            keyspace = databaseName.toLowerCase()
+                    .replaceAll(" ", "_")
+                    .replaceAll("-", "_");
         }
         if (!keyspace.matches(OperationsDb.KEYSPACE_NAME_PATTERN)) {
             throw new InvalidArgumentException("Keyspace should contain alphanumerics[a-z0-9_]");

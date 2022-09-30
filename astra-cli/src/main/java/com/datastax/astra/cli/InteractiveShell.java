@@ -1,7 +1,6 @@
 package com.datastax.astra.cli;
 
 import com.datastax.astra.cli.core.ExitCmd;
-import com.datastax.astra.cli.core.HelpCmd;
 import com.datastax.astra.cli.core.QuitCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.shell.ConnectSh;
@@ -24,6 +23,7 @@ import com.datastax.astra.cli.iam.UserInviteSh;
 import com.datastax.astra.cli.iam.UserListSh;
 import com.github.rvesse.airline.annotations.Cli;
 import com.github.rvesse.airline.annotations.Group;
+import com.github.rvesse.airline.help.Help;
 import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
 
 /**
@@ -39,7 +39,7 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
   commands       = { 
     ConnectSh.class,
     EmptySh.class,
-    HelpCmd.class,
+    Help.class,
     ExitCmd.class,
     // With selected db
     DbCreateKeyspaceSh.class,
