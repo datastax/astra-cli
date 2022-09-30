@@ -7,6 +7,7 @@ import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -93,6 +94,8 @@ public class LoggerShell {
      * 
      * @param e
      *      exception
+     * @param cmd
+     *      current command 
      * @param customMessage
      *      current error message
      */
@@ -104,7 +107,9 @@ public class LoggerShell {
        
        error("Try 'astra help " + cmd + "' to get help");
        if (ctx().isVerbose()) {
-           e.printStackTrace();
+           Arrays.asList(e.getStackTrace())
+                 .stream()
+                 .forEach(System.out::println);
        }
     }
     

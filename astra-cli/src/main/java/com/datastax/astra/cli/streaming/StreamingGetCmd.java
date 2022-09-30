@@ -18,13 +18,13 @@ public class StreamingGetCmd extends AbstractConnectedCmd {
 
     /** Enum for db get. */
     public static enum StreamingGetKeys { 
-        /* tenant status */
+        /** tenant status */
         status, 
-        /* cloud provider*/
+        /** cloud provider*/
         cloud, 
-        /* tpulsar token */
+        /** pulsar token */
         pulsar_token,
-        /* cloud region */
+        /** cloud region */
         region};
     
     /** name of the DB. */

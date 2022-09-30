@@ -9,11 +9,6 @@ public class TenantNotFoundException extends Exception {
     
     /** serial. */
     private static final long serialVersionUID = -224037288716231040L;
-
-    /**
-     * Default constructor
-     */
-    public TenantNotFoundException() {}
     
     /**
      * Constructor with tenant name

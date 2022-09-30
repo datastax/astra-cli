@@ -19,8 +19,8 @@ public class FileSystemException extends Exception {
     /**
      * Constructor with token
      * 
-     * @param token
-     *      invalid token
+     * @param msg
+     *       error message
      */
     public FileSystemException(String msg) {
         super(msg);
@@ -29,8 +29,8 @@ public class FileSystemException extends Exception {
     /**
      * Constructor with token
      * 
-     * @param token
-     *      invalid token
+     * @param msg
+     *      error message
      * @param parent
      *      parent exception
      */

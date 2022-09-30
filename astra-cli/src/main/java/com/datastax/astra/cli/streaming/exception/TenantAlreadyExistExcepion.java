@@ -13,11 +13,6 @@ public class TenantAlreadyExistExcepion extends Exception {
     private static final long serialVersionUID = 2456952914005268575L;
 
     /**
-     * Default constructor
-     */
-    public TenantAlreadyExistExcepion() {}
-    
-    /**
      * Constructor with dbName
      * 
      * @param tenantName

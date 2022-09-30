@@ -66,6 +66,7 @@ public class StreamingCommandTest extends AbstractCmdTest {
         assertSuccessCli("streaming create " + RANDOM_TENANT);
         // Then
         Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
+        assertExitCodeCli(ExitCode.ALREADY_EXIST, "streaming create " + RANDOM_TENANT);
     }
     
     @Test

@@ -13,11 +13,6 @@ public class KeyspaceAlreadyExistException extends Exception {
     private static final long serialVersionUID = 968018206118357644L;
 
     /**
-     * Default constructor
-     */
-    public KeyspaceAlreadyExistException() {}
-    
-    /**
      * Constructor with keyspace name
      * 
      * @param ksName

@@ -59,9 +59,7 @@ public class DbCqlShellCmd extends AbstractConnectedCmd {
             description = "Authenticate to the given keyspace.")
     protected String cqlshOptionKeyspace;
     
-    /** {@inheritDoc} 
-     * @throws FileSystemException 
-     * @throws CannotStartProcessException */
+    /** {@inheritDoc} */
     public void execute() throws Exception {
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,

@@ -13,11 +13,6 @@ public class SecureBundleNotFoundException extends Exception {
     private static final long serialVersionUID = -755957414395745147L;
 
     /**
-     * Default constructor
-     */
-    public SecureBundleNotFoundException() {}
-    
-    /**
      * Constructor with path
      * 
      * @param path

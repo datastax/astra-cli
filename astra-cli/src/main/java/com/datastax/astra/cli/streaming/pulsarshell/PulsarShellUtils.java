@@ -24,7 +24,7 @@ import com.datastax.astra.sdk.streaming.domain.Tenant;
 public class PulsarShellUtils {
     
     /** Version Number. */
-    public static final String LUNA_VERSION = "2.10.1.1";
+    public static final String LUNA_VERSION = AstraCliUtils.readProperty("pulsar.shell.version");
     
     /** Archive name. */
     public static final String LUNA_TARBALL = "lunastreaming-shell-" + LUNA_VERSION + "-bin.tar.gz";
@@ -33,7 +33,7 @@ public class PulsarShellUtils {
     public static final String LUNA_FOLDER = "lunastreaming-shell-" + LUNA_VERSION + "";
     
     /** Pulsar. */
-    public static final String LUNA_URL = "https://github.com/datastax/pulsar/releases/download/ls210_1.1/" + LUNA_TARBALL;
+    public static final String LUNA_URL = AstraCliUtils.readProperty("pulsar.shell.url") + LUNA_TARBALL;
     
     /**
      * Hide default construtor

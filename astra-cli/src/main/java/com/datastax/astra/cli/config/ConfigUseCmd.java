@@ -37,7 +37,7 @@ public class ConfigUseCmd extends AbstractConfigCmd implements Runnable {
     /**
      * Update property.
      * 
-     * @param t
+     * @param s
      *      current section
      * @return
      *      current reference

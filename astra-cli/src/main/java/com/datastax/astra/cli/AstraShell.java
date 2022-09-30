@@ -68,7 +68,7 @@ import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException
                   UserDeleteSh.class
           })
     })
-public class InteractiveShell {
+public class AstraShell {
     
     /**
      * Main program for the interactive Shell.
@@ -79,7 +79,7 @@ public class InteractiveShell {
     public static void main(String[] args) {
         try {
 
-            new com.github.rvesse.airline.Cli<Runnable>(InteractiveShell.class)
+            new com.github.rvesse.airline.Cli<Runnable>(AstraShell.class)
                .parse(args)  // Find the processor for the command 
                .run();       // Run the command
             

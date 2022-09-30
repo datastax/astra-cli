@@ -239,12 +239,13 @@ public class OperationsDb {
      *      error when db not found (when createing keyspace)
      * @throws KeyspaceAlreadyExistException
      *      keyspace already exist for this db
-     * @throws DatabaseNotAvailableException
+     * @throws InvalidDatabaseStateException
      *      database is hibernating or error state, cannot proceed 
      */
     public static void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
-           InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException {
+           InvalidDatabaseStateException, InvalidArgumentException, 
+           KeyspaceAlreadyExistException {
         
         // Parameter Validations
         Map<String, DatabaseRegionServerless> regionMap = ShellContext.getInstance()
@@ -302,6 +303,14 @@ public class OperationsDb {
         DatabaseStatusType dbStatus = db.getStatus();
         if (dbStatus.equals(DatabaseStatusType.HIBERNATED)) {
             OperationsDb.resumeDb(databaseName);
+            OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
+            db = dbClient.get().find().get();
+            dbStatus = db.getStatus();
+        }
+        
+        // Create keyspace on existing DB when needed
+        if (dbStatus.equals(DatabaseStatusType.PENDING) ||
+            dbStatus.equals(DatabaseStatusType.RESUMING)) {
             OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
             db = dbClient.get().find().get();
             dbStatus = db.getStatus();
@@ -499,8 +508,6 @@ public class OperationsDb {
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
      *      error is db is not found
-     * @return
-     *      status code
      */
     public static void showDb(String databaseName, DbGetKeys key)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
@@ -638,8 +645,6 @@ public class OperationsDb {
      *      db name
      * @param keyspaceName
      *      ks name
-     * @return
-     *      exit code
      * @throws DatabaseNameNotUniqueException 
      *      error if db name is not unique
      * @throws DatabaseNotFoundException 
@@ -792,8 +797,6 @@ public class OperationsDb {
      *      region
      * @param dest
      *      destinations
-     * @return
-     *      error code
      * @throws DatabaseNotFoundException 
      *      error db not found
      * @throws DatabaseNameNotUniqueException

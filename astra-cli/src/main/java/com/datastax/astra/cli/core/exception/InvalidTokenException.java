@@ -33,6 +33,8 @@ public class InvalidTokenException extends Exception {
      * 
      * @param token
      *      invalid token
+     * @param parent
+     *      parent exception
      */
     public InvalidTokenException(String token, Throwable parent) {
         super("Token '" + token + "' is invalid: " + parent.getMessage(), parent);

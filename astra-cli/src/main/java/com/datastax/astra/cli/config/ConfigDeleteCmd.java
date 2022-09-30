@@ -34,7 +34,7 @@ public class ConfigDeleteCmd extends AbstractConfigCmd {
     /**
      * Update property.
      * 
-     * @param t
+     * @param s
      *      current section
      * @return
      *      current reference

@@ -12,11 +12,6 @@ public class InvalidDatabaseStateException extends Exception {
 
     /** Serial Number. */
     private static final long serialVersionUID = -8460056062064740428L;
-
-    /**
-     * Default constructor
-     */
-    public InvalidDatabaseStateException() {}
     
     /**
      * Constructor with dbName

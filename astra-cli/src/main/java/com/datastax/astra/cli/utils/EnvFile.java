@@ -118,8 +118,7 @@ public class EnvFile {
     }
     
     /**
-     * Parse configuration file 
-     * @param file
+     * Parse configuration file.
      */
     public void load() {
         if (dotenvFile.exists()) {
@@ -142,9 +141,6 @@ public class EnvFile {
     
     /**
      * Save .env
-     *
-     * @param des
-     *      destination file
      */
     public void save() {
         FileWriter out = null;

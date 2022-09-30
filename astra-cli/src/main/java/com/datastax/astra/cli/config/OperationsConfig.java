@@ -38,7 +38,9 @@ public class OperationsConfig {
     
     /**
      * Syntax sugar.
+     *
      * @return
+     *      context
      */
     private static ShellContext ctx() {
         return ShellContext.getInstance();
@@ -46,9 +48,6 @@ public class OperationsConfig {
     
     /**
      * Show configuration in the output.
-     * 
-     * @param astraRc
-     *      current AstraRc
      */
     public static void listConfigurations() {
         Map<String, Map<String, String>> sections = ctx().getAstraRc().getSections();

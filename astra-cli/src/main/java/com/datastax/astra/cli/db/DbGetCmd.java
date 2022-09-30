@@ -17,19 +17,19 @@ public class DbGetCmd extends AbstractConnectedCmd {
 
     /** Enum for db get. */
     public static enum DbGetKeys { 
-        /* db unique identifier */
+        /** db unique identifier */
         id, 
-        /* db status */
+        /** db status */
         status, 
-        /* cloud provider */
+        /** cloud provider */
         cloud, 
-        /* default keyspace */
+        /** default keyspace */
         keyspace, 
-        /* all keyspaces */
+        /** all keyspaces */
         keyspaces, 
-        /* default region */
+        /** default region */
         region, 
-        /* all regions */
+        /** all regions */
         regions};
     
     /** name of the DB. */

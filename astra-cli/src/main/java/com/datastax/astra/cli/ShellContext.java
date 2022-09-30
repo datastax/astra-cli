@@ -210,7 +210,8 @@ public class ShellContext {
      * 
      * @param token
      *      token loaded from param
-     * @throws InvalidTokenException 
+     * @throws InvalidTokenException
+     *      token provided was not valid
      */
     public void connect(String token) 
     throws InvalidTokenException {

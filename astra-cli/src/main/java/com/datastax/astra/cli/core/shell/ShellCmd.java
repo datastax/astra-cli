@@ -2,7 +2,7 @@ package com.datastax.astra.cli.core.shell;
 
 import java.util.Scanner;
 
-import com.datastax.astra.cli.InteractiveShell;
+import com.datastax.astra.cli.AstraShell;
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
@@ -41,7 +41,7 @@ public class ShellCmd extends AbstractConnectedCmd {
                    String readline = scanner.nextLine();
                    ShellContext.getInstance().setRawShellCommand(readline);
                    if (null!= readline) {
-                       InteractiveShell.main(CommandLineUtils.parseCommand(readline.trim()));
+                       AstraShell.main(CommandLineUtils.parseCommand(readline.trim()));
                    }
                } while(interactive);
            }
@@ -51,10 +51,10 @@ public class ShellCmd extends AbstractConnectedCmd {
     /**
      * Enable version.
      * 
-     * @param
+     * @param b
      *      to disable interactive (default is false)
      * @return
-     *      targaet version.
+     *      target version.
      */
     public ShellCmd interactive(boolean b) {
         interactive = b;

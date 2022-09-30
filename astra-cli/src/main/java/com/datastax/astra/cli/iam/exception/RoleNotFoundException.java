@@ -9,12 +9,7 @@ public class RoleNotFoundException extends Exception {
 
     /** Serial Number. */
     private static final long serialVersionUID = -1269813351970244235L;
-
-    /**
-     * Default constructor
-     */
-    public RoleNotFoundException() {}
-    
+   
     /**
      * Constructor with roleName
      * 

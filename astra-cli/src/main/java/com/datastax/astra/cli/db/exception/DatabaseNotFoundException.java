@@ -13,11 +13,6 @@ public class DatabaseNotFoundException extends Exception {
     private static final long serialVersionUID = 8155558354861561721L;
     
     /**
-     * Default constructor
-     */
-    public DatabaseNotFoundException() {}
-    
-    /**
      * Constructor with dbName
      * 
      * @param dbName

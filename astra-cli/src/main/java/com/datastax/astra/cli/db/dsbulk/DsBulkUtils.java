@@ -24,13 +24,13 @@ import com.datastax.astra.sdk.databases.domain.Database;
 public class DsBulkUtils {
 
     /** Version Number. */
-    public static final String DSBULK_VERSION = "1.10.0";
+    public static final String DSBULK_VERSION = AstraCliUtils.readProperty("dsbulk.version");
     
     /** Archive name. */
     public static final String DSBULK_TARBALL = "dsbulk-" + DSBULK_VERSION + ".tar.gz";
     
     /** URL. */
-    public static final String DSBULK_DOWNLOAD = "https://downloads.datastax.com/dsbulk/" + DSBULK_TARBALL;
+    public static final String DSBULK_DOWNLOAD = AstraCliUtils.readProperty("dsbulk.url") + DSBULK_TARBALL;
     
     /** Folder name of dslbulk once untar. */
     public static final String DSBULK_FOLDER = "dsbulk-" + DSBULK_VERSION;

@@ -24,13 +24,13 @@ import com.datastax.astra.sdk.databases.domain.Database;
 public class CqlShellUtils {
     
     /** where to Download CqlSH. */
-    public static final String CQLSH_URL = "https://downloads.datastax.com/enterprise/cqlsh-astra.tar.gz";
+    public static final String CQLSH_URL = AstraCliUtils.readProperty("cqlsh.url");
     
     /** Folder name of Cqlsh once untar. */
-    public static final String CQLSH_FOLDER = "cqlsh-astra";
+    public static final String CQLSH_FOLDER = AstraCliUtils.readProperty("cqlsh.folder");
     
     /** Folder name of Cqlsh once untar. */
-    public static final String CQLSH_TARBALL = "cqlsh-astra.tar.gz";
+    public static final String CQLSH_TARBALL = AstraCliUtils.readProperty("cqlsh.tarball");
     
     /**
      * Hide default construtor

@@ -106,9 +106,6 @@ public abstract class AbstractCmd implements Runnable {
     /**
      * Return execution code (CLI).
      * 
-     * @return
-     *      returned code by the command
-     *     
      * @throws DatabaseNameNotUniqueException
      *      error with db name
      * @throws DatabaseNotFoundException
@@ -127,6 +124,10 @@ public abstract class AbstractCmd implements Runnable {
      *      cannot start external process (dsbulk, cqlsh..)
      * @throws FileSystemException
      *      reading cloud secure bundle
+     * @throws ConfigurationException
+     *      error with configuration
+     * @throws KeyspaceAlreadyExistException
+     *      keyspace already exist
      */
     public abstract void execute() 
     throws CannotStartProcessException, 
@@ -195,6 +196,8 @@ public abstract class AbstractCmd implements Runnable {
     /**
      * Enable flag.
      * 
+     * @param <T>
+     *      sub class of asbtract
      * @return
      *      current reference
      */
@@ -207,6 +210,8 @@ public abstract class AbstractCmd implements Runnable {
     /**
      * Enable flag.
      * 
+     * @param <T>
+     *      sub class of asbtract
      * @return
      *      current reference
      */

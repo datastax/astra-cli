@@ -9,11 +9,6 @@ public class UserNotFoundException extends Exception {
 
     /** Serial Number. */
     private static final long serialVersionUID = -1134966974107948087L;
-
-    /**
-     * Default constructor
-     */
-    public UserNotFoundException() {}
     
     /**
      * Constructor with userName

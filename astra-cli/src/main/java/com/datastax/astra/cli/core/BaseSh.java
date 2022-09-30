@@ -28,8 +28,6 @@ public abstract class BaseSh extends AbstractCmd {
     /**
      * Db Selected.
      *
-     * @return
-     *      if a db is selected or not
      * @throws DatabaseNotSelectedException
      *      db not selected 
      */

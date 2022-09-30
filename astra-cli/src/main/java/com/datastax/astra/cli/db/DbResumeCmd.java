@@ -39,8 +39,7 @@ public class DbResumeCmd extends AbstractConnectedCmd {
             description = "Provide a limit to the wait period in seconds, default is 180s.")
     protected int timeout = 180;
     
-    /** {@inheritDoc} 
-     * @throws InvalidDatabaseStateException */
+    /** {@inheritDoc} */
     public void execute() throws Exception {
         OperationsDb.resumeDb(databaseName);
         if (wait) {

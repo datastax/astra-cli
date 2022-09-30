@@ -13,11 +13,6 @@ public class UserAlreadyExistException extends Exception {
     private static final long serialVersionUID = 968018206118357644L;
 
     /**
-     * Default constructor
-     */
-    public UserAlreadyExistException() {}
-    
-    /**
      * Constructor with keyspace name
      * 
      * @param userName

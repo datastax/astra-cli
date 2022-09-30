@@ -1,12 +1,17 @@
 package com.datastax.astra.cli.test.db;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.test.AbstractCmdTest;
+import com.datastax.astra.sdk.databases.domain.Database;
 
 /**
  * Test command to list configurations.
@@ -54,11 +59,11 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(3)
-    public void should_create_db() {
+    public void should_create_db() throws DatabaseNameNotUniqueException {
         // When
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
         // Then
-        Assertions.assertTrue(ctx().getApiDevopsDatabases().database(DB_TEST).exist());
+        Assertions.assertTrue(  OperationsDb.getDatabaseClient(DB_TEST).isPresent());
         // Database is pending
         assertSuccessCli("db status %s".formatted(DB_TEST));
         

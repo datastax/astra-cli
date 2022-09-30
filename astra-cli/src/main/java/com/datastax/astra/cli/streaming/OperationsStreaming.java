@@ -188,8 +188,6 @@ public class OperationsStreaming {
      * 
      * @param tenantName
      *      tenant name
-     * @return
-     *      status
      * @throws TenantNotFoundException 
      *      error if tenant name is not unique
      */

@@ -10,8 +10,14 @@
 	<packaging>jar</packaging>
 	<inceptionYear>2022</inceptionYear>
 	<version>0.1.alpha6</version>
-
+	<url>https://github.com/datastax/astra-cli</url>
+	
 	<properties>
+	
+	 	<sonar.organization>clun-datastax</sonar.organization>
+  		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+  
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<astra-sdk.version>0.3.4-SNAPSHOT</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>

@@ -13,12 +13,7 @@ public class DatabaseNameNotUniqueException extends Exception {
      * Serial
      */
     private static final long serialVersionUID = -7880080384291100885L;
-    
-    /**
-     * Default constructor
-     */
-    public DatabaseNameNotUniqueException() {}
-    
+   
     /**
      * Constructor with dbName
      * 

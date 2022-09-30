@@ -55,7 +55,7 @@ public class ConfigGetCmd extends AbstractConfigCmd implements Runnable {
     /**
      * Update property.
      * 
-     * @param t
+     * @param s
      *      current section
      * @return
      *      current reference

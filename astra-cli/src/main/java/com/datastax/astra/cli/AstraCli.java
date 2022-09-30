@@ -208,6 +208,7 @@ public class AstraCli {
     
     /**
      * Parsing command and error relative to command.
+     * 
      * @param clazz
      *      class name to marshall
      * @param args
@@ -254,11 +255,8 @@ public class AstraCli {
     
     /**
      * Run CLI and process exceptions.
-     *
-     * @param clazz
-     *      current class.
-     * @param args
-     *      exception management
+     * @return
+     *      exit code
      */
     public static ExitCode runCli() {
         try {

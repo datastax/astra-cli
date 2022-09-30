@@ -1,6 +1,10 @@
 package com.datastax.astra.cli.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+
+import com.datastax.astra.cli.AstraCli;
 
 /**
  * Utilities for cli. 
@@ -20,4 +24,29 @@ public class AstraCliUtils {
     
     /** Folder name to download archives */
     public static final String TMP_FOLDER = "tmp";
+    
+    /** Hold properties. */
+    public static Properties properties;
+    
+    /**
+     * Read value from application.properties.
+     * 
+     * @param key
+     *      target key
+     * @return
+     *      key value
+     */
+    public static String readProperty(String key) {
+        if (properties == null) {
+            try {
+                properties = new Properties();
+                properties.load(AstraCli.class
+                    .getClassLoader()
+                    .getResourceAsStream("application.properties"));
+            } catch (IOException ex) {
+                throw new IllegalStateException(ex);
+            }
+        }
+        return properties.getProperty(key);
+    }
 }

@@ -64,6 +64,8 @@ public class UsersCommandsTest extends AbstractCmdTest {
         assertSuccessCli("user invite " + USERNAME);
         // Then
         assertSuccessCli("user get " + USERNAME);
+        // Then
+        assertExitCodeCli(ExitCode.ALREADY_EXIST, "user invite " + USERNAME);
     }
     
     @Test

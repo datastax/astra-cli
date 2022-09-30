@@ -230,8 +230,6 @@ public class OperationIam {
      *      current command options
      * @param user
      *      user email of technial identifier
-     * @return
-     *      status
      * @throws UserNotFoundException
      *      user not found
      */
