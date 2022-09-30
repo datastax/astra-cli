@@ -91,17 +91,4 @@ public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
             throw new InvalidTokenException(token, e);
         }
     }
-    
-    /**
-     * Update property.
-     * 
-     * @param t
-     *      current token
-     * @return
-     *      current reference
-     */
-    public ConfigSetupCmd token(String t) {
-        this.tokenParam = t;
-        return this;
-    }
 }

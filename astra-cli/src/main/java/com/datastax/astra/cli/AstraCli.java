@@ -45,6 +45,7 @@ import com.datastax.astra.cli.iam.UserGetCmd;
 import com.datastax.astra.cli.iam.UserInviteCmd;
 import com.datastax.astra.cli.iam.UserListCmd;
 import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
+import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
 import com.datastax.astra.cli.iam.exception.UserNotFoundException;
 import com.datastax.astra.cli.org.OrgCmd;
 import com.datastax.astra.cli.org.OrgIdCmd;
@@ -172,12 +173,6 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
          UserGetCmd.class, UserInviteCmd.class, UserDeleteCmd.class,
          UserListCmd.class
     }),
-    
-          /*
-          @Group(name= "token", description = "Manage security tokens", commands = {
-          }),
-          @Group(name= "acl", description = "Manage Access lists", commands = {
-          })*/
 })
 public class AstraCli {
     
@@ -275,7 +270,8 @@ public class AstraCli {
                  UserNotFoundException nfex) {
             ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
             return ExitCode.NOT_FOUND;
-        } catch (TenantAlreadyExistExcepion e) {
+        } catch (TenantAlreadyExistExcepion | 
+                 UserAlreadyExistException e) {
             ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
             return ExitCode.ALREADY_EXIST;
         } catch (DatabaseNotSelectedException e) {

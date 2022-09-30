@@ -35,7 +35,7 @@ public class ShellContext {
     /**
      * Singleton Pattern, private intance.
      */
-    private static ShellContext _instance;
+    private static ShellContext instance;
     
     /**
      * Default Constructor for Shell.
@@ -49,10 +49,10 @@ public class ShellContext {
      *      current instance of context
      */
     public static synchronized ShellContext getInstance() {
-        if (_instance == null) {
-            _instance = new ShellContext();
+        if (instance == null) {
+            instance = new ShellContext();
         }
-        return _instance;
+        return instance;
     }
     
     // -- Config --
@@ -140,15 +140,14 @@ public class ShellContext {
         LoggerShell.info("Command : " + ShellContext.getInstance().getRawCommandString());
         LoggerShell.info("Class   : " + cli.getClass());
         
-        if (cli instanceof AbstractConnectedCmd) {
-            AbstractConnectedCmd ccli = (AbstractConnectedCmd) cli;
+        if (cli instanceof AbstractConnectedCmd ccli) {
             this.token  = ccli.getToken();
             if (this.token == null) {
                 if (!StringUtils.isEmpty(ccli.getConfigSectionName())) {
                     this.configSection = ccli.getConfigSectionName();
                     LoggerShell.debug("ConfigSectionName: " + configSection);
                 }
-                assertSection(ccli);
+                assertSection();
                 assertTokenInSection(ccli);
                 token = this.astraRc
                             .getSection(this.configSection)
@@ -165,14 +164,12 @@ public class ShellContext {
     /**
      * Valid section.
      *
-     * @param cmd
-     *      current command with options
      * @return
      *      section is valid
      * @throws TokenNotFoundException
      *      token not found in section
      */
-    private void assertSection(AbstractCmd cmd) 
+    private void assertSection() 
     throws TokenNotFoundException {
         if (!this.astraRc.isSectionExists(this.configSection)) {
             ShellPrinter.outputError(CANNOT_CONNECT, "No token provided (-t), no config provided (--config), section '" + this.configSection 

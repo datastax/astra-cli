@@ -30,17 +30,4 @@ public class ConfigDeleteCmd extends AbstractConfigCmd {
         ctx().getAstraRc().save();
         ShellPrinter.outputSuccess("Section '" + sectionName + "' has been deleted.");
     }
-    
-    /**
-     * Update property.
-     * 
-     * @param s
-     *      current section
-     * @return
-     *      current reference
-     */
-    public ConfigDeleteCmd sectionName(String s) {
-        this.sectionName = s;
-        return this;
-    }
 }

@@ -1,7 +1,5 @@
 package com.datastax.astra.cli.iam.exception;
 
-import com.datastax.astra.cli.core.out.LoggerShell;
-
 /**
  * Database not found
  *
@@ -19,8 +17,7 @@ public class UserAlreadyExistException extends Exception {
      *      users name
      */
     public UserAlreadyExistException(String userName) {
-        super("USer '" + userName + "' already existsin the organization.");
-        LoggerShell.warning(getMessage());
+        super("User '" + userName + "' already existsin the organization.");
     }
 
 }

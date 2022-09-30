@@ -62,6 +62,11 @@ public class OperationsStreaming {
     private static Map<String, TenantClient> cacheTenantClient = new HashMap<>();
     
     /**
+     * Hide default constructor
+     */
+    private OperationsStreaming() {}
+    
+    /**
      * Syntax Sugar to work with Streaming Devops Apis.
      * 
      * @return
@@ -280,15 +285,11 @@ public class OperationsStreaming {
      *      current tenant
      */
     public static void createPulsarConf(Tenant tenant) {
-        File pulsarConf = getPulsarConfFile(tenant);
-        if (pulsarConf.exists()) {
-            LoggerShell.debug("Pulsar client.conf already exist");
-        }
         PulsarShellUtils.generateConf(
                 tenant.getCloudProvider() , 
                 tenant.getCloudRegion(), 
                 tenant.getPulsarToken(),
-                pulsarConf.getAbsolutePath());
+                getPulsarConfFile(tenant).getAbsolutePath());
         LoggerShell.info("Pulsar client.conf has been generated.");
     }
     
@@ -321,9 +322,6 @@ public class OperationsStreaming {
         try {
             System.out.println("Pulsar-shell is starting please wait for connection establishment...");
             Process cqlShProc = PulsarShellUtils.runPulsarShell(options, tenant, getPulsarConfFile(tenant));
-            if (cqlShProc == null) {
-                throw new CannotStartProcessException("pulsar-shell");
-            }
             cqlShProc.waitFor();
         } catch (Exception e) {
             LoggerShell.error("Cannot start Pulsar Shel :" + e.getMessage());
