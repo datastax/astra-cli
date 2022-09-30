@@ -239,13 +239,10 @@ public class AstraCli {
         } catch(ParseException ex) {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch (InvalidTokenException e) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, e.getMessage());
-            return ExitCode.INVALID_PARAMETER;
-        } catch (TokenNotFoundException e) {
+        } catch (InvalidTokenException | TokenNotFoundException e) {
             ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
-        } 
+        }
     }
     
     /**

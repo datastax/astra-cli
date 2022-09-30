@@ -123,9 +123,9 @@ public class EnvFile {
     public void load() {
         if (dotenvFile.exists()) {
             LoggerShell.debug("Loading existing file");
-            try {
+            try(FileInputStream fis = new FileInputStream(dotenvFile)) {
                 Properties p = new Properties();
-                p.load(new FileInputStream(dotenvFile));
+                p.load(fis);
                 p.entrySet().stream().forEach(e -> {
                     try {
                         keys.put(EnvKey.valueOf((String) e.getKey()), e.getValue().toString());

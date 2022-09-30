@@ -51,30 +51,4 @@ public class ConfigCreateCmd extends AbstractConfigCmd {
         ShellPrinter.outputSuccess("Configuration Saved.\n");
     }
     
-    /**
-     * Update property.
-     * 
-     * @param s
-     *      current section
-     * @return
-     *      current reference
-     */
-    public ConfigCreateCmd sectionName(String s) {
-        this.sectionName = s;
-        return this;
-    }
-    
-    /**
-     * Update property.
-     * 
-     * @param t
-     *      current token
-     * @return
-     *      current reference
-     */
-    public ConfigCreateCmd token(String t) {
-        this.token = t;
-        return this;
-    }
-    
 }
