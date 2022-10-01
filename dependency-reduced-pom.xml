@@ -361,12 +361,13 @@
     <sonar.organization>clun-datastax</sonar.organization>
     <commons-compress.version>1.21</commons-compress.version>
     <version.maven.plugin.compiler>3.8.1</version.maven.plugin.compiler>
-    <astra-sdk.version>0.3.4-SNAPSHOT</astra-sdk.version>
+    <astra-sdk.version>0.3.4</astra-sdk.version>
     <commons-lang.version>3.12.0</commons-lang.version>
+    <version.maven.plugin.assembly>3.4.2</version.maven.plugin.assembly>
     <maven.plugin.compiler.source>17</maven.plugin.compiler.source>
     <junit-jupiter.version>5.9.0</junit-jupiter.version>
     <junit-platform.version>1.9.0</junit-platform.version>
-    <version.maven.plugin.javadoc>2.10.3</version.maven.plugin.javadoc>
+    <version.maven.plugin.javadoc>3.4.1</version.maven.plugin.javadoc>
     <version.maven.plugin.surefire>2.22.2</version.maven.plugin.surefire>
     <version.maven.plugin.failsafe>2.22.2</version.maven.plugin.failsafe>
   </properties>
