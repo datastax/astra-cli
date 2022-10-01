@@ -189,32 +189,41 @@ public class OperationsDb {
     throws DatabaseNameNotUniqueException {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
-           Database db = dbClient.get().find().get();
-           int retries = 0;
-           long start = System.currentTimeMillis();
-           if (db.getStatus().equals(status)) {
-               return ExitCode.SUCCESS;
-           }
-           LoggerShell.success("Database '" + databaseName + "' has status '" + db.getStatus() + "' waiting to be '" + status + "' ...");
-           while (retries++ < timeout && !db.getStatus().equals(status)) {
-               try {
-                Thread.sleep(1000);
-                db = dbClient.get().find().get();
-                LoggerShell.debug("Waiting for database to become " + status + 
-                        " but was " + db.getStatus() + " retrying (" + retries + "/" + timeout + ")");
-               } catch (InterruptedException e) {}
-           }
-           // Success if you did not reach the timeout (meaning status is good)
-           if (retries < timeout) {
-               LoggerShell.success("Database '"
-                       + databaseName + "' has status '"  +  status 
-                       + "' (took " + (System.currentTimeMillis() - start) + " millis)");
-               return ExitCode.SUCCESS;
-           }
-           LoggerShell.warning("Timeout (" + timeout + "s) : "
-                   + "Database '" + databaseName + "' status is not yet '" + status 
-                   + "' (current status '" + db.getStatus() + "')");
-           return ExitCode.UNAVAILABLE;
+           DatabaseClient     dbc   = dbClient.get();
+           Optional<Database> optDb = dbc.find();
+           if (optDb.isPresent()) {
+               Database db = optDb.get();
+               long start = System.currentTimeMillis();
+               if (db.getStatus().equals(status)) {
+                   return ExitCode.SUCCESS;
+               }
+               LoggerShell.success("Database '%s' has status '%s' waiting to be '%s' ..."
+                       .formatted(databaseName, db.getStatus(), status));
+               
+               int retries = 0;
+               while (retries++ < timeout && !db.getStatus().equals(status)) {
+                   try {
+                    Thread.sleep(1000);
+                    db = dbc.find().get();
+                    LoggerShell.debug("Waiting for database to become " + status + 
+                            " but was " + db.getStatus() + " retrying (" + retries + "/" + timeout + ")");
+                   } catch (InterruptedException e) {
+                       LoggerShell.error("Interupted operation: %s".formatted(e.getMessage()));
+                       Thread.currentThread().interrupt();
+                   }
+               }
+               // Success if you did not reach the timeout (meaning status is good)
+               if (retries < timeout) {
+                   LoggerShell.success("Database '"
+                           + databaseName + "' has status '"  +  status 
+                           + "' (took " + (System.currentTimeMillis() - start) + " millis)");
+                   return ExitCode.SUCCESS;
+               }
+               LoggerShell.warning("Timeout (" + timeout + "s) : "
+                       + "Database '" + databaseName + "' status is not yet '" + status 
+                       + "' (current status '" + db.getStatus() + "')");
+               return ExitCode.UNAVAILABLE;
+            }
         }
         LoggerShell.error("Database '" + databaseName + "' has not been found.");
         return ExitCode.NOT_FOUND;
@@ -299,30 +308,33 @@ public class OperationsDb {
         }
         
         // If the database is HIBERNATED we need to wake it up before assessing the keyspace
-        Database db = dbClient.get().find().get();
-        DatabaseStatusType dbStatus = db.getStatus();
-        if (dbStatus.equals(DatabaseStatusType.HIBERNATED)) {
-            OperationsDb.resumeDb(databaseName);
-            OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
-            db = dbClient.get().find().get();
-            dbStatus = db.getStatus();
-        }
-        
-        // Create keyspace on existing DB when needed
-        if (dbStatus.equals(DatabaseStatusType.PENDING) ||
-            dbStatus.equals(DatabaseStatusType.RESUMING)) {
-            OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
-            db = dbClient.get().find().get();
-            dbStatus = db.getStatus();
-        }
-        
-        // Create keyspace on existing DB when needed
-        if (dbStatus.equals(DatabaseStatusType.ACTIVE)) {
-            OperationsDb.createKeyspace(databaseName, keyspace, ifNotExist);
-        } else {
-            LoggerShell.error("Database '" + databaseName + "' already exists "
-                    + "but was neither ACTIVE not HIBERNATED but '" + dbStatus + "', cannot create keyspace.");
-            throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
+        if (dbClient.isPresent()) {
+            DatabaseClient dbc = dbClient.get();
+            Database db = dbc.find().get();
+            DatabaseStatusType dbStatus = db.getStatus();
+            switch (dbStatus) {
+                case HIBERNATED:
+                    OperationsDb.resumeDb(databaseName);
+                    OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
+                    dbStatus = db.getStatus();
+                break;
+                case PENDING:
+                case RESUMING:
+                    OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
+                    dbStatus = db.getStatus();
+                break;
+                default:
+                break;
+            }
+            
+            // Create keyspace on existing DB when needed
+            if (dbStatus.equals(DatabaseStatusType.ACTIVE)) {
+                OperationsDb.createKeyspace(databaseName, keyspace, ifNotExist);
+            } else {
+                LoggerShell.error("Database '" + databaseName + "' already exists "
+                        + "but was neither ACTIVE not HIBERNATED but '" + dbStatus + "', cannot create keyspace.");
+                throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
+            }
         }
     }
      
@@ -361,11 +373,7 @@ public class OperationsDb {
      */
     public static void listKeyspaces(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
-        if (!dbClient.isPresent()) {
-            throw new DatabaseNotFoundException(databaseName);
-        }
-        Database db = dbClient.get().find().get();
+        Database   db  = getDatabase(databaseName);
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_NAME,    20);
         db.getInfo().getKeyspaces().forEach(ks -> {
@@ -392,12 +400,8 @@ public class OperationsDb {
      */
     public static void deleteDb(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
-        if (!dbClient.isPresent()) {
-            throw new DatabaseNotFoundException(databaseName);
-        }
-        dbClient.get().delete();
-        ShellPrinter.outputSuccess("Deleting Database '" + databaseName + "' (async operation)");
+        getRequiredDatabaseClient(databaseName).delete();
+        ShellPrinter.outputSuccess("Deleting Database '%s' (async operation)".formatted(databaseName));
     }
   
     /**
@@ -415,11 +419,7 @@ public class OperationsDb {
     public static void resumeDb(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
            InvalidDatabaseStateException {
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
-        if (!dbClient.isPresent()) {
-            throw new DatabaseNotFoundException(databaseName);
-        }
-        Database db = dbClient.get().find().get();
+        Database db = getDatabase(databaseName);
         switch(db.getStatus()) {
             case HIBERNATED:
                 resumeDbRequest(db);
@@ -429,8 +429,7 @@ public class OperationsDb {
                 break;
             default:
                 LoggerShell.warning("Your database has not 'HIBERNATED' status.");
-                throw new InvalidDatabaseStateException(databaseName, 
-                        DatabaseStatusType.HIBERNATED, db.getStatus());
+                throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.HIBERNATED, db.getStatus());
         }
     }
     
@@ -442,7 +441,6 @@ public class OperationsDb {
      */
     private static void resumeDbRequest(Database db) {
         try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            // Forge request (minimal dependencies)
             StringBuilder keyspacesUrl = new StringBuilder(
                         ApiLocator.getApiRestEndpoint(
                                 db.getId(), 
@@ -469,33 +467,8 @@ public class OperationsDb {
      */
     public static void showDbStatus(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
-        if (!dbClient.isPresent()) {
-            throw new DatabaseNotFoundException(databaseName);
-        }
-        Database db = dbClient.get().find().get();
-        ShellPrinter.outputSuccess("Database '" + databaseName + "' has status '" + db.getStatus() + "'");
-    }
-    
-    /**
-     * Access unique db.
-     * 
-     * @param databaseName
-     *      database name
-     * @return
-     *      unique db
-     * @throws DatabaseNameNotUniqueException
-     *      error when multiple dbs
-     * @throws DatabaseNotFoundException
-     *      error when db does not exists
-     */
-    private static Database getDatabase(String databaseName) 
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
-        if (!dbClient.isPresent()) {
-            throw new DatabaseNotFoundException(databaseName);
-        }
-        return dbClient.get().find().get();
+        ShellPrinter.outputSuccess("Database '%s' has status '%s'"
+                    .formatted(databaseName, getDatabase(databaseName).getStatus()));
     }
     
     /**
@@ -632,10 +605,9 @@ public class OperationsDb {
      */
     public static void downloadCloudSecureBundles(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        getDatabase(databaseName);
-        getDatabaseClient(databaseName)
-            .get()
-            .downloadAllSecureConnectBundles(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER);
+        getRequiredDatabaseClient(databaseName)
+            .downloadAllSecureConnectBundles(
+                    AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER);
         LoggerShell.info("Secure connect bundles have been downloaded.");
     }
     
@@ -655,12 +627,7 @@ public class OperationsDb {
      */
     public static void deleteKeyspace(String databaseName, String keyspaceName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, KeyspaceNotFoundException {
-        // Validate db Name
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
-        if (!dbClient.isPresent()) {
-            throw new DatabaseNotFoundException(databaseName);
-        }
-        Set<String> existingkeyspaces = dbClient.get().find().get().getInfo().getKeyspaces();
+        Set<String> existingkeyspaces = getDatabase(databaseName).getInfo().getKeyspaces();
         if (!existingkeyspaces.contains(keyspaceName)) {
             throw new KeyspaceNotFoundException(keyspaceName);
         }
@@ -840,5 +807,47 @@ public class OperationsDb {
         
         
         envFile.save();
+    }
+    
+    /**
+     * Access unique db.
+     * 
+     * @param databaseName
+     *      database name
+     * @return
+     *      unique db
+     * @throws DatabaseNameNotUniqueException
+     *      error when multiple dbs
+     * @throws DatabaseNotFoundException
+     *      error when db does not exists
+     */
+    private static Database getDatabase(String databaseName) 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+        Optional<Database> optDb = getRequiredDatabaseClient(databaseName).find();
+        if (optDb.isPresent()) {
+            return optDb.get();
+        }
+        throw new DatabaseNotFoundException(databaseName);
+    }
+    
+    /**
+     * Access unique db.
+     * 
+     * @param databaseName
+     *      database name
+     * @return
+     *      unique db
+     * @throws DatabaseNameNotUniqueException
+     *      error when multiple dbs
+     * @throws DatabaseNotFoundException
+     *      error when db does not exists
+     */
+    private static DatabaseClient getRequiredDatabaseClient(String databaseName) 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
+        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+        if (dbClient.isPresent()) {
+            return dbClient.get();
+        }
+        throw new DatabaseNotFoundException(databaseName);
     }
  }

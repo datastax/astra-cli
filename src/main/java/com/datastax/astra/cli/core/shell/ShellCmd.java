@@ -23,6 +23,7 @@ public class ShellCmd extends AbstractConnectedCmd {
     @Option(name = { "--version" }, description = "Show version")
     protected boolean version = false;
     
+    /** if set as interactive, the infinite loop is triggered. */
     protected boolean interactive = true;
     
     /** {@inheritDoc} */

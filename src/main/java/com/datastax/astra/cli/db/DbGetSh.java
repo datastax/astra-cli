@@ -1,7 +1,7 @@
 package com.datastax.astra.cli.db;
 
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.db.DbGetCmd.DbGetKeys;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -14,7 +14,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.GET, description = "Show details of a database")
-public class DbGetSh extends BaseSh {
+public class DbGetSh extends AbstractInteractiveCmd {
 
     /** name of the DB. */
     @Required

@@ -1,6 +1,7 @@
-package com.datastax.astra.cli.core;
+package com.datastax.astra.cli.core.shell;
 
 import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.github.rvesse.airline.annotations.Command;
 
@@ -10,7 +11,7 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "exit", description = "Exit program.")
-public class ExitCmd extends BaseSh {
+public class ExitCmd extends AbstractInteractiveCmd {
 
     /** {@inheritDoc} */
     @Override

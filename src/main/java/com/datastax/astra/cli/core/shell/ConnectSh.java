@@ -2,7 +2,7 @@ package com.datastax.astra.cli.core.shell;
 
 import java.util.Optional;
 
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.sdk.config.AstraClientConfig;
@@ -20,7 +20,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "connect", description = "Connect to another Astra Organization")
-public class ConnectSh extends BaseSh {
+public class ConnectSh extends AbstractInteractiveCmd {
     
     /**
      * Section name in configuration file.

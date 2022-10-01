@@ -1,7 +1,7 @@
 package com.datastax.astra.cli.db.cqlsh;
 
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.db.OperationsDb;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -12,7 +12,7 @@ import com.github.rvesse.airline.annotations.Option;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "cqlsh", description = "Start Cqlsh (db must be selected first)")
-public class DbCqlShellSh extends BaseSh {
+public class DbCqlShellSh extends AbstractInteractiveCmd {
     
     /** Cqlsh Options. */
     @Option(name = { "--version" }, 

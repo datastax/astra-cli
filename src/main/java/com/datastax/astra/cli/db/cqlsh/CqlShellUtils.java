@@ -53,7 +53,7 @@ public class CqlShellUtils {
             if (cqlshtarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
                 try {
-                    FileUtils.extactTargz(cqlshtarball, new File (AstraCliUtils.ASTRA_HOME));
+                    FileUtils.extactTargzInAstraCliHome(cqlshtarball);
                     if (isCqlShellInstalled()) {
                         // Change file permission
                         File cqlshFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  

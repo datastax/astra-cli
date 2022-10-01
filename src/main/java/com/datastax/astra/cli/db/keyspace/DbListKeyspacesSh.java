@@ -1,6 +1,6 @@
 package com.datastax.astra.cli.db.keyspace;
 
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -14,7 +14,7 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsDb.CMD_LIST_KEYSPACES, description = "Display the list of Keyspaces in an database")
-public class DbListKeyspacesSh extends BaseSh {
+public class DbListKeyspacesSh extends AbstractInteractiveCmd {
   
     /** {@inheritDoc} */
     public void execute()

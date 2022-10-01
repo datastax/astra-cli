@@ -1,7 +1,7 @@
 package com.datastax.astra.cli.db;
 
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
@@ -19,7 +19,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.CREATE, description = "Create a database with shell")
-public class DbCreateSh extends BaseSh {
+public class DbCreateSh extends AbstractInteractiveCmd {
     
     /** Cqlsh Options. */
     @Option(name = { "--if-not-exist" }, 

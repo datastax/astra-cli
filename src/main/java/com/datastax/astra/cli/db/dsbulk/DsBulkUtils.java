@@ -66,7 +66,7 @@ public class DsBulkUtils {
             if (dsbulkTarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
                 try {
-                    FileUtils.extactTargz(dsbulkTarball, new File (AstraCliUtils.ASTRA_HOME));
+                    FileUtils.extactTargzInAstraCliHome(dsbulkTarball);
                     if (isDsBulkInstalled()) {
                         // Change file permission
                         File dsBulkFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  

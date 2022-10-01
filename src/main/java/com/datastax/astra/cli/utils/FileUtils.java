@@ -14,14 +14,14 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 
-import com.datastax.astra.cli.core.exception.InvalidArgumentException;
-
 /**
  * Utility operations on Files.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
 public class FileUtils {
+    
+    private static final File ASTRA_CLI_HOME = new File (AstraCliUtils.ASTRA_HOME);
     
     /**
      * Hide Default Constructor
@@ -33,22 +33,17 @@ public class FileUtils {
      *
      * @param tarFile
      *      source file
-     * @param destFile
-     *      destination folder
      * @throws IOException
      *      error during opening archive
      */
-    public static void extactTargz(File tarFile, File destFile) 
+    public static void extactTargzInAstraCliHome(File tarFile) 
     throws IOException{
         try (FileInputStream fis = new FileInputStream(tarFile)) {
             try (GzipCompressorInputStream gzIn = new GzipCompressorInputStream(fis)) {
                 try ( TarArchiveInputStream tis = new TarArchiveInputStream(gzIn)) {
                   TarArchiveEntry tarEntry = null;
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
-                      if (!destFile.getCanonicalPath().startsWith(System.getProperty("user.home"))) {
-                         throw new IllegalArgumentException("Cannot extract targz outside of user home"); 
-                      }
-                      File outputFile = new File(destFile + File.separator + tarEntry.getName());
+                      File outputFile = new File(ASTRA_CLI_HOME + File.separator + tarEntry.getName());
                       if (tarEntry.isDirectory()) {
                           if (!outputFile.exists()) {
                               outputFile.mkdirs();

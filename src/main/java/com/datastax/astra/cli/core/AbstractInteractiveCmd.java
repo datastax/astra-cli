@@ -11,7 +11,7 @@ import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public abstract class BaseSh extends AbstractCmd {
+public abstract class AbstractInteractiveCmd extends AbstractCmd {
     
     /** {@inheritDoc} */
     @Override

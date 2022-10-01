@@ -1,6 +1,6 @@
 package com.datastax.astra.cli.iam;
 
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
 import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
 import com.datastax.astra.sdk.organizations.domain.DefaultRoles;
@@ -15,7 +15,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "invite", description = "Invite a user to an organization")
-public class UserInviteSh extends BaseSh {
+public class UserInviteSh extends AbstractInteractiveCmd {
 
     /** identifier or email. */
     @Required

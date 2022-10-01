@@ -119,7 +119,7 @@ public class PulsarShellUtils {
             if (pulsarShelltarball.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait it can take a minute...");
                 try {
-                    FileUtils.extactTargz(pulsarShelltarball, new File (AstraCliUtils.ASTRA_HOME));
+                    FileUtils.extactTargzInAstraCliHome(pulsarShelltarball);
                     if (isPulsarShellInstalled()) {
                         // Change file permission
                         File pulsarShellFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  

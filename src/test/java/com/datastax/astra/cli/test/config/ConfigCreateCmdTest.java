@@ -23,7 +23,7 @@ public class ConfigCreateCmdTest extends AbstractCmdTest {
     
     @Test
     public void should_not_create_config() {
-        assertExitCodeCli(ExitCode.NOT_FOUND, "config create demo");
-        assertExitCodeCli(ExitCode.INVALID_PARAMETER, "config create demo -t invalid");
+        assertExitCodeCli(ExitCode.CONFIGURATION, "config create demo");
+        assertExitCodeCli(ExitCode.CONFIGURATION, "config create demo -t invalid");
     }
 }

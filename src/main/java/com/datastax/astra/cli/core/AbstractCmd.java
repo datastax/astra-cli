@@ -128,6 +128,10 @@ public abstract class AbstractCmd implements Runnable {
      *      error with configuration
      * @throws KeyspaceAlreadyExistException
      *      keyspace already exist
+     * @throws TokenNotFoundException
+     *      no token provided
+     * @throws InvalidTokenException
+     *      token provided has invalid format.
      */
     public abstract void execute() 
     throws CannotStartProcessException, 
@@ -141,6 +145,8 @@ public abstract class AbstractCmd implements Runnable {
            KeyspaceAlreadyExistException,
            TenantAlreadyExistExcepion, 
            TenantNotFoundException,
+           TokenNotFoundException, 
+           InvalidTokenException,
            Exception; 
     
     /** {@inheritDoc} */

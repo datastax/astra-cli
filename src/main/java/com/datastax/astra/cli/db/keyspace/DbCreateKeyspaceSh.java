@@ -1,7 +1,7 @@
 package com.datastax.astra.cli.db.keyspace;
 
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -19,7 +19,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsDb.CMD_CREATE_KEYSPACE, description = "Create a new keyspace (db must be selected)")
-public class DbCreateKeyspaceSh extends BaseSh {
+public class DbCreateKeyspaceSh extends AbstractInteractiveCmd {
     
     /**
      * Database name or identifier

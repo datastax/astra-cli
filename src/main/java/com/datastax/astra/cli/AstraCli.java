@@ -277,6 +277,9 @@ public class AstraCli {
         } catch (FileSystemException | ConfigurationException ex) {
             ShellPrinter.outputError(ExitCode.CONFIGURATION, ex.getMessage());
             return ExitCode.CONFIGURATION;
+        } catch (InvalidTokenException | TokenNotFoundException e) {
+            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
+            return ExitCode.CONFIGURATION;
         } catch (Exception ex) {
             ShellPrinter.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
             return ExitCode.INTERNAL_ERROR;

@@ -1,7 +1,7 @@
 package com.datastax.astra.cli.db;
 
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -12,7 +12,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.DELETE, description = "Delete an existing database")
-public class DbDeleteSh extends BaseSh {
+public class DbDeleteSh extends AbstractInteractiveCmd {
     
     /**
      * Database name or identifier

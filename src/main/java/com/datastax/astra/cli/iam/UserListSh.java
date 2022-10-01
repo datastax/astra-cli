@@ -1,7 +1,7 @@
 package com.datastax.astra.cli.iam;
 
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.BaseSh;
+import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -10,7 +10,7 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.LIST, description = "Display the list of Users in an organization")
-public class UserListSh extends BaseSh {
+public class UserListSh extends AbstractInteractiveCmd {
    
     /** {@inheritDoc} */
     public void execute() {

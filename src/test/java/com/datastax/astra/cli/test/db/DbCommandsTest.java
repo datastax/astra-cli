@@ -1,7 +1,5 @@
 package com.datastax.astra.cli.test.db;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -11,7 +9,6 @@ import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.test.AbstractCmdTest;
-import com.datastax.astra.sdk.databases.domain.Database;
 
 /**
  * Test command to list configurations.
