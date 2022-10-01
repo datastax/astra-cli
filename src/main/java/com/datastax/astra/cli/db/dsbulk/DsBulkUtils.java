@@ -73,12 +73,19 @@ public class DsBulkUtils {
                                 + DSBULK_FOLDER + File.separator 
                                 + "bin" + File.separator  
                                 + "dsbulk");
-                        dsBulkFile.setExecutable(true, false);
-                        dsBulkFile.setReadable(true, false);
-                        dsBulkFile.setWritable(true, false);
-                        
+                        if (!dsBulkFile.setExecutable(true, false)) {
+                            throw new FileSystemException("Cannot set dsbulk file as executable");
+                        }
+                        if (!dsBulkFile.setReadable(true, false)) {
+                            throw new FileSystemException("Cannot set dsbulk file as readable");
+                        }
+                        if (!dsBulkFile.setWritable(true, false)) {
+                            throw new FileSystemException("Cannot set dsbulk file as writable");
+                        }
                         LoggerShell.success("DSBulk has been installed");
-                        dsbulkTarball.delete();
+                        if (!dsbulkTarball.delete()) {
+                            LoggerShell.warning("DSBulk Tar archived was not deleted");
+                        }
                     }
                 } catch (IOException e) {
                     LoggerShell.error("Cannot extract tar archive:" + e.getMessage());

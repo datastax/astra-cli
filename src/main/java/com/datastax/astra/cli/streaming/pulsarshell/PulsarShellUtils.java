@@ -126,12 +126,19 @@ public class PulsarShellUtils {
                                 + LUNA_FOLDER + File.separator 
                                 + "bin" + File.separator  
                                 + "pulsar-shell");
-                        pulsarShellFile.setExecutable(true, false);
-                        pulsarShellFile.setReadable(true, false);
-                        pulsarShellFile.setWritable(true, false);
-                        
+                        if (!pulsarShellFile.setExecutable(true, false)) {
+                            throw new FileSystemException("Cannot set pulsar-shell file as executable");
+                        }
+                        if (!pulsarShellFile.setReadable(true, false)) {
+                            throw new FileSystemException("Cannot set pulsar-shell file as readable");
+                        }
+                        if (!pulsarShellFile.setWritable(true, false)) {
+                            throw new FileSystemException("Cannot set pulsar-shell file as writable");
+                        }
                         LoggerShell.success("pulsar-shell has been installed");
-                        pulsarShelltarball.delete();
+                        if (!pulsarShelltarball.delete()) {
+                            LoggerShell.warning("Pulsar-shell Tar archived was not deleted");
+                        }
                     }
                 } catch (IOException e) {
                     LoggerShell.error("Cannot extract tar archive:" + e.getMessage());

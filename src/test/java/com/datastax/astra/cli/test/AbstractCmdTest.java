@@ -1,6 +1,5 @@
 package com.datastax.astra.cli.test;
 
-import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 import com.datastax.astra.cli.AstraCli;
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.shell.ShellCmd;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.stargate.sdk.utils.Utils;
@@ -101,15 +99,6 @@ public abstract class AbstractCmdTest {
     
     protected static void assertExitCodeCli(ExitCode code, String[] cmd) {
         Assertions.assertEquals(code, runCli(cmd));
-    }
-    
-    protected static void assertExitCodeInteractive(ExitCode code, String cmd) {
-        System.setIn(new ByteArrayInputStream((cmd + "\n").getBytes()));
-        Assertions.assertEquals(code, new ShellCmd().interactive(false));
-    }
-   
-    protected static void assertSuccessInteractive(String cmd) {
-        assertExitCodeInteractive(ExitCode.SUCCESS, cmd);
     }
 
 }

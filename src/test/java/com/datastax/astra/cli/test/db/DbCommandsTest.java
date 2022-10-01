@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.db.OperationsDb;
-import com.datastax.astra.cli.db.cqlsh.CqlShellUtils;
 import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.test.AbstractCmdTest;

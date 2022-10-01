@@ -324,6 +324,7 @@ public class OperationsStreaming {
             Process cqlShProc = PulsarShellUtils.runPulsarShell(options, tenant, getPulsarConfFile(tenant));
             cqlShProc.waitFor();
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             LoggerShell.error("Cannot start Pulsar Shel :" + e.getMessage());
             throw new CannotStartProcessException("pulsar-shell", e);
         }

@@ -184,9 +184,11 @@ public class OperationsDb {
      *      db is in correct status
      * @throws DatabaseNameNotUniqueException
      *      db name is present multiple times
+     * @throws DatabaseNotFoundException
+     *      database has not been found
      */
     public static ExitCode waitForDbStatus(String databaseName, DatabaseStatusType status, int timeout) 
-    throws DatabaseNameNotUniqueException {
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
            DatabaseClient     dbc   = dbClient.get();
@@ -204,7 +206,7 @@ public class OperationsDb {
                while (retries++ < timeout && !db.getStatus().equals(status)) {
                    try {
                     Thread.sleep(1000);
-                    db = dbc.find().get();
+                    db = getDatabase(databaseName);
                     LoggerShell.debug("Waiting for database to become " + status + 
                             " but was " + db.getStatus() + " retrying (" + retries + "/" + timeout + ")");
                    } catch (InterruptedException e) {
@@ -309,8 +311,7 @@ public class OperationsDb {
         
         // If the database is HIBERNATED we need to wake it up before assessing the keyspace
         if (dbClient.isPresent()) {
-            DatabaseClient dbc = dbClient.get();
-            Database db = dbc.find().get();
+            Database db = getDatabase(databaseName);
             DatabaseStatusType dbStatus = db.getStatus();
             switch (dbStatus) {
                 case HIBERNATED:
@@ -576,7 +577,7 @@ public class OperationsDb {
                 LoggerShell.error("You provided an invalid folder, check the -d parameters");
                 throw new InvalidArgumentException("Destination folder cannot be found or written.");
             }
-            getDatabaseClient(databaseName).get().downloadAllSecureConnectBundles(dir);
+            getRequiredDatabaseClient(databaseName).downloadAllSecureConnectBundles(dir);
             LoggerShell.info("Secure connect bundles have been downloaded.");
             
         } else if (file != null) {
@@ -670,7 +671,7 @@ public class OperationsDb {
                 throw new KeyspaceAlreadyExistException(keyspaceName, databaseName);
             }
         } else {
-            getDatabaseClient(databaseName).get().createKeyspace(keyspaceName);
+            getRequiredDatabaseClient(databaseName).createKeyspace(keyspaceName);
             LoggerShell.info("Keyspace '"+ keyspaceName + "' is creating.");
         }
     }
@@ -709,6 +710,7 @@ public class OperationsDb {
             }
             cqlShProc.waitFor();
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             throw new CannotStartProcessException("cqlsh", e);
         }
     }
@@ -750,6 +752,7 @@ public class OperationsDb {
            
         } catch (Exception e) {
             LoggerShell.error("Cannot start DsBulk:" + e.getMessage());
+            Thread.currentThread().interrupt();
             throw new CannotStartProcessException("dsbulk", e);
         }
     }
@@ -821,7 +824,7 @@ public class OperationsDb {
      * @throws DatabaseNotFoundException
      *      error when db does not exists
      */
-    private static Database getDatabase(String databaseName) 
+    public static Database getDatabase(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         Optional<Database> optDb = getRequiredDatabaseClient(databaseName).find();
         if (optDb.isPresent()) {

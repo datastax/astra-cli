@@ -60,12 +60,19 @@ public class CqlShellUtils {
                                 + CQLSH_FOLDER + File.separator 
                                 + "bin" + File.separator  
                                 + "cqlsh");
-                        cqlshFile.setExecutable(true, false);
-                        cqlshFile.setReadable(true, false);
-                        cqlshFile.setWritable(true, false);
-                        
+                        if (!cqlshFile.setExecutable(true, false)) {
+                            throw new FileSystemException("Cannot set cqlsh file as executable");
+                        }
+                        if (!cqlshFile.setReadable(true, false)) {
+                            throw new FileSystemException("Cannot set cqlsh file as readable");
+                        }
+                        if (!cqlshFile.setWritable(true, false)) {
+                            throw new FileSystemException("Cannot set cqlsh file as writable");
+                        }
                         LoggerShell.success("Cqlsh has been installed");
-                        cqlshtarball.delete();
+                        if (!cqlshtarball.delete()) {
+                            LoggerShell.warning("Cqlsh Tar archived was not deleted");
+                        }
                     }
                 } catch (IOException e) {
                     LoggerShell.error("Cannot extract tar archive:" + e.getMessage());

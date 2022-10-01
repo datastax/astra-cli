@@ -49,7 +49,7 @@ public class FileUtils {
                               .replaceAll(">", "")
                               .replaceAll("<", "")
                               .replaceAll("\\*", "")
-                              .replaceAll("|", "");
+                              .replaceAll("\\|", "");
                       File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, myTarEntry).toFile();
                           if (tarEntry.isDirectory()) {
                               if (!outputFile.exists()) {
