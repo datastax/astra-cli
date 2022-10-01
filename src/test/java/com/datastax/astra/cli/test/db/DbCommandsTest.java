@@ -67,11 +67,7 @@ public class DbCommandsTest extends AbstractCmdTest {
         
     }
     
-    @Test
-    public void should_install_Cqlsh()  throws Exception {
-        CqlShellUtils.installCqlShellAstra();
-        Assertions.assertTrue(CqlShellUtils.isCqlShellInstalled());
-    }
+   
     
     /*
     @Test
@@ -85,20 +81,4 @@ public class DbCommandsTest extends AbstractCmdTest {
         DsBulkUtils.installDsBulk();
         Assertions.assertTrue(DsBulkUtils.isDsBulkInstalled());
     }
-    
-    /*
-    
-    @Test
-    public void should_run() {
-        assertSuccessCli("""
-                db dsbulk workshops
-                   load -url /Users/cedricklunven/dev/workspaces/datastax-workshops/workshop-introduction-to-machine-learning/jupyter/data/ratings.csv
-                   -k machine_learning
-                   -t movieratings 
-                   -m "userid,movieid,rating,timestamp"
-                   -header false -delim -c csv
-                """);
-    }*/
-
-    
 }

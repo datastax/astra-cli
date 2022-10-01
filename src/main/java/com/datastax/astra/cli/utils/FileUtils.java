@@ -48,7 +48,7 @@ public class FileUtils {
                       String myTarEntry = tarEntry.getName()
                               .replaceAll(">", "")
                               .replaceAll("<", "")
-                              .replaceAll("*", "")
+                              .replaceAll("\\*", "")
                               .replaceAll("|", "");
                       File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, myTarEntry).toFile();
                           if (tarEntry.isDirectory()) {

@@ -87,7 +87,7 @@ public abstract class AbstractCmdTest {
         return code;
     }
     
-    protected void assertSuccessCli(String cmd) {
+    protected static void assertSuccessCli(String cmd) {
         assertExitCodeCli(ExitCode.SUCCESS, cmd);
     }
     
@@ -95,20 +95,20 @@ public abstract class AbstractCmdTest {
         assertExitCodeCli(ExitCode.SUCCESS, cmd);
     }
     
-    protected void assertExitCodeCli(ExitCode code, String cmd) {
+    protected static void assertExitCodeCli(ExitCode code, String cmd) {
         Assertions.assertEquals(code, runCli(cmd));
     }
     
-    protected void assertExitCodeCli(ExitCode code, String[] cmd) {
+    protected static void assertExitCodeCli(ExitCode code, String[] cmd) {
         Assertions.assertEquals(code, runCli(cmd));
     }
     
-    protected void assertExitCodeInteractive(ExitCode code, String cmd) {
+    protected static void assertExitCodeInteractive(ExitCode code, String cmd) {
         System.setIn(new ByteArrayInputStream((cmd + "\n").getBytes()));
         Assertions.assertEquals(code, new ShellCmd().interactive(false));
     }
    
-    protected void assertSuccessInteractive(String cmd) {
+    protected static void assertSuccessInteractive(String cmd) {
         assertExitCodeInteractive(ExitCode.SUCCESS, cmd);
     }
 
