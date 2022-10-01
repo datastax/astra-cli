@@ -92,7 +92,7 @@ public class FileUtils {
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Cannot read URL, invalid syntax",e);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot download file",e);
+            throw new IllegalArgumentException("Cannot download file:%s".formatted(e.getMessage()),e);
         } finally {
             try {
                 if (null != fis) fis.close();
