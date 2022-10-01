@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -21,7 +22,7 @@ import org.apache.commons.compress.utils.IOUtils;
  */
 public class FileUtils {
     
-    private static final File ASTRA_CLI_HOME = new File (AstraCliUtils.ASTRA_HOME);
+    public static final String VALID_TAR_ENTRY = "^[A-za-z0-9./-]{1,255}$";
     
     /**
      * Hide Default Constructor
@@ -43,17 +44,24 @@ public class FileUtils {
                 try ( TarArchiveInputStream tis = new TarArchiveInputStream(gzIn)) {
                   TarArchiveEntry tarEntry = null;
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
-                      File outputFile = new File(ASTRA_CLI_HOME + File.separator + tarEntry.getName());
-                      if (tarEntry.isDirectory()) {
-                          if (!outputFile.exists()) {
-                              outputFile.mkdirs();
+                      // Escaping to remove invalid entry
+                      String myTarEntry = tarEntry.getName()
+                              .replaceAll(">", "")
+                              .replaceAll("<", "")
+                              .replaceAll("*", "")
+                              .replaceAll("|", "");
+                      File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, myTarEntry).toFile();
+                          if (tarEntry.isDirectory()) {
+                              if (!outputFile.exists()) {
+                                  outputFile.mkdirs();
+                              }
+                          } else {
+                              outputFile.getParentFile().mkdirs();
+                              try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                                  IOUtils.copy(tis, fos);
+                              }
                           }
-                      } else {
-                          outputFile.getParentFile().mkdirs();
-                          try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-                              IOUtils.copy(tis, fos);
-                          }
-                      }
+                      
                   }
               }
           }

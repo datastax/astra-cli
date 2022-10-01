@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.db.OperationsDb;
+import com.datastax.astra.cli.db.cqlsh.CqlShellUtils;
 import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.test.AbstractCmdTest;
@@ -64,6 +65,12 @@ public class DbCommandsTest extends AbstractCmdTest {
         // Database is pending
         assertSuccessCli("db status %s".formatted(DB_TEST));
         
+    }
+    
+    @Test
+    public void should_install_Cqlsh()  throws Exception {
+        CqlShellUtils.installCqlShellAstra();
+        Assertions.assertTrue(CqlShellUtils.isCqlShellInstalled());
     }
     
     /*

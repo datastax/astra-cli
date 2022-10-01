@@ -151,7 +151,7 @@ public class CqlShellUtils {
      * @return
      *      if the folder exist
      */
-    private static boolean isCqlShellInstalled() {
+    public static boolean isCqlShellInstalled() {
        File cqlshAstra = new File(AstraCliUtils.ASTRA_HOME + File.separator + CQLSH_FOLDER);
        return cqlshAstra.exists() && cqlshAstra.isDirectory();
     }
