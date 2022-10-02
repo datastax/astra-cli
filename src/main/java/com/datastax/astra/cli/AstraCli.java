@@ -13,6 +13,7 @@ import com.datastax.astra.cli.config.ConfigSetupCmd;
 import com.datastax.astra.cli.config.ConfigUseCmd;
 import com.datastax.astra.cli.config.OperationsConfig;
 import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.DefaultCmd;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
@@ -20,7 +21,6 @@ import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
-import com.datastax.astra.cli.core.shell.ShellCmd;
 import com.datastax.astra.cli.db.DbCreateCmd;
 import com.datastax.astra.cli.db.DbDeleteCmd;
 import com.datastax.astra.cli.db.DbDotEnvCmd;
@@ -84,10 +84,10 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
 @com.github.rvesse.airline.annotations.Cli(
   name = "astra", 
   description = "CLI for DataStax Astra™ including an interactive mode",
-  defaultCommand = ShellCmd.class, // no command => interactive
+  defaultCommand = DefaultCmd.class, // no command => help
   commands = { 
     ConfigSetupCmd.class, Help.class, 
-    ShellCmd.class
+    DefaultCmd.class
   },
   groups = {
     
@@ -247,6 +247,7 @@ public class AstraCli {
     
     /**
      * Run CLI and process exceptions.
+     *
      * @return
      *      exit code
      */

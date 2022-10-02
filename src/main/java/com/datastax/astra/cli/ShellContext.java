@@ -11,12 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
-import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.OutputFormat;
-import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.DatabasesClient;
@@ -85,17 +84,11 @@ public class ShellContext {
     /** Current command. */
     private AbstractCmd startCommand;
     
-    /** Current shell command (overriding Cli eventually). */
-    private AbstractInteractiveCmd currentShellCommand;
-    
     /** Raw command. */
     private List<String> rawCommand = new ArrayList<>();
     
     /** Raw command. */
     private String rawShellCommand;
-    
-    /** History of commands in shell. */
-    private List<AbstractInteractiveCmd> history = new ArrayList<>();
     
     /** Organization informations (prompt). */
     private Organization organization;
@@ -313,8 +306,6 @@ public class ShellContext {
      *      if no color flag is toggled.
      */
     public boolean isNoColor() {
-        AbstractInteractiveCmd sh = getCurrentShellCommand();
-        if (sh != null) return sh.isNoColor();
         return getStartCommand().isNoColor();
     }
     
@@ -325,8 +316,6 @@ public class ShellContext {
      *      if verbose
      */
     public boolean isVerbose() {
-        AbstractInteractiveCmd sh = getCurrentShellCommand();
-        if (sh != null) return sh.isVerbose();
         return getStartCommand().isVerbose();
     }
     
@@ -337,8 +326,6 @@ public class ShellContext {
      *      check if logger is enabled
      */
     public boolean isFileLoggerEnabled() {
-        AbstractInteractiveCmd sh = getCurrentShellCommand();
-        if (sh != null) return (sh.getLogFileWriter() != null);
         return getStartCommand().getLogFileWriter() != null;
     }
     
@@ -349,8 +336,6 @@ public class ShellContext {
      *      output format
      */
     public OutputFormat getOutputFormat() {
-        AbstractInteractiveCmd sh = getCurrentShellCommand();
-        if (sh != null) return sh.getOutput();
         return getStartCommand().getOutput();
     }
     
@@ -422,36 +407,6 @@ public class ShellContext {
      */
     public AbstractCmd getStartCommand() {
         return startCommand;
-    }
-    
-    /**
-     * Getter accessor for attribute 'currentShellCommand'.
-     *
-     * @return
-     *       current value of 'currentShellCommand'
-     */
-    public AbstractInteractiveCmd getCurrentShellCommand() {
-        return currentShellCommand;
-    }
-
-    /**
-     * Setter accessor for attribute 'currentShellCommand'.
-     * @param currentShellCommand
-     * 		new value for 'currentShellCommand '
-     */
-    public void setCurrentShellCommand(AbstractInteractiveCmd currentShellCommand) {
-        this.currentShellCommand = currentShellCommand;
-        this.history.add(currentShellCommand);
-    }
-
-    /**
-     * Getter accessor for attribute 'history'.
-     *
-     * @return
-     *       current value of 'history'
-     */
-    public List<AbstractInteractiveCmd> getHistory() {
-        return history;
     }
 
     /**

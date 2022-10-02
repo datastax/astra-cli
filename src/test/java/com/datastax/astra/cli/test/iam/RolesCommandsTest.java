@@ -1,9 +1,9 @@
 package com.datastax.astra.cli.test.iam;
 
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;

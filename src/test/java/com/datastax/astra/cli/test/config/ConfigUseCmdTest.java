@@ -16,7 +16,7 @@ import com.datastax.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class ConfigUseCmdT extends AbstractCmdTest {
+public class ConfigUseCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
