@@ -54,9 +54,13 @@ public class PulsarShellTest extends AbstractCmdTest {
     @Test
     @Order(2)
     public void should_pulsar_shell() {
-        assertSuccessCli(new String[] {
+        if (disableTools) {
+            LOGGER.warn("Third Party tool is disabled for this test environment");
+        } else {
+            assertSuccessCli(new String[] {
                 "streaming", "pulsar-shell", RANDOM_TENANT, "-e", 
                 "admin namespaces list " + RANDOM_TENANT});
+        }
     }
     
     @AfterAll
