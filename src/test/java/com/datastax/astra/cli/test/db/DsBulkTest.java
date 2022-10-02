@@ -34,7 +34,6 @@ public class DsBulkTest extends AbstractCmdTest {
         if (!disableTools) {
             LOGGER.info("Third party tools are enabled in test");
         }
-        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
     }
     
     @Test
