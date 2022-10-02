@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellUtils;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -39,25 +38,6 @@ public class StreamingCommandTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_list_tenants() {
-        assertSuccessCli("streaming list");
-        assertSuccessCli("streaming list -v");
-        assertSuccessCli("streaming list --no-color");
-        assertSuccessCli("streaming list -o json");
-        assertSuccessCli("streaming list -o csv");
-    }
-    
-    @Test
-    @Order(3)
-    public void should_list_tenants_errors() {
-        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "streaming list -w");
-        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "streaming list DB");
-        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "streaming coaster");
-        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "streaming list -o yaml");
-    }
-    
-    @Test
-    @Order(4)
     public void should_create_tenant() {
         // Given
         Assertions.assertFalse(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
@@ -67,6 +47,25 @@ public class StreamingCommandTest extends AbstractCmdTest {
         // Then
         Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "streaming create " + RANDOM_TENANT);
+    }
+    
+    @Test
+    @Order(3)
+    public void should_list_tenants() {
+        assertSuccessCli("streaming list");
+        assertSuccessCli("streaming list -v");
+        assertSuccessCli("streaming list --no-color");
+        assertSuccessCli("streaming list -o json");
+        assertSuccessCli("streaming list -o csv");
+    }
+    
+    @Test
+    @Order(4)
+    public void should_list_tenants_errors() {
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "streaming list -w");
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "streaming list DB");
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "streaming coaster");
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "streaming list -o yaml");
     }
     
     @Test
@@ -95,21 +94,6 @@ public class StreamingCommandTest extends AbstractCmdTest {
     
     @Test
     @Order(7)
-    public void should_install_pulsarShell()  throws Exception {
-        PulsarShellUtils.installPulsarShell();
-        Assertions.assertTrue(PulsarShellUtils.isPulsarShellInstalled());
-    }
-    
-    @Test
-    @Order(8)
-    public void should_pulsar_shell() {
-        assertSuccessCli(new String[] {
-                "streaming", "pulsar-shell", RANDOM_TENANT, "-e", 
-                "admin namespaces list " + RANDOM_TENANT});
-    }
-    
-    @Test
-    @Order(9)
     public void should_delete_tenant() {
         // Given
         Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
@@ -121,7 +105,7 @@ public class StreamingCommandTest extends AbstractCmdTest {
     }
     
     @Test
-    @Order(10)
+    @Order(8)
     public void should_delete_tenant_error() {
         assertExitCodeCli(ExitCode.NOT_FOUND, "streaming delete does-not-exist");
     }

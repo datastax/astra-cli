@@ -27,7 +27,7 @@ import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.db.DbGetCmd.DbGetKeys;
 import com.datastax.astra.cli.db.cqlsh.CqlShellOption;
@@ -298,7 +298,7 @@ public class OperationsDb {
                     .cloudRegion(databaseRegion)
                     .keyspace(keyspace)
                     .build());
-            ShellPrinter.outputSuccess("Database '" + databaseName + "' and keyspace '" + keyspace + "'are being created.");
+            AstraCliConsole.outputSuccess("Database '" + databaseName + "' and keyspace '" + keyspace + "'are being created.");
         }
         
         // A single instance of the DB exist
@@ -359,7 +359,7 @@ public class OperationsDb {
                 rf.put(COLUMN_STATUS,  db.getStatus().name());
                 sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
     
     /**
@@ -386,7 +386,7 @@ public class OperationsDb {
             }
             sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
     
     /**
@@ -402,7 +402,7 @@ public class OperationsDb {
     public static void deleteDb(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         getRequiredDatabaseClient(databaseName).delete();
-        ShellPrinter.outputSuccess("Deleting Database '%s' (async operation)".formatted(databaseName));
+        AstraCliConsole.outputSuccess("Deleting Database '%s' (async operation)".formatted(databaseName));
     }
   
     /**
@@ -468,7 +468,7 @@ public class OperationsDb {
      */
     public static void showDbStatus(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        ShellPrinter.outputSuccess("Database '%s' has status '%s'"
+        AstraCliConsole.outputSuccess("Database '%s' has status '%s'"
                     .formatted(databaseName, getDatabase(databaseName).getStatus()));
     }
     
@@ -502,44 +502,45 @@ public class OperationsDb {
                 case csv:
                     sht.addPropertyRow(COLUMN_REGIONS, regions.toString());
                     sht.addPropertyRow(COLUMN_KEYSPACES, keyspaces.toString());
-                    ShellPrinter.printShellTable(sht);
+                    AstraCliConsole.printShellTable(sht);
                 break;
                 case json:
-                    ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
+                    AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
                                 OperationsDb.DB + " " + AbstractConnectedCmd.GET + " " + databaseName, db));
                 break;
                 case human:
                 default:
                     sht.addPropertyListRows(COLUMN_KEYSPACES, keyspaces);
                     sht.addPropertyListRows(COLUMN_REGIONS, regions);
-                    ShellPrinter.printShellTable(sht);
+                    AstraCliConsole.printShellTable(sht);
                 break;
              }
          } else {
             switch(key) {
                 case id:
-                    System.out.println(db.getId());
+                    AstraCliConsole.println(db.getId());
                 break;
                 case cloud:
-                    System.out.println(db.getInfo().getCloudProvider().name());
+                    AstraCliConsole.println(db.getInfo().getCloudProvider().name());
                 break;
                 case keyspace:
-                    System.out.println(db.getInfo().getKeyspace());
+                    AstraCliConsole.println(db.getInfo().getKeyspace());
                 break;
                 case keyspaces:
-                    System.out.println(new ArrayList<>(db.getInfo().getKeyspaces()));
+                    AstraCliConsole.println(new ArrayList<>(db.getInfo().getKeyspaces()).toString());
                 break;
                 case region:
-                    System.out.println(db.getInfo().getRegion());
+                    AstraCliConsole.println(db.getInfo().getRegion());
                 break;
                 case regions:
-                    System.out.println(db.getInfo().getDatacenters()
+                    AstraCliConsole.println(db.getInfo().getDatacenters()
                                          .stream()
                                          .map(Datacenter::getRegion)
-                                         .collect(Collectors.toList()));
+                                         .collect(Collectors.toList())
+                                         .toString());
                 break;
                 case status:
-                    System.out.println(db.getStatus().toString());
+                    AstraCliConsole.println(db.getStatus().toString());
                 break;
             }
             
@@ -632,7 +633,7 @@ public class OperationsDb {
         if (!existingkeyspaces.contains(keyspaceName)) {
             throw new KeyspaceNotFoundException(keyspaceName);
         }
-        ShellPrinter.outputWarning(ExitCode.NOT_IMPLEMENTED, "Astra does not provide endpoint to delete a keyspace");
+        AstraCliConsole.outputWarning(ExitCode.NOT_IMPLEMENTED, "Astra does not provide endpoint to delete a keyspace");
     }
     
     /**

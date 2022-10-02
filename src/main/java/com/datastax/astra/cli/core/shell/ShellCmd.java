@@ -5,8 +5,11 @@ import java.util.Scanner;
 import com.datastax.astra.cli.AstraShell;
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidTokenException;
+import com.datastax.astra.cli.core.exception.TokenNotFoundException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.CommandLineUtils;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -27,18 +30,19 @@ public class ShellCmd extends AbstractConnectedCmd {
     protected boolean interactive = true;
     
     /** {@inheritDoc} */
-    public void execute() throws Exception {
+    public void execute() 
+    throws TokenNotFoundException, InvalidTokenException  {
        // With version no need to init
        if (version) {
-           ShellPrinter.outputData("version", ShellPrinter.version());
+           AstraCliConsole.outputData("version", AstraCliUtils.version());
        } else {
            ShellContext.getInstance().init(this);
            LoggerShell.info("Shell : " + ShellContext.getInstance().getRawShellCommand());
            LoggerShell.info("Class : " + getClass().getName());
-           ShellPrinter.banner();
+           AstraCliConsole.banner();
            try(Scanner scanner = new Scanner(System.in)) {
                do {
-                   ShellPrinter.prompt();
+                   AstraCliConsole.prompt();
                    String readline = scanner.nextLine();
                    ShellContext.getInstance().setRawShellCommand(readline);
                    if (null!= readline) {

@@ -16,7 +16,11 @@ import com.datastax.astra.cli.core.out.OutputFormat;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
+import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
+import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
+import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
+import com.datastax.astra.cli.iam.exception.UserNotFoundException;
 import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.utils.AstraRcUtils;
@@ -116,8 +120,6 @@ public abstract class AbstractCmd implements Runnable {
      *      tenant was already existing
      * @throws TenantNotFoundException
      *      tenant name as not been found
-     * @throws Exception
-     *      generic exception
      * @throws DatabaseNotSelectedException
      *      db was not select before command
      * @throws CannotStartProcessException
@@ -132,6 +134,14 @@ public abstract class AbstractCmd implements Runnable {
      *      no token provided
      * @throws InvalidTokenException
      *      token provided has invalid format.
+     * @throws InvalidDatabaseStateException
+     *      invalid statie when running a command
+     * @throws RoleNotFoundException
+     *      role has not be found
+     * @throws UserNotFoundException
+     *      user has not be found
+     * @throws UserAlreadyExistException
+     *      user has not be found
      */
     public abstract void execute() 
     throws CannotStartProcessException, 
@@ -147,7 +157,10 @@ public abstract class AbstractCmd implements Runnable {
            TenantNotFoundException,
            TokenNotFoundException, 
            InvalidTokenException,
-           Exception; 
+           RoleNotFoundException,
+           UserNotFoundException, 
+           UserAlreadyExistException, 
+           InvalidDatabaseStateException;
     
     /** {@inheritDoc} */
     public void run() {}

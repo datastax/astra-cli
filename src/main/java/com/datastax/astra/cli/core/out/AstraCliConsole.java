@@ -6,11 +6,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,59 +21,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class ShellPrinter {
+public class AstraCliConsole {
+    
+    /** Using sl4j to access console, eventually pushing to file as well. */
+    private static Logger LOGGER = LoggerFactory.getLogger(AstraCliConsole.class);
+    
+    /** Json Object Mapper. */
+    public static final ObjectMapper OM = new ObjectMapper();
     
 	/** Default constructor. */
-	private ShellPrinter() {}
+	private AstraCliConsole() {}
 	
 	/** Start Banner. */
     public static void banner() {
-        System.out.println();
-        System.out.println("  █████╗ ███████╗████████╗██████╗  █████╗   ");
-        System.out.println(" ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ");
-        System.out.println(" ███████║███████╗   ██║   ██████╔╝███████║  ");
-        System.out.println(" ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║  ");
-        System.out.println(" ██║  ██║███████║   ██║   ██║  ██║██║  ██║  ");
-        System.out.println(" ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝  ");
-        System.out.println("");
-        System.out.print(" Version: " + version() + "\n");
+        println("");
+        println("  █████╗ ███████╗████████╗██████╗  █████╗   ", Ansi.Color.MAGENTA);
+        println(" ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ", Ansi.Color.MAGENTA);
+        println(" ███████║███████╗   ██║   ██████╔╝███████║  ", Ansi.Color.MAGENTA);
+        println(" ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║  ", Ansi.Color.MAGENTA);
+        println(" ██║  ██║███████║   ██║   ██║  ██║██║  ██║  ", Ansi.Color.MAGENTA);
+        println(" ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝  ", Ansi.Color.MAGENTA);
+        println("");
+        println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
     }
-    
-    /**
-     * Show version.
-     *
-     * @return
-     *      return version
-     */
-    public static String version() {
-        String versionPackage = ShellPrinter.class
-                .getPackage()
-                .getImplementationVersion();
-        if (versionPackage == null) {
-            versionPackage = "Development";
-        }
-        return versionPackage;
-    }
-    
-    /**
-     * Json Object Mapper. 
-     */
-    public static final ObjectMapper OM = new ObjectMapper();
     
     /**
      * Output.
      *
      * @param text
      *      text to display
-     * @param color
-     *      colot
      */
-    public static void print(String text, Ansi.Color color) {
-        if (ctx().isNoColor()) {
-            System.out.print(text);
-        } else {
-            System.out.print(ansi().fg(color).a(text).reset());
-        }
+    public static void println(String text) {
+        LOGGER.info(text);
     }
     
     /**
@@ -80,28 +61,24 @@ public class ShellPrinter {
      * @param text
      *      text to display
      * @param color
-     *      colot
+     *      color for the text
      */
     public static void println(String text, Ansi.Color color) {
         if (ctx().isNoColor()) {
-            System.out.println(text);
+            LOGGER.info(text);
         } else {
-            System.out.println(ansi().fg(color).a(text).reset());
+            LOGGER.info(ansi().fg(color).a(text).reset().toString());
         }
     }
     
     /**
-     * Show text in the console.
-     * 
-     * @param text
-     *      content of the message
-     * @param size
-     *      text size
-     * @param color
-     *      text color
+     * Output.
+     *
+     * @param builder
+     *      current builder
      */
-    public static void print(String text, Ansi.Color color, int size) {
-        print(StringUtils.rightPad(text, size), color);
+    public static void println(StringBuilderAnsi builder) {
+        LOGGER.info(builder.toString());
     }
     
     /**
@@ -113,10 +90,8 @@ public class ShellPrinter {
     public static void printJson(JsonOutput json) {
         if (json != null) {
             try {
-                String myJson = OM
-                        .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(json);
-                System.out.println(myJson);
+                println(OM.writerWithDefaultPrettyPrinter()
+                              .writeValueAsString(json));
             } catch (JsonProcessingException e) {
                 LoggerShell.error("Cannot create JSON :" + e.getMessage());
             }
@@ -131,7 +106,7 @@ public class ShellPrinter {
      */
     public static void printCsv(CsvOutput csv) {
         if (csv != null) {
-            System.out.println(csv.toString());
+            println(csv.toString());
         }
     }
     
@@ -178,20 +153,21 @@ public class ShellPrinter {
 	 * Will print Promt based on the current state.
 	 */
 	public static void prompt() {
-	    System.out.println("");
+	    println("");
 	    ShellContext ctx = ShellContext.getInstance();
+	    StringBuilderAnsi builder = new StringBuilderAnsi();
 	    if (ctx.getOrganization() != null) {
-	        print(ctx.getOrganization().getName(), Ansi.Color.GREEN);
+	        builder.append(ctx.getOrganization().getName(), Ansi.Color.GREEN);
 	    }
 	    if (ctx.getDatabase() != null) {
-	        print(" > ", Ansi.Color.GREEN);
-            print(ctx.getDatabase().getInfo().getName(), Ansi.Color.YELLOW);
-            print(" > ", Ansi.Color.GREEN);
-            print(ctx.getDatabaseRegion() + " ", Ansi.Color.YELLOW);
+	        builder.append(" > ", Ansi.Color.GREEN);
+	        builder.append(ctx.getDatabase().getInfo().getName(), Ansi.Color.YELLOW);
+	        builder.append(" > ", Ansi.Color.GREEN);
+	        builder.append(ctx.getDatabaseRegion() + " ", Ansi.Color.YELLOW);
         }
-	    print("> ", Ansi.Color.GREEN);
+	    builder.append("> ", Ansi.Color.GREEN);
+	    System.out.print(builder.toString());
 	}
-	
 	
 	/**
      * Exit program with error.

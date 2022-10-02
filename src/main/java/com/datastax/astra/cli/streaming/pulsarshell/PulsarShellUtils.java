@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
@@ -57,7 +58,6 @@ public class PulsarShellUtils {
         PrintWriter pw        = null;
         try {
             fileWriter = new FileWriter(destination);
-            System.out.println(destination);
             pw = new PrintWriter(fileWriter);
             pw.printf("webServiceUrl=https://pulsar-%s-%s.api.streaming.datastax.com\n", cloudProvider, cloudRegion);
             pw.printf("brokerServiceUrl=pulsar+ssl://pulsar-%s-%s.streaming.datastax.com:6651\n", cloudProvider, cloudRegion);

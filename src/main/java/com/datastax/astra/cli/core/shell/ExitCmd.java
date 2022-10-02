@@ -2,7 +2,7 @@ package com.datastax.astra.cli.core.shell;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractInteractiveCmd;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -15,8 +15,8 @@ public class ExitCmd extends AbstractInteractiveCmd {
 
     /** {@inheritDoc} */
     @Override
-    public void execute() throws Exception {
-        ShellPrinter.outputSuccess("Exiting Astra Cli");
+    public void execute() {
+        AstraCliConsole.outputSuccess("Exiting Astra Cli");
         System.exit(ExitCode.SUCCESS.getCode());
     }
 

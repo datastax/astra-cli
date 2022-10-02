@@ -7,18 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.astra.cli.db.cqlsh.CqlShellUtils;
+import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
- * Working with Cqlsh.
+ * Datstax Bulk Loader.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DbCqlshTest extends AbstractCmdTest {
+public class DsBulkTest extends AbstractCmdTest {
     
     /** Logger for my test. */
-    private static Logger LOGGER = LoggerFactory.getLogger(DbCqlshTest.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(DsBulkTest.class);
    
     public final static String DB_TEST = "astra_cli_test";
     
@@ -35,18 +35,17 @@ public class DbCqlshTest extends AbstractCmdTest {
             LOGGER.info("Third party tools are enabled in test");
         }
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
-        
     }
     
     @Test
     @Order(1)
-    public void should_install_Cqlsh()  throws Exception {
+    public void should_install_dsbulk()  throws Exception {
         if (disableTools) {
             LOGGER.warn("Third Party tool is disabled for this test environment");
         } else {
-            CqlShellUtils.installCqlShellAstra();
-            Assertions.assertTrue(CqlShellUtils.isCqlShellInstalled());
+            DsBulkUtils.installDsBulk();
+            Assertions.assertTrue(DsBulkUtils.isDsBulkInstalled());
         }
     }
-    
+
 }

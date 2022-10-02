@@ -11,7 +11,7 @@ import org.fusesource.jansi.Ansi;
 
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
@@ -63,7 +63,7 @@ public class OperationsConfig {
             rf.put(COLUMN_TITLE, org);
             sht.getCellValues().add(rf);
         }
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
 
     /**

@@ -1,7 +1,11 @@
 package com.datastax.astra.cli.db.cqlsh;
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.CannotStartProcessException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.db.OperationsDb;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -57,8 +61,10 @@ public class DbCqlShellCmd extends AbstractConnectedCmd {
             description = "Authenticate to the given keyspace.")
     protected String cqlshOptionKeyspace;
     
-    /** {@inheritDoc} */
-    public void execute() throws Exception {
+    /** {@inheritDoc}  */
+    public void execute() 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           CannotStartProcessException, FileSystemException {
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
                 cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace);

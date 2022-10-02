@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
+import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -29,9 +30,9 @@ public class ConnectSh extends AbstractInteractiveCmd {
     @Arguments(title = "configName", description = "Section name in configuration file")
     public String configName;
     
-    /** {@inheritDoc} */
+    /** {@inheritDoc}  */
     @Override
-    public void execute() throws Exception {
+    public void execute() throws ConfigurationException, InvalidTokenException  {
         if (!ctx().getAstraRc().isSectionExists(configName)) {
             throw new ConfigurationException("Config '" + configName + "' has not been found in configuration file.");
         } else {

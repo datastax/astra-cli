@@ -13,7 +13,7 @@ import com.github.rvesse.airline.annotations.Command;
 public class DbListSh extends AbstractInteractiveCmd {
    
     /** {@inheritDoc} */
-    public void execute() throws Exception {
+    public void execute() {
         OperationsDb.listDb();
     }
 

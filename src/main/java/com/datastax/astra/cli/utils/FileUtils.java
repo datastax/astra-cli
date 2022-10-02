@@ -22,8 +22,6 @@ import org.apache.commons.compress.utils.IOUtils;
  */
 public class FileUtils {
     
-    public static final String VALID_TAR_ENTRY = "^[A-za-z0-9./-]{1,255}$";
-    
     /**
      * Hide Default Constructor
      */

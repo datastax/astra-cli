@@ -3,6 +3,8 @@ package com.datastax.astra.cli.db;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.AbstractInteractiveCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -22,7 +24,8 @@ public class DbUseSh extends AbstractInteractiveCmd {
 
     /** {@inheritDoc} */
     @Override
-    public void execute() throws Exception {
+    public void execute() 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         this.verbose = true;
         ctx().useDatabase(OperationsDb.getDatabase(database));
         LoggerShell.info("Selecting Database '" + database + "'");

@@ -12,7 +12,7 @@ import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.streaming.StreamingGetCmd.StreamingGetKeys;
 import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
@@ -129,7 +129,7 @@ public class OperationsStreaming {
                 rf.put(COLUMN_STATUS, tnt.getStatus());
                 sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
     
     /**
@@ -160,28 +160,28 @@ public class OperationsStreaming {
             sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
             switch(ShellContext.getInstance().getOutputFormat()) {
                 case json:
-                    ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
+                    AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
                                 STREAMING + " " + AbstractConnectedCmd.GET + " " + tenantName, sht));
                 break;
                 case csv:
                 case human:
                 default:
-                    ShellPrinter.printShellTable(sht);
+                    AstraCliConsole.printShellTable(sht);
                 break;
              }
         }  else {
             switch(key) {
                 case cloud:
-                    System.out.println(tnt.getCloudProvider());
+                    AstraCliConsole.println(tnt.getCloudProvider());
                 break;
                 case pulsar_token:
-                    System.out.println(tnt.getPulsarToken());
+                    AstraCliConsole.println(tnt.getPulsarToken());
                 break;
                 case region:
-                    System.out.println(tnt.getCloudRegion());
+                    AstraCliConsole.println(tnt.getCloudRegion());
                 break;
                 case status:
-                    System.out.println(tnt.getStatus());
+                    AstraCliConsole.println(tnt.getStatus());
                 break;
              
             }
@@ -200,7 +200,7 @@ public class OperationsStreaming {
     throws TenantNotFoundException {
         getTenant(tenantName);
         tenantClient(tenantName).delete();
-        ShellPrinter.outputSuccess("Deleting Tenant '" + tenantName + "'");
+        AstraCliConsole.outputSuccess("Deleting Tenant '" + tenantName + "'");
     }
     
     /**
@@ -214,7 +214,7 @@ public class OperationsStreaming {
     public static void showTenantStatus(String tenantName)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
-        ShellPrinter.outputSuccess("Tenant '" + tenantName + "' has status '" + tnt.getStatus() + "'");
+        AstraCliConsole.outputSuccess("Tenant '" + tenantName + "' has status '" + tnt.getStatus() + "'");
     }
     
     /**
@@ -225,9 +225,9 @@ public class OperationsStreaming {
      */
     public static void showTenantExistence(String tenantName) {
         if (tenantClient(tenantName).exist()) {
-            ShellPrinter.outputSuccess("Tenant '" + tenantName + "' exists.");
+            AstraCliConsole.outputSuccess("Tenant '" + tenantName + "' exists.");
         } else {
-            ShellPrinter.outputSuccess("Tenant '" + tenantName + "' does not exist.");
+            AstraCliConsole.outputSuccess("Tenant '" + tenantName + "' does not exist.");
         }
     }
     
@@ -258,7 +258,7 @@ public class OperationsStreaming {
             throw new TenantAlreadyExistExcepion(ct.getTenantName());
         }
         streamingClient().createTenant(ct);
-        ShellPrinter.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
+        AstraCliConsole.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
     }
    
     /**

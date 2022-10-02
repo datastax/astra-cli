@@ -1,6 +1,7 @@
 package com.datastax.astra.cli.config;
 
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -24,10 +25,10 @@ public class ConfigDeleteCmd extends AbstractConfigCmd {
     
     /** {@inheritDoc} */
     @Override
-    public void execute() throws Exception {
+    public void execute() throws ConfigurationException  {
         OperationsConfig.assertSectionExist(sectionName);
         ctx().getAstraRc().deleteSection(sectionName);
         ctx().getAstraRc().save();
-        ShellPrinter.outputSuccess("Section '" + sectionName + "' has been deleted.");
+        AstraCliConsole.outputSuccess("Section '" + sectionName + "' has been deleted.");
     }
 }

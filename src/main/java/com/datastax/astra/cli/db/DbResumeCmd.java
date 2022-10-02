@@ -2,6 +2,7 @@ package com.datastax.astra.cli.db;
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
@@ -39,8 +40,10 @@ public class DbResumeCmd extends AbstractConnectedCmd {
             description = "Provide a limit to the wait period in seconds, default is 180s.")
     protected int timeout = 180;
     
-    /** {@inheritDoc} */
-    public void execute() throws Exception {
+    /** {@inheritDoc}  */
+    public void execute() 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+           InvalidDatabaseStateException  {
         OperationsDb.resumeDb(databaseName);
         if (wait) {
            switch(OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout)) {

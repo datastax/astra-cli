@@ -1,7 +1,11 @@
 package com.datastax.astra.cli.streaming.pulsarshell;
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.CannotStartProcessException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.streaming.OperationsStreaming;
+import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -45,9 +49,9 @@ public class PulsarShellCmd extends AbstractConnectedCmd {
             description= "Display raw output of the commands without the fancy progress visualization. ")
     protected boolean noProgress = false;
     
-    /** {@inheritDoc}  */
-    public void execute() throws Exception {
-        System.out.println(tenant);
+    /** {@inheritDoc} */
+    public void execute() 
+    throws TenantNotFoundException, CannotStartProcessException, FileSystemException {
         PulsarShellOptions options = new PulsarShellOptions();
         options.setExecute(execute);
         options.setFailOnError(failOnError);

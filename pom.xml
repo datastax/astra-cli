@@ -22,6 +22,7 @@
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.0</slf4j.version>
+		<logback.version>1.4.1</logback.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
 		<commons-cli.version>1.5.0</commons-cli.version>
@@ -65,11 +66,6 @@
 			<artifactId>jansi</artifactId>
 			<version>${jansi.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-nop</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
 		
 		<!-- Leveraging SDK for Astra Accesses -->
 		<dependency>
@@ -77,12 +73,6 @@
 			<artifactId>astra-sdk</artifactId>
 			<version>${astra-sdk.version}</version>
 			<exclusions>
-				<!-- 
-				<exclusion>
-			    	<groupId>com.datastax.stargate</groupId>
-					<artifactId>stargate-sdk</artifactId>
-				</exclusion>
-				-->
 				<exclusion>
 					<groupId>io.grpc</groupId>
   					<artifactId>grpc-netty-shaded</artifactId>
@@ -107,11 +97,19 @@
 					<groupId>org.everit.json</groupId>
 					<artifactId>org.everit.json.schema</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
 			</exclusions>
+		</dependency>
+		
+		<!--  Logger -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 
 		<!-- Commons -->

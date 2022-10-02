@@ -16,7 +16,7 @@ import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.OutputFormat;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.DatabasesClient;
@@ -148,7 +148,7 @@ public class ShellContext {
                     LoggerShell.debug("ConfigSectionName: " + configSection);
                 }
                 assertSection();
-                assertTokenInSection(ccli);
+                assertTokenInSection();
                 token = this.astraRc
                             .getSection(this.configSection)
                             .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
@@ -164,15 +164,13 @@ public class ShellContext {
     /**
      * Valid section.
      *
-     * @return
-     *      section is valid
      * @throws TokenNotFoundException
      *      token not found in section
      */
     private void assertSection() 
     throws TokenNotFoundException {
         if (!this.astraRc.isSectionExists(this.configSection)) {
-            ShellPrinter.outputError(CANNOT_CONNECT, "No token provided (-t), no config provided (--config), section '" + this.configSection 
+            AstraCliConsole.outputError(CANNOT_CONNECT, "No token provided (-t), no config provided (--config), section '" + this.configSection 
                     + "' has not been found in config file '" 
                     + this.astraRc.getConfigFile().getPath() + "'. Try [astra setup]");
            throw new TokenNotFoundException();
@@ -182,19 +180,15 @@ public class ShellContext {
     /**
      * Log error.
      *
-     * @param cmd
-     *      command.
-     * @return
-     *      error
      * @throws TokenNotFoundException
      *      token not found
      */
-    private void assertTokenInSection(AbstractCmd cmd) 
+    private void assertTokenInSection() 
     throws TokenNotFoundException {
         if (StringUtils.isEmpty(this.astraRc
                 .getSection(this.configSection)
                 .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
-            ShellPrinter.outputError(
+            AstraCliConsole.outputError(
                     INVALID_PARAMETER, 
                     "Key '" + AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN + 
                     "' has not found been in config [section '" + this.configSection + "']");
@@ -217,7 +211,7 @@ public class ShellContext {
         this.token = token;
         
         if (!token.startsWith("AstraCS")) {
-            ShellPrinter.outputError(INVALID_PARAMETER, "Token provided is invalid. It should start with 'AstraCS:...'. Try [astra setup]");
+            AstraCliConsole.outputError(INVALID_PARAMETER, "Token provided is invalid. It should start with 'AstraCS:...'. Try [astra setup]");
             throw new InvalidTokenException(token);
         }
 
@@ -229,7 +223,7 @@ public class ShellContext {
             this.organization = apiDevopsOrganizations.organization();
             LoggerShell.info("Cli successfully initialized");
         } catch(Exception e) {
-            ShellPrinter.outputError(CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
+            AstraCliConsole.outputError(CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
             throw new InvalidTokenException(token);
         }
     }

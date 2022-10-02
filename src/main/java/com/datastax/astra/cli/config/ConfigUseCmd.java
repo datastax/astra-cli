@@ -1,6 +1,7 @@
 package com.datastax.astra.cli.config;
 
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.exception.ConfigurationException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -27,11 +28,11 @@ public class ConfigUseCmd extends AbstractConfigCmd implements Runnable {
     
     /** {@inheritDoc} */
     @Override
-    public void execute() throws Exception {
+    public void execute() throws ConfigurationException{
         OperationsConfig.assertSectionExist(sectionName);
         ctx().getAstraRc().copySection(sectionName, AstraRcUtils.ASTRARC_DEFAULT);
         ctx().getAstraRc().save();
-        ShellPrinter.outputSuccess("Section '" + sectionName + "' is set as default.");
+        AstraCliConsole.outputSuccess("Section '" + sectionName + "' is set as default.");
     }
     
     /**

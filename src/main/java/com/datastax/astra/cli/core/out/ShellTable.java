@@ -101,20 +101,22 @@ public class ShellTable implements Serializable {
         if (ShellContext.getInstance().getRawShellCommand() != null) {
             currentCommand = ShellContext.getInstance().getRawShellCommand();
         }
-        ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, currentCommand, getCellValues()));
+        AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, currentCommand, getCellValues()));
     }
     
     /**
      * Show as Csv
      */
     public void showCsv() {
-        ShellPrinter.printCsv(new CsvOutput(getColumnTitlesNames(), getCellValues()));
+        AstraCliConsole.printCsv(new CsvOutput(getColumnTitlesNames(), getCellValues()));
     }
     
     /**
      * Display the table in the shell.
      */
     public void show() {
+        
+        StringBuilderAnsi builder = new StringBuilderAnsi();
         // Compute Columns Width
         cellValues.stream().forEach(myRow -> {
             columnTitlesNames.stream().forEach(colName -> {
@@ -134,34 +136,35 @@ public class ShellTable implements Serializable {
             }
             tableLine.append("+" + String.format("%-" + (size+1) + "s", "-").replaceAll(" " , "-"));
         }
-        ShellPrinter.print(tableLine.toString() + "+\n", tableColor);
+        builder.append(tableLine.toString() + "+\n", tableColor);
         
         // Display Column Titles
         for(String columnName : columnTitlesNames) {
-            ShellPrinter.print("| ", tableColor);
+            builder.append("| ", tableColor);
             Integer size = columnSize.get(columnName);
             if (null == size) {
                 size = columnName.length() + 1;
             }
-            ShellPrinter.print(columnName , columnTitlesColor, size);
+            builder.append(columnName , columnTitlesColor, size);
         }
-        ShellPrinter.print("|\n", tableColor);
-        ShellPrinter.print(tableLine.toString() + "+\n", tableColor);
+        builder.append("|\n", tableColor);
+        builder.append(tableLine.toString() + "+\n", tableColor);
         
         // Display Data
         for (Map<String, String > res : cellValues) {
             // Keep Orders
             for(String columnName : columnTitlesNames) {
-                ShellPrinter.print("| ", tableColor);
+                builder.append("| ", tableColor);
                 if (pkColumns.contains(columnName)) {
-                    ShellPrinter.print(res.get(columnName), pkColor, columnSize.get(columnName));
+                    builder.append(res.get(columnName), pkColor, columnSize.get(columnName));
                 } else {
-                    ShellPrinter.print(res.get(columnName), cellColor, columnSize.get(columnName));
+                    builder.append(res.get(columnName), cellColor, columnSize.get(columnName));
                 }
             }
-            ShellPrinter.print("|\n", tableColor);
+            builder.append("|\n", tableColor);
         }
-        ShellPrinter.print(tableLine.toString() + "+\n", tableColor);
+        builder.append(tableLine.toString() + "+\n", tableColor);
+        AstraCliConsole.println(builder);
     }
     
     /**

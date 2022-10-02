@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
@@ -73,7 +73,7 @@ public class OperationsOrganization {
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
         sht.addPropertyRow(COLUMN_ID, org.getId());
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
     
     /**
@@ -92,7 +92,7 @@ public class OperationsOrganization {
                 rf.put(COLUMN_REGION_DISPLAY, r.getRegionDisplay());
                 sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
          
     /**
@@ -111,7 +111,7 @@ public class OperationsOrganization {
                 rf.put(COLUMN_REGION_DISPLAY, r.getDisplayName());
                 sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }  
 
 }

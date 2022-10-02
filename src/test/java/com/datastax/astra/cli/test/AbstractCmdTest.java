@@ -32,7 +32,7 @@ public abstract class AbstractCmdTest {
      * @return
      *      if the value is there
      */
-    protected Optional<String> readEnvVariable(String key) {
+    public static Optional<String> readEnvVariable(String key) {
         if (Utils.hasLength(System.getProperty(key))) {
             return Optional.ofNullable(System.getProperty(key));
         } else if (Utils.hasLength(System.getenv(key))) {

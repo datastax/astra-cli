@@ -3,7 +3,7 @@ package com.datastax.astra.cli.config;
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -32,13 +32,14 @@ public class ConfigCreateCmd extends AbstractConfigCmd {
     
     /** {@inheritDoc} */
     @Override
-    public void execute() throws Exception {
+    public void execute() 
+    throws TokenNotFoundException, InvalidTokenException  {
         if (token == null) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Please Provide a token with option -t, --token");
+            AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Please Provide a token with option -t, --token");
             throw new TokenNotFoundException();
         }
         if (!token.startsWith("AstraCS:")) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
+            AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
             throw new InvalidTokenException();
         }
         OrganizationsClient apiOrg  = new OrganizationsClient(token);
@@ -48,7 +49,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd {
         }
         ctx().getAstraRc().createSectionWithToken(sectionName, token);
         ctx().getAstraRc().save();
-        ShellPrinter.outputSuccess("Configuration Saved.\n");
+        AstraCliConsole.outputSuccess("Configuration Saved.\n");
     }
     
 }

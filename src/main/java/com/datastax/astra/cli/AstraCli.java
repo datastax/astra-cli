@@ -19,7 +19,7 @@ import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.shell.ShellCmd;
 import com.datastax.astra.cli.db.DbCreateCmd;
 import com.datastax.astra.cli.db.DbDeleteCmd;
@@ -240,7 +240,7 @@ public class AstraCli {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.UNRECOGNIZED_COMMAND;
         } catch (InvalidTokenException | TokenNotFoundException e) {
-            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
+            AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
         }
     }
@@ -259,29 +259,29 @@ public class AstraCli {
             return ExitCode.SUCCESS;
         } catch (DatabaseNameNotUniqueException |
                  InvalidArgumentException dex) {
-            ShellPrinter.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
+            AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
             return  ExitCode.INVALID_PARAMETER;
         } catch (DatabaseNotFoundException  |
                  TenantNotFoundException    | 
                  RoleNotFoundException      |
                  UserNotFoundException nfex) {
-            ShellPrinter.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
+            AstraCliConsole.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
             return ExitCode.NOT_FOUND;
         } catch (TenantAlreadyExistExcepion | 
                  UserAlreadyExistException e) {
-            ShellPrinter.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
+            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
             return ExitCode.ALREADY_EXIST;
         } catch (DatabaseNotSelectedException e) {
-            ShellPrinter.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
+            AstraCliConsole.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
             return ExitCode.ILLEGAL_STATE;
         } catch (FileSystemException | ConfigurationException ex) {
-            ShellPrinter.outputError(ExitCode.CONFIGURATION, ex.getMessage());
+            AstraCliConsole.outputError(ExitCode.CONFIGURATION, ex.getMessage());
             return ExitCode.CONFIGURATION;
         } catch (InvalidTokenException | TokenNotFoundException e) {
-            ShellPrinter.outputError(ExitCode.CONFIGURATION, e.getMessage());
+            AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
         } catch (Exception ex) {
-            ShellPrinter.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
+            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
             return ExitCode.INTERNAL_ERROR;
         }
     }

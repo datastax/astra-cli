@@ -1,12 +1,15 @@
 package com.datastax.astra.cli.test.db;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.db.OperationsDb;
-import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
@@ -15,6 +18,7 @@ import com.datastax.astra.cli.test.AbstractCmdTest;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
+@TestMethodOrder(OrderAnnotation.class)
 public class DbCommandsTest extends AbstractCmdTest {
     
     static String DB_TEST = "astra_cli_test";
@@ -44,11 +48,6 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertSuccessCli("db list --no-color");
         assertSuccessCli("db list -o json");
         assertSuccessCli("db list -o csv");
-    }
-    
-    @Test
-    @Order(3)
-    public void should_list_db_errors() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "db list -w");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "db list DB");
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "db list -o yaml");
@@ -60,24 +59,70 @@ public class DbCommandsTest extends AbstractCmdTest {
         // When
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
         // Then
-        Assertions.assertTrue(  OperationsDb.getDatabaseClient(DB_TEST).isPresent());
+        Assertions.assertTrue(OperationsDb.getDatabaseClient(DB_TEST).isPresent());
         // Database is pending
         assertSuccessCli("db status %s".formatted(DB_TEST));
+    }
+    
+    @Test
+    @Order(4)
+    public void should_get_db() throws DatabaseNameNotUniqueException {
+        assertSuccessCli("db get %s".formatted(DB_TEST));
+        assertSuccessCli("db %s".formatted(DB_TEST));
+        assertSuccessCli("db get %s -o json".formatted(DB_TEST));
+        assertSuccessCli("db get %s -o csv".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key id".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key status".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key cloud".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key keyspace".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key keyspaces".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key region".formatted(DB_TEST));
+        assertSuccessCli("db get %s --key regions".formatted(DB_TEST));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db get %s --invalid".formatted(DB_TEST));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db get does-not-exist");
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "db get %s -o yaml".formatted(DB_TEST));
+    }
+    
+    @Test
+    @Order(5)
+    public void should_list_keyspaces()  {
+        assertSuccessCli("db list-keyspaces %s".formatted(DB_TEST));
+        assertSuccessCli("db list-keyspaces %s -v".formatted(DB_TEST));
+        assertSuccessCli("db list-keyspaces %s --no-color".formatted(DB_TEST));
+        assertSuccessCli("db list-keyspaces %s -o json".formatted(DB_TEST));
+        assertSuccessCli("db list-keyspaces %s -o csv".formatted(DB_TEST));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db list-keyspaces does-not-exist");
+    }
+    
+    @Test
+    @Order(6)
+    public void should_create_keyspaces()  {
+        String randomKS = "ks_" + UUID
+                .randomUUID().toString()
+                .replaceAll("-", "").substring(0, 8);
+        assertSuccessCli("db create-keyspace %s -k %s -v".formatted(DB_TEST, randomKS));
+        assertExitCodeCli(ExitCode.NOT_FOUND, 
+                "db create-keyspace %s -k %s -v".formatted("does-not-exist", randomKS));
+    }
+    
+    @Test
+    @Order(7)
+    public void should_download_scb()  {
+        assertSuccessCli("db download-scb %s".formatted(DB_TEST));
+        assertSuccessCli("db download-scb %s -d %s".formatted(DB_TEST, "/tmp"));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db download-scb %s".formatted("invalid"));
+    }
+    
+    @Test
+    @Order(7)
+    public void should_resumedb()  {
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
+        //String randomDB = "db_cli_" + UUID
+        //        .randomUUID().toString()
+        //        .replaceAll("-", "").substring(0, 8);
+        //assertSuccessCli("db create %s".formatted(randomDB));
         
+        //assertSuccessCli("db resume %s --wait".formatted(randomDB));
     }
-    
    
-    
-    /*
-    @Test
-    public void should_create_dot_env()  throws Exception {
-        assertSuccessCli("db create-dotenv mtg");
-    }
-    */
-    
-    @Test
-    public void should_install_DsBulk()  throws Exception {
-        DsBulkUtils.installDsBulk();
-        Assertions.assertTrue(DsBulkUtils.isDsBulkInstalled());
-    }
 }

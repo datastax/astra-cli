@@ -1,5 +1,6 @@
 package com.datastax.astra.cli.core.shell;
 
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -13,7 +14,7 @@ public class EmptySh implements Runnable {
     /** {@inheritDoc} */
     @Override
     public void run() {
-        System.out.println("");
+        AstraCliConsole.println("");
     }
     
 

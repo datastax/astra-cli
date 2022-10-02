@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.config;
 
+import static com.datastax.astra.cli.core.out.AstraCliConsole.println;
+
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,8 +9,8 @@ import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Color;
 
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.ShellPrinter;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -27,25 +29,25 @@ public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
    
     /** {@inheritDoc} */
     @Override
-    public void execute() throws Exception {
+    public void execute() throws InvalidTokenException  {
         // On setup you must have output
         if (StringUtils.isBlank(tokenParam)) {
             verbose = true;
-            ShellPrinter.println("+-------------------------------+", Color.CYAN);
-            ShellPrinter.println("+-     Astra CLI SETUP         -+", Color.CYAN);
-            ShellPrinter.println("+-------------------------------+", Color.CYAN);
-            System.out.println("\nWelcome to Astra Cli. We will guide you to start.");
-            ShellPrinter.println("\n[Astra Setup]", Ansi.Color.CYAN);
-            System.out.println("To use the cli you need to:");
-            System.out.println(" • Create an Astra account on : https://astra.datastax.com");
-            System.out.println(" • Create an Authentication token following: https://dtsx.io/create-astra-token");
-            ShellPrinter.println("\n[Cli Setup]", Ansi.Color.CYAN);
+            println("+-------------------------------+", Color.CYAN);
+            println("+-     Astra CLI SETUP         -+", Color.CYAN);
+            println("+-------------------------------+", Color.CYAN);
+            println("\nWelcome to Astra Cli. We will guide you to start.");
+            println("\n[Astra Setup]", Ansi.Color.CYAN);
+            println("To use the cli you need to:");
+            println(" • Create an Astra account on : https://astra.datastax.com");
+            println(" • Create an Authentication token following: https://dtsx.io/create-astra-token");
+            println("\n[Cli Setup]", Ansi.Color.CYAN);
             String token = null;
             
             try(Scanner scanner = new Scanner(System.in)) {
                 boolean valid_token = false;
                 while (!valid_token) {
-                    ShellPrinter.println("\n• Enter your token (AstraCS:*):", Ansi.Color.YELLOW);
+                    AstraCliConsole.println("\n• Enter your token (AstraCS:*):", Ansi.Color.YELLOW);
                     token = scanner.nextLine();
                     if (!token.startsWith("AstraCS:")) {
                         LoggerShell.error("Your token should start with 'AstraCS:'");
@@ -62,11 +64,11 @@ public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
         } else {
             createDefaultSection(tokenParam);
         }
-        ShellPrinter.println("\n[You are ready !] (configuration is stored in ~/.astrarc)", Ansi.Color.CYAN);
-        System.out.println(" • 'astra db list' : list databases");
-        System.out.println(" • 'astra db create demo --if-not-exist' : create new db");
-        System.out.println(" • 'astra help' list available command groups");
-        System.out.println(" • 'astra help <command>' :  help you on a particular command");
+        println("\n[You are ready !] (configuration is stored in ~/.astrarc)", Ansi.Color.CYAN);
+        println(" • 'astra db list' : list databases");
+        println(" • 'astra db create demo --if-not-exist' : create new db");
+        println(" • 'astra help' list available command groups");
+        println(" • 'astra help <command>' :  help you on a particular command");
     }
     
     /**

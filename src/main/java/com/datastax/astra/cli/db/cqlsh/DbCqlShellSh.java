@@ -2,7 +2,12 @@ package com.datastax.astra.cli.db.cqlsh;
 
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractInteractiveCmd;
+import com.datastax.astra.cli.core.exception.CannotStartProcessException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.db.OperationsDb;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -44,16 +49,11 @@ public class DbCqlShellSh extends AbstractInteractiveCmd {
             description = "Authenticate to the given keyspace.")
     protected String cqlshOptionKeyspace;
     
-    /** {@inheritDoc} */
-    public void execute() throws Exception {
+    /** {@inheritDoc}  */
+    public void execute() 
+    throws DatabaseNotSelectedException, DatabaseNameNotUniqueException, 
+           DatabaseNotFoundException, CannotStartProcessException, FileSystemException {
         assertDbSelected();
-        //CqlShellOptions options = new CqlShellOptions();
-        //options.setDebug(cqlShOptionDebug);
-        //options.setEncoding(cqlshOptionEncoding);
-        //options.setExecute(cqlshOptionExecute);
-        //options.setFile(cqlshOptionFile);
-        //options.setKeyspace(cqlshOptionKeyspace);
-        //options.setVersion(cqlShOptionVersion);
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
                 cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace);

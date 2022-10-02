@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import com.datastax.astra.cli.AstraCli;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 
 /**
  * Utilities for cli. 
@@ -48,5 +49,21 @@ public class AstraCliUtils {
             }
         }
         return properties.getProperty(key);
+    }
+    
+    /**
+     * Show version.
+     *
+     * @return
+     *      return version
+     */
+    public static String version() {
+        String versionPackage = AstraCliConsole.class
+                .getPackage()
+                .getImplementationVersion();
+        if (versionPackage == null) {
+            versionPackage = "Development";
+        }
+        return versionPackage;
     }
 }

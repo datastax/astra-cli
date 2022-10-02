@@ -353,6 +353,7 @@
     <jansi.version>2.4.0</jansi.version>
     <maven.plugin.compiler.target>17</maven.plugin.compiler.target>
     <version.maven.plugin.release>2.5.2</version.maven.plugin.release>
+    <logback.version>1.4.1</logback.version>
     <version.maven.plugin.dependency>2.8</version.maven.plugin.dependency>
     <version.maven.plugin.jacoco>0.8.8</version.maven.plugin.jacoco>
     <version.maven.plugin.xml-format>3.0.7</version.maven.plugin.xml-format>

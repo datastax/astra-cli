@@ -5,7 +5,7 @@ import java.util.Optional;
 import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -33,22 +33,22 @@ public class ConfigGetCmd extends AbstractConfigCmd implements Runnable {
     @Option(name = { "-k", "--key" }, title = "Key in the section", description = "If provided return only value for a key.")
     protected String key;
     
-    /** {@inheritDoc} */
+    /** {@inheritDoc}  */
     @Override
-    public void execute() throws Exception {
+    public void execute() throws ConfigurationException  {
         OperationsConfig.assertSectionExist(sectionName);
         if (key != null) {
             Optional<String> optKey = ctx().getAstraRc().getSectionKey(sectionName, key);
             if (!optKey.isPresent()) {
-                ShellPrinter.outputError(
+                AstraCliConsole.outputError(
                         ExitCode.INVALID_PARAMETER, 
                         "Key '" + key + "' has not been found in config section '" + sectionName + "'");
                 throw new ConfigurationException("Key '" + key + "' has not been found in config section '" + sectionName + "'");
             } else {
-                System.out.print(optKey.get());
+                AstraCliConsole.println(optKey.get());
             }
         } else {
-            System.out.print(ctx().getAstraRc().renderSection(sectionName));
+            AstraCliConsole.println(ctx().getAstraRc().renderSection(sectionName));
         }
      }
     

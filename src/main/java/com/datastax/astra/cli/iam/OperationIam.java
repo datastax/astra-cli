@@ -10,7 +10,7 @@ import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.out.JsonOutput;
-import com.datastax.astra.cli.core.out.ShellPrinter;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
 import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
@@ -64,7 +64,7 @@ public class OperationIam {
              rf.put(COLUMN_ROLE_DESCRIPTION, role.getPolicy().getDescription());
              sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
     
     /**
@@ -87,7 +87,7 @@ public class OperationIam {
              rf.put(COLUMN_USER_STATUS, user.getStatus().name());
              sht.getCellValues().add(rf);
         });
-        ShellPrinter.printShellTable(sht);
+        AstraCliConsole.printShellTable(sht);
     }
     
     /**
@@ -126,17 +126,17 @@ public class OperationIam {
             case csv:
                 sht.addPropertyRow("Resources", r.getPolicy().getResources().toString());
                 sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
-                ShellPrinter.printShellTable(sht);
+                AstraCliConsole.printShellTable(sht);
             break;
             case json:
-                ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, 
+                AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
                             OperationIam.COMMAND_ROLE + " " + AbstractCmd.GET + " " + role, r));
             break;
             case human:
             default:
                 sht.addPropertyListRows("Resources", r.getPolicy().getResources());
                 sht.addPropertyListRows("Actions",   r.getPolicy().getActions());
-                ShellPrinter.printShellTable(sht);
+                AstraCliConsole.printShellTable(sht);
             break;
         }
     }
@@ -181,15 +181,15 @@ public class OperationIam {
        switch(ShellContext.getInstance().getOutputFormat()) {
            case csv:
                sht.addPropertyRow("Roles", roleNames.toString());
-               ShellPrinter.printShellTable(sht);
+               AstraCliConsole.printShellTable(sht);
            break;
            case json:
-               ShellPrinter.printJson(new JsonOutput(ExitCode.SUCCESS, "user show " + user, r));
+               AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, "user show " + user, r));
            break;
            case human:
            default:
                sht.addPropertyListRows("Roles", roleNames);
-               ShellPrinter.printShellTable(sht);
+               AstraCliConsole.printShellTable(sht);
            break;
        }
     }
@@ -220,7 +220,7 @@ public class OperationIam {
             throw new RoleNotFoundException(role);
         }
         oc.inviteUser(user, optRole.get().getId());
-        ShellPrinter.outputSuccess(role);
+        AstraCliConsole.outputSuccess(role);
     }
 
     /**
@@ -244,7 +244,7 @@ public class OperationIam {
             throw new UserNotFoundException(user);
         }
         oc.user(optUser.get().getUserId()).delete();
-        ShellPrinter.outputSuccess("Deleting user '" + user + "' (async operation)");
+        AstraCliConsole.outputSuccess("Deleting user '" + user + "' (async operation)");
     }
     
 }

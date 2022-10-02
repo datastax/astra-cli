@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractCmd;
@@ -22,6 +24,9 @@ import com.datastax.astra.cli.core.AbstractCmd;
  */
 public class LoggerShell {
 	
+    /** Using sl4j to access console, eventually pushing to file as well. */
+    private static Logger LOGGER = LoggerFactory.getLogger(LoggerShell.class);
+    
 	/**
 	 * Hide default  constructor.
 	 */
@@ -45,7 +50,7 @@ public class LoggerShell {
                         + " - " + text + System.lineSeparator());
                 cli.getLogFileWriter().flush();
             } catch (IOException e) {
-                System.out.println("Writes in log file failed: " + e.getMessage());
+                LOGGER.error("Writes in log file failed: " + e.getMessage());
             }
         }
     }
@@ -60,9 +65,9 @@ public class LoggerShell {
         
         if (ctx().getOutputFormat().equals(OutputFormat.human)) {
             if (ShellContext.getInstance().isNoColor()) {
-                System.out.println("[INFO ] - " + text);
+                LOGGER.info("[INFO ] - " + text);
             } else {
-                System.out.println(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text));
+                LOGGER.info(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text).toString());
             }
         }
         
@@ -79,9 +84,11 @@ public class LoggerShell {
      */
     public static void error(String text) {
         if (ctx().isNoColor() && ctx().getOutputFormat().equals(OutputFormat.human)) {
-            System.out.println("[ERROR] - " + text);
+            LOGGER.info("[ERROR] - " + text);
         } else {
-            System.out.println(ansi().fg(RED).a("[ERROR] - ").reset().a(text));
+            LOGGER.info(ansi().fg(RED)
+                    .a("[ERROR] - ").reset()
+                    .a(text).toString());
         }
         
         if (ctx().isFileLoggerEnabled()) {
@@ -121,9 +128,9 @@ public class LoggerShell {
      */
     public static void warning(String text) {
         if (ctx().isNoColor() && ctx().getOutputFormat().equals(OutputFormat.human)) {
-            System.out.println("[WARN ] - " + text);
+            LOGGER.info("[WARN ] - " + text);
         } else {
-             System.out.println(ansi().fg(YELLOW).a("[WARN ] - ").reset().a(text));
+            LOGGER.info(ansi().fg(YELLOW).a("[WARN ] - ").reset().a(text).toString());
         }
         if (ctx().isFileLoggerEnabled()) {
             logToFile("WARN", text);
@@ -139,9 +146,9 @@ public class LoggerShell {
     public static void debug(String text) {
         if (ctx().isVerbose() && ctx().getOutputFormat().equals(OutputFormat.human)) {
             if (ctx().isNoColor()) {
-                System.out.println("[DEBUG] - " + text);
+                LOGGER.info("[DEBUG] - " + text);
             } else {
-                System.out.println(ansi().fg(YELLOW).a("[DEBUG] - ").reset().a(text));
+                LOGGER.info(ansi().fg(YELLOW).a("[DEBUG] - ").reset().a(text).toString());
             }
         }
         
@@ -159,9 +166,9 @@ public class LoggerShell {
     public static void info(String text) {
         if (ctx().isVerbose() && ctx().getOutputFormat().equals(OutputFormat.human)) {
             if (ctx().isNoColor()) {
-                System.out.println("[INFO ] - " + text);
+                LOGGER.info("[INFO ] - " + text);
             } else {
-                System.out.println(ansi().fg(CYAN).a("[INFO ] - ").reset().a(text));
+                LOGGER.info(ansi().fg(CYAN).a("[INFO ] - ").reset().a(text).toString());
             }
         }
         

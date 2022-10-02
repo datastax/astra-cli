@@ -3,6 +3,9 @@ package com.datastax.astra.cli.db;
 import java.nio.file.Paths;
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
+import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -44,8 +47,9 @@ public class DbDotEnvCmd extends AbstractConnectedCmd {
             description = "Destination for the config file")
     protected String destination = Paths.get(".").toAbsolutePath().normalize().toString();
     
-    /** {@inheritDoc}  */
-    public void execute() throws Exception {
+    /** {@inheritDoc} */
+    public void execute() 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
        OperationsDb.generateDotEnvFile(db, keyspace, region, destination);
     }
 
