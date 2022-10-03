@@ -5,6 +5,7 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=clun_astra-cli)
+
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=clun_astra-cli)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=bugs)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=coverage)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
