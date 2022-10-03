@@ -213,6 +213,7 @@ public class AstraCli {
      */
     public static ExitCode parseCli(Class<?> clazz, String[] args) {
         try {
+            ShellContext.getInstance().init(new DefaultCmd());
             // Parse
             AbstractCmd cmd = new Cli<AbstractCmd>(clazz).parse(args);
             // Save command in the context

@@ -18,4 +18,9 @@ public class MainCmdTest extends AbstractCmdTest {
     public void should_show_version() {
         assertSuccessCli("--version");
     }
+    
+    @Test
+    public void should_show_default_help() {
+        assertSuccessCli("help");
+    }
 }

@@ -47,7 +47,7 @@ public class DefaultCmd extends AbstractCmd {
             println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
             println(new StringBuilderAnsi(" 📋 Command list: ")
                     .append("'astra help'", Ansi.Color.GREEN));
-            println(new StringBuilderAnsi(" ℹ️ Command help: ")
+            println(new StringBuilderAnsi(" ℹ️  Command help: ")
                     .append("'astra help <cmd>'", Ansi.Color.GREEN)
                     .append(" (eg: astra help db create)"));
             println(new StringBuilderAnsi(" 🧑🏽‍💻 Get support: ")

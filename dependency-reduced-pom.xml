@@ -161,11 +161,6 @@
                 <class>com.datastax.astra.cli.AstraCli</class>
               </classes>
             </source>
-            <source>
-              <classes>
-                <class>com.datastax.astra.cli.AstraShell</class>
-              </classes>
-            </source>
           </sources>
         </configuration>
       </plugin>
