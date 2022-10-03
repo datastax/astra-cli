@@ -22,8 +22,8 @@ jobs:
         with:
           java-version: "17"
           distribution: "adopt"
-      - name: Run Jacoco and Coveralls
-        run: mvn clean test jacoco:report coveralls:report 
+      #- name: Run Jacoco and Coveralls
+      #  run: mvn clean test jacoco:report coveralls:report 
       - name: Run Sonar Analysis
         run: mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=clun_astra-cli
       

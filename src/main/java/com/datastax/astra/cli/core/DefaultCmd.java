@@ -17,7 +17,7 @@ import com.github.rvesse.airline.annotations.Option;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "version", description = "Interactive mode (default if no command provided)")
+@Command(name = "?", description = "Display this help version")
 public class DefaultCmd extends AbstractCmd {
     
     /** Ask for version number. s*/
@@ -50,7 +50,7 @@ public class DefaultCmd extends AbstractCmd {
             println(new StringBuilderAnsi(" ℹ️  Command help: ")
                     .append("'astra help <cmd>'", Ansi.Color.GREEN)
                     .append(" (eg: astra help db create)"));
-            println(new StringBuilderAnsi(" 🧑🏽‍💻 Get support: ")
+            println(new StringBuilderAnsi(" 🧑🏽‍💻 Get support : ")
                     .append("'https://dtsx.io/discord'", Ansi.Color.GREEN));
             println("");
         }

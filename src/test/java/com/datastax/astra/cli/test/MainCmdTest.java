@@ -11,7 +11,7 @@ public class MainCmdTest extends AbstractCmdTest {
 
     @Test
     public void should_show_banner() {
-        assertSuccessCli("version");
+        assertSuccessCli("?");
     }
     
     @Test
