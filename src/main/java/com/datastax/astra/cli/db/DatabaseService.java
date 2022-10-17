@@ -380,11 +380,14 @@ public class DatabaseService implements DatabaseConstants {
             
              HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
              return response.statusCode();
+        } catch (InterruptedException e) {
+            LoggerShell.warning("Interrupted %s".formatted(e.getMessage()));
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
              LoggerShell.warning("Resuming request might have failed, please check %s"
                      .formatted(e.getMessage()));
-             return 500;
         }
+        return 500;
     }
     
     /**

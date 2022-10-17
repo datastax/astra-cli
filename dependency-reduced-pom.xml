@@ -54,9 +54,7 @@
           </dependency>
         </dependencies>
         <configuration>
-          <configuration>
-            <argLine>-agentlib:native-image-agent=config-output-dir=META-INF/native-image</argLine>
-          </configuration>
+          <forkCount>0</forkCount>
         </configuration>
       </plugin>
       <plugin>
@@ -352,13 +350,11 @@
     <version.maven.plugin.dependency>2.8</version.maven.plugin.dependency>
     <version.maven.plugin.jacoco>0.8.8</version.maven.plugin.jacoco>
     <version.maven.plugin.xml-format>3.0.7</version.maven.plugin.xml-format>
-    <commons-cli.version>1.5.0</commons-cli.version>
     <maven.plugin.javadoc.source>17</maven.plugin.javadoc.source>
     <sonar.organization>clun-datastax</sonar.organization>
     <commons-compress.version>1.21</commons-compress.version>
     <version.maven.plugin.compiler>3.8.1</version.maven.plugin.compiler>
     <astra-sdk.version>0.3.4</astra-sdk.version>
-    <commons-lang.version>3.12.0</commons-lang.version>
     <version.maven.plugin.assembly>3.4.2</version.maven.plugin.assembly>
     <maven.plugin.compiler.source>17</maven.plugin.compiler.source>
     <junit-jupiter.version>5.9.0</junit-jupiter.version>
