@@ -68,7 +68,6 @@ public class DbCommandsTest extends AbstractCmdTest {
     @Order(4)
     public void should_get_db() throws DatabaseNameNotUniqueException {
         assertSuccessCli("db get %s".formatted(DB_TEST));
-        assertSuccessCli("db %s".formatted(DB_TEST));
         assertSuccessCli("db get %s -o json".formatted(DB_TEST));
         assertSuccessCli("db get %s -o csv".formatted(DB_TEST));
         assertSuccessCli("db get %s --key id".formatted(DB_TEST));

@@ -98,7 +98,7 @@ public class DsBulkTest extends AbstractCmdTest {
             assertSuccessCli("db", "unload", DB_TEST, "-k", DB_TEST,"-t", TABLE_TEST, 
                     "-url", "/tmp/export-"+ DB_TEST + "-" + TABLE_TEST,
                     "-logDir", "/tmp");
-            Assertions.assertTrue(new File("/tmp/export_dataset.csv").exists());
+            Assertions.assertTrue(new File("/tmp/export-"+ DB_TEST + "-" + TABLE_TEST).exists());
         }   
     }
 

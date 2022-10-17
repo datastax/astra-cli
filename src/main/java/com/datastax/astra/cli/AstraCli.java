@@ -31,7 +31,6 @@ import com.datastax.astra.cli.db.DbResumeCmd;
 import com.datastax.astra.cli.db.DbStatusCmd;
 import com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.datastax.astra.cli.db.dsbulk.DbCountCmd;
-import com.datastax.astra.cli.db.dsbulk.DbDSBulkCmd;
 import com.datastax.astra.cli.db.dsbulk.DbLoadCmd;
 import com.datastax.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -124,7 +123,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // DsBulk
-         DbDSBulkCmd.class, DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
+        DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
          // Cqlshell
          DbCqlShellCmd.class,
      }),
