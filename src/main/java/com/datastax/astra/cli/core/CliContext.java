@@ -164,8 +164,7 @@ public class CliContext {
             LoggerShell.info("Cli successfully initialized");
         } catch(Exception e) {
             AstraCliConsole.outputError(ExitCode.CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
-            e.printStackTrace();
-            //throw new InvalidTokenException(getToken());
+            throw new InvalidTokenException(getToken());
         }
     }
    
