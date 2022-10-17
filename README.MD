@@ -10,35 +10,40 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=bugs)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=coverage)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 
-Astra CLI provides a command line interface in a terminal to operate Datastax Astra. The goal is to offer access to any feature without accessing the user interface.
+Astra CLI provides a command line interface in a terminal to operate Datastax Astra. The goal is to offer access to any feature without accessing the user interface. The component is still under development (version `0.1.alpha5`), it will keep moving before the release GA.
 
 > ```
 > The component is still under development (version `0.1.alpha5`)
 > ```
 
-### Installation 
+## Getting started
 
-#### 1. Prequisites
+The extensive documentation will be provided in [Awesome Astra](https://awesome-astra.github.io/docs/pages/astra/astra-cli/)
 
-On your machine you will need the following components:
-- A bash shell (Bourne Again SHell)
-- The `curl` command.
+### QuickStart
 
-Complete those steps, you need a security token to setup the `cli`. 
-- [Create an Astra account](https://astra.dev/3B7HcYo)
-- [Generate an Astra Token](https://awesome-astra.github.io/docs/pages/astra/create-token/)
-
-#### 2. Installation
-
-To install or reinstall the CLI use the following command. Previous installations will be cleaned but configuration will NOT be lost. The cli is installed in ~/.astra/cli folder whereas your configuration is saved in ~/.astrarc file.
+- Install the CLI with 
 
 ```bash
 curl -Ls "https://dtsx.io/get-astra-cli" | bash
 ```
 
+- Open a new terminal to enable the autocompletion and add Astra in the path.
+
+- Enter your token 
+
+```
+astra setup
+```
+
+- You are good to go 
+
+```
+astra db list
+```
 
 
-### Developement 
+### Developement Commands
 
 - Generate Jacoco report and push to Coverall
 
