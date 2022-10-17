@@ -1,13 +1,10 @@
 package com.datastax.astra.cli.config;
 
-import static com.datastax.astra.cli.core.out.AstraCliConsole.println;
-
 import java.util.Scanner;
 
-import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.Ansi.Color;
 
+import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
@@ -21,33 +18,36 @@ import com.github.rvesse.airline.annotations.Option;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "setup", description = "Initialize configuration file")
-public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
+public class SetupCmd extends AbstractCmd {
     
     /** Authentication token used if not provided in config. */
-    @Option(name = { "-t", "--token" }, title = "AuthToken", description = "Key to use authenticate each call.")
+    @Option(name = { "-t", "--token" }, 
+            title = "TOKEN", 
+            description = "Key to use authenticate each call.")
     protected String tokenParam;
-   
+    
     /** {@inheritDoc} */
     @Override
-    public void execute() throws InvalidTokenException  {
-        // On setup you must have output
-        if (StringUtils.isBlank(tokenParam)) {
+    public void execute() {
+     // On setup you must have output
+        if (tokenParam == null || tokenParam.isBlank()) {
             verbose = true;
-            println("+-------------------------------+", Color.CYAN);
-            println("+-     Astra CLI SETUP         -+", Color.CYAN);
-            println("+-------------------------------+", Color.CYAN);
-            println("\nWelcome to Astra Cli. We will guide you to start.");
-            println("\n[Astra Setup]", Ansi.Color.CYAN);
-            println("To use the cli you need to:");
-            println(" • Create an Astra account on : https://astra.datastax.com");
-            println(" • Create an Authentication token following: https://dtsx.io/create-astra-token");
-            println("\n[Cli Setup]", Ansi.Color.CYAN);
             String token = null;
+            
+            AstraCliConsole.println("    _____            __                ",  Ansi.Color.YELLOW);
+            AstraCliConsole.println("   /  _  \\   _______/  |_____________   ",  Ansi.Color.YELLOW);
+            AstraCliConsole.println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\ ",  Ansi.Color.YELLOW);
+            AstraCliConsole.println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_",  Ansi.Color.YELLOW);
+            AstraCliConsole.println(" \\____|__  /____  > |__|  |__|  (____  /",  Ansi.Color.YELLOW);
+            AstraCliConsole.println("         \\/     \\/                   \\/\n",  Ansi.Color.YELLOW);
             
             try(Scanner scanner = new Scanner(System.in)) {
                 boolean valid_token = false;
                 while (!valid_token) {
-                    AstraCliConsole.println("\n• Enter your token (AstraCS:*):", Ansi.Color.YELLOW);
+                    AstraCliConsole.println("       ------------------------", Ansi.Color.CYAN);
+                    AstraCliConsole.println("       ---       SETUP      ---", Ansi.Color.CYAN);
+                    AstraCliConsole.println("       ------------------------\n", Ansi.Color.CYAN);
+                    AstraCliConsole.println("🔑 Enter token (starting with AstraCS...):", Ansi.Color.YELLOW);
                     token = scanner.nextLine();
                     if (!token.startsWith("AstraCS:")) {
                         LoggerShell.error("Your token should start with 'AstraCS:'");
@@ -56,7 +56,7 @@ public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
                             createDefaultSection(token);
                             valid_token = true;
                         } catch(InvalidTokenException ite) {
-                            // Not was not invalid, asking again
+                            // loop
                         }
                     }
                 }
@@ -64,11 +64,7 @@ public class ConfigSetupCmd extends AbstractConfigCmd implements Runnable {
         } else {
             createDefaultSection(tokenParam);
         }
-        println("\n[You are ready !] (configuration is stored in ~/.astrarc)", Ansi.Color.CYAN);
-        println(" • 'astra db list' : list databases");
-        println(" • 'astra db create demo --if-not-exist' : create new db");
-        println(" • 'astra help' list available command groups");
-        println(" • 'astra help <command>' :  help you on a particular command");
+        AstraCliConsole.outputSuccess("Your are all set 🚀 🧑‍🚀 . Enter `astra` to list available commands.");
     }
     
     /**

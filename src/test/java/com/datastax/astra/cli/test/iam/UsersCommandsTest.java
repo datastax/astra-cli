@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**

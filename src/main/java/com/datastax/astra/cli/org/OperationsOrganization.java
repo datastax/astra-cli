@@ -3,7 +3,7 @@ package com.datastax.astra.cli.org;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.datastax.astra.cli.ShellContext;
+import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
@@ -48,7 +48,7 @@ public class OperationsOrganization {
      *      org client
      */
     private static final OrganizationsClient orgClient() {
-        return ShellContext.getInstance().getApiDevopsOrganizations();
+        return CliContext.getInstance().getApiDevopsOrganizations();
     }
     
     /**

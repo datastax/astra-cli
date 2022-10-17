@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.test.db;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -7,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.astra.cli.db.dsbulk.DsBulkUtils;
+import com.datastax.astra.cli.db.dsbulk.DsBulkService;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -28,6 +30,9 @@ public class DsBulkTest extends AbstractCmdTest {
     /** flag coding for tool disabling. */
     public static boolean disableTools = false;
     
+    /** dataset. */
+    public final static String TABLE_TEST = "test_dsbulk";
+    
     @BeforeAll
     public static void should_create_when_needed() {
         readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.valueOf(flag));
@@ -42,9 +47,59 @@ public class DsBulkTest extends AbstractCmdTest {
         if (disableTools) {
             LOGGER.warn("Third Party tool is disabled for this test environment");
         } else {
-            DsBulkUtils.installDsBulk();
-            Assertions.assertTrue(DsBulkUtils.isDsBulkInstalled());
+            DsBulkService.getInstance().install();
+            Assertions.assertTrue(DsBulkService.getInstance().isInstalled());
         }
+    }
+    
+    @Test
+    @Order(2)
+    public void testShould_count() {
+        if (disableTools) {
+            LOGGER.warn("Third Party tool is disabled for this test environment");
+        } else {
+            // Given
+            assertSuccessCli("db", "create", DB_TEST, "--if-not-exists", "--wait");
+            assertSuccessCli("db", "cqlsh", DB_TEST, "-e", ""
+                    + "CREATE TABLE IF NOT EXISTS " 
+                    + DB_TEST + "." + TABLE_TEST + "(id text PRIMARY KEY);"
+                    + "INSERT INTO " + DB_TEST + "." + TABLE_TEST 
+                    + "(id) VALUES('a');");
+            // When
+            assertSuccessCli("db", "count", DB_TEST, 
+                    "-k", DB_TEST,
+                    "-t", TABLE_TEST,
+                    "-logDir", "/tmp");
+        }   
+    }
+    
+    @Test
+    @Order(3)
+    public void testShould_import() {
+        if (disableTools) {
+            LOGGER.warn("Third Party tool is disabled for this test environment");
+        } else {
+            // When
+            assertSuccessCli("db", "load", DB_TEST, 
+                    "-k", DB_TEST,
+                    "-t", TABLE_TEST, 
+                    "-url", "src/test/resources/test_dataset.csv", 
+                    "-logDir", "/tmp");
+        }   
+    }
+    
+    @Test
+    @Order(4)
+    public void testShould_export() {
+        if (disableTools) {
+            LOGGER.warn("Third Party tool is disabled for this test environment");
+        } else {
+            // When
+            assertSuccessCli("db", "unload", DB_TEST, "-k", DB_TEST,"-t", TABLE_TEST, 
+                    "-url", "/tmp/export-"+ DB_TEST + "-" + TABLE_TEST,
+                    "-logDir", "/tmp");
+            Assertions.assertTrue(new File("/tmp/export_dataset.csv").exists());
+        }   
     }
 
 }

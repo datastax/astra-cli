@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
-import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;

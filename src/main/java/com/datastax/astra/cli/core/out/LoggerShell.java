@@ -6,16 +6,12 @@ import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.CliContext;
 
 /**
  * Work with terminal.
@@ -32,28 +28,6 @@ public class LoggerShell {
 	 */
 	private LoggerShell() {}
 	
-    /**
-     * If log provided the output will go to the logfile.
-     * 
-     * @param level
-     *      level to log
-     * @param text
-     *      text to log
-     */
-    private static void logToFile(String level, String text) {
-        AbstractCmd cli = ShellContext.getInstance().getStartCommand();
-        if (cli.getLogFileWriter() != null) {
-            try {
-                cli.getLogFileWriter().write(new Date().toString() 
-                        + " - " 
-                        + StringUtils.rightPad(level, 5) 
-                        + " - " + text + System.lineSeparator());
-                cli.getLogFileWriter().flush();
-            } catch (IOException e) {
-                LOGGER.error("Writes in log file failed: " + e.getMessage());
-            }
-        }
-    }
     
     /**
      * Syntax sugar for OK.
@@ -62,17 +36,12 @@ public class LoggerShell {
      *      text to show in success
      */
     public static void success(String text) {
-        
         if (ctx().getOutputFormat().equals(OutputFormat.human)) {
-            if (ShellContext.getInstance().isNoColor()) {
+            if (CliContext.getInstance().isNoColor()) {
                 LOGGER.info("[INFO ] - " + text);
             } else {
                 LOGGER.info(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text).toString());
             }
-        }
-        
-        if (ShellContext.getInstance().isFileLoggerEnabled()) {
-            logToFile("INFO", text);
         }
     }
     
@@ -89,10 +58,6 @@ public class LoggerShell {
             LOGGER.info(ansi().fg(RED)
                     .a("[ERROR] - ").reset()
                     .a(text).toString());
-        }
-        
-        if (ctx().isFileLoggerEnabled()) {
-            logToFile("ERROR", text);
         }
     }
     
@@ -132,9 +97,6 @@ public class LoggerShell {
         } else {
             LOGGER.info(ansi().fg(YELLOW).a("[WARN ] - ").reset().a(text).toString());
         }
-        if (ctx().isFileLoggerEnabled()) {
-            logToFile("WARN", text);
-        }
     }
     
     /**
@@ -150,10 +112,6 @@ public class LoggerShell {
             } else {
                 LOGGER.info(ansi().fg(YELLOW).a("[DEBUG] - ").reset().a(text).toString());
             }
-        }
-        
-        if (ctx().isFileLoggerEnabled()) {
-            logToFile("DEBUG", text);
         }
     }
     
@@ -171,10 +129,6 @@ public class LoggerShell {
                 LOGGER.info(ansi().fg(CYAN).a("[INFO ] - ").reset().a(text).toString());
             }
         }
-        
-        if (ctx().isFileLoggerEnabled()) {
-            logToFile("INFO", text);
-        }
     }
     
     /**
@@ -183,8 +137,8 @@ public class LoggerShell {
      * @return
      *      cli context
      */
-    private static ShellContext ctx() {
-        return ShellContext.getInstance();
+    private static CliContext ctx() {
+        return CliContext.getInstance();
     }
     
 }

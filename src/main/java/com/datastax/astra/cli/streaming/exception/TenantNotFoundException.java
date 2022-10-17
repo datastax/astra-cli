@@ -5,7 +5,7 @@ package com.datastax.astra.cli.streaming.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class TenantNotFoundException extends Exception {
+public class TenantNotFoundException extends RuntimeException {
     
     /** serial. */
     private static final long serialVersionUID = -224037288716231040L;

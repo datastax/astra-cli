@@ -5,7 +5,7 @@ package com.datastax.astra.cli.iam.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class UserNotFoundException extends Exception {
+public class UserNotFoundException extends RuntimeException {
 
     /** Serial Number. */
     private static final long serialVersionUID = -1134966974107948087L;

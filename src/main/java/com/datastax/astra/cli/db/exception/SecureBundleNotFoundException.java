@@ -7,7 +7,7 @@ import com.datastax.astra.cli.core.out.LoggerShell;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class SecureBundleNotFoundException extends Exception {
+public class SecureBundleNotFoundException extends RuntimeException {
 
     /** Serial Number. */
     private static final long serialVersionUID = -755957414395745147L;

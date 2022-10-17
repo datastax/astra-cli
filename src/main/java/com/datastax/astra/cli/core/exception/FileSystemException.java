@@ -5,7 +5,7 @@ package com.datastax.astra.cli.core.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class FileSystemException extends Exception {
+public class FileSystemException extends RuntimeException {
 
     /** Serial. */
     private static final long serialVersionUID = -1631087992604077795L;

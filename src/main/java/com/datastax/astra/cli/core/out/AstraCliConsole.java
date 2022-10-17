@@ -10,9 +10,8 @@ import org.fusesource.jansi.Ansi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.utils.AstraCliUtils;
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.ExitCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,15 +33,7 @@ public class AstraCliConsole {
 	
 	/** Start Banner. */
     public static void banner() {
-        println("");
-        println("  █████╗ ███████╗████████╗██████╗  █████╗   ", Ansi.Color.MAGENTA);
-        println(" ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ", Ansi.Color.MAGENTA);
-        println(" ███████║███████╗   ██║   ██████╔╝███████║  ", Ansi.Color.MAGENTA);
-        println(" ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║  ", Ansi.Color.MAGENTA);
-        println(" ██║  ██║███████║   ██║   ██║  ██║██║  ██║  ", Ansi.Color.MAGENTA);
-        println(" ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝  ", Ansi.Color.MAGENTA);
-        println("");
-        println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
+       
     }
     
     /**
@@ -148,26 +139,6 @@ public class AstraCliConsole {
             throw new IllegalArgumentException("Cannot serialize object as JSON", e);
         }
     }
-    
-	/**
-	 * Will print Promt based on the current state.
-	 */
-	public static void prompt() {
-	    println("");
-	    ShellContext ctx = ShellContext.getInstance();
-	    StringBuilderAnsi builder = new StringBuilderAnsi();
-	    if (ctx.getOrganization() != null) {
-	        builder.append(ctx.getOrganization().getName(), Ansi.Color.GREEN);
-	    }
-	    if (ctx.getDatabase() != null) {
-	        builder.append(" > ", Ansi.Color.GREEN);
-	        builder.append(ctx.getDatabase().getInfo().getName(), Ansi.Color.YELLOW);
-	        builder.append(" > ", Ansi.Color.GREEN);
-	        builder.append(ctx.getDatabaseRegion() + " ", Ansi.Color.YELLOW);
-        }
-	    builder.append("> ", Ansi.Color.GREEN);
-	    System.out.print(builder.toString());
-	}
 	
 	/**
      * Exit program with error.
@@ -267,8 +238,8 @@ public class AstraCliConsole {
      * @return
      *      cli context
      */
-    private static ShellContext ctx() {
-        return ShellContext.getInstance();
+    private static CliContext ctx() {
+        return CliContext.getInstance();
     }
 	
 }

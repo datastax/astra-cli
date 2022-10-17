@@ -1,7 +1,5 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -9,10 +7,8 @@ import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Create a DB with the CLI (initializing connection)
@@ -21,15 +17,8 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = AbstractCmd.CREATE, description = "Create a database with cli")
-public class DbCreateCmd extends AbstractConnectedCmd {
-    
-    /**
-     * Database name or identifier
-     */
-    @Required
-    @Arguments(title = "DB_NAME", description = "Database name (not unique)")
-    protected String databaseName;
+@Command(name = "create", description = "Create a database with cli")
+public class DbCreateCmd extends AbstractDatabaseCmd {
     
     /** 
      * Database or keyspace are created when needed
@@ -43,14 +32,14 @@ public class DbCreateCmd extends AbstractConnectedCmd {
      */
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1, 
             description = "Cloud provider region to provision")
-    protected String databaseRegion = OperationsDb.DEFAULT_REGION;
+    protected String region = DEFAULT_REGION;
     
     /**
      * Default keyspace created with the Db
      */
     @Option(name = { "-k", "--keyspace" }, title = "KEYSPACE", arity = 1, 
             description = "Default keyspace created with the Db")
-    protected String defaultKeyspace;
+    protected String keyspace;
     
     /** 
      * Will wait until the database become ACTIVE.
@@ -71,15 +60,15 @@ public class DbCreateCmd extends AbstractConnectedCmd {
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
            InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException  {
-        OperationsDb.createDb(databaseName, databaseRegion, defaultKeyspace, ifNotExist);
+        dbServices.createDb(db, region, keyspace, ifNotExist);
         if (wait) {
-            switch(OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout)) {
+            switch(dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND:
-                    throw new DatabaseNotFoundException(databaseName);
+                    throw new DatabaseNotFoundException(db);
                 case UNAVAILABLE:
-                    throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,  DatabaseStatusType.PENDING);
+                    throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE,  DatabaseStatusType.PENDING);
                 default:
-                    LoggerShell.success("Database \'" + databaseName +  "' has been created.");
+                    LoggerShell.success("Database \'" + db +  "' has been created.");
                 break;  
             }
         }

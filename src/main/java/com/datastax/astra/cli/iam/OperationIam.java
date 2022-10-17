@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
@@ -54,7 +54,7 @@ public class OperationIam {
         sht.addColumn(COLUMN_ROLE_ID, 37);
         sht.addColumn(COLUMN_ROLE_NAME, 20);
         sht.addColumn(COLUMN_ROLE_DESCRIPTION, 20);
-        ShellContext.getInstance()
+        CliContext.getInstance()
                     .getApiDevopsOrganizations()
                     .roles()
                     .forEach(role -> {
@@ -78,7 +78,7 @@ public class OperationIam {
         sht.addColumn(COLUMN_USER_ID, 37);
         sht.addColumn(COLUMN_USER_EMAIL, 20);
         sht.addColumn(COLUMN_USER_STATUS, 20);
-        ShellContext.getInstance()
+        CliContext.getInstance()
                     .getApiDevopsOrganizations()
                     .users().forEach(user -> {
              Map <String, String> rf = new HashMap<>();
@@ -99,13 +99,13 @@ public class OperationIam {
      *      role has not been found
      */
     public static void showRole(String role) throws RoleNotFoundException {
-        Optional<Role> optRole = ShellContext
+        Optional<Role> optRole = CliContext
                 .getInstance()
                 .getApiDevopsOrganizations()
                 .findRoleByName(role);
             
         if (!optRole.isPresent() && IdUtils.isUUID(role)) {
-            optRole = ShellContext
+            optRole = CliContext
                  .getInstance()
                  .getApiDevopsOrganizations()
                  .role(role)
@@ -122,7 +122,7 @@ public class OperationIam {
         sht.addPropertyRow("Name",          r.getName());
         sht.addPropertyRow("Description",   r.getPolicy().getDescription());
         sht.addPropertyRow("Effect",        r.getPolicy().getEffect());
-        switch(ShellContext.getInstance().getOutputFormat()) {
+        switch(CliContext.getInstance().getOutputFormat()) {
             case csv:
                 sht.addPropertyRow("Resources", r.getPolicy().getResources().toString());
                 sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
@@ -150,13 +150,13 @@ public class OperationIam {
      *      user has not been found
      */
     public static void showUser(String user) throws UserNotFoundException {
-       Optional<User> optUser = ShellContext
+       Optional<User> optUser = CliContext
                .getInstance()
                .getApiDevopsOrganizations()
                .findUserByEmail(user);
             
        if (!optUser.isPresent() && IdUtils.isUUID(user)) {
-           optUser = ShellContext
+           optUser = CliContext
                 .getInstance()
                 .getApiDevopsOrganizations()
                 .user(user)
@@ -178,7 +178,7 @@ public class OperationIam {
                .map(Role::getName)
                .collect(Collectors.toList());
             
-       switch(ShellContext.getInstance().getOutputFormat()) {
+       switch(CliContext.getInstance().getOutputFormat()) {
            case csv:
                sht.addPropertyRow("Roles", roleNames.toString());
                AstraCliConsole.printShellTable(sht);
@@ -207,7 +207,7 @@ public class OperationIam {
      *      role does not exist 
      */
     public static void inviteUser(String user, String role) throws UserAlreadyExistException, RoleNotFoundException {
-        OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
+        OrganizationsClient oc = CliContext.getInstance().getApiDevopsOrganizations();
         Optional<User> optUser = oc.findUserByEmail(user);
         if (optUser.isPresent()) {
             throw new UserAlreadyExistException(user);
@@ -235,7 +235,7 @@ public class OperationIam {
      */
     public static void deleteUser(AbstractCmd cmd, String user) 
     throws UserNotFoundException {
-        OrganizationsClient oc = ShellContext.getInstance().getApiDevopsOrganizations();
+        OrganizationsClient oc = CliContext.getInstance().getApiDevopsOrganizations();
         Optional<User> optUser = oc.findUserByEmail(user);
         if (!optUser.isPresent() && IdUtils.isUUID(user)) {
             optUser = oc.user(user).find();

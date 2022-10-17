@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.astra.cli.db.cqlsh.CqlShellUtils;
+import com.datastax.astra.cli.db.cqlsh.CqlShellService;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -42,9 +42,18 @@ public class DbCqlshTest extends AbstractCmdTest {
         if (disableTools) {
             LOGGER.warn("Third Party tool is disabled for this test environment");
         } else {
-            CqlShellUtils.installCqlShellAstra();
-            Assertions.assertTrue(CqlShellUtils.isCqlShellInstalled());
+            CqlShellService.getInstance().install();
+            Assertions.assertTrue(CqlShellService.getInstance().isInstalled());
         }
+    }
+    
+    @Test
+    @Order(2)
+    public void testShould_start_shell() {
+        if (!disableTools) {
+            assertSuccessCli("db", "cqlsh", DB_TEST, 
+                    "-e", "SELECT cql_version FROM system.local");
+        }   
     }
     
 }

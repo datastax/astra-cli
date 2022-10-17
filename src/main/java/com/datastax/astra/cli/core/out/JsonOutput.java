@@ -2,7 +2,7 @@ package com.datastax.astra.cli.core.out;
 
 import java.io.Serializable;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.ExitCode;
 
 /**
  * Wrapper for Json outputs.

@@ -1,5 +1,6 @@
 package com.datastax.astra.cli.config;
 
+import com.datastax.astra.cli.core.AbstractCmd;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
@@ -10,7 +11,7 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "list", description = "Show the list of available configurations.")
-public class ConfigListCmd extends AbstractConfigCmd {
+public class ConfigListCmd extends AbstractCmd {
 
     /** {@inheritDoc} */
     @Override

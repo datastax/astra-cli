@@ -2,8 +2,8 @@ package com.datastax.astra.cli.config;
 
 import java.util.Optional;
 
-import com.datastax.astra.cli.ExitCode;
 import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -18,7 +18,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * astra show config default 
  */
 @Command(name = AbstractCmd.GET, description = "Show details for a configuration.")
-public class ConfigGetCmd extends AbstractConfigCmd implements Runnable {
+public class ConfigGetCmd extends AbstractCmd {
     
     /**
      * Section in configuration file to as as default.
@@ -38,7 +38,7 @@ public class ConfigGetCmd extends AbstractConfigCmd implements Runnable {
     public void execute() throws ConfigurationException  {
         OperationsConfig.assertSectionExist(sectionName);
         if (key != null) {
-            Optional<String> optKey = ctx().getAstraRc().getSectionKey(sectionName, key);
+            Optional<String> optKey = ctx().getConfiguration().getSectionKey(sectionName, key);
             if (!optKey.isPresent()) {
                 AstraCliConsole.outputError(
                         ExitCode.INVALID_PARAMETER, 
@@ -48,7 +48,7 @@ public class ConfigGetCmd extends AbstractConfigCmd implements Runnable {
                 AstraCliConsole.println(optKey.get());
             }
         } else {
-            AstraCliConsole.println(ctx().getAstraRc().renderSection(sectionName));
+            AstraCliConsole.println(ctx().getConfiguration().renderSection(sectionName));
         }
      }
     

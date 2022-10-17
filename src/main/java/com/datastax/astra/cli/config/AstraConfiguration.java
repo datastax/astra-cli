@@ -12,7 +12,7 @@
  * governing permissions and limitations under the License.
  */
 
-package com.datastax.astra.cli.utils;
+package com.datastax.astra.cli.config;
 
 import static com.datastax.astra.sdk.config.AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN;
 
@@ -25,12 +25,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
+import com.datastax.astra.cli.core.out.LoggerShell;
+
 /**
  * Utility class to load/save .astrarc file. This file is used to store Astra configuration.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class AstraRcUtils {
+public class AstraConfiguration {
     
     /** Default filename we are looking for. */
     public static final String ASTRARC_FILENAME = ".astrarc";
@@ -51,12 +53,12 @@ public class AstraRcUtils {
     private final Map<String, Map<String, String>> sections = new HashMap<>();
     
     /** Working configuration file to save keys. */
-    private File configFile;
+    private File file;
      
     /**
      * Load from ~/.astrarc
      */
-    public AstraRcUtils() {
+    public AstraConfiguration() {
         this(getDefaultConfigurationFileName());
     }
     
@@ -66,12 +68,14 @@ public class AstraRcUtils {
      * @param fileName
      *            String
      */
-    public AstraRcUtils(String fileName) {
-        this.configFile = new File(fileName);
-        if (!configFile.exists()) {
+    public AstraConfiguration(String fileName) {
+        this.file = new File(fileName);
+        if (!file.exists()) {
             createConfigFileIfNotExists();
         }
+        LoggerShell.debug("Configuration: Parsing file %s ...".formatted(fileName));
         parseConfigFile();
+        LoggerShell.debug("Configuration: [OK] Configurations are %s".formatted(sections.keySet().toString()));
     }
     
     /**
@@ -218,11 +222,11 @@ public class AstraRcUtils {
      *      if the file has been created
      */
     private boolean createConfigFileIfNotExists() {
-        if (!configFile.exists()) {
+        if (!getFile().exists()) {
             try {
-                return configFile.createNewFile();
+                return getFile().createNewFile();
             } catch (IOException e) {
-                throw new IllegalStateException("Cannot create configuration file " + configFile.getPath());
+                throw new IllegalStateException("Cannot create configuration file: " + getFile().getPath());
             }
         }
         return false;
@@ -234,7 +238,7 @@ public class AstraRcUtils {
     public void save() {
         FileWriter out = null;
         try {
-            out = new FileWriter(configFile);
+            out = new FileWriter(file);
             out.write(renderSections());
         } catch (IOException e) {
             throw new IllegalStateException("Cannot save configuration file", e);
@@ -254,8 +258,8 @@ public class AstraRcUtils {
      *      configuration file
      */
     private void parseConfigFile() {
-        try (Scanner scanner = new Scanner(configFile)) {
-            if (configFile.exists()) {
+        try (Scanner scanner = new Scanner(file)) {
+            if (file.exists()) {
                 String sectionName = "";
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
@@ -267,7 +271,7 @@ public class AstraRcUtils {
                         int off = line.indexOf("=");
                         if (off < 0) {
                             throw new IllegalArgumentException(
-                                    "Cannot parse file " + configFile.getName() + ", line '" + line + "' invalid format expecting key=value");
+                                    "Cannot parse file " + file.getName() + ", line '" + line + "' invalid format expecting key=value");
                         }
                         String key = line.substring(0, off);
                         String val = line.substring(off + 1);
@@ -328,13 +332,13 @@ public class AstraRcUtils {
     }
 
     /**
-     * Getter accessor for attribute 'configFile'.
+     * Getter accessor for attribute 'file'.
      *
      * @return
-     *       current value of 'configFile'
+     *       current value of 'file'
      */
-    public File getConfigFile() {
-        return configFile;
-    }   
+    public File getFile() {
+        return file;
+    }
 
 }

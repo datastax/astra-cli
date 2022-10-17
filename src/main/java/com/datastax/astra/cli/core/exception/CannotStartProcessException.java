@@ -5,7 +5,7 @@ package com.datastax.astra.cli.core.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class CannotStartProcessException extends Exception {
+public class CannotStartProcessException extends RuntimeException {
 
     /** Serial. */
     private static final long serialVersionUID = 3366100557983747828L;

@@ -1,13 +1,10 @@
 package com.datastax.astra.cli.db;
 
 import com.datastax.astra.cli.core.AbstractCmd;
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Display information relative to a db.
@@ -15,7 +12,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = AbstractCmd.GET, description = "Show details of a database")
-public class DbGetCmd extends AbstractConnectedCmd {
+public class DbGetCmd extends AbstractDatabaseCmd {
 
     /** Enum for db get. */
     public enum DbGetKeys { 
@@ -34,11 +31,6 @@ public class DbGetCmd extends AbstractConnectedCmd {
         /** all regions */
         regions};
     
-    /** name of the DB. */
-    @Required
-    @Arguments(title = "DB", description = "Database name or identifier")
-    public String database;
-    
     /** Authentication token used if not provided in config. */
     @Option(name = { "-k", "--key" }, title = "Key", description = ""
             + "Show value for a property among: "
@@ -48,7 +40,7 @@ public class DbGetCmd extends AbstractConnectedCmd {
     /** {@inheritDoc} */
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {    
-        OperationsDb.showDb(database, key);
+        dbServices.showDb(db, key);
     }
 
 }

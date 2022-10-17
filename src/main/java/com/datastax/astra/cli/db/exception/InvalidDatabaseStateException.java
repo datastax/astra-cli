@@ -8,7 +8,7 @@ import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class InvalidDatabaseStateException extends Exception {
+public class InvalidDatabaseStateException extends RuntimeException {
 
     /** Serial Number. */
     private static final long serialVersionUID = -8460056062064740428L;

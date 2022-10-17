@@ -5,7 +5,7 @@ package com.datastax.astra.cli.core.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class TokenNotFoundException extends Exception {
+public class TokenNotFoundException extends RuntimeException {
     
     /** serial. */
     private static final long serialVersionUID = -5461243744804311589L;

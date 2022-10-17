@@ -1,6 +1,7 @@
 package com.datastax.astra.cli.config;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
@@ -19,7 +20,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "create", description = "Create a new section in configuration")
-public class ConfigCreateCmd extends AbstractConfigCmd {
+public class ConfigCreateCmd extends AbstractCmd {
     
     /** Section in configuration file to as as default. */
     @Required
@@ -32,8 +33,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd {
     
     /** {@inheritDoc} */
     @Override
-    public void execute() 
-    throws TokenNotFoundException, InvalidTokenException  {
+    public void execute() {
         if (token == null) {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Please Provide a token with option -t, --token");
             throw new TokenNotFoundException();
@@ -47,8 +47,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd {
         if (sectionName == null) {
             sectionName = o.getName();
         }
-        ctx().getAstraRc().createSectionWithToken(sectionName, token);
-        ctx().getAstraRc().save();
+        ctx().getConfiguration().createSectionWithToken(sectionName, token);
+        ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Configuration Saved.\n");
     }
     

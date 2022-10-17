@@ -1,4 +1,4 @@
-package com.datastax.astra.cli;
+package com.datastax.astra.cli.core;
 
 /**
  * Normalization of exit codes.

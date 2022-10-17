@@ -25,6 +25,22 @@ public class AstraCliUtils {
     
     /** Folder name to download archives */
     public static final String TMP_FOLDER = "tmp";
+   
+    /**
+     * Show version.
+     *
+     * @return
+     *      return version
+     */
+    public static String version() {
+        String versionPackage = AstraCliConsole.class
+                .getPackage()
+                .getImplementationVersion();
+        if (versionPackage == null) {
+            versionPackage = "Development";
+        }
+        return versionPackage;
+    }
     
     /** Hold properties. */
     public static Properties properties;
@@ -51,19 +67,4 @@ public class AstraCliUtils {
         return properties.getProperty(key);
     }
     
-    /**
-     * Show version.
-     *
-     * @return
-     *      return version
-     */
-    public static String version() {
-        String versionPackage = AstraCliConsole.class
-                .getPackage()
-                .getImplementationVersion();
-        if (versionPackage == null) {
-            versionPackage = "Development";
-        }
-        return versionPackage;
-    }
 }

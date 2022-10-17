@@ -9,11 +9,10 @@ import java.util.Optional;
 
 import org.fusesource.jansi.Ansi;
 
-import com.datastax.astra.cli.ShellContext;
+import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
-import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 
 /**
@@ -42,15 +41,15 @@ public class OperationsConfig {
      * @return
      *      context
      */
-    private static ShellContext ctx() {
-        return ShellContext.getInstance();
+    private static CliContext ctx() {
+        return CliContext.getInstance();
     }
     
     /**
      * Show configuration in the output.
      */
     public static void listConfigurations() {
-        Map<String, Map<String, String>> sections = ctx().getAstraRc().getSections();
+        Map<String, Map<String, String>> sections = ctx().getConfiguration().getSections();
         List<String> orgs = listOrganizations(sections);
         ShellTable sht = new ShellTable();
         sht.setColumnTitlesColor(Ansi.Color.YELLOW);
@@ -78,8 +77,8 @@ public class OperationsConfig {
         List<String> returnedList = new ArrayList<>();
         Optional<String> defaultOrg = findDefaultOrganizationName(sections);
         for (Entry<String, Map<String, String>> section : sections.entrySet()) {
-            if (AstraRcUtils.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
-                returnedList.add(AstraRcUtils.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
+            if (AstraConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
+                returnedList.add(AstraConfiguration.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
             } else {
                 returnedList.add(section.getKey());
             }
@@ -97,13 +96,13 @@ public class OperationsConfig {
      */
     public static Optional<String> findDefaultOrganizationName(Map<String, Map<String, String>> sections) {
         String defaultOrgName = null;
-        if (sections.containsKey(AstraRcUtils.ASTRARC_DEFAULT)) {
+        if (sections.containsKey(AstraConfiguration.ASTRARC_DEFAULT)) {
             String defaultToken = sections
-                    .get(AstraRcUtils.ASTRARC_DEFAULT)
+                    .get(AstraConfiguration.ASTRARC_DEFAULT)
                     .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
             if (defaultToken !=null) {
                 for (String sectionName : sections.keySet()) {
-                    if (!sectionName.equals(AstraRcUtils.ASTRARC_DEFAULT)) {
+                    if (!sectionName.equals(AstraConfiguration.ASTRARC_DEFAULT)) {
                        if (defaultToken.equalsIgnoreCase(
                                sections.get(sectionName).get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
                            defaultOrgName = sectionName;
@@ -125,7 +124,7 @@ public class OperationsConfig {
      */
     public static void assertSectionExist(String sectionName) 
     throws ConfigurationException {
-        if (!ctx().getAstraRc().isSectionExists(sectionName)) {
+        if (!ctx().getConfiguration().isSectionExists(sectionName)) {
             throw new ConfigurationException("Section '" + sectionName + "' has not been found in config.");
         } 
     }

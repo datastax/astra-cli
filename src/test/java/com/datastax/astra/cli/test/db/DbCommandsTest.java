@@ -3,13 +3,13 @@ package com.datastax.astra.cli.test.db;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.db.OperationsDb;
+import com.datastax.astra.cli.core.ExitCode;
+import com.datastax.astra.cli.db.DatabaseDao;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
@@ -59,7 +59,7 @@ public class DbCommandsTest extends AbstractCmdTest {
         // When
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
         // Then
-        Assertions.assertTrue(OperationsDb.getDatabaseClient(DB_TEST).isPresent());
+        Assertions.assertTrue(DatabaseDao.getInstance().getDatabaseClient(DB_TEST).isPresent());
         // Database is pending
         assertSuccessCli("db status %s".formatted(DB_TEST));
     }
@@ -107,22 +107,15 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(7)
-    public void should_download_scb()  {
-        assertSuccessCli("db download-scb %s".formatted(DB_TEST));
-        assertSuccessCli("db download-scb %s -d %s".formatted(DB_TEST, "/tmp"));
+    public void testShould_download_scb()  {
+        assertSuccessCli("db download-scb %s -f %s".formatted(DB_TEST, "/tmp/sample.zip"));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db download-scb %s".formatted("invalid"));
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void should_resumedb()  {
         assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
-        //String randomDB = "db_cli_" + UUID
-        //        .randomUUID().toString()
-        //        .replaceAll("-", "").substring(0, 8);
-        //assertSuccessCli("db create %s".formatted(randomDB));
-        
-        //assertSuccessCli("db resume %s --wait".formatted(randomDB));
     }
    
 }

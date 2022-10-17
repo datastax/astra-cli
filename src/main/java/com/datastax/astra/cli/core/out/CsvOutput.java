@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.ExitCode;
 
 /**
  * Show cli output as CSV.

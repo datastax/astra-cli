@@ -12,8 +12,9 @@
 
 Astra CLI provides a command line interface in a terminal to operate Datastax Astra. The goal is to offer access to any feature without accessing the user interface.
 
-
-The component is still under development (version `0.1.alpha5`) stay tuned.
+> ```
+> The component is still under development (version `0.1.alpha5`)
+> ```
 
 ### Installation 
 
@@ -34,6 +35,8 @@ To install or reinstall the CLI use the following command. Previous installation
 ```bash
 curl -Ls "https://dtsx.io/get-astra-cli" | bash
 ```
+
+
 
 ### Developement 
 

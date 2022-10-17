@@ -7,7 +7,7 @@ import com.datastax.astra.cli.core.out.LoggerShell;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class KeyspaceAlreadyExistException extends Exception {
+public class KeyspaceAlreadyExistException extends RuntimeException {
 
     /** Serial Number. */
     private static final long serialVersionUID = 968018206118357644L;

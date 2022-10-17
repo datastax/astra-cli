@@ -5,7 +5,7 @@ package com.datastax.astra.cli.iam.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class RoleNotFoundException extends Exception {
+public class RoleNotFoundException extends RuntimeException {
 
     /** Serial Number. */
     private static final long serialVersionUID = -1269813351970244235L;

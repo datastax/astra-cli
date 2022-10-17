@@ -6,7 +6,7 @@ package com.datastax.astra.cli.core.exception;
  * @author Cedrick LUNVEN (@clunven)
  *
  */
-public class InvalidTokenException extends Exception {
+public class InvalidTokenException extends RuntimeException {
 
     /** 
      * Serial

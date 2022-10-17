@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
 import com.datastax.astra.cli.AstraCli;
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.ShellContext;
-import com.datastax.astra.cli.utils.AstraRcUtils;
+import com.datastax.astra.cli.config.AstraConfiguration;
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.stargate.sdk.utils.Utils;
 
@@ -50,8 +50,8 @@ public abstract class AbstractCmdTest {
         if (t2.isPresent()) { 
             return t2.get();
         }
-        Optional<String> t1 = new AstraRcUtils().getSectionKey(
-                AstraRcUtils.ASTRARC_DEFAULT, 
+        Optional<String> t1 = new AstraConfiguration().getSectionKey(
+                AstraConfiguration.ASTRARC_DEFAULT, 
                 AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
         if (t1.isPresent()) { 
             return t1.get();
@@ -65,12 +65,12 @@ public abstract class AbstractCmdTest {
      * @return
      *      utils
      */
-    protected ShellContext ctx() {
-        return ShellContext.getInstance();
+    protected CliContext ctx() {
+        return CliContext.getInstance();
     }
    
-    protected AstraRcUtils astraRc() {
-        return ctx().getAstraRc();
+    protected AstraConfiguration config() {
+        return ctx().getConfiguration();
     }
     
     protected static ExitCode runCli(String cmd) {
@@ -78,18 +78,14 @@ public abstract class AbstractCmdTest {
     }
     
     protected static ExitCode runCli(String[] cmd) {
-        ExitCode code = AstraCli.parseCli(AstraCli.class, cmd);
-        if (ExitCode.SUCCESS.equals(code)) {
-            code = AstraCli.runCli();
-        }
-        return code;
+        return AstraCli.run(AstraCli.class, cmd);
     }
     
     protected static void assertSuccessCli(String cmd) {
         assertExitCodeCli(ExitCode.SUCCESS, cmd);
     }
     
-    protected void assertSuccessCli(String[] cmd) {
+    protected static void assertSuccessCli(String... cmd) {
         assertExitCodeCli(ExitCode.SUCCESS, cmd);
     }
     

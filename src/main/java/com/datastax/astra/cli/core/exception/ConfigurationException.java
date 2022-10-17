@@ -5,7 +5,7 @@ package com.datastax.astra.cli.core.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class ConfigurationException extends Exception {
+public class ConfigurationException extends RuntimeException {
     
     /** serial. */
     private static final long serialVersionUID = 134379114903653046L;

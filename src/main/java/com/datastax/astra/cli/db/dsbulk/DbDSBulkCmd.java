@@ -2,11 +2,9 @@ package com.datastax.astra.cli.db.dsbulk;
 
 import java.util.List;
 
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
-import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -18,7 +16,7 @@ import com.github.rvesse.airline.annotations.Command;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "dsbulk", description = "Load data leveraging DSBulk")
-public class DbDSBulkCmd extends AbstractConnectedCmd {
+public class DbDSBulkCmd extends AbstractDsbulkDataCmd {
 
     @Arguments(description = "Use DSBulk arguments")
     private List<String> dsbulkArguments;
@@ -31,7 +29,7 @@ public class DbDSBulkCmd extends AbstractConnectedCmd {
         if (dsbulkArguments.size() < 3) {
             throw new InvalidArgumentException("Please use format astra db dsbulk <DB_NAME> [dsbulk options]");
         }
-        OperationsDb.runDsBulk(dsbulkArguments);
+        DsBulkService.getInstance().run(dsbulkArguments, db);
     }
     
 }

@@ -7,7 +7,7 @@ import com.datastax.astra.cli.core.out.LoggerShell;
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DatabaseNameNotUniqueException extends Exception {
+public class DatabaseNameNotUniqueException extends RuntimeException {
 
     /** 
      * Serial

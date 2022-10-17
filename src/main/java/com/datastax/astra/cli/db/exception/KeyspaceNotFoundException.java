@@ -7,7 +7,7 @@ import com.datastax.astra.cli.core.out.LoggerShell;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class KeyspaceNotFoundException extends Exception {
+public class KeyspaceNotFoundException extends RuntimeException {
 
     /** Serial Number. */
     private static final long serialVersionUID = 8155558354861561721L;

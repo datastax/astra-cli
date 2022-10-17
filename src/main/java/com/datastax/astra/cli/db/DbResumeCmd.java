@@ -1,30 +1,20 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Delete a DB is exist
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsDb.CMD_RESUME, description = "Resume a db if needed")
-public class DbResumeCmd extends AbstractConnectedCmd {
-    
-    /**
-     * Database name or identifier
-     */
-    @Required
-    @Arguments(title = "DB", description = "Database name or identifier")
-    public String databaseName;
+@Command(name = "resume", description = "Resume a db if needed")
+public class DbResumeCmd extends AbstractDatabaseCmd {
     
     /** 
      * Will wait until the database become ACTIVE.
@@ -44,19 +34,19 @@ public class DbResumeCmd extends AbstractConnectedCmd {
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
            InvalidDatabaseStateException  {
-        OperationsDb.resumeDb(databaseName);
+        dbServices.resumeDb(db);
         if (wait) {
-           switch(OperationsDb.waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, timeout)) {
+           switch(dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
             case NOT_FOUND:
-                throw new DatabaseNotFoundException(databaseName);
+                throw new DatabaseNotFoundException(db);
             case UNAVAILABLE:
-                throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,  DatabaseStatusType.HIBERNATED);
+                throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE,  DatabaseStatusType.HIBERNATED);
             default:
-                LoggerShell.success("Database \'" + databaseName +  "' has resumed");
+                LoggerShell.success("Database \'%s' has resumed".formatted(db));
             break;
            }
         } else {
-            LoggerShell.success("Database \'" + databaseName +  "' is resuming");
+            LoggerShell.success("Database \'%s' is resuming".formatted(db));
         }
     }
     

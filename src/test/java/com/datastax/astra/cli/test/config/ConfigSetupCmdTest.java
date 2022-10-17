@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import com.datastax.astra.cli.config.AstraConfiguration;
 import com.datastax.astra.cli.test.AbstractCmdTest;
-import com.datastax.astra.cli.utils.AstraRcUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 
 /**
@@ -29,10 +29,10 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
         assertSuccessCli("setup");
         // Then
         Assertions.assertNotNull(
-                astraRc().getSection(AstraRcUtils.ASTRARC_DEFAULT));
+                config().getSection(AstraConfiguration.ASTRARC_DEFAULT));
         Assertions.assertEquals(
                 getToken(),
-                astraRc().getSection(AstraRcUtils.ASTRARC_DEFAULT)
+                config().getSection(AstraConfiguration.ASTRARC_DEFAULT)
                          .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN));
     }
     
@@ -43,10 +43,10 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
         assertSuccessCli("setup --token " + getToken());
         // Thebn
         Assertions.assertNotNull(
-                astraRc().getSection(AstraRcUtils.ASTRARC_DEFAULT));
+                config().getSection(AstraConfiguration.ASTRARC_DEFAULT));
         Assertions.assertEquals(
                 getToken(),
-                astraRc().getSection(AstraRcUtils.ASTRARC_DEFAULT)
+                config().getSection(AstraConfiguration.ASTRARC_DEFAULT)
                          .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN));
         
     }

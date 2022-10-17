@@ -25,8 +25,6 @@
 		<logback.version>1.4.1</logback.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
-		<commons-cli.version>1.5.0</commons-cli.version>
-		<commons-lang.version>3.12.0</commons-lang.version>
 		<commons-compress.version>1.21</commons-compress.version>
 		<!-- Junit -->
 		<junit-platform.version>1.9.0</junit-platform.version>
@@ -115,20 +113,10 @@
 		<!-- Commons -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${commons-lang.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<version>${commons-compress.version}</version>
 		</dependency>
-		<dependency>
-    		<groupId>org.apache.httpcomponents.client5</groupId>
-  			<artifactId>httpclient5</artifactId>
-  			<version>${httpclient.version}</version>
-		</dependency>
-
+		
 		<!-- Unit tests -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -176,10 +164,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${version.maven.plugin.surefire}</version>
 				<configuration>
-					<configuration>
-    				 <argLine>-agentlib:native-image-agent=config-output-dir=META-INF/native-image</argLine>
-    				 </configuration>
-				</configuration>
+					<forkCount>0</forkCount>
+    			</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>org.junit.jupiter</groupId>
@@ -418,7 +404,6 @@
 			</build>
 		</profile>
 	</profiles>
-
 
 	<scm>
 		<connection>scm:git:git@github.com:datastax/astra-cli.git</connection>

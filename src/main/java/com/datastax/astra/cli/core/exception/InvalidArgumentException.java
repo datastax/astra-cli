@@ -6,7 +6,7 @@ package com.datastax.astra.cli.core.exception;
  * @author Cedrick LUNVEN (@clunven)
  *
  */
-public class InvalidArgumentException extends Exception {
+public class InvalidArgumentException extends RuntimeException {
 
     /** 
      * Serial

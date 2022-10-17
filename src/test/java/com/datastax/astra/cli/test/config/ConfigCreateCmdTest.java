@@ -3,7 +3,7 @@ package com.datastax.astra.cli.test.config;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -18,7 +18,7 @@ public class ConfigCreateCmdTest extends AbstractCmdTest {
         // Given
         assertSuccessCli("config create test-cli -t " + getToken());
         // When
-        Assertions.assertNotNull(astraRc().getSection("test-cli"));
+        Assertions.assertNotNull(config().getSection("test-cli"));
     }
     
     @Test

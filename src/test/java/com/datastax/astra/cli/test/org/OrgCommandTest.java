@@ -2,7 +2,7 @@ package com.datastax.astra.cli.test.org;
 
 import org.junit.jupiter.api.Test;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**

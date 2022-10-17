@@ -9,18 +9,18 @@ import com.datastax.astra.cli.config.ConfigCreateCmd;
 import com.datastax.astra.cli.config.ConfigDeleteCmd;
 import com.datastax.astra.cli.config.ConfigGetCmd;
 import com.datastax.astra.cli.config.ConfigListCmd;
-import com.datastax.astra.cli.config.ConfigSetupCmd;
-import com.datastax.astra.cli.config.ConfigUseCmd;
-import com.datastax.astra.cli.config.OperationsConfig;
+import com.datastax.astra.cli.config.SetupCmd;
 import com.datastax.astra.cli.core.AbstractCmd;
+import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.DefaultCmd;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.ConfigurationException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
-import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
+import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.DbCreateCmd;
 import com.datastax.astra.cli.db.DbDeleteCmd;
 import com.datastax.astra.cli.db.DbDotEnvCmd;
@@ -29,15 +29,16 @@ import com.datastax.astra.cli.db.DbGetCmd;
 import com.datastax.astra.cli.db.DbListCmd;
 import com.datastax.astra.cli.db.DbResumeCmd;
 import com.datastax.astra.cli.db.DbStatusCmd;
-import com.datastax.astra.cli.db.OperationsDb;
 import com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd;
+import com.datastax.astra.cli.db.dsbulk.DbCountCmd;
 import com.datastax.astra.cli.db.dsbulk.DbDSBulkCmd;
+import com.datastax.astra.cli.db.dsbulk.DbLoadCmd;
+import com.datastax.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
 import com.datastax.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.datastax.astra.cli.db.keyspace.DbListKeyspacesCmd;
-import com.datastax.astra.cli.iam.OperationIam;
 import com.datastax.astra.cli.iam.RoleGetCmd;
 import com.datastax.astra.cli.iam.RoleListCmd;
 import com.datastax.astra.cli.iam.UserDeleteCmd;
@@ -52,7 +53,6 @@ import com.datastax.astra.cli.org.OrgIdCmd;
 import com.datastax.astra.cli.org.OrgListRegionsClassicCmd;
 import com.datastax.astra.cli.org.OrgListRegionsServerlessCmd;
 import com.datastax.astra.cli.org.OrgNameCmd;
-import com.datastax.astra.cli.streaming.OperationsStreaming;
 import com.datastax.astra.cli.streaming.StreamingCreateCmd;
 import com.datastax.astra.cli.streaming.StreamingDeleteCmd;
 import com.datastax.astra.cli.streaming.StreamingExistCmd;
@@ -83,34 +83,26 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
  */
 @com.github.rvesse.airline.annotations.Cli(
   name = "astra", 
-  description = "CLI for DataStax Astra™ including an interactive mode",
-  defaultCommand = DefaultCmd.class, // no command => help
+  description = "CLI for DataStax Astra™ ",
+  defaultCommand = DefaultCmd.class, 
   commands = { 
-    ConfigSetupCmd.class, Help.class, 
+    SetupCmd.class, Help.class, 
     DefaultCmd.class
   },
   groups = {
     
-    /* ------------------------------
-     * astra config ...
-     * ------------------------------
-     */
     @Group(
-       name = OperationsConfig.COMMAND_CONFIG, 
+       name = "config", 
        description = "Manage configuration file", 
        defaultCommand = ConfigListCmd.class, 
        commands = {
          ConfigCreateCmd.class, ConfigGetCmd.class, ConfigDeleteCmd.class,
-         ConfigUseCmd.class, ConfigListCmd.class
+         ConfigListCmd.class
     }),
    
-    /* ------------------------------
-     * astra org ...
-     * ------------------------------
-     */
-    @Group(name = AbstractCmd.ORG, 
-      defaultCommand = OrgCmd.class,  
+    @Group(name = "org", 
       description = "Display Organization Info", 
+      defaultCommand = OrgCmd.class,  
       commands = {
         OrgIdCmd.class, 
         OrgNameCmd.class,
@@ -118,55 +110,50 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
         OrgListRegionsServerlessCmd.class
     }),
     
-    /* ------------------------------
-     * astra db ...
-     * ------------------------------
-     */
     @Group(
-       name = OperationsDb.DB, 
+       name = "db", 
        description = "Manage databases",
-       defaultCommand = DbGetCmd.class, 
+       defaultCommand = DbListCmd.class, 
        commands = { 
-         DbCreateCmd.class, DbGetCmd.class, DbDeleteCmd.class,
-         DbListCmd.class, DbStatusCmd.class,
+         // Create,delete
+         DbCreateCmd.class,  DbDeleteCmd.class,
+         // Read
+         DbListCmd.class,   DbGetCmd.class, DbStatusCmd.class,
+         // Operation
          DbResumeCmd.class, DbDownloadScbCmd.class, DbDotEnvCmd.class,
-         DbCqlShellCmd.class, DbDSBulkCmd.class,
-         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class
+         // Keyspaces
+         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
+         // DsBulk
+         DbDSBulkCmd.class, DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
+         // Cqlshell
+         DbCqlShellCmd.class,
      }),
     
-    /* ------------------------------
-     * astra streaming ...
-     * ------------------------------
-     */
     @Group(
-       name = OperationsStreaming.STREAMING, 
+       name = "streaming", 
        description = "Manage Streaming tenants", 
        defaultCommand = StreamingListCmd.class, 
        commands = { 
-         StreamingCreateCmd.class, StreamingGetCmd.class, StreamingDeleteCmd.class,
-         StreamingExistCmd.class, StreamingListCmd.class, 
-         StreamingStatusCmd.class, StreamingPulsarTokenCmd.class,
+         // Create, Delete
+         StreamingCreateCmd.class, StreamingDeleteCmd.class,
+         // Read
+         StreamingListCmd.class, StreamingGetCmd.class,
+         StreamingExistCmd.class, StreamingStatusCmd.class, 
+         StreamingPulsarTokenCmd.class,
+         // Pulsar Shell
          PulsarShellCmd.class
     }),
     
-    /* ------------------------------
-     * astra role ...
-     * ------------------------------
-     */
     @Group(
-       name= OperationIam.COMMAND_ROLE, 
+       name= "role", 
        description = "Manage roles", 
        defaultCommand = RoleListCmd.class, 
        commands = {
          RoleListCmd.class, RoleGetCmd.class
     }),
     
-    /* ------------------------------
-     * astra user ...
-     * ------------------------------
-     */
     @Group(
-       name= OperationIam.COMMAND_USER, 
+       name= "user", 
        description = "Manage users", 
        defaultCommand = UserListCmd.class, 
        commands = {
@@ -183,19 +170,14 @@ public class AstraCli {
      *           start options for the shell
      */
     public static void main(String[] args) {
-        
         // Enable Colors in terminal
         AnsiConsole.systemInstall();
-        
-        // Persist command line to log it later
-        ShellContext.getInstance().setRawCommand(args);
        
         // Parse command
-        ExitCode code = parseCli(AstraCli.class, args);
-        if (ExitCode.SUCCESS.equals(code)) {
-            // Run only if parsing is successful
-            code = runCli();
-        }
+        ExitCode code = run(AstraCli.class, args);
+        
+        // Enable Colors in terminal
+        AnsiConsole.systemUninstall();
         
         // Exit with proper to code
         System.exit(code.getCode());
@@ -211,14 +193,18 @@ public class AstraCli {
      * @return
      *      code for the parsing
      */
-    public static ExitCode parseCli(Class<?> clazz, String[] args) {
+    public static ExitCode run(Class<?> clazz, String[] args) {
         try {
-            ShellContext.getInstance().init(new DefaultCmd());
-            // Parse
-            AbstractCmd cmd = new Cli<AbstractCmd>(clazz).parse(args);
-            // Save command in the context
-            ShellContext.getInstance().init(cmd);
+            
+            // Persist command line to log it later
+            CliContext.getInstance().setArguments(Arrays.asList(args));
+            
+            // Parse and Run
+            new Cli<AbstractCmd>(clazz).parse(args).run();
+            
+            // Return all good
             return ExitCode.SUCCESS;
+            
         } catch(ClassCastException ce) {
             // Help does its own things
             new Cli<Runnable>(clazz).parse(args).run();
@@ -243,49 +229,30 @@ public class AstraCli {
         } catch (InvalidTokenException | TokenNotFoundException e) {
             AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
-        }
-    }
-    
-    /**
-     * Run CLI and process exceptions.
-     *
-     * @return
-     *      exit code
-     */
-    public static ExitCode runCli() {
-        try {
-            // Execute command
-            ShellContext.getInstance().getStartCommand().initLog();
-            ShellContext.getInstance().getStartCommand().init();
-            ShellContext.getInstance().getStartCommand().execute();
-            return ExitCode.SUCCESS;
         } catch (DatabaseNameNotUniqueException |
-                 InvalidArgumentException dex) {
-            AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
-            return  ExitCode.INVALID_PARAMETER;
-        } catch (DatabaseNotFoundException  |
-                 TenantNotFoundException    | 
-                 RoleNotFoundException      |
-                 UserNotFoundException nfex) {
-            AstraCliConsole.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
-            return ExitCode.NOT_FOUND;
-        } catch (TenantAlreadyExistExcepion | 
-                 UserAlreadyExistException e) {
-            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
-            return ExitCode.ALREADY_EXIST;
-        } catch (DatabaseNotSelectedException e) {
-            AstraCliConsole.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
-            return ExitCode.ILLEGAL_STATE;
-        } catch (FileSystemException | ConfigurationException ex) {
-            AstraCliConsole.outputError(ExitCode.CONFIGURATION, ex.getMessage());
-            return ExitCode.CONFIGURATION;
-        } catch (InvalidTokenException | TokenNotFoundException e) {
-            AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
-            return ExitCode.CONFIGURATION;
-        } catch (Exception ex) {
-            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
-            return ExitCode.INTERNAL_ERROR;
-        }
+                InvalidArgumentException dex) {
+           AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
+           return  ExitCode.INVALID_PARAMETER;
+       } catch (DatabaseNotFoundException  |
+                TenantNotFoundException    | 
+                RoleNotFoundException      |
+                UserNotFoundException nfex) {
+           AstraCliConsole.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
+           return ExitCode.NOT_FOUND;
+       } catch (TenantAlreadyExistExcepion | 
+                UserAlreadyExistException e) {
+           AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
+           return ExitCode.ALREADY_EXIST;
+       } catch (DatabaseNotSelectedException e) {
+           AstraCliConsole.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
+           return ExitCode.ILLEGAL_STATE;
+       } catch (FileSystemException | ConfigurationException ex) {
+           AstraCliConsole.outputError(ExitCode.CONFIGURATION, ex.getMessage());
+           return ExitCode.CONFIGURATION;
+       } catch (Exception ex) {
+           AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
+           return ExitCode.INTERNAL_ERROR;
+       }
     }
     
     /**

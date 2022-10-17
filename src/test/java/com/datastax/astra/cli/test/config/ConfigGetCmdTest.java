@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.datastax.astra.cli.ExitCode;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
 
 /**
@@ -22,7 +22,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
     public void should_get_config() {
         // Given
         assertSuccessCli("config create test-cli -v -t " + getToken());
-        Assertions.assertNotNull(astraRc().getSection("test-cli"));
+        Assertions.assertNotNull(config().getSection("test-cli"));
         // When
         assertSuccessCli("config get test-cli -v");
     }
@@ -31,7 +31,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
     @Order(2)
     public void should_get_fail_invalidsection() {
         // Given
-        Assertions.assertNull(astraRc().getSection("does-not-exist"));
+        Assertions.assertNull(config().getSection("does-not-exist"));
         // When
         assertExitCodeCli(ExitCode.CONFIGURATION, "config get does-not-exist -v");
     }

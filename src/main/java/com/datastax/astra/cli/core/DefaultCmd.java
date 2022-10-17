@@ -4,8 +4,6 @@ import static com.datastax.astra.cli.core.out.AstraCliConsole.println;
 
 import org.fusesource.jansi.Ansi;
 
-import com.datastax.astra.cli.core.exception.InvalidTokenException;
-import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.StringBuilderAnsi;
 import com.datastax.astra.cli.utils.AstraCliUtils;
@@ -23,13 +21,6 @@ public class DefaultCmd extends AbstractCmd {
     /** Ask for version number. s*/
     @Option(name = { "--version" }, description = "Show version")
     protected boolean version = false;
-   
-    /** {@inheritDoc} */
-    @Override
-    public void init() 
-    throws TokenNotFoundException, InvalidTokenException {
-       ctx().init(this);
-    }
     
     /** {@inheritDoc} */
     public void execute() {
@@ -37,19 +28,18 @@ public class DefaultCmd extends AbstractCmd {
             AstraCliConsole.outputData("version", AstraCliUtils.version());
         } else {
             println("");
-            println("  █████╗ ███████╗████████╗██████╗  █████╗   ", Ansi.Color.MAGENTA);
-            println(" ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗  ", Ansi.Color.MAGENTA);
-            println(" ███████║███████╗   ██║   ██████╔╝███████║  ", Ansi.Color.MAGENTA);
-            println(" ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║  ", Ansi.Color.MAGENTA);
-            println(" ██║  ██║███████║   ██║   ██║  ██║██║  ██║  ", Ansi.Color.MAGENTA);
-            println(" ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝  ", Ansi.Color.MAGENTA);
+            println("    _____            __                  ", Ansi.Color.GREEN);
+            println("   /  _  \\   _______/  |_____________    ", Ansi.Color.GREEN);
+            println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ", Ansi.Color.GREEN);
+            println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", Ansi.Color.GREEN);
+            println(" \\____|__  /____  > |__|  |__|  (____  /", Ansi.Color.GREEN);
+            println("         \\/     \\/                   \\/ ", Ansi.Color.GREEN);
             println("");
             println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
             println(new StringBuilderAnsi(" 📋 Command list: ")
-                    .append("'astra help'", Ansi.Color.GREEN));
-            println(new StringBuilderAnsi(" ℹ️  Command help: ")
-                    .append("'astra help <cmd>'", Ansi.Color.GREEN)
-                    .append(" (eg: astra help db create)"));
+                    .append("astra help", Ansi.Color.GREEN));
+            println(new StringBuilderAnsi(" ℹ️ Get help: ")
+                    .append("astra help <you command>", Ansi.Color.GREEN));
             println(new StringBuilderAnsi(" 🧑🏽‍💻 Get support : ")
                     .append("'https://dtsx.io/discord'", Ansi.Color.GREEN));
             println("");

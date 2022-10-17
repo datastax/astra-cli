@@ -5,7 +5,7 @@ package com.datastax.astra.cli.streaming.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class TenantAlreadyExistExcepion extends Exception {
+public class TenantAlreadyExistExcepion extends RuntimeException {
 
     /**
      * Serial number.

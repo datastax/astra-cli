@@ -1,9 +1,6 @@
 package com.datastax.astra.cli.core;
 
-import com.datastax.astra.cli.core.exception.FileSystemException;
-import com.datastax.astra.cli.core.exception.InvalidTokenException;
-import com.datastax.astra.cli.core.exception.TokenNotFoundException;
-import com.datastax.astra.cli.utils.AstraRcUtils;
+import com.datastax.astra.cli.config.AstraConfiguration;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
@@ -24,62 +21,15 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
     @Option(name = { "-conf","--config" }, 
             title = "CONFIG_SECTION",
             description= "Section in configuration file (default = ~/.astrarc)")
-    protected String configSectionName = AstraRcUtils.ASTRARC_DEFAULT;
+    protected String configSectionName = AstraConfiguration.ASTRARC_DEFAULT;
+    
     
     /** {@inheritDoc} */
     @Override
-    public void init() 
-    throws TokenNotFoundException, InvalidTokenException, FileSystemException {
-        ctx().init(this);
-        if (null == ctx().getToken()) {
-           throw new TokenNotFoundException();
-        }
-    }
-    
-    /**
-     * Getter accessor for attribute 'token'.
-     *
-     * @return
-     *       current value of 'token'
-     */
-    public String getToken() {
-        return token;
-    }
-    
-    /**
-     * Change options format.
-     * 
-     * @param pToken
-     *      current token
-     * @return
-     *      current reference
-     */
-    public AbstractConnectedCmd token(String pToken) {
-        this.token = pToken;
-        return this;
-    }
-
-    /**
-     * Getter accessor for attribute 'configSectionName'.
-     *
-     * @return
-     *       current value of 'configSectionName'
-     */
-    public String getConfigSectionName() {
-        return configSectionName;
-    } 
-    
-    /**
-     * Change options format.
-     * 
-     * @param pSection
-     *      current section
-     * @return
-     *      current reference
-     */
-    public AbstractConnectedCmd section(String pSection) {
-        this.configSectionName = pSection;
-        return this;
+    public void run() {
+        ctx().init(new CoreOptions(verbose, noColor, output, configFilename));
+        ctx().initToken(new TokenOptions(token, configSectionName));
+        execute();
     }
    
 }

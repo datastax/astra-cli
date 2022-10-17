@@ -11,10 +11,10 @@ import com.github.rvesse.airline.annotations.Command;
  */
 @Command(name = AbstractCmd.LIST, description = "Display the list of Databases in an organization")
 public class DbListCmd extends AbstractConnectedCmd {
-   
+    
     /** {@inheritDoc} */
     public void execute() {
-        OperationsDb.listDb();
+        DatabaseService.getInstance().listDb();
     }
 
 }

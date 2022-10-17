@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.ShellContext;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.JsonOutput;
@@ -73,7 +73,7 @@ public class OperationsStreaming {
      *      streaming tenant.
      */
     private static StreamingClient streamingClient() {
-        return  ShellContext.getInstance().getApiDevopsStreaming();
+        return  CliContext.getInstance().getApiDevopsStreaming();
     }
     
     /**
@@ -158,7 +158,7 @@ public class OperationsStreaming {
             sht.addPropertyRow("WebServiceUrl", tnt.getWebServiceUrl());
             sht.addPropertyRow("BrokerServiceUrl", tnt.getBrokerServiceUrl());
             sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
-            switch(ShellContext.getInstance().getOutputFormat()) {
+            switch(CliContext.getInstance().getOutputFormat()) {
                 case json:
                     AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
                                 STREAMING + " " + AbstractConnectedCmd.GET + " " + tenantName, sht));

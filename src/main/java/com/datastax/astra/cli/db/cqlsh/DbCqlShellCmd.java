@@ -1,15 +1,12 @@
 package com.datastax.astra.cli.db.cqlsh;
 
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
-import com.datastax.astra.cli.db.OperationsDb;
+import com.datastax.astra.cli.db.AbstractDatabaseCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Start CqlSh for a DB.
@@ -19,17 +16,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "cqlsh", description = "Start Cqlsh")
-public class DbCqlShellCmd extends AbstractConnectedCmd {
-
-    /**
-     * Database name or identifier
-     */
-    @Required
-    @Arguments(title = "DB", 
-               description = "Database name or identifier")
-    public String database;
-    
-    // -- Cqlsh --
+public class DbCqlShellCmd extends AbstractDatabaseCmd {
     
     /** Cqlsh Options. */
     @Option(name = { "--version" }, 
@@ -61,6 +48,7 @@ public class DbCqlShellCmd extends AbstractConnectedCmd {
             description = "Authenticate to the given keyspace.")
     protected String cqlshOptionKeyspace;
     
+    
     /** {@inheritDoc}  */
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
@@ -68,7 +56,7 @@ public class DbCqlShellCmd extends AbstractConnectedCmd {
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
                 cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace);
-        OperationsDb.startCqlShell(options, database);
+        CqlShellService.getInstance().run(options, db);
     }
     
 }

@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fusesource.jansi.Ansi;
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.ExitCode;
 
-import com.datastax.astra.cli.ExitCode;
-import com.datastax.astra.cli.ShellContext;
+import org.fusesource.jansi.Ansi;
 
 /**
  * Standardize output for tables.
@@ -97,11 +97,15 @@ public class ShellTable implements Serializable {
      * Show as Json.
      */
     public void showJson() {
-        String currentCommand = ShellContext.getInstance().getRawCommandString();
-        if (ShellContext.getInstance().getRawShellCommand() != null) {
-            currentCommand = ShellContext.getInstance().getRawShellCommand();
-        }
-        AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, currentCommand, getCellValues()));
+        AstraCliConsole.printJson(
+                new JsonOutput(ExitCode.SUCCESS, 
+                        ctx().getArguments().toString(), 
+                        getCellValues()));
+    }
+    
+    
+    private CliContext ctx() {
+        return CliContext.getInstance();
     }
     
     /**
