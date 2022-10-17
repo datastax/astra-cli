@@ -28,8 +28,7 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
         // When
         assertSuccessCli("setup");
         // Then
-        Assertions.assertNotNull(
-                config().getSection(AstraConfiguration.ASTRARC_DEFAULT));
+        Assertions.assertFalse(config().getSection(AstraConfiguration.ASTRARC_DEFAULT).isEmpty());
         Assertions.assertEquals(
                 getToken(),
                 config().getSection(AstraConfiguration.ASTRARC_DEFAULT)
@@ -42,8 +41,7 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
         // When
         assertSuccessCli("setup --token " + getToken());
         // Thebn
-        Assertions.assertNotNull(
-                config().getSection(AstraConfiguration.ASTRARC_DEFAULT));
+        Assertions.assertFalse(config().getSection(AstraConfiguration.ASTRARC_DEFAULT).isEmpty());
         Assertions.assertEquals(
                 getToken(),
                 config().getSection(AstraConfiguration.ASTRARC_DEFAULT)

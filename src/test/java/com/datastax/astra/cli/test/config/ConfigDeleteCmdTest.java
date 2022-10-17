@@ -22,18 +22,18 @@ public class ConfigDeleteCmdTest extends AbstractCmdTest {
     public void should_delete_config() {
         // Given
         assertSuccessCli("config create test-cli -v -t " + getToken());
-        Assertions.assertNotNull(config().getSection("test-cli"));
+        Assertions.assertFalse(config().getSection("test-cli").isEmpty());
         // When
         assertSuccessCli("config delete test-cli -v");
         // Then
-        Assertions.assertNull(config().getSection("test-cli"));
+        Assertions.assertTrue(config().getSection("test-cli").isEmpty());
     }
     
     @Test
     @Order(2)
     public void should_delete_fail_with_invalidsection() {
         // Given and invalid section
-        Assertions.assertNull(config().getSection("test-cli"));
+        Assertions.assertTrue(config().getSection("test-cli").isEmpty());
         // When
         assertExitCodeCli(ExitCode.CONFIGURATION, "config delete test-cli -v");
     }

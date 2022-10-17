@@ -18,7 +18,7 @@ public class ConfigCreateCmdTest extends AbstractCmdTest {
         // Given
         assertSuccessCli("config create test-cli -t " + getToken());
         // When
-        Assertions.assertNotNull(config().getSection("test-cli"));
+        Assertions.assertFalse(config().getSection("test-cli").isEmpty());
     }
     
     @Test

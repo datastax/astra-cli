@@ -22,7 +22,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
     public void should_get_config() {
         // Given
         assertSuccessCli("config create test-cli -v -t " + getToken());
-        Assertions.assertNotNull(config().getSection("test-cli"));
+        Assertions.assertFalse(config().getSection("test-cli").isEmpty());
         // When
         assertSuccessCli("config get test-cli -v");
     }
@@ -31,7 +31,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
     @Order(2)
     public void should_get_fail_invalidsection() {
         // Given
-        Assertions.assertNull(config().getSection("does-not-exist"));
+        Assertions.assertTrue(config().getSection("does-not-exist").isEmpty());
         // When
         assertExitCodeCli(ExitCode.CONFIGURATION, "config get does-not-exist -v");
     }

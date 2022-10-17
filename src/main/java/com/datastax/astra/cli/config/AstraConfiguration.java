@@ -131,7 +131,7 @@ public class AstraConfiguration {
         if (isSectionExists(sectionName)) {
             return sections.get(sectionName);
         }
-        return null;
+        return new HashMap<String, String>();
     }
     
     /**
@@ -143,11 +143,11 @@ public class AstraConfiguration {
      *      if delete or not
      */
     public boolean deleteSection(String sectionName) {
-        boolean should_delete = isSectionExists(sectionName);
-        if (should_delete) {
+        boolean shouldDelete = isSectionExists(sectionName);
+        if (shouldDelete) {
             sections.remove(sectionName);
         }
-        return should_delete;
+        return shouldDelete;
     }
 
     /**
