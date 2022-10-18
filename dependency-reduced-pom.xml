@@ -53,9 +53,7 @@
             <version>${junit-jupiter.version}</version>
           </dependency>
         </dependencies>
-        <configuration>
-          <forkCount>0</forkCount>
-        </configuration>
+        <configuration />
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>

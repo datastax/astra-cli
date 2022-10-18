@@ -52,6 +52,7 @@ public class DsBulkTest extends AbstractCmdTest {
         }
     }
     
+    /*
     @Test
     @Order(2)
     public void testShould_count() {
@@ -71,7 +72,7 @@ public class DsBulkTest extends AbstractCmdTest {
                     "-t", TABLE_TEST,
                     "-logDir", "/tmp");
         }   
-    }
+    }*/
     
     @Test
     @Order(3)

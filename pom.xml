@@ -164,7 +164,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${version.maven.plugin.surefire}</version>
 				<configuration>
-					<forkCount>0</forkCount>
+					
     			</configuration>
 				<dependencies>
 					<dependency>

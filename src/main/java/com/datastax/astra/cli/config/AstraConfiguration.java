@@ -131,7 +131,7 @@ public class AstraConfiguration {
         if (isSectionExists(sectionName)) {
             return sections.get(sectionName);
         }
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
     
     /**
@@ -144,9 +144,8 @@ public class AstraConfiguration {
      */
     public boolean deleteSection(String sectionName) {
         boolean shouldDelete = isSectionExists(sectionName);
-        if (shouldDelete) {
+        if (shouldDelete) 
             sections.remove(sectionName);
-        }
         return shouldDelete;
     }
 
@@ -161,9 +160,8 @@ public class AstraConfiguration {
      */
     public Optional<String> getSectionKey(String sectionName, String key) {
         Optional<String> result = Optional.empty();
-        if (isSectionExists(sectionName)) {
+        if (isSectionExists(sectionName))
             result = Optional.ofNullable(sections.get(sectionName).get(key));
-        }
         return result;
     }
     
@@ -178,9 +176,8 @@ public class AstraConfiguration {
      *            String
      */
     public void updateSectionKey(String sectionName, String key, String value) {
-        if (!isSectionExists(sectionName)) {
+        if (!isSectionExists(sectionName))
             sections.put(sectionName, new HashMap<>());
-        }
         sections.get(sectionName).put(key, value);
     }
     
@@ -209,9 +206,10 @@ public class AstraConfiguration {
         if (isSectionExists(sectionOld)) {
             sections.remove(sectionNew);
             sections.put(sectionNew, new HashMap<>());
-            getSection(sectionOld).entrySet().forEach(m -> {
-                sections.get(sectionNew).put(m.getKey(), m.getValue());
-            });
+            getSection(sectionOld).entrySet().forEach(m -> 
+                sections.get(sectionNew)
+                        .put(m.getKey(), m.getValue())
+            );
         }
     }   
     
@@ -236,18 +234,10 @@ public class AstraConfiguration {
      * Create configuration file with current sections.
      */
     public void save() {
-        FileWriter out = null;
-        try {
-            out = new FileWriter(file);
+        try (FileWriter out = new FileWriter(file)) {
             out.write(renderSections());
         } catch (IOException e) {
             throw new IllegalStateException("Cannot save configuration file", e);
-        } finally {
-            if (null != out) {
-                try {
-                    out.close();
-                } catch (IOException e) {}
-            }
         }
     }
 
@@ -265,7 +255,7 @@ public class AstraConfiguration {
                     String line = scanner.nextLine();
                     if (line.startsWith("[")) {
                         // Starting a new section
-                        sectionName = line.replaceAll("\\[", "").replaceAll("\\]", "").trim();
+                        sectionName = line.replace("\\[", "").replace("\\]", "").trim();
                         sections.put(sectionName, new HashMap<>());
                     } else if (!line.isEmpty() && !line.startsWith("#") && !"".equals(line)) {
                         int off = line.indexOf("=");
