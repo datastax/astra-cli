@@ -255,7 +255,7 @@ public class AstraConfiguration {
                     String line = scanner.nextLine();
                     if (line.startsWith("[")) {
                         // Starting a new section
-                        sectionName = line.replace("\\[", "").replace("\\]", "").trim();
+                        sectionName = line.replace("[", "").replace("]", "").trim();
                         sections.put(sectionName, new HashMap<>());
                     } else if (!line.isEmpty() && !line.startsWith("#") && !"".equals(line)) {
                         int off = line.indexOf("=");
