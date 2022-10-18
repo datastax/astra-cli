@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
@@ -440,7 +439,7 @@ public class DatabaseService implements DatabaseConstants {
                 break;
                 case json:
                     AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                                DB + " " + AbstractConnectedCmd.GET + " " + databaseName, db));
+                                DB + " get " + databaseName, db));
                 break;
                 case human:
                 default:

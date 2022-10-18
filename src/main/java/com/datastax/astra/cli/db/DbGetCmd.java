@@ -1,6 +1,5 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
@@ -11,7 +10,7 @@ import com.github.rvesse.airline.annotations.Option;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = AbstractCmd.GET, description = "Show details of a database")
+@Command(name = "get", description = "Show details of a database")
 public class DbGetCmd extends AbstractDatabaseCmd {
 
     /** Enum for db get. */

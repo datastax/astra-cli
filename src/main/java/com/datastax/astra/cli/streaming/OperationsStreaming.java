@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
+import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.streaming.StreamingGetCmd.StreamingGetKeys;
 import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
@@ -161,7 +160,7 @@ public class OperationsStreaming {
             switch(CliContext.getInstance().getOutputFormat()) {
                 case json:
                     AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                                STREAMING + " " + AbstractConnectedCmd.GET + " " + tenantName, sht));
+                                STREAMING + " get " + tenantName, sht));
                 break;
                 case csv:
                 case human:

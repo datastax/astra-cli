@@ -1,6 +1,5 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Command;
 
@@ -9,7 +8,7 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = AbstractCmd.LIST, description = "Display the list of Databases in an organization")
+@Command(name = "list", description = "Display the list of Databases in an organization")
 public class DbListCmd extends AbstractConnectedCmd {
     
     /** {@inheritDoc} */

@@ -100,16 +100,15 @@ public class OperationsConfig {
             String defaultToken = sections
                     .get(AstraConfiguration.ASTRARC_DEFAULT)
                     .get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
-            if (defaultToken !=null) {
-                for (String sectionName : sections.keySet()) {
-                    if (!sectionName.equals(AstraConfiguration.ASTRARC_DEFAULT)) {
-                       if (defaultToken.equalsIgnoreCase(
-                               sections.get(sectionName).get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
-                           defaultOrgName = sectionName;
+            for (Entry<String, Map<String, String>> section : sections.entrySet()) {
+                if (!section.getKey().equals(AstraConfiguration.ASTRARC_DEFAULT)) {
+                    if (defaultToken !=null && 
+                        defaultToken.equalsIgnoreCase(
+                                sections.get(section.getKey()).get(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN))) {
+                           defaultOrgName = section.getKey();
                        }
                     }
                 }
-            }
         }
         return Optional.ofNullable(defaultOrgName);
     }

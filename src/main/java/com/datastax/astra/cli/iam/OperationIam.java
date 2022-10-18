@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
-import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
+import com.datastax.astra.cli.core.out.JsonOutput;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
 import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
@@ -130,7 +130,7 @@ public class OperationIam {
             break;
             case json:
                 AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                            OperationIam.COMMAND_ROLE + " " + AbstractCmd.GET + " " + role, r));
+                            OperationIam.COMMAND_ROLE + " get " + role, r));
             break;
             case human:
             default:

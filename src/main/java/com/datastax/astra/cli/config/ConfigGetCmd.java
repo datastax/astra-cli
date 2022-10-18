@@ -17,7 +17,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * astra config show default
  * astra show config default 
  */
-@Command(name = AbstractCmd.GET, description = "Show details for a configuration.")
+@Command(name = "get", description = "Show details for a configuration.")
 public class ConfigGetCmd extends AbstractCmd {
     
     /**

@@ -1,6 +1,5 @@
 package com.datastax.astra.cli.org;
 
-import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Command;
 
@@ -9,7 +8,7 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = AbstractCmd.GET, description = "Show details of an organization")
+@Command(name = "get", description = "Show details of an organization")
 public class OrgCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */

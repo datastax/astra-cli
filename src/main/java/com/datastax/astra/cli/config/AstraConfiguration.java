@@ -220,11 +220,11 @@ public class AstraConfiguration {
      *      if the file has been created
      */
     private boolean createConfigFileIfNotExists() {
-        if (!getFile().exists()) {
+        if (!file.exists()) {
             try {
-                return getFile().createNewFile();
+                return file.createNewFile();
             } catch (IOException e) {
-                throw new IllegalStateException("Cannot create configuration file: " + getFile().getPath());
+                throw new IllegalStateException("Cannot create configuration file: " + file.getPath());
             }
         }
         return false;
@@ -268,7 +268,6 @@ public class AstraConfiguration {
                         sections.get(sectionName).put(key, val);
                     }
                 }
-                scanner.close();
             }
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("Cannot read configuration file", e);
@@ -299,9 +298,9 @@ public class AstraConfiguration {
         StringBuilder sb = new StringBuilder();
         if (sectionName!= null && sections.containsKey(sectionName)) {
             sb.append(LINE_SEPARATOR + "[" + sectionName + "]" + LINE_SEPARATOR);
-            sections.get(sectionName).entrySet().forEach(line -> {
-                sb.append(line.getKey() + "=" + line.getValue() + LINE_SEPARATOR);
-            });
+            sections.get(sectionName).entrySet().forEach(line -> 
+                sb.append(line.getKey() + "=" + line.getValue() + LINE_SEPARATOR)
+            );
         }
         return sb.toString();
     }
@@ -316,19 +315,8 @@ public class AstraConfiguration {
      */
     public void createSectionWithToken(String sectionName, String token) {
         updateSectionKey(sectionName, ASTRA_DB_APPLICATION_TOKEN, token);
-        if (!isSectionExists(ASTRARC_DEFAULT)) {
+        if (!isSectionExists(ASTRARC_DEFAULT))
             copySection(sectionName, ASTRARC_DEFAULT);
-        }
-    }
-
-    /**
-     * Getter accessor for attribute 'file'.
-     *
-     * @return
-     *       current value of 'file'
-     */
-    public File getFile() {
-        return file;
     }
 
 }

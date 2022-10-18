@@ -9,7 +9,7 @@ import com.github.rvesse.airline.annotations.Option;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public abstract class AbstractCmd implements Runnable, CliConstants {
+public abstract class AbstractCmd implements Runnable {
     
     /** 
      * Each command can have a verbose mode. 

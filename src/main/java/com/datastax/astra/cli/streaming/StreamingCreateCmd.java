@@ -5,7 +5,6 @@ import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD
 import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD_TENANT;
 import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_EMAIL;
 
-import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -21,7 +20,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = AbstractCmd.CREATE, description = "Create a tenant in streaming with cli")
+@Command(name = "create", description = "Create a tenant in streaming with cli")
 public class StreamingCreateCmd extends AbstractConnectedCmd {
     /**
      * Database name or identifier
