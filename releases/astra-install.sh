@@ -18,16 +18,16 @@ trap echo_failed_command EXIT
 
 clear
 echo " "
-echo "   █████╗ ███████╗████████╗██████╗  █████╗     ███████╗██╗  ██╗███████╗██╗     ██╗"     
-echo "  ██╔══██╗██╔════╝╚══██╔══╝██╔══██╗██╔══██╗    ██╔════╝██║  ██║██╔════╝██║     ██║  "
-echo "  ███████║███████╗   ██║   ██████╔╝███████║    ███████╗███████║█████╗  ██║     ██║ "  
-echo "  ██╔══██║╚════██║   ██║   ██╔══██╗██╔══██║    ╚════██║██╔══██║██╔══╝  ██║     ██║"
-echo "  ██║  ██║███████║   ██║   ██║  ██║██║  ██║    ███████║██║  ██║███████╗███████╗███████╗"
-echo "  ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝"
+echo "    _____            __ "
+echo "   /  _  \   _______/  |_____________ "
+echo "  /  /_\  \ /  ___/\   __\_  __ \__  \ "
+echo " /    |    \\___ \  |  |  |  | \// __ \_ "
+echo " \____|__  /____  > |__|  |__|  (____  / "
+echo "         \/     \/                   \/ "
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.1.alpha5"
+ASTRA_CLI_VERSION="0.1.alpha6"
 
 echo "Installing Astra Cli $ASTRA_CLI_VERSION, please wait...      "
 
@@ -48,7 +48,7 @@ astra_zshrc="${ZDOTDIR:-${HOME}}/.zshrc"
 astra_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR ASTRA_CLI TO WORK!!!
 export ASTRADIR="$ASTRA_CLI_DIR"
-[[ -s "${ASTRA_CLI_DIR}/astra-init.sh" ]] && source "${ASTRA_CLI_DIR}/astra-init.sh"
+[[ -s "${ASTRA_CLI_DIR}/astra-cli-autocomplete.sh" ]] && source "${ASTRA_CLI_DIR}/astra-cli-autocomplete.sh"
 EOF
 )
 
@@ -176,21 +176,21 @@ echo "$(tput setaf 2)[OK]$(tput setaf 7) - Installation cleaned up"
 if [[ $darwin == true ]]; then
   # Adding on MAC OS
   touch "$astra_bash_profile"
-  if [[ -z $(grep 'astra-init.sh' "$astra_bash_profile") ]]; then
+  if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_bash_profile") ]]; then
     echo -e "\n$astra_init_snippet" >> "$astra_bash_profile"
     echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_bash_profile}"
   fi
 else
   # Attempt update of interactive bash profile on regular UNIX
   touch "${astra_bashrc}"
-  if [[ -z $(grep 'astra-init.sh' "$astra_bashrc") ]]; then
+  if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_bashrc") ]]; then
       echo -e "\n$astra_init_snippet" >> "$astra_bashrc"
       echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_bashrc}"
   fi
 fi
 
 touch "$astra_zshrc"
-if [[ -z $(grep 'astra-init.sh' "$astra_zshrc") ]]; then
+if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_zshrc") ]]; then
     echo -e "\n$astra_init_snippet" >> "$astra_zshrc"
     echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_zshrc}"
 fi

@@ -217,7 +217,7 @@
           <plugin>
             <groupId>org.graalvm.buildtools</groupId>
             <artifactId>native-maven-plugin</artifactId>
-            <version>0.9.11</version>
+            <version>${native.maven.plugin.version}</version>
             <extensions>true</extensions>
             <executions>
               <execution>
@@ -226,21 +226,6 @@
                 <goals>
                   <goal>build</goal>
                 </goals>
-                <configuration>
-                  <imageName>astra-native</imageName>
-                  <useArgFile>false</useArgFile>
-                  <mainClass>com.datastax.astra.cli.AstraCli</mainClass>
-                  <buildArgs>
-                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                    <buildArg>-H:EnableURLProtocols=http,https</buildArg>
-                    <buildArg>--allow-incomplete-classpath</buildArg>
-                    <buildArg>--report-unsupported-elements-at-runtime</buildArg>
-                    <buildArg>--verbose</buildArg>
-                  </buildArgs>
-                  <classpath>
-                    <param>/Users/cedricklunven/dev/workspaces/datastax/astra-cli/target/astra-cli-0.1.alpha6-shaded.jar</param>
-                  </classpath>
-                </configuration>
               </execution>
             </executions>
             <configuration>
@@ -255,7 +240,7 @@
                 <buildArg>--verbose</buildArg>
               </buildArgs>
               <classpath>
-                <param>/Users/cedricklunven/dev/workspaces/datastax/astra-cli/target/astra-cli-0.1.alpha6-shaded.jar</param>
+                <param>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</param>
               </classpath>
             </configuration>
           </plugin>

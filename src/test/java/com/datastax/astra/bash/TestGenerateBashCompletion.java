@@ -16,7 +16,7 @@ import com.github.rvesse.airline.help.cli.bash.BashCompletionGenerator;
 public class TestGenerateBashCompletion {
 
     /** Autocompletion file generated. */
-    private static final String DESTINATION = "astra-cli-autocomplete.sh";
+    private static final String DESTINATION = "src/main/dist/astra-cli-autocomplete.sh";
     
     @Test
     public void testGenerateAutoComplete() {
