@@ -1,60 +1,54 @@
 package com.datastax.astra.cli.core.out;
 
-import static org.fusesource.jansi.Ansi.ansi;
-import static org.fusesource.jansi.Ansi.Color.CYAN;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
-import static org.fusesource.jansi.Ansi.Color.RED;
-import static org.fusesource.jansi.Ansi.Color.YELLOW;
+import com.datastax.astra.cli.core.CliContext;
+import org.fusesource.jansi.Ansi;
 
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.datastax.astra.cli.core.CliContext;
+import static org.fusesource.jansi.Ansi.Color.*;
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * Work with terminal.
  *
  * @author Cedrick Lunven (@clunven)
  */
-public class LoggerShell {
-    
+public class LoggerShell extends AstraCliConsole {
+
     /** Info String. */
-    private static final String INFO  = "[INFO]  - ";
+    private static final String INFO  = "[INFO]  ";
     
     /** Info String. */
     private static final String INFO_CYAN = ansi().fg(CYAN).a(INFO).reset().toString();
-    
+
     /** Error String. */
-    private static final String ERROR = "[ERROR] - ";
+    private static final String ERROR = "[ERROR] ";
     
     /** Info String. */
     private static final String ERROR_RED = ansi().fg(RED).a(ERROR).reset().toString();
     
     /** Warning String. */
-    private static final String WARNING = "[WARN]  - ";
+    private static final String WARNING = "[WARN]  ";
     
     /** Info String. */
     private static final String WARNING_YELLOW = ansi().fg(YELLOW).a(WARNING).reset().toString();
     
     /** Info String. */
-    private static final String SUCCESS  = "[OK]    - ";
+    private static final String SUCCESS  = "[OK]    ";
     
     /** Info String. */
-    private static final String SUCCESS_GREEN = ansi().fg(GREEN).a(GREEN).reset().toString();
+    private static final String SUCCESS_GREEN =  ansi().fg(GREEN).a(SUCCESS).reset().toString();
     
     /** Warning String. */
-    private static final String DEBUG = "[DEBUG] - ";
-    
-    /** Using sl4j to access console, eventually pushing to file as well. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoggerShell.class);
-    
+    private static final String DEBUG = "[DEBUG] ";
+
 	/**
 	 * Hide default  constructor.
 	 */
-	private LoggerShell() {}
-	
+	protected LoggerShell() {
+        super();
+    }
+
     /**
      * Syntax sugar for OK.
      * 
@@ -64,9 +58,9 @@ public class LoggerShell {
     public static void success(String text) {
         if (isHuman()) {
             if (isColor()) {
-                LOGGER.info(SUCCESS_GREEN + text);
+                println(SUCCESS_GREEN + text);
             } else {
-                LOGGER.info(SUCCESS + text);
+                println(SUCCESS + text);
             }
         }
     }
@@ -80,9 +74,9 @@ public class LoggerShell {
     public static void info(String text) {
         if (isHuman()) {
             if (isColor()) {
-                LOGGER.info(INFO_CYAN + text);
+                println(INFO_CYAN + text);
             } else {
-                LOGGER.info(INFO + text);
+                println(INFO + text);
             }
         }
     }
@@ -96,9 +90,9 @@ public class LoggerShell {
     public static void error(String text) {
         if (isHuman()) {
             if (isColor()) {
-                LOGGER.info(ERROR_RED + text);
+                println(ERROR_RED + text);
             } else {
-                LOGGER.info(ERROR + text);
+                println(ERROR + text);
             }
         }
     }
@@ -112,9 +106,9 @@ public class LoggerShell {
     public static void warning(String text) {
         if (isHuman()) {
             if (isColor()) {
-                LOGGER.info(WARNING_YELLOW + text);
+                print(WARNING_YELLOW + text);
             } else {
-                LOGGER.info(WARNING + text);
+                print(WARNING + text);
             }
         }
     }
@@ -127,7 +121,7 @@ public class LoggerShell {
      */
     public static void debug(String text) {
         if (CliContext.getInstance().isVerbose()) {
-            LOGGER.info(DEBUG + text);
+            println(DEBUG + text);
         }
     }
     
@@ -154,12 +148,12 @@ public class LoggerShell {
      * Get context.
      *
      * @return
-     *      if you should print becasue human output
+     *      if you should print because human output
      */
     private static boolean isHuman() {
         return CliContext.getInstance()
                          .getOutputFormat()
-                         .equals(OutputFormat.human);
+                         .equals(OutputFormat.HUMAN);
     }
     
     
@@ -167,7 +161,7 @@ public class LoggerShell {
      * Get context.
      *
      * @return
-     *      if you should print becasue human output
+     *      if you should print because human output
      */
     private static boolean isColor() {
         return !CliContext.getInstance()

@@ -8,12 +8,12 @@ package com.datastax.astra.cli.core.out;
 public enum OutputFormat {
     
     /** Output as a JSON. */
-    json,
+    JSON,
     
     /** Output as tables. */
-    human,
+    HUMAN,
     
     /** Output as comma. */
-    csv
+    CSV
 
 }

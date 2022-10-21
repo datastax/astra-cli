@@ -39,7 +39,7 @@ public class ConfigGetCmd extends AbstractCmd {
         OperationsConfig.assertSectionExist(sectionName);
         if (key != null) {
             Optional<String> optKey = ctx().getConfiguration().getSectionKey(sectionName, key);
-            if (!optKey.isPresent()) {
+            if (optKey.isEmpty()) {
                 AstraCliConsole.outputError(
                         ExitCode.INVALID_PARAMETER, 
                         "Key '" + key + "' has not been found in config section '" + sectionName + "'");

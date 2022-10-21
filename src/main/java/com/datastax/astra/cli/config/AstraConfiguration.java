@@ -44,16 +44,16 @@ public class AstraConfiguration {
     public static final String ENV_USER_HOME = "user.home";
 
     /** line separator. */
-    public static final String ENV_LINE_SEPERATOR = "line.separator";
+    public static final String ENV_LINE_SEPARATOR = "line.separator";
     
     /** line separator. */
-    public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPERATOR);
+    public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPARATOR);
 
     /** Sections in the file. [sectionName] -> key=Value. */
     private final Map<String, Map<String, String>> sections = new HashMap<>();
     
     /** Working configuration file to save keys. */
-    private File file;
+    private final File file;
      
     /**
      * Load from ~/.astrarc
@@ -77,17 +77,7 @@ public class AstraConfiguration {
         parseConfigFile();
         LoggerShell.debug("Configuration: [OK] Configurations are %s".formatted(sections.keySet().toString()));
     }
-    
-    /**
-     * Assess if default config exist.
-     * 
-     * @return
-     *      if default config exists
-     */
-    public static boolean isDefaultConfigFileExists() {
-        return new File(getDefaultConfigurationFileName()).exists();
-    }
-    
+
     /**
      * Build default configuration filename.
      * 
@@ -180,20 +170,7 @@ public class AstraConfiguration {
             sections.put(sectionName, new HashMap<>());
         sections.get(sectionName).put(key, value);
     }
-    
-    /**
-     * Renaming a section (if exist)
-     * 
-     * @param sectionOld
-     *      old name
-     * @param sectionNew
-     *      new section name
-     */
-    public void renameSection(String sectionOld, String sectionNew) {
-        copySection(sectionOld, sectionNew);
-        sections.remove(sectionOld);
-    }
-    
+
     /**
      * Copy a section with all those key in another.
      * 
@@ -243,9 +220,6 @@ public class AstraConfiguration {
 
     /**
      * Load configuration file.
-     *  
-     * @param file
-     *      configuration file
      */
     private void parseConfigFile() {
         try (Scanner scanner = new Scanner(file)) {
@@ -257,7 +231,7 @@ public class AstraConfiguration {
                         // Starting a new section
                         sectionName = line.replace("[", "").replace("]", "").trim();
                         sections.put(sectionName, new HashMap<>());
-                    } else if (!line.isEmpty() && !line.startsWith("#") && !"".equals(line)) {
+                    } else if (!line.isEmpty() && !line.startsWith("#")) {
                         int off = line.indexOf("=");
                         if (off < 0) {
                             throw new IllegalArgumentException(
@@ -297,8 +271,8 @@ public class AstraConfiguration {
     public String renderSection(String sectionName) {
         StringBuilder sb = new StringBuilder();
         if (sectionName!= null && sections.containsKey(sectionName)) {
-            sb.append(LINE_SEPARATOR + "[" + sectionName + "]" + LINE_SEPARATOR);
-            sections.get(sectionName).entrySet().forEach(line -> 
+            sb.append(LINE_SEPARATOR).append("[").append(sectionName).append("]").append(LINE_SEPARATOR);
+            sections.get(sectionName).entrySet().forEach(line ->
                 sb.append(line.getKey() + "=" + line.getValue() + LINE_SEPARATOR)
             );
         }

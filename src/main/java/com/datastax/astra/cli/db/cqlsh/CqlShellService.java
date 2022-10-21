@@ -24,17 +24,17 @@ import com.datastax.astra.sdk.databases.domain.Database;
  * @author Cedrick LUNVEN (@clunven)
  */
 public class CqlShellService {
-   
+
+    /** Configutation to Donwload the archive. */
     CqlShellConfig settings;
-    
+
+    /** Access to Database client */
     DatabaseDao dbDao;
     
     /** Local installation for CqlSh. */
     File cqlshLocalFolder;
     
-    /**
-     * Singleton Pattern
-     */
+    /** Singleton Pattern. */
     private static CqlShellService instance;
     
     /**
@@ -82,11 +82,11 @@ public class CqlShellService {
             LoggerShell.info("CqlSh has not been found, downloading, please wait...");
             String destination = AstraCliUtils.ASTRA_HOME + File.separator + settings.tarball();
             FileUtils.downloadFile(settings.url(), destination);
-            File cqlshtarball = new File (destination);
-            if (cqlshtarball.exists()) {
+            File tarArchive = new File (destination);
+            if (tarArchive.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait...");
                 try {
-                    FileUtils.extactTargzInAstraCliHome(cqlshtarball);
+                    FileUtils.extactTargzInAstraCliHome(tarArchive);
                     if (isInstalled()) {
                         // Change file permission
                         File cqlshFile = new File(cqlshLocalFolder.getAbsolutePath() + File.separator 
@@ -102,7 +102,7 @@ public class CqlShellService {
                             throw new FileSystemException("Cannot set cqlsh file as writable");
                         }
                         LoggerShell.success("Cqlsh has been installed");
-                        if (!cqlshtarball.delete()) {
+                        if (!tarArchive.delete()) {
                             LoggerShell.warning("Cqlsh Tar archived was not deleted");
                         }
                     }

@@ -16,30 +16,31 @@ public class DbGetCmd extends AbstractDatabaseCmd {
     /** Enum for db get. */
     public enum DbGetKeys { 
         /** db unique identifier */
-        id, 
+        ID,
         /** db status */
-        status, 
+        STATUS,
         /** cloud provider */
-        cloud, 
+        CLOUD,
         /** default keyspace */
-        keyspace, 
+        KEYSPACE,
         /** all keyspaces */
-        keyspaces, 
+        KEYSPACES,
         /** default region */
-        region, 
+        REGION,
         /** all regions */
-        regions};
+        REGIONS
+    }
     
     /** Authentication token used if not provided in config. */
     @Option(name = { "-k", "--key" }, title = "Key", description = ""
             + "Show value for a property among: "
             + "'id', 'status', 'cloud', 'keyspace', 'keyspaces', 'region', 'regions'")
-    protected DbGetKeys key;
+    protected String key;
     
     /** {@inheritDoc} */
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {    
-        dbServices.showDb(db, key);
+        dbServices.showDb(db, key == null ? null : DbGetKeys.valueOf(key.toUpperCase()));
     }
 
 }

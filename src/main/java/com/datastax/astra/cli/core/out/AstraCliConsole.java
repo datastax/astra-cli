@@ -1,20 +1,17 @@
 package com.datastax.astra.cli.core.out;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.fusesource.jansi.Ansi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.fusesource.jansi.Ansi;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * Render all component for the FF4J commands.
@@ -22,27 +19,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Cedrick LUNVEN (@clunven)
  */
 public class AstraCliConsole {
-    
-    /** Using sl4j to access console, eventually pushing to file as well. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AstraCliConsole.class);
-    
+
     /** Json Object Mapper. */
     public static final ObjectMapper OM = new ObjectMapper();
     
 	/** Default constructor. */
-	private AstraCliConsole() {}
+	protected AstraCliConsole() {}
 	
 	/** Start Banner. */
     public static void banner() {
         println("");
-        println("    _____            __                  ", Ansi.Color.GREEN);
-        println("   /  _  \\   _______/  |_____________    ", Ansi.Color.GREEN);
-        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ", Ansi.Color.GREEN);
-        println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", Ansi.Color.GREEN);
-        println(" \\____|__  /____  > |__|  |__|  (____  /", Ansi.Color.GREEN);
-        println("         \\/     \\/                   \\/ ", Ansi.Color.GREEN);
+        println("    _____            __                  ", 236, 107, 40);
+        println("   /  _  \\   _______/  |_____________    ", 236, 107, 40);
+        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ",236, 107, 40);
+        println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", 236, 107, 40);
+        println(" \\____|__  /____  > |__|  |__|  (____  /", 236, 107, 40);
+        println("         \\/     \\/                   \\/ ", 236, 107, 40);
         println("");
         println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
+    }
+
+    /**
+     * Access to Console.
+     *
+     * @param message
+     *      message to print
+     */
+    public static void print(String message) {
+        System.out.print(message);
     }
     
     /**
@@ -52,7 +56,7 @@ public class AstraCliConsole {
      *      text to display
      */
     public static void println(String text) {
-        LOGGER.info(text);
+        System.out.println(text);
     }
     
     /**
@@ -65,9 +69,29 @@ public class AstraCliConsole {
      */
     public static void println(String text, Ansi.Color color) {
         if (ctx().isNoColor()) {
-            LOGGER.info(text);
+            print(text + System.lineSeparator());
         } else {
-            LOGGER.info(ansi().fg(color).a(text).reset().toString());
+            print(ansi().fg(color).a(text).reset().toString() + System.lineSeparator());
+        }
+    }
+
+    /**
+     * Display item with colors.
+     *
+     * @param text
+     *      text to display
+     * @param red
+     *      red
+     * @param green
+     *      green
+     * @param blue
+     *      blue
+     */
+    public static void println(String text, int red, int green, int blue) {
+        if (ctx().isNoColor()) {
+            print(text + System.lineSeparator());
+        } else {
+            print(ansi().fgRgb(red, green, blue).a(text).reset().toString() + System.lineSeparator());
         }
     }
     
@@ -78,7 +102,7 @@ public class AstraCliConsole {
      *      current builder
      */
     public static void println(StringBuilderAnsi builder) {
-        LOGGER.info(builder.toString());
+        println(builder.toString());
     }
     
     /**
@@ -118,30 +142,12 @@ public class AstraCliConsole {
      */
     public static void printShellTable(ShellTable sht) {
         switch (ctx().getOutputFormat()) {
-            case json -> sht.showJson();
-            case csv  -> sht.showCsv();
-            case human -> sht.show();
+            case JSON -> sht.showJson();
+            case CSV -> sht.showCsv();
+            case HUMAN -> sht.show();
         }
     }
     
-    /**
-     * Show object as Json in console.
-     *
-     * @param obj
-     *      object
-     * @param color
-     *      color
-     */
-    public static void printObjectAsJson(Object obj, Ansi.Color color) {
-        try {
-            println(OM
-                  .writerWithDefaultPrettyPrinter()
-                  .writeValueAsString(obj), color);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Cannot serialize object as JSON", e);
-        }
-    }
-	
 	/**
      * Exit program with error.
      *
@@ -152,28 +158,12 @@ public class AstraCliConsole {
      */
     public static void outputError(ExitCode code, String msg) {
         switch (ctx().getOutputFormat()) {
-            case json -> printJson(new JsonOutput<String>(code, code.name() + ": " + msg));
-            case csv -> printCsv(new CsvOutput(code, code.name() + ": " + msg));
-            case human -> LoggerShell.error(code.name() + ": " + msg);
+            case JSON -> printJson(new JsonOutput<String>(code, code.name() + ": " + msg));
+            case CSV -> printCsv(new CsvOutput(code, code.name() + ": " + msg));
+            case HUMAN -> LoggerShell.error(code.name() + ": " + msg);
         }
     }
-    
-    /**
-     * Exit program with no operation
-     *
-     * @param code
-     *      error code
-     * @param msg
-     *      error message
-     */
-    public static void outputWarning(ExitCode code, String msg) {
-        switch (ctx().getOutputFormat()) {
-            case json -> printJson(new JsonOutput<String>(code, code.name() + ": " + msg));
-            case csv -> printCsv(new CsvOutput(code, code.name() + ": " + msg));
-            case human -> LoggerShell.warning(code.name() + ": " + msg);
-        }
-    }
-    
+
     /**
      * Exit program with error.
      *
@@ -184,13 +174,13 @@ public class AstraCliConsole {
      */
     public static void outputData(String label, String data) {
         switch (ctx().getOutputFormat()) {
-            case json -> printJson(new JsonOutput<String>(ExitCode.SUCCESS, label, data));
-            case csv -> {
+            case JSON -> printJson(new JsonOutput<>(ExitCode.SUCCESS, label, data));
+            case CSV -> {
                 Map<String, String> m = new HashMap<>();
                 m.put(label, data);
-                printCsv(new CsvOutput(Arrays.asList(label), Arrays.asList(m)));
+                printCsv(new CsvOutput(List.of(label), List.of(m)));
             }
-            case human -> System.out.println(data);
+            case HUMAN -> System.out.println(data);
         }
     }
     
@@ -202,9 +192,9 @@ public class AstraCliConsole {
      */
     public static void outputSuccess(String msg) {
         switch (ctx().getOutputFormat()) {
-            case json  -> printJson(new JsonOutput<String>(ExitCode.SUCCESS, msg));
-            case csv   -> printCsv(new CsvOutput(ExitCode.SUCCESS, msg));
-            case human -> LoggerShell.success(msg);
+            case JSON -> printJson(new JsonOutput<String>(ExitCode.SUCCESS, msg));
+            case CSV -> printCsv(new CsvOutput(ExitCode.SUCCESS, msg));
+            case HUMAN -> LoggerShell.success(msg);
         }
     }
     

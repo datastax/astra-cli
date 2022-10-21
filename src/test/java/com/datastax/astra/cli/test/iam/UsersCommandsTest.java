@@ -32,7 +32,7 @@ public class UsersCommandsTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "user list -w");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "user list DB");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "user coaster");
-        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "users list -o yaml");
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "user list -o yaml");
     }
     
     @Test

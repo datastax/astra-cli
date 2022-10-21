@@ -29,11 +29,9 @@ public class DefaultCmd extends AbstractCmd {
         } else {
             AstraCliConsole.banner();
             println(new StringBuilderAnsi(" - Command list: ")
-                    .append("astra help", Ansi.Color.GREEN));
+                    .append("astra help", Ansi.Color.CYAN));
             println(new StringBuilderAnsi("️ - Get help: ")
-                    .append("astra help <you command>", Ansi.Color.GREEN));
-            println(new StringBuilderAnsi(" - Get support : ")
-                    .append("'https://dtsx.io/discord'", Ansi.Color.GREEN));
+                    .append("astra help <your command>", Ansi.Color.CYAN));
             println("");
         }
     }    

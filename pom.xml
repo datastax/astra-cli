@@ -21,14 +21,13 @@
 		<astra-sdk.version>0.3.4</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
-		<slf4j.version>2.0.0</slf4j.version>
-		<logback.version>1.4.1</logback.version>
+		<slf4j.version>2.0.3</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
 		<commons-compress.version>1.21</commons-compress.version>
 		<!-- Junit -->
-		<junit-platform.version>1.9.0</junit-platform.version>
-		<junit-jupiter.version>5.9.0</junit-jupiter.version>
+		<junit-platform.version>1.9.1</junit-platform.version>
+		<junit-jupiter.version>5.9.1</junit-jupiter.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
 		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
@@ -44,14 +43,17 @@
 		<version.maven.plugin.jar>3.2.0</version.maven.plugin.jar>
 		<version.maven.plugin.compiler>3.8.1</version.maven.plugin.compiler>
 		<version.maven.plugin.dependency>2.8</version.maven.plugin.dependency>
-		<version.maven.plugin.xml-format>3.0.7</version.maven.plugin.xml-format>
-		<version.maven.plugin.fmt>2.2.0</version.maven.plugin.fmt>
 		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
 		<version.maven.plugin.jacoco>0.8.8</version.maven.plugin.jacoco>
 		<version.maven.plugin.assembly>3.4.2</version.maven.plugin.assembly>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
 
 		<!-- Parsing CLI -->
 		<dependency>
@@ -71,6 +73,15 @@
 			<artifactId>astra-sdk</artifactId>
 			<version>${astra-sdk.version}</version>
 			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
 				<exclusion>
 					<groupId>io.grpc</groupId>
   					<artifactId>grpc-netty-shaded</artifactId>
@@ -96,18 +107,6 @@
 					<artifactId>org.everit.json.schema</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		
-		<!--  Logger -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${logback.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>${logback.version}</version>
 		</dependency>
 
 		<!-- Commons -->
@@ -225,6 +224,7 @@
 				<configuration>
 					<artifactSet>
 						<excludes>
+							<exclude>module-info.java</exclude>
 							<exclude>*:junit-*</exclude>
 							<exclude>*:opentest4j-*</exclude>
 							<exclude>*:airline-help-bash*</exclude>
@@ -383,11 +383,7 @@
 						<configuration>
 							<imageName>astra-native</imageName>
 							<useArgFile>false</useArgFile>
-							<quickBuild>false</quickBuild>
-							<skipNativeBuild>false</skipNativeBuild>
 							<mainClass>com.datastax.astra.cli.AstraCli</mainClass>
-							<fallback>false</fallback>
-							<verbose>true</verbose>
 							<buildArgs>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 								<buildArg>-H:EnableURLProtocols=http,https</buildArg>

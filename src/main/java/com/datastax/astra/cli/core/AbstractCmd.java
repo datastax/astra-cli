@@ -1,8 +1,13 @@
 package com.datastax.astra.cli.core;
 
 import com.datastax.astra.cli.config.AstraConfiguration;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.OutputFormat;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Options, parameters and treatments that you want to apply on all commands.
@@ -29,7 +34,7 @@ public abstract class AbstractCmd implements Runnable {
     @Option(name = { "-o", "--output" }, 
             title = "FORMAT",
             description = "Output format, valid values are: human,json,csv")
-    protected OutputFormat output = OutputFormat.human;
+    protected String output = OutputFormat.HUMAN.name();
      
     /**
      * File on disk to reuse configuration.
@@ -41,8 +46,19 @@ public abstract class AbstractCmd implements Runnable {
     
     /** {@inheritDoc} */
     public void run() {
-        ctx().init(new CoreOptions(verbose, noColor, output, configFilename));
+        validateOptions();
+        ctx().init(new CoreOptions(verbose, noColor, OutputFormat.valueOf(output.toUpperCase()), configFilename));
         execute();
+    }
+
+    /**
+     * Check parameters and throws speciliazed error
+     */
+    protected void validateOptions() {
+        List<String> validFormats = Arrays.stream(OutputFormat.values()).map(OutputFormat::name).toList();
+        if (!validFormats.contains(output.toUpperCase())) {
+            throw new ParseRestrictionViolatedException("Invalid option value (-o, --output), expecting human,json or csv");
+        }
     }
     
     /**

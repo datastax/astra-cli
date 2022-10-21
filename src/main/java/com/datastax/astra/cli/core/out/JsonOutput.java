@@ -44,8 +44,7 @@ public class JsonOutput<T> {
         }
         this.message = message;
     }
-    
-    
+
     /**
      * Constructor with fields.
      *

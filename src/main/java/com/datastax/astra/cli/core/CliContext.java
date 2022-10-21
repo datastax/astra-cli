@@ -126,7 +126,7 @@ public class CliContext {
         if (coreOptions != null) {
             return coreOptions.output();   
         }
-        return OutputFormat.human;
+        return OutputFormat.HUMAN;
     }
     
     /**
@@ -161,7 +161,7 @@ public class CliContext {
         }
         try {
             new OrganizationsClient(getToken()).organization();
-            LoggerShell.info("Cli successfully initialized");
+            LoggerShell.debug("Cli successfully initialized");
         } catch(Exception e) {
             AstraCliConsole.outputError(ExitCode.CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
             throw new InvalidTokenException(getToken());

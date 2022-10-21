@@ -3,7 +3,6 @@ package com.datastax.astra.cli.streaming;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
@@ -156,9 +155,9 @@ public class OperationsStreaming {
             sht.addPropertyRow("BrokerServiceUrl", tnt.getBrokerServiceUrl());
             sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
             switch (CliContext.getInstance().getOutputFormat()) {
-                case json -> AstraCliConsole.printJson(new JsonOutput<ShellTable>(ExitCode.SUCCESS,
+                case JSON -> AstraCliConsole.printJson(new JsonOutput<ShellTable>(ExitCode.SUCCESS,
                         STREAMING + " get " + tenantName, sht));
-                case csv, human -> AstraCliConsole.printShellTable(sht);
+                case CSV, HUMAN -> AstraCliConsole.printShellTable(sht);
             }
         }  else {
             switch (key) {

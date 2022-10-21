@@ -3,6 +3,7 @@ package com.datastax.astra.cli;
 import java.util.Arrays;
 import java.util.List;
 
+import com.datastax.astra.cli.db.*;
 import org.fusesource.jansi.AnsiConsole;
 
 import com.datastax.astra.cli.config.ConfigCreateCmd;
@@ -21,14 +22,6 @@ import com.datastax.astra.cli.core.exception.InvalidTokenException;
 import com.datastax.astra.cli.core.exception.TokenNotFoundException;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.db.DbCreateCmd;
-import com.datastax.astra.cli.db.DbDeleteCmd;
-import com.datastax.astra.cli.db.DbDotEnvCmd;
-import com.datastax.astra.cli.db.DbDownloadScbCmd;
-import com.datastax.astra.cli.db.DbGetCmd;
-import com.datastax.astra.cli.db.DbListCmd;
-import com.datastax.astra.cli.db.DbResumeCmd;
-import com.datastax.astra.cli.db.DbStatusCmd;
 import com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.datastax.astra.cli.db.dsbulk.DbCountCmd;
 import com.datastax.astra.cli.db.dsbulk.DbLoadCmd;
@@ -117,7 +110,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
          // Create,delete
          DbCreateCmd.class,  DbDeleteCmd.class,
          // Read
-         DbListCmd.class,   DbGetCmd.class, DbStatusCmd.class,
+         DbListCmd.class,  DbGetCmd.class, DbStatusCmd.class,
          // Operation
          DbResumeCmd.class, DbDownloadScbCmd.class, DbDotEnvCmd.class,
          // Keyspaces
@@ -225,7 +218,8 @@ public class AstraCli {
         } catch(ParseException ex) {
             LoggerShell.exception(ex, getCmd(args), null);
             return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch (InvalidTokenException | TokenNotFoundException e) {
+        } catch (InvalidTokenException | TokenNotFoundException |
+                 FileSystemException | ConfigurationException e) {
             AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
         } catch (DatabaseNameNotUniqueException |
@@ -235,8 +229,8 @@ public class AstraCli {
        } catch (DatabaseNotFoundException  |
                 TenantNotFoundException    | 
                 RoleNotFoundException      |
-                UserNotFoundException nfex) {
-           AstraCliConsole.outputError(ExitCode.NOT_FOUND, nfex.getMessage());
+                UserNotFoundException ex) {
+           AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
            return ExitCode.NOT_FOUND;
        } catch (TenantAlreadyExistExcepion | 
                 UserAlreadyExistException e) {
@@ -245,9 +239,6 @@ public class AstraCli {
        } catch (DatabaseNotSelectedException e) {
            AstraCliConsole.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
            return ExitCode.ILLEGAL_STATE;
-       } catch (FileSystemException | ConfigurationException ex) {
-           AstraCliConsole.outputError(ExitCode.CONFIGURATION, ex.getMessage());
-           return ExitCode.CONFIGURATION;
        } catch (Exception ex) {
            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
            return ExitCode.INTERNAL_ERROR;
@@ -260,7 +251,7 @@ public class AstraCli {
      * @param args
      *      arguments
      * @return
-     *      first part of commadn line
+     *      first part of command line
      */
     public static String getCmd(String[] args) {
         List <String > listArgs = Arrays.asList(args);
@@ -282,7 +273,7 @@ public class AstraCli {
      * @param args
      *      arguments
      * @return
-     *      first part of commadn line
+     *      first part of command line
      */
     public static String getInvalidCmd(String[] args) {
         List <String > listArgs = Arrays.asList(args);

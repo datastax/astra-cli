@@ -123,14 +123,14 @@ public class OperationIam {
         sht.addPropertyRow("Description",   r.getPolicy().getDescription());
         sht.addPropertyRow("Effect",        r.getPolicy().getEffect());
         switch (CliContext.getInstance().getOutputFormat()) {
-            case csv -> {
+            case CSV -> {
                 sht.addPropertyRow("Resources", r.getPolicy().getResources().toString());
                 sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
                 AstraCliConsole.printShellTable(sht);
             }
-            case json -> AstraCliConsole.printJson(new JsonOutput<Role>(ExitCode.SUCCESS,
+            case JSON -> AstraCliConsole.printJson(new JsonOutput<Role>(ExitCode.SUCCESS,
                     OperationIam.COMMAND_ROLE + " get " + role, r));
-            case human -> {
+            case HUMAN -> {
                 sht.addPropertyListRows("Resources", r.getPolicy().getResources());
                 sht.addPropertyListRows("Actions", r.getPolicy().getActions());
                 AstraCliConsole.printShellTable(sht);
@@ -176,12 +176,12 @@ public class OperationIam {
                .collect(Collectors.toList());
 
         switch (CliContext.getInstance().getOutputFormat()) {
-            case csv -> {
+            case CSV -> {
                 sht.addPropertyRow("Roles", roleNames.toString());
                 AstraCliConsole.printShellTable(sht);
             }
-            case json -> AstraCliConsole.printJson(new JsonOutput<User>(ExitCode.SUCCESS, "user show " + user, r));
-            case human -> {
+            case JSON -> AstraCliConsole.printJson(new JsonOutput<User>(ExitCode.SUCCESS, "user show " + user, r));
+            case HUMAN -> {
                 sht.addPropertyListRows("Roles", roleNames);
                 AstraCliConsole.printShellTable(sht);
             }
