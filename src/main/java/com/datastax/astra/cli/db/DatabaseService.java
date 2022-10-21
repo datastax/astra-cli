@@ -45,12 +45,44 @@ import com.datastax.astra.sdk.databases.domain.Datacenter;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.datastax.astra.sdk.utils.ApiLocator;
 
+
+
 /**
  * Service layer to work with database.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DatabaseService implements DatabaseConstants {
+public class DatabaseService {
+    
+    /** Default region. **/
+    public static final String DEFAULT_REGION        = "us-east-1";
+    
+    /** Default tier. **/
+    public static final String DEFAULT_TIER          = "serverless";
+    
+    /** Allow Snake case. */
+    public static final String KEYSPACE_NAME_PATTERN = "^[_a-z0-9]+$";
+    
+    /** column names. */
+    static final String COLUMN_ID                = "id";
+    /** column names. */
+    static final String COLUMN_NAME              = "Name";
+    /** column names. */
+    static final String COLUMN_DEFAULT_REGION    = "Default Region";
+    /** column names. */
+    static final String COLUMN_REGIONS           = "Regions";
+    /** column names. */
+    static final String COLUMN_DEFAULT_CLOUD     = "Default Cloud Provider";
+    /** column names. */
+    static final String COLUMN_STATUS            = "Status";
+    /** column names. */
+    static final String COLUMN_DEFAULT_KEYSPACE  = "Default Keyspace";
+    /** column names. */
+    static final String COLUMN_KEYSPACES         = "Keyspaces";
+    /** column names. */
+    static final String COLUMN_CREATION_TIME     = "Creation Time";
+    /** working object. */
+    static final String DB                       = "Database";
     
     /**
      * Access to databases object.
@@ -115,40 +147,80 @@ public class DatabaseService implements DatabaseConstants {
            Optional<Database> optDb = dbc.find();
            if (optDb.isPresent()) {
                Database db = optDb.get();
-               long start = System.currentTimeMillis();
                if (db.getStatus().equals(status)) {
                    return ExitCode.SUCCESS;
                }
-               LoggerShell.success("Database '%s' has status '%s' waiting to be '%s' ..."
-                       .formatted(databaseName, db.getStatus(), status));
+               LoggerShell.success("%s '%s' has status '%s' waiting to be '%s' ..."
+                       .formatted(DB, databaseName, db.getStatus(), status));
                
-               int retries = 0;
-               while (retries++ < timeout && !db.getStatus().equals(status)) {
-                   try {
-                    Thread.sleep(1000);
-                    db = dbDao.getDatabase(databaseName);
-                    LoggerShell.debug("Waiting for database to become " + status + 
-                            " but was " + db.getStatus() + " retrying (" + retries + "/" + timeout + ")");
-                   } catch (InterruptedException e) {
-                       LoggerShell.error("Interupted operation: %s".formatted(e.getMessage()));
-                       Thread.currentThread().interrupt();
-                   }
-               }
-               // Success if you did not reach the timeout (meaning status is good)
-               if (retries < timeout) {
-                   LoggerShell.success("Database '"
-                           + databaseName + "' has status '"  +  status 
-                           + "' (took " + (System.currentTimeMillis() - start) + " millis)");
-                   return ExitCode.SUCCESS;
-               }
-               LoggerShell.warning("Timeout (" + timeout + "s) : "
-                       + "Database '" + databaseName + "' status is not yet '" + status 
-                       + "' (current status '" + db.getStatus() + "')");
-               return ExitCode.UNAVAILABLE;
+               long start = System.currentTimeMillis();
+               return evaluateReturnedCode(db, status, 
+                       retriesUntilTimeoutOrSuccess(db, status, timeout), timeout, start);
             }
         }
-        LoggerShell.error("Database '" + databaseName + "' has not been found.");
+        LoggerShell.error("%s '%s' has not been found."
+                .formatted(DB, databaseName));
         return ExitCode.NOT_FOUND;
+    }
+    
+    /**
+     * Based on computation result give us a return code.
+     * 
+     * @param db
+     *      current db
+     * @param status
+     *      exoected status
+     * @param retries
+     *      number of retries
+     * @param timeout
+     *      timeout
+     * @param start
+     *      starttime
+     * @return
+     *      exit code
+     */
+    public ExitCode evaluateReturnedCode(Database db, DatabaseStatusType status, int retries, int timeout, long start) {
+        
+        // Success if you did not reach the timeout (meaning status is good)
+        if (retries < timeout) {
+            LoggerShell.success("%s '%s' has status '%s' (took %d millis)"
+                       .formatted(DB, db.getInfo().getName(), status, 
+                               System.currentTimeMillis() - start));
+            return ExitCode.SUCCESS;
+        }
+        
+        LoggerShell.warning("Timeout (%d s) : %s '%s' status is not yet '%s' (current status '%s')"
+                       .formatted(timeout, DB, db.getInfo().getName(), 
+                        status.toString(), db.getStatus().toString()));
+        return ExitCode.UNAVAILABLE;
+    }
+    
+    /**
+     * Loop and wait 1s in between 2 tests.
+     * 
+     * @param db
+     *      database
+     * @param status
+     *      current status
+     * @param timeout
+     *      timeout is max retries
+     * @return
+     *      max retried
+     */
+    public int retriesUntilTimeoutOrSuccess(Database db, DatabaseStatusType status, int timeout) {
+        int retries = 0;
+        while (retries++ < timeout && !db.getStatus().equals(status)) {
+            try {
+             Thread.sleep(1000);
+             db = dbDao.getDatabase(db.getInfo().getName());
+             LoggerShell.debug("Waiting for %s to become '%s' but was '%s' retrying ( %d / %d )"
+                     .formatted(DB, status.toString(), db.getStatus().toString(), retries, timeout));
+            } catch (InterruptedException e) {
+                LoggerShell.error("Interupted operation: %s".formatted(e.getMessage()));
+                Thread.currentThread().interrupt();
+            }
+        }
+        return retries;
     }
     
     /**
@@ -186,8 +258,8 @@ public class DatabaseService implements DatabaseConstants {
                 .toMap(DatabaseRegionServerless::getName, Function.identity()));
         if (StringUtils.isEmpty(keyspace)) {
             keyspace = databaseName.toLowerCase()
-                    .replaceAll(" ", "_")
-                    .replaceAll("-", "_");
+                    .replace(" ", "_")
+                    .replace("-", "_");
         }
         if (!keyspace.matches(KEYSPACE_NAME_PATTERN)) {
             throw new InvalidArgumentException("Keyspace should contain alphanumerics[a-z0-9_]");
@@ -438,8 +510,8 @@ public class DatabaseService implements DatabaseConstants {
                     AstraCliConsole.printShellTable(sht);
                 break;
                 case json:
-                    AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                                DB + " get " + databaseName, db));
+                    AstraCliConsole.printJson(new JsonOutput<Database>(ExitCode.SUCCESS, 
+                                "db get %s".formatted(databaseName), db));
                 break;
                 case human:
                 default:

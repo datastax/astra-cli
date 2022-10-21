@@ -107,20 +107,18 @@ public class DatabaseDao {
         DatabasesClient dbsClient = CliContext.getInstance().getApiDevopsDatabases();
         
         // Escape special chars
-        db = db.replaceAll("\"", "");
+        db = db.replace("\"", "");
         // Database name containing spaces cannot be an id
         if (!db.contains(" ") ) {
             DatabaseClient dbClient = dbsClient.database(db);
             if (dbClient.exist()) {
                 LoggerShell.debug("Database found id=" + dbClient.getDatabaseId());
-                return Optional.ofNullable(dbClient);
+                return Optional.of(dbClient);
             }
         }
         
         // Not found, try with the name
-        List<Database> dbs = dbsClient
-                .databasesNonTerminatedByName(db)
-                .collect(Collectors.toList());
+        List<Database> dbs = dbsClient.databasesNonTerminatedByName(db).toList();
         
         // Multiple databases with the same name
         if (dbs.size() > 1) {

@@ -104,7 +104,7 @@ public class OperationIam {
                 .getApiDevopsOrganizations()
                 .findRoleByName(role);
             
-        if (!optRole.isPresent() && IdUtils.isUUID(role)) {
+        if (optRole.isEmpty() && IdUtils.isUUID(role)) {
             optRole = CliContext
                  .getInstance()
                  .getApiDevopsOrganizations()
@@ -112,7 +112,7 @@ public class OperationIam {
                  .find();
             }
             
-        if (!optRole.isPresent()) {
+        if (optRole.isEmpty()) {
             throw new RoleNotFoundException(role);
         }
             
@@ -122,22 +122,19 @@ public class OperationIam {
         sht.addPropertyRow("Name",          r.getName());
         sht.addPropertyRow("Description",   r.getPolicy().getDescription());
         sht.addPropertyRow("Effect",        r.getPolicy().getEffect());
-        switch(CliContext.getInstance().getOutputFormat()) {
-            case csv:
+        switch (CliContext.getInstance().getOutputFormat()) {
+            case csv -> {
                 sht.addPropertyRow("Resources", r.getPolicy().getResources().toString());
                 sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
                 AstraCliConsole.printShellTable(sht);
-            break;
-            case json:
-                AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                            OperationIam.COMMAND_ROLE + " get " + role, r));
-            break;
-            case human:
-            default:
+            }
+            case json -> AstraCliConsole.printJson(new JsonOutput<Role>(ExitCode.SUCCESS,
+                    OperationIam.COMMAND_ROLE + " get " + role, r));
+            case human -> {
                 sht.addPropertyListRows("Resources", r.getPolicy().getResources());
-                sht.addPropertyListRows("Actions",   r.getPolicy().getActions());
+                sht.addPropertyListRows("Actions", r.getPolicy().getActions());
                 AstraCliConsole.printShellTable(sht);
-            break;
+            }
         }
     }
     
@@ -155,7 +152,7 @@ public class OperationIam {
                .getApiDevopsOrganizations()
                .findUserByEmail(user);
             
-       if (!optUser.isPresent() && IdUtils.isUUID(user)) {
+       if (optUser.isEmpty() && IdUtils.isUUID(user)) {
            optUser = CliContext
                 .getInstance()
                 .getApiDevopsOrganizations()
@@ -163,7 +160,7 @@ public class OperationIam {
                 .find();
        }
             
-       if (!optUser.isPresent()) {
+       if (optUser.isEmpty()) {
            throw new UserNotFoundException(user);
        }
        
@@ -177,21 +174,18 @@ public class OperationIam {
                .stream()
                .map(Role::getName)
                .collect(Collectors.toList());
-            
-       switch(CliContext.getInstance().getOutputFormat()) {
-           case csv:
-               sht.addPropertyRow("Roles", roleNames.toString());
-               AstraCliConsole.printShellTable(sht);
-           break;
-           case json:
-               AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, "user show " + user, r));
-           break;
-           case human:
-           default:
-               sht.addPropertyListRows("Roles", roleNames);
-               AstraCliConsole.printShellTable(sht);
-           break;
-       }
+
+        switch (CliContext.getInstance().getOutputFormat()) {
+            case csv -> {
+                sht.addPropertyRow("Roles", roleNames.toString());
+                AstraCliConsole.printShellTable(sht);
+            }
+            case json -> AstraCliConsole.printJson(new JsonOutput<User>(ExitCode.SUCCESS, "user show " + user, r));
+            case human -> {
+                sht.addPropertyListRows("Roles", roleNames);
+                AstraCliConsole.printShellTable(sht);
+            }
+        }
     }
     
     /**
@@ -213,10 +207,10 @@ public class OperationIam {
             throw new UserAlreadyExistException(user);
         }
         Optional<Role> optRole = oc.findRoleByName(role);
-        if (!optRole.isPresent() && IdUtils.isUUID(role)) {
+        if (optRole.isEmpty() && IdUtils.isUUID(role)) {
             optRole = oc.role(role).find();
         }
-        if (!optRole.isPresent()) {
+        if (optRole.isEmpty()) {
             throw new RoleNotFoundException(role);
         }
         oc.inviteUser(user, optRole.get().getId());
@@ -237,10 +231,10 @@ public class OperationIam {
     throws UserNotFoundException {
         OrganizationsClient oc = CliContext.getInstance().getApiDevopsOrganizations();
         Optional<User> optUser = oc.findUserByEmail(user);
-        if (!optUser.isPresent() && IdUtils.isUUID(user)) {
+        if (optUser.isEmpty() && IdUtils.isUUID(user)) {
             optUser = oc.user(user).find();
         }
-        if (!optUser.isPresent()) {
+        if (optUser.isEmpty()) {
             throw new UserNotFoundException(user);
         }
         oc.user(optUser.get().getUserId()).delete();

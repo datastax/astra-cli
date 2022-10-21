@@ -1,7 +1,5 @@
 package com.datastax.astra.cli.core.out;
 
-import java.io.Serializable;
-
 import com.datastax.astra.cli.core.ExitCode;
 
 /**
@@ -9,11 +7,8 @@ import com.datastax.astra.cli.core.ExitCode;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class JsonOutput implements Serializable {
+public class JsonOutput<T> {
     
-    /** serial. */
-    private static final long serialVersionUID = 2907600658138969142L;
-
     /**
      * Returned code.
      */
@@ -27,7 +22,7 @@ public class JsonOutput implements Serializable {
     /**
      * Custom payload
      */
-    private Object data;
+    private T data;
 
     /**
      * Default constructor.
@@ -61,7 +56,7 @@ public class JsonOutput implements Serializable {
      * @param data
      *      data in JSON
      */
-    public JsonOutput(ExitCode code, String message, Object data) {
+    public JsonOutput(ExitCode code, String message, T data) {
         this(code, message);
         this.data     = data;  
     }
@@ -119,7 +114,7 @@ public class JsonOutput implements Serializable {
      * @param data
      * 		new value for 'data '
      */
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
     

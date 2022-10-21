@@ -1,5 +1,6 @@
 package com.datastax.astra.cli.core.out;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fusesource.jansi.Ansi;
+
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
-
-import org.fusesource.jansi.Ansi;
 
 /**
  * Standardize output for tables.
@@ -21,6 +22,7 @@ import org.fusesource.jansi.Ansi;
 public class ShellTable implements Serializable {
     
     /** Serial */
+    @Serial
     private static final long serialVersionUID = -2134504321420499395L;
     
     /** Column name. */
@@ -98,8 +100,8 @@ public class ShellTable implements Serializable {
      */
     public void showJson() {
         AstraCliConsole.printJson(
-                new JsonOutput(ExitCode.SUCCESS, 
-                        ctx().getArguments().toString(), 
+                new JsonOutput<>(ExitCode.SUCCESS,
+                        ctx().getArguments().toString(),
                         getCellValues()));
     }
     
@@ -121,40 +123,26 @@ public class ShellTable implements Serializable {
     public void show() {
         
         StringBuilderAnsi builder = new StringBuilderAnsi();
-        // Compute Columns Width
-        cellValues.stream().forEach(myRow -> {
-            columnTitlesNames.stream().forEach(colName -> {
-                if (!columnSize.containsKey(colName) || 
-                     columnSize.get(colName) <  Math.max(colName.length(), myRow.get(colName).length())) {
-                    columnSize.put(colName,  Math.max(colName.length(), myRow.get(colName).length()) + 1);
-                }
-            });
-        });
+        computeColumnsWidths();
         
         // Compute Table Horizontal Line
-        StringBuilder tableLine = new StringBuilder();
-        for(String columnName : columnTitlesNames) {
-            Integer size = columnSize.get(columnName);
-            if (null == size) {
-                size = columnName.length() + 1;
-            }
-            tableLine.append("+" + String.format("%-" + (size+1) + "s", "-").replaceAll(" " , "-"));
-        }
-        builder.append(tableLine.toString() + "+\n", tableColor);
+        String tableLine = buildTableLines();
         
-        // Display Column Titles
-        for(String columnName : columnTitlesNames) {
-            builder.append("| ", tableColor);
-            Integer size = columnSize.get(columnName);
-            if (null == size) {
-                size = columnName.length() + 1;
-            }
-            builder.append(columnName , columnTitlesColor, size);
-        }
-        builder.append("|\n", tableColor);
-        builder.append(tableLine.toString() + "+\n", tableColor);
+        // Header
+        builder.append(tableLine + "+\n", tableColor);
+        buildTableHeader(builder);
+        builder.append(tableLine + "+\n", tableColor);
         
         // Display Data
+        buildTableData(builder);
+        builder.append(tableLine + "+\n", tableColor);
+        AstraCliConsole.println(builder);
+    }
+    
+    /**
+     * Display Column Titles
+     */
+    private void buildTableData(StringBuilderAnsi builder) {
         for (Map<String, String > res : cellValues) {
             // Keep Orders
             for(String columnName : columnTitlesNames) {
@@ -167,8 +155,51 @@ public class ShellTable implements Serializable {
             }
             builder.append("|\n", tableColor);
         }
-        builder.append(tableLine.toString() + "+\n", tableColor);
-        AstraCliConsole.println(builder);
+    }
+    
+    /**
+     * Display Column Titles
+     */
+    private void buildTableHeader(StringBuilderAnsi builder) {
+        for(String columnName : columnTitlesNames) {
+            builder.append("| ", tableColor);
+            Integer size = columnSize.get(columnName);
+            if (null == size) {
+                size = columnName.length() + 1;
+            }
+            builder.append(columnName , columnTitlesColor, size);
+        }
+        builder.append("|\n", tableColor);
+    }
+    
+    /**
+     * Build column width.
+     */
+    private void computeColumnsWidths() {
+        cellValues.forEach(myRow -> columnTitlesNames.stream().forEach(colName -> {
+            if (!columnSize.containsKey(colName) ||
+                 columnSize.get(colName) <  Math.max(colName.length(), myRow.get(colName).length())) {
+                columnSize.put(colName,  Math.max(colName.length(), myRow.get(colName).length()) + 1);
+            }
+        }));
+    }
+    
+    /**
+     * Build table lines.
+     * 
+     * @return
+     *      line
+     */
+    private String buildTableLines() {
+        StringBuilder tableLine = new StringBuilder();
+        for(String columnName : columnTitlesNames) {
+            Integer size = columnSize.get(columnName);
+            if (null == size) {
+                size = columnName.length() + 1;
+            }
+            tableLine.append("+").append(String.format("%-" + (size + 1) + "s", "-").replace(" ", "-"));
+        }
+        return tableLine.toString();
     }
     
     /**

@@ -22,33 +22,39 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  */
 @Command(name = "create", description = "Create a tenant in streaming with cli")
 public class StreamingCreateCmd extends AbstractConnectedCmd {
+
     /**
-     * Database name or identifier
+     * Tenant Name
      */
     @Required
     @Arguments(title = "TENANT", description = "Tenant name (unique for the region)")
-    protected String tenantName;
-    
-    // Create Tenant Options
+    String tenantName;
+
+    /**
+     * Cloud provider or the tenant
+     */
     @Option(name = { "-c", "--cloud" }, description = "Cloud Provider to create a tenant")
-    private String cloudProvider = DEFAULT_CLOUD_PROVIDER;
-    
-    /** option. */
+    String cloudProvider = DEFAULT_CLOUD_PROVIDER;
+
+    /**
+     * Cloud region or the tenant
+     */
     @Option(name = { "-r", "--region" }, description = "Cloud Region for the tenant")
-    private String cloudRegion = DEFAULT_CLOUD_REGION;
-    
-    /** option. */
+    String cloudRegion = DEFAULT_CLOUD_REGION;
+
+    /**
+     * Define proper plan
+     */
     @Option(name = { "-p", "--plan" }, description = "Plan for the tenant")    
-    private String plan = DEFAULT_CLOUD_TENANT;
+    String plan = DEFAULT_CLOUD_TENANT;
     
     /** option. */
     @Option(name = { "-e", "--email" }, description = "User Email")    
-    private String email = DEFAULT_EMAIL;
+    String email = DEFAULT_EMAIL;
     
     /** {@inheritDoc} */
     @Override
-    public void execute() 
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException, TenantAlreadyExistExcepion {
+    public void execute() {
         CreateTenant ct = new CreateTenant();
         ct.setCloudProvider(cloudProvider);
         ct.setCloudRegion(cloudRegion);

@@ -21,7 +21,7 @@ public class DbDotEnvCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1, 
             description = "Cloud provider region to provision")
-    protected String region = DEFAULT_REGION;
+    protected String region = DatabaseService.DEFAULT_REGION;
     
     /**
      * Default keyspace created with the Db

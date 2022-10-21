@@ -1,6 +1,7 @@
 package com.datastax.astra.cli.core.out;
 
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,14 +13,12 @@ import com.datastax.astra.cli.core.ExitCode;
 
 /**
  * Show cli output as CSV.
- * 
- * TODO: Use a real CSV library to escape special characters.
- *
  * @author Cedrick LUNVEN (@clunven)
  */
 public class CsvOutput implements Serializable{
 
     /** Serial. */
+    @Serial
     private static final long serialVersionUID = -6255622898821481245L;
     
     /** code. */
@@ -102,10 +101,9 @@ public class CsvOutput implements Serializable{
     public String toString() {
         StringBuilder csv = new StringBuilder(String.join(",",headers));
         csv.append(LINE_SEPARATOR);
-        rows.stream().forEach(row -> {
+        rows.forEach(row -> {
             List<String> values = new ArrayList<>();
-            for(int colIdx = 0;colIdx < headers.size();colIdx++) {
-                String colName = headers.get(colIdx);
+            for (String colName : headers) {
                 values.add(row.containsKey(colName) ? csvEscape(row.get(colName)) : "");
             }
             csv.append(String.join(",",values));

@@ -58,7 +58,7 @@ public class OperationsStreaming {
     public static final String COLUMN_STATUS = "Status";
     
     /** limit resource usage by caching tenant clients. */
-    private static Map<String, TenantClient> cacheTenantClient = new HashMap<>();
+    private static final Map<String, TenantClient> cacheTenantClient = new HashMap<>();
     
     /**
      * Hide default constructor
@@ -102,11 +102,9 @@ public class OperationsStreaming {
      */
     private static Tenant getTenant(String tenantName) 
     throws TenantNotFoundException {
-        Optional<Tenant> optTenant = tenantClient(tenantName).find();
-        if (!optTenant.isPresent()) {
-            throw new TenantNotFoundException(tenantName);
-        }
-        return optTenant.get();
+        return tenantClient(tenantName)
+                .find()
+                .orElseThrow(() -> new TenantNotFoundException(tenantName));
     }
     
     /**
@@ -157,32 +155,17 @@ public class OperationsStreaming {
             sht.addPropertyRow("WebServiceUrl", tnt.getWebServiceUrl());
             sht.addPropertyRow("BrokerServiceUrl", tnt.getBrokerServiceUrl());
             sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
-            switch(CliContext.getInstance().getOutputFormat()) {
-                case json:
-                    AstraCliConsole.printJson(new JsonOutput(ExitCode.SUCCESS, 
-                                STREAMING + " get " + tenantName, sht));
-                break;
-                case csv:
-                case human:
-                default:
-                    AstraCliConsole.printShellTable(sht);
-                break;
-             }
+            switch (CliContext.getInstance().getOutputFormat()) {
+                case json -> AstraCliConsole.printJson(new JsonOutput<ShellTable>(ExitCode.SUCCESS,
+                        STREAMING + " get " + tenantName, sht));
+                case csv, human -> AstraCliConsole.printShellTable(sht);
+            }
         }  else {
-            switch(key) {
-                case cloud:
-                    AstraCliConsole.println(tnt.getCloudProvider());
-                break;
-                case pulsar_token:
-                    AstraCliConsole.println(tnt.getPulsarToken());
-                break;
-                case region:
-                    AstraCliConsole.println(tnt.getCloudRegion());
-                break;
-                case status:
-                    AstraCliConsole.println(tnt.getStatus());
-                break;
-             
+            switch (key) {
+                case cloud -> AstraCliConsole.println(tnt.getCloudProvider());
+                case pulsar_token -> AstraCliConsole.println(tnt.getPulsarToken());
+                case region -> AstraCliConsole.println(tnt.getCloudRegion());
+                case status -> AstraCliConsole.println(tnt.getStatus());
             }
         }
     }

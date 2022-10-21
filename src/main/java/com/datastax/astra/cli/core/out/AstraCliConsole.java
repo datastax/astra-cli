@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AstraCliConsole {
     
     /** Using sl4j to access console, eventually pushing to file as well. */
-    private static Logger LOGGER = LoggerFactory.getLogger(AstraCliConsole.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AstraCliConsole.class);
     
     /** Json Object Mapper. */
     public static final ObjectMapper OM = new ObjectMapper();
@@ -33,7 +34,15 @@ public class AstraCliConsole {
 	
 	/** Start Banner. */
     public static void banner() {
-       
+        println("");
+        println("    _____            __                  ", Ansi.Color.GREEN);
+        println("   /  _  \\   _______/  |_____________    ", Ansi.Color.GREEN);
+        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ", Ansi.Color.GREEN);
+        println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", Ansi.Color.GREEN);
+        println(" \\____|__  /____  > |__|  |__|  (____  /", Ansi.Color.GREEN);
+        println("         \\/     \\/                   \\/ ", Ansi.Color.GREEN);
+        println("");
+        println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
     }
     
     /**
@@ -78,7 +87,7 @@ public class AstraCliConsole {
      * @param json
      *      json in the console
      */
-    public static void printJson(JsonOutput json) {
+    public static <T> void printJson(JsonOutput<T> json) {
         if (json != null) {
             try {
                 println(OM.writerWithDefaultPrettyPrinter()
@@ -108,17 +117,10 @@ public class AstraCliConsole {
      *      table
      */
     public static void printShellTable(ShellTable sht) {
-        switch(ctx().getOutputFormat()) {
-            case json:
-                sht.showJson();
-            break;
-            case csv: 
-                sht.showCsv(); 
-            break;
-            case human:
-            default:
-                sht.show();
-            break;
+        switch (ctx().getOutputFormat()) {
+            case json -> sht.showJson();
+            case csv  -> sht.showCsv();
+            case human -> sht.show();
         }
     }
     
@@ -130,7 +132,7 @@ public class AstraCliConsole {
      * @param color
      *      color
      */
-    public static final void printObjectAsJson(Object obj, Ansi.Color color) {
+    public static void printObjectAsJson(Object obj, Ansi.Color color) {
         try {
             println(OM
                   .writerWithDefaultPrettyPrinter()
@@ -149,17 +151,10 @@ public class AstraCliConsole {
      *      error message
      */
     public static void outputError(ExitCode code, String msg) {
-        switch(ctx().getOutputFormat()) {
-            case json:
-                printJson(new JsonOutput(code, code.name() + ": " + msg));
-            break;
-            case csv:
-                printCsv(new CsvOutput(code,  code.name() + ": " + msg));
-            break;
-            case human:
-            default:
-                LoggerShell.error(code.name() + ": " + msg);
-            break;
+        switch (ctx().getOutputFormat()) {
+            case json -> printJson(new JsonOutput<String>(code, code.name() + ": " + msg));
+            case csv -> printCsv(new CsvOutput(code, code.name() + ": " + msg));
+            case human -> LoggerShell.error(code.name() + ": " + msg);
         }
     }
     
@@ -172,17 +167,10 @@ public class AstraCliConsole {
      *      error message
      */
     public static void outputWarning(ExitCode code, String msg) {
-        switch(ctx().getOutputFormat()) {
-            case json:
-                printJson(new JsonOutput(code, code.name() + ": " + msg));
-            break;
-            case csv:
-                printCsv(new CsvOutput(code,  code.name() + ": " + msg));
-            break;
-            case human:
-            default:
-                LoggerShell.warning(code.name() + ": " + msg);
-            break;
+        switch (ctx().getOutputFormat()) {
+            case json -> printJson(new JsonOutput<String>(code, code.name() + ": " + msg));
+            case csv -> printCsv(new CsvOutput(code, code.name() + ": " + msg));
+            case human -> LoggerShell.warning(code.name() + ": " + msg);
         }
     }
     
@@ -195,19 +183,14 @@ public class AstraCliConsole {
      *      show data
      */
     public static void outputData(String label, String data) {
-        switch(ctx().getOutputFormat()) {
-            case json:
-                printJson(new JsonOutput(ExitCode.SUCCESS, label, data));
-            break;
-            case csv:
+        switch (ctx().getOutputFormat()) {
+            case json -> printJson(new JsonOutput<String>(ExitCode.SUCCESS, label, data));
+            case csv -> {
                 Map<String, String> m = new HashMap<>();
                 m.put(label, data);
                 printCsv(new CsvOutput(Arrays.asList(label), Arrays.asList(m)));
-            break;
-            case human:
-            default:
-               System.out.println(data);
-            break;
+            }
+            case human -> System.out.println(data);
         }
     }
     
@@ -218,17 +201,10 @@ public class AstraCliConsole {
      *      return message
      */
     public static void outputSuccess(String msg) {
-        switch(ctx().getOutputFormat()) {
-            case json:
-                printJson(new JsonOutput(ExitCode.SUCCESS, msg));
-            break;
-            case csv:
-                printCsv(new CsvOutput(ExitCode.SUCCESS, msg));
-            break;
-            case human:
-            default:
-                LoggerShell.success(msg);
-            break;
+        switch (ctx().getOutputFormat()) {
+            case json  -> printJson(new JsonOutput<String>(ExitCode.SUCCESS, msg));
+            case csv   -> printCsv(new CsvOutput(ExitCode.SUCCESS, msg));
+            case human -> LoggerShell.success(msg);
         }
     }
     

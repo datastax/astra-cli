@@ -32,7 +32,7 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1, 
             description = "Cloud provider region to provision")
-    protected String region = DEFAULT_REGION;
+    protected String region = DatabaseService.DEFAULT_REGION;
     
     /**
      * Default keyspace created with the Db
@@ -62,14 +62,10 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
            InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException  {
         dbServices.createDb(db, region, keyspace, ifNotExist);
         if (wait) {
-            switch(dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
-                case NOT_FOUND:
-                    throw new DatabaseNotFoundException(db);
-                case UNAVAILABLE:
-                    throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE,  DatabaseStatusType.PENDING);
-                default:
-                    LoggerShell.success("Database \'" + db +  "' has been created.");
-                break;  
+            switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
+                case NOT_FOUND -> throw new DatabaseNotFoundException(db);
+                case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.PENDING);
+                default -> LoggerShell.success("Database '%s' has been created.".formatted(db));
             }
         }
     }

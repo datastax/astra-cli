@@ -8,18 +8,13 @@ package com.datastax.astra.cli.streaming.exception;
 public class TenantAlreadyExistExcepion extends RuntimeException {
 
     /**
-     * Serial number.
-     */
-    private static final long serialVersionUID = 2456952914005268575L;
-
-    /**
      * Constructor with dbName
      * 
      * @param tenantName
      *      tenant name
      */
     public TenantAlreadyExistExcepion(String tenantName) {
-        super("Tenant name '" + tenantName + "' already exist and must be unique for the cluster.");
+        super("Tenant name '%s' already exist and must be unique for the cluster.".formatted(tenantName));
     }
     
 }

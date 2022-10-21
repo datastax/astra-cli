@@ -13,7 +13,7 @@ public enum OutputFormat {
     /** Output as tables. */
     human,
     
-    /** Output as CSV. */
-    csv;
+    /** Output as comma. */
+    csv
 
 }

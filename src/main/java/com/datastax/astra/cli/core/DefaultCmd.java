@@ -27,20 +27,12 @@ public class DefaultCmd extends AbstractCmd {
         if (version) {
             AstraCliConsole.outputData("version", AstraCliUtils.version());
         } else {
-            println("");
-            println("    _____            __                  ", Ansi.Color.GREEN);
-            println("   /  _  \\   _______/  |_____________    ", Ansi.Color.GREEN);
-            println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ", Ansi.Color.GREEN);
-            println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", Ansi.Color.GREEN);
-            println(" \\____|__  /____  > |__|  |__|  (____  /", Ansi.Color.GREEN);
-            println("         \\/     \\/                   \\/ ", Ansi.Color.GREEN);
-            println("");
-            println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
-            println(new StringBuilderAnsi(" 📋 Command list: ")
+            AstraCliConsole.banner();
+            println(new StringBuilderAnsi(" - Command list: ")
                     .append("astra help", Ansi.Color.GREEN));
-            println(new StringBuilderAnsi(" ℹ️ Get help: ")
+            println(new StringBuilderAnsi("️ - Get help: ")
                     .append("astra help <you command>", Ansi.Color.GREEN));
-            println(new StringBuilderAnsi(" 🧑🏽‍💻 Get support : ")
+            println(new StringBuilderAnsi(" - Get support : ")
                     .append("'https://dtsx.io/discord'", Ansi.Color.GREEN));
             println("");
         }

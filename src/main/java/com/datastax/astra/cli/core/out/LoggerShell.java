@@ -19,16 +19,42 @@ import com.datastax.astra.cli.core.CliContext;
  * @author Cedrick Lunven (@clunven)
  */
 public class LoggerShell {
-	
+    
+    /** Info String. */
+    private static final String INFO  = "[INFO]  - ";
+    
+    /** Info String. */
+    private static final String INFO_CYAN = ansi().fg(CYAN).a(INFO).reset().toString();
+    
+    /** Error String. */
+    private static final String ERROR = "[ERROR] - ";
+    
+    /** Info String. */
+    private static final String ERROR_RED = ansi().fg(RED).a(ERROR).reset().toString();
+    
+    /** Warning String. */
+    private static final String WARNING = "[WARN]  - ";
+    
+    /** Info String. */
+    private static final String WARNING_YELLOW = ansi().fg(YELLOW).a(WARNING).reset().toString();
+    
+    /** Info String. */
+    private static final String SUCCESS  = "[OK]    - ";
+    
+    /** Info String. */
+    private static final String SUCCESS_GREEN = ansi().fg(GREEN).a(GREEN).reset().toString();
+    
+    /** Warning String. */
+    private static final String DEBUG = "[DEBUG] - ";
+    
     /** Using sl4j to access console, eventually pushing to file as well. */
-    private static Logger LOGGER = LoggerFactory.getLogger(LoggerShell.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggerShell.class);
     
 	/**
 	 * Hide default  constructor.
 	 */
 	private LoggerShell() {}
 	
-    
     /**
      * Syntax sugar for OK.
      * 
@@ -36,11 +62,27 @@ public class LoggerShell {
      *      text to show in success
      */
     public static void success(String text) {
-        if (ctx().getOutputFormat().equals(OutputFormat.human)) {
-            if (CliContext.getInstance().isNoColor()) {
-                LOGGER.info("[INFO ] - " + text);
+        if (isHuman()) {
+            if (isColor()) {
+                LOGGER.info(SUCCESS_GREEN + text);
             } else {
-                LOGGER.info(ansi().fg(GREEN).a("[ INFO ] - ").reset().a(text).toString());
+                LOGGER.info(SUCCESS + text);
+            }
+        }
+    }
+    
+    /**
+     * Syntax sugar for OK.
+     *
+     * @param text
+     *      text to show in success
+     */
+    public static void info(String text) {
+        if (isHuman()) {
+            if (isColor()) {
+                LOGGER.info(INFO_CYAN + text);
+            } else {
+                LOGGER.info(INFO + text);
             }
         }
     }
@@ -52,12 +94,40 @@ public class LoggerShell {
      *       text to be displayed
      */
     public static void error(String text) {
-        if (ctx().isNoColor() && ctx().getOutputFormat().equals(OutputFormat.human)) {
-            LOGGER.info("[ERROR] - " + text);
-        } else {
-            LOGGER.info(ansi().fg(RED)
-                    .a("[ERROR] - ").reset()
-                    .a(text).toString());
+        if (isHuman()) {
+            if (isColor()) {
+                LOGGER.info(ERROR_RED + text);
+            } else {
+                LOGGER.info(ERROR + text);
+            }
+        }
+    }
+    
+    /**
+     * Log warning.
+     *
+     * @param text
+     *       text to be displayed
+     */
+    public static void warning(String text) {
+        if (isHuman()) {
+            if (isColor()) {
+                LOGGER.info(WARNING_YELLOW + text);
+            } else {
+                LOGGER.info(WARNING + text);
+            }
+        }
+    }
+    
+    /**
+     * Syntax sugar for OK.
+     * 
+     * @param text
+     *      text to show in success
+     */
+    public static void debug(String text) {
+        if (CliContext.getInstance().isVerbose()) {
+            LOGGER.info(DEBUG + text);
         }
     }
     
@@ -72,73 +142,36 @@ public class LoggerShell {
      *      current error message
      */
     public static void exception (Exception e, String cmd, String customMessage) {
-       if (customMessage != null) {
+       if (customMessage != null)
            error(customMessage);
-       }
        error(e.getMessage() + " ("+ e.getClass().getSimpleName() + ")");
-       
        error("Try 'astra help " + cmd + "' to get help");
-       if (ctx().isVerbose()) {
-           Arrays.asList(e.getStackTrace())
-                 .stream()
-                 .forEach(System.out::println);
-       }
-    }
-    
-    /**
-     * Log warning.
-     *
-     * @param text
-     *       text to be displayed
-     */
-    public static void warning(String text) {
-        if (ctx().isNoColor() && ctx().getOutputFormat().equals(OutputFormat.human)) {
-            LOGGER.info("[WARN ] - " + text);
-        } else {
-            LOGGER.info(ansi().fg(YELLOW).a("[WARN ] - ").reset().a(text).toString());
-        }
-    }
-    
-    /**
-     * Syntax sugar for OK.
-     * 
-     * @param text
-     *      text to show in success
-     */
-    public static void debug(String text) {
-        if (ctx().isVerbose() && ctx().getOutputFormat().equals(OutputFormat.human)) {
-            if (ctx().isNoColor()) {
-                LOGGER.info("[DEBUG] - " + text);
-            } else {
-                LOGGER.info(ansi().fg(YELLOW).a("[DEBUG] - ").reset().a(text).toString());
-            }
-        }
-    }
-    
-    /**
-     * Syntax sugar for OK.
-     *
-     * @param text
-     *      text to show in success
-     */
-    public static void info(String text) {
-        if (ctx().isVerbose() && ctx().getOutputFormat().equals(OutputFormat.human)) {
-            if (ctx().isNoColor()) {
-                LOGGER.info("[INFO ] - " + text);
-            } else {
-                LOGGER.info(ansi().fg(CYAN).a("[INFO ] - ").reset().a(text).toString());
-            }
-        }
+       if (CliContext.getInstance().isVerbose())
+           Arrays.stream(e.getStackTrace()).forEach(System.out::println);
     }
     
     /**
      * Get context.
      *
      * @return
-     *      cli context
+     *      if you should print becasue human output
      */
-    private static CliContext ctx() {
-        return CliContext.getInstance();
+    private static boolean isHuman() {
+        return CliContext.getInstance()
+                         .getOutputFormat()
+                         .equals(OutputFormat.human);
+    }
+    
+    
+    /**
+     * Get context.
+     *
+     * @return
+     *      if you should print becasue human output
+     */
+    private static boolean isColor() {
+        return !CliContext.getInstance()
+                         .isNoColor();
     }
     
 }
