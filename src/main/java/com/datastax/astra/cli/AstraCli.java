@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.datastax.astra.cli.db.*;
+import com.datastax.astra.cli.db.dsbulk.DbDsBulkCmd;
 import org.fusesource.jansi.AnsiConsole;
 
 import com.datastax.astra.cli.config.ConfigCreateCmd;
@@ -116,7 +117,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // DsBulk
-        DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
+         DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class, DbDsBulkCmd.class,
          // Cqlshell
          DbCqlShellCmd.class,
      }),

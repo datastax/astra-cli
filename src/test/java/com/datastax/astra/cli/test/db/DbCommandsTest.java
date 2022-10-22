@@ -1,12 +1,13 @@
 package com.datastax.astra.cli.test.db;
 
+import java.io.File;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Assertions;
+import com.datastax.astra.cli.db.cqlsh.CqlShellService;
+import com.datastax.astra.cli.db.dsbulk.DsBulkService;
+import com.datastax.astra.cli.utils.AstraCliUtils;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.db.DatabaseDao;
@@ -22,6 +23,24 @@ import com.datastax.astra.cli.test.AbstractCmdTest;
 public class DbCommandsTest extends AbstractCmdTest {
     
     static String DB_TEST = "astra_cli_test";
+
+    /** Use to disable usage of CqlSh, Dsbulk and other during test for CI/CD. */
+    public final static String FLAG_TOOLS = "disable_tools";
+
+    /** flag coding for tool disabling. */
+    public static boolean disableTools = false;
+
+    /** dataset. */
+    public final static String TABLE_TEST = "test_dsbulk";
+
+    @BeforeAll
+    public static void should_create_when_needed() {
+        readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.parseBoolean(flag));
+        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+        if (!disableTools) {
+            System.out.println("Third party tools are enabled in test");
+        }
+    }
     
     @Test
     @Order(1)
@@ -110,11 +129,76 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertSuccessCli("db download-scb %s -f %s".formatted(DB_TEST, "/tmp/sample.zip"));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db download-scb %s".formatted("invalid"));
     }
-    
+
     @Test
     @Order(8)
-    public void should_resumedb()  {
+    public void testShould_createDotenv()  {
+        assertSuccessCli("db create-dotenv %s -d %s".formatted(DB_TEST, "/tmp/"));
+        Assertions.assertTrue(new File("/tmp/.env").exists());
+    }
+    
+    @Test
+    @Order(9)
+    public void should_resume_db()  {
         assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
     }
-   
+
+    @Test
+    @Order(10)
+    public void should_install_Cqlsh() {
+        if (!disableTools) {
+            new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra").delete();
+            CqlShellService.getInstance().install();
+            Assertions.assertTrue(CqlShellService.getInstance().isInstalled());
+        }
+    }
+
+    @Test
+    @Order(11)
+    public void testShould_start_shell() {
+        if (!disableTools) {
+            assertSuccessCli("db", "cqlsh", DB_TEST,
+                    "-e", "SELECT cql_version FROM system.local");
+        }
+    }
+
+    @Test
+    @Order(12)
+    public void should_install_dsbulk() {
+        if (!disableTools) {
+            // delete previous install
+            new File(AstraCliUtils.ASTRA_HOME + File.separator
+                    + "dsbulk-"
+                    + AstraCliUtils.readProperty("dsbulk.version")).delete();
+            // install
+            DsBulkService.getInstance().install();
+            Assertions.assertTrue(DsBulkService.getInstance().isInstalled());
+        }
+    }
+
+    @Test
+    @Order(13)
+    public void testShould_count() {
+        if (!disableTools) {
+            // Given
+            assertSuccessCli("db", "create", DB_TEST, "--if-not-exists", "--wait");
+            // Cqlsh is installed if needed
+            assertSuccessCli("db", "cqlsh", DB_TEST, "-e", ""
+                    + "CREATE TABLE IF NOT EXISTS "
+                    + DB_TEST + "." + TABLE_TEST + "(id text PRIMARY KEY);"
+                    + "INSERT INTO " + DB_TEST + "." + TABLE_TEST
+                    + "(id) VALUES('a');");
+            // When
+            assertSuccessCli("db", "count", DB_TEST,
+                    "-k", DB_TEST,
+                    "-t", TABLE_TEST,
+                    "-logDir", "/tmp");
+        }
+    }
+
+    @Test
+    @Order(14)
+    public void should_delete_db()  {
+        assertSuccessCli("db delete %s".formatted(DB_TEST));
+    }
 }

@@ -24,13 +24,16 @@ import com.datastax.astra.sdk.databases.domain.Database;
 public class DsBulkService  {
     
     /** Operations. */
-    public enum DsBulkOperations { load, unload, count };
+    public enum DsBulkOperations { load, unload, count }
     
     /** DSbulk configuration. */
     DsBulkConfig config;
     
     /** Installation folder. */
     File dsbulkLocalFolder;
+
+    /** Local installation for Dsbulk. */
+    String dsbulkExecutable;
     
     /** Access to databases object. */
     DatabaseDao dbDao;
@@ -66,6 +69,9 @@ public class DsBulkService  {
         this.dsbulkLocalFolder = new File(AstraCliUtils.ASTRA_HOME 
                 + File.separator 
                 + "dsbulk-" + config.version());
+
+        this.dsbulkExecutable = dsbulkLocalFolder.getAbsolutePath() +
+               File.separator + "bin" + File.separator + "dsbulk";
     }
     
     /**
@@ -80,53 +86,24 @@ public class DsBulkService  {
     }
     
     /**
-     * Download targz and unzip.
-     * 
-     * @return
-     *      if an installation was required or not
+     * Download archive and extract it.
      */
-    public boolean install() {
-        if (!isInstalled()) {
-            LoggerShell.success("dsbulk first launch, downloading (~25MB), please wait...");
-            String destination = AstraCliUtils.ASTRA_HOME 
-                    + File.separator + "dsbulk-" 
-                    + config.version() + ".tar.gz";
-            FileUtils.downloadFile(config.url() + "dsbulk-" + config.version() + ".tar.gz", destination);
-            File dsbulkTarball = new File (destination);
-            if (dsbulkTarball.exists()) {
-                LoggerShell.info("File Downloaded. Extracting archive, please wait...");
-                try {
-                    FileUtils.extactTargzInAstraCliHome(dsbulkTarball);
-                    if (isInstalled()) {
-                        // Change file permission
-                        File dsBulkFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  
-                                + "dsbulk-" + config.version() + File.separator 
-                                + "bin" + File.separator  
-                                + "dsbulk");
-                        if (!dsBulkFile.setExecutable(true, false)) {
-                            throw new FileSystemException("Cannot set dsbulk file as executable");
-                        }
-                        if (!dsBulkFile.setReadable(true, false)) {
-                            throw new FileSystemException("Cannot set dsbulk file as readable");
-                        }
-                        if (!dsBulkFile.setWritable(true, false)) {
-                            throw new FileSystemException("Cannot set dsbulk file as writable");
-                        }
-                        LoggerShell.success("DSBulk has been installed");
-                        if (!dsbulkTarball.delete()) {
-                            LoggerShell.warning("DSBulk Tar archived was not deleted");
-                        }
-                    }
-                } catch (IOException e) {
-                    LoggerShell.error("Cannot extract tar archive:" + e.getMessage());
-                        throw new FileSystemException("Cannot extract tar archive:" + e.getMessage(), e);
-                }
+    public void install() {
+        try {
+            LoggerShell.info("Downloading Dsbulk, please wait...");
+            String tarArchive = AstraCliUtils.ASTRA_HOME + File.separator + "dsbulk-" + config.version() + ".tar.gz";
+            FileUtils.downloadFile(config.url() + "dsbulk-" + config.version() + ".tar.gz", tarArchive);
+
+            LoggerShell.info("Installing  archive, please wait...");
+            FileUtils.extactTargzInAstraCliHome(new File(tarArchive));
+            if (!new File(dsbulkExecutable).setExecutable(true, false)) {
+                throw new FileSystemException("Cannot make dsbulk executable. ");
             }
-        } else {
-            LoggerShell.info("DSBulk is already installed");
-            return false;
+            if (new File(tarArchive).delete())
+                LoggerShell.success("DSBulk has been installed");
+        } catch (IOException e) {
+            throw new FileSystemException("Cannot install CqlShell :" + e.getMessage(), e);
         }
-        return true;
     }
 
     /**
@@ -139,11 +116,7 @@ public class DsBulkService  {
      */
     private List<String> initCommandLine(DsBulkOperations op) {
         List<String> dsbulk = new ArrayList<>();
-        dsbulk.add(new StringBuilder()
-                .append(dsbulkLocalFolder.getAbsolutePath())
-                .append(File.separator + "bin")
-                .append(File.separator + "dsbulk")
-                .toString());
+        dsbulk.add(dsbulkExecutable);
         dsbulk.add(op.name());
         return dsbulk;
     }
@@ -151,14 +124,12 @@ public class DsBulkService  {
     /**
      * All DSBulkd command will start with.
      * 
-     * @paran options
+     * @param options
      *      add core options
      * @param cmd
      *      target
-     * @return
-     *      first part of command
      */
-    private List<String> addCoreOptions(List<String> options, AbstractDsbulkCmd cmd) {
+    private void addCoreOptions(List<String> options, AbstractDsbulkCmd cmd) {
         // Keyspace
         if (null != cmd.keyspace) {
             options.add("-k");
@@ -192,6 +163,17 @@ public class DsBulkService  {
         // Concurrent queries
         options.add("-maxConcurrentQueries");
         options.add(cmd.maxConcurrentQueries);
+    }
+
+    /**
+     * Add user, password and scb to command line.
+     *
+     * @param dbName
+     *      database name
+     * @param options
+     *      options
+     */
+    private void addCredentialsOptions(List<String> options, String dbName) {
         // User
         options.add("-u");
         options.add("token");
@@ -200,16 +182,13 @@ public class DsBulkService  {
         options.add(CliContext.getInstance().getToken());
         // Cloud Secure bundle
         options.add("-b");
-        Database db = dbDao.getDatabase(cmd.getDb());
-        File scb = new File(new StringBuilder()
-                .append(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator)
-                .append(AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()))
-                .toString());
+        Database db = dbDao.getDatabase(dbName);
+        File scb = new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
+                AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()));
         if (!scb.exists()) {
             throw new SecureBundleNotFoundException(scb.getAbsolutePath());
         }
         options.add(scb.getAbsolutePath());
-        return options;
     }
     
     /**
@@ -247,11 +226,11 @@ public class DsBulkService  {
      */
     public void load(DbLoadCmd cmd) {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.load);
+        addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
-        if (cmd.dryRun) {
+        if (cmd.dryRun)
             dsbulkCmd.add("-dryRun");   
-        }
         run(dsbulkCmd, cmd.getDb());
     }
     
@@ -263,6 +242,7 @@ public class DsBulkService  {
      */
     public void count(DbCountCmd cmd) {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.count);
+        addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         run(dsbulkCmd, cmd.getDb());
     }
@@ -275,35 +255,47 @@ public class DsBulkService  {
      */
     public void unload(DbUnLoadCmd cmd) {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.unload);
+        addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
         run(dsbulkCmd, cmd.getDb());
     }
-    
+
+    /**
+     * Run raw dsbulk command, astra db dsbulk dbname load -url ...
+     *
+     * @param options
+     *      command line as provided by user dbName, dbOperaton,dbOptions
+     */
+    public void runRaw(List<String> options) {
+        List<String> commandDsbulk = new ArrayList<>();
+        commandDsbulk.add(dsbulkExecutable);
+        commandDsbulk.addAll(options.subList(1, options.size()));
+        addCredentialsOptions(commandDsbulk, options.get(0));
+        run(commandDsbulk, options.get(0));
+    }
+
     /**
      * Run DSBulk.
      * 
      * @param commandDsbulk
      *      current command line
-     * @param dbName
+     * @param database
      *      current db name
      */
-    public void run(List<String> commandDsbulk, String dbName) {
-        if (!isInstalled()) {
-            install();
-        }
-        // Download scb (if needed)
-        dbDao.downloadCloudSecureBundles(dbName);
+    public void run(List<String> commandDsbulk, String database) {
+        System.out.println(commandDsbulk);
+
+        // Install Cqlsh for Astra and set permissions
+        if (!isInstalled()) install();
+
+        // Download scb and throw DatabaseNotFound.
+        dbDao.downloadCloudSecureBundles(database);
+
         try {
-            System.out.println("\nDSBulk is starting please wait ...");
             LoggerShell.info("RUNNING: " + String.join(" ", commandDsbulk));
-            ProcessBuilder pb = new ProcessBuilder(commandDsbulk.toArray(new String[0]));
-            pb.inheritIO();
-            Process dsbulkProc = pb.start();
-            if (dsbulkProc == null) {
-                throw new CannotStartProcessException("dsbulk");
-            }
-            dsbulkProc.waitFor();
+            LoggerShell.info("\nDSBulk is starting please wait ...");
+            new ProcessBuilder(commandDsbulk.toArray(new String[0])).inheritIO().start().waitFor();
         } catch (Exception e) {
             Thread.currentThread().interrupt();
             throw new CannotStartProcessException("dsbulk", e);

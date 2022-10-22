@@ -52,8 +52,8 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
      * Provide a limit to the wait period in seconds, default is 180s. 
      */
     @Option(name = { "--timeout" }, 
-            description = "Provide a limit to the wait period in seconds, default is 180s.")
-    protected int timeout = 180;
+            description = "Provide a limit to the wait period in seconds, default is 300s.")
+    protected int timeout = 300;
     
     /** {@inheritDoc} */
     @Override

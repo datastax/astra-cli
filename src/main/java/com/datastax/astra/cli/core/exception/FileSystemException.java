@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.core.exception;
 
+import java.io.Serial;
+
 /**
  * Cannot create or read files on hard disk drive
  *
@@ -8,14 +10,9 @@ package com.datastax.astra.cli.core.exception;
 public class FileSystemException extends RuntimeException {
 
     /** Serial. */
+    @Serial
     private static final long serialVersionUID = -1631087992604077795L;
 
-    /**
-     * Default constructor
-     */
-    public FileSystemException() {
-    }
-    
     /**
      * Constructor with token
      * 
@@ -24,18 +21,18 @@ public class FileSystemException extends RuntimeException {
      */
     public FileSystemException(String msg) {
         super(msg);
-    }    
-    
+    }
+
     /**
      * Constructor with token
-     * 
-     * @param msg
-     *      error message
-     * @param parent
+     *
+     * @param e
      *      parent exception
+     * @param msg
+     *       error message
      */
-    public FileSystemException(String msg, Throwable parent) {
-        super(msg, parent);
+    public FileSystemException(String msg, Exception e) {
+        super(msg, e);
     }
 
 }

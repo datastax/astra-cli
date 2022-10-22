@@ -42,12 +42,7 @@ public class CsvOutput implements Serializable{
      * Rows in CSV
      */
     private List<Map<String, String >> rows = new ArrayList<>();
-    
-    /**
-     * Default constructor.
-     */
-    public CsvOutput() {}
-    
+
     /**
      * Show errors as CSV.
      * 
@@ -63,18 +58,18 @@ public class CsvOutput implements Serializable{
        error.put(ERROR_MESSAGE_COLUMN, errorMessage);
        rows.add(error);
     }
-    
+
     /**
      * Show data as CSV.
-     * 
+     *
      * @param headers
      *      target headers
      * @param rows
      *      list of rows
      */
     public CsvOutput(List< String > headers, List<Map<String, String >> rows) {
-       this.rows    = rows;
-       this.headers = headers;
+        this.rows    = rows;
+        this.headers = headers;
     }
     
     /**

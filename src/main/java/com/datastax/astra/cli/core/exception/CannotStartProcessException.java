@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.core.exception;
 
+import java.io.Serial;
+
 /**
  * Exception throws when third party process cannot start.
  *
@@ -8,33 +10,19 @@ package com.datastax.astra.cli.core.exception;
 public class CannotStartProcessException extends RuntimeException {
 
     /** Serial. */
+    @Serial
     private static final long serialVersionUID = 3366100557983747828L;
 
     /**
-     * Default constructor
-     */
-    public CannotStartProcessException() {}
-    
-    /**
-     * Constructor with token
-     * 
-     * @param proc
-     *      proc token
-     */
-    public CannotStartProcessException(String proc) {
-        super("Cannot start process '" + proc + "' is invalid");
-    }
-    
-    /**
      * Constructor with process
      * 
-     * @param proc
-     *      invalid token
+     * @param process
+     *      process name
      * @param parent
      *      parent exception
      */
-    public CannotStartProcessException(String proc, Throwable parent) {
-        super("Cannot start process '" + proc + "' is invalid: " + parent.getMessage(), parent);
+    public CannotStartProcessException(String process, Throwable parent) {
+        super("Cannot start process '%s', error:%s".formatted(process, parent.getMessage()), parent);
     }
     
 }

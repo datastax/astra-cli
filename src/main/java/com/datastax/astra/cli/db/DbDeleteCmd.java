@@ -14,8 +14,7 @@ import com.github.rvesse.airline.annotations.Command;
 public class DbDeleteCmd extends AbstractDatabaseCmd {
     
     /** {@inheritDoc} */
-    public void execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
+    public void execute() {
         dbServices.deleteDb(db);
     }
     

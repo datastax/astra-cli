@@ -536,7 +536,9 @@
 ,
   {
     "name":"com.github.rvesse.airline.help.Help",
-    "allDeclaredFields":true}
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  }
 ,
   {
     "name":"com.github.rvesse.airline.types.DefaultTypeConverterProvider",

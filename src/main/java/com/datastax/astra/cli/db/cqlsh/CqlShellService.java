@@ -1,22 +1,19 @@
 package com.datastax.astra.cli.db.cqlsh;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.DatabaseDao;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.SecureBundleNotFoundException;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.domain.Database;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Working with external cqlsh.
@@ -25,18 +22,27 @@ import com.datastax.astra.sdk.databases.domain.Database;
  */
 public class CqlShellService {
 
-    /** Configutation to Donwload the archive. */
+    /** Patch for cqlShell. */
+    private static final String VERSION_TO_REPLACE = "|| [ \"$version\" = \"2.7\" ]";
+
+    /** Patch for cqlShell. */
+    private static final String VERSION_REPLACED = "|| [ \"$version\" = \"3.10\" ] || [ \"$version\" \\> \"3.10\" ] || [ \"$version\" = \"2.7\" ]";
+
+    /** Configuration to Download the archive. */
     CqlShellConfig settings;
 
     /** Access to Database client */
     DatabaseDao dbDao;
     
-    /** Local installation for CqlSh. */
+    /** Local installation folder for CqlSh. */
     File cqlshLocalFolder;
-    
+
+    /** Local installation for CqlSh. */
+    String cqlshExecutable;
+
     /** Singleton Pattern. */
     private static CqlShellService instance;
-    
+
     /**
      * Singleton Pattern.
      * 
@@ -60,12 +66,13 @@ public class CqlShellService {
                 AstraCliUtils.readProperty("cqlsh.url"),
                 AstraCliUtils.readProperty("cqlsh.tarball"));
                 
-        cqlshLocalFolder = new File(AstraCliUtils.ASTRA_HOME 
-                + File.separator + "cqlsh-astra");
+        cqlshLocalFolder = new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra");
+
+        cqlshExecutable = cqlshLocalFolder.getAbsolutePath() + File.separator + "bin" + File.separator + "cqlsh";
     }
     
     /**
-     * Check if cqlshel has been installed.
+     * Check if cqlshell has been installed.
      *
      * @return
      *      if the folder exist
@@ -73,74 +80,78 @@ public class CqlShellService {
     public boolean isInstalled() {
        return cqlshLocalFolder.exists() && cqlshLocalFolder.isDirectory();
     }
-    
+
     /**
-     * Download targz and unzip.
+     * Waiting for a fix at Cqlsh-Astra system
      */
-    public void install() {
-        if (!isInstalled()) {
-            LoggerShell.info("CqlSh has not been found, downloading, please wait...");
-            String destination = AstraCliUtils.ASTRA_HOME + File.separator + settings.tarball();
-            FileUtils.downloadFile(settings.url(), destination);
-            File tarArchive = new File (destination);
-            if (tarArchive.exists()) {
-                LoggerShell.info("File Downloaded. Extracting archive, please wait...");
-                try {
-                    FileUtils.extactTargzInAstraCliHome(tarArchive);
-                    if (isInstalled()) {
-                        // Change file permission
-                        File cqlshFile = new File(cqlshLocalFolder.getAbsolutePath() + File.separator 
-                                + "bin" + File.separator  
-                                + "cqlsh");
-                        if (!cqlshFile.setExecutable(true, false)) {
-                            throw new FileSystemException("Cannot set cqlsh file as executable");
-                        }
-                        if (!cqlshFile.setReadable(true, false)) {
-                            throw new FileSystemException("Cannot set cqlsh file as readable");
-                        }
-                        if (!cqlshFile.setWritable(true, false)) {
-                            throw new FileSystemException("Cannot set cqlsh file as writable");
-                        }
-                        LoggerShell.success("Cqlsh has been installed");
-                        if (!tarArchive.delete()) {
-                            LoggerShell.warning("Cqlsh Tar archived was not deleted");
+    public void patchCqlshInstallation() {
+        String workingDirectory = cqlshLocalFolder.getAbsolutePath() + File.separator + "bin" + File.separator;
+        File originalCqlsh = new File(cqlshExecutable);
+        File originalCqlshRenamed = new File(workingDirectory + "cqlsh_old");
+        boolean renamedTo = originalCqlsh.renameTo(originalCqlshRenamed);
+        if (!renamedTo) {
+            throw new FileSystemException("Cannot rename cqlsh executable to path it.");
+        }
+        try(FileInputStream fis = new FileInputStream(originalCqlshRenamed)) {
+            try(BufferedReader in = new BufferedReader(new InputStreamReader(fis))) {
+                try(FileWriter fw = new FileWriter(originalCqlsh, true)) {
+                    try(BufferedWriter out = new BufferedWriter(fw)) {
+                        String aLine;
+                        while ((aLine = in.readLine()) != null) {
+                            out.write(aLine.replace(VERSION_TO_REPLACE, VERSION_REPLACED));
+                            out.newLine();
                         }
                     }
-                } catch (IOException e) {
-                    LoggerShell.error("Cannot extract tar archive:" + e.getMessage());
-                    throw new FileSystemException("Cannot extract tar archive:" + e.getMessage(), e);
                 }
             }
-        } else {
-            LoggerShell.info("Cqlsh is already installed");
+        } catch (FileNotFoundException e) {
+            throw new FileSystemException("Cannot find cql file to patch it", e);
+        } catch (IOException e) {
+            throw new FileSystemException("Cannot edit cql executable to patch it", e);
+        }
+    }
+
+    /**
+     * Download tar archive and decompress.
+     */
+    public void install() {
+        try {
+            LoggerShell.info("Downloading Cqlshell, please wait...");
+            String tarArchive = AstraCliUtils.ASTRA_HOME + File.separator + settings.tarball();
+            FileUtils.downloadFile(settings.url(), tarArchive);
+
+            LoggerShell.info("Installing  archive, please wait...");
+            FileUtils.extactTargzInAstraCliHome(new File(tarArchive));
+            patchCqlshInstallation();
+            if (!new File(cqlshExecutable).setExecutable(true, false)) {
+                throw new FileSystemException("Cannot make cqlshell executable. ");
+            }
+            if (new File(tarArchive).delete())
+                LoggerShell.success("Cqlsh has been installed");
+        } catch (IOException e) {
+            throw new FileSystemException("Cannot install CqlShell :" + e.getMessage(), e);
         }
     }
     
     /**
-     * Initialize DSBulk command line.
+     * Initialize CqlShell command line.
      *
-     * @param op
-     *      current operation
+     * @param options
+     *      options in the command line
+     * @param db
+     *      current database
      * @return
      *      command line
      */
     private List<String> buildCommandLine(CqlShellOption options, Database db) {
         List<String> cqlSh = new ArrayList<>();
-        cqlSh.add(new StringBuilder()
-                .append(cqlshLocalFolder.getAbsolutePath())
-                .append(File.separator + "bin")
-                .append(File.separator + "cqlsh")
-                .toString());
+        cqlSh.add(cqlshExecutable);
         // Credentials
-        cqlSh.add("-u");
-        cqlSh.add("token");
-        cqlSh.add("-p");
-        cqlSh.add(CliContext.getInstance().getToken());
+        cqlSh.add("-u");cqlSh.add("token");
+        cqlSh.add("-p");cqlSh.add(CliContext.getInstance().getToken());
         cqlSh.add("-b");
-        File scb = new File(new StringBuilder()
-                .append(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator)
-                .append(AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()))
-                .toString());
+        File scb = new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
+                AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()));
         if (!scb.exists()) {
             LoggerShell.error("Cloud Secure Bundle '" + scb.getAbsolutePath() + "' has not been found.");
                     throw new SecureBundleNotFoundException(scb.getAbsolutePath());
@@ -148,13 +159,10 @@ public class CqlShellService {
         cqlSh.add(scb.getAbsolutePath());
         
         // -- Custom options of Cqlsh itself
-        
-        if (options.debug()) {
+        if (options.debug())
             cqlSh.add("--debug");
-        }
-        if (options.version()) {
+        if (options.version())
             cqlSh.add("--version");
-        }
         if (options.execute() != null) {
             cqlSh.add("-e");
             cqlSh.add(options.execute());
@@ -181,37 +189,20 @@ public class CqlShellService {
      *      shell options
      * @param database
      *      current db
-     * @throws DatabaseNameNotUniqueException 
-     *      error if db name is not unique
-     * @throws DatabaseNotFoundException 
-     *      error is db is not found
-     * @throws CannotStartProcessException
-     *      cannot start third party process
-     * @throws FileSystemException
-     *      cannot access file system 
      */
     public void run(CqlShellOption options, String database) {
         
         // Install Cqlsh for Astra and set permissions
-        if (!isInstalled()) {
-            install();
-        }
+        if (!isInstalled()) install();
         
         // Download scb and throw DatabaseNotFound.
         dbDao.downloadCloudSecureBundles(database);    
         
         try {
             List <String > commands = buildCommandLine(options, dbDao.getDatabase(database));
-            LoggerShell.info("RUNNING: " + String.join(" ", commands));
-            
-            System.out.println("\nCqlsh is starting please wait for connection establishment...");
-            ProcessBuilder pb = new ProcessBuilder(commands.toArray(new String[0]));
-            pb.inheritIO();
-            Process cqlshProc = pb.start();
-            if (cqlshProc == null) {
-                throw new CannotStartProcessException("cqlsh");
-            }
-            cqlshProc.waitFor();
+            LoggerShell.debug("RUNNING: " + String.join(" ", commands));
+            LoggerShell.info("\nCqlsh is starting, please wait for connection establishment...");
+            new ProcessBuilder(commands.toArray(new String[0])).inheritIO().start().waitFor();
         } catch (Exception e) {
             Thread.currentThread().interrupt();
             throw new CannotStartProcessException("cqlsh", e);

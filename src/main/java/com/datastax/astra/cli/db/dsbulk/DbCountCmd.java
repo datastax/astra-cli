@@ -16,5 +16,4 @@ public class DbCountCmd extends AbstractDsbulkDataCmd {
         DsBulkService.getInstance().count(this);
     }
 
-
 }
