@@ -1,10 +1,5 @@
 package com.datastax.astra.cli.db.dsbulk;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
@@ -16,17 +11,55 @@ import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.domain.Database;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Working with external DSBulk.
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
 public class DsBulkService  {
-    
+
+    /** prefix in definition. */
+    static final String DSBULK_PREFIX = "dsbulk-";
+
     /** Operations. */
-    public enum DsBulkOperations { load, unload, count }
+    public enum DsBulkOperations {
+        /** Load operation. */
+        LOAD("load"),
+        /** Unload operation. */
+        UNLOAD("unload"),
+        /** Count operation. */
+        COUNT("count");
+
+        /** internal op value. */
+        private final String op;
+
+        /**
+         * Constructor.
+         *
+         * @param op
+         *      value for op
+         */
+        DsBulkOperations(String op) {
+           this.op = op;
+        }
+
+        /**
+         * Getter for Op.
+         *
+         * @return
+         *      value of op.
+         */
+        public String getOp() {
+            return op;
+        }
+    }
     
-    /** DSbulk configuration. */
+    /** dsbulk configuration. */
     DsBulkConfig config;
     
     /** Installation folder. */
@@ -68,7 +101,7 @@ public class DsBulkService  {
         
         this.dsbulkLocalFolder = new File(AstraCliUtils.ASTRA_HOME 
                 + File.separator 
-                + "dsbulk-" + config.version());
+                + DSBULK_PREFIX + config.version());
 
         this.dsbulkExecutable = dsbulkLocalFolder.getAbsolutePath() +
                File.separator + "bin" + File.separator + "dsbulk";
@@ -78,7 +111,7 @@ public class DsBulkService  {
      * Check if DSBulk is installed locally.
      * 
      * @return
-     *      dskbulk folder is detected
+     *      dsbulk folder is detected
      */
     public boolean isInstalled() {
         return dsbulkLocalFolder.exists() && 
@@ -91,8 +124,8 @@ public class DsBulkService  {
     public void install() {
         try {
             LoggerShell.info("Downloading Dsbulk, please wait...");
-            String tarArchive = AstraCliUtils.ASTRA_HOME + File.separator + "dsbulk-" + config.version() + ".tar.gz";
-            FileUtils.downloadFile(config.url() + "dsbulk-" + config.version() + ".tar.gz", tarArchive);
+            String tarArchive = AstraCliUtils.ASTRA_HOME + File.separator + DSBULK_PREFIX + config.version() + ".tar.gz";
+            FileUtils.downloadFile(config.url() + DSBULK_PREFIX + config.version() + ".tar.gz", tarArchive);
 
             LoggerShell.info("Installing  archive, please wait...");
             FileUtils.extactTargzInAstraCliHome(new File(tarArchive));
@@ -117,12 +150,12 @@ public class DsBulkService  {
     private List<String> initCommandLine(DsBulkOperations op) {
         List<String> dsbulk = new ArrayList<>();
         dsbulk.add(dsbulkExecutable);
-        dsbulk.add(op.name());
+        dsbulk.add(op.getOp());
         return dsbulk;
     }
     
     /**
-     * All DSBulkd command will start with.
+     * All dsbulk command will start with.
      * 
      * @param options
      *      add core options
@@ -157,7 +190,7 @@ public class DsBulkService  {
         // Reducing log level
         options.add("--log.verbosity");
         options.add("normal");
-        // Allo Missing fields
+        // Allow missing fields
         options.add("--schema.allowMissingFields");
         options.add("true");
         // Concurrent queries
@@ -225,7 +258,7 @@ public class DsBulkService  {
      *      command to be executed
      */
     public void load(DbLoadCmd cmd) {
-        List<String> dsbulkCmd = initCommandLine(DsBulkOperations.load);
+        List<String> dsbulkCmd = initCommandLine(DsBulkOperations.LOAD);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
@@ -241,7 +274,7 @@ public class DsBulkService  {
      *      current command line
      */
     public void count(DbCountCmd cmd) {
-        List<String> dsbulkCmd = initCommandLine(DsBulkOperations.count);
+        List<String> dsbulkCmd = initCommandLine(DsBulkOperations.COUNT);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         run(dsbulkCmd, cmd.getDb());
@@ -254,7 +287,7 @@ public class DsBulkService  {
      *      current command line
      */
     public void unload(DbUnLoadCmd cmd) {
-        List<String> dsbulkCmd = initCommandLine(DsBulkOperations.unload);
+        List<String> dsbulkCmd = initCommandLine(DsBulkOperations.UNLOAD);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
@@ -265,7 +298,7 @@ public class DsBulkService  {
      * Run raw dsbulk command, astra db dsbulk dbname load -url ...
      *
      * @param options
-     *      command line as provided by user dbName, dbOperaton,dbOptions
+     *      command line as provided by user dbName, dbOperation,dbOptions
      */
     public void runRaw(List<String> options) {
         List<String> commandDsbulk = new ArrayList<>();

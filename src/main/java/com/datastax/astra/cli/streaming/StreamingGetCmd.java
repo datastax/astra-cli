@@ -1,11 +1,14 @@
 package com.datastax.astra.cli.streaming;
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
+
+import java.util.Arrays;
 
 /**
  * Display information relative to a db.
@@ -16,15 +19,50 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public class StreamingGetCmd extends AbstractConnectedCmd {
 
     /** Enum for db get. */
-    public static enum StreamingGetKeys { 
+    public enum StreamingGetKeys {
         /** tenant status */
-        status, 
+        STATUS("status"),
         /** cloud provider*/
-        cloud, 
+        CLOUD("cloud"),
         /** pulsar token */
-        pulsar_token,
+        PULSAR_TOKEN("pulsar_token"),
         /** cloud region */
-        region};
+        REGION("region");
+
+        /** hold code value. */
+        private final String key;
+
+        /**
+         * Default constructor.
+         *
+         * @param key
+         *      key value
+         */
+        StreamingGetKeys(String key) {
+            this.key = key;
+        }
+
+        /**
+         * Access key value.
+         * @return
+         *      key value
+         */
+        public String getKey() {
+            return key;
+        }
+
+        /**
+         * Create on from code.
+         *
+         * @param key
+         *      key value.
+         * @return
+         *      instance of get key
+         */
+        public static StreamingGetKeys fromKey(String key) {
+            return StreamingGetKeys.valueOf(key.toUpperCase());
+        }
+    }
     
     /** name of the DB. */
     @Required
@@ -35,12 +73,25 @@ public class StreamingGetCmd extends AbstractConnectedCmd {
     @Option(name = { "-k", "--key" }, title = "Key", description = ""
             + "Show value for a property among: "
             + "'status', 'cloud', 'pulsar_token', 'region'")
-    protected StreamingGetKeys key;
+    protected String key;
     
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        OperationsStreaming.showTenant(tenant, key);
+        StreamingGetKeys sKey = null;
+        if (null != key) {
+            try {
+                sKey = StreamingGetKeys.fromKey(key);
+            } catch (Exception e) {
+                throw new InvalidArgumentException("Invalid key. Expected one of %s".formatted(
+                        Arrays.stream(StreamingGetKeys.values())
+                                .map(StreamingGetKeys::name)
+                                .map(String::toLowerCase)
+                                .toList()
+                                .toString()));
+            }
+        }
+        OperationsStreaming.showTenant(tenant, sKey);
     }
 
 }

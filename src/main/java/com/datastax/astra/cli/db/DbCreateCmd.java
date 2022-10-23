@@ -65,7 +65,7 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);
                 case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.PENDING);
-                default -> LoggerShell.success("Database '%s' has been created.".formatted(db));
+                default -> LoggerShell.success("Database '%s' is ready.".formatted(db));
             }
         }
     }

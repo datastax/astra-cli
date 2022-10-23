@@ -1,73 +1,40 @@
 package com.datastax.astra.cli;
 
-import java.util.Arrays;
-import java.util.List;
-
-import com.datastax.astra.cli.db.*;
-import com.datastax.astra.cli.db.dsbulk.DbDsBulkCmd;
-import org.fusesource.jansi.AnsiConsole;
-
-import com.datastax.astra.cli.config.ConfigCreateCmd;
-import com.datastax.astra.cli.config.ConfigDeleteCmd;
-import com.datastax.astra.cli.config.ConfigGetCmd;
-import com.datastax.astra.cli.config.ConfigListCmd;
-import com.datastax.astra.cli.config.SetupCmd;
+import com.datastax.astra.cli.config.*;
 import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.DefaultCmd;
 import com.datastax.astra.cli.core.ExitCode;
-import com.datastax.astra.cli.core.exception.ConfigurationException;
-import com.datastax.astra.cli.core.exception.FileSystemException;
-import com.datastax.astra.cli.core.exception.InvalidArgumentException;
-import com.datastax.astra.cli.core.exception.InvalidTokenException;
-import com.datastax.astra.cli.core.exception.TokenNotFoundException;
+import com.datastax.astra.cli.core.exception.*;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.db.*;
 import com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.datastax.astra.cli.db.dsbulk.DbCountCmd;
+import com.datastax.astra.cli.db.dsbulk.DbDsBulkCmd;
 import com.datastax.astra.cli.db.dsbulk.DbLoadCmd;
 import com.datastax.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
-import com.datastax.astra.cli.db.exception.DatabaseNotSelectedException;
 import com.datastax.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.datastax.astra.cli.db.keyspace.DbListKeyspacesCmd;
-import com.datastax.astra.cli.iam.RoleGetCmd;
-import com.datastax.astra.cli.iam.RoleListCmd;
-import com.datastax.astra.cli.iam.UserDeleteCmd;
-import com.datastax.astra.cli.iam.UserGetCmd;
-import com.datastax.astra.cli.iam.UserInviteCmd;
-import com.datastax.astra.cli.iam.UserListCmd;
+import com.datastax.astra.cli.iam.*;
 import com.datastax.astra.cli.iam.exception.RoleNotFoundException;
 import com.datastax.astra.cli.iam.exception.UserAlreadyExistException;
 import com.datastax.astra.cli.iam.exception.UserNotFoundException;
-import com.datastax.astra.cli.org.OrgCmd;
-import com.datastax.astra.cli.org.OrgIdCmd;
-import com.datastax.astra.cli.org.OrgListRegionsClassicCmd;
-import com.datastax.astra.cli.org.OrgListRegionsServerlessCmd;
-import com.datastax.astra.cli.org.OrgNameCmd;
-import com.datastax.astra.cli.streaming.StreamingCreateCmd;
-import com.datastax.astra.cli.streaming.StreamingDeleteCmd;
-import com.datastax.astra.cli.streaming.StreamingExistCmd;
-import com.datastax.astra.cli.streaming.StreamingGetCmd;
-import com.datastax.astra.cli.streaming.StreamingListCmd;
-import com.datastax.astra.cli.streaming.StreamingPulsarTokenCmd;
-import com.datastax.astra.cli.streaming.StreamingStatusCmd;
-import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
+import com.datastax.astra.cli.org.*;
+import com.datastax.astra.cli.streaming.*;
+import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.help.Help;
-import com.github.rvesse.airline.parser.errors.ParseArgumentsMissingException;
-import com.github.rvesse.airline.parser.errors.ParseArgumentsUnexpectedException;
-import com.github.rvesse.airline.parser.errors.ParseException;
-import com.github.rvesse.airline.parser.errors.ParseOptionConversionException;
-import com.github.rvesse.airline.parser.errors.ParseOptionGroupException;
-import com.github.rvesse.airline.parser.errors.ParseOptionIllegalValueException;
-import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
-import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
-import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
+import com.github.rvesse.airline.parser.errors.*;
+import org.fusesource.jansi.AnsiConsole;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Main class for the program. Will route commands to proper class 
@@ -113,7 +80,7 @@ import com.github.rvesse.airline.parser.errors.ParseTooManyArgumentsException;
          // Read
          DbListCmd.class,  DbGetCmd.class, DbStatusCmd.class,
          // Operation
-         DbResumeCmd.class, DbDownloadScbCmd.class, DbDotEnvCmd.class,
+         DbResumeCmd.class, DbDownloadScbCmd.class, DbCreateDotEnvCmd.class,
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // DsBulk
@@ -233,13 +200,10 @@ public class AstraCli {
                 UserNotFoundException ex) {
            AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
            return ExitCode.NOT_FOUND;
-       } catch (TenantAlreadyExistExcepion | 
+       } catch (TenantAlreadyExistException |
                 UserAlreadyExistException e) {
            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
            return ExitCode.ALREADY_EXIST;
-       } catch (DatabaseNotSelectedException e) {
-           AstraCliConsole.outputError(ExitCode.ILLEGAL_STATE, e.getMessage());
-           return ExitCode.ILLEGAL_STATE;
        } catch (Exception ex) {
            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
            return ExitCode.INTERNAL_ERROR;

@@ -125,18 +125,15 @@ public class AstraConfiguration {
     }
     
     /**
-     * Delete a section is exist.
+     * Delete a section if exists.
      * 
      * @param sectionName
      *      current name.
-     * @return
-     *      if delete or not
      */
-    public boolean deleteSection(String sectionName) {
+    public void deleteSection(String sectionName) {
         boolean shouldDelete = isSectionExists(sectionName);
         if (shouldDelete) 
             sections.remove(sectionName);
-        return shouldDelete;
     }
 
     /**
@@ -183,28 +180,24 @@ public class AstraConfiguration {
         if (isSectionExists(sectionOld)) {
             sections.remove(sectionNew);
             sections.put(sectionNew, new HashMap<>());
-            getSection(sectionOld).entrySet().forEach(m -> 
-                sections.get(sectionNew)
-                        .put(m.getKey(), m.getValue())
-            );
+            getSection(sectionOld).forEach(
+                    (key, value) -> sections.get(sectionNew).put(key, value));
         }
     }   
     
     /**
      * Create configuration file if not exist.
-     * 
-     * @return
-     *      if the file has been created
      */
-    private boolean createConfigFileIfNotExists() {
+    private void createConfigFileIfNotExists() {
         if (!file.exists()) {
             try {
-                return file.createNewFile();
+                if (file.createNewFile()) {
+                    LoggerShell.debug("File Created");
+                }
             } catch (IOException e) {
                 throw new IllegalStateException("Cannot create configuration file: " + file.getPath());
             }
         }
-        return false;
     }
 
     /**
@@ -272,9 +265,8 @@ public class AstraConfiguration {
         StringBuilder sb = new StringBuilder();
         if (sectionName!= null && sections.containsKey(sectionName)) {
             sb.append(LINE_SEPARATOR).append("[").append(sectionName).append("]").append(LINE_SEPARATOR);
-            sections.get(sectionName).entrySet().forEach(line ->
-                sb.append(line.getKey() + "=" + line.getValue() + LINE_SEPARATOR)
-            );
+            sections.get(sectionName).forEach(
+                    (key, value) -> sb.append(key).append("=").append(value).append(LINE_SEPARATOR));
         }
         return sb.toString();
     }

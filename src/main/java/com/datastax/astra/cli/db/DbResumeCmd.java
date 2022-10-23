@@ -45,8 +45,6 @@ public class DbResumeCmd extends AbstractDatabaseCmd {
                 LoggerShell.success("Database \'%s' has resumed".formatted(db));
             break;
            }
-        } else {
-            LoggerShell.success("Database \'%s' is resuming".formatted(db));
         }
     }
     

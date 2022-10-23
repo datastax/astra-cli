@@ -14,7 +14,7 @@ import com.github.rvesse.airline.annotations.Option;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "create-dotenv", description = "Generate an .env configuration file associate with the db")
-public class DbDotEnvCmd extends AbstractDatabaseCmd {
+public class DbCreateDotEnvCmd extends AbstractDatabaseCmd {
     
     /**
      * Cloud provider region to provision

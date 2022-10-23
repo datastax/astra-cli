@@ -5,7 +5,7 @@ package com.datastax.astra.cli.streaming.exception;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class TenantAlreadyExistExcepion extends RuntimeException {
+public class TenantAlreadyExistException extends RuntimeException {
 
     /**
      * Constructor with dbName
@@ -13,7 +13,7 @@ public class TenantAlreadyExistExcepion extends RuntimeException {
      * @param tenantName
      *      tenant name
      */
-    public TenantAlreadyExistExcepion(String tenantName) {
+    public TenantAlreadyExistException(String tenantName) {
         super("Tenant name '%s' already exist and must be unique for the cluster.".formatted(tenantName));
     }
     

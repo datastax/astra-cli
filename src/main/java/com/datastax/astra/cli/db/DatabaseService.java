@@ -12,14 +12,17 @@ import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
+import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.EnvFile;
 import com.datastax.astra.cli.utils.EnvFile.EnvKey;
+import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.DatabaseClient;
 import com.datastax.astra.sdk.databases.domain.*;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 import com.datastax.astra.sdk.utils.ApiLocator;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
@@ -65,6 +68,8 @@ public class DatabaseService {
     static final String COLUMN_KEYSPACES         = "Keyspaces";
     /** working object. */
     static final String DB                       = "Database";
+    /** working object. */
+    static final String KS                       = "Keyspace ";
     
     /**
      * Access to databases object.
@@ -136,8 +141,7 @@ public class DatabaseService {
                        .formatted(DB, databaseName, db.getStatus(), status));
                
                long start = System.currentTimeMillis();
-               return evaluateReturnedCode(db, status, 
-                       retriesUntilTimeoutOrSuccess(db, status, timeout), timeout, start);
+               return evalReturnCode(db, status, retryUntilTimeoutOrSuccess(db, status, timeout), timeout, start);
             }
         }
         LoggerShell.error("%s '%s' has not been found."
@@ -161,7 +165,7 @@ public class DatabaseService {
      * @return
      *      exit code
      */
-    public ExitCode evaluateReturnedCode(Database db, DatabaseStatusType status, int retries, int timeout, long start) {
+    public ExitCode evalReturnCode(Database db, DatabaseStatusType status, int retries, int timeout, long start) {
         
         // Success if you did not reach the timeout (meaning status is good)
         if (retries < timeout) {
@@ -189,7 +193,7 @@ public class DatabaseService {
      * @return
      *      max retried
      */
-    public int retriesUntilTimeoutOrSuccess(Database db, DatabaseStatusType status, int timeout) {
+    public int retryUntilTimeoutOrSuccess(Database db, DatabaseStatusType status, int timeout) {
         int retries = 0;
         while (retries++ < timeout && !db.getStatus().equals(status)) {
             try {
@@ -197,6 +201,33 @@ public class DatabaseService {
              db = dbDao.getDatabase(db.getInfo().getName());
              LoggerShell.debug("Waiting for %s to become '%s' but was '%s' retrying ( %d / %d )"
                      .formatted(DB, status.toString(), db.getStatus().toString(), retries, timeout));
+            } catch (InterruptedException e) {
+                LoggerShell.error("Interrupted operation: %s".formatted(e.getMessage()));
+                Thread.currentThread().interrupt();
+            }
+        }
+        return retries;
+    }
+
+    /**
+     * Loop and wait 1s in between 2 tests.
+     *
+     * @param dbName
+     *      database name
+     * @param timeout
+     *      timeout is max retries
+     * @return
+     *      max retried
+     */
+    public int retryUntilDbDeleted(String dbName, int timeout) {
+        int retries = 0;
+        Optional<DatabaseClient> optDbClient = dbDao.getDatabaseClient(dbName);
+        while (retries++ < timeout && optDbClient.isPresent()) {
+            try {
+                Thread.sleep(1000);
+                optDbClient = dbDao.getDatabaseClient(dbName);
+                LoggerShell.debug("Waiting for %s to be deleted ( %d / %d )"
+                        .formatted(DB, retries, timeout));
             } catch (InterruptedException e) {
                 LoggerShell.error("Interrupted operation: %s".formatted(e.getMessage()));
                 Thread.currentThread().interrupt();
@@ -258,7 +289,7 @@ public class DatabaseService {
         
         // DATABASE DOES NOT EXIST
         if (dbClient.isEmpty()) {
-            LoggerShell.success("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
+            LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
                     .formatted(DB, databaseName, databaseName, keyspace));
             CliContext.getInstance().getApiDevopsDatabases()
             .createDatabase(DatabaseCreationRequest.builder()
@@ -271,21 +302,16 @@ public class DatabaseService {
                     .cloudRegion(databaseRegion)
                     .keyspace(keyspace)
                     .build());
-            AstraCliConsole.outputSuccess("%s '%s' and keyspace '%s' are being created."
+            LoggerShell.info("%s '%s' and keyspace '%s' are being created."
                     .formatted(DB, databaseName, keyspace));
-        }
-        
-        // A single instance of the DB exist
-        LoggerShell.success("%s '%s' already exist. Connecting to database."
-                    .formatted(DB, databaseName));
-        
-        if (!ifNotExist) {
-            LoggerShell.warning("Cannot create another database with name '" + databaseName + ". Use flag --if-not-exist to connect to the existing database");
-            throw new DatabaseNameNotUniqueException(databaseName);
-        }
-        
-        // If the database is HIBERNATED we need to wake it up before assessing the keyspace
-        if (dbClient.isPresent()) {
+        } else {
+
+            if (!ifNotExist) {
+                LoggerShell.warning("Cannot create another %s with name '%s' Use flag --if-not-exist to connect to the existing database"
+                                .formatted(DB, databaseName));
+                throw new DatabaseNameNotUniqueException(databaseName);
+            }
+
             Database db = dbDao.getDatabase(databaseName);
             DatabaseStatusType dbStatus = db.getStatus();
             switch (dbStatus) {
@@ -298,8 +324,7 @@ public class DatabaseService {
                     waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
                     dbStatus = dbDao.getDatabase(databaseName).getStatus();
                 }
-                default -> {
-                }
+                default -> LoggerShell.info("%s '%s' already exist. Connecting to database.".formatted(DB, databaseName));
             }
             
             // Create keyspace on existing DB when needed
@@ -397,12 +422,13 @@ public class DatabaseService {
            InvalidDatabaseStateException {
         Database db = dbDao.getDatabase(databaseName);
         switch (db.getStatus()) {
-            case HIBERNATED -> resumeDbRequest(db);
-            case RESUMING -> LoggerShell.warning("Database '" + databaseName + "'is already resuming");
-            default -> {
-                LoggerShell.warning("Your database has not 'HIBERNATED' status.");
-                throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.HIBERNATED, db.getStatus());
+            case HIBERNATED -> {
+                resumeDbRequest(db);
+                LoggerShell.success("Database '%s' is resuming".formatted(db));
             }
+            case RESUMING -> LoggerShell.info("Database '" + databaseName + "' is already resuming");
+            case ACTIVE -> LoggerShell.info("Database '" + databaseName + "' is already active");
+            default -> throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.HIBERNATED, db.getStatus());
         }
     }
     
@@ -411,10 +437,8 @@ public class DatabaseService {
      *
      * @param db
      *      database name
-     * @return
-     *      evaluate success of the operation
      */
-    private int resumeDbRequest(Database db) {
+    private void resumeDbRequest(Database db) {
         try {
             // Compute Endpoint for the Keyspaces
             String endpoint = ApiLocator.getApiRestEndpoint(db.getId(), db.getInfo().getRegion()) +
@@ -429,7 +453,9 @@ public class DatabaseService {
                     .build();
             
              HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-             return response.statusCode();
+             if (response.statusCode() == 500) {
+                 throw new RuntimeException("Cannot resume db error: %s".formatted(response.body()));
+             }
         } catch (InterruptedException e) {
             LoggerShell.warning("Interrupted %s".formatted(e.getMessage()));
             Thread.currentThread().interrupt();
@@ -437,7 +463,6 @@ public class DatabaseService {
              LoggerShell.warning("Resuming request might have failed, please check %s"
                      .formatted(e.getMessage()));
         }
-        return 500;
     }
     
     /**
@@ -533,7 +558,8 @@ public class DatabaseService {
      *      keyspace exist and --if-not-exist option not provided
      */
     public void createKeyspace(String databaseName, String keyspaceName, boolean ifNotExist)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException, KeyspaceAlreadyExistException { 
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
+           InvalidArgumentException, KeyspaceAlreadyExistException {
         
         // Validate keyspace names
         if (!keyspaceName.matches(KEYSPACE_NAME_PATTERN))
@@ -541,15 +567,14 @@ public class DatabaseService {
         
         if (dbDao.getDatabase(databaseName).getInfo().getKeyspaces().contains(keyspaceName)) {
             if (ifNotExist) {
-                LoggerShell.success("Keyspace '" + keyspaceName + "' already exists. Connecting to keyspace.");
+                LoggerShell.info("%s '%s' already exists. Connecting to keyspace.".formatted(KS, keyspaceName));
             } else {
-                LoggerShell.error("Keyspace '" + keyspaceName + "' already exists. Cannot create "
-                        + "another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.");
+                LoggerShell.error("%s '%s' already exists. Cannot create another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.".formatted(KS, keyspaceName));
                 throw new KeyspaceAlreadyExistException(keyspaceName, databaseName);
             }
         } else {
             dbDao.getRequiredDatabaseClient(databaseName).createKeyspace(keyspaceName);
-            LoggerShell.info("Keyspace '"+ keyspaceName + "' is creating.");
+            LoggerShell.info("%s '%s' is creating.".formatted(KS, keyspaceName));
         }
     }
     
@@ -601,10 +626,22 @@ public class DatabaseService {
             }
             envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, region);
         }
-        
-        // keep adding keys
-        
-        
+        // Keyspace
+        envFile.getKeys().put(EnvKey.ASTRA_DB_KEYSPACE, ks);
+        // Application Token
+        envFile.getKeys().put(EnvKey.ASTRA_DB_APPLICATION_TOKEN, CliContext.getInstance().getToken());
+        // Cloud secure Bundle
+        dbDao.downloadCloudSecureBundles(dbName);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_SECURE_BUNDLE_PATH, AstraCliUtils.ASTRA_HOME
+                + File.separator + AstraCliUtils.SCB_FOLDER
+                + AstraClientConfig.buildScbFileName(db.getId(), region));
+        // GraphQL URL
+        String graphQLEndpoint = ApiLocator.getApiGraphQLEndPoint(db.getId(), region);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL, graphQLEndpoint + "/graphql/" + ks);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL_PLAYGROUND, graphQLEndpoint + "/playground");
+        envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL_SCHEMA, graphQLEndpoint + "/graphql-schema");
+        envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL_ADMIN, graphQLEndpoint + "/graphql-admin");
+
         envFile.save();
     }
 

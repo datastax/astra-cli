@@ -21,7 +21,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public class ConfigGetCmd extends AbstractCmd {
     
     /**
-     * Section in configuration file to as as default.
+     * Section in configuration file to as default.
      */
     @Required
     @Arguments(
@@ -51,18 +51,4 @@ public class ConfigGetCmd extends AbstractCmd {
             AstraCliConsole.println(ctx().getConfiguration().renderSection(sectionName));
         }
      }
-    
-    /**
-     * Update property.
-     * 
-     * @param s
-     *      current section
-     * @return
-     *      current reference
-     */
-    public ConfigGetCmd sectionName(String s) {
-        this.sectionName = s;
-        return this;
-    }
-
 }

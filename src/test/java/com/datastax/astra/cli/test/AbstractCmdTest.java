@@ -18,14 +18,21 @@ import com.datastax.stargate.sdk.utils.Utils;
  * @author Cedrick LUNVEN (@clunven)
  */
 public abstract class AbstractCmdTest {
-    
+
+    /** Use to disable usage of CqlSh, Dsbulk and other during test for CI/CD. */
+    public final static String FLAG_TOOLS = "disable_tools";
+
+    /** flag coding for tool disabling. */
+    public static boolean disableTools = false;
+
     @BeforeAll
     public static void init() {
+        readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.parseBoolean(flag));
         runCli("--version");
     }
     
     /**
-     * Syntaxic sugar to read environment variables.
+     * Syntax sugar to read environment variables.
      *
      * @param key
      *      environment variable
@@ -46,8 +53,7 @@ public abstract class AbstractCmdTest {
      */
     protected String getToken() {
         Optional<String> t2 = readEnvVariable(AstraClientConfig.ASTRA_DB_APPLICATION_TOKEN);
-        /** Env var is always first. */
-        if (t2.isPresent()) { 
+        if (t2.isPresent()) {
             return t2.get();
         }
         Optional<String> t1 = new AstraConfiguration().getSectionKey(

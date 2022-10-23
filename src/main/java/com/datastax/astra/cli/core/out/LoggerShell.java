@@ -1,7 +1,6 @@
 package com.datastax.astra.cli.core.out;
 
 import com.datastax.astra.cli.core.CliContext;
-import org.fusesource.jansi.Ansi;
 
 import java.util.Arrays;
 
@@ -106,9 +105,9 @@ public class LoggerShell extends AstraCliConsole {
     public static void warning(String text) {
         if (isHuman()) {
             if (isColor()) {
-                print(WARNING_YELLOW + text);
+                println(WARNING_YELLOW + text);
             } else {
-                print(WARNING + text);
+                println(WARNING + text);
             }
         }
     }

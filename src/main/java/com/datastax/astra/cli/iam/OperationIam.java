@@ -120,7 +120,7 @@ public class OperationIam {
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow("Identifier",    r.getId());
         sht.addPropertyRow("Name",          r.getName());
-        sht.addPropertyRow("Description",   r.getPolicy().getDescription());
+        sht.addPropertyRow(COLUMN_ROLE_DESCRIPTION,   r.getPolicy().getDescription());
         sht.addPropertyRow("Effect",        r.getPolicy().getEffect());
         switch (CliContext.getInstance().getOutputFormat()) {
             case CSV -> {
@@ -166,9 +166,9 @@ public class OperationIam {
        
        User r = optUser.get();
        ShellTable sht = ShellTable.propertyTable(15, 40);
-       sht.addPropertyRow("Identifier",   r.getUserId());
-       sht.addPropertyRow("Email",        r.getEmail());
-       sht.addPropertyRow("Status",       r.getStatus().name());
+       sht.addPropertyRow(COLUMN_USER_ID,   r.getUserId());
+       sht.addPropertyRow(COLUMN_USER_EMAIL,  r.getEmail());
+       sht.addPropertyRow(COLUMN_USER_STATUS, r.getStatus().name());
        
        List<String> roleNames =  r.getRoles()
                .stream()

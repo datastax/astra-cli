@@ -15,7 +15,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public class ConfigDeleteCmd extends AbstractCmd {
     
     /**
-     * Section in configuration file to as as default.
+     * Section in configuration file to as default.
      */
     @Required
     @Arguments(

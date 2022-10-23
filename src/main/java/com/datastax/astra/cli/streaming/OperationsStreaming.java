@@ -8,12 +8,9 @@ import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
-import com.datastax.astra.cli.core.out.AstraCliConsole;
-import com.datastax.astra.cli.core.out.JsonOutput;
-import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.core.out.ShellTable;
+import com.datastax.astra.cli.core.out.*;
 import com.datastax.astra.cli.streaming.StreamingGetCmd.StreamingGetKeys;
-import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
+import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellUtils;
@@ -55,6 +52,8 @@ public class OperationsStreaming {
     public static final String COLUMN_REGION = "region";
     /** columns. */
     public static final String COLUMN_STATUS = "Status";
+    /** Working object. */
+    static final String TENANT = "Tenant";
     
     /** limit resource usage by caching tenant clients. */
     private static final Map<String, TenantClient> cacheTenantClient = new HashMap<>();
@@ -90,7 +89,7 @@ public class OperationsStreaming {
     }
     
     /**
-     * Get tenant informations.
+     * Get tenant information.
      *
      * @param tenantName
      *      tenant name
@@ -144,7 +143,7 @@ public class OperationsStreaming {
         if (key == null) {
             ShellTable sht = ShellTable.propertyTable(15, 40);
             sht.addPropertyRow("Name", tnt.getTenantName());
-            sht.addPropertyRow("Status", tnt.getStatus());
+            sht.addPropertyRow(COLUMN_STATUS, tnt.getStatus());
             sht.addPropertyRow("Cloud Provider", tnt.getCloudProvider());
             sht.addPropertyRow("Cloud region", tnt.getCloudRegion());
             sht.addPropertyRow("Cluster Name", tnt.getClusterName());
@@ -154,17 +153,18 @@ public class OperationsStreaming {
             sht.addPropertyRow("WebServiceUrl", tnt.getWebServiceUrl());
             sht.addPropertyRow("BrokerServiceUrl", tnt.getBrokerServiceUrl());
             sht.addPropertyRow("WebSocketUrl", tnt.getWebsocketUrl());
-            switch (CliContext.getInstance().getOutputFormat()) {
-                case JSON -> AstraCliConsole.printJson(new JsonOutput<ShellTable>(ExitCode.SUCCESS,
+            if (CliContext.getInstance().getOutputFormat() == OutputFormat.JSON) {
+                AstraCliConsole.printJson(new JsonOutput<>(ExitCode.SUCCESS,
                         STREAMING + " get " + tenantName, sht));
-                case CSV, HUMAN -> AstraCliConsole.printShellTable(sht);
+            } else {
+                AstraCliConsole.printShellTable(sht);
             }
         }  else {
             switch (key) {
-                case cloud -> AstraCliConsole.println(tnt.getCloudProvider());
-                case pulsar_token -> AstraCliConsole.println(tnt.getPulsarToken());
-                case region -> AstraCliConsole.println(tnt.getCloudRegion());
-                case status -> AstraCliConsole.println(tnt.getStatus());
+                case CLOUD -> AstraCliConsole.println(tnt.getCloudProvider());
+                case PULSAR_TOKEN -> AstraCliConsole.println(tnt.getPulsarToken());
+                case REGION -> AstraCliConsole.println(tnt.getCloudRegion());
+                case STATUS -> AstraCliConsole.println(tnt.getStatus());
             }
         }
     }
@@ -195,7 +195,8 @@ public class OperationsStreaming {
     public static void showTenantStatus(String tenantName)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
-        AstraCliConsole.outputSuccess("Tenant '" + tenantName + "' has status '" + tnt.getStatus() + "'");
+        AstraCliConsole.outputSuccess("%s '%s' has status '%s'"
+                .formatted(TENANT, tenantName, tnt.getStatus()));
     }
     
     /**
@@ -206,9 +207,9 @@ public class OperationsStreaming {
      */
     public static void showTenantExistence(String tenantName) {
         if (tenantClient(tenantName).exist()) {
-            AstraCliConsole.outputSuccess("Tenant '" + tenantName + "' exists.");
+            AstraCliConsole.outputSuccess("%s '%s' exists.".formatted(TENANT, tenantName));
         } else {
-            AstraCliConsole.outputSuccess("Tenant '" + tenantName + "' does not exist.");
+            AstraCliConsole.outputSuccess("%s '%s' does not exist.".formatted(TENANT, tenantName));
         }
     }
     
@@ -230,13 +231,13 @@ public class OperationsStreaming {
      *
      * @param ct
      *      tenant creation request
-     * @throws TenantAlreadyExistExcepion
+     * @throws TenantAlreadyExistException
      *      already exist exception 
      */
     public static void createStreamingTenant(CreateTenant ct) 
-    throws TenantAlreadyExistExcepion {
+    throws TenantAlreadyExistException {
         if (tenantClient(ct.getTenantName()).exist()) {
-            throw new TenantAlreadyExistExcepion(ct.getTenantName());
+            throw new TenantAlreadyExistException(ct.getTenantName());
         }
         streamingClient().createTenant(ct);
         AstraCliConsole.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
@@ -302,7 +303,7 @@ public class OperationsStreaming {
         
         try {
             System.out.println("Pulsar-shell is starting please wait for connection establishment...");
-            Process cqlShProc = PulsarShellUtils.runPulsarShell(options, tenant, getPulsarConfFile(tenant));
+            Process cqlShProc = PulsarShellUtils.runPulsarShell(options, getPulsarConfFile(tenant));
             cqlShProc.waitFor();
         } catch (Exception e) {
             Thread.currentThread().interrupt();

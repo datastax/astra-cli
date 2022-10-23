@@ -6,10 +6,6 @@ import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD
 import static com.datastax.astra.cli.streaming.OperationsStreaming.DEFAULT_EMAIL;
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
-import com.datastax.astra.cli.core.exception.InvalidArgumentException;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
-import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistExcepion;
 import com.datastax.astra.sdk.streaming.domain.CreateTenant;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;

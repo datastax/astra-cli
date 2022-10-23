@@ -18,12 +18,6 @@ public class PulsarShellOptions {
     
     /** option. */
     protected boolean noProgress = false;
-    
-    /**
-     * Default constructor
-     */
-    public PulsarShellOptions() {
-    }
 
     /**
      * Getter accessor for attribute 'execute'.

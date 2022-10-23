@@ -24,27 +24,17 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     static String DB_TEST = "astra_cli_test";
 
-    /** Use to disable usage of CqlSh, Dsbulk and other during test for CI/CD. */
-    public final static String FLAG_TOOLS = "disable_tools";
-
-    /** flag coding for tool disabling. */
-    public static boolean disableTools = false;
-
     /** dataset. */
     public final static String TABLE_TEST = "test_dsbulk";
 
     @BeforeAll
     public static void should_create_when_needed() {
-        readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.parseBoolean(flag));
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
-        if (!disableTools) {
-            System.out.println("Third party tools are enabled in test");
-        }
     }
     
     @Test
     @Order(1)
-    public void should_show_help() {
+    public void testShouldShowHelp() {
         assertSuccessCli("help");
         assertSuccessCli("help db");
         assertSuccessCli("help db create");
@@ -61,7 +51,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_list_db() {
+    public void testShouldListDb() {
         assertSuccessCli("db list");
         assertSuccessCli("db list -v");
         assertSuccessCli("db list --no-color");
@@ -74,7 +64,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(3)
-    public void should_create_db() throws DatabaseNameNotUniqueException {
+    public void testShouldCreateDb() throws DatabaseNameNotUniqueException {
         // When
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
         // Then
@@ -85,7 +75,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(4)
-    public void should_get_db() throws DatabaseNameNotUniqueException {
+    public void testShoulGetDb() throws DatabaseNameNotUniqueException {
         assertSuccessCli("db get %s".formatted(DB_TEST));
         assertSuccessCli("db get %s -o json".formatted(DB_TEST));
         assertSuccessCli("db get %s -o csv".formatted(DB_TEST));
@@ -103,7 +93,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(5)
-    public void should_list_keyspaces()  {
+    public void testShouldListKeyspaces()  {
         assertSuccessCli("db list-keyspaces %s".formatted(DB_TEST));
         assertSuccessCli("db list-keyspaces %s -v".formatted(DB_TEST));
         assertSuccessCli("db list-keyspaces %s --no-color".formatted(DB_TEST));
@@ -114,7 +104,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(6)
-    public void should_create_keyspaces()  {
+    public void testShouldCreateKeyspaces()  {
         String randomKS = "ks_" + UUID
                 .randomUUID().toString()
                 .replaceAll("-", "").substring(0, 8);
@@ -125,27 +115,28 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(7)
-    public void testShould_download_scb()  {
+    public void testShouldDownloadScb()  {
         assertSuccessCli("db download-scb %s -f %s".formatted(DB_TEST, "/tmp/sample.zip"));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db download-scb %s".formatted("invalid"));
     }
 
     @Test
     @Order(8)
-    public void testShould_createDotenv()  {
+    public void testShouldCreateDotenv()  {
         assertSuccessCli("db create-dotenv %s -d %s".formatted(DB_TEST, "/tmp/"));
         Assertions.assertTrue(new File("/tmp/.env").exists());
     }
     
     @Test
     @Order(9)
-    public void should_resume_db()  {
+    public void testShouldResumeDb()  {
+        assertSuccessCli("db resume %s".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
     }
 
     @Test
     @Order(10)
-    public void should_install_Cqlsh() {
+    public void testShouldInstallCqlsh() {
         if (!disableTools) {
             new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra").delete();
             CqlShellService.getInstance().install();
@@ -155,16 +146,15 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(11)
-    public void testShould_start_shell() {
+    public void testShouldStartShell() {
         if (!disableTools) {
-            assertSuccessCli("db", "cqlsh", DB_TEST,
-                    "-e", "SELECT cql_version FROM system.local");
+            assertSuccessCli("db", "cqlsh", DB_TEST, "-e", "SELECT cql_version FROM system.local");
         }
     }
 
     @Test
     @Order(12)
-    public void should_install_dsbulk() {
+    public void testShouldInstallDsbulk() {
         if (!disableTools) {
             // delete previous install
             new File(AstraCliUtils.ASTRA_HOME + File.separator
@@ -178,7 +168,7 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(13)
-    public void testShould_count() {
+    public void testShouldCount() {
         if (!disableTools) {
             // Given
             assertSuccessCli("db", "create", DB_TEST, "--if-not-exists", "--wait");
@@ -193,12 +183,18 @@ public class DbCommandsTest extends AbstractCmdTest {
                     "-k", DB_TEST,
                     "-t", TABLE_TEST,
                     "-logDir", "/tmp");
+            // When
+            assertSuccessCli("db", "dsbulk", DB_TEST,  "count",
+                    "-k", DB_TEST,
+                    "-t", TABLE_TEST,
+                    "-logDir", "/tmp");
+
         }
     }
 
     @Test
     @Order(14)
-    public void should_delete_db()  {
+    public void testShouldDeleteDb()  {
         assertSuccessCli("db delete %s".formatted(DB_TEST));
     }
 }

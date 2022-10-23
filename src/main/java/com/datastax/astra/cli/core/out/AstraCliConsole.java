@@ -110,6 +110,8 @@ public class AstraCliConsole {
      *
      * @param json
      *      json in the console
+     * @param <T>
+     *     object type to marshall
      */
     public static <T> void printJson(JsonOutput<T> json) {
         if (json != null) {

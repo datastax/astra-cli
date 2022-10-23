@@ -130,8 +130,6 @@ public class DatabaseDao {
             LoggerShell.debug("Database found id=" + dbs.get(0).getId());
             return Optional.ofNullable(dbsClient.database(dbs.get(0).getId()));
         }
-        
-        LoggerShell.warning("Database " + db + " has not been found");
         return Optional.empty();
     }
     

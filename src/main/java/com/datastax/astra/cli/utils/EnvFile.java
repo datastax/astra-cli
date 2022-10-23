@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Properties;
 
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 
 /**
@@ -19,7 +20,7 @@ public class EnvFile {
     /**
      * Valid / Supported keys in .env file
      */
-     public static enum EnvKey { 
+     public enum EnvKey {
         /** Organization Id. */
         ASTRA_ORG_ID, 
         /** Organization Name. */
@@ -70,7 +71,7 @@ public class EnvFile {
         ASTRA_STREAMING_WEBSERVICE_URL,
         /** Tenant web socket URL. */
         ASTRA_STREAMING_WEBSOCKET_URL,
-    };
+    }
     
     /** filename. */
     private static final String DOTENV_FILENAME = ".env";
@@ -84,17 +85,12 @@ public class EnvFile {
     /**
      * Keys to be populated in file. 
      */
-    private LinkedHashMap<EnvKey, String> keys = new LinkedHashMap<>();
-    
-    /**
-     * Working folder 
-     */
-    private File workingFolder;
-    
+    private final LinkedHashMap<EnvKey, String> keys = new LinkedHashMap<>();
+
     /**
      * Working File 
      */
-    private File dotenvFile;
+    private final File dotenvFile;
     
     /**
      * Constructor.
@@ -103,15 +99,15 @@ public class EnvFile {
      *      destination for file .env
      */
     public EnvFile(String workingFolderPath) {
-        this.workingFolder = new File(workingFolderPath);
+        File workingFolder = new File(workingFolderPath);
         if (!workingFolder.exists()) {
-            throw new IllegalArgumentException("Destination folder has not been found");
+            throw new InvalidArgumentException("Destination folder has not been found");
         }
         if (!workingFolder.isDirectory() ) {
-            throw new IllegalArgumentException("Destination path is not a directory");
+            throw new InvalidArgumentException("Destination path is not a directory");
         }
         if (!workingFolder.canRead() || !workingFolder.canWrite() ) {
-            throw new IllegalArgumentException("Cannot access destination directory, check permissions");
+            throw new InvalidArgumentException("Cannot access destination directory, check permissions");
         }
         this.dotenvFile = new File(workingFolderPath + File.separator + DOTENV_FILENAME);
         load();
@@ -126,10 +122,10 @@ public class EnvFile {
             try(FileInputStream fis = new FileInputStream(dotenvFile)) {
                 Properties p = new Properties();
                 p.load(fis);
-                p.entrySet().stream().forEach(e -> {
+                p.forEach((key, value) -> {
                     try {
-                        keys.put(EnvKey.valueOf((String) e.getKey()), e.getValue().toString());
-                    } catch(IllegalArgumentException iae) {
+                        keys.put(EnvKey.valueOf((String) key), value.toString());
+                    } catch (IllegalArgumentException iae) {
                         // ommit invalid keys
                     }
                 });
@@ -143,22 +139,12 @@ public class EnvFile {
      * Save .env
      */
     public void save() {
-        FileWriter out = null;
-        try {
-            out = new FileWriter(dotenvFile);
+        try (FileWriter out = new FileWriter(dotenvFile)) {
             StringBuilder sb = new StringBuilder();
-            keys.entrySet().forEach(line -> {
-                sb.append(line.getKey().name() + "=\"" + line.getValue() + "\"" + LINE_SEPARATOR);
-            });
+            keys.forEach((key, value) -> sb.append(key.name()).append("=\"").append(value).append("\"").append(LINE_SEPARATOR));
             out.write(sb.toString());
         } catch (IOException e) {
             throw new IllegalStateException("Cannot save dotenv file", e);
-        } finally {
-            if (null != out) {
-                try {
-                    out.close();
-                } catch (IOException e) {}
-            }
         }
     }
     

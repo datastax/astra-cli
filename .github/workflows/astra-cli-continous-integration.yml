@@ -1,0 +1,79 @@
+name: ⌨️ CLI - Continuous Integration
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - '.github/workflows/astra-cli-continuous-integration.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - '.github/workflows/astra-cli-continuous-integration.yml'
+jobs:
+  build-jar:
+    name: 'Build JAR package'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/cli
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          check-latest: false
+          cache: 'maven'
+      - name: Build with Maven
+        run: 'mvn package'
+      - name: Temporarily save package
+        uses: actions/upload-artifact@v3
+        with:
+          name: java-binary
+          path: |
+            ${{ github.workspace }}/cli/target/*.jar
+            !${{ github.workspace }}/cli/target/original-*.jar
+          retention-days: 30
+  build-native-image:
+    name: Native image build on ${{ matrix.os }} and Java ${{ matrix.jdk-version }}
+    needs: [ build-jar ]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        graalvm-version: ['22.1.0']
+        jdk-version: ['17']
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Download application package
+        uses: actions/download-artifact@v3
+        with:
+          name: java-binary
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: ${{ matrix.graalvm-version }}
+          java-version: ${{ matrix.jdk-version }}
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build native image on Linux
+        run: native-image --enable-url-protocols=https --static -jar astra-cli-*.jar astra-cli-linux
+        if: runner.os == 'Linux'
+      - name: Build native image on Mac OS X
+        run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-macos
+        if: runner.os == 'macOS'
+      - name: Build native image on Windows
+        run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-windows
+        if: runner.os == 'Windows'
+      - name: Temporarily save package
+        uses: actions/upload-artifact@v3
+        with:
+          name: astra-cli-${{ matrix.os }}-java-${{ matrix.jdk-version }}
+          path: |
+            astra-cli-*
+            !*.txt
+            !*.jar
+          retention-days: 30

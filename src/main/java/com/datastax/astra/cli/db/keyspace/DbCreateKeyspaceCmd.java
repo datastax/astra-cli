@@ -31,9 +31,7 @@ public class DbCreateKeyspaceCmd extends AbstractDatabaseCmd {
     protected boolean ifNotExist = false;
     
     /** {@inheritDoc}  */
-    public void execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
-           InvalidArgumentException, KeyspaceAlreadyExistException  {
+    public void execute() {
         dbServices.createKeyspace(db, keyspace, ifNotExist);
     }
     

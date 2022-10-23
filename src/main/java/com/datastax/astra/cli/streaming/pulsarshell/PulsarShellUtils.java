@@ -1,20 +1,18 @@
 package com.datastax.astra.cli.streaming.pulsarshell;
 
+import com.datastax.astra.cli.core.exception.ConfigurationException;
+import com.datastax.astra.cli.core.exception.FileSystemException;
+import com.datastax.astra.cli.core.out.LoggerShell;
+import com.datastax.astra.cli.utils.AstraCliUtils;
+import com.datastax.astra.cli.utils.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.datastax.astra.cli.core.exception.ConfigurationException;
-import com.datastax.astra.cli.core.exception.FileSystemException;
-import com.datastax.astra.cli.core.out.LoggerShell;
-import com.datastax.astra.cli.utils.AstraCliUtils;
-import com.datastax.astra.cli.utils.FileUtils;
-import com.datastax.astra.sdk.streaming.domain.Tenant;
 
 /**
  * Utilities to work with Pulsar
@@ -36,7 +34,7 @@ public class PulsarShellUtils {
     public static final String LUNA_URL = AstraCliUtils.readProperty("pulsar.shell.url") + LUNA_TARBALL;
     
     /**
-     * Hide default construtor
+     * Hide default constructor
      */
     private PulsarShellUtils() {}
     
@@ -53,11 +51,7 @@ public class PulsarShellUtils {
      *      destination file
      */
     public static void generateConf(String cloudProvider, String cloudRegion, String pulsarToken, String destination) {
-        FileWriter fileWriter = null;
-        PrintWriter pw        = null;
-        try {
-            fileWriter = new FileWriter(destination);
-            pw = new PrintWriter(fileWriter);
+        try (FileWriter fileWriter = new FileWriter(destination); PrintWriter pw = new PrintWriter(fileWriter)) {
             pw.printf("webServiceUrl=https://pulsar-%s-%s.api.streaming.datastax.com\n", cloudProvider, cloudRegion);
             pw.printf("brokerServiceUrl=pulsar+ssl://pulsar-%s-%s.streaming.datastax.com:6651\n", cloudProvider, cloudRegion);
             pw.printf("authPlugin=org.apache.pulsar.client.impl.auth.AuthenticationToken\n");
@@ -71,11 +65,6 @@ public class PulsarShellUtils {
             //pw.flush();
         } catch (IOException e1) {
             throw new IllegalStateException("Cannot generate configuration file.");
-        } finally {
-            try {
-                if (pw != null)        pw.close();
-                if (fileWriter!= null) fileWriter .close();
-            } catch (IOException e) {}
         }
     }
     
@@ -154,8 +143,6 @@ public class PulsarShellUtils {
      * 
      * @param options
      *      command to start pulsar-shell
-     * @param tenant
-     *      current tenant
      * @param configFile
      *      configuration file associated with the current tenant
      * @return
@@ -165,7 +152,7 @@ public class PulsarShellUtils {
      * @throws ConfigurationException
      *      starting pulsar shell 
      */
-    public static Process runPulsarShell(PulsarShellOptions options, Tenant tenant, File configFile) 
+    public static Process runPulsarShell(PulsarShellOptions options, File configFile)
     throws IOException, ConfigurationException {
         
         if (!configFile.exists()) {
@@ -174,11 +161,9 @@ public class PulsarShellUtils {
         }
         
         List<String> pulsarShCommand = new ArrayList<>();
-        pulsarShCommand.add(new StringBuilder()
-                .append(AstraCliUtils.ASTRA_HOME + File.separator + LUNA_FOLDER)
-                .append(File.separator + "bin")
-                .append(File.separator + "pulsar-shell")
-                .toString());
+        pulsarShCommand.add(AstraCliUtils.ASTRA_HOME + File.separator + LUNA_FOLDER +
+                File.separator + "bin" +
+                File.separator + "pulsar-shell");
         
         // Enforcing usage of generated file
         pulsarShCommand.add("--config");
