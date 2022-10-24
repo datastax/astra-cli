@@ -5,12 +5,22 @@ To get the latest version:
 curl -Ls "https://dtsx.io/get-astra-cli" | bash
 ```
 
-### BACKLOG
+## v0.1.alpha6
+- [x] - Speed up setup with `astra setup --token <token>`
+- [x] - Installation less verbose
+- [x] - Test coverage to 80%+
+- [x] - Code quality A+
+- [x] - Improved and specialized error messages
+- [x] - Fix Cqlsh Installation with Python 3.10
+- [x] - Fix autocompletion with zsh
+- [x] - Rewrite with pico cli then keep airline
+- [x] - New Syntax for load `astra db load...`
+- [x] - New Syntax for unload `astra db unload...`
+- [x] - New Syntax for count `astra db count...`
+- [x] - Create dotenv file for both DB and Streaming `astra db create-dotenv`, `astra streaming create-dotenv`
+- [x] - Native compilation with GraalVM
+- [x] - Upgrade to Java17
 
-- [ ] - Speed up setup with `astra setup --token <token>`
-- [ ] - Improved and specialized error messages
-- [ ] - Native compilation with GraalVM
- 
 - [ ] - Add a region to a db `astra db create-region <myDb> -r <regionName>`
 - [ ] - Remove a region to a db `astra db delete-region <myDb> -r <regionName>`
 - [ ] - List db regions `astra db list-regions`

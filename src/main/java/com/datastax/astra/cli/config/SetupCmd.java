@@ -62,7 +62,7 @@ public class SetupCmd extends AbstractCmd {
         } else {
             createDefaultSection(tokenParam);
         }
-        AstraCliConsole.outputSuccess("Your are all set. Enter `astra` to list available commands.");
+        AstraCliConsole.outputSuccess(" Enter 'astra help' to list available commands.");
     }
     
     /**

@@ -18,7 +18,7 @@ mvn package -Dmaven.test.skip=true
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Jar"
 
 echo "Building autocompletion file"
-mvn test -Dtest="com.datastax.astra.bash.TestGenerateBashCompletion"
+#mvn test -Dtest="com.datastax.astra.bash.TestGenerateBashCompletion"
 chmod 700 ./src/main/dist/astra
 chmod 700 ./src/main/dist/astra-cli-autocomplete.sh
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Autocompletion file"

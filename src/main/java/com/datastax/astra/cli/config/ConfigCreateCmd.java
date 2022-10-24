@@ -49,7 +49,7 @@ public class ConfigCreateCmd extends AbstractCmd {
         }
         ctx().getConfiguration().createSectionWithToken(sectionName, token);
         ctx().getConfiguration().save();
-        AstraCliConsole.outputSuccess("Configuration Saved.\n");
+        AstraCliConsole.outputSuccess("Configuration has been saved.");
     }
     
 }
