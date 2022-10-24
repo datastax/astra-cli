@@ -36,8 +36,7 @@ jobs:
         with:
           name: java-binary
           path: |
-            ${{ github.workspace }}/target/*.jar
-            !${{ github.workspace }}/target/original-*.jar
+            ${{ github.workspace }}/target/*-shaded.jar
           retention-days: 30
   build-native-image:
     name: Native image build on ${{ matrix.os }} and Java ${{ matrix.jdk-version }}
