@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.LoggerShell;
@@ -66,6 +67,8 @@ public class EnvFile {
         ASTRA_STREAMING_WEBSERVICE_URL,
         /** Tenant web socket URL. */
         ASTRA_STREAMING_WEBSOCKET_URL,
+
+
     }
     
     /** filename. */
@@ -136,8 +139,11 @@ public class EnvFile {
     public void save() {
         try (FileWriter out = new FileWriter(dotenvFile)) {
             StringBuilder sb = new StringBuilder();
-            keys.forEach((key, value) -> {
-                sb.append(key.name());
+            // Sorting keys
+            TreeMap<String, String> fileKey = new TreeMap<>();
+            keys.forEach((key, value) -> fileKey.put(key.name(), value));
+            fileKey.forEach((key, value) -> {
+                sb.append(key);
                 sb.append("=");
                 if (!value.startsWith("\"")) sb.append("\"");
                 sb.append(value);
