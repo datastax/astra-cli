@@ -32,7 +32,7 @@
 		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
 		<maven.plugin.javadoc.source>17</maven.plugin.javadoc.source>
 		<!-- Maven -->
-		<native.maven.plugin.version>0.9.11</native.maven.plugin.version>
+		<native.maven.plugin.version>0.9.16</native.maven.plugin.version>
 		<maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
 		<version.maven.plugin.resources>3.2.0</version.maven.plugin.resources>
 		<version.maven.plugin.failsafe>2.22.2</version.maven.plugin.failsafe>
