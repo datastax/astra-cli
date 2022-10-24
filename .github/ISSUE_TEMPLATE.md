@@ -1,6 +1,6 @@
 <!--
 - Please follow the issue template below for bug reports and feature requests.
-  -->
+-->
 
 ##### **Overview of the issue**
 
@@ -23,12 +23,12 @@
 <!-- For bug reports, if you can't fix the bug yourself, perhaps you can point to what might be
   causing the problem (line of code or commit) -->
 
-##### **Astra Cli Version(s)**
+##### **NubesGen Version(s)**
 
 <!--
-Which version of Astra Cli are you using, is it a regression?
+Which version of NubesGen are you using, is it a regression?
 -->
 
 ##### **Browsers and Operating System**
 
-<!-- What OS are you on ? -->
+<!-- What OS are you on? is this a problem with all browsers or only IE8? -->
