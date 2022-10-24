@@ -1,17 +1,17 @@
-name: Package (no test) and native Images
+name: 🖥️ CLI packaging and native images
 on:
   push:
     branches:
       - main
     paths:
       - 'src/**'
-      - '.github/workflows/astra-cli-continuous-integration.yml'
+      - '.github/workflows/astra-cli-continous-integration.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'src/**'
-      - '.github/workflows/astra-cli-continuous-integration.yml'
+      - '.github/workflows/astra-cli-continous-integration.yml'
 jobs:
   build-jar:
     name: 'Build JAR package'
