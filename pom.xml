@@ -13,10 +13,9 @@
 	<url>https://github.com/datastax/astra-cli</url>
 	
 	<properties>
-	
 	 	<sonar.organization>clun-datastax</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-  
+        <app.main.class>com.datastax.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<astra-sdk.version>0.3.4</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
@@ -175,22 +174,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${version.maven.plugin.javadoc}</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<source>${maven.plugin.javadoc.source}</source>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>${version.maven.plugin.dependency}</version>
 			</plugin>
@@ -201,6 +184,7 @@
 				<configuration>
 					<archive>
 						<manifest>
+							<mainClass>${app.main.class}</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
@@ -241,7 +225,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.datastax.astra.cli.AstraCli</mainClass>
+									<mainClass>${app.main.class}</mainClass>
 								</transformer>
 							</transformers>
 							<filters>
@@ -270,7 +254,7 @@
 					<sources>
 						<source>
 							<classes>
-								<class>com.datastax.astra.cli.AstraCli</class>
+								<class>${app.main.class}</class>
 							</classes>
 						</source>
 					</sources>

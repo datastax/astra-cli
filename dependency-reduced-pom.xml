@@ -56,21 +56,6 @@
         <configuration />
       </plugin>
       <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${version.maven.plugin.javadoc}</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <source>${maven.plugin.javadoc.source}</source>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>${version.maven.plugin.dependency}</version>
       </plugin>
@@ -80,6 +65,7 @@
         <configuration>
           <archive>
             <manifest>
+              <mainClass>${app.main.class}</mainClass>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>
@@ -106,7 +92,7 @@
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <transformers>
                 <transformer>
-                  <mainClass>com.datastax.astra.cli.AstraCli</mainClass>
+                  <mainClass>${app.main.class}</mainClass>
                 </transformer>
               </transformers>
               <filters>
@@ -153,7 +139,7 @@
           <sources>
             <source>
               <classes>
-                <class>com.datastax.astra.cli.AstraCli</class>
+                <class>${app.main.class}</class>
               </classes>
             </source>
           </sources>
@@ -351,6 +337,7 @@
     <junit-platform.version>1.9.1</junit-platform.version>
     <version.maven.plugin.javadoc>3.4.1</version.maven.plugin.javadoc>
     <version.maven.plugin.surefire>2.22.2</version.maven.plugin.surefire>
+    <app.main.class>com.datastax.astra.cli.AstraCli</app.main.class>
     <version.maven.plugin.failsafe>2.22.2</version.maven.plugin.failsafe>
   </properties>
 </project>
