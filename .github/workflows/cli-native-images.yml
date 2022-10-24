@@ -70,7 +70,7 @@ jobs:
       - name: Temporarily save package
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.artifact_name }}
+          name: astra-cli-${{ matrix.os }}-java-${{ matrix.jdk-version }}
           path: |
             astra-cli-*
             !*.txt
