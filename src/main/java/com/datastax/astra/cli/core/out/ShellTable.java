@@ -177,9 +177,8 @@ public class ShellTable implements Serializable {
         StringBuilder tableLine = new StringBuilder();
         for(String columnName : columnTitlesNames) {
             Integer size = columnSize.get(columnName);
-            String format = "%-%ds".formatted(size + 1);
             tableLine.append("+")
-                    .append(String.format(format, "-")
+                    .append(String.format("%-"+(size + 1)+"s", "-")
                     .replace(" ", "-"));
         }
         return tableLine.toString();

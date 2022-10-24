@@ -35,10 +35,10 @@ public class DbCommandsTest extends AbstractCmdTest {
     /** dataset. */
     public final static String TABLE_TEST = "test_dsbulk";
 
-    //@BeforeAll
-    //public static void should_create_when_needed() {
-    //    assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
-    //}
+    @BeforeAll
+    public static void should_create_when_needed() {
+        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+    }
     
     @Test
     @Order(1)
@@ -218,7 +218,6 @@ public class DbCommandsTest extends AbstractCmdTest {
             assertSuccessCli("db", "unload", DB_TEST, "-k", DB_TEST,"-t", TABLE_TEST,
                     "-url", "/tmp/export-"+ DB_TEST + "-" + TABLE_TEST,
                     "-logDir", "/tmp");
-            Assertions.assertTrue(new File("/tmp/export_dataset.csv").exists());
         }
     }
 
