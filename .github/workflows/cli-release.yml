@@ -1,4 +1,4 @@
-name: ⌨️ CLI - Create a release
+name: 📦 CLI Release
 on:
   release:
     types: [published]
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ github.workspace }}/cli
+        working-directory: ${{ github.workspace }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,28 +20,24 @@ jobs:
           check-latest: false
           cache: 'maven'
       - name: Build with Maven
-        run: 'mvn package'
+        run: 'mvn package -Dmaven.test.skip=true'
       - name: Temporarily save package
         uses: actions/upload-artifact@v3
         with:
           name: java-binary
           path: |
-            ${{ github.workspace }}/cli/target/*.jar
-            !${{ github.workspace }}/cli/target/original-*.jar
-          retention-days: 1
+            ${{ github.workspace }}/target/*.jar
+            !${{ github.workspace }}/target/original-*.jar
+          retention-days: 30
   build-native-image:
-    name: Native image build on ${{ matrix.os }}
+    name: Native image build on ${{ matrix.os }} and Java ${{ matrix.jdk-version }}
     needs: [ build-jar ]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: linux-binary
-          - os: macos-latest
-            artifact_name: macos-binary
-          - os: windows-latest
-            artifact_name: windows-binary
+        graalvm-version: ['22.1.0']
+        jdk-version: ['17']
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Download application package
         uses: actions/download-artifact@v3
@@ -49,8 +45,8 @@ jobs:
           name: java-binary
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.1.0'
-          java-version: '17'
+          version: ${{ matrix.graalvm-version }}
+          java-version: ${{ matrix.jdk-version }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build native image on Linux
@@ -67,7 +63,7 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            nubesgen-cli-*
+            astra-cli-*
             !*.txt
             !*.jar
           retention-days: 1

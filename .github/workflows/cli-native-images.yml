@@ -1,17 +1,17 @@
-name: 🖥️ CLI packaging and native images
+name:  🖥️ CLI Native Image
 on:
   push:
     branches:
       - main
     paths:
       - 'src/**'
-      - '.github/workflows/astra-cli-continous-integration.yml'
+      - '.github/workflows/cli-native-images.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'src/**'
-      - '.github/workflows/astra-cli-continous-integration.yml'
+      - '.github/workflows/cli-native-images.yml'
 jobs:
   build-jar:
     name: 'Build JAR package'
@@ -71,7 +71,7 @@ jobs:
       - name: Temporarily save package
         uses: actions/upload-artifact@v3
         with:
-          name: astra-cli-${{ matrix.os }}-java-${{ matrix.jdk-version }}
+          name: ${{ matrix.artifact_name }}
           path: |
             astra-cli-*
             !*.txt
