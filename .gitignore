@@ -19,7 +19,6 @@ sec
 target
 build
 tmp
-dist
 
 # misc
 .DS_Store
