@@ -1,4 +1,4 @@
-ISSUE_TEMPLATE<!--
+<!--
 - Please follow the issue template below for bug reports and feature requests.
   -->
 
