@@ -182,7 +182,7 @@ public class AstraCliConsole {
                 m.put(label, data);
                 printCsv(new CsvOutput(List.of(label), List.of(m)));
             }
-            case HUMAN -> System.out.println(data);
+            case HUMAN -> println(data);
         }
     }
     

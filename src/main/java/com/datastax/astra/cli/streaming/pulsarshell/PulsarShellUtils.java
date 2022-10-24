@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,18 +53,18 @@ public class PulsarShellUtils {
      *      destination file
      */
     public static void generateConf(String cloudProvider, String cloudRegion, String pulsarToken, String destination) {
-        try (FileWriter fileWriter = new FileWriter(destination); PrintWriter pw = new PrintWriter(fileWriter)) {
-            pw.printf("webServiceUrl=https://pulsar-%s-%s.api.streaming.datastax.com\n", cloudProvider, cloudRegion);
-            pw.printf("brokerServiceUrl=pulsar+ssl://pulsar-%s-%s.streaming.datastax.com:6651\n", cloudProvider, cloudRegion);
-            pw.printf("authPlugin=org.apache.pulsar.client.impl.auth.AuthenticationToken\n");
-            pw.printf("authParams=token:%s\n", pulsarToken);
-            pw.printf("tlsAllowInsecureConnection=%b\n", false);
-            pw.printf("tlsEnableHostnameVerification=%b\n", true);
-            pw.printf("useKeyStoreTls=%b\n", false);
-            pw.printf("tlsTrustStoreType=%s\n", "JKS");
-            pw.printf("tlsTrustStorePath=\n");
-            pw.printf("tlsTrustStorePassword=\n");
-            //pw.flush();
+        try (FileWriter fileWriter = new FileWriter(destination);
+             PrintWriter pw = new PrintWriter(fileWriter)) {
+            pw.printf("webServiceUrl=https://pulsar-%s-%s.api.streaming.datastax.com%n", cloudProvider, cloudRegion);
+            pw.printf("brokerServiceUrl=pulsar+ssl://pulsar-%s-%s.streaming.datastax.com:6651%n", cloudProvider, cloudRegion);
+            pw.printf("authPlugin=%s%n", "org.apache.pulsar.client.impl.auth.AuthenticationToken");
+            pw.printf("authParams=token:%s%n", pulsarToken);
+            pw.printf("tlsAllowInsecureConnection=%b%n", false);
+            pw.printf("tlsEnableHostnameVerification=%b%n", true);
+            pw.printf("useKeyStoreTls=%b%n", false);
+            pw.printf("tlsTrustStoreType=%s%n", "JKS");
+            pw.printf("tlsTrustStorePath=%s%n", "");
+            pw.printf("tlsTrustStorePassword=%s%n", "");
         } catch (IOException e1) {
             throw new IllegalStateException("Cannot generate configuration file.");
         }
@@ -99,42 +101,25 @@ public class PulsarShellUtils {
      */
     public static void installPulsarShell() 
     throws FileSystemException {
-        if (!isPulsarShellInstalled()) {
-            LoggerShell.success("pulsar-shell first launch, downloading (~ 60MB), please wait...");
+        try {
+            LoggerShell.info("Downloading PulsarShell, please wait...");
             String destination = AstraCliUtils.ASTRA_HOME + File.separator + LUNA_TARBALL;
             FileUtils.downloadFile(LUNA_URL, destination);
             File tarArchive = new File (destination);
-            if (tarArchive.exists()) {
-                LoggerShell.info("File Downloaded. Extracting archive, please wait it can take a minute...");
-                try {
-                    FileUtils.extractTarArchiveInAstraCliHome(tarArchive);
-                    if (isPulsarShellInstalled()) {
-                        // Change file permission
-                        File pulsarShellFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  
-                                + LUNA_FOLDER + File.separator 
-                                + "bin" + File.separator  
-                                + "pulsar-shell");
-                        if (!pulsarShellFile.setExecutable(true, false)) {
-                            throw new FileSystemException("Cannot set pulsar-shell file as executable");
-                        }
-                        if (!pulsarShellFile.setReadable(true, false)) {
-                            throw new FileSystemException("Cannot set pulsar-shell file as readable");
-                        }
-                        if (!pulsarShellFile.setWritable(true, false)) {
-                            throw new FileSystemException("Cannot set pulsar-shell file as writable");
-                        }
-                        LoggerShell.success("pulsar-shell has been installed");
-                        if (!tarArchive.delete()) {
-                            LoggerShell.warning("Pulsar-shell Tar archived was not deleted");
-                        }
-                    }
-                } catch (IOException e) {
-                    LoggerShell.error("Cannot extract tar archive:" + e.getMessage());
-                    throw new FileSystemException("Cannot extract tar archive:" + e.getMessage(), e);
-                }
+
+            LoggerShell.info("Installing  archive, please wait...");
+            FileUtils.extractTarArchiveInAstraCliHome(tarArchive);
+
+            File pulsarShellFile = new File(AstraCliUtils.ASTRA_HOME + File.separator
+                    + LUNA_FOLDER + File.separator
+                    + "bin" + File.separator
+                    + "pulsar-shell");
+            if (!pulsarShellFile.setExecutable(true, false)) {
+                throw new FileSystemException("Cannot make pulsar-shell executable. ");
             }
-        } else {
-            LoggerShell.info("pulsar-shell is already installed");
+            Files.delete(Paths.get(destination));
+        } catch (IOException e) {
+            throw new FileSystemException("Cannot install Pulsar-Shell :" + e.getMessage(), e);
         }
     }
 

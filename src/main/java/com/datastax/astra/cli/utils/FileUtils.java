@@ -45,10 +45,10 @@ public class FileUtils {
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
                       // Escaping to remove invalid entry
                       String myTarEntry = tarEntry.getName()
-                              .replaceAll(">", "")
-                              .replaceAll("<", "")
-                              .replaceAll("\\*", "")
-                              .replaceAll("\\|", "");
+                              .replace(">", "")
+                              .replace("<", "")
+                              .replace("\\*", "")
+                              .replace("\\|", "");
                       File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, myTarEntry).toFile();
                           if (tarEntry.isDirectory()) {
                               if (!outputFile.exists() && outputFile.mkdirs())

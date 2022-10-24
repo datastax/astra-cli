@@ -1,14 +1,13 @@
 package com.datastax.astra.cli.org;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellTable;
-import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Operations on organizations
@@ -41,36 +40,26 @@ public class OperationsOrganization {
      * Hide default constructor.
      */
     private OperationsOrganization() {}
-    
-    /**
-     * Syntax sugar.
-     * 
-     * @return
-     *      org client
-     */
-    private static OrganizationsClient orgClient() {
-        return CliContext.getInstance().getApiDevopsOrganizations();
-    }
-    
+
     /**
      * Return organization id.
      */
     public static void getId() {
-        LoggerShell.println(orgClient().organizationId());
+        LoggerShell.println(CliContext.getInstance().getApiDevopsOrganizations().organizationId());
     }
     
     /**
      * Return organization name.
      */
     public static void getName() {
-        LoggerShell.println(orgClient().organization().getName());
+        LoggerShell.println(CliContext.getInstance().getApiDevopsOrganizations().organization().getName());
     }
     
     /**
      * Return organization info.
      */
     public static void showOrg() {
-        Organization org = orgClient().organization();
+        Organization org = CliContext.getInstance().getApiDevopsOrganizations().organization();
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
         sht.addPropertyRow(COLUMN_ID, org.getId());
@@ -85,7 +74,7 @@ public class OperationsOrganization {
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
-        orgClient().regions()
+        CliContext.getInstance().getApiDevopsOrganizations().regions()
            .forEach(r -> {
                 Map <String, String> rf = new HashMap<>();
                 rf.put(COLUMN_CLOUD,  r.getCloudProvider().toString());
@@ -104,8 +93,10 @@ public class OperationsOrganization {
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
-        orgClient().regionsServerless()
-           .forEach(r -> {
+        CliContext.getInstance()
+                .getApiDevopsOrganizations()
+                .regionsServerless()
+                .forEach(r -> {
                 Map <String, String> rf = new HashMap<>();
                 rf.put(COLUMN_CLOUD,  r.getCloudProvider());
                 rf.put(COLUMN_REGION_NAME,  r.getName());

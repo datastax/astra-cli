@@ -84,10 +84,7 @@ public class OperationsStreaming {
      *      tenant client or error
      */
     private static TenantClient tenantClient(String tenantName) {
-        if (!cacheTenantClient.containsKey(tenantName)) {
-            cacheTenantClient.put(tenantName, streamingClient().tenant(tenantName));
-        }
-        return cacheTenantClient.get(tenantName);
+        return cacheTenantClient.computeIfAbsent(tenantName, (t) -> streamingClient().tenant(t));
     }
     
     /**
@@ -225,7 +222,7 @@ public class OperationsStreaming {
      */
     public static void showTenantPulsarToken(String tenantName)
     throws TenantNotFoundException {
-        System.out.println(getTenant(tenantName).getPulsarToken());
+       AstraCliConsole.println(getTenant(tenantName).getPulsarToken());
     }
     
     /**
@@ -298,13 +295,15 @@ public class OperationsStreaming {
         Tenant tenant = getTenant(tenantName);
         
         // Download and install pulsar-shell tarball when needed
-        PulsarShellUtils.installPulsarShell();
+        if (!PulsarShellUtils.isPulsarShellInstalled()) {
+            PulsarShellUtils.installPulsarShell();
+        }
         
         // Generating configuration file if needed (~/.astra/luna streaming-shell-2.10.1.1/conf/...)
         createPulsarConf(tenant);
         
         try {
-            System.out.println("Pulsar-shell is starting please wait for connection establishment...");
+            AstraCliConsole.println("Pulsar-shell is starting please wait for connection establishment...");
             Process cqlShProcess = PulsarShellUtils.runPulsarShell(options, getPulsarConfFile(tenant));
             cqlShProcess.waitFor();
         } catch (Exception e) {

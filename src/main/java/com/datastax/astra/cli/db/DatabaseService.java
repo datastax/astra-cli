@@ -451,15 +451,13 @@ public class DatabaseService {
                     .build();
             
              HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-             if (response.statusCode() == 500) {
-                 throw new RuntimeException("Cannot resume db error: %s".formatted(response.body()));
-             }
+             if (response.statusCode() == 500)
+                 throw new InvalidDatabaseStateException("Cannot resume db error: %s".formatted(response.body()));
         } catch (InterruptedException e) {
             LoggerShell.warning("Interrupted %s".formatted(e.getMessage()));
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-             LoggerShell.warning("Resuming request might have failed, please check %s"
-                     .formatted(e.getMessage()));
+             LoggerShell.warning("Resuming request might have failed, please check %s".formatted(e.getMessage()));
         }
     }
     
@@ -503,7 +501,10 @@ public class DatabaseService {
             sht.addPropertyRow(COLUMN_DEFAULT_REGION, db.getInfo().getRegion());
             sht.addPropertyRow(COLUMN_DEFAULT_KEYSPACE, db.getInfo().getKeyspace());
             sht.addPropertyRow("Creation Time", db.getCreationTime());
-            List<String> regions   = db.getInfo().getDatacenters().stream().map(Datacenter::getRegion).collect(Collectors.toList());
+            List<String> regions   = db.getInfo().getDatacenters()
+                    .stream()
+                    .map(Datacenter::getRegion)
+                    .toList();
             List<String> keyspaces = new ArrayList<>(db.getInfo().getKeyspaces());
             switch (CliContext.getInstance().getOutputFormat()) {
                 case CSV -> {
@@ -615,9 +616,7 @@ public class DatabaseService {
                 .stream().collect(Collectors.toMap(Datacenter::getRegion, Function.identity()));
         envFile.getKeys().put(EnvKey.ASTRA_DB_ID, db.getId());
         envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, db.getInfo().getRegion());
-        envFile.getKeys().put(EnvKey.ASTRA_DB_SECURE_BUNDLE_URL, datacenters.get(region).getSecureBundleUrl());
 
-        if (region == null) region = db.getInfo().getRegion();
         // Parameter Validations
         Set<String> availableRegions = CliContext.getInstance()
                 .getApiDevopsOrganizations()
@@ -627,8 +626,12 @@ public class DatabaseService {
         if (!availableRegions.contains(region)) {
             throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
         }
+        if (region == null) region = db.getInfo().getRegion();
+        envFile.getKeys().put(EnvKey.ASTRA_DB_SECURE_BUNDLE_URL, datacenters.get(region).getSecureBundleUrl());
+
         Set <String> dbRegions = db.getInfo().getDatacenters()
-                .stream().map(Datacenter::getRegion).collect(Collectors.toSet());
+                .stream().map(Datacenter::getRegion)
+                .collect(Collectors.toSet());
         if (!dbRegions.contains(region)) {
             throw new InvalidArgumentException("Database is not deployed in provided region");
         }

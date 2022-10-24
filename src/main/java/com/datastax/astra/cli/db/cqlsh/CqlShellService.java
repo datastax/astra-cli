@@ -11,6 +11,8 @@ import com.datastax.astra.sdk.config.AstraClientConfig;
 import com.datastax.astra.sdk.databases.domain.Database;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,8 +127,7 @@ public class CqlShellService {
             if (!new File(cqlshExecutable).setExecutable(true, false)) {
                 throw new FileSystemException("Cannot make cqlshell executable. ");
             }
-            if (new File(tarArchive).delete())
-                LoggerShell.success("Cqlsh has been installed");
+            Files.delete(Paths.get(tarArchive));
         } catch (IOException e) {
             throw new FileSystemException("Cannot install CqlShell :" + e.getMessage(), e);
         }

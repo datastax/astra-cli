@@ -12,6 +12,8 @@ import com.datastax.astra.sdk.databases.domain.Database;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,8 +133,7 @@ public class DsBulkService  {
             if (!new File(dsbulkExecutable).setExecutable(true, false)) {
                 throw new FileSystemException("Cannot make dsbulk executable. ");
             }
-            if (new File(tarArchive).delete())
-                LoggerShell.success("DSBulk has been installed");
+            Files.delete(Paths.get(tarArchive));
         } catch (IOException e) {
             throw new FileSystemException("Cannot install CqlShell :" + e.getMessage(), e);
         }
@@ -312,7 +313,6 @@ public class DsBulkService  {
      *      current db name
      */
     public void run(List<String> commandDsbulk, String database) {
-        System.out.println(commandDsbulk);
 
         // Install Cqlsh for Astra and set permissions
         if (!isInstalled()) install();

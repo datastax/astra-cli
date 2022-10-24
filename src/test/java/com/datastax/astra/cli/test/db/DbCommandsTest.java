@@ -3,9 +3,17 @@ package com.datastax.astra.cli.test.db;
 import java.io.File;
 import java.util.UUID;
 
+import com.datastax.astra.cli.config.AstraConfiguration;
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.CoreOptions;
+import com.datastax.astra.cli.core.TokenOptions;
+import com.datastax.astra.cli.core.exception.InvalidArgumentException;
+import com.datastax.astra.cli.core.out.OutputFormat;
+import com.datastax.astra.cli.db.DatabaseService;
 import com.datastax.astra.cli.db.cqlsh.CqlShellService;
 import com.datastax.astra.cli.db.dsbulk.DsBulkService;
 import com.datastax.astra.cli.utils.AstraCliUtils;
+import com.datastax.astra.sdk.utils.Token;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
@@ -27,10 +35,10 @@ public class DbCommandsTest extends AbstractCmdTest {
     /** dataset. */
     public final static String TABLE_TEST = "test_dsbulk";
 
-    @BeforeAll
-    public static void should_create_when_needed() {
-        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
-    }
+    //@BeforeAll
+    //public static void should_create_when_needed() {
+    //    assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+    //}
     
     @Test
     @Order(1)
@@ -108,9 +116,8 @@ public class DbCommandsTest extends AbstractCmdTest {
         String randomKS = "ks_" + UUID
                 .randomUUID().toString()
                 .replaceAll("-", "").substring(0, 8);
-        assertSuccessCli("db create-keyspace %s -k %s -v".formatted(DB_TEST, randomKS));
-        assertExitCodeCli(ExitCode.NOT_FOUND, 
-                "db create-keyspace %s -k %s -v".formatted("does-not-exist", randomKS));
+        assertSuccessCli("db create-keyspace %s -k %s -v ".formatted(DB_TEST, randomKS));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db create-keyspace %s -k %s -v".formatted("does-not-exist", randomKS));
     }
     
     @Test
@@ -130,7 +137,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     @Test
     @Order(9)
     public void testShouldResumeDb()  {
-        assertSuccessCli("db resume %s".formatted(DB_TEST));
+        assertSuccessCli("db resume %s --wait".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
     }
 
@@ -207,7 +214,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     @Test
     @Order(15)
     public void testShouldExport() {
-        if (disableTools) {
+        if (!disableTools) {
             assertSuccessCli("db", "unload", DB_TEST, "-k", DB_TEST,"-t", TABLE_TEST,
                     "-url", "/tmp/export-"+ DB_TEST + "-" + TABLE_TEST,
                     "-logDir", "/tmp");
@@ -237,7 +244,19 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
+    public void testShouldThrowInvalidArgument()  {
+        Assertions.assertThrows(InvalidArgumentException.class, () -> {
+            CliContext.getInstance().init(new CoreOptions(false,false,
+                    OutputFormat.HUMAN,
+                    AstraConfiguration.getDefaultConfigurationFileName()));
+            CliContext.getInstance().initToken(new TokenOptions(null, AstraConfiguration.ASTRARC_DEFAULT));
+            DatabaseService.getInstance().generateDotEnvFile(DB_TEST, DB_TEST, "invalid", "/tmp");
+        });
+    }
+
+    @Test
+    @Order(19)
     public void testShouldDeleteDb()  {
         assertSuccessCli("db delete %s".formatted(DB_TEST));
     }

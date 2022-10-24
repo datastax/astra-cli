@@ -140,7 +140,9 @@ public class LoggerShell extends AstraCliConsole {
        error(e.getMessage() + " ("+ e.getClass().getSimpleName() + ")");
        error("Try 'astra help " + cmd + "' to get help");
        if (CliContext.getInstance().isVerbose())
-           Arrays.stream(e.getStackTrace()).forEach(System.out::println);
+           Arrays.stream(e.getStackTrace())
+                 .map(StackTraceElement::toString)
+                 .forEach(AstraCliConsole::println);
     }
     
     /**

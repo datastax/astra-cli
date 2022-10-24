@@ -20,13 +20,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Utility class for command `eolw`
+ * Utility class for command `role`
  *
  * @author Cedrick LUNVEN (@clunven)
  */
 public class OperationIam {
     
-    /** worki with roles. */
+    /** working with roles. */
     public static final String COMMAND_ROLE = "role";
     /** Column name. */
     private static final String COLUMN_ROLE_ID          = "Role Id";
@@ -41,7 +41,12 @@ public class OperationIam {
     private static final String COLUMN_USER_EMAIL       = "User Email";
     /** Column name. */
     private static final String COLUMN_USER_STATUS      = "Status";
-    
+
+    /**
+     * Hide default constructor.
+     */
+    private OperationIam() {}
+
     /**
      * List Roles.
      */
@@ -166,7 +171,7 @@ public class OperationIam {
        List<String> roleNames =  r.getRoles()
                .stream()
                .map(Role::getName)
-               .collect(Collectors.toList());
+               .toList();
 
         switch (CliContext.getInstance().getOutputFormat()) {
             case CSV -> {
@@ -213,7 +218,7 @@ public class OperationIam {
     /**
      * Delete a user if exist.
      * @param user
-     *      user email of technial identifier
+     *      user email of technical identifier
      * @throws UserNotFoundException
      *      user not found
      */

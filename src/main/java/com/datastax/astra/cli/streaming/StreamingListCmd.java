@@ -15,8 +15,7 @@ import com.github.rvesse.airline.annotations.Command;
 public class StreamingListCmd extends AbstractConnectedCmd {
    
     /** {@inheritDoc} */
-    public void execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
+    public void execute() {
         OperationsStreaming.listTenants();
     }
 

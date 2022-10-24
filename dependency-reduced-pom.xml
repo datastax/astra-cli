@@ -148,8 +148,6 @@
         </executions>
         <configuration>
           <formats>
-            <format>MAN</format>
-            <format>CLI</format>
             <format>MARKDOWN</format>
           </formats>
           <sources>

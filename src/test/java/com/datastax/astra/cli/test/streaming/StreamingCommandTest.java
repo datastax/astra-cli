@@ -48,8 +48,6 @@ public class StreamingCommandTest extends AbstractCmdTest {
     @Test
     @Order(2)
     public void testShouldExistTenant() {
-        // Given
-        Assertions.assertFalse(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
         // When
         assertSuccessCli("streaming exist " + RANDOM_TENANT);
         // Then

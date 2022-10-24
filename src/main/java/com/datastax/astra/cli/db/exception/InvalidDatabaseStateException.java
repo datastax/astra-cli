@@ -15,7 +15,17 @@ public class InvalidDatabaseStateException extends RuntimeException {
     /** Serial Number. */
     @Serial
     private static final long serialVersionUID = -8460056062064740428L;
-    
+
+    /**
+     * Simple constructor.
+     *
+     * @param msg
+     *      current message
+     */
+    public InvalidDatabaseStateException(String msg) {
+        super(msg);
+    }
+
     /**
      * Constructor with dbName
      * 
