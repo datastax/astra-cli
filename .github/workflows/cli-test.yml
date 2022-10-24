@@ -8,7 +8,6 @@ on:
       - main
   schedule:
     - cron: "0 0 * * *"
-name: Code Analysis
 jobs:
   cli-tests:
     env:
