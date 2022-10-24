@@ -11,7 +11,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * The is a COMMAND from the CLI when no command name is provided
+ * Question mark is a COMMAND from the CLI when no command name is provided
  *
  * @author Cedrick LUNVEN (@clunven)
  */

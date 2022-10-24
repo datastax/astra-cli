@@ -22,9 +22,6 @@ import com.datastax.astra.sdk.config.AstraClientConfig;
  */
 public class OperationsConfig {
 
-    /** worki with roles. */
-    public static final String COMMAND_CONFIG = "config";
-    
     /**
      * Title of the table.
      */
@@ -50,14 +47,14 @@ public class OperationsConfig {
      */
     public static void listConfigurations() {
         Map<String, Map<String, String>> sections = ctx().getConfiguration().getSections();
-        List<String> orgs = listOrganizations(sections);
+        List<String> listOrg = listOrganizations(sections);
         ShellTable sht = new ShellTable();
         sht.setColumnTitlesColor(Ansi.Color.YELLOW);
         sht.setCellColor(Ansi.Color.WHITE);
         sht.setTableColor(Ansi.Color.CYAN);
         sht.getColumnTitlesNames().add(COLUMN_TITLE);
         sht.getColumnSize().put(COLUMN_TITLE, 40);
-        for (String org : orgs) {
+        for (String org : listOrg) {
             Map<String, String> rf = new HashMap<>();
             rf.put(COLUMN_TITLE, org);
             sht.getCellValues().add(rf);

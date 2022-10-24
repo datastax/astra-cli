@@ -10,11 +10,8 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 public abstract class AbstractDatabaseCmd extends AbstractConnectedCmd  {
-    
-    /** Access to db dao. */
-    protected DatabaseDao dbDao = DatabaseDao.getInstance();
-    
-    /** Access to sdb Services. */
+
+     /** Access to sdb Services. */
     protected DatabaseService dbServices = DatabaseService.getInstance();
     
     /**

@@ -14,6 +14,7 @@ import com.datastax.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.datastax.astra.cli.streaming.exception.TenantNotFoundException;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.datastax.astra.cli.streaming.pulsarshell.PulsarShellUtils;
+import com.datastax.astra.cli.utils.EnvFile;
 import com.datastax.astra.sdk.streaming.StreamingClient;
 import com.datastax.astra.sdk.streaming.TenantClient;
 import com.datastax.astra.sdk.streaming.domain.CreateTenant;
@@ -96,7 +97,7 @@ public class OperationsStreaming {
      * @return
      *      tenant when exist
      * @throws TenantNotFoundException
-     *      tenant has not been foind 
+     *      tenant has not been found
      */
     private static Tenant getTenant(String tenantName) 
     throws TenantNotFoundException {
@@ -170,7 +171,7 @@ public class OperationsStreaming {
     }
     
     /**
-     * Delete a dabatase if exist.
+     * Delete database if exists.
      * 
      * @param tenantName
      *      tenant name
@@ -279,7 +280,7 @@ public class OperationsStreaming {
      * Start Pulsar shell as a Process.
      * 
      * @param options
-     *      options from the comman dline
+     *      options from the command line
      * @param tenantName
      *      current tenant name
      * @throws TenantNotFoundException
@@ -298,19 +299,41 @@ public class OperationsStreaming {
         // Download and install pulsar-shell tarball when needed
         PulsarShellUtils.installPulsarShell();
         
-        // Generating configuration file if needed (~/.astra/lunastreaming-shell-2.10.1.1/conf/...)
+        // Generating configuration file if needed (~/.astra/luna streaming-shell-2.10.1.1/conf/...)
         createPulsarConf(tenant);
         
         try {
             System.out.println("Pulsar-shell is starting please wait for connection establishment...");
-            Process cqlShProc = PulsarShellUtils.runPulsarShell(options, getPulsarConfFile(tenant));
-            cqlShProc.waitFor();
+            Process cqlShProcess = PulsarShellUtils.runPulsarShell(options, getPulsarConfFile(tenant));
+            cqlShProcess.waitFor();
         } catch (Exception e) {
             Thread.currentThread().interrupt();
             LoggerShell.error("Cannot start Pulsar Shel :" + e.getMessage());
             throw new CannotStartProcessException("pulsar-shell", e);
         }
     }
-    
+
+    /**
+     * Create keys relative to Streaming.
+     *
+     * @param tenantName
+     *      tenant name
+     * @param dest
+     *      destination folder
+     */
+    public static void generateDotEnvFile(String tenantName, String dest) {
+        Tenant tenant = getTenant(tenantName);
+        EnvFile envFile = new EnvFile(dest);
+        // Tenant Information
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_NAME, tenantName);
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_CLOUD, tenant.getCloudProvider());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_REGION, tenant.getCloudRegion());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_PULSAR_TOKEN, tenant.getPulsarToken());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_BROKER_URL, tenant.getBrokerServiceUrl());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSERVICE_URL, tenant.getWebServiceUrl());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSOCKET_URL, tenant.getWebsocketUrl());
+        envFile.save();
+    }
+
 }
     

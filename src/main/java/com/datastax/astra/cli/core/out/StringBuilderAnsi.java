@@ -13,7 +13,7 @@ import org.fusesource.jansi.Ansi;
 public class StringBuilderAnsi {
     
     /** Internal String Builder. */
-    private StringBuilder builder;
+    private final StringBuilder builder;
     
     /**
      * Default constructor
@@ -31,19 +31,7 @@ public class StringBuilderAnsi {
     public StringBuilderAnsi(String init) {
         builder = new StringBuilder(init);
     }
-    
-    /**
-     * Start with a colored String.
-     *
-     * @param init
-     *      default text
-     * @param color
-     *      default color
-     */
-    public StringBuilderAnsi(String init, Ansi.Color color) {
-        builder = new StringBuilder(colored(init, color));
-    }
-    
+
     /**
      * Text in color in the console.
      *
@@ -56,63 +44,6 @@ public class StringBuilderAnsi {
      */
     private String colored(String text, Ansi.Color color) {
         return ansi().fg(color).a(text).reset().toString();
-    }
-   
-    
-    /**
-     * Append content.
-     * 
-     * @param pObject
-     *      target object
-     * @return
-     *      current reference
-     */
-    public StringBuilderAnsi append(Object pObject) {
-        builder.append(pObject);
-        return this;
-    }
-    
-    /**
-     * Append content.
-     * 
-     * @param text
-     *      target text
-     * @return
-     *      current reference
-     */
-    public StringBuilderAnsi append(String text) {
-        builder.append(text);
-        return this;
-    }
-    
-    /**
-     * Append colored content.
-     * 
-     * @param pObject
-     *      target object
-     * @param color
-     *      target color
-     * @return
-     *      current reference
-     */
-    public StringBuilderAnsi append(Object pObject, Ansi.Color color) {
-        builder.append(colored(String.valueOf(pObject), color));
-        return this;
-    }
-    
-    /**
-     * Append right pad.
-     * 
-     * @param text
-     *      current text to append
-     * @param size
-     *      global size of the message
-     * @return
-     *      current reference
-     */
-    public StringBuilderAnsi append(String text, int size) {
-        builder.append(StringUtils.rightPad(text,size));
-        return this;
     }
 
     /**
@@ -139,16 +70,11 @@ public class StringBuilderAnsi {
      *      current color
      * @param size
      *      size of element
-     * @return
-     *      current reference
      */
-    public StringBuilderAnsi append(String text, Ansi.Color color, int size) {
+    public void append(String text, Ansi.Color color, int size) {
         builder.append(colored(StringUtils.rightPad(text,size), color));
-        return this;
     }
-    
-   
-    
+
     /** {@inheritDoc} */
     public String toString() {
         return builder.toString();

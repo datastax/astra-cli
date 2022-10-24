@@ -36,15 +36,11 @@ public class DbResumeCmd extends AbstractDatabaseCmd {
            InvalidDatabaseStateException  {
         dbServices.resumeDb(db);
         if (wait) {
-           switch(dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
-            case NOT_FOUND:
-                throw new DatabaseNotFoundException(db);
-            case UNAVAILABLE:
-                throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE,  DatabaseStatusType.HIBERNATED);
-            default:
-                LoggerShell.success("Database \'%s' has resumed".formatted(db));
-            break;
-           }
+            switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
+                case NOT_FOUND -> throw new DatabaseNotFoundException(db);
+                case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.HIBERNATED);
+                default -> LoggerShell.success("Database '%s' has resumed".formatted(db));
+            }
         }
     }
     

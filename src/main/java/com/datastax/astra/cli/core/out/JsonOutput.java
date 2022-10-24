@@ -17,18 +17,13 @@ public class JsonOutput<T> {
     /**
      * Returned message
      */
-    private String message;
+    private final String message;
     
     /**
      * Custom payload
      */
     private T data;
 
-    /**
-     * Default constructor.
-     */
-    public JsonOutput() {}
-    
     /**
      * Constructor with fields.
      *
@@ -87,15 +82,6 @@ public class JsonOutput<T> {
      */
     public String getMessage() {
         return message;
-    }
-
-    /**
-     * Setter accessor for attribute 'message'.
-     * @param message
-     * 		new value for 'message '
-     */
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     /**

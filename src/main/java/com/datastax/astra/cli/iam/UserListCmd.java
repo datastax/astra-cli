@@ -13,7 +13,7 @@ public class UserListCmd extends AbstractConnectedCmd {
    
     /** {@inheritDoc} */
     public void execute() {
-        OperationIam.listUsers(this);
+        OperationIam.listUsers();
     }
     
 }

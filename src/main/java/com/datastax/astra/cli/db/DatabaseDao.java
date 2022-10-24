@@ -1,11 +1,5 @@
 package com.datastax.astra.cli.db;
 
-import java.io.File;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.LoggerShell;
@@ -18,6 +12,11 @@ import com.datastax.astra.sdk.databases.DatabaseClient;
 import com.datastax.astra.sdk.databases.DatabasesClient;
 import com.datastax.astra.sdk.databases.domain.Database;
 import com.datastax.astra.sdk.databases.domain.Datacenter;
+
+import java.io.File;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Unitary operation for databases.
@@ -61,7 +60,7 @@ public class DatabaseDao {
      * @throws DatabaseNameNotUniqueException
      *      error when multiple dbs
      * @throws DatabaseNotFoundException
-     *      error when db does not exists
+     *      error when db does not exist
      */
     public Database getDatabase(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
@@ -82,7 +81,7 @@ public class DatabaseDao {
      * @throws DatabaseNameNotUniqueException
      *      error when multiple dbs
      * @throws DatabaseNotFoundException
-     *      error when db does not exists
+     *      error when db does not exist
      */
     public DatabaseClient getRequiredDatabaseClient(String databaseName) {
         Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
@@ -184,7 +183,7 @@ public class DatabaseDao {
             if (optDc.isEmpty()) {
                 throw new InvalidArgumentException(""
                         + "Your database is deployed on multiple regions. "
-                        + "You selectect and invalid region name. "
+                        + "You select and invalid region name. "
                         + "Please use one from %s".formatted(
                                 dcs.stream().map(Datacenter::getName)
                                    .toList().toString()));

@@ -15,7 +15,7 @@ import java.util.List;
 public class DbDsBulkCmd extends AbstractConnectedCmd {
 
     @Arguments(description = "Provide as many dsbulk parameters as you want.")
-    private List<String> dsbulkArguments;
+    List<String> dsbulkArguments;
 
     /** {@inheritDoc} */
     @Override

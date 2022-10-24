@@ -11,7 +11,7 @@ import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
- * This command allows to load data with pulsar-client.
+ * This command allows loading data with pulsar-client.
  * 
  * 
  * astra pulsar-shell

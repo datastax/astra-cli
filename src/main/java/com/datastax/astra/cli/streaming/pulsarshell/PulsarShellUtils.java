@@ -92,7 +92,7 @@ public class PulsarShellUtils {
     }
     
     /**
-     * Download targz and unzip.
+     * Download tar archive and unzip.
      *
      * @throws FileSystemException
      *      file system exception 
@@ -103,11 +103,11 @@ public class PulsarShellUtils {
             LoggerShell.success("pulsar-shell first launch, downloading (~ 60MB), please wait...");
             String destination = AstraCliUtils.ASTRA_HOME + File.separator + LUNA_TARBALL;
             FileUtils.downloadFile(LUNA_URL, destination);
-            File pulsarShelltarball = new File (destination);
-            if (pulsarShelltarball.exists()) {
+            File tarArchive = new File (destination);
+            if (tarArchive.exists()) {
                 LoggerShell.info("File Downloaded. Extracting archive, please wait it can take a minute...");
                 try {
-                    FileUtils.extactTargzInAstraCliHome(pulsarShelltarball);
+                    FileUtils.extractTarArchiveInAstraCliHome(tarArchive);
                     if (isPulsarShellInstalled()) {
                         // Change file permission
                         File pulsarShellFile = new File(AstraCliUtils.ASTRA_HOME + File.separator  
@@ -124,7 +124,7 @@ public class PulsarShellUtils {
                             throw new FileSystemException("Cannot set pulsar-shell file as writable");
                         }
                         LoggerShell.success("pulsar-shell has been installed");
-                        if (!pulsarShelltarball.delete()) {
+                        if (!tarArchive.delete()) {
                             LoggerShell.warning("Pulsar-shell Tar archived was not deleted");
                         }
                     }
@@ -148,7 +148,7 @@ public class PulsarShellUtils {
      * @return
      *      unix process for pulsar-shell
      * @throws IOException
-     *      errors occured
+     *      errors occurred
      * @throws ConfigurationException
      *      starting pulsar shell 
      */

@@ -1,10 +1,6 @@
 package com.datastax.astra.cli.db.keyspace;
 
-import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.db.AbstractDatabaseCmd;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
-import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;

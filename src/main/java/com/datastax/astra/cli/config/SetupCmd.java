@@ -13,7 +13,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * Setup the configuration
+ * Set up the configuration
  *
  * @author Cedrick LUNVEN (@clunven)
  */
@@ -29,11 +29,9 @@ public class SetupCmd extends AbstractCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
-     // On setup you must have output
         if (tokenParam == null || tokenParam.isBlank()) {
             verbose = true;
-            String token = null;
-            
+            String token;
             AstraCliConsole.println("    _____            __                ",  Ansi.Color.YELLOW);
             AstraCliConsole.println("   /  _  \\   _______/  |_____________   ",  Ansi.Color.YELLOW);
             AstraCliConsole.println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\ ",  Ansi.Color.YELLOW);
@@ -71,9 +69,7 @@ public class SetupCmd extends AbstractCmd {
      * Based on provided token create the default section.
      * 
      * @param token
-     *      current token
-     * @return
-     *      if token is valid
+     *      token to create a section
      * @throws InvalidTokenException
      *      invalid token provided 
      */

@@ -599,6 +599,7 @@ public class DatabaseService {
     public void generateDotEnvFile(String dbName, String ks, String region, String dest) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
         EnvFile envFile = new EnvFile(dest);
+
         // Organization Block
         Organization org = CliContext.getInstance().getApiDevopsOrganizations().organization();
         envFile.getKeys().put(EnvKey.ASTRA_ORG_ID, org.getId());
@@ -607,27 +608,30 @@ public class DatabaseService {
         
         // Database
         Database db = dbDao.getDatabase(dbName);
+        Map<String, Datacenter> datacenters = db
+                .getInfo().getDatacenters()
+                .stream().collect(Collectors.toMap(Datacenter::getRegion, Function.identity()));
         envFile.getKeys().put(EnvKey.ASTRA_DB_ID, db.getId());
         envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, db.getInfo().getRegion());
-        if (region != null) {
-            // Parameter Validations
-            Set<String> availableRegions = CliContext.getInstance()
-                    .getApiDevopsOrganizations()
-                    .regionsServerless()
-                    .map(DatabaseRegionServerless::getName)
-                    .collect(Collectors.toSet());
-            if (!availableRegions.contains(region)) {
-                throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
-            }
-            Set <String> dbRegions = db.getInfo().getDatacenters()
-                    .stream().map(Datacenter::getRegion).collect(Collectors.toSet());
-            if (!dbRegions.contains(region)) {
-                throw new InvalidArgumentException("Database is not deployed in provided region");
-            }
-            envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, region);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_SECURE_BUNDLE_URL, datacenters.get(region).getSecureBundleUrl());
+
+        if (region == null) region = db.getInfo().getRegion();
+        // Parameter Validations
+        Set<String> availableRegions = CliContext.getInstance()
+                .getApiDevopsOrganizations()
+                .regionsServerless()
+                .map(DatabaseRegionServerless::getName)
+                .collect(Collectors.toSet());
+        if (!availableRegions.contains(region)) {
+            throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
         }
-        // Keyspace
-        envFile.getKeys().put(EnvKey.ASTRA_DB_KEYSPACE, ks);
+        Set <String> dbRegions = db.getInfo().getDatacenters()
+                .stream().map(Datacenter::getRegion).collect(Collectors.toSet());
+        if (!dbRegions.contains(region)) {
+            throw new InvalidArgumentException("Database is not deployed in provided region");
+        }
+        envFile.getKeys().put(EnvKey.ASTRA_DB_REGION, region);
+
         // Application Token
         envFile.getKeys().put(EnvKey.ASTRA_DB_APPLICATION_TOKEN, CliContext.getInstance().getToken());
         // Cloud secure Bundle
@@ -637,10 +641,18 @@ public class DatabaseService {
                 + AstraClientConfig.buildScbFileName(db.getId(), region));
         // GraphQL URL
         String graphQLEndpoint = ApiLocator.getApiGraphQLEndPoint(db.getId(), region);
+        // Keyspace
+        if (ks == null) ks = db.getInfo().getKeyspace();
+        envFile.getKeys().put(EnvKey.ASTRA_DB_KEYSPACE, ks);
         envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL, graphQLEndpoint + "/graphql/" + ks);
         envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL_PLAYGROUND, graphQLEndpoint + "/playground");
         envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL_SCHEMA, graphQLEndpoint + "/graphql-schema");
         envFile.getKeys().put(EnvKey.ASTRA_DB_GRAPHQL_URL_ADMIN, graphQLEndpoint + "/graphql-admin");
+
+        // Rest URL
+        String restEndpoint = ApiLocator.getApiRestEndpoint(db.getId(), region);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_REST_URL, restEndpoint);
+        envFile.getKeys().put(EnvKey.ASTRA_DB_REST_URL_SWAGGER, restEndpoint + "/swagger-ui/");
 
         envFile.save();
     }

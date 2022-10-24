@@ -1,7 +1,6 @@
 package com.datastax.astra.cli.core;
 
 import com.datastax.astra.cli.config.AstraConfiguration;
-import com.datastax.astra.cli.core.exception.InvalidArgumentException;
 import com.datastax.astra.cli.core.out.OutputFormat;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
@@ -52,7 +51,7 @@ public abstract class AbstractCmd implements Runnable {
     }
 
     /**
-     * Check parameters and throws speciliazed error
+     * Check parameters and throws specialized error
      */
     protected void validateOptions() {
         List<String> validFormats = Arrays.stream(OutputFormat.values()).map(OutputFormat::name).toList();

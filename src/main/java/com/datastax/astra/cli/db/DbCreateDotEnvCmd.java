@@ -9,7 +9,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * Unforce update of the program.
+ * Create .env file.
  *
  * @author Cedrick LUNVEN (@clunven)
  */

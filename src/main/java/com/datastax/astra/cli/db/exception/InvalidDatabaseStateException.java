@@ -3,6 +3,8 @@ package com.datastax.astra.cli.db.exception;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 
+import java.io.Serial;
+
 /**
  * Database not found
  *
@@ -11,6 +13,7 @@ import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 public class InvalidDatabaseStateException extends RuntimeException {
 
     /** Serial Number. */
+    @Serial
     private static final long serialVersionUID = -8460056062064740428L;
     
     /**

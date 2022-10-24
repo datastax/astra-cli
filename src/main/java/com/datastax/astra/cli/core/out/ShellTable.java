@@ -1,18 +1,15 @@
 package com.datastax.astra.cli.core.out;
 
+import com.datastax.astra.cli.core.CliContext;
+import com.datastax.astra.cli.core.ExitCode;
+import org.fusesource.jansi.Ansi;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.fusesource.jansi.Ansi;
-
-import com.datastax.astra.cli.core.CliContext;
-import com.datastax.astra.cli.core.ExitCode;
 
 /**
  * Standardize output for tables.
@@ -44,32 +41,22 @@ public class ShellTable implements Serializable {
     /**
      * Color of cell
      */
-    private Ansi.Color  cellColor = Ansi.Color.WHITE;
-    
-    /**
-     * Color of PK
-     */
-    private Ansi.Color  pkColor = Ansi.Color.RED;
-    
+    private Ansi.Color cellColor = Ansi.Color.WHITE;
+
     /**
      * Title column names
      */
-    private List < String > columnTitlesNames = new ArrayList<>();
-    
-    /**
-     * Partition keys columns
-     */
-    private Set < String > pkColumns = new HashSet<>();
-    
+    private final List < String > columnTitlesNames = new ArrayList<>();
+
     /**
      * Columns sizes
      */
-    private Map < String, Integer > columnSize = new HashMap<>();
+    private final Map < String, Integer > columnSize = new HashMap<>();
     
     /**
      * Cell values
      */
-    private List< Map < String, String > > cellValues = new ArrayList<>();
+    private final List< Map < String, String > > cellValues = new ArrayList<>();
     
     /** Shell Table */
     public ShellTable() {
@@ -147,11 +134,7 @@ public class ShellTable implements Serializable {
             // Keep Orders
             for(String columnName : columnTitlesNames) {
                 builder.append("| ", tableColor);
-                if (pkColumns.contains(columnName)) {
-                    builder.append(res.get(columnName), pkColor, columnSize.get(columnName));
-                } else {
-                    builder.append(res.get(columnName), cellColor, columnSize.get(columnName));
-                }
+                builder.append(res.get(columnName), cellColor, columnSize.get(columnName));
             }
             builder.append("|\n", tableColor);
         }
@@ -176,7 +159,7 @@ public class ShellTable implements Serializable {
      * Build column width.
      */
     private void computeColumnsWidths() {
-        cellValues.forEach(myRow -> columnTitlesNames.stream().forEach(colName -> {
+        cellValues.forEach(myRow -> columnTitlesNames.forEach(colName -> {
             if (!columnSize.containsKey(colName) ||
                  columnSize.get(colName) <  Math.max(colName.length(), myRow.get(colName).length())) {
                 columnSize.put(colName,  Math.max(colName.length(), myRow.get(colName).length()) + 1);
@@ -258,34 +241,14 @@ public class ShellTable implements Serializable {
     /**
      * Add a column.
      *
-     * @param colName
+     * @param columnName
      *      name
-     * @param colwidth
+     * @param columnWidth
      *      with
      */
-    public void addColumn(String colName, int colwidth) {
-        getColumnTitlesNames().add(colName);
-        getColumnSize().put(colName, colwidth);
-    }
-    
-    /**
-     * Add a row providing key/values.
-     * 
-     * @param row
-     *      row as a key/value hashmap
-     */
-    public void addRow(Map<String, String> row) {
-        getCellValues().add(row);
-    }
-
-    /**
-     * Getter accessor for attribute 'tableColor'.
-     *
-     * @return
-     *       current value of 'tableColor'
-     */
-    public Ansi.Color getTableColor() {
-        return tableColor;
+    public void addColumn(String columnName, int columnWidth) {
+        getColumnTitlesNames().add(columnName);
+        getColumnSize().put(columnName, columnWidth);
     }
 
     /**
@@ -308,41 +271,12 @@ public class ShellTable implements Serializable {
     }
 
     /**
-     * Setter accessor for attribute 'columnTitlesNames'.
-     * @param columnTitlesNames
-     * 		new value for 'columnTitlesNames '
-     */
-    public void setColumnTitlesNames(List<String> columnTitlesNames) {
-        this.columnTitlesNames = columnTitlesNames;
-    }
-
-    /**
-     * Getter accessor for attribute 'columnTitlesColor'.
-     *
-     * @return
-     *       current value of 'columnTitlesColor'
-     */
-    public Ansi.Color getColumnTitlesColor() {
-        return columnTitlesColor;
-    }
-
-    /**
      * Setter accessor for attribute 'columnTitlesColor'.
      * @param columnTitlesColor
      * 		new value for 'columnTitlesColor '
      */
     public void setColumnTitlesColor(Ansi.Color columnTitlesColor) {
         this.columnTitlesColor = columnTitlesColor;
-    }
-
-    /**
-     * Getter accessor for attribute 'cellColor'.
-     *
-     * @return
-     *       current value of 'cellColor'
-     */
-    public Ansi.Color getCellColor() {
-        return cellColor;
     }
 
     /**
@@ -365,53 +299,6 @@ public class ShellTable implements Serializable {
     }
 
     /**
-     * Setter accessor for attribute 'cellValues'.
-     * @param cellValues
-     * 		new value for 'cellValues '
-     */
-    public void setCellValues(List<Map<String, String>> cellValues) {
-        this.cellValues = cellValues;
-    }
-
-    /**
-     * Getter accessor for attribute 'pkColumns'.
-     *
-     * @return
-     *       current value of 'pkColumns'
-     */
-    public Set<String> getPkColumns() {
-        return pkColumns;
-    }
-
-    /**
-     * Setter accessor for attribute 'pkColumns'.
-     * @param pkColumns
-     * 		new value for 'pkColumns '
-     */
-    public void setPkColumns(Set<String> pkColumns) {
-        this.pkColumns = pkColumns;
-    }
-
-    /**
-     * Getter accessor for attribute 'pkColor'.
-     *
-     * @return
-     *       current value of 'pkColor'
-     */
-    public Ansi.Color getPkColor() {
-        return pkColor;
-    }
-
-    /**
-     * Setter accessor for attribute 'pkColor'.
-     * @param pkColor
-     * 		new value for 'pkColor '
-     */
-    public void setPkColor(Ansi.Color pkColor) {
-        this.pkColor = pkColor;
-    }
-
-    /**
      * Getter accessor for attribute 'columnSize'.
      *
      * @return
@@ -421,13 +308,4 @@ public class ShellTable implements Serializable {
         return columnSize;
     }
 
-    /**
-     * Setter accessor for attribute 'columnSize'.
-     * @param columnSize
-     * 		new value for 'columnSize '
-     */
-    public void setColumnSize(Map<String, Integer> columnSize) {
-        this.columnSize = columnSize;
-    }
-    
 }

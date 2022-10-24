@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
+import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
@@ -47,7 +48,7 @@ public class OperationsOrganization {
      * @return
      *      org client
      */
-    private static final OrganizationsClient orgClient() {
+    private static OrganizationsClient orgClient() {
         return CliContext.getInstance().getApiDevopsOrganizations();
     }
     
@@ -55,18 +56,18 @@ public class OperationsOrganization {
      * Return organization id.
      */
     public static void getId() {
-        System.out.print(orgClient().organizationId());
+        LoggerShell.println(orgClient().organizationId());
     }
     
     /**
      * Return organization name.
      */
     public static void getName() {
-        System.out.print(orgClient().organization().getName());
+        LoggerShell.println(orgClient().organization().getName());
     }
     
     /**
-     * Return organization infos.
+     * Return organization info.
      */
     public static void showOrg() {
         Organization org = orgClient().organization();
@@ -106,7 +107,7 @@ public class OperationsOrganization {
         orgClient().regionsServerless()
            .forEach(r -> {
                 Map <String, String> rf = new HashMap<>();
-                rf.put(COLUMN_CLOUD,  r.getCloudProvider().toString());
+                rf.put(COLUMN_CLOUD,  r.getCloudProvider());
                 rf.put(COLUMN_REGION_NAME,  r.getName());
                 rf.put(COLUMN_REGION_DISPLAY, r.getDisplayName());
                 sht.getCellValues().add(rf);

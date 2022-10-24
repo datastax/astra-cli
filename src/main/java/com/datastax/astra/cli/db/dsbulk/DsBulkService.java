@@ -128,7 +128,7 @@ public class DsBulkService  {
             FileUtils.downloadFile(config.url() + DSBULK_PREFIX + config.version() + ".tar.gz", tarArchive);
 
             LoggerShell.info("Installing  archive, please wait...");
-            FileUtils.extactTargzInAstraCliHome(new File(tarArchive));
+            FileUtils.extractTarArchiveInAstraCliHome(new File(tarArchive));
             if (!new File(dsbulkExecutable).setExecutable(true, false)) {
                 throw new FileSystemException("Cannot make dsbulk executable. ");
             }

@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 
+import com.datastax.astra.cli.core.out.LoggerShell;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -35,12 +36,12 @@ public class FileUtils {
      * @throws IOException
      *      error during opening archive
      */
-    public static void extactTargzInAstraCliHome(File tarFile) 
+    public static void extractTarArchiveInAstraCliHome(File tarFile)
     throws IOException{
         try (FileInputStream fis = new FileInputStream(tarFile)) {
             try (GzipCompressorInputStream gzIn = new GzipCompressorInputStream(fis)) {
                 try ( TarArchiveInputStream tis = new TarArchiveInputStream(gzIn)) {
-                  TarArchiveEntry tarEntry = null;
+                  TarArchiveEntry tarEntry;
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
                       // Escaping to remove invalid entry
                       String myTarEntry = tarEntry.getName()
@@ -50,11 +51,13 @@ public class FileUtils {
                               .replaceAll("\\|", "");
                       File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, myTarEntry).toFile();
                           if (tarEntry.isDirectory()) {
-                              if (!outputFile.exists()) {
-                                  outputFile.mkdirs();
-                              }
+                              if (!outputFile.exists() && outputFile.mkdirs())
+                                  LoggerShell.debug("Repository %s has been created"
+                                          .formatted(outputFile.getAbsolutePath()));
                           } else {
-                              outputFile.getParentFile().mkdirs();
+                              if (outputFile.getParentFile().mkdirs())
+                                  LoggerShell.debug("Repository %s has been created"
+                                          .formatted(outputFile.getParentFile().getAbsolutePath()));
                               try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                                   IOUtils.copy(tis, fos);
                               }
@@ -73,29 +76,22 @@ public class FileUtils {
      * @param file String
      */
     public static void downloadFile(String urlStr, String file) {
-        URL url;
-        FileOutputStream    fis = null;
-        BufferedInputStream bis = null;
         try {
-            url = new URL(urlStr);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            //urlConnection.setRequestProperty("Accept", "bytes");
-            bis = new BufferedInputStream(urlConnection.getInputStream());
-            fis = new FileOutputStream(file);
+            HttpURLConnection urlConnection = (HttpURLConnection) new URL(urlStr).openConnection();
+            int count;
             byte[] buffer = new byte[1024];
-            int count=0;
-            while((count = bis.read(buffer,0,1024)) != -1) {
-                fis.write(buffer, 0, count);
+            try (
+                 BufferedInputStream bis = new BufferedInputStream(urlConnection.getInputStream());
+                 FileOutputStream fis = new FileOutputStream(file)) {
+
+                while ((count = bis.read(buffer, 0, 1024)) != -1) {
+                    fis.write(buffer, 0, count);
+                }
             }
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Cannot read URL, invalid syntax",e);
+            throw new IllegalArgumentException("Cannot read URL, invalid syntax", e);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot download file:%s".formatted(e.getMessage()),e);
-        } finally {
-            try {
-                if (null != fis) fis.close();
-                if (null!= bis)  bis.close();
-            } catch (IOException e) {}
+            throw new IllegalArgumentException("Cannot download file:%s".formatted(e.getMessage()), e);
         }
     }
 }

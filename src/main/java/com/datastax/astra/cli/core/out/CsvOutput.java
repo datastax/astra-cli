@@ -28,10 +28,10 @@ public class CsvOutput implements Serializable{
     public static final String ERROR_MESSAGE_COLUMN = "error_message";
     
     /** line separator. */
-    public static final String ENV_LINE_SEPERATOR = "line.separator";
+    public static final String ENV_LINE_SEPARATOR = "line.separator";
     
     /** line separator. */
-    public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPERATOR);
+    public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPARATOR);
     
     /**
      * Headers in CSV
@@ -108,25 +108,6 @@ public class CsvOutput implements Serializable{
     }
     
     /**
-     * Getter accessor for attribute 'headers'.
-     *
-     * @return
-     *       current value of 'headers'
-     */
-    public List<String> getHeaders() {
-        return headers;
-    }
-
-    /**
-     * Setter accessor for attribute 'headers'.
-     * @param headers
-     * 		new value for 'headers '
-     */
-    public void setHeaders(List<String> headers) {
-        this.headers = headers;
-    }
-    
-    /**
      * Setter accessor for attribute 'headers'.
      * @param headers
      *      new value for 'headers '
@@ -134,24 +115,4 @@ public class CsvOutput implements Serializable{
     public void setHeaders(String... headers) {
         this.headers = Arrays.asList(headers);
     }
-
-    /**
-     * Getter accessor for attribute 'rows'.
-     *
-     * @return
-     *       current value of 'rows'
-     */
-    public List<Map<String, String>> getRows() {
-        return rows;
-    }
-
-    /**
-     * Setter accessor for attribute 'rows'.
-     * @param rows
-     * 		new value for 'rows '
-     */
-    public void setRows(List<Map<String, String>> rows) {
-        this.rows = rows;
-    }
-
 }

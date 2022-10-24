@@ -4,7 +4,7 @@ import com.datastax.astra.cli.db.AbstractDatabaseCmd;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * This command allows to load data with DsBulk.
+ * This command allows loading data with DsBulk.
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
@@ -32,7 +32,7 @@ public abstract class AbstractDsbulkCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "--schema.query" },
             title = "QUERY", 
-            description = "Optional to unloac or count")
+            description = "Optional to unload or count")
     protected String query;
 
     /**

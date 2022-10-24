@@ -1,12 +1,5 @@
 package com.datastax.astra.cli.iam;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.datastax.astra.cli.core.AbstractCmd;
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
@@ -20,6 +13,12 @@ import com.datastax.astra.sdk.organizations.domain.Role;
 import com.datastax.astra.sdk.organizations.domain.User;
 import com.datastax.astra.sdk.utils.IdUtils;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * Utility class for command `eolw`
  *
@@ -29,9 +28,6 @@ public class OperationIam {
     
     /** worki with roles. */
     public static final String COMMAND_ROLE = "role";
-    /** worki with users. */
-    public static final String COMMAND_USER = "user";
-    
     /** Column name. */
     private static final String COLUMN_ROLE_ID          = "Role Id";
     /** Column name. */
@@ -69,11 +65,8 @@ public class OperationIam {
     
     /**
      * List Roles.
-     * 
-     * @param cmd
-     *      current command
      */
-    public static void listUsers(AbstractCmd cmd) {
+    public static void listUsers() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_USER_ID, 37);
         sht.addColumn(COLUMN_USER_EMAIL, 20);
@@ -128,7 +121,7 @@ public class OperationIam {
                 sht.addPropertyRow("Actions", r.getPolicy().getActions().toString());
                 AstraCliConsole.printShellTable(sht);
             }
-            case JSON -> AstraCliConsole.printJson(new JsonOutput<Role>(ExitCode.SUCCESS,
+            case JSON -> AstraCliConsole.printJson(new JsonOutput<>(ExitCode.SUCCESS,
                     OperationIam.COMMAND_ROLE + " get " + role, r));
             case HUMAN -> {
                 sht.addPropertyListRows("Resources", r.getPolicy().getResources());
@@ -180,7 +173,7 @@ public class OperationIam {
                 sht.addPropertyRow("Roles", roleNames.toString());
                 AstraCliConsole.printShellTable(sht);
             }
-            case JSON -> AstraCliConsole.printJson(new JsonOutput<User>(ExitCode.SUCCESS, "user show " + user, r));
+            case JSON -> AstraCliConsole.printJson(new JsonOutput<>(ExitCode.SUCCESS, "user show " + user, r));
             case HUMAN -> {
                 sht.addPropertyListRows("Roles", roleNames);
                 AstraCliConsole.printShellTable(sht);
@@ -219,15 +212,12 @@ public class OperationIam {
 
     /**
      * Delete a user if exist.
-     * 
-     * @param cmd
-     *      current command options
      * @param user
      *      user email of technial identifier
      * @throws UserNotFoundException
      *      user not found
      */
-    public static void deleteUser(AbstractCmd cmd, String user) 
+    public static void deleteUser(String user)
     throws UserNotFoundException {
         OrganizationsClient oc = CliContext.getInstance().getApiDevopsOrganizations();
         Optional<User> optUser = oc.findUserByEmail(user);

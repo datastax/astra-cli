@@ -22,10 +22,7 @@ public class AstraCliUtils {
     
     /** Folder name where to download SCB. */
     public static final String SCB_FOLDER = "scb";
-    
-    /** Folder name to download archives */
-    public static final String TMP_FOLDER = "tmp";
-   
+
     /**
      * Show version.
      *

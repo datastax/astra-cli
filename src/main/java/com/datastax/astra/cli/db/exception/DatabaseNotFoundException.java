@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.db.exception;
 
+import java.io.Serial;
+
 /**
  * Database not found
  *
@@ -8,6 +10,7 @@ package com.datastax.astra.cli.db.exception;
 public class DatabaseNotFoundException extends RuntimeException {
 
     /** Serial Number. */
+    @Serial
     private static final long serialVersionUID = 8155558354861561721L;
     
     /**

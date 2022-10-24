@@ -7,7 +7,7 @@ import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
- * Show Keyspaces for an Database.
+ * Show Keyspaces for Databases.
  *
  * @author Cedrick LUNVEN (@clunven)
  */

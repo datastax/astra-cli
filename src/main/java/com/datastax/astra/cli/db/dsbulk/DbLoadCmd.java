@@ -18,7 +18,7 @@ public class DbLoadCmd extends AbstractDsbulkDataCmd {
             title = "dryRun", 
             description = "Enable or disable dry-run mode, a test mode that runs the "
                     + "command but does not load data. ")
-    protected boolean dryRun = false;
+    boolean dryRun = false;
     
     /** {@inheritDoc} */
     @Override

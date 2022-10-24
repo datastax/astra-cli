@@ -17,7 +17,7 @@ public class RoleGetCmd extends AbstractConnectedCmd {
     /** Role name or id. */
     @Required
     @Arguments(title = "ROLE", description = "Role name or identifier")
-    public String role;
+    String role;
     
     /** {@inheritDoc} */
     public void execute() throws RoleNotFoundException {

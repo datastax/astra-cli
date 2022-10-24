@@ -20,7 +20,7 @@ public class UserInviteCmd extends AbstractConnectedCmd {
     /** identifier or email. */
     @Required
     @Arguments(title = "EMAIL", description = "User Email")
-    public String user;
+    String user;
     
     /**
      * Cloud provider region to provision

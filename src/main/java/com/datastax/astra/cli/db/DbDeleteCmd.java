@@ -1,8 +1,5 @@
 package com.datastax.astra.cli.db;
 
-import com.datastax.astra.cli.core.exception.InvalidArgumentException;
-import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.github.rvesse.airline.annotations.Command;

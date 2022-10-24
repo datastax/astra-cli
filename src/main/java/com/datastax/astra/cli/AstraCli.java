@@ -99,7 +99,7 @@ import java.util.List;
          // Read
          StreamingListCmd.class, StreamingGetCmd.class,
          StreamingExistCmd.class, StreamingStatusCmd.class, 
-         StreamingPulsarTokenCmd.class,
+         StreamingPulsarTokenCmd.class, StreamingCreateDotEnvCmd.class,
          // Pulsar Shell
          PulsarShellCmd.class
     }),

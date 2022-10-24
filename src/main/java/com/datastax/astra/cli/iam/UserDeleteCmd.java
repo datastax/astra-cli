@@ -19,11 +19,11 @@ public class UserDeleteCmd extends AbstractConnectedCmd {
      */
     @Required
     @Arguments(title = "EMAIL", description = "User email or identifier")
-    public String user;
+    String user;
     
     /** {@inheritDoc} */
     public void execute() throws UserNotFoundException {
-        OperationIam.deleteUser(this, user);
+        OperationIam.deleteUser(user);
     }
     
 }

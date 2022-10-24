@@ -17,7 +17,7 @@ public class UserGetCmd extends AbstractConnectedCmd {
     /** identifier or email. */
     @Required
     @Arguments(title = "EMAIL", description = "User Email")
-    public String user;
+    String user;
     
     /** {@inheritDoc} */
     public void execute() throws UserNotFoundException {

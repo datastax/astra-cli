@@ -2,6 +2,8 @@ package com.datastax.astra.cli.db.exception;
 
 import com.datastax.astra.cli.core.out.LoggerShell;
 
+import java.io.Serial;
+
 /**
  * Business exception if multiple database names.
  * 
@@ -12,6 +14,7 @@ public class DatabaseNameNotUniqueException extends RuntimeException {
     /** 
      * Serial
      */
+    @Serial
     private static final long serialVersionUID = -7880080384291100885L;
    
     /**

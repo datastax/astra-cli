@@ -121,7 +121,7 @@ public class CqlShellService {
             FileUtils.downloadFile(settings.url(), tarArchive);
 
             LoggerShell.info("Installing  archive, please wait...");
-            FileUtils.extactTargzInAstraCliHome(new File(tarArchive));
+            FileUtils.extractTarArchiveInAstraCliHome(new File(tarArchive));
             patchCqlshInstallation();
             if (!new File(cqlshExecutable).setExecutable(true, false)) {
                 throw new FileSystemException("Cannot make cqlshell executable. ");

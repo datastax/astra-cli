@@ -35,10 +35,6 @@ public class EnvFile {
         /** database keyspace.*/
         ASTRA_DB_KEYSPACE,
         /** credentials. */
-        ASTRA_DB_CLIENT_ID,
-        /** credentials. */
-        ASTRA_DB_CLIENT_SECRET,
-        /** credentials. */
         ASTRA_DB_APPLICATION_TOKEN,
         /** bundle PATH.*/
         ASTRA_DB_SECURE_BUNDLE_PATH,
@@ -54,9 +50,8 @@ public class EnvFile {
         ASTRA_DB_GRAPHQL_URL_ADMIN,
         /** rest and document Api endpoint */
         ASTRA_DB_REST_URL,
-        /** swagger speficiation URL */
+        /** swagger specification URL */
         ASTRA_DB_REST_URL_SWAGGER,
-        
         /** Tenant Name. */
         ASTRA_STREAMING_NAME,
         /** Tenant Cloud. */
@@ -77,10 +72,10 @@ public class EnvFile {
     private static final String DOTENV_FILENAME = ".env";
     
     /** line separator. */
-    public static final String ENV_LINE_SEPERATOR = "line.separator";
+    public static final String ENV_LINE_SEPARATOR = "line.separator";
     
     /** line separator. */
-    public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPERATOR);
+    public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPARATOR);
     
     /**
      * Keys to be populated in file. 
@@ -126,7 +121,7 @@ public class EnvFile {
                     try {
                         keys.put(EnvKey.valueOf((String) key), value.toString());
                     } catch (IllegalArgumentException iae) {
-                        // ommit invalid keys
+                        LoggerShell.debug("Key %s omitted".formatted(key));
                     }
                 });
             } catch (Exception e) {

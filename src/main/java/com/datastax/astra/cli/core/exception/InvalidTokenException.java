@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.core.exception;
 
+import java.io.Serial;
+
 /**
  * Invalid parameter provided.
  *
@@ -11,6 +13,7 @@ public class InvalidTokenException extends RuntimeException {
     /** 
      * Serial
      */
+    @Serial
     private static final long serialVersionUID = -7071867151543923236L;
 
     /**

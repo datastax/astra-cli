@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.core.exception;
 
+import java.io.Serial;
+
 /**
  * Tenant not found
  *
@@ -8,6 +10,7 @@ package com.datastax.astra.cli.core.exception;
 public class ConfigurationException extends RuntimeException {
     
     /** serial. */
+    @Serial
     private static final long serialVersionUID = 134379114903653046L;
 
     /**

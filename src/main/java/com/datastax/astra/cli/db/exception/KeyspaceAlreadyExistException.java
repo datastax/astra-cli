@@ -2,6 +2,8 @@ package com.datastax.astra.cli.db.exception;
 
 import com.datastax.astra.cli.core.out.LoggerShell;
 
+import java.io.Serial;
+
 /**
  * Database not found
  *
@@ -10,6 +12,7 @@ import com.datastax.astra.cli.core.out.LoggerShell;
 public class KeyspaceAlreadyExistException extends RuntimeException {
 
     /** Serial Number. */
+    @Serial
     private static final long serialVersionUID = 968018206118357644L;
 
     /**

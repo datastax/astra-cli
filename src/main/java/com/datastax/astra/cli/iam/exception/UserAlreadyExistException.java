@@ -1,5 +1,7 @@
 package com.datastax.astra.cli.iam.exception;
 
+import java.io.Serial;
+
 /**
  * Database not found
  *
@@ -8,6 +10,7 @@ package com.datastax.astra.cli.iam.exception;
 public class UserAlreadyExistException extends RuntimeException {
 
     /** Serial Number. */
+    @Serial
     private static final long serialVersionUID = 968018206118357644L;
 
     /**
@@ -17,7 +20,7 @@ public class UserAlreadyExistException extends RuntimeException {
      *      users name
      */
     public UserAlreadyExistException(String userName) {
-        super("User '" + userName + "' already existsin the organization.");
+        super("User '" + userName + "' already exists in the organization.");
     }
 
 }

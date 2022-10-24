@@ -24,7 +24,7 @@ import com.datastax.astra.sdk.streaming.StreamingClient;
 public class CliContext {
 
     /**
-     * Singleton Pattern, private intance.
+     * Singleton Pattern, private instance.
      */
     private static CliContext instance;
     
@@ -59,7 +59,7 @@ public class CliContext {
     private AstraConfiguration astraConfig;
      
     /**
-     * Should initialized the client based on provided parameters.
+     * Should initialize the client based on provided parameters.
      *
      * @param options
      *      options of the cli
@@ -102,20 +102,7 @@ public class CliContext {
     public boolean isVerbose() {
         return coreOptions != null && coreOptions.verbose();
     }
-    
-    /**
-     * Access if extra configuration file provided
-     * 
-     * @return
-     *    configuration file
-     */
-    public String getConfigFilename() {
-        if (coreOptions != null) {
-            return coreOptions.configFilename();   
-        }
-        return AstraConfiguration.getDefaultConfigurationFileName();
-    }
-    
+
     /**
      * Access output format
      * 
@@ -132,7 +119,7 @@ public class CliContext {
     /**
      * No explicit token = We want to read one from section
      * @throws TokenNotFoundException
-     *      tokken has not been found 
+     *      token has not been found
      */
     private void updateTokenWithSectionValue() 
     throws TokenNotFoundException {
