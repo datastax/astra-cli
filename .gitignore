@@ -3,6 +3,7 @@ astra-sdk-java.wiki/
 .astrarc
 sec
 
+
 # eclipse conf file
 .settings
 .classpath
@@ -19,6 +20,7 @@ sec
 target
 build
 tmp
+releases
 
 # misc
 .DS_Store
