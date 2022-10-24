@@ -5,7 +5,6 @@ import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.DatabaseDao;
-import com.datastax.astra.cli.db.exception.SecureBundleNotFoundException;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
@@ -150,13 +149,8 @@ public class CqlShellService {
         cqlSh.add("-u");cqlSh.add("token");
         cqlSh.add("-p");cqlSh.add(CliContext.getInstance().getToken());
         cqlSh.add("-b");
-        File scb = new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
-                AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()));
-        if (!scb.exists()) {
-            LoggerShell.error("Cloud Secure Bundle '" + scb.getAbsolutePath() + "' has not been found.");
-                    throw new SecureBundleNotFoundException(scb.getAbsolutePath());
-        }
-        cqlSh.add(scb.getAbsolutePath());
+        cqlSh.add(new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
+                AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion())).getAbsolutePath());
         
         // -- Custom options of Cqlsh itself
         if (options.debug())

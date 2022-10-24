@@ -131,12 +131,19 @@ public class EnvFile {
     }
     
     /**
-     * Save .env
+     * Save .env. Key values are wrapped with quotes  when not present.
      */
     public void save() {
         try (FileWriter out = new FileWriter(dotenvFile)) {
             StringBuilder sb = new StringBuilder();
-            keys.forEach((key, value) -> sb.append(key.name()).append("=\"").append(value).append("\"").append(LINE_SEPARATOR));
+            keys.forEach((key, value) -> {
+                sb.append(key.name());
+                sb.append("=");
+                if (!value.startsWith("\"")) sb.append("\"");
+                sb.append(value);
+                if (!value.startsWith("\"")) sb.append("\"");
+                sb.append(LINE_SEPARATOR);
+            });
             out.write(sb.toString());
         } catch (IOException e) {
             throw new IllegalStateException("Cannot save dotenv file", e);
@@ -166,6 +173,16 @@ public class EnvFile {
      */
     public LinkedHashMap<EnvKey, String> getKeys() {
         return keys;
+    }
+
+    /**
+     * Get value of dotenv file.
+     *
+     * @return
+     *      file for dotenv
+     */
+    public File getDotenvFile() {
+        return dotenvFile;
     }
 }
     

@@ -1,12 +1,10 @@
 package com.datastax.astra.cli.test.streaming;
 
+import java.io.File;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 import com.datastax.astra.cli.core.ExitCode;
 import com.datastax.astra.cli.test.AbstractCmdTest;
@@ -21,10 +19,21 @@ public class StreamingCommandTest extends AbstractCmdTest {
     
     static String RANDOM_TENANT = "cli-" + 
             UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12);
-    
+
+    @BeforeAll
+    public static void testShouldCreateTenant() {
+        try {
+            assertSuccessCli("streaming create %s ".formatted(RANDOM_TENANT));
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
+    }
+
     @Test
     @Order(1)
-    public void should_show_help() {
+    public void testShouldShowHelp() {
         assertSuccessCli("help");
         assertSuccessCli("help streaming");
         assertSuccessCli("help streaming create");
@@ -38,12 +47,11 @@ public class StreamingCommandTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_create_tenant() {
+    public void testShouldExistTenant() {
         // Given
         Assertions.assertFalse(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
         // When
         assertSuccessCli("streaming exist " + RANDOM_TENANT);
-        assertSuccessCli("streaming create " + RANDOM_TENANT);
         // Then
         Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "streaming create " + RANDOM_TENANT);
@@ -91,9 +99,17 @@ public class StreamingCommandTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.NOT_FOUND, "streaming get does-not-exist");
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "streaming get " + RANDOM_TENANT + " -o yaml"); 
     }
-    
+
     @Test
     @Order(7)
+    public void testShouldCreateDotenv()  {
+        assertSuccessCli("streaming create-dotenv %s -d %s".formatted(RANDOM_TENANT, "/tmp/"));
+        Assertions.assertTrue(new File("/tmp/.env").exists());
+    }
+
+    
+    @Test
+    @Order(8)
     public void should_delete_tenant() {
         // Given
         Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
@@ -105,8 +121,15 @@ public class StreamingCommandTest extends AbstractCmdTest {
     }
     
     @Test
-    @Order(8)
+    @Order(9)
     public void should_delete_tenant_error() {
         assertExitCodeCli(ExitCode.NOT_FOUND, "streaming delete does-not-exist");
+    }
+
+    @AfterAll
+    public static void testShouldDeleteTenant() {
+        if (ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist()) {
+            assertSuccessCli("streaming delete " + RANDOM_TENANT);
+        }
     }
 }

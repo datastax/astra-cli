@@ -3,6 +3,7 @@ package com.datastax.astra.cli.streaming;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.ExitCode;
@@ -333,6 +334,7 @@ public class OperationsStreaming {
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSERVICE_URL, tenant.getWebServiceUrl());
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSOCKET_URL, tenant.getWebsocketUrl());
         envFile.save();
+        LoggerShell.success("File '%s' has been created/amended".formatted(envFile.getDotenvFile().getAbsolutePath()) );
     }
 
 }

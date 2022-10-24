@@ -49,6 +49,9 @@ public class DatabaseService {
     
     /** Allow Snake case. */
     public static final String KEYSPACE_NAME_PATTERN = "^[_a-z0-9]+$";
+
+    /** Default timeout for operations. */
+    public static final int DEFAULT_TIMEOUT_SECONDS = 300;
     
     /** column names. */
     static final String COLUMN_ID                = "id";
@@ -70,7 +73,7 @@ public class DatabaseService {
     static final String DB                       = "Database";
     /** working object. */
     static final String KS                       = "Keyspace ";
-    
+
     /**
      * Access to databases object.
      */
@@ -137,7 +140,7 @@ public class DatabaseService {
                if (db.getStatus().equals(status)) {
                    return ExitCode.SUCCESS;
                }
-               LoggerShell.success("%s '%s' has status '%s' waiting to be '%s' ..."
+               LoggerShell.info("%s '%s' has status '%s' waiting to be '%s' ..."
                        .formatted(DB, databaseName, db.getStatus(), status));
                
                long start = System.currentTimeMillis();
@@ -169,7 +172,7 @@ public class DatabaseService {
         
         // Success if you did not reach the timeout (meaning status is good)
         if (retries < timeout) {
-            LoggerShell.success("%s '%s' has status '%s' (took %d millis)"
+            LoggerShell.info("%s '%s' has status '%s' (took %d millis)"
                        .formatted(DB, db.getInfo().getName(), status, 
                                System.currentTimeMillis() - start));
             return ExitCode.SUCCESS;
@@ -307,8 +310,6 @@ public class DatabaseService {
         } else {
 
             if (!ifNotExist) {
-                LoggerShell.warning("Cannot create another %s with name '%s' Use flag --if-not-exist to connect to the existing database"
-                                .formatted(DB, databaseName));
                 throw new DatabaseNameNotUniqueException(databaseName);
             }
 
@@ -317,11 +318,11 @@ public class DatabaseService {
             switch (dbStatus) {
                 case HIBERNATED -> {
                     resumeDb(databaseName);
-                    waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
+                    waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
                     dbStatus = dbDao.getDatabase(databaseName).getStatus();
                 }
                 case PENDING, RESUMING -> {
-                    waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, 180);
+                    waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
                     dbStatus = dbDao.getDatabase(databaseName).getStatus();
                 }
                 default -> LoggerShell.info("%s '%s' already exist. Connecting to database.".formatted(DB, databaseName));
@@ -331,9 +332,6 @@ public class DatabaseService {
             if (DatabaseStatusType.ACTIVE.equals(dbStatus)) {
                 createKeyspace(databaseName, keyspace, true);
             } else {
-                LoggerShell.error(("%s '%s' already exists but was neither ACTIVE not " +
-                        "HIBERNATED but '%s', cannot create keyspace.")
-                        .formatted(DB, databaseName, dbStatus.toString()));
                 throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
             }
         }
@@ -402,7 +400,7 @@ public class DatabaseService {
     public void deleteDb(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         dbDao.getRequiredDatabaseClient(databaseName).delete();
-        AstraCliConsole.outputSuccess("Deleting Database '%s' (async operation)".formatted(databaseName));
+        LoggerShell.info("Deleting Database '%s' (async operation)".formatted(databaseName));
     }
   
     /**
@@ -569,12 +567,16 @@ public class DatabaseService {
             if (ifNotExist) {
                 LoggerShell.info("%s '%s' already exists. Connecting to keyspace.".formatted(KS, keyspaceName));
             } else {
-                LoggerShell.error("%s '%s' already exists. Cannot create another keyspace with same name. Use flag --if-not-exist to connect to the existing keyspace.".formatted(KS, keyspaceName));
                 throw new KeyspaceAlreadyExistException(keyspaceName, databaseName);
             }
         } else {
-            dbDao.getRequiredDatabaseClient(databaseName).createKeyspace(keyspaceName);
-            LoggerShell.info("%s '%s' is creating.".formatted(KS, keyspaceName));
+            try {
+                dbDao.getRequiredDatabaseClient(databaseName).createKeyspace(keyspaceName);
+                LoggerShell.info("%s '%s' is creating.".formatted(KS, keyspaceName));
+            } catch(Exception e) {
+               throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,
+                       dbDao.getDatabase(databaseName).getStatus());
+            }
         }
     }
     

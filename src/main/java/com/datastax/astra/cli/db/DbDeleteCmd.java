@@ -1,9 +1,13 @@
 package com.datastax.astra.cli.db;
 
+import com.datastax.astra.cli.core.out.AstraCliConsole;
+import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.datastax.astra.sdk.databases.domain.DatabaseStatusType;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+
+import java.util.logging.Logger;
 
 /**
  * Delete a DB is exist
@@ -30,9 +34,13 @@ public class DbDeleteCmd extends AbstractDatabaseCmd {
     /** {@inheritDoc} */
     public void execute() {
         dbServices.deleteDb(db);
-        if (wait &&  dbServices.retryUntilDbDeleted(db, timeout) >= timeout) {
-               throw new InvalidDatabaseStateException(db, DatabaseStatusType.TERMINATED,
-                       DatabaseStatusType.TERMINATING);
+        if (wait) {
+            if (dbServices.retryUntilDbDeleted(db, timeout) >= timeout) {
+                throw new InvalidDatabaseStateException(db, DatabaseStatusType.TERMINATED,
+                        DatabaseStatusType.TERMINATING);
+            } else {
+                AstraCliConsole.outputSuccess("Database %s has been deleted".formatted(db));
+            }
         }
     }
     

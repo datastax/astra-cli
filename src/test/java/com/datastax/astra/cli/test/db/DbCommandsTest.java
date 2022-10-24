@@ -194,7 +194,52 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(14)
+    public void testShouldImport() {
+        if (!disableTools){
+            assertSuccessCli("db", "load", DB_TEST,
+                    "-k", DB_TEST,
+                    "-t", TABLE_TEST,
+                    "-url", "src/test/resources/test_dataset.csv",
+                    "-logDir", "/tmp");
+        }
+    }
+
+    @Test
+    @Order(15)
+    public void testShouldExport() {
+        if (disableTools) {
+            assertSuccessCli("db", "unload", DB_TEST, "-k", DB_TEST,"-t", TABLE_TEST,
+                    "-url", "/tmp/export-"+ DB_TEST + "-" + TABLE_TEST,
+                    "-logDir", "/tmp");
+            Assertions.assertTrue(new File("/tmp/export_dataset.csv").exists());
+        }
+    }
+
+    @Test
+    @Order(16)
+    public void testShouldThrowDatabaseAlreadyExist() {
+        assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create %s".formatted(DB_TEST));
+        assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create-keyspace %s -k %s".formatted(DB_TEST, DB_TEST));
+    }
+
+    @Test
+    @Order(17)
+    public void testShouldThrowDatabaseInvalidState() {
+        // Given
+        // Create a temporary db without waiting..expecting status PENDING
+        assertSuccessCli("db create %s".formatted("tmp_db"));
+        // When, Then
+        assertExitCodeCli(ExitCode.UNAVAILABLE, "db create-keyspace %s -k %s".formatted("tmp_db", "ks"));
+        // Waiting for the db to be started
+        assertSuccessCli("db create %s --if-not-exist --wait".formatted("tmp_db"));
+        // Delete db
+        assertSuccessCli("db delete %s --wait".formatted("tmp_db"));
+    }
+
+    @Test
+    @Order(18)
     public void testShouldDeleteDb()  {
         assertSuccessCli("db delete %s".formatted(DB_TEST));
     }
+
 }

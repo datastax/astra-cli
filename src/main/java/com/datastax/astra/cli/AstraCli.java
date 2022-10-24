@@ -16,6 +16,8 @@ import com.datastax.astra.cli.db.dsbulk.DbLoadCmd;
 import com.datastax.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.datastax.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.datastax.astra.cli.db.exception.DatabaseNotFoundException;
+import com.datastax.astra.cli.db.exception.InvalidDatabaseStateException;
+import com.datastax.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.datastax.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.datastax.astra.cli.db.keyspace.DbListKeyspacesCmd;
 import com.datastax.astra.cli.iam.*;
@@ -190,21 +192,23 @@ public class AstraCli {
                  FileSystemException | ConfigurationException e) {
             AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
-        } catch (DatabaseNameNotUniqueException |
-                InvalidArgumentException dex) {
-           AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, dex.getMessage());
-           return  ExitCode.INVALID_PARAMETER;
-       } catch (DatabaseNotFoundException  |
+        } catch (InvalidArgumentException dex) {
+           AstraCliConsole.outputError(ExitCode.INVALID_ARGUMENT, dex.getMessage());
+           return  ExitCode.INVALID_ARGUMENT;
+        } catch (DatabaseNotFoundException  |
                 TenantNotFoundException    | 
                 RoleNotFoundException      |
                 UserNotFoundException ex) {
            AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
            return ExitCode.NOT_FOUND;
-       } catch (TenantAlreadyExistException |
-                UserAlreadyExistException e) {
+       } catch (DatabaseNameNotUniqueException | KeyspaceAlreadyExistException |
+                TenantAlreadyExistException | UserAlreadyExistException e) {
            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
            return ExitCode.ALREADY_EXIST;
-       } catch (Exception ex) {
+       } catch(InvalidDatabaseStateException ex) {
+            AstraCliConsole.outputError(ExitCode.UNAVAILABLE, ex.getMessage());
+            return ExitCode.UNAVAILABLE;
+        } catch (Exception ex) {
            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
            return ExitCode.INTERNAL_ERROR;
        }

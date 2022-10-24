@@ -24,8 +24,8 @@ public class DatabaseNameNotUniqueException extends RuntimeException {
      *      db name
      */
     public DatabaseNameNotUniqueException(String dbName) {
-        super("Multiple databases with name '" + dbName + "' exist.");
-        LoggerShell.warning(getMessage());
+        super("Cannot create another Database with name '%s' Use flag --if-not-exist to connect to the existing database".formatted(dbName));
+
     }
     
 }

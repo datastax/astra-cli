@@ -71,7 +71,7 @@ public abstract class AbstractCmdTest {
      * @return
      *      utils
      */
-    protected CliContext ctx() {
+    public static CliContext ctx() {
         return CliContext.getInstance();
     }
    

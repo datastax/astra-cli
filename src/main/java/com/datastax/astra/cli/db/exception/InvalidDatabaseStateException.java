@@ -30,7 +30,6 @@ public class InvalidDatabaseStateException extends RuntimeException {
         super("Database '" + dbName + "' has been found "
                 + "but operation cannot be processed due "
                 + "to invalid state (" + (current) + ") expected (" + expected + ")");
-        LoggerShell.warning(getMessage());
     }
 
 }

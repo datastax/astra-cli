@@ -5,7 +5,6 @@ import com.datastax.astra.cli.core.exception.CannotStartProcessException;
 import com.datastax.astra.cli.core.exception.FileSystemException;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.db.DatabaseDao;
-import com.datastax.astra.cli.db.exception.SecureBundleNotFoundException;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.cli.utils.FileUtils;
 import com.datastax.astra.sdk.config.AstraClientConfig;
@@ -216,12 +215,8 @@ public class DsBulkService  {
         // Cloud Secure bundle
         options.add("-b");
         Database db = dbDao.getDatabase(dbName);
-        File scb = new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
-                AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion()));
-        if (!scb.exists()) {
-            throw new SecureBundleNotFoundException(scb.getAbsolutePath());
-        }
-        options.add(scb.getAbsolutePath());
+        options.add(new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
+                AstraClientConfig.buildScbFileName(db.getId(), db.getInfo().getRegion())).getAbsolutePath());
     }
     
     /**

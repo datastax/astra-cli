@@ -24,8 +24,9 @@ public class KeyspaceAlreadyExistException extends RuntimeException {
      *      database name
      */
     public KeyspaceAlreadyExistException(String ksName, String dbname) {
-        super("Keyspace '" + ksName + "' already exists for database '" + dbname + "'");
-        LoggerShell.warning(getMessage());
+        super(("Keyspace '%s' already exists for database %s. " +
+                "Cannot create another keyspace with same name. " +
+                "Use flag --if-not-exist to connect to the existing keyspace.").formatted(ksName, dbname));
     }
 
 }
