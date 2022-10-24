@@ -44,12 +44,7 @@ public class FileUtils {
                   TarArchiveEntry tarEntry;
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
                       // Escaping to remove invalid entry
-                      String myTarEntry = tarEntry.getName()
-                              .replace(">", "")
-                              .replace("<", "")
-                              .replace("\\*", "")
-                              .replace("\\|", "");
-                      File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, myTarEntry).toFile();
+                      File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, escapeTarEntry(tarEntry.getName())).toFile();
                           if (tarEntry.isDirectory()) {
                               if (!outputFile.exists() && outputFile.mkdirs())
                                   LoggerShell.debug("Repository %s has been created"
@@ -67,6 +62,22 @@ public class FileUtils {
               }
           }
        }
+    }
+
+    /**
+     * Escape value for the entry.
+     *
+     * @param tarEntry
+     *      entry
+     * @return
+     *      escaped
+     */
+    private static String escapeTarEntry(String tarEntry) {
+        return tarEntry
+                .replaceAll(">", "")
+                .replaceAll("<", "")
+                .replaceAll("\\*", "")
+                .replaceAll("\\|", "");
     }
     
     /**

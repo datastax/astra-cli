@@ -13,7 +13,7 @@ public class OrgCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OperationsOrganization.showOrg();
+        OrganizationService.getInstance().showOrg();
     }
 
 }

@@ -8,12 +8,12 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsOrganization.CMD_REGIONS, description = "Show available regions (classic).")
+@Command(name = OrganizationService.CMD_REGIONS, description = "Show available regions (classic).")
 public class OrgListRegionsClassicCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OperationsOrganization.listRegions();
+        OrganizationService.getInstance().listRegions();
     }
 
 }

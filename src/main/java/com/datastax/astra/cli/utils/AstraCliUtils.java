@@ -24,6 +24,11 @@ public class AstraCliUtils {
     public static final String SCB_FOLDER = "scb";
 
     /**
+     * Hide default constructor.
+     */
+    private AstraCliUtils() {}
+
+    /**
      * Show version.
      *
      * @return

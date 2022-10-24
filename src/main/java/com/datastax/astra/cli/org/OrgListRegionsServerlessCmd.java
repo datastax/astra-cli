@@ -8,12 +8,12 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsOrganization.CMD_SERVERLESS, description = "Show available regions (serverless).")
+@Command(name = OrganizationService.CMD_SERVERLESS, description = "Show available regions (serverless).")
 public class OrgListRegionsServerlessCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OperationsOrganization.listRegionsServerless();
+        OrganizationService.getInstance().listRegionsServerless();
     }
 
 }

@@ -4,6 +4,7 @@ import com.datastax.astra.cli.core.CliContext;
 import com.datastax.astra.cli.core.out.AstraCliConsole;
 import com.datastax.astra.cli.core.out.LoggerShell;
 import com.datastax.astra.cli.core.out.ShellTable;
+import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class OperationsOrganization {
+public class OrganizationService {
     
     /** cmd. */
     public static final String CMD_ID = "id";
@@ -35,31 +36,57 @@ public class OperationsOrganization {
     public static final String COLUMN_REGION_NAME = "Region";
     /** column names. */
     public static final String COLUMN_REGION_DISPLAY= "Full Name";
-    
+
+    /** Http Client for devops Api. */
+    private final OrganizationsClient orgClient;
+
+    /**
+     * Singleton pattern.
+     */
+    private static OrganizationService instance;
+
+    /**
+     * Singleton pattern.
+     *
+     * @return
+     *      organization.
+     */
+    public static synchronized OrganizationService getInstance() {
+        if (instance == null) {
+            instance = new OrganizationService(CliContext.getInstance().getApiDevopsOrganizations());
+        }
+        return instance;
+    }
+
     /**
      * Hide default constructor.
+     *
+     * @param orgClient
+     *      http client to organization
      */
-    private OperationsOrganization() {}
+    private OrganizationService(OrganizationsClient orgClient) {
+        this.orgClient = orgClient;
+    }
 
     /**
      * Return organization id.
      */
-    public static void getId() {
-        LoggerShell.println(CliContext.getInstance().getApiDevopsOrganizations().organizationId());
+    public void getId() {
+        LoggerShell.println(orgClient.organizationId());
     }
     
     /**
      * Return organization name.
      */
-    public static void getName() {
-        LoggerShell.println(CliContext.getInstance().getApiDevopsOrganizations().organization().getName());
+    public void getName() {
+        LoggerShell.println(orgClient.organization().getName());
     }
     
     /**
      * Return organization info.
      */
-    public static void showOrg() {
-        Organization org = CliContext.getInstance().getApiDevopsOrganizations().organization();
+    public void showOrg() {
+        Organization org = orgClient.organization();
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
         sht.addPropertyRow(COLUMN_ID, org.getId());
@@ -69,12 +96,12 @@ public class OperationsOrganization {
     /**
      * Show organization regions.
      */
-    public static void listRegions() {
+    public void listRegions() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
-        CliContext.getInstance().getApiDevopsOrganizations().regions()
+        orgClient.regions()
            .forEach(r -> {
                 Map <String, String> rf = new HashMap<>();
                 rf.put(COLUMN_CLOUD,  r.getCloudProvider().toString());
@@ -88,20 +115,17 @@ public class OperationsOrganization {
     /**
      * Show serverless regions
      */
-    public static void listRegionsServerless() {
+    public void listRegionsServerless() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
-        CliContext.getInstance()
-                .getApiDevopsOrganizations()
-                .regionsServerless()
-                .forEach(r -> {
-                Map <String, String> rf = new HashMap<>();
-                rf.put(COLUMN_CLOUD,  r.getCloudProvider());
-                rf.put(COLUMN_REGION_NAME,  r.getName());
-                rf.put(COLUMN_REGION_DISPLAY, r.getDisplayName());
-                sht.getCellValues().add(rf);
+        orgClient.regionsServerless().forEach(r -> {
+            Map <String, String> rf = new HashMap<>();
+            rf.put(COLUMN_CLOUD,  r.getCloudProvider());
+            rf.put(COLUMN_REGION_NAME,  r.getName());
+            rf.put(COLUMN_REGION_DISPLAY, r.getDisplayName());
+            sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
     }  
