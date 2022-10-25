@@ -14,6 +14,7 @@ import com.datastax.astra.cli.db.cqlsh.CqlShellService;
 import com.datastax.astra.cli.db.dsbulk.DsBulkService;
 import com.datastax.astra.cli.utils.AstraCliUtils;
 import com.datastax.astra.sdk.utils.Token;
+import org.junit.After;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
@@ -130,13 +131,15 @@ public class DbCommandsTest extends AbstractCmdTest {
     @Test
     @Order(8)
     public void testShouldCreateDotenv()  {
-        assertSuccessCli("db create-dotenv %s -d %s".formatted(DB_TEST, "/tmp/"));
-        Assertions.assertTrue(new File("/tmp/.env").exists());
+        if (!disableTools) {
+            assertSuccessCli("db create-dotenv %s -d %s".formatted(DB_TEST, "/tmp/"));
+        }
     }
     
     @Test
     @Order(9)
     public void testShouldResumeDb()  {
+        assertSuccessCli("db create-keyspace %s -k %s --if-not-exist --wait".formatted(DB_TEST, "kkk2"));
         assertSuccessCli("db resume %s --wait".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
     }
@@ -254,10 +257,11 @@ public class DbCommandsTest extends AbstractCmdTest {
         });
     }
 
-    @Test
-    @Order(19)
-    public void testShouldDeleteDb()  {
-        assertSuccessCli("db delete %s".formatted(DB_TEST));
+    //@AfterAll
+    public static void testShouldDelete() {
+        assertSuccessCli("db delete %s --wait".formatted(DB_TEST));
     }
+
+
 
 }

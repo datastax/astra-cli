@@ -11,7 +11,6 @@
 	<inceptionYear>2022</inceptionYear>
 	<version>0.1.alpha6</version>
 	<url>https://github.com/datastax/astra-cli</url>
-	
 	<properties>
 	 	<sonar.organization>clun-datastax</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -347,12 +346,13 @@
                 </executions>
             </plugin>
             
-            <!-- 
-		    <plugin>
+            <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>${version.maven.plugin.assembly}</version>
 				<configuration>
+					<finalName>astra-cli-${project.version}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
 					<descriptors>
 						<descriptor>src/main/assembly/assembly.xml</descriptor>
 					</descriptors>
@@ -361,12 +361,11 @@
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>attached</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
 		    </plugin>
-		    -->
 
 		</plugins>
 	</build>

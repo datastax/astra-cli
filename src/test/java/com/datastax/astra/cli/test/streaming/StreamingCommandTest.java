@@ -115,11 +115,13 @@ public class StreamingCommandTest extends AbstractCmdTest {
 
     @Test
     @Order(8)
-    public void should_delete_tenant() {
+    public void should_delete_tenant() throws InterruptedException {
         // Given
         Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
         // When
         assertSuccessCli("streaming delete " + RANDOM_TENANT);
+        // Operation is "almost" instantaneous but little tempo to avoid failing test
+        Thread.sleep(500);
         // Then
         assertSuccessCli("streaming exist " + RANDOM_TENANT);
         Assertions.assertFalse(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
