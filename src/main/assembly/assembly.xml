@@ -8,11 +8,6 @@
     </formats>
     <files>
         <file>
-            <source>${project.basedir}/README.MD</source>
-            <outputDirectory>/</outputDirectory>
-            <destName>README.MD</destName>
-        </file>
-        <file>
             <source>${project.build.directory}/astra-cli-${project.version}-shaded.jar</source>
             <outputDirectory>/</outputDirectory>
             <destName>astra-cli.jar</destName>
@@ -24,7 +19,7 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>astra</include>
-                <include>astra-cli-autocomplete.sh</include>
+                <include>astra-init.sh</include>
             </includes>
         </fileSet>
     </fileSets>

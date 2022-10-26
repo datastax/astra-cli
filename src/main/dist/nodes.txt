@@ -1,2 +1,0 @@
-autoload -U +X compinit > /dev/null 2>&1 && compinit
-autoload -U +X bashcompinit > /dev/null 2>&1 && bashcompinit

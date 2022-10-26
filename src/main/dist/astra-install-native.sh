@@ -176,21 +176,21 @@ echo "$(tput setaf 2)[OK]$(tput setaf 7) - Installation cleaned up"
 if [[ $darwin == true ]]; then
   # Adding on MAC OS
   touch "$astra_bash_profile"
-  if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_bash_profile") ]]; then
+  if [[ -z $(grep 'astra-init.sh' "$astra_bash_profile") ]]; then
     echo -e "\n$astra_init_snippet" >> "$astra_bash_profile"
     echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_bash_profile}"
   fi
 else
   # Attempt update of interactive bash profile on regular UNIX
   touch "${astra_bashrc}"
-  if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_bashrc") ]]; then
+  if [[ -z $(grep 'astra-init.sh' "$astra_bashrc") ]]; then
       echo -e "\n$astra_init_snippet" >> "$astra_bashrc"
       echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_bashrc}"
   fi
 fi
 
 touch "$astra_zshrc"
-if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_zshrc") ]]; then
+if [[ -z $(grep 'astra-init.sh' "$astra_zshrc") ]]; then
     echo -e "\n$astra_init_snippet" >> "$astra_zshrc"
     echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_zshrc}"
 fi

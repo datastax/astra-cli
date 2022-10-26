@@ -88,7 +88,7 @@ import java.util.List;
       commands = {
         OrgIdCmd.class, 
         OrgNameCmd.class,
-        OrgListRegionsClassicCmd.class, 
+        OrgListRegionsDbClassicCmd.class,
         OrgListRegionsServerlessCmd.class
     }),
     

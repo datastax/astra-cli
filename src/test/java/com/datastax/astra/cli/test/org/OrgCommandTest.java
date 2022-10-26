@@ -13,23 +13,35 @@ import com.datastax.astra.cli.test.AbstractCmdTest;
 public class OrgCommandTest extends AbstractCmdTest {
     
     @Test
-    public void should_display_org()  throws Exception {
+    public void should_display_org() {
         assertSuccessCli("org");
         assertSuccessCli("org -o json");
         assertSuccessCli("org -o csv");
         assertSuccessCli("org id");
         assertSuccessCli("org name");
-        assertSuccessCli("org list-regions-classic");
-        assertSuccessCli("org list-regions-classic -o json");
-        assertSuccessCli("org list-regions-classic -o csv");
-        assertSuccessCli("org list-regions-serverless");
-        assertSuccessCli("org list-regions-serverless -o csv");
-        assertSuccessCli("org list-regions-serverless -o json");
+    }
+
+    @Test
+    public void tesListDbRegionsServerless()  {
+        assertSuccessCli("org list-regions-db-serverless");
+        assertSuccessCli("org list-regions-db-serverless -o csv");
+        assertSuccessCli("org list-regions-db-serverless -o json");
+    }
+
+    @Test
+    public void testListDbRegionsClassic() {
+        assertSuccessCli("org list-regions-db-classic");
+
+        assertSuccessCli("org list-regions-db-classic --cloud aws");
+
+        assertSuccessCli("org list-regions-db-classic --cloud aws --filter us");
+        //assertSuccessCli("org list-regions-db-classic -o json");
+        //assertSuccessCli("org list-regions-db-classic -o csv");
     }
     
     @Test
-    public void should_org_errors() {
-        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "organe");
+    public void testThrowErrors() {
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "organ");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "org invalid");
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "org -o yaml");
     }

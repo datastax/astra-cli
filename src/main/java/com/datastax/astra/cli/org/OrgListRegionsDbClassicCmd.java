@@ -21,19 +21,35 @@ package com.datastax.astra.cli.org;
  */
 
 import com.datastax.astra.cli.core.AbstractConnectedCmd;
+import com.datastax.astra.cli.db.DatabaseService;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
  * List regions
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OrganizationService.CMD_REGIONS, description = "Show available regions (classic).")
-public class OrgListRegionsClassicCmd extends AbstractConnectedCmd {
+@Command(name = OrganizationService.CMD_REGIONS_DB_CLASSIC, description = "Show available regions (classic).")
+public class OrgListRegionsDbClassicCmd extends AbstractConnectedCmd {
+
+    /**
+     * Cloud provider
+     */
+    @Option(name = { "-c", "--cloud" }, title = "CLOUD", arity = 1,
+            description = "Filter on Cloud provider")
+    protected String cloud;
+
+    /**
+     * Filter on names
+     */
+    @Option(name = { "-f", "--filter" }, title = "filter", arity = 1,
+            description = "Filter on names")
+    protected String filter;
 
     /** {@inheritDoc} */
     public void execute() {
-        OrganizationService.getInstance().listRegions();
+        OrganizationService.getInstance().listRegionsDbClassic(cloud, filter);
     }
 
 }

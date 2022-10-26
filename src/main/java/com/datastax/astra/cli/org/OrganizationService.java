@@ -27,8 +27,7 @@ import com.datastax.astra.cli.core.out.ShellTable;
 import com.datastax.astra.sdk.organizations.OrganizationsClient;
 import com.datastax.astra.sdk.organizations.domain.Organization;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Operations on organizations
@@ -42,10 +41,11 @@ public class OrganizationService {
     /** cmd. */
     public static final String CMD_NAME = "name";
     /** cmd. */
-    public static final String CMD_REGIONS = "list-regions-classic";
+    public static final String CMD_REGIONS_DB_CLASSIC = "list-regions-db-classic";
     /** cmd. */
-    public static final String CMD_SERVERLESS = "list-regions-serverless";
-    
+    public static final String CMD_REGIONS_DB_SERVERLESS = "list-regions-db-serverless";
+    /** cmd. */
+    public static final String CMD_REGIONS_STREAMING = "list-regions-streaming";
     /** column names. */
     public static final String COLUMN_ID         = "id";
     /** column names. */
@@ -114,21 +114,38 @@ public class OrganizationService {
     }
     
     /**
-     * Show organization regions.
+     * Show organization database classic regions.
+     *
+     * @param cloudProvider
+     *      name of cloud provider
+     * @param filter
+     *      name of filter
      */
-    public void listRegions() {
+    public void listRegionsDbClassic(String cloudProvider, String filter) {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD,          10);
         sht.addColumn(COLUMN_REGION_NAME,    20);
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
-        orgClient.regions()
-           .forEach(r -> {
-                Map <String, String> rf = new HashMap<>();
-                rf.put(COLUMN_CLOUD,  r.getCloudProvider().toString());
-                rf.put(COLUMN_REGION_NAME,  r.getRegion());
-                rf.put(COLUMN_REGION_DISPLAY, r.getRegionDisplay());
-                sht.getCellValues().add(rf);
+        // Sorting Regions per cloud than region name
+        TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
+        orgClient.regions().forEach(r -> {
+            String cloud = r.getCloudProvider().toString().toLowerCase();
+            sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
+            sortedRegion.get(cloud).put(r.getRegion(), r.getRegionDisplay());
         });
+
+        // Building Table
+        sortedRegion.forEach((cloud, treemap) -> treemap.forEach((region, name) -> {
+            Map<String, String> rf = new HashMap<>();
+            if (cloudProvider==null || cloudProvider.equalsIgnoreCase(cloud)) {
+                if (filter == null || region.contains(filter) || name.contains(filter)) {
+                    rf.put(COLUMN_CLOUD, cloud);
+                    rf.put(COLUMN_REGION_NAME, region);
+                    rf.put(COLUMN_REGION_DISPLAY, name);
+                    sht.getCellValues().add(rf);
+                }
+            }
+        }));
         AstraCliConsole.printShellTable(sht);
     }
          
