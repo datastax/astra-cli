@@ -344,7 +344,6 @@
 					<plugin>
 						<groupId>org.graalvm.buildtools</groupId>
 						<artifactId>native-maven-plugin</artifactId>
-						<version>${native.maven.plugin.version}</version>
 						<extensions>true</extensions>
 						<executions>
 							<execution>
@@ -357,7 +356,6 @@
 						</executions>
 						<configuration>
 							<imageName>astra-native</imageName>
-							<useArgFile>false</useArgFile>
 							<mainClass>com.dtsx.astra.cli.AstraCli</mainClass>
 							<buildArgs>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>

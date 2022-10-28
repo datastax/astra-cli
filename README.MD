@@ -68,7 +68,7 @@ mvn clean install
 - Run with Agent:
 
 ```
-java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar target/astra-cli-0.1.alpha5-shaded.jar org list
+java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.1.alpha6-shaded.jar streaming list-regions
 ```
 
 - Build as a native image
