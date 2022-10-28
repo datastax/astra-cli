@@ -27,7 +27,7 @@ echo "         \/     \/                   \/ "
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.1.alpha5"
+ASTRA_CLI_VERSION="0.1.alpha6"
 
 echo "Installing Astra Cli $ASTRA_CLI_VERSION, please wait...      "
 
