@@ -27,6 +27,9 @@
     }, 
     {
       "pattern":"\\Qorg/fusesource/jansi/jansi.properties\\E"
+    },
+    {
+      "pattern":"\\Qapplication.properties\\E"
     }
   ]},
   "bundles":[]

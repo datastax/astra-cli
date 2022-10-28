@@ -85,7 +85,11 @@ public class CqlShellService {
         settings = new CqlShellConfig(
                 AstraCliUtils.readProperty("cqlsh.url"),
                 AstraCliUtils.readProperty("cqlsh.tarball"));
-                
+
+        //settings = new CqlShellConfig(
+        //        "https://downloads.datastax.com/enterprise/cqlsh-astra.tar.gz",
+        //        "cqlsh-astra.tar.gz");
+
         cqlshLocalFolder = new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra");
 
         cqlshExecutable = cqlshLocalFolder.getAbsolutePath() + File.separator + "bin" + File.separator + "cqlsh";
@@ -170,7 +174,7 @@ public class CqlShellService {
         cqlSh.add("-p");cqlSh.add(CliContext.getInstance().getToken());
         cqlSh.add("-b");
         cqlSh.add(new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
-                "scb_" + db.getId() + "_" + db.getInfo().getRegion()).getAbsolutePath());
+                AstraCliUtils.buildScbFileName(db.getId(), db.getInfo().getRegion())).getAbsolutePath());
         
         // -- Custom options of Cqlsh itself
         if (options.debug())
