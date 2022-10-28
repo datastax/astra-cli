@@ -148,8 +148,8 @@ astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}.zip"
 if [ -f "$astra_zip_file" ]; then
 	echo "$(tput setaf 2)[OK]$(tput setaf 7) - Archive is already there"
 else
-	curl --fail --location --progress-bar "$download_url" > "$astra_zip_file"  
-	echo "$(tput setaf 2)[OK]$(tput setaf 7) - File downloaded"  
+	curl --fail --location --progress-bar "$download_url" > "$astra_zip_file"
+	echo "$(tput setaf 2)[OK]$(tput setaf 7) - File downloaded"
 fi
 
 # check integrity

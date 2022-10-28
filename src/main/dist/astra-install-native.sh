@@ -29,7 +29,7 @@ echo " "
 # Global variables
 ASTRA_CLI_VERSION="0.1.alpha6"
 
-echo "Installing Astra Cli $ASTRA_CLI_VERSION, please wait...      "
+echo "Installing Astra Cli$(tput setaf 6) $ASTRA_CLI_VERSION $(tput setaf 7) please wait...      "
 
 ASTRA_CLI_PLATFORM=$(uname)
 ASTRA_CLI_DIR="$HOME/.astra/cli"
@@ -48,7 +48,7 @@ astra_zshrc="${ZDOTDIR:-${HOME}}/.zshrc"
 astra_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR ASTRA_CLI TO WORK!!!
 export ASTRADIR="$ASTRA_CLI_DIR"
-[[ -s "${ASTRA_CLI_DIR}/astra-cli-autocomplete.sh" ]] && source "${ASTRA_CLI_DIR}/astra-cli-autocomplete.sh"
+[[ -s "${ASTRA_CLI_DIR}/astra-init.sh" ]] && source "${ASTRA_CLI_DIR}/astra-init.sh"
 EOF
 )
 
@@ -57,24 +57,38 @@ cygwin=false;
 darwin=false;
 solaris=false;
 freebsd=false;
+linux=false;
 case "$(uname)" in
     CYGWIN*)
         cygwin=true
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-windows.zip"
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-windows.zip"
         ;;
     Darwin*)
         darwin=true
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-mac.zip"
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-mac.zip"
         ;;
     SunOS*)
         solaris=true
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
         ;;
     FreeBSD*)
         freebsd=true
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        ;;
+    Linux*)
+        linux=true
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        ;;
 esac
 
 # Sanity checks
 echo ""
-echo "Checking prerequisites:"
-
+echo "$(tput setaf 6)Checking prerequisites:$(tput setaf 7)"
 if [ -d "$ASTRA_DIR" ]; then
 	echo ""
 	echo "======================================================================================================"
@@ -98,18 +112,6 @@ if ! command -v unzip > /dev/null; then
 fi
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - unzip command is available"
 
-if ! command -v zip > /dev/null; then
-	echo "Not found."
-	echo "======================================================================================================"
-	echo " Please install zip on your system using your favourite package manager."
-	echo ""
-	echo " Restart after installing zip."
-	echo "======================================================================================================"
-	echo ""
-	exit 1
-fi
-echo "$(tput setaf 2)[OK]$(tput setaf 7) - zip command is available"
-
 if ! command -v curl > /dev/null; then
 	echo "Not found."
 	echo ""
@@ -124,7 +126,7 @@ fi
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - curl command is available"
 
 echo ""
-echo "Preparing directories:"
+echo "$(tput setaf 6)Preparing directories:$(tput setaf 7)"
 mkdir -p "$astra_tmp_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Created $astra_tmp_folder"
 mkdir -p "$ASTRA_CLI_DIR"
@@ -133,9 +135,7 @@ mkdir -p "$astra_scb_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Created $astra_scb_folder"
 
 echo ""
-echo "Downloading archive:"
-download_url="https://github.com/datastax/astra-cli/raw/main/releases/astra-cli-${ASTRA_CLI_VERSION}.zip"
-astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}.zip"
+echo "$(tput setaf 6)Downloading archive:$(tput setaf 7)"
 if [ -f "$astra_zip_file" ]; then
 	echo "$(tput setaf 2)[OK]$(tput setaf 7) - Archive is already there"
 else
@@ -155,14 +155,13 @@ if [[ -z "$ARCHIVE_OK" ]]; then
 fi
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Integrity of the archive checked"
 
-
 if [[ "$cygwin" == 'true' ]]; then
 	astra_tmp_folder=$(cygpath -w "$astra_tmp_folder")
 	astra_zip_file=$(cygpath -w "$astra_zip_file")
 fi
 
 echo ""
-echo "Extracting and installation:"
+echo "$(tput setaf 6)Extracting and installation:$(tput setaf 7)"
 unzip -qo "$astra_zip_file" -d "$astra_tmp_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Extraction is successful"
 
@@ -197,6 +196,15 @@ fi
 
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Installation Successful"
 echo ""
+if [[ "$darwin" == 'true' ]]; then
+	echo "+---------------------------------------------------------------------+"
+  echo "| ⚠️     Mac installation detected                                     |"
+  echo "|                                                                     |"
+  echo "| astra is now a binary                                               |"
+  echo "| Make sure to $(tput setaf 3)authorize in System Preferences$(tput setaf 7) during first usage     |"
+  echo "+---------------------------------------------------------------------+"
+  echo ""
+fi
 echo "Open $(tput setaf 2)A NEW TERMINAL$(tput setaf 7) and run: $(tput setaf 3)astra setup$(tput setaf 7)"
 echo ""
 echo "You can close this window."
