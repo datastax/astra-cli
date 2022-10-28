@@ -1,40 +1,40 @@
 [
   {
-    "name":"com.datastax.astra.cli.core.AbstractCmd",
+    "name":"com.dtsx.astra.cli.core.AbstractCmd",
     "allDeclaredFields":true}
 ,
   {
-    "name":"com.datastax.astra.cli.core.AbstractConnectedCmd",
+    "name":"com.dtsx.astra.cli.core.AbstractConnectedCmd",
     "allDeclaredFields":true
   },
 
 
   {
-    "name":"com.datastax.astra.cli.config.SetupCmd",
+    "name":"com.dtsx.astra.cli.config.SetupCmd",
     "allDeclaredFields":true
   },
   {
-    "name":"com.datastax.astra.cli.config.ConfigCreateCmd",
+    "name":"com.dtsx.astra.cli.config.ConfigCreateCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.config.ConfigDeleteCmd",
+    "name":"com.dtsx.astra.cli.config.ConfigDeleteCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.config.ConfigGetCmd",
+    "name":"com.dtsx.astra.cli.config.ConfigGetCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.config.ConfigListCmd",
+    "name":"com.dtsx.astra.cli.config.ConfigListCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.core.DefaultCmd",
+    "name":"com.dtsx.astra.cli.core.DefaultCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
@@ -42,51 +42,51 @@
 
 
   {
-    "name":"com.datastax.astra.cli.db.AbstractDatabaseCmd",
+    "name":"com.dtsx.astra.cli.db.AbstractDatabaseCmd",
     "allDeclaredFields":true
   },
   {
-    "name":"com.datastax.astra.cli.db.DbCreateCmd",
+    "name":"com.dtsx.astra.cli.db.DbCreateCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbDeleteCmd",
+    "name":"com.dtsx.astra.cli.db.DbDeleteCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbDotEnvCmd",
+    "name":"com.dtsx.astra.cli.db.DbDotEnvCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbDownloadScbCmd",
+    "name":"com.dtsx.astra.cli.db.DbDownloadScbCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbGetCmd",
+    "name":"com.dtsx.astra.cli.db.DbGetCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbListCmd",
+    "name":"com.dtsx.astra.cli.db.DbListCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbResumeCmd",
+    "name":"com.dtsx.astra.cli.db.DbResumeCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.DbStatusCmd",
+    "name":"com.dtsx.astra.cli.db.DbStatusCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.cqlsh.DbCqlShellCmd",
+    "name":"com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
@@ -94,25 +94,25 @@
 
 
   {
-    "name":"com.datastax.astra.cli.db.dsbulk.AbstractDsbulkCmd",
+    "name":"com.dtsx.astra.cli.db.dsbulk.AbstractDsbulkCmd",
     "allDeclaredFields":true
   },
   {
-    "name":"com.datastax.astra.cli.db.dsbulk.AbstractDsbulkDataCmd",
+    "name":"com.dtsx.astra.cli.db.dsbulk.AbstractDsbulkDataCmd",
     "allDeclaredFields":true
   },
   {
-    "name":"com.datastax.astra.cli.db.dsbulk.DbCountCmd",
+    "name":"com.dtsx.astra.cli.db.dsbulk.DbCountCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.dsbulk.DbLoadCmd",
+    "name":"com.dtsx.astra.cli.db.dsbulk.DbLoadCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.datastax.astra.cli.db.dsbulk.DbUnLoadCmd",
+    "name":"com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -120,47 +120,24 @@
 
 
   {
-    "name":"com.datastax.astra.cli.db.keyspace.DbCreateKeyspaceCmd",
+    "name":"com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.db.keyspace.DbListKeyspacesCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-
-
-  {
-    "name":"com.datastax.astra.cli.iam.RoleGetCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-  {
-    "name":"com.datastax.astra.cli.iam.RoleListCmd",
+    "name":"com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
 
 
-
   {
-    "name":"com.datastax.astra.cli.iam.UserDeleteCmd",
+    "name":"com.dtsx.astra.cli.iam.RoleGetCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.iam.UserGetCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-  {
-    "name":"com.datastax.astra.cli.iam.UserInviteCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-  {
-    "name":"com.datastax.astra.cli.iam.UserListCmd",
+    "name":"com.dtsx.astra.cli.iam.RoleListCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
@@ -168,27 +145,50 @@
 
 
   {
-    "name":"com.datastax.astra.cli.org.OrgCmd",
+    "name":"com.dtsx.astra.cli.iam.UserDeleteCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+  {
+    "name":"com.dtsx.astra.cli.iam.UserGetCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+  {
+    "name":"com.dtsx.astra.cli.iam.UserInviteCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+  {
+    "name":"com.dtsx.astra.cli.iam.UserListCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]}
+,
+
+
+
+  {
+    "name":"com.dtsx.astra.cli.org.OrgCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.datastax.astra.cli.org.OrgIdCmd",
+    "name":"com.dtsx.astra.cli.org.OrgIdCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.org.OrgListRegionsClassicCmd",
+    "name":"com.dtsx.astra.cli.org.OrgListRegionsClassicCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.org.OrgListRegionsServerlessCmd",
+    "name":"com.dtsx.astra.cli.org.OrgListRegionsServerlessCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.org.OrgNameCmd",
+    "name":"com.dtsx.astra.cli.org.OrgNameCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
@@ -198,53 +198,53 @@
 
 
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingCreateCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingCreateCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingDeleteCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingDeleteCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingExistCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingExistCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingGetCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingGetCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingListCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingListCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingPulsarTokenCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingPulsarTokenCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.StreamingStatusCmd",
+    "name":"com.dtsx.astra.cli.streaming.StreamingStatusCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.cli.streaming.pulsarshell.PulsarShellCmd",
+    "name":"com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.CloudProviderType",
+    "name":"com.dtsx.astra.sdk.databases.domain.CloudProviderType",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true}
 ,
 
   {
-    "name":"com.datastax.astra.cli.core.out.JsonOutput",
+    "name":"com.dtsx.astra.cli.core.out.JsonOutput",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -256,34 +256,34 @@
   },
 
   {
-    "name":"com.datastax.astra.sdk.databases.domain.Database",
+    "name":"com.dtsx.astra.sdk.databases.domain.Database",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setAvailableActions","parameterTypes":["java.util.Set"] },
-      {"name":"setCost","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseCost"] },
+      {"name":"setCost","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseCost"] },
       {"name":"setCqlshUrl","parameterTypes":["java.lang.String"] },
       {"name":"setCreationTime","parameterTypes":["java.lang.String"] },
       {"name":"setDataEndpointUrl","parameterTypes":["java.lang.String"] },
       {"name":"setGrafanaUrl","parameterTypes":["java.lang.String"] },
       {"name":"setGraphqlUrl","parameterTypes":["java.lang.String"] },
       {"name":"setId","parameterTypes":["java.lang.String"] },
-      {"name":"setInfo","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseInfo"] },
+      {"name":"setInfo","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseInfo"] },
       {"name":"setLastUsageTime","parameterTypes":["java.lang.String"] },
-      {"name":"setMetrics","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseMetrics"] },
-      {"name":"setObservedStatus","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseStatusType"] },
+      {"name":"setMetrics","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseMetrics"] },
+      {"name":"setObservedStatus","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseStatusType"] },
       {"name":"setOrgId","parameterTypes":["java.lang.String"] },
       {"name":"setOwnerId","parameterTypes":["java.lang.String"] },
-      {"name":"setStatus","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseStatusType"] },
-      {"name":"setStorage","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseStorage"] },
+      {"name":"setStatus","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseStatusType"] },
+      {"name":"setStorage","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseStorage"] },
       {"name":"setStudioUrl","parameterTypes":["java.lang.String"] },
       {"name":"setTerminationTime","parameterTypes":["java.lang.String"] }
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseCost",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseCost",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -307,7 +307,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseCreationRequest",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseCreationRequest",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -323,7 +323,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseInfo",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseInfo",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -331,7 +331,7 @@
       {"name":"<init>","parameterTypes":[] },
       {"name":"setAdditionalKeyspaces","parameterTypes":["java.util.Set"] },
       {"name":"setCapacityUnits","parameterTypes":["int"] },
-      {"name":"setCloudProvider","parameterTypes":["com.datastax.astra.sdk.databases.domain.CloudProviderType"] },
+      {"name":"setCloudProvider","parameterTypes":["com.dtsx.astra.sdk.databases.domain.CloudProviderType"] },
       {"name":"setDatacenters","parameterTypes":["java.util.Set"] },
       {"name":"setKeyspace","parameterTypes":["java.lang.String"] },
       {"name":"setKeyspaces","parameterTypes":["java.util.Set"] },
@@ -341,7 +341,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseMetrics",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseMetrics",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -354,12 +354,12 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseStatusType",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseStatusType",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseStorage",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseStorage",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -371,14 +371,14 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.Datacenter",
+    "name":"com.dtsx.astra.sdk.databases.domain.Datacenter",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setCapacityUnits","parameterTypes":["int"] },
-      {"name":"setCloudProvider","parameterTypes":["com.datastax.astra.sdk.databases.domain.CloudProviderType"] },
+      {"name":"setCloudProvider","parameterTypes":["com.dtsx.astra.sdk.databases.domain.CloudProviderType"] },
       {"name":"setDateCreated","parameterTypes":["java.lang.String"] },
       {"name":"setId","parameterTypes":["java.lang.String"] },
       {"name":"setName","parameterTypes":["java.lang.String"] },
@@ -394,7 +394,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseRegionServerless",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseRegionServerless",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -410,7 +410,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.databases.domain.DatabaseRegion",
+    "name":"com.dtsx.astra.sdk.databases.domain.DatabaseRegion",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -418,8 +418,8 @@
       {"name":"<init>","parameterTypes":[] },
       {"name":"setCapacityUnitsLimit","parameterTypes":["int"] },
       {"name":"setCapacityUnitsUsed","parameterTypes":["int"] },
-      {"name":"setCloudProvider","parameterTypes":["com.datastax.astra.sdk.databases.domain.CloudProviderType"] },
-      {"name":"setCost","parameterTypes":["com.datastax.astra.sdk.databases.domain.DatabaseCost"] },
+      {"name":"setCloudProvider","parameterTypes":["com.dtsx.astra.sdk.databases.domain.CloudProviderType"] },
+      {"name":"setCost","parameterTypes":["com.dtsx.astra.sdk.databases.domain.DatabaseCost"] },
       {"name":"setDatabaseCountLimit","parameterTypes":["int"] },
       {"name":"setDatabaseCountUsed","parameterTypes":["int"] },
       {"name":"setDefaultStoragePerCapacityUnitGb","parameterTypes":["int"] },
@@ -431,7 +431,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.organizations.domain.ResponseAllUsers",
+    "name":"com.dtsx.astra.sdk.organizations.domain.ResponseAllUsers",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -443,7 +443,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.organizations.domain.Role",
+    "name":"com.dtsx.astra.sdk.organizations.domain.Role",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -451,11 +451,11 @@
       {"name":"<init>","parameterTypes":[] },
       {"name":"setId","parameterTypes":["java.lang.String"] },
       {"name":"setName","parameterTypes":["java.lang.String"] },
-      {"name":"setPolicy","parameterTypes":["com.datastax.astra.sdk.organizations.domain.RolePolicy"] }
+      {"name":"setPolicy","parameterTypes":["com.dtsx.astra.sdk.organizations.domain.RolePolicy"] }
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.organizations.domain.RolePolicy",
+    "name":"com.dtsx.astra.sdk.organizations.domain.RolePolicy",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -468,7 +468,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.organizations.domain.User",
+    "name":"com.dtsx.astra.sdk.organizations.domain.User",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -476,17 +476,17 @@
       {"name":"<init>","parameterTypes":[] },
       {"name":"setEmail","parameterTypes":["java.lang.String"] },
       {"name":"setRoles","parameterTypes":["java.util.List"] },
-      {"name":"setStatus","parameterTypes":["com.datastax.astra.sdk.organizations.domain.UserStatus"] },
+      {"name":"setStatus","parameterTypes":["com.dtsx.astra.sdk.organizations.domain.UserStatus"] },
       {"name":"setUserId","parameterTypes":["java.lang.String"] }
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.organizations.domain.UserStatus",
+    "name":"com.dtsx.astra.sdk.organizations.domain.UserStatus",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true}
 ,
   {
-    "name":"com.datastax.astra.sdk.streaming.domain.Tenant",
+    "name":"com.dtsx.astra.sdk.streaming.domain.Tenant",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
@@ -511,7 +511,7 @@
     ]}
 ,
   {
-    "name":"com.datastax.astra.sdk.streaming.domain.CreateTenant",
+    "name":"com.dtsx.astra.sdk.streaming.domain.CreateTenant",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,

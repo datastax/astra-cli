@@ -14,9 +14,9 @@
 	<properties>
 	 	<sonar.organization>clun-datastax</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <app.main.class>com.datastax.astra.cli.AstraCli</app.main.class>
+        <app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<astra-sdk.version>0.3.4</astra-sdk.version>
+		<astra-sdk.version>0.3.5-SNAPSHOT</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.3</slf4j.version>
@@ -65,47 +65,12 @@
 			<artifactId>jansi</artifactId>
 			<version>${jansi.version}</version>
 		</dependency>
-		
-		<!-- Leveraging SDK for Astra Accesses -->
+
+		<!-- Http client wrapping Calls -->
 		<dependency>
 			<groupId>com.datastax.astra</groupId>
-			<artifactId>astra-sdk</artifactId>
+			<artifactId>astra-sdk-devops</artifactId>
 			<version>${astra-sdk.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-
-				</exclusion>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>io.grpc</groupId>
-  					<artifactId>grpc-netty-shaded</artifactId>
-				</exclusion>
-				<exclusion>
-	        		<groupId>io.stargate.grpc</groupId>
-	        		<artifactId>grpc-proto</artifactId>
-   				</exclusion>
-				<exclusion>
-			    	<groupId>com.datastax.oss</groupId>
-					<artifactId>java-driver-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.pulsar</groupId>
-					<artifactId>pulsar-client</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.pulsar</groupId>
-					<artifactId>pulsar-client-admin</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.everit.json</groupId>
-					<artifactId>org.everit.json.schema</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<!-- Commons -->
@@ -393,7 +358,7 @@
 						<configuration>
 							<imageName>astra-native</imageName>
 							<useArgFile>false</useArgFile>
-							<mainClass>com.datastax.astra.cli.AstraCli</mainClass>
+							<mainClass>com.dtsx.astra.cli.AstraCli</mainClass>
 							<buildArgs>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 								<buildArg>-H:EnableURLProtocols=http,https</buildArg>

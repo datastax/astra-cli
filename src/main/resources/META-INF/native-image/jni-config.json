@@ -1,6 +1,6 @@
 [
 {
-  "name":"com.datastax.astra.cli.AstraCli",
+  "name":"com.dtsx.astra.cli.AstraCli",
   "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
 },
 {
