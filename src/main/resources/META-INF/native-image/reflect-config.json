@@ -177,7 +177,7 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.dtsx.astra.cli.org.OrgListRegionsClassicCmd",
+    "name":"com.dtsx.astra.cli.org.OrgListRegionsDbClassicCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,

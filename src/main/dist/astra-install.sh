@@ -57,18 +57,27 @@ cygwin=false;
 darwin=false;
 solaris=false;
 freebsd=false;
+linux=false;
 case "$(uname)" in
     CYGWIN*)
         cygwin=true
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-windows.zip"
         ;;
     Darwin*)
         darwin=true
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-macos.zip"
         ;;
     SunOS*)
         solaris=true
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
         ;;
     FreeBSD*)
         freebsd=true
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+    Linux*)
+        linux=true
+        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+
 esac
 
 # Sanity checks
