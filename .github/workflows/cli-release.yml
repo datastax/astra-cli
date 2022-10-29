@@ -26,8 +26,7 @@ jobs:
         with:
           name: java-binary
           path: |
-            ${{ github.workspace }}/target/*.jar
-            !${{ github.workspace }}/target/original-*.jar
+            ${{ github.workspace }}/target/*-shaded.jar
           retention-days: 30
   build-native-image:
     name: Native image build on ${{ matrix.os }} and Java ${{ matrix.jdk-version }}
@@ -61,7 +60,7 @@ jobs:
       - name: Temporarily save package
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.artifact_name }}
+          name: astra-cli-${{ matrix.os }}-java-${{ matrix.jdk-version }}
           path: |
             astra-cli-*
             !*.txt
@@ -84,7 +83,7 @@ jobs:
             binary_name: astra-cli-macos
             file_glob: false
           - artifact_name: windows-binary
-            binary_name: astra-cli-windows.exe
+            binary_name: astra.exe
             file_glob: false
     steps:
       - name: Download binary

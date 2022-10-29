@@ -65,7 +65,7 @@ jobs:
         run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-macos
         if: runner.os == 'macOS'
       - name: Build native image on Windows
-        run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-windows
+        run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-windows.exe
         if: runner.os == 'Windows'
       - name: Temporarily save package
         uses: actions/upload-artifact@v3
