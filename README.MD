@@ -99,7 +99,7 @@ git push
 ```
 - Release
 ```
-mvn release:prepare release:perform
+mvn clean -DskipTests -Darguments=-DskipTests release:prepare release:perform
 ```
 
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
