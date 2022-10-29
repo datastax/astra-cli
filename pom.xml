@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.datastax.astra</groupId>
 	<artifactId>astra-cli</artifactId>
@@ -9,7 +7,7 @@
 	<description>Command Line Interface for DataStax Astra</description>
 	<packaging>jar</packaging>
 	<inceptionYear>2022</inceptionYear>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1</version>
 	<url>https://github.com/datastax/astra-cli</url>
 	<properties>
 	 	<sonar.organization>clun-datastax</sonar.organization>
@@ -216,8 +214,7 @@
 						<configuration>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
 							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>${app.main.class}</mainClass>
 								</transformer>
 							</transformers>
@@ -378,7 +375,7 @@
 		<connection>scm:git:git@github.com:datastax/astra-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:datastax/astra-cli.git</developerConnection>
 		<url>https://github.com/datastax/astra-cli</url>
-		<tag>HEAD</tag>
+		<tag>0.1</tag>
 	</scm>
 	
 	<distributionManagement>
