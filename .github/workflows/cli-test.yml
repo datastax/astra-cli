@@ -23,5 +23,5 @@ jobs:
           java-version: "17"
           distribution: "adopt"
       - name: Test with Maven
-        run: mvn test
+        run: mvn compile
         
