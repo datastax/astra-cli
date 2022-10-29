@@ -77,5 +77,30 @@ java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar targe
 mvn clean install -Pnative
 ```
 
+
+## Deploy
+
+- Start the `ssh-agent`
+```
+eval "$(ssh-agent -s)"
+```
+- Add the ssh key to the agent
+```
+cd ~/.ssh
+ssh-add githubff4j
+```
+- Update sources
+```
+find . -type f -name *.DS_Store -ls -delete
+git pull
+git add -A
+git commit -m "delivery"
+git push
+```
+- Release
+```
+mvn release:prepare release:perform
+```
+
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 
