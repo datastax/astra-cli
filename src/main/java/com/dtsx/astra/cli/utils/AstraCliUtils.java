@@ -102,5 +102,14 @@ public class AstraCliUtils {
         }
         return properties.getProperty(key);
     }
-    
+
+    /**
+     * Initialization of the folders at startup
+     */
+    public static void createHomeAstraFolders() {
+        File install = new File(ASTRA_HOME);
+        if (!install.exists()) install.mkdirs();
+        File folderSCB = new File(ASTRA_HOME + File.separator + SCB_FOLDER);
+        if (!folderSCB.exists()) folderSCB.mkdirs();
+    }
 }

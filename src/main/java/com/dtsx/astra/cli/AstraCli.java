@@ -49,6 +49,7 @@ import com.dtsx.astra.cli.streaming.*;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellCmd;
+import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.help.Help;
@@ -155,7 +156,10 @@ public class AstraCli {
     public static void main(String[] args) {
         // Enable Colors in terminal
         AnsiConsole.systemInstall();
-       
+
+        // Create ~/.astra and required sub folders
+        AstraCliUtils.createHomeAstraFolders();
+
         // Parse command
         ExitCode code = run(AstraCli.class, args);
         

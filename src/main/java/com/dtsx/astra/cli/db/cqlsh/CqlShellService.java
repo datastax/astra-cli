@@ -86,15 +86,11 @@ public class CqlShellService {
                 AstraCliUtils.readProperty("cqlsh.url"),
                 AstraCliUtils.readProperty("cqlsh.tarball"));
 
-        //settings = new CqlShellConfig(
-        //        "https://downloads.datastax.com/enterprise/cqlsh-astra.tar.gz",
-        //        "cqlsh-astra.tar.gz");
-
         cqlshLocalFolder = new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra");
 
         cqlshExecutable = cqlshLocalFolder.getAbsolutePath() + File.separator + "bin" + File.separator + "cqlsh";
     }
-    
+
     /**
      * Check if cqlshell has been installed.
      *
