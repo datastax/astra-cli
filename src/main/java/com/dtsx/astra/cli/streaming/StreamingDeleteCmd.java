@@ -32,12 +32,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "delete", description = "Delete an existing tenant")
-public class StreamingDeleteCmd extends AbstractConnectedCmd {
-    
-    /** name of the DB. */
-    @Required
-    @Arguments(title = "TENANT", description = "Tenant name ")
-    public String tenant;
+public class StreamingDeleteCmd extends AbstractStreamingCmd {
     
     /** {@inheritDoc} */
     public void execute()

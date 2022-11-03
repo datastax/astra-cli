@@ -20,13 +20,10 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 import java.util.Arrays;
 
@@ -36,7 +33,7 @@ import java.util.Arrays;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "get", description = "Show details of a tenant")
-public class StreamingGetCmd extends AbstractConnectedCmd {
+public class StreamingGetCmd extends AbstractStreamingCmd {
 
     /** Enum for db get. */
     public enum StreamingGetKeys {
@@ -83,12 +80,7 @@ public class StreamingGetCmd extends AbstractConnectedCmd {
             return StreamingGetKeys.valueOf(key.toUpperCase());
         }
     }
-    
-    /** name of the DB. */
-    @Required
-    @Arguments(title = "TENANT", description = "Tenant name ")
-    public String tenant;
-    
+
     /** Authentication token used if not provided in config. */
     @Option(name = { "-k", "--key" }, title = "Key", description = ""
             + "Show value for a property among: "

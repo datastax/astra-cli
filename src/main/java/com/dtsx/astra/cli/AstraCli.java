@@ -45,6 +45,9 @@ import com.dtsx.astra.cli.iam.exception.UserAlreadyExistException;
 import com.dtsx.astra.cli.iam.exception.UserNotFoundException;
 import com.dtsx.astra.cli.org.*;
 import com.dtsx.astra.cli.streaming.*;
+import com.dtsx.astra.cli.streaming.cdc.StreamingCreateCdcCmd;
+import com.dtsx.astra.cli.streaming.cdc.StreamingDeleteCdcCmd;
+import com.dtsx.astra.cli.streaming.cdc.StreamingGetCdcCmd;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellCmd;
@@ -123,7 +126,9 @@ import java.util.Arrays;
          StreamingPulsarTokenCmd.class, StreamingCreateDotEnvCmd.class,
          StreamingListRegionsCmd.class,
          // Pulsar Shell
-         PulsarShellCmd.class
+         PulsarShellCmd.class,
+         // Create CDC
+         StreamingCreateCdcCmd.class, StreamingDeleteCdcCmd.class, StreamingGetCdcCmd.class
     }),
     
     @Group(

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.streaming;
+package com.dtsx.astra.cli.streaming.cdc;
 
 /*-
  * #%L
@@ -21,21 +21,25 @@ package com.dtsx.astra.cli.streaming;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
+import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
- * Display information relative to a tenant.
+ * Display information relative to a db.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsStreaming.CMD_EXIST, description = "Show existence of a tenant")
-public class StreamingExistCmd extends AbstractStreamingCmd {
-    
+@Command(name = "list-cdc", description = "List CDC available on this tenant")
+public class StreamingGetCdcCmd extends AbstractStreamingCmd {
+
     /** {@inheritDoc} */
-    public void execute() {
-        OperationsStreaming.showTenantExistence(tenant);
+    public void execute()
+    throws TenantNotFoundException {
+
     }
 
 }

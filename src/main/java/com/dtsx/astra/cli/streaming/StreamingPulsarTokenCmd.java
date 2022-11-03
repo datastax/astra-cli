@@ -20,11 +20,8 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Display information relative to a tenant.
@@ -32,13 +29,8 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = OperationsStreaming.CMD_GET_TOKEN, description = "Show status of a tenant")
-public class StreamingPulsarTokenCmd extends AbstractConnectedCmd {
+public class StreamingPulsarTokenCmd extends AbstractStreamingCmd {
 
-    /** name of the DB. */
-    @Required
-    @Arguments(title = "TENANT", description = "Tenant name ")
-    public String tenant;
-    
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
