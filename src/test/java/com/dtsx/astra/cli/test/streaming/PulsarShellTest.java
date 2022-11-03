@@ -21,7 +21,7 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
 public class PulsarShellTest extends AbstractCmdTest {
     
     /** Logger for my test. */
-    private static Logger LOGGER = LoggerFactory.getLogger(PulsarShellTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PulsarShellTest.class);
     
     /** Use to disable usage of CqlSh, DsBulkd and other during test for CI/CD. */
     public final static String FLAG_TOOLS = "disable_tools";
@@ -33,7 +33,7 @@ public class PulsarShellTest extends AbstractCmdTest {
     
     @BeforeAll
     public static void should_create_when_needed() {
-        readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.valueOf(flag));
+        readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.parseBoolean(flag));
         if (!disableTools) {
             LOGGER.info("Third party tools are enabled in test");
         }
@@ -42,7 +42,7 @@ public class PulsarShellTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_install_pulsarshell()  throws Exception {
+    public void should_install_pulsarshell()  {
         if (disableTools) {
             LOGGER.warn("Third Party tool is disabled for this test environment");
         } else {

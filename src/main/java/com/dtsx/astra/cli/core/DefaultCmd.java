@@ -20,8 +20,6 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
-import static com.dtsx.astra.cli.core.out.AstraCliConsole.println;
-
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.cli.utils.AstraCliUtils;

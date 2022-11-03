@@ -310,20 +310,6 @@ public class DsBulkService  {
     }
 
     /**
-     * Run raw dsbulk command, astra db dsbulk dbname load -url ...
-     *
-     * @param options
-     *      command line as provided by user dbName, dbOperation,dbOptions
-     */
-    public void runRaw(List<String> options) {
-        List<String> commandDsbulk = new ArrayList<>();
-        commandDsbulk.add(dsbulkExecutable);
-        commandDsbulk.addAll(options.subList(1, options.size()));
-        addCredentialsOptions(commandDsbulk, options.get(0));
-        run(commandDsbulk, options.get(0));
-    }
-
-    /**
      * Run DSBulk.
      * 
      * @param commandDsbulk

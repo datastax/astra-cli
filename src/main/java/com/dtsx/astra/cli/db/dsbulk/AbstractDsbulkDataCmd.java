@@ -59,7 +59,8 @@ public abstract class AbstractDsbulkDataCmd extends AbstractDsbulkCmd {
      * Optional filter
      */
     @Option(name = { "-header" },
-            title = "header", 
+            title = "header",
+            arity = 1,
             description = "Enable or disable whether the files to read "
                     + "or write begin with a header line.")
     protected boolean header = true;

@@ -31,7 +31,6 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.*;
 import com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbCountCmd;
-import com.dtsx.astra.cli.db.dsbulk.DbDsBulkCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
@@ -57,7 +56,6 @@ import com.github.rvesse.airline.parser.errors.*;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Main class for the program. Will route commands to proper class 
@@ -88,9 +86,7 @@ import java.util.List;
       defaultCommand = OrgCmd.class,
       commands = {
         OrgIdCmd.class,
-        OrgNameCmd.class,
-        OrgListRegionsDbClassicCmd.class,
-        OrgListRegionsServerlessCmd.class
+        OrgNameCmd.class
     }),
     
     @Group(
@@ -107,9 +103,11 @@ import java.util.List;
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // DsBulk
-         DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class, DbDsBulkCmd.class,
+         DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
          // Cqlshell
          DbCqlShellCmd.class,
+         // List Regions
+         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class
      }),
     
     @Group(
@@ -200,18 +198,20 @@ public class AstraCli {
                 ParseArgumentsMissingException    |
                 ParseTooManyArgumentsException    |
                 ParseOptionGroupException ex) {
-            LoggerShell.exception(ex, getInvalidCmd(args), null);
+            LoggerShell.exception(ex,
+                    "You provided unknown or not well formatted argument.");
             return ExitCode.INVALID_ARGUMENT;
-        } catch(ParseOptionIllegalValueException | 
-                ParseOptionMissingException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
+        } catch(ParseOptionIllegalValueException | ParseOptionMissingException ex) {
+            LoggerShell.exception(ex,
+                    "You provided unknown or not well formatted option. (-option)");
             return ExitCode.INVALID_OPTION;
-        } catch(ParseRestrictionViolatedException |
-                ParseOptionConversionException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
+        } catch(ParseRestrictionViolatedException | ParseOptionConversionException ex) {
+            LoggerShell.exception(ex,
+                    "You provided an invalid value for option. (-option)");
             return ExitCode.INVALID_OPTION_VALUE;
         } catch(ParseException ex) {
-            LoggerShell.exception(ex, getCmd(args), null);
+            LoggerShell.exception(ex,
+                    "Command is not properly formatted.");
             return ExitCode.UNRECOGNIZED_COMMAND;
         } catch (InvalidTokenException | TokenNotFoundException |
                 FileSystemException | ConfigurationException e) {
@@ -237,50 +237,6 @@ public class AstraCli {
            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
            return ExitCode.INTERNAL_ERROR;
        }
-    }
-    
-    /**
-     * Extract commands without options from command line.
-     * 
-     * @param args
-     *      arguments
-     * @return
-     *      first part of command line
-     */
-    public static String getCmd(String[] args) {
-        List <String > listArgs = Arrays.asList(args);
-        boolean firstOption = false;
-        int idx = 0;
-        while (!firstOption && idx < listArgs.size()) {
-            firstOption = listArgs.get(idx).startsWith("-");
-            idx++;
-        }
-        if (firstOption) {
-            idx--;
-        }
-        return String.join(" ", listArgs.subList(0, idx));
-    }
-    
-    /**
-     * Extract commands without options from command line.
-     * 
-     * @param args
-     *      arguments
-     * @return
-     *      first part of command line
-     */
-    public static String getInvalidCmd(String[] args) {
-        List <String > listArgs = Arrays.asList(args);
-        boolean firstOption = false;
-        int idx = 0;
-        while (!firstOption && idx < listArgs.size()) {
-            firstOption = listArgs.get(idx).startsWith("-");
-            idx++;
-        }
-        if (firstOption) {
-            idx--;
-        }
-        return String.join(" ", listArgs.subList(0, idx-1));
     }
     
 }

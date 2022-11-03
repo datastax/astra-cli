@@ -48,15 +48,13 @@ public class AstraCliConsole {
 	
 	/** Start Banner. */
     public static void banner() {
-        println("");
         println("    _____            __                  ", 236, 107, 40);
         println("   /  _  \\   _______/  |_____________    ", 236, 107, 40);
         println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ",236, 107, 40);
         println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", 236, 107, 40);
         println(" \\____|__  /____  > |__|  |__|  (____  /", 236, 107, 40);
         println("         \\/     \\/                   \\/ ", 236, 107, 40);
-        println("");
-        println(" Version: " + AstraCliUtils.version() + "\n", Ansi.Color.CYAN);
+        println("           Version: " + AstraCliUtils.version() + "\n",236, 107, 40);
     }
 
     /**
@@ -78,7 +76,23 @@ public class AstraCliConsole {
     public static void println(String text) {
         System.out.println(text);
     }
-    
+
+    /**
+     * Output.
+     *
+     * @param text
+     *      text to display
+     * @param color
+     *      color for the text
+     */
+    public static void print(String text, Ansi.Color color) {
+        if (ctx().isNoColor()) {
+            print(text );
+        } else {
+            print(ansi().fg(color).a(text).reset().toString());
+        }
+    }
+
     /**
      * Output.
      *

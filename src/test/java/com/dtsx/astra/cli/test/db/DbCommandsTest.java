@@ -34,10 +34,10 @@ public class DbCommandsTest extends AbstractCmdTest {
     /** dataset. */
     public final static String TABLE_TEST = "test_dsbulk";
 
-    //@BeforeAll
-    //public static void should_create_when_needed() {
-    //    assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
-    //}
+    @BeforeAll
+    public static void should_create_when_needed() {
+        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+    }
     
     @Test
     @Order(1)
@@ -48,7 +48,6 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertSuccessCli("help db delete");
         assertSuccessCli("help db list");
         assertSuccessCli("help db cqlsh");
-        assertSuccessCli("help db dsbulk");
         assertSuccessCli("help db resume");
         assertSuccessCli("help db status");
         assertSuccessCli("help db download-scb");
@@ -191,12 +190,6 @@ public class DbCommandsTest extends AbstractCmdTest {
                     "-k", DB_TEST,
                     "-t", TABLE_TEST,
                     "-logDir", "/tmp");
-            // When
-            assertSuccessCli("db", "dsbulk", DB_TEST,  "count",
-                    "-k", DB_TEST,
-                    "-t", TABLE_TEST,
-                    "-logDir", "/tmp");
-
         }
     }
 
@@ -259,7 +252,5 @@ public class DbCommandsTest extends AbstractCmdTest {
     public static void testShouldDelete() {
         assertSuccessCli("db delete %s --wait".formatted(DB_TEST));
     }
-
-
 
 }

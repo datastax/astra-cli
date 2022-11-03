@@ -20,9 +20,6 @@ package com.dtsx.astra.cli.db;
  * #L%
  */
 
-import java.awt.*;
-import java.net.URI;
-
 public class DbGraphqlPlaygroundCmd {
 
     // ...

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.dsbulk;
+package com.dtsx.astra.cli.db;
 
 /*-
  * #%L
@@ -21,25 +21,35 @@ package com.dtsx.astra.cli.db.dsbulk;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.github.rvesse.airline.annotations.Arguments;
+import com.dtsx.astra.cli.org.OrganizationService;
 import com.github.rvesse.airline.annotations.Command;
-
-import java.util.List;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
- * DSBulk generic command.
+ * List regions serverless.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "dsbulk", description = "Count items for a table, a query")
-public class DbDsBulkCmd extends AbstractConnectedCmd {
+@Command(name = "list-regions-serverless", description = "Show available regions (serverless).")
+public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
 
-    @Arguments(description = "Provide as many dsbulk parameters as you want.")
-    List<String> dsbulkArguments;
+    /**
+     * Cloud provider
+     */
+    @Option(name = { "-c", "--cloud" }, title = "CLOUD", arity = 1,
+            description = "Filter on Cloud provider")
+    protected String cloud;
+
+    /**
+     * Filter on names
+     */
+    @Option(name = { "-f", "--filter" }, title = "filter", arity = 1,
+            description = "Filter on names")
+    protected String filter;
 
     /** {@inheritDoc} */
-    @Override
-    protected void execute() {
-        DsBulkService.getInstance().runRaw(dsbulkArguments);
+    public void execute() {
+        OrganizationService.getInstance().listRegionsDbServerless(cloud, filter);
     }
+
 }

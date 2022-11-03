@@ -177,12 +177,12 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.dtsx.astra.cli.org.OrgListRegionsDbClassicCmd",
+    "name":"com.dtsx.astra.cli.db.DbListRegionsClassicCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
   {
-    "name":"com.dtsx.astra.cli.org.OrgListRegionsServerlessCmd",
+    "name":"com.dtsx.astra.cli.db.DbListRegionsServerlessCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,

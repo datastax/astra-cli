@@ -12,7 +12,9 @@ public class ExceptionTests extends AbstractCmdTest {
 
     @Test
     public void should_throw_common_exceptions() {
-        new CannotStartProcessException("test", new IllegalArgumentException());
+        Assertions.assertThrows(CannotStartProcessException.class, () -> {
+            throw new CannotStartProcessException("test", new IllegalArgumentException());
+        });
         Assertions.assertThrows(FileSystemException.class, () -> {
             throw new FileSystemException("test");
         });

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.org;
+package com.dtsx.astra.cli.db;
 
 /*-
  * #%L
@@ -21,6 +21,7 @@ package com.dtsx.astra.cli.org;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.dtsx.astra.cli.org.OrganizationService;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -29,8 +30,8 @@ import com.github.rvesse.airline.annotations.Option;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OrganizationService.CMD_REGIONS_DB_CLASSIC, description = "Show available regions (classic).")
-public class OrgListRegionsDbClassicCmd extends AbstractConnectedCmd {
+@Command(name = "list-regions-classic", description = "Show available regions (classic).")
+public class DbListRegionsClassicCmd extends AbstractConnectedCmd {
 
     /**
      * Cloud provider
@@ -48,7 +49,6 @@ public class OrgListRegionsDbClassicCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-
         OrganizationService.getInstance().listRegionsDbClassic(cloud, filter);
     }
 

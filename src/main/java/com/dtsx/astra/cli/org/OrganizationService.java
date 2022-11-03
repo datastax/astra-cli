@@ -41,11 +41,7 @@ public class OrganizationService {
     /** cmd. */
     public static final String CMD_NAME = "name";
     /** cmd. */
-    public static final String CMD_REGIONS_DB_CLASSIC = "list-regions-db-classic";
-    /** cmd. */
-    public static final String CMD_REGIONS_DB_SERVERLESS = "list-regions-db-serverless";
-    /** cmd. */
-    public static final String CMD_REGIONS_STREAMING = "list-regions-streaming";
+    public static final String CMD_REGIONS_STREAMING = "list-regions";
     /** column names. */
     public static final String COLUMN_ID         = "id";
     /** column names. */

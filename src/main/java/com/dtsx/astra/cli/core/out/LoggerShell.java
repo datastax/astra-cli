@@ -149,16 +149,14 @@ public class LoggerShell extends AstraCliConsole {
      * 
      * @param e
      *      exception
-     * @param cmd
-     *      current command 
      * @param customMessage
      *      current error message
      */
-    public static void exception (Exception e, String cmd, String customMessage) {
+    public static void exception (Exception e, String customMessage) {
        if (customMessage != null)
            error(customMessage);
        error(e.getMessage() + " ("+ e.getClass().getSimpleName() + ")");
-       error("Try 'astra help " + cmd + "' to get help");
+       error("Try 'astra help <your_command>' to get help");
        if (CliContext.getInstance().isVerbose())
            Arrays.stream(e.getStackTrace())
                  .map(StackTraceElement::toString)

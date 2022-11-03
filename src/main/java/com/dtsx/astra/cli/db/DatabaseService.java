@@ -644,10 +644,19 @@ public class DatabaseService {
                 .regionsServerless()
                 .map(DatabaseRegionServerless::getName)
                 .collect(Collectors.toSet());
+
+        if (region == null)
+            region = db.getInfo().getRegion();
+        if (datacenters.size() == 1)
+            region = datacenters.keySet().iterator().next();
+
+        if (!datacenters.containsKey(region)) {
+            throw new InvalidArgumentException("Region %s is not part of existing regions %s, use flag -r to specify region name"
+                    .formatted(region, datacenters.keySet().toString()));
+        }
         if (!availableRegions.contains(region)) {
             throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
         }
-        if (region == null) region = db.getInfo().getRegion();
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_SECURE_BUNDLE_URL, datacenters.get(region).getSecureBundleUrl());
 
         Set <String> dbRegions = db.getInfo().getDatacenters()

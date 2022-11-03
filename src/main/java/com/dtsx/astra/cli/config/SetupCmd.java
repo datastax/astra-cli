@@ -51,20 +51,14 @@ public class SetupCmd extends AbstractCmd {
         if (tokenParam == null || tokenParam.isBlank()) {
             verbose = true;
             String token;
-            AstraCliConsole.println("    _____            __                ",  Ansi.Color.YELLOW);
-            AstraCliConsole.println("   /  _  \\   _______/  |_____________   ",  Ansi.Color.YELLOW);
-            AstraCliConsole.println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\ ",  Ansi.Color.YELLOW);
-            AstraCliConsole.println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_",  Ansi.Color.YELLOW);
-            AstraCliConsole.println(" \\____|__  /____  > |__|  |__|  (____  /",  Ansi.Color.YELLOW);
-            AstraCliConsole.println("         \\/     \\/                   \\/\n",  Ansi.Color.YELLOW);
-            
+            AstraCliConsole.banner();
             try(Scanner scanner = new Scanner(System.in)) {
                 boolean valid_token = false;
                 while (!valid_token) {
-                    AstraCliConsole.println("       ------------------------", Ansi.Color.CYAN);
-                    AstraCliConsole.println("       ---       SETUP      ---", Ansi.Color.CYAN);
-                    AstraCliConsole.println("       ------------------------\n", Ansi.Color.CYAN);
-                    AstraCliConsole.println("🔑 Enter token (starting with AstraCS...):", Ansi.Color.YELLOW);
+                    AstraCliConsole.println(" -----------------------", Ansi.Color.CYAN);
+                    AstraCliConsole.println(" ---      SETUP      ---", Ansi.Color.CYAN);
+                    AstraCliConsole.println(" -----------------------\n",Ansi.Color.CYAN);
+                    AstraCliConsole.println("$ Enter an Astra token:", Ansi.Color.CYAN);
                     token = scanner.nextLine();
                     if (!token.startsWith("AstraCS:")) {
                         LoggerShell.error("Your token should start with 'AstraCS:'");
