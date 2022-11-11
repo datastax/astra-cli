@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam;
+package com.dtsx.astra.cli.db.region;
 
 /*-
  * #%L
@@ -20,20 +20,20 @@ package com.dtsx.astra.cli.iam;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
- * Display roles.
- * 
+ * List regions for a DB.
+ *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "list", description = "Display the list of Users in an organization")
-public class UserListCmd extends AbstractConnectedCmd {
-   
-    /** {@inheritDoc} */
+@Command(name = "list-regions", description = "List regions for a database")
+public class DbListRegionsCmd extends AbstractDatabaseCmd {
+
+    /** {@inheritDoc}  */
     public void execute() {
-        OperationIam.listUsers();
+        ServiceRegion.getInstance().listRegions(db);
     }
-    
 }

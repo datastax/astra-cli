@@ -33,7 +33,7 @@ public class DbListCmd extends AbstractConnectedCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        DatabaseService.getInstance().listDb();
+        ServiceDatabase.getInstance().listDb();
     }
 
 }

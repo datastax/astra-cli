@@ -24,7 +24,7 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.sdk.databases.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -41,7 +41,7 @@ public class DbResumeCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "--wait" }, 
             description = "Will wait until the database become ACTIVE")
-    protected boolean wait = false;
+    protected boolean wait = true;
     
     /** 
      * Provide a limit to the wait period in seconds, default is 180s. 
@@ -49,13 +49,19 @@ public class DbResumeCmd extends AbstractDatabaseCmd {
     @Option(name = { "--timeout" }, 
             description = "Provide a limit to the wait period in seconds, default is 180s.")
     protected int timeout = 180;
+
+    /**
+     * Will not wait for the database become available.
+     */
+    @Option(name = { "--async" }, description = "Will not wait for the resource to become available")
+    protected boolean async = false;
     
     /** {@inheritDoc}  */
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
             InvalidDatabaseStateException {
         dbServices.resumeDb(db);
-        if (wait) {
+        if (!async) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);
                 case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.HIBERNATED);

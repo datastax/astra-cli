@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam.exception;
+package com.dtsx.astra.cli.iam.user;
 
 /*-
  * #%L
@@ -20,27 +20,20 @@ package com.dtsx.astra.cli.iam.exception;
  * #L%
  */
 
-import java.io.Serial;
+import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.github.rvesse.airline.annotations.Command;
 
 /**
- * User not found
- *
+ * Display roles.
+ * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public class UserNotFoundException extends RuntimeException {
-
-    /** Serial Number. */
-    @Serial
-    private static final long serialVersionUID = -1134966974107948087L;
-    
-    /**
-     * Constructor with userName
-     * 
-     * @param userName
-     *      name of user
-     */
-    public UserNotFoundException(String userName) {
-        super("User " + userName + "' has not been found.");
+@Command(name = "list", description = "Display the list of Users in an organization")
+public class UserListCmd extends AbstractConnectedCmd {
+   
+    /** {@inheritDoc} */
+    public void execute() {
+        ServiceUser.getInstance().listUsers();
     }
-
+    
 }

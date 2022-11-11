@@ -20,13 +20,8 @@ package com.dtsx.astra.cli.streaming.cdc;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Display information relative to a db.
@@ -37,8 +32,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public class StreamingDeleteCdcCmd extends AbstractStreamingCmd {
 
     /** {@inheritDoc} */
-    public void execute()
-    throws TenantNotFoundException {
+    public void execute() {
 
     }
 

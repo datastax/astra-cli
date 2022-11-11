@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam;
+package com.dtsx.astra.cli.iam.role;
 
 /*-
  * #%L
@@ -21,7 +21,7 @@ package com.dtsx.astra.cli.iam;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.iam.exception.RoleNotFoundException;
+import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -41,7 +41,7 @@ public class RoleGetCmd extends AbstractConnectedCmd {
     
     /** {@inheritDoc} */
     public void execute() throws RoleNotFoundException {
-        OperationIam.showRole(role);
+        ServiceRole.getInstance().showRole(role);
     }
     
 }

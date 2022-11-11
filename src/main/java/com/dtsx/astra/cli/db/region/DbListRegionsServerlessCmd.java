@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db;
+package com.dtsx.astra.cli.db.region;
 
 /*-
  * #%L
@@ -21,17 +21,17 @@ package com.dtsx.astra.cli.db;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.org.OrganizationService;
+import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * List regions
+ * List regions serverless.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "list-regions-classic", description = "Show available regions (classic).")
-public class DbListRegionsClassicCmd extends AbstractConnectedCmd {
+@Command(name = "list-regions-serverless", description = "Show available regions (serverless).")
+public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
 
     /**
      * Cloud provider
@@ -49,7 +49,7 @@ public class DbListRegionsClassicCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OrganizationService.getInstance().listRegionsDbClassic(cloud, filter);
+        ServiceOrganization.getInstance().listRegionsDbServerless(cloud, filter);
     }
 
 }

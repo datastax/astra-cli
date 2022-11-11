@@ -45,6 +45,6 @@ public class StreamingCreateDotEnvCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OperationsStreaming.generateDotEnvFile(tenant, destination);
+        ServiceStreaming.generateDotEnvFile(tenant, destination);
     }
 }

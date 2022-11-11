@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam.exception;
+package com.dtsx.astra.cli.iam.role;
 
 /*-
  * #%L
@@ -20,27 +20,20 @@ package com.dtsx.astra.cli.iam.exception;
  * #L%
  */
 
-import java.io.Serial;
+import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.github.rvesse.airline.annotations.Command;
 
 /**
- * Database not found
- *
+ * Display roles.
+ * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public class UserAlreadyExistException extends RuntimeException {
-
-    /** Serial Number. */
-    @Serial
-    private static final long serialVersionUID = 968018206118357644L;
-
-    /**
-     * Constructor with keyspace name
-     * 
-     * @param userName
-     *      users name
-     */
-    public UserAlreadyExistException(String userName) {
-        super("User '" + userName + "' already exists in the organization.");
+@Command(name = "list", description = "Display the list of Roles in an organization")
+public class RoleListCmd extends AbstractConnectedCmd {
+    
+    /** {@inheritDoc} */
+    public void execute() {
+        ServiceRole.getInstance().listRoles();
     }
-
+    
 }

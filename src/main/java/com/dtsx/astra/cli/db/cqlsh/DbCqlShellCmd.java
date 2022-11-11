@@ -76,7 +76,7 @@ public class DbCqlShellCmd extends AbstractDatabaseCmd {
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
                 cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace);
-        CqlShellService.getInstance().run(options, db);
+        ServiceCqlShell.getInstance().run(options, db);
     }
     
 }

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db;
+package com.dtsx.astra.cli.iam.token;
 
 /*-
  * #%L
@@ -20,12 +20,15 @@ package com.dtsx.astra.cli.db;
  * #L%
  */
 
-public class DbGraphqlPlaygroundCmd {
+import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.github.rvesse.airline.annotations.Command;
 
-    // ...
-//Desktop.
-//if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
- //       Desktop.getDesktop().browse(new URI("http://www.example.com"));
- //   }
+@Command(name = "list", description = "Display the list of tokens in an organization")
+public class TokenListCmd extends AbstractConnectedCmd {
+
+    /** {@inheritDoc} */
+    public void execute() {
+        ServiceToken.getInstance().listTokens();
+    }
 
 }

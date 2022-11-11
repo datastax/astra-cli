@@ -46,7 +46,7 @@ public class ConfigDeleteCmd extends AbstractCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
-        OperationsConfig.assertSectionExist(sectionName);
+        ServiceConfig.assertSectionExist(sectionName);
         ctx().getConfiguration().deleteSection(sectionName);
         ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Section '" + sectionName + "' has been deleted.");

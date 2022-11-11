@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam;
+package com.dtsx.astra.cli.iam.token;
 
 /*-
  * #%L
@@ -21,29 +21,24 @@ package com.dtsx.astra.cli.iam;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.iam.exception.UserNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
-/**
- * Delete a user if exist
- *
- * @author Cedrick LUNVEN (@clunven)
- */
-@Command(name = "delete", description = "Delete an existing user")
-public class UserDeleteCmd extends AbstractConnectedCmd {
-    
-    /**
-     * Database name or identifier
-     */
+@Command(name = "create", description = "Display the list of tokens in an organization")
+public class TokenCreateCmd extends AbstractConnectedCmd {
+
+    /** Provide a keyspace Name. */
     @Required
-    @Arguments(title = "EMAIL", description = "User email or identifier")
-    String user;
-    
+    @Option(name = {"-r", "--role" },
+            title = "ROLE",
+            arity = 1,
+            description = "Identifier of the role for this token")
+    public String role;
+
     /** {@inheritDoc} */
-    public void execute() throws UserNotFoundException {
-        OperationIam.deleteUser(user);
+    public void execute() {
+        ServiceToken.getInstance().createToken(role);
     }
-    
+
 }

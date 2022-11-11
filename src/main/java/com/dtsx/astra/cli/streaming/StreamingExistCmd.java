@@ -20,22 +20,19 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Display information relative to a tenant.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsStreaming.CMD_EXIST, description = "Show existence of a tenant")
+@Command(name = ServiceStreaming.CMD_EXIST, description = "Show existence of a tenant")
 public class StreamingExistCmd extends AbstractStreamingCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        OperationsStreaming.showTenantExistence(tenant);
+        ServiceStreaming.showTenantExistence(tenant);
     }
 
 }

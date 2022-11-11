@@ -27,10 +27,10 @@ import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
-import com.dtsx.astra.sdk.databases.DatabaseClient;
-import com.dtsx.astra.sdk.databases.DatabasesClient;
-import com.dtsx.astra.sdk.databases.domain.Database;
-import com.dtsx.astra.sdk.databases.domain.Datacenter;
+import com.dtsx.astra.sdk.db.DatabaseClient;
+import com.dtsx.astra.sdk.db.DatabasesClient;
+import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.Datacenter;
 
 import java.io.File;
 import java.util.List;
@@ -42,12 +42,12 @@ import java.util.Set;
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DatabaseDao {
+public class DaoDatabase {
     
     /**
      * Singleton Pattern
      */
-    private static DatabaseDao instance;
+    private static DaoDatabase instance;
     
     /**
      * Singleton Pattern.
@@ -55,9 +55,9 @@ public class DatabaseDao {
      * @return
      *      instance of the service.
      */
-    public static synchronized DatabaseDao getInstance() {
+    public static synchronized DaoDatabase getInstance() {
         if (null == instance) {
-            instance = new DatabaseDao();
+            instance = new DaoDatabase();
         }
         return instance;
     }
@@ -65,7 +65,7 @@ public class DatabaseDao {
     /**
      * Default Constructor.
      */
-    private DatabaseDao() {
+    private DaoDatabase() {
     }
     
     

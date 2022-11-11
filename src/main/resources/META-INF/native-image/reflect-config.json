@@ -92,6 +92,7 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]}
 ,
 
+
   {
     "name":"com.dtsx.astra.cli.db.dsbulk.AbstractDsbulkCmd",
     "allDeclaredFields":true
@@ -103,8 +104,8 @@
   {
     "name":"com.dtsx.astra.cli.db.dsbulk.DbCountCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
   {
     "name":"com.dtsx.astra.cli.db.dsbulk.DbLoadCmd",
     "allDeclaredFields":true,
@@ -121,48 +122,106 @@
   {
     "name":"com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
   {
     "name":"com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-
-
-  {
-    "name":"com.dtsx.astra.cli.iam.RoleGetCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-  {
-    "name":"com.dtsx.astra.cli.iam.RoleListCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
 
 
 
   {
-    "name":"com.dtsx.astra.cli.iam.UserDeleteCmd",
+    "name":"com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
   {
-    "name":"com.dtsx.astra.cli.iam.UserGetCmd",
+    "name":"com.dtsx.astra.cli.db.tool.DbSwaggerUICmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
   {
-    "name":"com.dtsx.astra.cli.iam.UserInviteCmd",
+    "name":"com.dtsx.astra.cli.db.region.DbListRegionsClassicCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
   {
-    "name":"com.dtsx.astra.cli.iam.UserListCmd",
+    "name":"com.dtsx.astra.cli.db.region.DbListRegionsServerlessCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.region.DbCreateRegionCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.region.DbDeleteRegionCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.region.DbListRegionsCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  }
 ,
+
+
+  {
+    "name":"com.dtsx.astra.cli.iam.role.RoleGetCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.role.RoleListCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
+
+  {
+    "name":"com.dtsx.astra.cli.iam.token.TokenCreateCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.token.TokenDeleteCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.token.TokenListCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
+  {
+    "name":"com.dtsx.astra.cli.iam.user.UserDeleteCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.user.UserGetCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.user.UserInviteCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.user.UserListCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
 
 
 
@@ -174,26 +233,13 @@
   {
     "name":"com.dtsx.astra.cli.org.OrgIdCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-  {
-    "name":"com.dtsx.astra.cli.db.DbListRegionsClassicCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-  {
-    "name":"com.dtsx.astra.cli.db.DbListRegionsServerlessCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
   {
     "name":"com.dtsx.astra.cli.org.OrgNameCmd",
     "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]}
-,
-
-
-
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
 
 
   {

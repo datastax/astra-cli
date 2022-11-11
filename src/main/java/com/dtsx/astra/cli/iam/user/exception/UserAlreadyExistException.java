@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam.exception;
+package com.dtsx.astra.cli.iam.user.exception;
 
 /*-
  * #%L
@@ -23,24 +23,24 @@ package com.dtsx.astra.cli.iam.exception;
 import java.io.Serial;
 
 /**
- * Role not found
+ * Database not found
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class RoleNotFoundException extends RuntimeException {
+public class UserAlreadyExistException extends RuntimeException {
 
     /** Serial Number. */
     @Serial
-    private static final long serialVersionUID = -1269813351970244235L;
-   
+    private static final long serialVersionUID = 968018206118357644L;
+
     /**
-     * Constructor with roleName
+     * Constructor with keyspace name
      * 
-     * @param roleName
-     *      role name
+     * @param userName
+     *      users name
      */
-    public RoleNotFoundException(String roleName) {
-        super("Role '" + roleName + "' has not been found.");
+    public UserAlreadyExistException(String userName) {
+        super("User '" + userName + "' already exists in the organization.");
     }
 
 }

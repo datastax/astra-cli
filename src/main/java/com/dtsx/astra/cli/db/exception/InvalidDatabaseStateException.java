@@ -20,7 +20,7 @@ package com.dtsx.astra.cli.db.exception;
  * #L%
  */
 
-import com.dtsx.astra.sdk.databases.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 
 import java.io.Serial;
 

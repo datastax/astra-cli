@@ -20,9 +20,6 @@ package com.dtsx.astra.cli.db;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
-import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -33,12 +30,11 @@ import com.github.rvesse.airline.annotations.Option;
  */
 @Command(name = "download-scb", description = "Delete an existing database")
 public class DbDownloadScbCmd extends AbstractDatabaseCmd {
-   
+
     /**
-     * Cloud provider region to provision
+     * Specified a region explicitly
      */
-    @Option(name = { "-r", "--region" }, 
-            title = "REGION", 
+    @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1,
             description = "Cloud provider region")
     protected String region;
     
@@ -49,10 +45,8 @@ public class DbDownloadScbCmd extends AbstractDatabaseCmd {
     protected String destination;
     
     /** {@inheritDoc} */
-    public void execute()
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, InvalidArgumentException {
-        DatabaseDao.getInstance()
-                   .downloadCloudSecureBundle(db, region, destination);
+    public void execute() {
+        DaoDatabase.getInstance().downloadCloudSecureBundle(db, region, destination);
     }
     
 }

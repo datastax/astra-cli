@@ -33,7 +33,7 @@ public class DbCountCmd extends AbstractDsbulkDataCmd {
     /** {@inheritDoc} */
     @Override
     public void execute()  {
-        DsBulkService.getInstance().count(this);
+        ServiceDsBulk.getInstance().count(this);
     }
 
 }

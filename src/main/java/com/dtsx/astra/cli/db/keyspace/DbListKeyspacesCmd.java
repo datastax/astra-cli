@@ -33,7 +33,7 @@ public class DbListKeyspacesCmd extends AbstractDatabaseCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        dbServices.listKeyspaces(db);
+        ServiceKeyspace.getInstance().listKeyspaces(db);
     }
 
 }

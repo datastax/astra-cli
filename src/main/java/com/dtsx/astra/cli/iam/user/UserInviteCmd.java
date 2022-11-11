@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam;
+package com.dtsx.astra.cli.iam.user;
 
 /*-
  * #%L
@@ -21,27 +21,38 @@ package com.dtsx.astra.cli.iam;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.iam.exception.UserNotFoundException;
+import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
+import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
+import com.dtsx.astra.sdk.org.domain.DefaultRoles;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
- * Display user.
- * 
+ * Invite user.
+ *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "get", description = "Show user details")
-public class UserGetCmd extends AbstractConnectedCmd {
-    
+@Command(name = "invite", description = "Invite a user to an organization")
+public class UserInviteCmd extends AbstractConnectedCmd {
+
     /** identifier or email. */
     @Required
     @Arguments(title = "EMAIL", description = "User Email")
     String user;
     
+    /**
+     * Cloud provider region to provision
+     */
+    @Option(name = { "-r", "--role"}, title = "ROLE", arity = 1, 
+            description = "Role for the user (default is Database Administrator)")
+    protected String role = DefaultRoles.DATABASE_ADMINISTRATOR.getName();
+    
     /** {@inheritDoc} */
-    public void execute() throws UserNotFoundException {
-        OperationIam.showUser(user);
+    @Override
+    public void execute() throws UserAlreadyExistException, RoleNotFoundException {
+        ServiceUser.getInstance().inviteUser(user, role);
     }
 
 }

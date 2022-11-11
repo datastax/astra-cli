@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam;
+package com.dtsx.astra.cli.db.region;
 
 /*-
  * #%L
@@ -21,19 +21,35 @@ package com.dtsx.astra.cli.iam;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
- * Display roles.
- * 
+ * List regions
+ *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "list", description = "Display the list of Roles in an organization")
-public class RoleListCmd extends AbstractConnectedCmd {
-    
+@Command(name = "list-regions-classic", description = "Show available regions (classic).")
+public class DbListRegionsClassicCmd extends AbstractConnectedCmd {
+
+    /**
+     * Cloud provider
+     */
+    @Option(name = { "-c", "--cloud" }, title = "CLOUD", arity = 1,
+            description = "Filter on Cloud provider")
+    protected String cloud;
+
+    /**
+     * Filter on names
+     */
+    @Option(name = { "-f", "--filter" }, title = "filter", arity = 1,
+            description = "Filter on names")
+    protected String filter;
+
     /** {@inheritDoc} */
     public void execute() {
-        OperationIam.listRoles();
+        ServiceOrganization.getInstance().listRegionsDbClassic(cloud, filter);
     }
-    
+
 }

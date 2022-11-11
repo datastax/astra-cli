@@ -22,10 +22,10 @@ package com.dtsx.astra.cli.db.keyspace;
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
-import com.dtsx.astra.cli.db.DatabaseService;
+import com.dtsx.astra.cli.db.ServiceDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.sdk.databases.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -56,19 +56,26 @@ public class DbCreateKeyspaceCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "--wait" },
             description = "Will wait until the database become ACTIVE")
-    protected boolean wait = false;
+    protected boolean wait = true;
+
+    /**
+     * Will wait until the database become ACTIVE.
+     */
+    @Option(name = { "--async" },
+            description = "Will wait until the database become ACTIVE")
+    protected boolean async = false;
 
     /**
      * Provide a limit to the wait period in seconds, default is 180s.
      */
     @Option(name = { "--timeout" },
             description = "Provide a limit to the wait period in seconds, default is 300s.")
-    protected int timeout = DatabaseService.DEFAULT_TIMEOUT_SECONDS;
+    protected int timeout = ServiceDatabase.DEFAULT_TIMEOUT_SECONDS;
     
     /** {@inheritDoc}  */
     public void execute() {
-        dbServices.createKeyspace(db, keyspace, ifNotExist);
-        if (wait) {
+        ServiceKeyspace.getInstance().createKeyspace(db, keyspace, ifNotExist);
+        if (!async) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);
                 case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.MAINTENANCE);

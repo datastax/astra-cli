@@ -20,11 +20,8 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Delete a tenant if exists
@@ -37,7 +34,7 @@ public class StreamingDeleteCmd extends AbstractStreamingCmd {
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        OperationsStreaming.deleteTenant(tenant);
+        ServiceStreaming.deleteTenant(tenant);
     }
     
 }

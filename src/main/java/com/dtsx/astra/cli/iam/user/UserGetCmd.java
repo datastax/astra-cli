@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db;
+package com.dtsx.astra.cli.iam.user;
 
 /*-
  * #%L
@@ -21,35 +21,27 @@ package com.dtsx.astra.cli.db;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.org.OrganizationService;
+import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
+import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
- * List regions serverless.
- *
+ * Display user.
+ * 
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "list-regions-serverless", description = "Show available regions (serverless).")
-public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
-
-    /**
-     * Cloud provider
-     */
-    @Option(name = { "-c", "--cloud" }, title = "CLOUD", arity = 1,
-            description = "Filter on Cloud provider")
-    protected String cloud;
-
-    /**
-     * Filter on names
-     */
-    @Option(name = { "-f", "--filter" }, title = "filter", arity = 1,
-            description = "Filter on names")
-    protected String filter;
-
+@Command(name = "get", description = "Show user details")
+public class UserGetCmd extends AbstractConnectedCmd {
+    
+    /** identifier or email. */
+    @Required
+    @Arguments(title = "EMAIL", description = "User Email")
+    String user;
+    
     /** {@inheritDoc} */
-    public void execute() {
-        OrganizationService.getInstance().listRegionsDbServerless(cloud, filter);
+    public void execute() throws UserNotFoundException {
+        ServiceUser.getInstance().showUser(user);
     }
 
 }

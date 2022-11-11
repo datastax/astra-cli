@@ -31,11 +31,13 @@ import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.cli.db.exception.KeyspaceAlreadyExistException;
+import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
-import com.dtsx.astra.sdk.databases.DatabaseClient;
-import com.dtsx.astra.sdk.databases.domain.*;
-import com.dtsx.astra.sdk.organizations.domain.Organization;
+import com.dtsx.astra.sdk.db.DatabaseClient;
+import com.dtsx.astra.sdk.db.domain.*;
+import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.ApiLocator;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,16 +58,13 @@ import java.util.stream.Collectors;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DatabaseService {
+public class ServiceDatabase {
     
     /** Default region. **/
     public static final String DEFAULT_REGION        = "us-east-1";
     
     /** Default tier. **/
     public static final String DEFAULT_TIER          = "serverless";
-    
-    /** Allow Snake case. */
-    public static final String KEYSPACE_NAME_PATTERN = "^[_a-z0-9]+$";
 
     /** Default timeout for operations. */
     public static final int DEFAULT_TIMEOUT_SECONDS = 300;
@@ -88,13 +87,11 @@ public class DatabaseService {
     static final String COLUMN_KEYSPACES         = "Keyspaces";
     /** working object. */
     static final String DB                       = "Database";
-    /** working object. */
-    static final String KS                       = "Keyspace ";
 
     /**
      * Access to databases object.
      */
-    DatabaseDao dbDao;
+    DaoDatabase dbDao;
 
     /**
      * JDK 11 HttpClient
@@ -104,17 +101,17 @@ public class DatabaseService {
     /**
      * Singleton Pattern
      */
-    private static DatabaseService instance;
-    
+    private static ServiceDatabase instance;
+
     /**
      * Singleton Pattern.
      * 
      * @return
      *      instance of the service.
      */
-    public static synchronized DatabaseService getInstance() {
+    public static synchronized ServiceDatabase getInstance() {
         if (null == instance) {
-            instance = new DatabaseService();
+            instance = new ServiceDatabase();
         }
         return instance;
     }
@@ -122,12 +119,22 @@ public class DatabaseService {
     /**
      * Default Constructor.
      */
-    private DatabaseService() {
-        this.dbDao = DatabaseDao.getInstance();
+    private ServiceDatabase() {
+        this.dbDao = DaoDatabase.getInstance();
         client = HttpClient.newBuilder()
                 .version(Version.HTTP_2)
                 .connectTimeout(Duration.ofSeconds(20))
                 .build();
+    }
+
+    /**
+     * Access Api devops from context.
+     *
+     * @return
+     *      api devops
+     */
+    private OrganizationsClient apiDevopsOrg() {
+        return CliContext.getInstance().getApiDevopsOrganizations();
     }
     
     /**
@@ -215,7 +222,7 @@ public class DatabaseService {
      */
     public int retryUntilTimeoutOrSuccess(Database db, DatabaseStatusType status, int timeout) {
         int retries = 0;
-        while (retries++ < timeout && !db.getStatus().equals(status)) {
+        while (((timeout == 0) || (retries++ < timeout)) && !db.getStatus().equals(status)) {
             try {
              Thread.sleep(1000);
              db = dbDao.getDatabase(db.getInfo().getName());
@@ -294,7 +301,7 @@ public class DatabaseService {
                     .replace(" ", "_")
                     .replace("-", "_");
         }
-        if (!keyspace.matches(KEYSPACE_NAME_PATTERN)) {
+        if (!keyspace.matches(ServiceKeyspace.KEYSPACE_NAME_PATTERN)) {
             throw new InvalidArgumentException("Keyspace should contain alphanumerics[a-z0-9_]");
         }
         if (!regionMap.containsKey(databaseRegion)) {
@@ -338,7 +345,7 @@ public class DatabaseService {
                     waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
                     dbStatus = dbDao.getDatabase(databaseName).getStatus();
                 }
-                case PENDING, RESUMING -> {
+                case PENDING, RESUMING, INITIALIZING, MAINTENANCE -> {
                     waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
                     dbStatus = dbDao.getDatabase(databaseName).getStatus();
                 }
@@ -347,7 +354,7 @@ public class DatabaseService {
             
             // Create keyspace on existing DB when needed
             if (DatabaseStatusType.ACTIVE.equals(dbStatus)) {
-                createKeyspace(databaseName, keyspace, true);
+                ServiceKeyspace.getInstance().createKeyspace(databaseName, keyspace, true);
             } else {
                 throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
             }
@@ -377,32 +384,7 @@ public class DatabaseService {
         AstraCliConsole.printShellTable(sht);
     }
     
-    /**
-     * List keyspaces of a database.
-     *
-     * @param databaseName
-     *      database name
-     * @throws DatabaseNameNotUniqueException
-     *      multiple databases with the name.
-     * @throws DatabaseNotFoundException
-     *      database name has not been found.
-     */
-    public void listKeyspaces(String databaseName)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        Database   db  = dbDao.getDatabase(databaseName);
-        ShellTable sht = new ShellTable();
-        sht.addColumn(COLUMN_NAME,    20);
-        db.getInfo().getKeyspaces().forEach(ks -> {
-            Map <String, String> rf = new HashMap<>();
-            if (db.getInfo().getKeyspace().equals(ks)) {
-                rf.put(COLUMN_NAME, ks + " (default)");
-            } else {
-                rf.put(COLUMN_NAME, ks);
-            }
-            sht.getCellValues().add(rf);
-        });
-        AstraCliConsole.printShellTable(sht);
-    }
+
     
     /**
      * Delete a database if exist.
@@ -558,48 +540,39 @@ public class DatabaseService {
             
          }
     }
-    
+
     /**
-     * Create a keyspace if not exist.
-     * 
-     * @param ifNotExist
-     *      flag to disable error if already exists
-     * @param databaseName
-     *      db name
-     * @param keyspaceName
-     *      ks name
-     * @throws DatabaseNameNotUniqueException 
-     *      error if db name is not unique
-     * @throws DatabaseNotFoundException 
-     *      error is db is not found
-     * @throws InvalidArgumentException
-     *      invalid parameter
-     * @throws KeyspaceAlreadyExistException
-     *      keyspace exist and --if-not-exist option not provided
+     * Retrieve region name.
+     *
+     * @param region
+     *      forced region name
+     * @return
+     *      region name
      */
-    public void createKeyspace(String databaseName, String keyspaceName, boolean ifNotExist)
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
-           InvalidArgumentException, KeyspaceAlreadyExistException {
-        
-        // Validate keyspace names
-        if (!keyspaceName.matches(KEYSPACE_NAME_PATTERN))
-            throw new InvalidArgumentException("The keyspace name is not valid, please use snake_case: [a-z0-9_]");
-        
-        if (dbDao.getDatabase(databaseName).getInfo().getKeyspaces().contains(keyspaceName)) {
-            if (ifNotExist) {
-                LoggerShell.info("%s '%s' already exists. Connecting to keyspace.".formatted(KS, keyspaceName));
-            } else {
-                throw new KeyspaceAlreadyExistException(keyspaceName, databaseName);
-            }
-        } else {
-            try {
-                dbDao.getRequiredDatabaseClient(databaseName).createKeyspace(keyspaceName);
-                LoggerShell.info("%s '%s' is creating.".formatted(KS, keyspaceName));
-            } catch(Exception e) {
-               throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,
-                       dbDao.getDatabase(databaseName).getStatus());
-            }
+    private String retrieveDatabaseRegion(Database db, String region) {
+
+        if (region == null)
+            region = db.getInfo().getRegion();
+
+        // Region is valid
+        Set<String> availableRegions = apiDevopsOrg()
+                .regionsServerless()
+                .map(DatabaseRegionServerless::getName)
+                .collect(Collectors.toSet());
+        if (!availableRegions.contains(region)) {
+            throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
         }
+
+        // Db is actually present in that region
+        Map<String, Datacenter> datacenters = db
+                .getInfo().getDatacenters()
+                .stream().collect(Collectors.toMap(Datacenter::getRegion, Function.identity()));
+        if (!datacenters.containsKey(region)) {
+            throw new InvalidArgumentException("Region %s is not part of existing regions %s, use flag -r to specify region name"
+                    .formatted(region, datacenters.keySet().toString()));
+        }
+
+        return region;
     }
     
     /**
@@ -632,31 +605,12 @@ public class DatabaseService {
         
         // Database
         Database db = dbDao.getDatabase(dbName);
+        region = retrieveDatabaseRegion(db, region);
         Map<String, Datacenter> datacenters = db
                 .getInfo().getDatacenters()
                 .stream().collect(Collectors.toMap(Datacenter::getRegion, Function.identity()));
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_ID, db.getId());
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REGION, db.getInfo().getRegion());
-
-        // Parameter Validations
-        Set<String> availableRegions = CliContext.getInstance()
-                .getApiDevopsOrganizations()
-                .regionsServerless()
-                .map(DatabaseRegionServerless::getName)
-                .collect(Collectors.toSet());
-
-        if (region == null)
-            region = db.getInfo().getRegion();
-        if (datacenters.size() == 1)
-            region = datacenters.keySet().iterator().next();
-
-        if (!datacenters.containsKey(region)) {
-            throw new InvalidArgumentException("Region %s is not part of existing regions %s, use flag -r to specify region name"
-                    .formatted(region, datacenters.keySet().toString()));
-        }
-        if (!availableRegions.contains(region)) {
-            throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
-        }
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_SECURE_BUNDLE_URL, datacenters.get(region).getSecureBundleUrl());
 
         Set <String> dbRegions = db.getInfo().getDatacenters()
@@ -691,6 +645,37 @@ public class DatabaseService {
 
         envFile.save();
     }
+
+    /**
+     * Build Swagger Url based on db and region.
+     *
+     * @param dbName
+     *      database name
+     * @param region
+     *      database region
+     * @return
+     *      swagger url
+     */
+    public String swaggerUrl(String dbName, String region) {
+        Database db = dbDao.getDatabase(dbName);
+        return ApiLocator.getApiRestEndpoint(db.getId(), retrieveDatabaseRegion(db, region)) + "/swagger-ui/";
+    }
+
+    /**
+     * Build Playground Url based on db and region.
+     *
+     * @param dbName
+     *      database name
+     * @param region
+     *      database region
+     * @return
+     *      swagger url
+     */
+    public String graphQLPlayground(String dbName, String region) {
+        Database db = dbDao.getDatabase(dbName);
+        return ApiLocator.getApiGraphQLEndPoint(db.getId(), retrieveDatabaseRegion(db, region)) + "/playground";
+    }
+
 
 }
  

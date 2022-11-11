@@ -24,8 +24,8 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
-import com.dtsx.astra.sdk.organizations.OrganizationsClient;
-import com.dtsx.astra.sdk.organizations.domain.Organization;
+import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.org.domain.Organization;
 
 import java.util.*;
 
@@ -34,15 +34,13 @@ import java.util.*;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class OrganizationService {
+public class ServiceOrganization {
     
     /** cmd. */
     public static final String CMD_ID = "id";
     /** cmd. */
     public static final String CMD_NAME = "name";
-    /** cmd. */
-    public static final String CMD_REGIONS_STREAMING = "list-regions";
-    /** column names. */
+     /** column names. */
     public static final String COLUMN_ID         = "id";
     /** column names. */
     public static final String COLUMN_NAME       = "Name";
@@ -53,13 +51,10 @@ public class OrganizationService {
     /** column names. */
     public static final String COLUMN_REGION_DISPLAY= "Full Name";
 
-    /** Http Client for devops Api. */
-    private final OrganizationsClient orgClient;
-
     /**
      * Singleton pattern.
      */
-    private static OrganizationService instance;
+    private static ServiceOrganization instance;
 
     /**
      * Singleton pattern.
@@ -67,66 +62,52 @@ public class OrganizationService {
      * @return
      *      organization.
      */
-    public static synchronized OrganizationService getInstance() {
+    public static synchronized ServiceOrganization getInstance() {
         if (instance == null) {
-            instance = new OrganizationService(CliContext.getInstance().getApiDevopsOrganizations());
+            instance = new ServiceOrganization();
         }
         return instance;
     }
 
     /**
-     * Hide default constructor.
+     * Access Api devops from context.
      *
-     * @param orgClient
-     *      http client to organization
+     * @return
+     *      api devops
      */
-    private OrganizationService(OrganizationsClient orgClient) {
-        this.orgClient = orgClient;
+    private OrganizationsClient apiDevopsOrg() {
+        return CliContext.getInstance().getApiDevopsOrganizations();
+    }
+
+    /**
+     * Hide default constructor.
+     */
+    private ServiceOrganization() {
     }
 
     /**
      * Return organization id.
      */
     public void getId() {
-        LoggerShell.println(orgClient.organizationId());
+        LoggerShell.println(apiDevopsOrg().organizationId());
     }
     
     /**
      * Return organization name.
      */
     public void getName() {
-        LoggerShell.println(orgClient.organization().getName());
+        LoggerShell.println(apiDevopsOrg().organization().getName());
     }
     
     /**
      * Return organization info.
      */
     public void showOrg() {
-        Organization org = orgClient.organization();
+        Organization org = apiDevopsOrg().organization();
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
         sht.addPropertyRow(COLUMN_ID, org.getId());
         AstraCliConsole.printShellTable(sht);
-    }
-    
-    /**
-     * Show organization database classic regions.
-     *
-     * @param cloudProvider
-     *      name of cloud provider
-     * @param filter
-     *      name of filter
-     */
-    public void listRegionsDbClassic(String cloudProvider, String filter) {
-        // Sorting Regions per cloud than region name
-        TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
-        orgClient.regions().forEach(r -> {
-            String cloud = r.getCloudProvider().toString().toLowerCase();
-            sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
-            sortedRegion.get(cloud).put(r.getRegion(), r.getRegionDisplay());
-        });
-        // Building Table
-        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, sortedRegion));
     }
 
     /**
@@ -150,6 +131,26 @@ public class OrganizationService {
     }
 
     /**
+     * Show organization database classic regions.
+     *
+     * @param cloudProvider
+     *      name of cloud provider
+     * @param filter
+     *      name of filter
+     */
+    public void listRegionsDbClassic(String cloudProvider, String filter) {
+        // Sorting Regions per cloud than region name
+        TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
+        apiDevopsOrg().regions().forEach(r -> {
+            String cloud = r.getCloudProvider().toString().toLowerCase();
+            sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
+            sortedRegion.get(cloud).put(r.getRegion(), r.getRegionDisplay());
+        });
+        // Building Table
+        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, sortedRegion));
+    }
+
+    /**
      * Show serverless regions.
      *
      * @param cloudProvider
@@ -159,7 +160,7 @@ public class OrganizationService {
      */
     public void listRegionsDbServerless(String cloudProvider, String filter) {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
-        orgClient.regionsServerless().forEach(r -> {
+        apiDevopsOrg().regionsServerless().forEach(r -> {
             String cloud = r.getCloudProvider().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());

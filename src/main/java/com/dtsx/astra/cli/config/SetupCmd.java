@@ -24,7 +24,7 @@ import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.sdk.organizations.OrganizationsClient;
+import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import org.fusesource.jansi.Ansi;
@@ -94,7 +94,9 @@ public class SetupCmd extends AbstractCmd {
             ccc.sectionName = new OrganizationsClient(token).organization().getName();
             ccc.run();
         } catch(Exception e) {
-            LoggerShell.error("Token provided is invalid. Please enter a valid token or quit with CTRL+C");
+            LoggerShell.warning("Invalid token: It must be start with 'AstraCS:..' and have Organization Administrator privileges.");
+            LoggerShell.warning("Generated token at database creation cannot be used.");
+            LoggerShell.warning("Please enter a valid token or quit with CTRL+C.");
             throw new InvalidTokenException(token, e);
         }
     }

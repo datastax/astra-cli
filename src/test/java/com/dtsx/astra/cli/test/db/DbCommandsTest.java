@@ -9,15 +9,15 @@ import com.dtsx.astra.cli.core.CoreOptions;
 import com.dtsx.astra.cli.core.TokenOptions;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.OutputFormat;
-import com.dtsx.astra.cli.db.DatabaseService;
-import com.dtsx.astra.cli.db.cqlsh.CqlShellService;
-import com.dtsx.astra.cli.db.dsbulk.DsBulkService;
+import com.dtsx.astra.cli.db.ServiceDatabase;
+import com.dtsx.astra.cli.db.cqlsh.ServiceCqlShell;
+import com.dtsx.astra.cli.db.dsbulk.ServiceDsBulk;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
 import com.dtsx.astra.cli.core.ExitCode;
-import com.dtsx.astra.cli.db.DatabaseDao;
+import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.test.AbstractCmdTest;
 
@@ -74,7 +74,7 @@ public class DbCommandsTest extends AbstractCmdTest {
         // When
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
         // Then
-        Assertions.assertTrue(DatabaseDao.getInstance().getDatabaseClient(DB_TEST).isPresent());
+        Assertions.assertTrue(DaoDatabase.getInstance().getDatabaseClient(DB_TEST).isPresent());
         // Database is pending
         assertSuccessCli("db status %s".formatted(DB_TEST));
     }
@@ -146,8 +146,8 @@ public class DbCommandsTest extends AbstractCmdTest {
     public void testShouldInstallCqlsh() {
         if (!disableTools) {
             new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra").delete();
-            CqlShellService.getInstance().install();
-            Assertions.assertTrue(CqlShellService.getInstance().isInstalled());
+            ServiceCqlShell.getInstance().install();
+            Assertions.assertTrue(ServiceCqlShell.getInstance().isInstalled());
         }
     }
 
@@ -168,8 +168,8 @@ public class DbCommandsTest extends AbstractCmdTest {
                     + "dsbulk-"
                     + AstraCliUtils.readProperty("dsbulk.version")).delete();
             // install
-            DsBulkService.getInstance().install();
-            Assertions.assertTrue(DsBulkService.getInstance().isInstalled());
+            ServiceDsBulk.getInstance().install();
+            Assertions.assertTrue(ServiceDsBulk.getInstance().isInstalled());
         }
     }
 
@@ -244,8 +244,15 @@ public class DbCommandsTest extends AbstractCmdTest {
                     OutputFormat.HUMAN,
                     AstraConfiguration.getDefaultConfigurationFileName()));
             CliContext.getInstance().initToken(new TokenOptions(null, AstraConfiguration.ASTRARC_DEFAULT));
-            DatabaseService.getInstance().generateDotEnvFile(DB_TEST, DB_TEST, "invalid", "/tmp");
+            ServiceDatabase.getInstance().generateDotEnvFile(DB_TEST, DB_TEST, "invalid", "/tmp");
         });
+    }
+
+    @Test
+    @Order(20)
+    public void showToolsURL() {
+        assertSuccessCli("db swagger mtg");
+        assertSuccessCli("db playground mtg");
     }
 
     @AfterAll

@@ -23,7 +23,7 @@ package com.dtsx.astra.cli.db.exception;
 import java.io.Serial;
 
 /**
- * Database not found
+ * Keyspace already exists
  *
  * @author Cedrick LUNVEN (@clunven)
  */

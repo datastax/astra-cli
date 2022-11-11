@@ -26,8 +26,9 @@ import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.OutputFormat;
-import com.dtsx.astra.sdk.databases.DatabasesClient;
-import com.dtsx.astra.sdk.organizations.OrganizationsClient;
+import com.dtsx.astra.sdk.db.DatabasesClient;
+import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.dtsx.astra.sdk.streaming.StreamingClient;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.apache.commons.lang3.StringUtils;
@@ -183,7 +184,7 @@ public class CliContext {
      */
     public String getToken() 
     throws TokenNotFoundException {
-        if (StringUtils.isEmpty(tokenOptions.token())) {
+        if (tokenOptions == null || StringUtils.isEmpty(tokenOptions.token())) {
             throw new TokenNotFoundException();
         }
         return tokenOptions.token();

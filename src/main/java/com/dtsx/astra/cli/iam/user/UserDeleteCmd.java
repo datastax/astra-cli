@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.iam;
+package com.dtsx.astra.cli.iam.user;
 
 /*-
  * #%L
@@ -21,38 +21,29 @@ package com.dtsx.astra.cli.iam;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.iam.exception.RoleNotFoundException;
-import com.dtsx.astra.cli.iam.exception.UserAlreadyExistException;
-import com.dtsx.astra.sdk.organizations.domain.DefaultRoles;
+import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
- * Invite user.
+ * Delete a user if exist
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "invite", description = "Invite a user to an organization")
-public class UserInviteCmd extends AbstractConnectedCmd {
-
-    /** identifier or email. */
-    @Required
-    @Arguments(title = "EMAIL", description = "User Email")
-    String user;
+@Command(name = "delete", description = "Delete an existing user")
+public class UserDeleteCmd extends AbstractConnectedCmd {
     
     /**
-     * Cloud provider region to provision
+     * Database name or identifier
      */
-    @Option(name = { "-r", "--role"}, title = "ROLE", arity = 1, 
-            description = "Role for the user (default is Database Administrator)")
-    protected String role = DefaultRoles.DATABASE_ADMINISTRATOR.getName();
+    @Required
+    @Arguments(title = "EMAIL", description = "User email or identifier")
+    String user;
     
     /** {@inheritDoc} */
-    @Override
-    public void execute() throws UserAlreadyExistException, RoleNotFoundException {
-        OperationIam.inviteUser(user, role);
+    public void execute() throws UserNotFoundException {
+        ServiceUser.getInstance().deleteUser(user);
     }
-
+    
 }

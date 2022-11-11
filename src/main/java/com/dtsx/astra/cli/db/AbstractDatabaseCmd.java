@@ -32,7 +32,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public abstract class AbstractDatabaseCmd extends AbstractConnectedCmd {
 
      /** Access to sdb Services. */
-    protected DatabaseService dbServices = DatabaseService.getInstance();
+    protected ServiceDatabase dbServices = ServiceDatabase.getInstance();
     
     /**
      * Database name or identifier

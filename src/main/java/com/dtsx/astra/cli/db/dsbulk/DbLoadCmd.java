@@ -43,7 +43,7 @@ public class DbLoadCmd extends AbstractDsbulkDataCmd {
     /** {@inheritDoc} */
     @Override
     public void execute()  {
-        DsBulkService.getInstance().load(this);
+        ServiceDsBulk.getInstance().load(this);
     }
 
 }

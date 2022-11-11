@@ -20,10 +20,10 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import static com.dtsx.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD_PROVIDER;
-import static com.dtsx.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD_REGION;
-import static com.dtsx.astra.cli.streaming.OperationsStreaming.DEFAULT_CLOUD_TENANT;
-import static com.dtsx.astra.cli.streaming.OperationsStreaming.DEFAULT_EMAIL;
+import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_CLOUD_PROVIDER;
+import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_CLOUD_REGION;
+import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_CLOUD_TENANT;
+import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_EMAIL;
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
@@ -80,7 +80,7 @@ public class StreamingCreateCmd extends AbstractConnectedCmd {
         // Param Validations
         //throw new ParameterException(cloudProvider)
         // Does the tenant exist ?
-        OperationsStreaming.createStreamingTenant(ct);
+        ServiceStreaming.createStreamingTenant(ct);
     }
     
 

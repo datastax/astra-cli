@@ -21,7 +21,7 @@ package com.dtsx.astra.cli.streaming;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.org.OrganizationService;
+import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -47,6 +47,6 @@ public class StreamingListRegionsCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OrganizationService.getInstance().listRegionsStreaming(cloud, filter);
+        ServiceOrganization.getInstance().listRegionsStreaming(cloud, filter);
     }
 }

@@ -48,7 +48,7 @@ public class ConfigUseCmd extends AbstractCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
-        OperationsConfig.assertSectionExist(sectionName);
+        ServiceConfig.assertSectionExist(sectionName);
         ctx().getConfiguration().copySection(sectionName, AstraConfiguration.ASTRARC_DEFAULT);
         ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Section '" + sectionName + "' is set as default.");

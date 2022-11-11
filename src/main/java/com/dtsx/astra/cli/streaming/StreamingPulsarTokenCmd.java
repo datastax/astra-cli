@@ -28,13 +28,13 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsStreaming.CMD_GET_TOKEN, description = "Show status of a tenant")
+@Command(name = ServiceStreaming.CMD_GET_TOKEN, description = "Show status of a tenant")
 public class StreamingPulsarTokenCmd extends AbstractStreamingCmd {
 
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        OperationsStreaming.showTenantPulsarToken(tenant);
+        ServiceStreaming.showTenantPulsarToken(tenant);
     }
 
 }

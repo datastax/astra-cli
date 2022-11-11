@@ -34,7 +34,7 @@ public class DbUnLoadCmd extends AbstractDsbulkDataCmd {
     /** {@inheritDoc} */
     @Override
     public void execute()  {
-        DsBulkService.getInstance().unload(this);
+        ServiceDsBulk.getInstance().unload(this);
     }
 
 }

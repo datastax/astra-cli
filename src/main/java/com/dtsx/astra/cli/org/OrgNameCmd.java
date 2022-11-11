@@ -28,12 +28,12 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OrganizationService.CMD_NAME, description = "Show organization name.")
+@Command(name = ServiceOrganization.CMD_NAME, description = "Show organization name.")
 public class OrgNameCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        OrganizationService.getInstance().getName();
+        ServiceOrganization.getInstance().getName();
     }
 
 }

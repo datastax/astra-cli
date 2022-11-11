@@ -24,10 +24,10 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exception.CannotStartProcessException;
 import com.dtsx.astra.cli.core.exception.FileSystemException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.db.DatabaseDao;
+import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
-import com.dtsx.astra.sdk.databases.domain.Database;
+import com.dtsx.astra.sdk.db.domain.Database;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class CqlShellService {
+public class ServiceCqlShell {
 
     /** Patch for cqlShell. */
     private static final String VERSION_TO_REPLACE = "|| [ \"$version\" = \"2.7\" ]";
@@ -52,7 +52,7 @@ public class CqlShellService {
     CqlShellConfig settings;
 
     /** Access to Database client */
-    DatabaseDao dbDao;
+    DaoDatabase dbDao;
     
     /** Local installation folder for CqlSh. */
     File cqlshLocalFolder;
@@ -61,7 +61,7 @@ public class CqlShellService {
     String cqlshExecutable;
 
     /** Singleton Pattern. */
-    private static CqlShellService instance;
+    private static ServiceCqlShell instance;
 
     /**
      * Singleton Pattern.
@@ -69,9 +69,9 @@ public class CqlShellService {
      * @return
      *      instance of the service.
      */
-    public static synchronized CqlShellService getInstance() {
+    public static synchronized ServiceCqlShell getInstance() {
         if (null == instance) {
-            instance = new CqlShellService();
+            instance = new ServiceCqlShell();
         }
         return instance;
     }
@@ -79,8 +79,8 @@ public class CqlShellService {
     /**
      * Default constructor
      */
-    private CqlShellService() {
-        this.dbDao = DatabaseDao.getInstance();
+    private ServiceCqlShell() {
+        this.dbDao = DaoDatabase.getInstance();
         
         settings = new CqlShellConfig(
                 AstraCliUtils.readProperty("cqlsh.url"),

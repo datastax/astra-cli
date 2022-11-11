@@ -20,19 +20,12 @@ package com.dtsx.astra.cli.streaming.cdc;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
-
-import java.util.Arrays;
 
 /**
- * Display information relative to a db.
+ * Declare a Change Data Capture between DB and Pulsar.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
@@ -40,7 +33,7 @@ import java.util.Arrays;
 public class StreamingCreateCdcCmd extends AbstractStreamingCmd {
 
     /**  Options. */
-    @Option(name = {"-db", "--database" }, title = "DATABSE", arity = 1,
+    @Option(name = {"-db", "--database" }, title = "DATABASE", arity = 1,
             description = "Database name or identifier")
     protected String db;
 
@@ -59,8 +52,7 @@ public class StreamingCreateCdcCmd extends AbstractStreamingCmd {
     protected int topicPartition = 3;
 
     /** {@inheritDoc} */
-    public void execute()
-    throws TenantNotFoundException {
+    public void execute() {
 
     }
 

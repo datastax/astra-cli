@@ -44,7 +44,7 @@ import com.dtsx.astra.sdk.streaming.domain.Tenant;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class OperationsStreaming {
+public class ServiceStreaming {
 
     /** Command constants. */
     public static final String CMD_STATUS    = "status";
@@ -81,7 +81,7 @@ public class OperationsStreaming {
     /**
      * Hide default constructor
      */
-    private OperationsStreaming() {}
+    private ServiceStreaming() {}
     
     /**
      * Syntax Sugar to work with Streaming Devops Apis.

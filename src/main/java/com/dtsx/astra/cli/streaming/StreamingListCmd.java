@@ -33,7 +33,7 @@ public class StreamingListCmd extends AbstractConnectedCmd {
    
     /** {@inheritDoc} */
     public void execute() {
-        OperationsStreaming.listTenants();
+        ServiceStreaming.listTenants();
     }
 
 }

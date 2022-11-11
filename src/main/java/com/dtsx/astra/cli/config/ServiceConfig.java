@@ -35,7 +35,7 @@ import java.util.Map.Entry;
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public class OperationsConfig {
+public class ServiceConfig {
 
     /**
      * Title of the table.
@@ -45,7 +45,7 @@ public class OperationsConfig {
     /**
      * Hide default constructor
      */
-    private OperationsConfig() {}
+    private ServiceConfig() {}
     
     /**
      * Syntax sugar.

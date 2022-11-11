@@ -28,13 +28,13 @@ import com.github.rvesse.airline.annotations.Command;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = OperationsStreaming.CMD_STATUS, description = "Show status of a tenant")
+@Command(name = ServiceStreaming.CMD_STATUS, description = "Show status of a tenant")
 public class StreamingStatusCmd extends AbstractStreamingCmd {
     
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        OperationsStreaming.showTenantStatus(tenant);
+        ServiceStreaming.showTenantStatus(tenant);
     }
 
 }

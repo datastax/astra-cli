@@ -22,7 +22,7 @@ package com.dtsx.astra.cli.db;
 
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.sdk.databases.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -39,7 +39,7 @@ public class DbDeleteCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "--wait" },
             description = "Will wait until the database become ACTIVE")
-    protected boolean wait = false;
+    protected boolean wait = true;
 
     /**
      * Provide a limit to the wait period in seconds, default is 180s.
@@ -48,10 +48,16 @@ public class DbDeleteCmd extends AbstractDatabaseCmd {
             description = "Provide a limit to the wait period in seconds, default is 300s.")
     protected int timeout = 300;
 
+    /**
+     * Will not wait for the database become available.
+     */
+    @Option(name = { "--async" }, description = "Will not wait for the resource to become available")
+    protected boolean async = false;
+
     /** {@inheritDoc} */
     public void execute() {
         dbServices.deleteDb(db);
-        if (wait) {
+        if (!async) {
             if (dbServices.retryUntilDbDeleted(db, timeout) >= timeout) {
                 throw new InvalidDatabaseStateException(db, DatabaseStatusType.TERMINATED,
                         DatabaseStatusType.TERMINATING);

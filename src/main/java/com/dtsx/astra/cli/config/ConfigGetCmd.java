@@ -56,7 +56,7 @@ public class ConfigGetCmd extends AbstractCmd {
     /** {@inheritDoc}  */
     @Override
     public void execute() throws ConfigurationException  {
-        OperationsConfig.assertSectionExist(sectionName);
+        ServiceConfig.assertSectionExist(sectionName);
         if (key != null) {
             Optional<String> optKey = ctx().getConfiguration().getSectionKey(sectionName, key);
             if (optKey.isEmpty()) {

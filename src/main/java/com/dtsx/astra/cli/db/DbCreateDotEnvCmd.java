@@ -37,11 +37,11 @@ import com.github.rvesse.airline.annotations.Option;
 public class DbCreateDotEnvCmd extends AbstractDatabaseCmd {
     
     /**
-     * Cloud provider region to provision
+     * Specified a region explicitly
      */
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1, 
-            description = "Cloud provider region to provision")
-    protected String region = DatabaseService.DEFAULT_REGION;
+            description = "Cloud provider region")
+    protected String region;
     
     /**
      * Default keyspace created with the Db

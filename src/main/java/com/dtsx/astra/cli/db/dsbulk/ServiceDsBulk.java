@@ -24,10 +24,10 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exception.CannotStartProcessException;
 import com.dtsx.astra.cli.core.exception.FileSystemException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.db.DatabaseDao;
+import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
-import com.dtsx.astra.sdk.databases.domain.Database;
+import com.dtsx.astra.sdk.db.domain.Database;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.util.List;
  * 
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DsBulkService  {
+public class ServiceDsBulk {
 
     /** prefix in definition. */
     static final String DSBULK_PREFIX = "dsbulk-";
@@ -89,12 +89,12 @@ public class DsBulkService  {
     String dsbulkExecutable;
     
     /** Access to databases object. */
-    DatabaseDao dbDao;
+    DaoDatabase dbDao;
     
     /**
      * Singleton Pattern
      */
-    private static DsBulkService instance;
+    private static ServiceDsBulk instance;
     
     /**
      * Singleton Pattern.
@@ -102,9 +102,9 @@ public class DsBulkService  {
      * @return
      *      instance of the service.
      */
-    public static synchronized DsBulkService getInstance() {
+    public static synchronized ServiceDsBulk getInstance() {
         if (null == instance) {
-            instance = new DsBulkService();
+            instance = new ServiceDsBulk();
         }
         return instance;
     }
@@ -112,12 +112,12 @@ public class DsBulkService  {
     /**
      * Initialization.
      */
-    private DsBulkService() {
+    private ServiceDsBulk() {
         config = new DsBulkConfig(
                 AstraCliUtils.readProperty("dsbulk.url"),
                 AstraCliUtils.readProperty("dsbulk.version"));
         
-        this.dbDao = DatabaseDao.getInstance();
+        this.dbDao = DaoDatabase.getInstance();
         
         this.dsbulkLocalFolder = new File(AstraCliUtils.ASTRA_HOME 
                 + File.separator 

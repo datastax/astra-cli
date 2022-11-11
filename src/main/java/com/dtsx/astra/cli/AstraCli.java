@@ -39,10 +39,21 @@ import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd;
-import com.dtsx.astra.cli.iam.*;
-import com.dtsx.astra.cli.iam.exception.RoleNotFoundException;
-import com.dtsx.astra.cli.iam.exception.UserAlreadyExistException;
-import com.dtsx.astra.cli.iam.exception.UserNotFoundException;
+import com.dtsx.astra.cli.db.region.*;
+import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
+import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
+import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
+import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
+import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
+import com.dtsx.astra.cli.iam.role.RoleGetCmd;
+import com.dtsx.astra.cli.iam.role.RoleListCmd;
+import com.dtsx.astra.cli.iam.token.TokenCreateCmd;
+import com.dtsx.astra.cli.iam.token.TokenDeleteCmd;
+import com.dtsx.astra.cli.iam.token.TokenListCmd;
+import com.dtsx.astra.cli.iam.user.UserDeleteCmd;
+import com.dtsx.astra.cli.iam.user.UserGetCmd;
+import com.dtsx.astra.cli.iam.user.UserInviteCmd;
+import com.dtsx.astra.cli.iam.user.UserListCmd;
 import com.dtsx.astra.cli.org.*;
 import com.dtsx.astra.cli.streaming.*;
 import com.dtsx.astra.cli.streaming.cdc.StreamingCreateCdcCmd;
@@ -103,14 +114,18 @@ import java.util.Arrays;
          DbListCmd.class,  DbGetCmd.class, DbStatusCmd.class,
          // Operation
          DbResumeCmd.class, DbDownloadScbCmd.class, DbCreateDotEnvCmd.class,
-         // Keyspaces
-         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // DsBulk
          DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
          // Cqlshell
          DbCqlShellCmd.class,
-         // List Regions
-         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class
+         // Work with Keyspaces
+         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
+         // Work with Regions
+         DbCreateRegionCmd.class, DbListRegionsCmd.class, DbDeleteRegionCmd.class,
+         // List Region
+         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class,
+         // External Tools
+         DbSwaggerUICmd.class, DbGraphqlPlaygroundCmd.class
      }),
     
     @Group(
@@ -124,10 +139,11 @@ import java.util.Arrays;
          StreamingListCmd.class, StreamingGetCmd.class,
          StreamingExistCmd.class, StreamingStatusCmd.class,
          StreamingPulsarTokenCmd.class, StreamingCreateDotEnvCmd.class,
+         // list Regions
          StreamingListRegionsCmd.class,
          // Pulsar Shell
          PulsarShellCmd.class,
-         // Create CDC
+         // Change Data Capture
          StreamingCreateCdcCmd.class, StreamingDeleteCdcCmd.class, StreamingGetCdcCmd.class
     }),
     
@@ -147,6 +163,14 @@ import java.util.Arrays;
          UserGetCmd.class, UserInviteCmd.class, UserDeleteCmd.class,
          UserListCmd.class
     }),
+
+    @Group(
+       name= "token",
+       description = "Manage tokens",
+       defaultCommand = TokenListCmd.class,
+       commands = {
+         TokenListCmd.class, TokenCreateCmd.class, TokenDeleteCmd.class
+     })
 })
 public class AstraCli {
     
@@ -239,6 +263,7 @@ public class AstraCli {
             AstraCliConsole.outputError(ExitCode.UNAVAILABLE, ex.getMessage());
             return ExitCode.UNAVAILABLE;
         } catch (Exception ex) {
+            ex.printStackTrace();
            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
            return ExitCode.INTERNAL_ERROR;
        }
