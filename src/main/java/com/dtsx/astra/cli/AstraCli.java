@@ -43,6 +43,7 @@ import com.dtsx.astra.cli.db.region.*;
 import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
 import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
+import com.dtsx.astra.cli.iam.token.TokenRevokeCmd;
 import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
 import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
 import com.dtsx.astra.cli.iam.role.RoleGetCmd;
@@ -169,7 +170,7 @@ import java.util.Arrays;
        description = "Manage tokens",
        defaultCommand = TokenListCmd.class,
        commands = {
-         TokenListCmd.class, TokenCreateCmd.class, TokenDeleteCmd.class
+         TokenListCmd.class, TokenCreateCmd.class, TokenDeleteCmd.class, TokenRevokeCmd.class
      })
 })
 public class AstraCli {

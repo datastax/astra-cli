@@ -27,9 +27,9 @@ echo "         \/     \/                   \/ "
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.1.alpha6"
+ASTRA_CLI_VERSION="0.1.1"
 
-echo "Installing Astra Cli $ASTRA_CLI_VERSION, please wait...      "
+echo "Installing Astra Cli $ASTRA_CLI_VERSION, $(tput setaf 4)JAVA VERSION (JDK17 is required)$(tput setaf 7) please wait...      "
 
 ASTRA_CLI_PLATFORM=$(uname)
 ASTRA_CLI_DIR="$HOME/.astra/cli"
@@ -39,6 +39,7 @@ astra_tmp_folder="$HOME/.astra/tmp"
 astra_scb_folder="$HOME/.astra/scb"
 astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}.zip"
 astra_zip_base_folder="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}"
+download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}.zip"
 
 # Config Files
 astra_bash_profile="${HOME}/.bash_profile"
@@ -48,7 +49,7 @@ astra_zshrc="${ZDOTDIR:-${HOME}}/.zshrc"
 astra_init_snippet=$( cat << EOF
 #THIS MUST BE AT THE END OF THE FILE FOR ASTRA_CLI TO WORK!!!
 export ASTRADIR="$ASTRA_CLI_DIR"
-[[ -s "${ASTRA_CLI_DIR}/astra-cli-autocomplete.sh" ]] && source "${ASTRA_CLI_DIR}/astra-cli-autocomplete.sh"
+[[ -s "${ASTRA_CLI_DIR}/astra-init.sh" ]] && source "${ASTRA_CLI_DIR}/astra-init.sh"
 EOF
 )
 
@@ -73,8 +74,7 @@ esac
 
 # Sanity checks
 echo ""
-echo "Checking prerequisites:"
-
+echo "$(tput setaf 6)Checking prerequisites:$(tput setaf 7)"
 if [ -d "$ASTRA_DIR" ]; then
 	echo ""
 	echo "======================================================================================================"
@@ -124,7 +124,7 @@ fi
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - curl command is available"
 
 echo ""
-echo "Preparing directories:"
+echo "$(tput setaf 6)Preparing directories:$(tput setaf 7)"
 mkdir -p "$astra_tmp_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Created $astra_tmp_folder"
 mkdir -p "$ASTRA_CLI_DIR"
@@ -133,9 +133,7 @@ mkdir -p "$astra_scb_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Created $astra_scb_folder"
 
 echo ""
-echo "Downloading archive:"
-download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}.zip"
-astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}.zip"
+echo "$(tput setaf 6)Downloading archive in $astra_zip_file$(tput setaf 7)"
 if [ -f "$astra_zip_file" ]; then
 	echo "$(tput setaf 2)[OK]$(tput setaf 7) - Archive is already there"
 else
@@ -155,19 +153,18 @@ if [[ -z "$ARCHIVE_OK" ]]; then
 fi
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Integrity of the archive checked"
 
-
 if [[ "$cygwin" == 'true' ]]; then
 	astra_tmp_folder=$(cygpath -w "$astra_tmp_folder")
 	astra_zip_file=$(cygpath -w "$astra_zip_file")
 fi
 
 echo ""
-echo "Extracting and installation:"
+echo "$(tput setaf 6)Extracting and installation:$(tput setaf 7)"
 unzip -qo "$astra_zip_file" -d "$astra_tmp_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Extraction is successful"
 
 rm -rf "$astra_zip_file"
-cp -rf "${astra_tmp_folder}/"* "$ASTRA_CLI_DIR"
+cp -rf "${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}/"* "$ASTRA_CLI_DIR"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - File moved to $ASTRA_CLI_DIR"
 
 rm -rf "${astra_tmp_folder}"
@@ -176,21 +173,21 @@ echo "$(tput setaf 2)[OK]$(tput setaf 7) - Installation cleaned up"
 if [[ $darwin == true ]]; then
   # Adding on MAC OS
   touch "$astra_bash_profile"
-  if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_bash_profile") ]]; then
+  if [[ -z $(grep 'astra-init.sh' "$astra_bash_profile") ]]; then
     echo -e "\n$astra_init_snippet" >> "$astra_bash_profile"
     echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_bash_profile}"
   fi
 else
   # Attempt update of interactive bash profile on regular UNIX
   touch "${astra_bashrc}"
-  if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_bashrc") ]]; then
+  if [[ -z $(grep 'astra-init.sh' "$astra_bashrc") ]]; then
       echo -e "\n$astra_init_snippet" >> "$astra_bashrc"
       echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_bashrc}"
   fi
 fi
 
 touch "$astra_zshrc"
-if [[ -z $(grep 'astra-cli-autocomplete.sh' "$astra_zshrc") ]]; then
+if [[ -z $(grep 'astra-init.sh' "$astra_zshrc") ]]; then
     echo -e "\n$astra_init_snippet" >> "$astra_zshrc"
     echo "$(tput setaf 2)[OK]$(tput setaf 7) - astra added to ${astra_zshrc}"
 fi
