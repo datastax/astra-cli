@@ -36,7 +36,7 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @BeforeAll
     public static void should_create_when_needed() {
-        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
     }
     
     @Test
@@ -227,13 +227,13 @@ public class DbCommandsTest extends AbstractCmdTest {
     public void testShouldThrowDatabaseInvalidState() {
         // Given
         // Create a temporary db without waiting, expecting status PENDING
-        assertSuccessCli("db create %s".formatted("tmp_db"));
+        assertSuccessCli("db create %s --async".formatted("tmp_db"));
         // When, Then
         assertExitCodeCli(ExitCode.UNAVAILABLE, "db create-keyspace %s -k %s".formatted("tmp_db", "ks"));
         // Waiting for the db to be started
-        assertSuccessCli("db create %s --if-not-exist --wait".formatted("tmp_db"));
+        assertSuccessCli("db create %s --if-not-exist".formatted("tmp_db"));
         // Delete db
-        assertSuccessCli("db delete %s --wait".formatted("tmp_db"));
+        assertSuccessCli("db delete %s".formatted("tmp_db"));
     }
 
     @Test
@@ -251,13 +251,13 @@ public class DbCommandsTest extends AbstractCmdTest {
     @Test
     @Order(20)
     public void showToolsURL() {
-        assertSuccessCli("db swagger mtg");
-        assertSuccessCli("db playground mtg");
+        assertSuccessCli("db swagger %s".formatted(DB_TEST));
+        assertSuccessCli("db playground %s".formatted(DB_TEST));
     }
 
-    @AfterAll
-    public static void testShouldDelete() {
-        assertSuccessCli("db delete %s --wait".formatted(DB_TEST));
-    }
+    //@AfterAll
+    //public static void testShouldDelete() {
+    //    assertSuccessCli("db delete %s".formatted(DB_TEST));
+    //}
 
 }

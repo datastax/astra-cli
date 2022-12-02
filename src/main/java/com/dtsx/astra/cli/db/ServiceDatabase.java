@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 public class ServiceDatabase {
     
     /** Default region. **/
-    public static final String DEFAULT_REGION        = "us-east-1";
+    public static final String DEFAULT_REGION        = "us-east1";
     
     /** Default tier. **/
     public static final String DEFAULT_TIER          = "serverless";
@@ -399,7 +399,7 @@ public class ServiceDatabase {
     public void deleteDb(String databaseName) 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
         dbDao.getRequiredDatabaseClient(databaseName).delete();
-        LoggerShell.info("Deleting Database '%s' (async operation)".formatted(databaseName));
+        LoggerShell.info("Deleting Database '%s'".formatted(databaseName));
     }
   
     /**

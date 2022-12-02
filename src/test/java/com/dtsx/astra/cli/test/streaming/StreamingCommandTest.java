@@ -106,14 +106,6 @@ public class StreamingCommandTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(7)
-    public void testShouldCreateDotenv2()  {
-        assertSuccessCli("streaming create-dotenv test-clun-12345 -d /tmp");
-        Assertions.assertTrue(new File("/tmp/.env").exists());
-    }
-
-
-    @Test
     @Order(8)
     public void should_delete_tenant() throws InterruptedException {
         // Given
