@@ -103,7 +103,7 @@ public class EnvFile {
     /**
      * Keys to be populated in file. 
      */
-    private final LinkedHashMap<EnvKey, String> keys = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> keys = new LinkedHashMap<>();
 
     /**
      * Working File 
@@ -140,13 +140,7 @@ public class EnvFile {
             try(FileInputStream fis = new FileInputStream(dotenvFile)) {
                 Properties p = new Properties();
                 p.load(fis);
-                p.forEach((key, value) -> {
-                    try {
-                        keys.put(EnvKey.valueOf((String) key), value.toString());
-                    } catch (IllegalArgumentException iae) {
-                        LoggerShell.debug("Key %s omitted".formatted(key));
-                    }
-                });
+                p.forEach((key, value) -> keys.put((String) key, value.toString()));
             } catch (Exception e) {
                 throw new IllegalArgumentException("Cannot log existing config file " + e.getMessage());
             }
@@ -160,8 +154,7 @@ public class EnvFile {
         try (FileWriter out = new FileWriter(dotenvFile)) {
             StringBuilder sb = new StringBuilder();
             // Sorting keys
-            TreeMap<String, String> fileKey = new TreeMap<>();
-            keys.forEach((key, value) -> fileKey.put(key.name(), value));
+            TreeMap<String, String> fileKey = new TreeMap<>(keys);
             fileKey.forEach((key, value) -> {
                 sb.append(key);
                 sb.append("=");
@@ -186,7 +179,7 @@ public class EnvFile {
      * @return
      *      reference to current object
      */
-    public EnvFile add(EnvKey k, String value) {
+    public EnvFile add(String k, String value) {
         this.keys.put(k, value);
         return this;
     }
@@ -197,7 +190,7 @@ public class EnvFile {
      * @return
      *       current value of 'keys'
      */
-    public LinkedHashMap<EnvKey, String> getKeys() {
+    public LinkedHashMap<String, String> getKeys() {
         return keys;
     }
 

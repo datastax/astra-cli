@@ -343,13 +343,13 @@ public class ServiceStreaming {
         Tenant tenant = getTenant(tenantName);
         EnvFile envFile = new EnvFile(dest);
         // Tenant Information
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_NAME, tenantName);
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_CLOUD, tenant.getCloudProvider());
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_REGION, tenant.getCloudRegion());
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_PULSAR_TOKEN, tenant.getPulsarToken());
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_BROKER_URL, tenant.getBrokerServiceUrl());
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSERVICE_URL, tenant.getWebServiceUrl());
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSOCKET_URL, tenant.getWebsocketUrl());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_NAME.name(), tenantName);
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_CLOUD.name(), tenant.getCloudProvider());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_REGION.name(), tenant.getCloudRegion());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_PULSAR_TOKEN.name(), tenant.getPulsarToken());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_BROKER_URL.name(), tenant.getBrokerServiceUrl());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSERVICE_URL.name(), tenant.getWebServiceUrl());
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_STREAMING_WEBSOCKET_URL.name(), tenant.getWebsocketUrl());
         envFile.save();
         LoggerShell.success("File '%s' has been created/amended".formatted(envFile.getDotenvFile().getAbsolutePath()) );
     }
