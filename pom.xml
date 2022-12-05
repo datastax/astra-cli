@@ -7,7 +7,7 @@
 	<description>Command Line Interface for DataStax Astra</description>
 	<packaging>jar</packaging>
 	<inceptionYear>2022</inceptionYear>
-	<version>0.2</version>
+	<version>0.3-SNAPSHOT</version>
 	<url>https://github.com/datastax/astra-cli</url>
 	<properties>
 	 	<sonar.organization>clun-datastax</sonar.organization>
@@ -375,7 +375,7 @@
 		<connection>scm:git:git@github.com:datastax/astra-cli.git</connection>
 		<developerConnection>scm:git:git@github.com:datastax/astra-cli.git</developerConnection>
 		<url>https://github.com/datastax/astra-cli</url>
-		<tag>0.2</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<distributionManagement>
