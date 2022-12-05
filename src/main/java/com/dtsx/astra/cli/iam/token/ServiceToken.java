@@ -177,9 +177,12 @@ public class ServiceToken {
     public void deleteToken(String tokenId) {
         Assert.hasLength(tokenId, "tokenId");
         TokenClient tokenClient = apiDevopsOrg().token(tokenId);
-        tokenClient.find().orElseThrow(() -> new TokenNotFoundException(tokenId));
-        tokenClient.delete();
-        LoggerShell.success("Your token has been deleted.");
+        if (tokenClient.find().isPresent()) {
+            tokenClient.delete();
+            LoggerShell.success("Your token has been deleted.");
+        } else {
+            throw new TokenNotFoundException(tokenId);
+        }
     }
 
 }

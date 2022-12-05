@@ -33,37 +33,34 @@ import com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbCountCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd;
-import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
-import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.cli.db.exception.KeyspaceAlreadyExistException;
+import com.dtsx.astra.cli.db.exception.*;
 import com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd;
 import com.dtsx.astra.cli.db.region.*;
 import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
 import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
-import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
-import com.dtsx.astra.cli.iam.token.TokenRevokeCmd;
-import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
-import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
 import com.dtsx.astra.cli.iam.role.RoleGetCmd;
 import com.dtsx.astra.cli.iam.role.RoleListCmd;
+import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
 import com.dtsx.astra.cli.iam.token.TokenCreateCmd;
 import com.dtsx.astra.cli.iam.token.TokenDeleteCmd;
 import com.dtsx.astra.cli.iam.token.TokenListCmd;
+import com.dtsx.astra.cli.iam.token.TokenRevokeCmd;
 import com.dtsx.astra.cli.iam.user.UserDeleteCmd;
 import com.dtsx.astra.cli.iam.user.UserGetCmd;
 import com.dtsx.astra.cli.iam.user.UserInviteCmd;
 import com.dtsx.astra.cli.iam.user.UserListCmd;
-import com.dtsx.astra.cli.org.*;
+import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
+import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
+import com.dtsx.astra.cli.org.OrgCmd;
+import com.dtsx.astra.cli.org.OrgIdCmd;
+import com.dtsx.astra.cli.org.OrgNameCmd;
 import com.dtsx.astra.cli.streaming.*;
-import com.dtsx.astra.cli.streaming.cdc.StreamingCreateCdcCmd;
-import com.dtsx.astra.cli.streaming.cdc.StreamingDeleteCdcCmd;
-import com.dtsx.astra.cli.streaming.cdc.StreamingGetCdcCmd;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
+import com.dtsx.astra.sdk.db.domain.exception.RegionNotFoundException;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.help.Help;
@@ -145,7 +142,7 @@ import java.util.Arrays;
          // Pulsar Shell
          PulsarShellCmd.class,
          // Change Data Capture
-         StreamingCreateCdcCmd.class, StreamingDeleteCdcCmd.class, StreamingGetCdcCmd.class
+         // StreamingCreateCdcCmd.class, StreamingDeleteCdcCmd.class, StreamingGetCdcCmd.class
     }),
     
     @Group(
@@ -253,20 +250,19 @@ public class AstraCli {
         } catch (DatabaseNotFoundException |
                 TenantNotFoundException |
                 RoleNotFoundException |
-                UserNotFoundException ex) {
+                UserNotFoundException | RegionNotFoundException ex) {
            AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
            return ExitCode.NOT_FOUND;
        } catch (DatabaseNameNotUniqueException | KeyspaceAlreadyExistException |
-                TenantAlreadyExistException | UserAlreadyExistException e) {
+                TenantAlreadyExistException | UserAlreadyExistException | RegionAlreadyExistException e) {
            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
            return ExitCode.ALREADY_EXIST;
        } catch(InvalidDatabaseStateException ex) {
             AstraCliConsole.outputError(ExitCode.UNAVAILABLE, ex.getMessage());
             return ExitCode.UNAVAILABLE;
         } catch (Exception ex) {
-            ex.printStackTrace();
-           AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
-           return ExitCode.INTERNAL_ERROR;
+            AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
+            return ExitCode.INTERNAL_ERROR;
        }
     }
     

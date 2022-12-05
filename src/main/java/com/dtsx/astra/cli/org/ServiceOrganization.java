@@ -89,14 +89,16 @@ public class ServiceOrganization {
      * Return organization id.
      */
     public void getId() {
-        LoggerShell.println(apiDevopsOrg().organizationId());
+
+        AstraCliConsole.println(apiDevopsOrg().organizationId());
     }
     
     /**
      * Return organization name.
      */
     public void getName() {
-        LoggerShell.println(apiDevopsOrg().organization().getName());
+
+        AstraCliConsole.println(apiDevopsOrg().organization().getName());
     }
     
     /**
@@ -122,7 +124,7 @@ public class ServiceOrganization {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         CliContext.getInstance()
                   .getApiDevopsStreaming()
-                   .serverlessRegions().forEach(r -> {
+                  .serverlessRegions().forEach(r -> {
             String cloud = r.getCloudProvider().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());

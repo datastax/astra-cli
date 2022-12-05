@@ -95,9 +95,9 @@ public class FileUtils {
     private static String escapeTarEntry(String tarEntry) {
         return tarEntry
                 .replaceAll(">", "")
-                .replaceAll("<", "")
-                .replaceAll("\\*", "")
-                .replaceAll("\\|", "");
+                .replace("<", "")
+                .replace("\\*", "")
+                .replace("\\|", "");
     }
     
     /**

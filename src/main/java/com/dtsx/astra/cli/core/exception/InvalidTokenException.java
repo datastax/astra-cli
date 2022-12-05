@@ -36,10 +36,7 @@ public class InvalidTokenException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = -7071867151543923236L;
 
-    /**
-     * Default constructor
-     */
-    public InvalidTokenException() {}
+
     
     /**
      * Constructor with token
@@ -50,10 +47,10 @@ public class InvalidTokenException extends RuntimeException {
     public InvalidTokenException(String token) {
         super("Token '" + token + "' is invalid");
     }
-    
+
     /**
      * Constructor with token
-     * 
+     *
      * @param token
      *      invalid token
      * @param parent

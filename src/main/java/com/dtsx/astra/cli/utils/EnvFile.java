@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
@@ -190,7 +191,7 @@ public class EnvFile {
      * @return
      *       current value of 'keys'
      */
-    public LinkedHashMap<String, String> getKeys() {
+    public Map<String, String> getKeys() {
         return keys;
     }
 

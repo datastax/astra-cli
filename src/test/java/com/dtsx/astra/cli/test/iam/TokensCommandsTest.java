@@ -51,4 +51,22 @@ public class TokensCommandsTest extends AbstractCmdTest {
         // Then
         Assertions.assertFalse(ServiceToken.getInstance().tokenExist(token.clientId()));
     }
+
+    @Test
+    @Order(4)
+    @DisplayName("Create a token a revoke it")
+    public void createAndRevokeTokenTest() {
+        // Given
+        assertSuccessCli("token list");
+        Role role = ServiceRole.getInstance().get("Database Administrator");
+        // When
+        assertSuccessCli("token create -r " + role.getId());
+        AstraToken token = ServiceToken.getInstance().createToken(role.getId());
+        // Then
+        Assertions.assertTrue(ServiceToken.getInstance().tokenExist(token.clientId()));
+        // When
+        assertSuccessCli("token revoke " + token.clientId());
+        // Then
+        Assertions.assertFalse(ServiceToken.getInstance().tokenExist(token.clientId()));
+    }
 }

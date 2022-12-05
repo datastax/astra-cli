@@ -42,7 +42,7 @@ public class CannotStartProcessException extends RuntimeException {
      *      parent exception
      */
     public CannotStartProcessException(String process, Throwable parent) {
-        super("Cannot start process '%s', error:%s".formatted(process, parent.getMessage()), parent);
+        super("Cannot start process '%s'".formatted(process), parent);
     }
     
 }

@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.test.config;
 import java.io.ByteArrayInputStream;
 
 import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -48,4 +49,11 @@ public class ConfigSetupCmdTest extends AbstractCmdTest {
                          .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN));
         
     }
+
+    @Test
+    @Order(3)
+    public void shoudReturnedExceptionTest() {
+        assertExitCodeCli(ExitCode.CONFIGURATION, "setup --token stupid");
+    }
+
 }

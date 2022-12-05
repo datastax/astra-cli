@@ -66,9 +66,7 @@ public class SetupCmd extends AbstractCmd {
                         try {
                             createDefaultSection(token);
                             valid_token = true;
-                        } catch(InvalidTokenException ite) {
-                            // loop
-                        }
+                        } catch(InvalidTokenException ite) {}
                     }
                 }
             }

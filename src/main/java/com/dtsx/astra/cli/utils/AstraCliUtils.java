@@ -20,12 +20,12 @@ package com.dtsx.astra.cli.utils;
  * #L%
  */
 
+import com.dtsx.astra.cli.AstraCli;
+import com.dtsx.astra.cli.core.out.AstraCliConsole;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-
-import com.dtsx.astra.cli.AstraCli;
-import com.dtsx.astra.cli.core.out.AstraCliConsole;
 
 /**
  * Utilities for cli. 
@@ -79,7 +79,7 @@ public class AstraCliUtils {
     }
     
     /** Hold properties. */
-    public static Properties properties;
+    private static Properties properties;
     
     /**
      * Read value from application.properties.

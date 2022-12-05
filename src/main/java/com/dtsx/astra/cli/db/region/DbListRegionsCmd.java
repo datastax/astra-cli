@@ -20,7 +20,6 @@ package com.dtsx.astra.cli.db.region;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
 import com.github.rvesse.airline.annotations.Command;
 

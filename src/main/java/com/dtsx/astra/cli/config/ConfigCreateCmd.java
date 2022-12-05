@@ -60,7 +60,7 @@ public class ConfigCreateCmd extends AbstractCmd {
         }
         if (!token.startsWith("AstraCS:")) {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
-            throw new InvalidTokenException();
+            throw new InvalidTokenException(token);
         }
         OrganizationsClient apiOrg  = new OrganizationsClient(token);
         Organization o = apiOrg.organization();

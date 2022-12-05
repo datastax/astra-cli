@@ -21,7 +21,6 @@ package com.dtsx.astra.cli.db.tool;
  */
 
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;

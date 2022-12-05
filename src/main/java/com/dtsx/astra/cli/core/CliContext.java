@@ -28,7 +28,6 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.OutputFormat;
 import com.dtsx.astra.sdk.db.DatabasesClient;
 import com.dtsx.astra.sdk.org.OrganizationsClient;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.dtsx.astra.sdk.streaming.StreamingClient;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.apache.commons.lang3.StringUtils;

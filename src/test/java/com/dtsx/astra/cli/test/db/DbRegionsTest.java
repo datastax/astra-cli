@@ -4,6 +4,9 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static com.dtsx.astra.cli.core.ExitCode.ALREADY_EXIST;
+import static com.dtsx.astra.cli.core.ExitCode.NOT_FOUND;
+
 /**
  * Crud on Db Region.
  */
@@ -22,17 +25,14 @@ public class DbRegionsTest extends AbstractCmdTest {
         assertSuccessCli("db list-regions %s".formatted(DB_TEST));
     }
 
-    //@Test
-    // Will take forever to run
-    public void shouldAddRegionTest() {
-        assertSuccessCli("db create-region %s -r eu-west-1 --async".formatted(DB_TEST));
+    @Test
+    public void shouldThrowRegionAlreadyExistTest() {
+        assertExitCodeCli(ALREADY_EXIST, "db create-region %s -r us-east1".formatted(DB_TEST));
     }
 
-    //@Test
-    // Will take forever to run
-    public void deleteRegionTest() {
-        assertSuccessCli("db delete-region%s -r eu-west-1 --async".formatted(DB_TEST));
+    @Test
+    public void shouldThrowRegionNotFoundTest() {
+        assertExitCodeCli(NOT_FOUND, "db delete-region %s -r eu-west-1".formatted(DB_TEST));
     }
-
 
 }

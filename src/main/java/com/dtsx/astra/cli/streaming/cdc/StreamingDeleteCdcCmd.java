@@ -33,7 +33,7 @@ public class StreamingDeleteCdcCmd extends AbstractStreamingCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-
+        throw new UnsupportedOperationException("Create Cdc function is under development");
     }
 
 }

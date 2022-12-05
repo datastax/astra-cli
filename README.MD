@@ -46,7 +46,7 @@ astra db list
 ```
 
 
-### Developement Commands
+### Development Commands
 
 - Generate Jacoco report and push to Coverall
 
@@ -70,7 +70,7 @@ mvn clean install
 - Run with Agent:
 
 ```
-java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.1.alpha6-shaded.jar streaming list-regions
+java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.1.1-shaded.jar streaming list-regions
 ```
 
 - Build as a native image

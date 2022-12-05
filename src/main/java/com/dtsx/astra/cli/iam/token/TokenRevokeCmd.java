@@ -20,10 +20,7 @@ package com.dtsx.astra.cli.iam.token;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Alias to revoke a token.
