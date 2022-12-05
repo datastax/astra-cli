@@ -353,7 +353,7 @@
 						</executions>
 						<configuration>
 							<imageName>astra-native</imageName>
-							<mainClass>com.dtsx.astra.cli.AstraCli</mainClass>
+							<mainClass>${app.main.class}</mainClass>
 							<buildArgs>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
 								<buildArg>-H:EnableURLProtocols=http,https</buildArg>

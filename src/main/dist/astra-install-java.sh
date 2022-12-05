@@ -27,7 +27,7 @@ echo "         \/     \/                   \/ "
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.1.1"
+ASTRA_CLI_VERSION="0.2"
 
 echo "Installing Astra Cli $ASTRA_CLI_VERSION, $(tput setaf 4)JAVA VERSION (JDK17 is required)$(tput setaf 7) please wait...      "
 
@@ -164,7 +164,7 @@ unzip -qo "$astra_zip_file" -d "$astra_tmp_folder"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - Extraction is successful"
 
 rm -rf "$astra_zip_file"
-cp -rf "${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}/"* "$ASTRA_CLI_DIR"
+cp -rf "${astra_tmp_folder}/"* "$ASTRA_CLI_DIR"
 echo "$(tput setaf 2)[OK]$(tput setaf 7) - File moved to $ASTRA_CLI_DIR"
 
 rm -rf "${astra_tmp_folder}"
