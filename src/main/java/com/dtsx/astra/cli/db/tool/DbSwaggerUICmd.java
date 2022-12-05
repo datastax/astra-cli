@@ -28,7 +28,7 @@ import com.github.rvesse.airline.annotations.Option;
 /**
  * Open a browser with playground.
  *
- * @author @clunven
+ * @author clunven
  */
 @Command(name = "swagger", description = "Open the swagger user interface")
 public class DbSwaggerUICmd extends AbstractDatabaseCmd {

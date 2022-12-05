@@ -28,6 +28,9 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 
 import java.nio.file.Paths;
 
+/**
+ * Create or amend existing .env configuration file with keys relative to a tenant
+ */
 @Command(name = "create-dotenv", description = "Generate an .env configuration file associate with the tenant")
 public class StreamingCreateDotEnvCmd extends AbstractConnectedCmd {
 

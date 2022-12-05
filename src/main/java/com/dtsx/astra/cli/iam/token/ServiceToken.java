@@ -151,6 +151,8 @@ public class ServiceToken {
      *
      * @param role
      *      role asked
+     * @return
+     *      astra token
      */
     public AstraToken createToken(String role) {
         // Validate that role exists.

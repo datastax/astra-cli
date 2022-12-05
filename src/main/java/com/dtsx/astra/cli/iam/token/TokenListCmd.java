@@ -23,6 +23,9 @@ package com.dtsx.astra.cli.iam.token;
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.github.rvesse.airline.annotations.Command;
 
+/**
+ * List tokens of an Organization.
+ */
 @Command(name = "list", description = "Display the list of tokens in an organization")
 public class TokenListCmd extends AbstractConnectedCmd {
 

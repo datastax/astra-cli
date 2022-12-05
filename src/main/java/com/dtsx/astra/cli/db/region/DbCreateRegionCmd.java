@@ -32,7 +32,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 /**
  * Expand database to a new region.
  *
- * @author Cedrick LUNVEN (@clunven)
+ * @author Cedrick LUNVEN (clunven)
  */
 @Command(name = "create-region", description = "Expand database to a new region")
 public class DbCreateRegionCmd extends AbstractDatabaseCmd {
@@ -45,12 +45,14 @@ public class DbCreateRegionCmd extends AbstractDatabaseCmd {
             description = "Name of the region to create")
     public String region;
 
+    /** Provide a cloud provider Name. */
     @Option(name = {"-c", "--cloud" },
             title = "CLOUD",
             arity = 1,
             description = "Name of the cloud provider")
     public String cloudProvider;
 
+    /** Provide a cloud tier. */
     @Option(name = {"-t", "--tier" },
             title = "CLOUD",
             arity = 1,

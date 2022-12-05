@@ -41,7 +41,10 @@ public class TokenNotFoundException extends RuntimeException {
     }
 
     /**
-     * Default constructor
+     * Default constructor.
+     *
+     * @param tokenId
+     *      token identifier
      */
     public TokenNotFoundException(String tokenId) {
         super("Token "+ tokenId + " has not been found.");

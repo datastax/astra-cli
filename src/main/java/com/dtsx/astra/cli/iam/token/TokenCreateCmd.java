@@ -25,6 +25,9 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
+/**
+ * Create a token providing a role identifier.
+ */
 @Command(name = "create", description = "Display the list of tokens in an organization")
 public class TokenCreateCmd extends AbstractConnectedCmd {
 

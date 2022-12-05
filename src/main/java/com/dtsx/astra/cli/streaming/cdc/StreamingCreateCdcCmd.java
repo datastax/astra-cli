@@ -47,6 +47,7 @@ public class StreamingCreateCdcCmd extends AbstractStreamingCmd {
             description = "Table name")
     protected String table;
 
+    /**  Options. */
     @Option(name = {"-p", "--partition" }, title = "topicPartition",
             description = "Partition in topic")
     protected int topicPartition = 3;

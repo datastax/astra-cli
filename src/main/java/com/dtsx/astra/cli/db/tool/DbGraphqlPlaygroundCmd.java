@@ -28,7 +28,7 @@ import com.github.rvesse.airline.annotations.Option;
 /**
  * Open a browser with playground.
  *
- * @author @clunven
+ * @author clunven
  */
 @Command(name = "playground", description = "Expand database to a new region")
 public class DbGraphqlPlaygroundCmd extends AbstractDatabaseCmd {

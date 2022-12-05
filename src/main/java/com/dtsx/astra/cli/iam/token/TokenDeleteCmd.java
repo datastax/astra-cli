@@ -25,6 +25,9 @@ import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
+/**
+ * Delete an existing token from its id.
+ */
 @Command(name = "delete", description = "Delete a token")
 public class TokenDeleteCmd extends AbstractConnectedCmd {
 
