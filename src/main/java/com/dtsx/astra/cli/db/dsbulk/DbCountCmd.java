@@ -21,6 +21,7 @@ package com.dtsx.astra.cli.db.dsbulk;
  */
 
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
  * Load data into AstraDB.
@@ -29,7 +30,7 @@ import com.github.rvesse.airline.annotations.Command;
  */
 @Command(name = "count", description = "Count items for a table, a query")
 public class DbCountCmd extends AbstractDsbulkDataCmd {
-    
+
     /** {@inheritDoc} */
     @Override
     public void execute()  {

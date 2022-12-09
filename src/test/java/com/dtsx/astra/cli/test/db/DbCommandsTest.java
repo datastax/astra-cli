@@ -1,25 +1,23 @@
 package com.dtsx.astra.cli.test.db;
 
-import java.io.File;
-import java.util.UUID;
-
 import com.dtsx.astra.cli.config.AstraConfiguration;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CoreOptions;
+import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.TokenOptions;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.OutputFormat;
+import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.ServiceDatabase;
 import com.dtsx.astra.cli.db.cqlsh.ServiceCqlShell;
-import com.dtsx.astra.cli.db.dsbulk.ServiceDsBulk;
+import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.dtsx.astra.cli.test.AbstractCmdTest;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-import com.dtsx.astra.cli.core.ExitCode;
-import com.dtsx.astra.cli.db.DaoDatabase;
-import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.test.AbstractCmdTest;
+import java.io.File;
+import java.util.UUID;
 
 /**
  * Test command to list configurations.
@@ -30,9 +28,6 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
 public class DbCommandsTest extends AbstractCmdTest {
     
     static String DB_TEST = "astra_cli_test";
-
-    /** dataset. */
-    public final static String TABLE_TEST = "test_dsbulk";
 
     @BeforeAll
     public static void should_create_when_needed() {
@@ -159,71 +154,16 @@ public class DbCommandsTest extends AbstractCmdTest {
         }
     }
 
+
     @Test
     @Order(12)
-    public void testShouldInstallDsbulk() {
-        if (!disableTools) {
-            // delete previous install
-            new File(AstraCliUtils.ASTRA_HOME + File.separator
-                    + "dsbulk-"
-                    + AstraCliUtils.readProperty("dsbulk.version")).delete();
-            // install
-            ServiceDsBulk.getInstance().install();
-            Assertions.assertTrue(ServiceDsBulk.getInstance().isInstalled());
-        }
-    }
-
-    @Test
-    @Order(13)
-    public void testShouldCount() {
-        if (!disableTools) {
-            // Given
-            assertSuccessCli("db", "create", DB_TEST, "--if-not-exists", "--wait");
-            // Cqlsh is installed if needed
-            assertSuccessCli("db", "cqlsh", DB_TEST, "-e", ""
-                    + "CREATE TABLE IF NOT EXISTS "
-                    + DB_TEST + "." + TABLE_TEST + "(id text PRIMARY KEY);"
-                    + "INSERT INTO " + DB_TEST + "." + TABLE_TEST
-                    + "(id) VALUES('a');");
-            // When
-            assertSuccessCli("db", "count", DB_TEST,
-                    "-k", DB_TEST,
-                    "-t", TABLE_TEST,
-                    "-logDir", "/tmp");
-        }
-    }
-
-    @Test
-    @Order(14)
-    public void testShouldImport() {
-        if (!disableTools){
-            assertSuccessCli("db", "load", DB_TEST,
-                    "-k", DB_TEST,
-                    "-t", TABLE_TEST,
-                    "-url", "src/test/resources/test_dataset.csv",
-                    "-logDir", "/tmp");
-        }
-    }
-
-    @Test
-    @Order(15)
-    public void testShouldExport() {
-        if (!disableTools) {
-            assertSuccessCli("db", "unload", DB_TEST, "-k", DB_TEST,"-t", TABLE_TEST,
-                    "-url", "/tmp/export-"+ DB_TEST + "-" + TABLE_TEST,
-                    "-logDir", "/tmp");
-        }
-    }
-
-    @Test
-    @Order(16)
     public void testShouldThrowDatabaseAlreadyExist() {
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create %s".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create-keyspace %s -k %s".formatted(DB_TEST, DB_TEST));
     }
 
     @Test
-    @Order(17)
+    @Order(13)
     public void testShouldThrowDatabaseInvalidState() {
         // Given
         // Create a temporary db without waiting, expecting status PENDING
@@ -237,7 +177,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(19)
+    @Order(14)
     public void testShouldThrowInvalidArgument()  {
         Assertions.assertThrows(InvalidArgumentException.class, () -> {
             CliContext.getInstance().init(new CoreOptions(false,false,
@@ -249,7 +189,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(20)
+    @Order(15)
     public void showToolsURL() {
         assertSuccessCli("db swagger %s".formatted(DB_TEST));
         assertSuccessCli("db playground %s".formatted(DB_TEST));

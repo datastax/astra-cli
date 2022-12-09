@@ -277,8 +277,11 @@ public class ServiceDsBulk {
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
-        if (cmd.dryRun)
-            dsbulkCmd.add("-dryRun");   
+        if (cmd.dryRun) dsbulkCmd.add("-dryRun");
+        if (cmd.allowMissingFields) {
+            dsbulkCmd.add("--schema.allowMissingFields");
+            dsbulkCmd.add("true");
+        }
         run(dsbulkCmd, cmd.getDb());
     }
     
@@ -292,6 +295,10 @@ public class ServiceDsBulk {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.COUNT);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
+        if (null != cmd.query) {
+            dsbulkCmd.add("-query");
+            dsbulkCmd.add(cmd.query);
+        }
         run(dsbulkCmd, cmd.getDb());
     }
     
@@ -306,6 +313,10 @@ public class ServiceDsBulk {
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
+        if (null != cmd.query) {
+            dsbulkCmd.add("-query");
+            dsbulkCmd.add(cmd.query);
+        }
         run(dsbulkCmd, cmd.getDb());
     }
 

@@ -39,6 +39,15 @@ public class DbLoadCmd extends AbstractDsbulkDataCmd {
             description = "Enable or disable dry-run mode, a test mode that runs the "
                     + "command but does not load data. ")
     boolean dryRun = false;
+
+    /**
+     * Optional filter
+     */
+    @Option(name = { "--schema.allowMissingFields" },
+            title = "allowMissingFields",
+            arity = 1,
+            description = "Ease the mapping")
+    boolean allowMissingFields = false;
     
     /** {@inheritDoc} */
     @Override

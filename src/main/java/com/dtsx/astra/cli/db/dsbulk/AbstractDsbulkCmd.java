@@ -50,7 +50,7 @@ public abstract class AbstractDsbulkCmd extends AbstractDatabaseCmd {
     /**
      * Optional filter
      */
-    @Option(name = { "--schema.query" },
+    @Option(name = { "-query","--schema.query" },
             title = "QUERY", 
             description = "Optional to unload or count")
     protected String query;

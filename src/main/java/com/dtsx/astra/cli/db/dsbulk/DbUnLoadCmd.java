@@ -21,6 +21,7 @@ package com.dtsx.astra.cli.db.dsbulk;
  */
 
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
  * Load data into AstraDB.
@@ -30,7 +31,7 @@ import com.github.rvesse.airline.annotations.Command;
 @Command(name = "unload", 
         description = "Unload data leveraging DSBulk")
 public class DbUnLoadCmd extends AbstractDsbulkDataCmd {
-    
+
     /** {@inheritDoc} */
     @Override
     public void execute()  {
