@@ -10,4 +10,3 @@ tasks:
       sed -i '1,$s/sdkman_selfupdate_enable=true/sdkman_selfupdate_enable=false/' /home/gitpod/.sdkman/etc/config 
       sdk install java 22.1.0.r11-grl -y
       gu install native-image
-      
