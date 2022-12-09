@@ -971,7 +971,7 @@ function _complete_astra_group_db_command_count() {
   COMMANDS=$1
 
   FLAG_OPTS="--no-color -v --verbose"
-  ARG_OPTS="--token -m --keyspace --config-file -o -maxErrors -encoding -t -skipRecords --config -cf -url --dsbulk-config -header -delim --schema.query -maxConcurrentQueries -conf -logDir --table --schema.mapping -k --output"
+  ARG_OPTS="--token -m --keyspace --config-file -query -o -maxErrors -encoding -t -skipRecords --config -cf -url --dsbulk-config -header --schema.query -delim -maxConcurrentQueries -conf -logDir --table --schema.mapping -k --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
   SAW_ARG=$?
@@ -1009,6 +1009,11 @@ function _complete_astra_group_db_command_count() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
+      -query|--schema.query)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
       -skipRecords)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
@@ -1035,11 +1040,6 @@ function _complete_astra_group_db_command_count() {
         return 0
         ;;
       -delim)
-        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
-        echo ${COMPREPLY[@]}
-        return 0
-        ;;
-      --schema.query)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1081,7 +1081,7 @@ function _complete_astra_group_db_command_load() {
   COMMANDS=$1
 
   FLAG_OPTS="--no-color -dryRun -v --verbose"
-  ARG_OPTS="--token -m --keyspace --config-file -o -maxErrors -encoding -t -skipRecords --config -cf -url --dsbulk-config -header -delim --schema.query -maxConcurrentQueries -conf -logDir --table --schema.mapping -k --output"
+  ARG_OPTS="--token --keyspace --config-file -query -encoding -skipRecords --schema.allowMissingFields -cf --dsbulk-config -header -delim -maxConcurrentQueries -logDir --schema.mapping -k -m -o -maxErrors -t --config -url --schema.query -conf --table --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
   SAW_ARG=$?
@@ -1119,7 +1119,17 @@ function _complete_astra_group_db_command_load() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
+      -query|--schema.query)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
       -skipRecords)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      --schema.allowMissingFields)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1145,11 +1155,6 @@ function _complete_astra_group_db_command_load() {
         return 0
         ;;
       -delim)
-        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
-        echo ${COMPREPLY[@]}
-        return 0
-        ;;
-      --schema.query)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1191,7 +1196,7 @@ function _complete_astra_group_db_command_unload() {
   COMMANDS=$1
 
   FLAG_OPTS="--no-color -v --verbose"
-  ARG_OPTS="--token -m --keyspace --config-file -o -maxErrors -encoding -t -skipRecords --config -cf -url --dsbulk-config -header -delim --schema.query -maxConcurrentQueries -conf -logDir --table --schema.mapping -k --output"
+  ARG_OPTS="--token -m --keyspace --config-file -query -o -maxErrors -encoding -t -skipRecords --config -cf -url --dsbulk-config -header --schema.query -delim -maxConcurrentQueries -conf -logDir --table --schema.mapping -k --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
   SAW_ARG=$?
@@ -1229,6 +1234,11 @@ function _complete_astra_group_db_command_unload() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
+      -query|--schema.query)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
       -skipRecords)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
@@ -1255,11 +1265,6 @@ function _complete_astra_group_db_command_unload() {
         return 0
         ;;
       -delim)
-        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
-        echo ${COMPREPLY[@]}
-        return 0
-        ;;
-      --schema.query)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
