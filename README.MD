@@ -13,10 +13,10 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=clun_astra-cli&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=clun_astra-cli)
 ![downloads](https://img.shields.io/github/downloads/datastax/astra-cli/total)
 
-Astra CLI provides a command line interface in a terminal to operate Datastax Astra. The goal is to offer access to any feature without accessing the user interface. The component is still under development (version `0.1.alpha5`), it will keep moving before the release GA.
+Astra CLI provides a command line interface in a terminal to operate DataStax Astra. The goal is to offer access to any feature without accessing the user interface.
 
 > ```
-> The component is still under development (version `0.1.alpha5`)
+> The component was made generally available in 2022. See [this blog](https://www.datastax.com/blog/introducing-cassandra-astra-cli) for more details or refer to the [Releases](https://github.com/datastax/astra-cli/releases) section.
 > ```
 
 ## Getting started
@@ -45,3 +45,4 @@ astra setup
 astra db list
 ```
 
+---

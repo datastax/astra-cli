@@ -392,11 +392,17 @@
 			<email>cedrick.lunven@gmail.com</email>
 			<url>https://github.com/clun</url>
 		</developer>
+		<developer>
+			<id>msmygit</id>
+			<name>Madhavan S.</name>
+			<email>madhavan_5k@yahoo.com</email>
+			<url>https://github.com/msmygit</url>
+		</developer>
 	</developers>
 
 	<organization>
 		<name>DataStax</name>
-		<url>http://datastax.com</url>
+		<url>https://www.datastax.com</url>
 	</organization>
 	
 	<licenses>
