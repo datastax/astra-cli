@@ -59,13 +59,13 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build native image on Linux
-        run: native-image --enable-url-protocols=https --static -jar astra-cli-*.jar astra-cli-linux
+        run: native-image --enable-url-protocols=https --static -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-linux
         if: runner.os == 'Linux'
       - name: Build native image on Mac OS X
-        run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-macos
+        run: native-image --enable-url-protocols=https -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-macos
         if: runner.os == 'macOS'
       - name: Build native image on Windows
-        run: native-image --enable-url-protocols=https -jar astra-cli-*.jar astra-cli-windows.exe
+        run: native-image --enable-url-protocols=https -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-windows.exe
         if: runner.os == 'Windows'
       - name: Temporarily save package
         uses: actions/upload-artifact@v3
