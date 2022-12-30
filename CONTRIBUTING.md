@@ -36,7 +36,7 @@ chances of your issue being dealt with quickly:
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-* Search the repository (https://github.com/bechbd/[repository-name]/pulls) for an open or closed PR that relates to your submission. You don't want to duplicate effort.
+* Search the repository (https://github.com/datastax/astra-cli/pulls) for an open or closed PR that relates to your submission. You don't want to duplicate effort.
 
 * Create a fork of the repo
 	* Navigate to the repo you want to fork
@@ -55,4 +55,6 @@ Before you submit your Pull Request (PR) consider the following guidelines:
     git push -f
     ```
 
-That's it! Thank you for your contribution!
+That's it! Thank you for your contribution! 🫶
+
+---
