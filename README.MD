@@ -15,9 +15,7 @@
 
 Astra CLI provides a command line interface in a terminal to operate DataStax Astra. The goal is to offer access to any feature without accessing the user interface.
 
-> ```
 > The component was made generally available in 2022. See [this blog](https://www.datastax.com/blog/introducing-cassandra-astra-cli) for more details or refer to the [Releases](https://github.com/datastax/astra-cli/releases) section.
-> ```
 
 ## Getting started
 
