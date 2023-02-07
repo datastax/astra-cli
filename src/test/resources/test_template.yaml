@@ -1,0 +1,126 @@
+metadata:
+  name: Sample Template
+  version: 1.0
+  description: show all keys for parsing
+  author: Cedrick Lunven
+  last_update: 2023-02-08
+
+## ASTRA DB
+db:
+  - name: db1
+    cloud: gcp
+    regions:
+      - us-east1
+    keyspaces:
+      - name: ks1
+        cql_scripts:
+          - create-schema.cql
+          - dataset.cql
+        load_data:
+          - url: sample.csv
+            table : sample
+            delim: ","
+            dsbulk_config: .
+            encoding: utf-8
+            dry_run: false
+            log_dir: .
+            mapping : "..."
+            table_name: xxxx
+            header: true
+            max_concurrent_queries: 10
+            max_errors: 100
+            query: "..."
+            allow_missing_field: true
+    access_lists:
+      - address: 137.187.23.0/24
+        enabled: true
+        description: do something
+    telemetry:
+      kafka:
+        bootstrap_servers":
+          - kafka-0.yourdomain.com:9092
+        topic: astra_metrics_events
+        sasl_mechanism: GSSAPI
+        sasl_username: kafkauser
+        sasl_password: kafkapassword
+        security_protocol: SASL_PLAINTEXT
+      pulsar:
+      datadog:
+      cloud-watch:
+      prometheus:
+      splunk:
+    vpc_peering:
+      azure:
+        tenantId: string
+        subscriptionId: string
+        resourceGroupName: string
+        virtualNetworkName: string
+      gcp:
+        projectId: string
+        vpcNetworkName: string
+      aws:
+        accountId: 123456780000
+        vpcId: vpc-00001111aa332244c
+        region: string
+        cidrBlock: 137.187.23.0/24
+
+
+
+# Astra Streaming
+streaming:
+  - name: tenant-12345
+    cloud: gcp
+    region: ok
+    plan: free
+    email: test
+    namespaces:
+      - name: default
+        topics:
+          - name: topic1
+            persistent: true
+            partitions: 1
+        sinks:
+          - topic: topic1
+            type: cassandra-enhanced
+            config: external.yaml
+        sources:
+          - topic: topic 1
+            type: kafka
+            instance: 1
+            processing_garantee: AT_LEAST_ONCE
+            auto_acknowledge: true
+            validate_connection: false
+            force_create: true
+    cdc:
+      - db: dbname
+        keyspace: string
+        table: string
+        partitions: 0
+
+# Organization level
+roles:
+  - name: roleX
+    description": string
+    actions:
+      - db-all-keyspace-create
+    resources:
+      - drn:astra:org:__ORG_ID__
+
+users:
+  - email: a@a.com
+    roles:
+      - roleX
+
+customer_keys:
+  gcp:
+    keyID: string
+    region: string
+  aws:
+    keyID: 123456780000
+    region: vpc-00001111aa332244c
+
+private_endpoints:
+  - endpoint_id: "com.amazonaws.vpce.us-east-1.vpce-svc-1148ea04af491da11"
+    description: something
+    allowedPrincipals:
+      - "arn:aws:iam::123456789012:role/admin"
