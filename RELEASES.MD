@@ -32,8 +32,7 @@ java --version
 ```
 
 ```
-/Library/Java/JavaVirtualMachines/graalvm-ce-java17-21.3.0/Contents/Home/bin/java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.2-shaded.jar streaming get clunven-xx
-
+/Library/Java/JavaVirtualMachines/graalvm-ce-java17-21.3.0/Contents/Home/bin/java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.2-shaded.jar token list
 ```
 
 - Build as a native image

@@ -22,6 +22,7 @@ package com.dtsx.astra.cli.db.dsbulk;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Load data into AstraDB.
@@ -52,6 +53,9 @@ public class DbLoadCmd extends AbstractDsbulkDataCmd {
     /** {@inheritDoc} */
     @Override
     public void execute()  {
+        if (url == null || "".equals(url)) {
+            throw new IllegalArgumentException("Option 'url' is required to load data");
+        }
         ServiceDsBulk.getInstance().load(this);
     }
 

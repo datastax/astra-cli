@@ -35,6 +35,9 @@ public class DbUnLoadCmd extends AbstractDsbulkDataCmd {
     /** {@inheritDoc} */
     @Override
     public void execute()  {
+        // When exporting default location is current path.
+        if (url == null) url = "./data" ;
+
         ServiceDsBulk.getInstance().unload(this);
     }
 

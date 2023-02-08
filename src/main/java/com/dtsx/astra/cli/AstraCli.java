@@ -241,7 +241,7 @@ public class AstraCli {
                 FileSystemException | ConfigurationException e) {
             AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
-        } catch (InvalidArgumentException dex) {
+        } catch (InvalidArgumentException | IllegalArgumentException dex) {
            AstraCliConsole.outputError(ExitCode.INVALID_ARGUMENT, dex.getMessage());
            return  ExitCode.INVALID_ARGUMENT;
         } catch (DatabaseNotFoundException |
