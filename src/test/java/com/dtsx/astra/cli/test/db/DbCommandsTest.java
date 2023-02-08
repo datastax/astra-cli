@@ -33,7 +33,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     public static void should_create_when_needed() {
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
     }
-    
+
     @Test
     @Order(1)
     public void testShouldShowHelp() {

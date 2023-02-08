@@ -23,28 +23,25 @@ package com.dtsx.astra.cli.db.exception;
 import java.io.Serial;
 
 /**
- * Business exception if multiple database names.
- * 
+ * Keyspace already exists
+ *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class DatabaseNameNotUniqueException extends RuntimeException {
+public class DatabaseAlreadyExistException extends RuntimeException {
 
-    /** 
-     * Serial
-     */
+    /** Serial Number. */
     @Serial
-    private static final long serialVersionUID = -7880080384291100885L;
-   
-    /**
-     * Constructor with dbName
-     * 
-     * @param dbName
-     *      db name
-     */
-    public DatabaseNameNotUniqueException(String dbName) {
-        super(("Multiple databases with same name '%s' detected. " +
-               "Please fallback to database id to resolve the conflict").formatted(dbName));
+    private static final long serialVersionUID = 968018206118357644L;
 
+    /**
+     * Constructor with database name
+     *
+     * @param dbname
+     *      database name
+     */
+    public DatabaseAlreadyExistException(String dbname) {
+        super(("A database with name '%s' already exists in the organization. " +
+               "To prevent conflicts CLI will not create another one, please change name").formatted(dbname));
     }
-    
+
 }

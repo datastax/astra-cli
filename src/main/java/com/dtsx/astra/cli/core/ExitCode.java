@@ -59,6 +59,9 @@ public enum ExitCode {
     
     /** code. */
     UNRECOGNIZED_COMMAND(14),
+
+    /** code. */
+    CONFLICT(15),
     
     /** Internal error. */
     INTERNAL_ERROR(100);

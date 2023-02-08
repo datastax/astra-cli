@@ -248,10 +248,14 @@ public class AstraCli {
                 TenantNotFoundException |
                 RoleNotFoundException |
                 UserNotFoundException | RegionNotFoundException ex) {
-           AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
-           return ExitCode.NOT_FOUND;
-       } catch (DatabaseNameNotUniqueException | KeyspaceAlreadyExistException |
-                TenantAlreadyExistException | UserAlreadyExistException | RegionAlreadyExistException e) {
+            AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
+            return ExitCode.NOT_FOUND;
+       } catch (DatabaseNameNotUniqueException name) {
+            AstraCliConsole.outputError(ExitCode.CONFLICT, name.getMessage());
+            return ExitCode.CONFLICT;
+       } catch (DatabaseAlreadyExistException | KeyspaceAlreadyExistException |
+                TenantAlreadyExistException | UserAlreadyExistException |
+                RegionAlreadyExistException e) {
            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
            return ExitCode.ALREADY_EXIST;
        } catch(InvalidDatabaseStateException ex) {

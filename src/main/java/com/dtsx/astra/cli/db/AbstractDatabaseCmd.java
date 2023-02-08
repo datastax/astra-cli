@@ -38,7 +38,7 @@ public abstract class AbstractDatabaseCmd extends AbstractConnectedCmd {
      * Database name or identifier
      */
     @Required
-    @Arguments(title = "DB", description = "Database name (not unique)")
+    @Arguments(title = "DB", description = "Database name (if unique) or Database identifier")
     protected String db;
 
     /**

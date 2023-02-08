@@ -134,7 +134,7 @@ public class DaoDatabase {
                 return Optional.of(dbClient);
             }
         }
-        
+
         // Not found, try with the name
         List<Database> dbs = dbsClient.databasesNonTerminatedByName(db).toList();
         

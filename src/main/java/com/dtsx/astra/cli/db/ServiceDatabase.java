@@ -27,10 +27,7 @@ import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.JsonOutput;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
-import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
-import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.cli.db.exception.KeyspaceAlreadyExistException;
+import com.dtsx.astra.cli.db.exception.*;
 import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
@@ -274,8 +271,8 @@ public class ServiceDatabase {
      *      db ks
      * @param ifNotExist
      *      will create if needed
-     * @throws DatabaseNameNotUniqueException 
-     *      db name not unique
+     * @throws DatabaseAlreadyExistException
+     *      db name already exist
      * @throws InvalidArgumentException
      *      error in params 
      * @throws DatabaseNotFoundException
@@ -286,7 +283,7 @@ public class ServiceDatabase {
      *      database is hibernating or error state, cannot proceed 
      */
     public void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist) 
-    throws DatabaseNameNotUniqueException, DatabaseNotFoundException, 
+    throws DatabaseAlreadyExistException, DatabaseNotFoundException,
            InvalidDatabaseStateException, InvalidArgumentException, 
            KeyspaceAlreadyExistException {
         
@@ -312,52 +309,56 @@ public class ServiceDatabase {
         }
         
         // if multiple databases with same name => error
-        Optional<DatabaseClient> dbClient = dbDao.getDatabaseClient(databaseName);
-        
-        // DATABASE DOES NOT EXIST
-        if (dbClient.isEmpty()) {
-            LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
-                    .formatted(DB, databaseName, databaseName, keyspace));
-            CliContext.getInstance().getApiDevopsDatabases()
-            .createDatabase(DatabaseCreationRequest.builder()
-                    .name(databaseName)
-                    .tier(DEFAULT_TIER)
-                    .cloudProvider(CloudProviderType.valueOf(regionMap
-                            .get(databaseRegion)
-                            .getCloudProvider()
-                            .toUpperCase()))
-                    .cloudRegion(databaseRegion)
-                    .keyspace(keyspace)
-                    .build());
-            LoggerShell.info("%s '%s' and keyspace '%s' are being created."
-                    .formatted(DB, databaseName, keyspace));
-        } else {
+        try {
+            Optional<DatabaseClient> dbClient = dbDao.getDatabaseClient(databaseName);
 
-            if (!ifNotExist) {
-                throw new DatabaseNameNotUniqueException(databaseName);
-            }
-
-            Database db = dbDao.getDatabase(databaseName);
-            DatabaseStatusType dbStatus = db.getStatus();
-            switch (dbStatus) {
-                case HIBERNATED -> {
-                    resumeDb(databaseName);
-                    waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
-                    dbStatus = dbDao.getDatabase(databaseName).getStatus();
-                }
-                case PENDING, RESUMING, INITIALIZING, MAINTENANCE -> {
-                    waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
-                    dbStatus = dbDao.getDatabase(databaseName).getStatus();
-                }
-                default -> LoggerShell.info("%s '%s' already exist. Connecting to database.".formatted(DB, databaseName));
-            }
-            
-            // Create keyspace on existing DB when needed
-            if (DatabaseStatusType.ACTIVE.equals(dbStatus)) {
-                ServiceKeyspace.getInstance().createKeyspace(databaseName, keyspace, true);
+            // DATABASE DOES NOT EXIST
+            if (dbClient.isEmpty()) {
+                LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
+                        .formatted(DB, databaseName, databaseName, keyspace));
+                CliContext.getInstance().getApiDevopsDatabases()
+                .createDatabase(DatabaseCreationRequest.builder()
+                        .name(databaseName)
+                        .tier(DEFAULT_TIER)
+                        .cloudProvider(CloudProviderType.valueOf(regionMap
+                                .get(databaseRegion)
+                                .getCloudProvider()
+                                .toUpperCase()))
+                        .cloudRegion(databaseRegion)
+                        .keyspace(keyspace)
+                        .build());
+                LoggerShell.info("%s '%s' and keyspace '%s' are being created."
+                        .formatted(DB, databaseName, keyspace));
             } else {
-                throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
+
+                if (!ifNotExist) {
+                    throw new DatabaseAlreadyExistException(databaseName);
+                }
+
+                Database db = dbDao.getDatabase(databaseName);
+                DatabaseStatusType dbStatus = db.getStatus();
+                switch (dbStatus) {
+                    case HIBERNATED -> {
+                        resumeDb(databaseName);
+                        waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
+                        dbStatus = dbDao.getDatabase(databaseName).getStatus();
+                    }
+                    case PENDING, RESUMING, INITIALIZING, MAINTENANCE -> {
+                        waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
+                        dbStatus = dbDao.getDatabase(databaseName).getStatus();
+                    }
+                    default -> LoggerShell.info("%s '%s' already exist. Connecting to database.".formatted(DB, databaseName));
+                }
+
+                // Create keyspace on existing DB when needed
+                if (DatabaseStatusType.ACTIVE.equals(dbStatus)) {
+                    ServiceKeyspace.getInstance().createKeyspace(databaseName, keyspace, true);
+                } else {
+                    throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
+                }
             }
+        } catch (DatabaseNameNotUniqueException ex) {
+            throw new DatabaseAlreadyExistException(databaseName);
         }
     }
      

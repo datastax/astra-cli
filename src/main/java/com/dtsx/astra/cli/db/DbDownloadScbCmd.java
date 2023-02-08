@@ -28,7 +28,7 @@ import com.github.rvesse.airline.annotations.Option;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-@Command(name = "download-scb", description = "Delete an existing database")
+@Command(name = "download-scb", description = "Download secure connect bundle archive for a region")
 public class DbDownloadScbCmd extends AbstractDatabaseCmd {
 
     /**
