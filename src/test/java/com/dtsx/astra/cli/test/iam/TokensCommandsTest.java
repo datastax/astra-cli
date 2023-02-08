@@ -10,8 +10,6 @@ import org.junit.jupiter.api.*;
 
 /**
  * Testing CRUD for tokens.
- *
- * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TokensCommandsTest extends AbstractCmdTest {

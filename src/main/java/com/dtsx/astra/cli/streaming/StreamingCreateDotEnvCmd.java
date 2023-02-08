@@ -20,11 +20,8 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 import java.nio.file.Paths;
 
@@ -32,12 +29,7 @@ import java.nio.file.Paths;
  * Create or amend existing .env configuration file with keys relative to a tenant
  */
 @Command(name = "create-dotenv", description = "Generate an .env configuration file associate with the tenant")
-public class StreamingCreateDotEnvCmd extends AbstractConnectedCmd {
-
-    /** name of the DB. */
-    @Required
-    @Arguments(title = "TENANT", description = "Tenant name ")
-    public String tenant;
+public class StreamingCreateDotEnvCmd extends AbstractStreamingCmd {
 
     /**
      * Default keyspace created with the Db
@@ -48,6 +40,7 @@ public class StreamingCreateDotEnvCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceStreaming.generateDotEnvFile(tenant, destination);
+        ServiceStreaming.generateDotEnvFile(getTenant(), destination);
     }
+
 }

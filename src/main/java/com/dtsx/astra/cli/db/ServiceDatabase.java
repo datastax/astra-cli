@@ -94,7 +94,7 @@ public class ServiceDatabase {
     DaoDatabase dbDao;
 
     /**
-     * JDK 11 HttpClient
+     * JDK HttpClient
      */
     HttpClient client;
     

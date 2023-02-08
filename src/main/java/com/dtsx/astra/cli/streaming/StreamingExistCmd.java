@@ -32,7 +32,7 @@ public class StreamingExistCmd extends AbstractStreamingCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        ServiceStreaming.showTenantExistence(tenant);
+        ServiceStreaming.showTenantExistence(getTenant());
     }
 
 }

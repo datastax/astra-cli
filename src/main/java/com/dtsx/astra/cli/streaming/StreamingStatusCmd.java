@@ -34,7 +34,7 @@ public class StreamingStatusCmd extends AbstractStreamingCmd {
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        ServiceStreaming.showTenantStatus(tenant);
+        ServiceStreaming.showTenantStatus(getTenant());
     }
 
 }

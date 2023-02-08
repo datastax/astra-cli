@@ -20,31 +20,18 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_CLOUD_PROVIDER;
-import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_CLOUD_REGION;
-import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_CLOUD_TENANT;
-import static com.dtsx.astra.cli.streaming.ServiceStreaming.DEFAULT_EMAIL;
-
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
+
+import static com.dtsx.astra.cli.streaming.ServiceStreaming.*;
 /**
  * Will create a tenant when needed.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "create", description = "Create a tenant in streaming with cli")
-public class StreamingCreateCmd extends AbstractConnectedCmd {
-
-    /**
-     * Tenant Name
-     */
-    @Required
-    @Arguments(title = "TENANT", description = "Tenant name (unique for the region)")
-    String tenantName;
+public class StreamingCreateCmd extends AbstractStreamingCmd {
 
     /**
      * Cloud provider or the tenant
@@ -76,7 +63,7 @@ public class StreamingCreateCmd extends AbstractConnectedCmd {
         ct.setCloudRegion(cloudRegion);
         ct.setPlan(plan);
         ct.setUserEmail(email);
-        ct.setTenantName(tenantName);
+        ct.setTenantName(getTenant());
         // Param Validations
         //throw new ParameterException(cloudProvider)
         // Does the tenant exist ?

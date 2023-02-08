@@ -103,7 +103,7 @@ public class StreamingGetCmd extends AbstractStreamingCmd {
                                 .toString()));
             }
         }
-        ServiceStreaming.showTenant(tenant, sKey);
+        ServiceStreaming.showTenant(getTenant(), sKey);
     }
 
 }

@@ -260,6 +260,10 @@
 
 
   {
+    "name":"com.dtsx.astra.cli.streaming.AbstractStreamingCmd",
+    "allDeclaredFields":true
+  },
+  {
     "name":"com.dtsx.astra.cli.streaming.StreamingCreateCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -635,7 +639,28 @@
       {"name":"getUserEmail","parameterTypes":[] }
     ]
   },
-
+  {
+    "name":"com.dtsx.astra.sdk.org.domain.IamToken",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setClientId","parameterTypes":["java.lang.String"] },
+      {"name":"setGeneratedOn","parameterTypes":["java.lang.String"] },
+      {"name":"setRoles","parameterTypes":["java.util.List"] }
+    ]
+  },
+  {
+    "name":"com.dtsx.astra.sdk.org.domain.ResponseAllIamTokens",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setClients","parameterTypes":["java.util.List"] }
+    ]
+  },
   {
     "name":"com.dtsx.astra.sdk.utils.ApiResponse",
     "allDeclaredFields":true,

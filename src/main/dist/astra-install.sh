@@ -207,4 +207,5 @@ if [[ "$darwin" == 'true' ]]; then
 fi
 echo "Open $(tput setaf 2)A NEW TERMINAL$(tput setaf 7) and run: $(tput setaf 3)astra setup$(tput setaf 7)"
 echo ""
-echo "You can close this window."
+echo "You can close this window.$(tput sgr0)"
+tput init

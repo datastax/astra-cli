@@ -25,11 +25,9 @@ db:
             dry_run: false
             log_dir: .
             mapping : "..."
-            table_name: xxxx
             header: true
             max_concurrent_queries: 10
             max_errors: 100
-            query: "..."
             allow_missing_field: true
     access_lists:
       - address: 137.187.23.0/24

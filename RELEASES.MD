@@ -24,8 +24,16 @@ mvn clean install
 
 - Run with Agent:
 
+_Make sure you are using a graalVM JDK_
+
+```bash
+sdk install java 22.3.1.r17-grl
+java --version
 ```
-java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.1.1-shaded.jar streaming list-regions
+
+```
+/Library/Java/JavaVirtualMachines/graalvm-ce-java17-21.3.0/Contents/Home/bin/java -agentlib:native-image-agent=config-output-dir=/tmp/native-image -jar target/astra-cli-0.2-shaded.jar streaming get clunven-xx
+
 ```
 
 - Build as a native image

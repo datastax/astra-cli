@@ -1,0 +1,24 @@
+metadata:
+  name: Sample Template
+  description: show all keys for parsing
+  author: Cedrick Lunven
+  version: 1.0
+regions:
+  - us-east1
+keyspaces:
+  - name: ks1
+    schema:
+      - create-schema.cql
+      - dataset.cql
+    data:
+      - url: sample.csv
+        table : sample
+        delim: ","
+        dsbulk_config: .
+        encoding: utf-8
+        dry_run: false
+        mapping : "..."
+        header: true
+        max_concurrent_queries: 10
+        max_errors: 100
+        allow_missing_field: true

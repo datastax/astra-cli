@@ -34,4 +34,13 @@ public abstract class AbstractStreamingCmd extends AbstractConnectedCmd {
     @Arguments(title = "TENANT", description = "Tenant identifier")
     protected String tenant;
 
+    /**
+     * Getter accessor for attribute 'tenant'.
+     *
+     * @return
+     *       current value of 'tenant'
+     */
+    public String getTenant() {
+        return tenant;
+    }
 }

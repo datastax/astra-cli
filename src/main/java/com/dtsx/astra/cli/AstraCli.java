@@ -71,16 +71,13 @@ import java.util.Arrays;
 
 /**
  * Main class for the program. Will route commands to proper class 
- *
- * @author Cedrick LUNVEN (@clunven)
  */
 @com.github.rvesse.airline.annotations.Cli(
   name = "astra", 
   description = "CLI for DataStax Astra™ ",
   defaultCommand = DefaultCmd.class, 
   commands = { 
-    SetupCmd.class, Help.class,
-    DefaultCmd.class
+    SetupCmd.class, Help.class, DefaultCmd.class
   },
   groups = {
     
