@@ -90,7 +90,11 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.NOT_FOUND, "db get %s --invalid".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db get does-not-exist");
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "db get %s -o yaml".formatted(DB_TEST));
+    }
 
+    @Test
+    @Order(5)
+    public void testShouldDescribeDb() throws DatabaseNameNotUniqueException {
         assertSuccessCli("db describe %s".formatted(DB_TEST));
         assertSuccessCli("db describe %s -o json".formatted(DB_TEST));
         assertSuccessCli("db describe %s -o csv".formatted(DB_TEST));
@@ -107,7 +111,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
     
     @Test
-    @Order(5)
+    @Order(6)
     public void testShouldListKeyspaces()  {
         assertSuccessCli("db list-keyspaces %s".formatted(DB_TEST));
         assertSuccessCli("db list-keyspaces %s -v".formatted(DB_TEST));
@@ -118,7 +122,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
     
     @Test
-    @Order(6)
+    @Order(7)
     public void testShouldCreateKeyspaces()  {
         String randomKS = "ks_" + UUID
                 .randomUUID().toString()
@@ -128,14 +132,14 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
     
     @Test
-    @Order(7)
+    @Order(8)
     public void testShouldDownloadScb()  {
         assertSuccessCli("db download-scb %s -f %s".formatted(DB_TEST, "/tmp/sample.zip"));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db download-scb %s".formatted("invalid"));
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testShouldCreateDotenv()  {
         if (!disableTools) {
             assertSuccessCli("db create-dotenv %s -d %s".formatted(DB_TEST, "/tmp/"));
@@ -143,7 +147,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
     
     @Test
-    @Order(9)
+    @Order(10)
     public void testShouldResumeDb()  {
         assertSuccessCli("db create-keyspace %s -k %s --if-not-exist --wait".formatted(DB_TEST, "kkk2"));
         assertSuccessCli("db resume %s --wait".formatted(DB_TEST));
@@ -151,7 +155,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void testShouldInstallCqlsh() {
         if (!disableTools) {
             new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra").delete();
@@ -161,7 +165,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void testShouldStartShell() {
         if (!disableTools) {
             assertSuccessCli("db", "cqlsh", DB_TEST, "-e", "SELECT cql_version FROM system.local");
@@ -170,14 +174,14 @@ public class DbCommandsTest extends AbstractCmdTest {
 
 
     @Test
-    @Order(12)
+    @Order(13)
     public void testShouldThrowDatabaseAlreadyExist() {
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create %s".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create-keyspace %s -k %s".formatted(DB_TEST, DB_TEST));
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     public void testShouldThrowDatabaseInvalidState() {
         // Given
         // Create a temporary db without waiting, expecting status PENDING
@@ -191,19 +195,19 @@ public class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     public void testShouldThrowInvalidArgument()  {
+        CliContext.getInstance().init(new CoreOptions(false,false,
+                OutputFormat.HUMAN,
+                AstraConfiguration.getDefaultConfigurationFileName()));
+        CliContext.getInstance().initToken(new TokenOptions(null, AstraConfiguration.ASTRARC_DEFAULT));
         Assertions.assertThrows(InvalidArgumentException.class, () -> {
-            CliContext.getInstance().init(new CoreOptions(false,false,
-                    OutputFormat.HUMAN,
-                    AstraConfiguration.getDefaultConfigurationFileName()));
-            CliContext.getInstance().initToken(new TokenOptions(null, AstraConfiguration.ASTRARC_DEFAULT));
             ServiceDatabase.getInstance().generateDotEnvFile(DB_TEST, DB_TEST, "invalid", "/tmp");
         });
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     public void showToolsURL() {
         assertSuccessCli("db swagger %s".formatted(DB_TEST));
         assertSuccessCli("db playground %s".formatted(DB_TEST));

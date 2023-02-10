@@ -66,7 +66,9 @@ public class SetupCmd extends AbstractCmd {
                         try {
                             createDefaultSection(token);
                             valid_token = true;
-                        } catch(InvalidTokenException ite) {}
+                        } catch(InvalidTokenException ite) {
+                            LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
+                        }
                     }
                 }
             }

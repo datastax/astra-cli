@@ -20,18 +20,30 @@ package com.dtsx.astra.cli.db.dsbulk;
  * #L%
  */
 
-import com.github.rvesse.airline.annotations.Command;
-
 /**
- * Load data into AstraDB.
+ * Command parameters for DSBulk.
  */
-@Command(name = "count", description = "Count items for a table, a query")
-public class DbCountCmd extends AbstractDsbulkCmd {
+public interface DsBulkParameters {
 
-    /** {@inheritDoc} */
-    @Override
-    public void execute()  {
-        ServiceDsBulk.getInstance().count(this);
-    }
+    /** Param for dsbulk. */
+    String PARAM_QUERY = "-query";
+
+    /** Param for dsbulk. */
+    String PARAM_DELIMITER = "-delim";
+
+    /** Param for dsbulk. */
+    String PARAM_HEADER = "-header";
+
+    /** Param for dsbulk. */
+    String PARAM_ENCODING = "-encoding";
+
+    /** Param for dsbulk. */
+    String PARAM_URL = "-url";
+
+    /** Param for dsbulk. */
+    String PARAM_SKIP_RECORDS = "-skipRecords";
+
+    /** Param for dsbulk. */
+    String PARAM_MAX_ERRORS = "-maxErrors";
 
 }

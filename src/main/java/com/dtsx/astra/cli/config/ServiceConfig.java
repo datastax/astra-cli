@@ -32,8 +32,6 @@ import java.util.Map.Entry;
 
 /**
  * Group configuration actions.
- * 
- * @author Cedrick LUNVEN (@clunven)
  */
 public class ServiceConfig {
 
@@ -107,22 +105,17 @@ public class ServiceConfig {
      *      organization name if exists
      */
     public static Optional<String> findDefaultOrganizationName(Map<String, Map<String, String>> sections) {
-        String defaultOrgName = null;
         if (sections.containsKey(AstraConfiguration.ASTRARC_DEFAULT)) {
             String defaultToken = sections
                     .get(AstraConfiguration.ASTRARC_DEFAULT)
                     .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN);
-            for (Entry<String, Map<String, String>> section : sections.entrySet()) {
-                if (!section.getKey().equals(AstraConfiguration.ASTRARC_DEFAULT)) {
-                    if (defaultToken !=null && 
-                        defaultToken.equalsIgnoreCase(
-                                sections.get(section.getKey()).get(AstraRc.ASTRA_DB_APPLICATION_TOKEN))) {
-                           defaultOrgName = section.getKey();
-                       }
-                    }
-                }
+            return sections
+                    .entrySet().stream()
+                    .filter(e -> e.getValue().get(AstraRc.ASTRA_DB_APPLICATION_TOKEN).equals(defaultToken))
+                    .map(Entry::getKey)
+                    .findFirst();
         }
-        return Optional.ofNullable(defaultOrgName);
+        return Optional.empty();
     }
     
     /**

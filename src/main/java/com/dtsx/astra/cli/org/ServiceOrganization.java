@@ -187,13 +187,12 @@ public class ServiceOrganization {
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
         sortedRegion.forEach((cloud, treemap) -> treemap.forEach((region, name) -> {
             Map<String, String> rf = new HashMap<>();
-            if (cloudProvider == null || cloudProvider.equalsIgnoreCase(cloud)) {
-                if (filter == null || region.contains(filter) || name.contains(filter)) {
+            if ((cloudProvider == null || cloudProvider.equalsIgnoreCase(cloud)) &&
+                (filter == null || region.contains(filter) || name.contains(filter))) {
                     rf.put(COLUMN_CLOUD, cloud);
                     rf.put(COLUMN_REGION_NAME, region);
                     rf.put(COLUMN_REGION_DISPLAY, name);
                     sht.getCellValues().add(rf);
-                }
             }
         }));
         return sht;

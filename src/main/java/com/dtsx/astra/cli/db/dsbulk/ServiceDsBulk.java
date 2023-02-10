@@ -39,13 +39,10 @@ import java.util.List;
 /**
  * Working with external DSBulk.
  */
-public class ServiceDsBulk {
+public class ServiceDsBulk implements DsBulkParameters {
 
     /** prefix in definition. */
-    static final String DSBULK_PREFIX = "dsbulk-";
-
-    /** Param for dsbulk. */
-    static final String PARAM_QUERY = "-query";
+    static String DSBULK_PREFIX = "dsbulk-";
 
     /** Operations. */
     public enum DsBulkOperations {
@@ -239,34 +236,7 @@ public class ServiceDsBulk {
         options.add(new File(AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER + File.separator +
                 AstraCliUtils.buildScbFileName(db.getId(), db.getInfo().getRegion())).getAbsolutePath());
     }
-    
-    /**
-     * Adding properties to load and unload.
-     *
-     * @param options
-     *      add options for dsbulk
-     * @param cmd
-     *      add command for dsbulk
-     */
-    private void addDataOptions(List<String> options, AbstractDsbulkDataCmd cmd) {
-        options.add("-delim");
-        options.add(cmd.delim);
-        options.add("-url");
-        options.add(cmd.url);
-        options.add("-header");
-        options.add(String.valueOf(cmd.header));
-        options.add("-encoding");
-        options.add(cmd.encoding);
-        options.add("-skipRecords");
-        options.add(String.valueOf(cmd.skipRecords));
-        options.add("-maxErrors");
-        options.add(String.valueOf(cmd.maxErrors));
-        if (null != cmd.mapping) {
-            options.add("-m");
-            options.add(cmd.mapping);
-        }
-    }
-    
+
     /**
      * Run a Load command.
      * 
@@ -277,7 +247,23 @@ public class ServiceDsBulk {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.LOAD);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
-        addDataOptions(dsbulkCmd, cmd);
+
+        dsbulkCmd.add(PARAM_DELIMITER);
+        dsbulkCmd.add(cmd.delim);
+        dsbulkCmd.add(PARAM_URL);
+        dsbulkCmd.add(cmd.url);
+        dsbulkCmd.add(PARAM_HEADER);
+        dsbulkCmd.add(String.valueOf(cmd.header));
+        dsbulkCmd.add(PARAM_ENCODING);
+        dsbulkCmd.add(cmd.encoding);
+        dsbulkCmd.add(PARAM_SKIP_RECORDS);
+        dsbulkCmd.add(String.valueOf(cmd.skipRecords));
+        dsbulkCmd.add(PARAM_MAX_ERRORS);
+        dsbulkCmd.add(String.valueOf(cmd.maxErrors));
+        if (null != cmd.mapping) {
+            dsbulkCmd.add("-m");
+            dsbulkCmd.add(cmd.mapping);
+        }
         if (cmd.dryRun) dsbulkCmd.add("-dryRun");
         if (cmd.allowMissingFields) {
             dsbulkCmd.add("--schema.allowMissingFields");
@@ -313,7 +299,18 @@ public class ServiceDsBulk {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.UNLOAD);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
-        addDataOptions(dsbulkCmd, cmd);
+        dsbulkCmd.add(PARAM_DELIMITER);
+        dsbulkCmd.add(cmd.delim);
+        dsbulkCmd.add(PARAM_URL);
+        dsbulkCmd.add(cmd.url);
+        dsbulkCmd.add(PARAM_HEADER);
+        dsbulkCmd.add(String.valueOf(cmd.header));
+        dsbulkCmd.add(PARAM_ENCODING);
+        dsbulkCmd.add(cmd.encoding);
+        dsbulkCmd.add(PARAM_SKIP_RECORDS);
+        dsbulkCmd.add(String.valueOf(cmd.skipRecords));
+        dsbulkCmd.add(PARAM_MAX_ERRORS);
+        dsbulkCmd.add(String.valueOf(cmd.maxErrors));
         if (null != cmd.query) {
             dsbulkCmd.add(PARAM_QUERY);
             dsbulkCmd.add(cmd.query);
