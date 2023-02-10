@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.dsbulk;
+package com.dtsx.astra.cli.iam.role;
 
 /*-
  * #%L
@@ -23,19 +23,7 @@ package com.dtsx.astra.cli.db.dsbulk;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
- * Load data into AstraDB.
+ * Alias for 'role get'
  */
-@Command(name = "unload", 
-        description = "Unload data leveraging DSBulk")
-public class DbUnLoadCmd extends AbstractDsbulkDataCmd {
-
-    /** {@inheritDoc} */
-    @Override
-    public void execute()  {
-        // When exporting default location is current path.
-        if (url == null) url = "./data" ;
-
-        ServiceDsBulk.getInstance().unload(this);
-    }
-
-}
+@Command(name = "describe", description = "Show role details")
+public class RoleDescribeCmd extends RoleGetCmd {}

@@ -90,6 +90,20 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.NOT_FOUND, "db get %s --invalid".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db get does-not-exist");
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "db get %s -o yaml".formatted(DB_TEST));
+
+        assertSuccessCli("db describe %s".formatted(DB_TEST));
+        assertSuccessCli("db describe %s -o json".formatted(DB_TEST));
+        assertSuccessCli("db describe %s -o csv".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key id".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key status".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key cloud".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key keyspace".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key keyspaces".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key region".formatted(DB_TEST));
+        assertSuccessCli("db describe %s --key regions".formatted(DB_TEST));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db describe %s --invalid".formatted(DB_TEST));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db describe does-not-exist");
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "db describe %s -o yaml".formatted(DB_TEST));
     }
     
     @Test

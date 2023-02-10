@@ -15,6 +15,11 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"com.dtsx.astra.cli.config.ConfigDescribeCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"com.dtsx.astra.cli.config.ConfigListCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -75,6 +80,11 @@
   },
   {
     "name":"com.dtsx.astra.cli.db.DbGetCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.DbDescribeCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -190,11 +200,15 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"com.dtsx.astra.cli.iam.role.RoleDescribeCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"com.dtsx.astra.cli.iam.role.RoleListCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
-
 
 
   {
@@ -226,6 +240,11 @@
   },
   {
     "name":"com.dtsx.astra.cli.iam.user.UserGetCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.user.UserDescribeCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -285,6 +304,11 @@
   },
   {
     "name":"com.dtsx.astra.cli.streaming.StreamingGetCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.streaming.StreamingDescribeCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },

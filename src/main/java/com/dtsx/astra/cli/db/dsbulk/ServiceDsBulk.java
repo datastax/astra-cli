@@ -2,15 +2,15 @@ package com.dtsx.astra.cli.db.dsbulk;
 
 /*-
  * #%L
- * Astra Cli
- * %%
- * Copyright (C) 2022 DataStax
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Astra CLI
+ * --
+ * Copyright (C) 2022 - 2023 DataStax
+ * --
+ * Licensed under the Apache License, Version 2.0
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,13 +38,14 @@ import java.util.List;
 
 /**
  * Working with external DSBulk.
- * 
- * @author Cedrick LUNVEN (@clunven)
  */
 public class ServiceDsBulk {
 
     /** prefix in definition. */
     static final String DSBULK_PREFIX = "dsbulk-";
+
+    /** Param for dsbulk. */
+    static final String PARAM_QUERY = "-query";
 
     /** Operations. */
     public enum DsBulkOperations {
@@ -193,7 +194,7 @@ public class ServiceDsBulk {
             options.add(cmd.table);
         }
         if (null != cmd.query) {
-            options.add("-query");
+            options.add(PARAM_QUERY);
             options.add(cmd.query);
         }
         // Config
@@ -296,7 +297,7 @@ public class ServiceDsBulk {
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
         if (null != cmd.query) {
-            dsbulkCmd.add("-query");
+            dsbulkCmd.add(PARAM_QUERY);
             dsbulkCmd.add(cmd.query);
         }
         run(dsbulkCmd, cmd.getDb());
@@ -314,7 +315,7 @@ public class ServiceDsBulk {
         addCoreOptions(dsbulkCmd, cmd);
         addDataOptions(dsbulkCmd, cmd);
         if (null != cmd.query) {
-            dsbulkCmd.add("-query");
+            dsbulkCmd.add(PARAM_QUERY);
             dsbulkCmd.add(cmd.query);
         }
         run(dsbulkCmd, cmd.getDb());

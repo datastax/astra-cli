@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.dsbulk;
+package com.dtsx.astra.cli.streaming;
 
 /*-
  * #%L
@@ -23,19 +23,8 @@ package com.dtsx.astra.cli.db.dsbulk;
 import com.github.rvesse.airline.annotations.Command;
 
 /**
- * Load data into AstraDB.
+ * Alias for streaming get.
  */
-@Command(name = "unload", 
-        description = "Unload data leveraging DSBulk")
-public class DbUnLoadCmd extends AbstractDsbulkDataCmd {
+@Command(name = "describe", description = "Show details of a tenant")
+public class StreamingDescribeCmd extends StreamingGetCmd {}
 
-    /** {@inheritDoc} */
-    @Override
-    public void execute()  {
-        // When exporting default location is current path.
-        if (url == null) url = "./data" ;
-
-        ServiceDsBulk.getInstance().unload(this);
-    }
-
-}

@@ -43,6 +43,10 @@ public class UsersCommandsTest extends AbstractCmdTest {
         assertSuccessCli("user get -v " + USERNAME + " -o json");
         assertSuccessCli("user get -v " + USERNAME + " -o csv");
         assertSuccessCli("user get --no-color " + USERNAME);
+        assertSuccessCli("user describe -v " + USERNAME);
+        assertSuccessCli("user describe -v " + USERNAME + " -o json");
+        assertSuccessCli("user describe -v " + USERNAME + " -o csv");
+        assertSuccessCli("user describe --no-color " + USERNAME);
     }
     
     @Test
@@ -52,6 +56,8 @@ public class UsersCommandsTest extends AbstractCmdTest {
         String userInvalid = "john.doe@datastax.com";
         assertExitCodeCli(ExitCode.NOT_FOUND, "user get " + userInvalid);
         assertExitCodeCli(ExitCode.NOT_FOUND, "user get " + userInvalidId);
+        assertExitCodeCli(ExitCode.NOT_FOUND, "user describe " + userInvalid);
+        assertExitCodeCli(ExitCode.NOT_FOUND, "user describe " + userInvalidId);
     }
     
     @Test

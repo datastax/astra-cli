@@ -84,6 +84,13 @@ public class StreamingCommandTest extends AbstractCmdTest {
         assertSuccessCli("streaming get " + RANDOM_TENANT + " --key cloud");
         assertSuccessCli("streaming get " + RANDOM_TENANT + " --key pulsar_token");
         assertSuccessCli("streaming get " + RANDOM_TENANT + " --key region");
+        assertSuccessCli("streaming describe " + RANDOM_TENANT);
+        assertSuccessCli("streaming describe " + RANDOM_TENANT + " -o json");
+        assertSuccessCli("streaming describe " + RANDOM_TENANT + " -o csv");
+        assertSuccessCli("streaming describe " + RANDOM_TENANT + " --key status");
+        assertSuccessCli("streaming describe " + RANDOM_TENANT + " --key cloud");
+        assertSuccessCli("streaming describe " + RANDOM_TENANT + " --key pulsar_token");
+        assertSuccessCli("streaming describe " + RANDOM_TENANT + " --key region");
         assertSuccessCli("streaming exist " + RANDOM_TENANT);
         assertSuccessCli("streaming status " + RANDOM_TENANT);
         assertSuccessCli("streaming pulsar-token " + RANDOM_TENANT);

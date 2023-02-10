@@ -2,15 +2,15 @@ package com.dtsx.astra.cli;
 
 /*-
  * #%L
- * Astra Cli
- * %%
- * Copyright (C) 2022 DataStax
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Astra CLI
+ * --
+ * Copyright (C) 2022 - 2023 DataStax
+ * --
+ * Licensed under the Apache License, Version 2.0
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,6 +39,7 @@ import com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd;
 import com.dtsx.astra.cli.db.region.*;
 import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
 import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
+import com.dtsx.astra.cli.iam.role.RoleDescribeCmd;
 import com.dtsx.astra.cli.iam.role.RoleGetCmd;
 import com.dtsx.astra.cli.iam.role.RoleListCmd;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
@@ -46,10 +47,7 @@ import com.dtsx.astra.cli.iam.token.TokenCreateCmd;
 import com.dtsx.astra.cli.iam.token.TokenDeleteCmd;
 import com.dtsx.astra.cli.iam.token.TokenListCmd;
 import com.dtsx.astra.cli.iam.token.TokenRevokeCmd;
-import com.dtsx.astra.cli.iam.user.UserDeleteCmd;
-import com.dtsx.astra.cli.iam.user.UserGetCmd;
-import com.dtsx.astra.cli.iam.user.UserInviteCmd;
-import com.dtsx.astra.cli.iam.user.UserListCmd;
+import com.dtsx.astra.cli.iam.user.*;
 import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
 import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
 import com.dtsx.astra.cli.org.OrgCmd;
@@ -87,7 +85,7 @@ import java.util.Arrays;
        defaultCommand = ConfigListCmd.class,
        commands = {
          ConfigCreateCmd.class, ConfigGetCmd.class, ConfigDeleteCmd.class,
-         ConfigListCmd.class, ConfigUseCmd.class
+         ConfigListCmd.class, ConfigUseCmd.class, ConfigDescribeCmd.class
     }),
    
     @Group(name = "org", 
@@ -106,7 +104,7 @@ import java.util.Arrays;
          // Create,delete
          DbCreateCmd.class,  DbDeleteCmd.class,
          // Read
-         DbListCmd.class,  DbGetCmd.class, DbStatusCmd.class,
+         DbListCmd.class,  DbGetCmd.class, DbDescribeCmd.class, DbStatusCmd.class,
          // Operation
          DbResumeCmd.class, DbDownloadScbCmd.class, DbCreateDotEnvCmd.class,
          // DsBulk
@@ -131,7 +129,7 @@ import java.util.Arrays;
          // Create, Delete
          StreamingCreateCmd.class, StreamingDeleteCmd.class,
          // Read
-         StreamingListCmd.class, StreamingGetCmd.class,
+         StreamingListCmd.class, StreamingGetCmd.class, StreamingDescribeCmd.class,
          StreamingExistCmd.class, StreamingStatusCmd.class,
          StreamingPulsarTokenCmd.class, StreamingCreateDotEnvCmd.class,
          // list Regions
@@ -147,7 +145,7 @@ import java.util.Arrays;
        description = "Manage roles", 
        defaultCommand = RoleListCmd.class,
        commands = {
-         RoleListCmd.class, RoleGetCmd.class
+         RoleListCmd.class, RoleGetCmd.class, RoleDescribeCmd.class
     }),
     
     @Group(
@@ -156,7 +154,7 @@ import java.util.Arrays;
        defaultCommand = UserListCmd.class,
        commands = {
          UserGetCmd.class, UserInviteCmd.class, UserDeleteCmd.class,
-         UserListCmd.class
+         UserListCmd.class, UserDescribeCmd.class
     }),
 
     @Group(

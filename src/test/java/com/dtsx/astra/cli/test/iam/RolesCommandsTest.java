@@ -43,6 +43,10 @@ public class RolesCommandsTest extends AbstractCmdTest {
         assertSuccessCli("role get -v " + ADMIN_ROLE_ID + " -o json");
         assertSuccessCli("role get -v " + ADMIN_ROLE_ID + " -o csv");
         assertSuccessCli("role get --no-color " + ADMIN_ROLE_ID);
+        assertSuccessCli("role describe -v " + ADMIN_ROLE_ID);
+        assertSuccessCli("role describe -v " + ADMIN_ROLE_ID + " -o json");
+        assertSuccessCli("role describe -v " + ADMIN_ROLE_ID + " -o csv");
+        assertSuccessCli("role describe --no-color " + ADMIN_ROLE_ID);
     }
     
     @Test
@@ -52,5 +56,7 @@ public class RolesCommandsTest extends AbstractCmdTest {
         String roleInvalid = "jgrkjhlkjrheglkrehgrlejk";
         assertExitCodeCli(ExitCode.NOT_FOUND, "role get " + roleInvalid);
         assertExitCodeCli(ExitCode.NOT_FOUND, "role get " + roleInvalidId);
+        assertExitCodeCli(ExitCode.NOT_FOUND, "role describe " + roleInvalid);
+        assertExitCodeCli(ExitCode.NOT_FOUND, "role describe " + roleInvalidId);
     }
 }

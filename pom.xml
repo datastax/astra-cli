@@ -158,7 +158,12 @@
 						</goals>
 						<phase>process-sources</phase>
 						<configuration>
-							<licenseName>apache_v2</licenseName>
+							<projectName>Astra CLI</projectName>
+							<organizationName>DataStax</organizationName>
+							<licenseName>apache2</licenseName>
+							<licenseResolver>${project.baseUri}/src/license</licenseResolver>
+							<addJavaLicenseAfterPackage>true</addJavaLicenseAfterPackage>
+							<sectionDelimiter>--</sectionDelimiter>
 							<roots>
 								<root>src/main/java</root>
 							</roots>
@@ -404,11 +409,11 @@
 		<name>DataStax</name>
 		<url>https://www.datastax.com</url>
 	</organization>
-	
+
 	<licenses>
 		<license>
 			<name>Apache 2</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+			<url>${project.baseUri}/src/license/apache_v2/license.txt</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>

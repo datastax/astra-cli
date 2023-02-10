@@ -25,6 +25,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
         Assertions.assertFalse(config().getSection("test-cli").isEmpty());
         // When
         assertSuccessCli("config get test-cli -v");
+        assertSuccessCli("config describe test-cli -v");
     }
     
     @Test

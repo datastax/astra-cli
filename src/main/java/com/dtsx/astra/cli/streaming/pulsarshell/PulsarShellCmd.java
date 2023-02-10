@@ -2,15 +2,15 @@ package com.dtsx.astra.cli.streaming.pulsarshell;
 
 /*-
  * #%L
- * Astra Cli
- * %%
- * Copyright (C) 2022 DataStax
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Astra CLI
+ * --
+ * Copyright (C) 2022 - 2023 DataStax
+ * --
+ * Licensed under the Apache License, Version 2.0
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,11 +32,6 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * This command allows loading data with pulsar-client.
- * 
- * 
- * astra pulsar-shell
- * 
- * @author Cedrick LUNVEN (@clunven)
  */
 @Command(name = "pulsar-shell", description = "Start pulsar admin against your tenant")
 public class PulsarShellCmd extends AbstractConnectedCmd {
@@ -62,6 +57,8 @@ public class PulsarShellCmd extends AbstractConnectedCmd {
     @Option(name = {"-f", "--filename" }, title = "FILE", arity = 1,  
             description = "Input filename with a list of commands to be executed. Each command must be separated by a newline.")
     protected String fileName;
+
+
     
     /** Cqlsh Options. */
     @Option(name=  {"-np", "--no-progress" }, 
