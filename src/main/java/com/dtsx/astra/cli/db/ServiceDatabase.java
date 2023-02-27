@@ -422,7 +422,7 @@ public class ServiceDatabase {
                     LoggerShell.info("%s '%s' is already active".formatted(DB, databaseName));
             case HIBERNATED -> {
                 resumeDbRequest(db);
-                LoggerShell.success("Resuming %s '%s' ...".formatted(DB, db));
+                LoggerShell.success("Resuming %s '%s' ...".formatted(DB, databaseName));
             }
             case MAINTENANCE,INITIALIZING,PENDING ->
                     LoggerShell.info("%s '%s' will be available soon");
