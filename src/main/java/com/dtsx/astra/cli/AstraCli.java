@@ -29,6 +29,9 @@ import com.dtsx.astra.cli.core.exception.*;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.*;
+import com.dtsx.astra.cli.db.cdc.DbCreateCdcCmd;
+import com.dtsx.astra.cli.db.cdc.DbDeleteCdcCmd;
+import com.dtsx.astra.cli.db.cdc.DbListCdcCmd;
 import com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbCountCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
@@ -54,11 +57,13 @@ import com.dtsx.astra.cli.org.OrgCmd;
 import com.dtsx.astra.cli.org.OrgIdCmd;
 import com.dtsx.astra.cli.org.OrgNameCmd;
 import com.dtsx.astra.cli.streaming.*;
+import com.dtsx.astra.cli.streaming.cdc.StreamingListCdcCmd;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
-import com.dtsx.astra.sdk.db.domain.exception.RegionNotFoundException;
+import com.dtsx.astra.sdk.db.exception.ChangeDataCaptureNotFoundException;
+import com.dtsx.astra.sdk.db.exception.RegionNotFoundException;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.help.Help;
@@ -118,7 +123,9 @@ import java.util.Arrays;
          // List Region
          DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class,
          // External Tools
-         DbSwaggerUICmd.class, DbGraphqlPlaygroundCmd.class
+         DbSwaggerUICmd.class, DbGraphqlPlaygroundCmd.class,
+         // Cdc
+         DbListCdcCmd.class, DbDeleteCdcCmd.class, DbCreateCdcCmd.class
      }),
     
     @Group(
@@ -137,6 +144,7 @@ import java.util.Arrays;
          // Pulsar Shell
          PulsarShellCmd.class,
          // Change Data Capture
+         StreamingListCdcCmd.class
          // StreamingCreateCdcCmd.class, StreamingDeleteCdcCmd.class, StreamingGetCdcCmd.class
     }),
     
@@ -244,7 +252,7 @@ public class AstraCli {
            return  ExitCode.INVALID_ARGUMENT;
         } catch (DatabaseNotFoundException |
                 TenantNotFoundException |
-                RoleNotFoundException |
+                RoleNotFoundException | ChangeDataCaptureNotFoundException |
                 UserNotFoundException | RegionNotFoundException ex) {
             AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
             return ExitCode.NOT_FOUND;

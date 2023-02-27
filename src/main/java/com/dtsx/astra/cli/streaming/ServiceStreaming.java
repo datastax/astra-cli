@@ -69,7 +69,17 @@ public class ServiceStreaming {
     /** columns. */
     public static final String COLUMN_REGION = "region";
     /** columns. */
-    public static final String COLUMN_STATUS = "Status";
+    public static final String COLUMN_STATUS = "status";
+    /** columns. */
+    public static final String COLUMN_CLUSTER = "cluster";
+    /** columns. */
+    public static final String COLUMN_NAMESPACE = "namespace";
+    /** columns. */
+    public static final String COLUMN_DB = "database";
+    /** columns. */
+    public static final String COLUMN_KEYSPACE = "keyspace";
+    /** columns. */
+    public static final String COLUMN_TABLE = "table";
     /** Working object. */
     static final String TENANT = "Tenant";
     
@@ -138,6 +148,39 @@ public class ServiceStreaming {
                 rf.put(COLUMN_REGION, tnt.getCloudRegion());
                 rf.put(COLUMN_STATUS, tnt.getStatus());
                 sht.getCellValues().add(rf);
+        });
+        AstraCliConsole.printShellTable(sht);
+    }
+
+    /**
+     * List cdc for a tenant.
+     *
+     * @param tenantName
+     *      tenant name
+     * @throws TenantNotFoundException
+     *      tenant has not been found
+     */
+    public static void listCdc(String tenantName)
+    throws TenantNotFoundException {
+        ShellTable sht = new ShellTable();
+        sht.addColumn(COLUMN_CLUSTER,   15);
+        sht.addColumn(COLUMN_NAMESPACE,  15);
+        sht.addColumn(COLUMN_DB, 15);
+        sht.addColumn(COLUMN_KEYSPACE,  15);
+        sht.addColumn(COLUMN_TABLE,  15);
+        sht.addColumn(COLUMN_STATUS,  15);
+        tenantClient(tenantName)
+                .cdc()
+                .list()
+                .forEach(cdc -> {
+                    Map <String, String> rf = new HashMap<>();
+                    rf.put(COLUMN_CLUSTER,   cdc.getClusterName());
+                    rf.put(COLUMN_NAMESPACE,  cdc.getNamespace());
+                    rf.put(COLUMN_DB, cdc.getDatabaseName());
+                    rf.put(COLUMN_KEYSPACE, cdc.getKeyspace());
+                    rf.put(COLUMN_TABLE, cdc.getDatabaseTable());
+                    rf.put(COLUMN_STATUS, cdc.getConnectorStatus());
+                    sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
     }

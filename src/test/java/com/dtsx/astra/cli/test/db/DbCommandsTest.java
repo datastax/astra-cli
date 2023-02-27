@@ -29,9 +29,14 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     static String DB_TEST = "astra_cli_test";
 
-    @BeforeAll
-    public static void should_create_when_needed() {
-        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
+    //@BeforeAll
+    //public static void should_create_when_needed() {
+    //    assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
+   // }
+
+    @Test
+    public void demoTest() {
+        assertSuccessCli("db list");
     }
 
     @Test
@@ -212,6 +217,15 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertSuccessCli("db swagger %s".formatted(DB_TEST));
         assertSuccessCli("db playground %s".formatted(DB_TEST));
     }
+
+    @Test
+    @Order(17)
+    public void showCdc() {
+        assertSuccessCli("db list-cdc %s".formatted("db2"));
+        //assertSuccessCli("db playground %s".formatted(DB_TEST));
+    }
+
+
 
     //@AfterAll
     //public static void testShouldDelete() {

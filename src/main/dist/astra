@@ -1,3 +1,2 @@
 #!/bin/bash
-
-java -jar $HOME/.astra/cli/astra-cli.jar "$@"
+java -jar astra-cli.jar "$@"

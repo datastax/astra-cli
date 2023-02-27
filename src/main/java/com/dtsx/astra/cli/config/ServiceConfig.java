@@ -25,7 +25,6 @@ import com.dtsx.astra.cli.core.exception.ConfigurationException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.sdk.utils.AstraRc;
-import org.fusesource.jansi.Ansi;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -62,9 +61,6 @@ public class ServiceConfig {
         Map<String, Map<String, String>> sections = ctx().getConfiguration().getSections();
         List<String> listOrg = listOrganizations(sections);
         ShellTable sht = new ShellTable();
-        sht.setColumnTitlesColor(Ansi.Color.YELLOW);
-        sht.setCellColor(Ansi.Color.WHITE);
-        sht.setTableColor(Ansi.Color.CYAN);
         sht.getColumnTitlesNames().add(COLUMN_TITLE);
         sht.getColumnSize().put(COLUMN_TITLE, 40);
         for (String org : listOrg) {

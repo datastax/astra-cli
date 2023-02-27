@@ -22,11 +22,22 @@ astra db clone <db> -destination <db2>
 Pulsar
 ```
 #cdc
-astra streaming create-cdc <tenant>
-    -db,--database <db>
-    -k,--keyspace  <keyspace>
-    -t,--table  <table>
+astra streaming list-cdcs <tenant>
+
+astra streaming create-cdc <tenant> \
+    -db,--database <db> \
+    -k,--keyspace  <keyspace> \
+    -t,--table     <table> \
     -p,--partition <partition>
+
+astra streaming create-cdc <tenant>
+
+astra db create-cdc ${DB} \
+    --tenant ${TENANT} \
+    -k,--keyspace ${KEYSPACE_NAME} \
+    -t,--table ${TABLE_NAME} \
+    -p,--partition ${NUM_PARTITION}
+
 
 #Namespace
 
@@ -40,6 +51,15 @@ astra streaming write-topic <tenant> --topic <topic> (--message "Hello World")
 #Sinks
 #Source
 
+CREATE TABLE IF NOT EXISTS user (
+    email text,
+    firstname text,
+    lastname text,
+    PRIMARY KEY ((email))
+);
 
+INSERT INTO user (email, firstname, lastname) VALUES('a@a.com', 'a', 'a');
+INSERT INTO user (email, firstname, lastname) VALUES('b@b.com', 'b', 'b');
+INSERT INTO user (email, firstname, lastname) VALUES('c@c.com', 'c', 'c');
 
 ```

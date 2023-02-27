@@ -14,7 +14,7 @@
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<astra-sdk.version>0.4</astra-sdk.version>
+		<astra-sdk.version>0.4.1-SNAPSHOT</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.6</slf4j.version>
@@ -46,12 +46,6 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-nop</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-
 		<!-- Parsing CLI -->
 		<dependency>
 			<groupId>com.github.rvesse</groupId>
@@ -69,6 +63,18 @@
 			<groupId>com.datastax.astra</groupId>
 			<artifactId>astra-sdk-devops</artifactId>
 			<version>${astra-sdk.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- Commons -->

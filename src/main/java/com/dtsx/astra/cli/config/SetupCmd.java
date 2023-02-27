@@ -23,6 +23,7 @@ package com.dtsx.astra.cli.config;
 import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
+import com.dtsx.astra.cli.core.out.AstraColorScheme;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.github.rvesse.airline.annotations.Command;
@@ -55,10 +56,10 @@ public class SetupCmd extends AbstractCmd {
             try(Scanner scanner = new Scanner(System.in)) {
                 boolean valid_token = false;
                 while (!valid_token) {
-                    AstraCliConsole.println(" -----------------------", Ansi.Color.CYAN);
-                    AstraCliConsole.println(" ---      SETUP      ---", Ansi.Color.CYAN);
-                    AstraCliConsole.println(" -----------------------\n",Ansi.Color.CYAN);
-                    AstraCliConsole.println("$ Enter an Astra token:", Ansi.Color.CYAN);
+                    AstraCliConsole.println(" -----------------------", AstraColorScheme.purple500);
+                    AstraCliConsole.println(" ---      SETUP      ---", AstraColorScheme.purple500);
+                    AstraCliConsole.println(" -----------------------\n",AstraColorScheme.purple500);
+                    AstraCliConsole.println("$ Enter an Astra token:", AstraColorScheme.cyan400);
                     token = scanner.nextLine();
                     if (!token.startsWith("AstraCS:")) {
                         LoggerShell.error("Your token should start with 'AstraCS:'");
@@ -75,7 +76,8 @@ public class SetupCmd extends AbstractCmd {
         } else {
             createDefaultSection(tokenParam);
         }
-        AstraCliConsole.outputSuccess(" Enter 'astra help' to list available commands.");
+        LoggerShell.info("Enter 'astra help' to list available commands.");
+        AstraCliConsole.outputSuccess("Setup completed.");
     }
     
     /**

@@ -126,7 +126,7 @@ public class DaoDatabase {
         db = db.replace("\"", "");
         // Database name containing spaces cannot be an id
         if (!db.contains(" ") ) {
-            DatabaseClient dbClient = dbsClient.database(db);
+            DatabaseClient dbClient = dbsClient.id(db);
             if (dbClient.exist()) {
                 LoggerShell.debug("Database found id=" + dbClient.getDatabaseId());
                 return Optional.of(dbClient);
@@ -134,7 +134,7 @@ public class DaoDatabase {
         }
 
         // Not found, try with the name
-        List<Database> dbs = dbsClient.databasesNonTerminatedByName(db).toList();
+        List<Database> dbs = dbsClient.findByName(db).toList();
         
         // Multiple databases with the same name
         if (dbs.size() > 1) {
@@ -144,7 +144,7 @@ public class DaoDatabase {
         // Database exists and is unique
         if (1 == dbs.size()) {
             LoggerShell.debug("Database found id=" + dbs.get(0).getId());
-            return Optional.ofNullable(dbsClient.database(dbs.get(0).getId()));
+            return Optional.ofNullable(dbsClient.id(dbs.get(0).getId()));
         }
         return Optional.empty();
     }

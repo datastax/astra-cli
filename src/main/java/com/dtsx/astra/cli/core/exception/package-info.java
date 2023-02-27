@@ -1,11 +1,7 @@
 /**
- * Defines the entry point (main) for the DataStax Astra Command Line Interface (CLI)
- * <p>
- * Commands are split in different standalone classes and wired with Airline framework.
- * </p>
+ * Defines specialized exceptions for core operation like authentication and external processes interactions.
  */
-package com.dtsx.astra.cli;
-
+package com.dtsx.astra.cli.core.exception;
 /*-
  * #%L
  * Astra CLI

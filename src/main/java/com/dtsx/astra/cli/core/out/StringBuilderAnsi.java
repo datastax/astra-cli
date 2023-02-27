@@ -60,8 +60,23 @@ public class StringBuilderAnsi {
      * @return
      *      text colored
      */
-    private String colored(String text, Ansi.Color color) {
+    public static String colored(String text, Ansi.Color color) {
         return ansi().fg(color).a(text).reset().toString();
+    }
+
+    /**
+     * Colored with RGB element
+     * @param text
+     *      current text
+     * @param color
+     *      current color
+     * @return
+     *      current String
+     */
+    public static String colored(String text, AnsiColorRGB color) {
+        return ansi().fgRgb(color.red(), color.green(), color.blue())
+                     .a(text)
+                     .reset().toString();
     }
 
     /**
@@ -78,6 +93,21 @@ public class StringBuilderAnsi {
         builder.append(colored(text, color));
         return this;
     }
+
+    /**
+     * Append colored content.
+     *
+     * @param text
+     *      target text
+     * @param color
+     *      target color
+     * @return
+     *      current reference
+     */
+    public StringBuilderAnsi append(String text, AnsiColorRGB color) {
+        builder.append(colored(text, color));
+        return this;
+    }
     
     /**
      * Append colored content with size.
@@ -91,6 +121,27 @@ public class StringBuilderAnsi {
      */
     public void append(String text, Ansi.Color color, int size) {
         builder.append(colored(StringUtils.rightPad(text,size), color));
+    }
+
+    /**
+     * Append colored content with size.
+     *
+     * @param text
+     *      target text
+     * @param color
+     *      current color
+     * @param size
+     *      size of element
+     */
+    public void append(String text, AnsiColorRGB color, int size) {
+        if (text.matches(".*\u001B\\[[;\\d]*m")) {
+            // Real length without special char
+            String raw = text.replaceAll("\u001B\\[[;\\d]*m", "");
+            // You need to add the number of special chars
+            builder.append(StringUtils.rightPad(text,size+(text.length()-raw.length())));
+        } else {
+            builder.append(colored(StringUtils.rightPad(text, size), color));
+        }
     }
 
     /** {@inheritDoc} */

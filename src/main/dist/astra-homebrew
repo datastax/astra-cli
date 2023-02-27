@@ -1,0 +1,18 @@
+#!/bin/bash
+
+PRG="$0"
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG="`dirname "$PRG"`/$link"
+  fi
+done
+
+BINDIR=$(dirname "$PRG")
+export ASTRA_HOME=`cd -P $BINDIR/..;pwd`
+
+cd "$ASTRA_HOME"
+java -jar $ASTRA_HOME/libexec/astra-cli.jar "$@"

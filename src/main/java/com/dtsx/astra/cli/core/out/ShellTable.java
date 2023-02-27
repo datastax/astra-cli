@@ -22,7 +22,6 @@ package com.dtsx.astra.cli.core.out;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.ExitCode;
-import org.fusesource.jansi.Ansi;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -34,7 +33,7 @@ import java.util.Map;
 /**
  * Standardize output for tables.
  */
-public class ShellTable implements Serializable {
+public class ShellTable implements Serializable, AstraColorScheme {
     
     /** Serial */
     @Serial
@@ -45,21 +44,21 @@ public class ShellTable implements Serializable {
     
     /** Column name. */
     public static final String COLUMN_PROPERTY_VALUE   = "Value";
-    
+
     /**
      * Color of table. 
      */
-    private Ansi.Color tableColor = Ansi.Color.CYAN;
+    private final AnsiColorRGB tableColor = blue300;
     
     /**
      * Color of title
      */
-    private Ansi.Color  columnTitlesColor = Ansi.Color.YELLOW;
+    private final AnsiColorRGB columnTitlesColor = blue300;
 
     /**
      * Color of cell
      */
-    private Ansi.Color cellColor = Ansi.Color.WHITE;
+    private final AnsiColorRGB cellColor = neutral300;
 
     /**
      * Title column names
@@ -78,9 +77,6 @@ public class ShellTable implements Serializable {
     
     /** Shell Table */
     public ShellTable() {
-        setColumnTitlesColor(Ansi.Color.YELLOW);
-        setCellColor(Ansi.Color.WHITE);
-        setTableColor(Ansi.Color.CYAN);
     }
     
     /**
@@ -152,6 +148,7 @@ public class ShellTable implements Serializable {
             // Keep Orders
             for(String columnName : columnTitlesNames) {
                 builder.append("| ", tableColor);
+                // Handle color
                 builder.append(res.get(columnName), cellColor, columnSize.get(columnName));
             }
             builder.append("|\n", tableColor);
@@ -178,10 +175,9 @@ public class ShellTable implements Serializable {
      */
     private void computeColumnsWidths() {
         cellValues.forEach(myRow -> columnTitlesNames.forEach(colName -> {
-            if (!columnSize.containsKey(colName) ||
-                 columnSize.get(colName) <  Math.max(colName.length(), myRow.get(colName).length())) {
-                columnSize.put(colName,  Math.max(colName.length(), myRow.get(colName).length()) + 1);
-            }
+            String uncoloredText = myRow.get(colName).replaceAll("\u001B\\[[;\\d]*m", "");
+            int max = Math.max(colName.length(), uncoloredText.length());
+            if (!columnSize.containsKey(colName) || columnSize.get(colName) < max) columnSize.put(colName, max + 1);
         }));
     }
     
@@ -269,15 +265,6 @@ public class ShellTable implements Serializable {
     }
 
     /**
-     * Setter accessor for attribute 'tableColor'.
-     * @param tableColor
-     * 		new value for 'tableColor '
-     */
-    public void setTableColor(Ansi.Color tableColor) {
-        this.tableColor = tableColor;
-    }
-
-    /**
      * Getter accessor for attribute 'columnTitlesNames'.
      *
      * @return
@@ -285,24 +272,6 @@ public class ShellTable implements Serializable {
      */
     public List<String> getColumnTitlesNames() {
         return columnTitlesNames;
-    }
-
-    /**
-     * Setter accessor for attribute 'columnTitlesColor'.
-     * @param columnTitlesColor
-     * 		new value for 'columnTitlesColor '
-     */
-    public void setColumnTitlesColor(Ansi.Color columnTitlesColor) {
-        this.columnTitlesColor = columnTitlesColor;
-    }
-
-    /**
-     * Setter accessor for attribute 'cellColor'.
-     * @param cellColor
-     * 		new value for 'cellColor '
-     */
-    public void setCellColor(Ansi.Color cellColor) {
-        this.cellColor = cellColor;
     }
 
     /**

@@ -1,12 +1,8 @@
 /**
- * Parent classes for the commands
+ * Defines support classes for the command, a shared context and exit codes.
  * <p>
- * Super class contain logic and error management.
+ * Super classes contain logic and error management.
  * </p>
- *
- * @since 0.1
- * @version 0.1
- * @author DataStax
  */
 package com.dtsx.astra.cli.core;
 /*-

@@ -1,10 +1,4 @@
-/**
- * Defines the entry point (main) for the DataStax Astra Command Line Interface (CLI)
- * <p>
- * Commands are split in different standalone classes and wired with Airline framework.
- * </p>
- */
-package com.dtsx.astra.cli;
+package com.dtsx.astra.cli.streaming.cdc;
 
 /*-
  * #%L
@@ -25,3 +19,20 @@ package com.dtsx.astra.cli;
  * limitations under the License.
  * #L%
  */
+
+import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
+import com.dtsx.astra.cli.streaming.ServiceStreaming;
+import com.github.rvesse.airline.annotations.Command;
+
+/**
+ * Display information relative to a db.
+ */
+@Command(name = "list-cdc", description = "List CDC available on this tenant")
+public class StreamingListCdcCmd extends AbstractStreamingCmd {
+
+    /** {@inheritDoc} */
+    public void execute() {
+        ServiceStreaming.listCdc(tenant);
+    }
+
+}

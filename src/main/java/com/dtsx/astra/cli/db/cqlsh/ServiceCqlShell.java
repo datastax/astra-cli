@@ -213,7 +213,7 @@ public class ServiceCqlShell {
         try {
             List <String > commands = buildCommandLine(options, dbDao.getDatabase(database));
             LoggerShell.debug("RUNNING: " + String.join(" ", commands));
-            LoggerShell.info("\nCqlsh is starting, please wait for connection establishment...");
+            LoggerShell.info("Cqlsh is starting, please wait for connection establishment...");
             new ProcessBuilder(commands.toArray(new String[0])).inheritIO().start().waitFor();
         } catch (Exception e) {
             Thread.currentThread().interrupt();

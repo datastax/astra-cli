@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.streaming.cdc;
+package com.dtsx.astra.cli.core.out;
 
 /*-
  * #%L
@@ -20,18 +20,14 @@ package com.dtsx.astra.cli.streaming.cdc;
  * #L%
  */
 
-import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.github.rvesse.airline.annotations.Command;
-
 /**
- * Display information relative to a db.
+ * RGB Color.
+ *
+ * @param red
+ *      code for red
+ * @param green
+ *      code for green
+ * @param blue
+ *      code for blue
  */
-@Command(name = "list-cdc", description = "List CDC available on this tenant")
-public class StreamingGetCdcCmd extends AbstractStreamingCmd {
-
-    /** {@inheritDoc} */
-    public void execute() {
-        throw new UnsupportedOperationException("Create Cdc function is under development");
-    }
-
-}
+public record AnsiColorRGB(int red, int green, int blue) {}

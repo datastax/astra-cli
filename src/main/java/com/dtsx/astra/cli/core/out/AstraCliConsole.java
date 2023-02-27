@@ -36,7 +36,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 /**
  * Render all component for the FF4J commands.
  */
-public class AstraCliConsole {
+public class AstraCliConsole implements AstraColorScheme {
 
     /** Json Object Mapper. */
     public static final ObjectMapper OM = new ObjectMapper();
@@ -46,13 +46,13 @@ public class AstraCliConsole {
 	
 	/** Start Banner. */
     public static void banner() {
-        println("    _____            __                  ", 236, 107, 40);
-        println("   /  _  \\   _______/  |_____________    ", 236, 107, 40);
-        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ",236, 107, 40);
-        println(" /    |    \\\\___ \\  |  |  |  | \\// __ \\_ ", 236, 107, 40);
-        println(" \\____|__  /____  > |__|  |__|  (____  /", 236, 107, 40);
-        println("         \\/     \\/                   \\/ ", 236, 107, 40);
-        println("           Version: " + AstraCliUtils.version() + "\n",236, 107, 40);
+        println("    _____            __                  ", purple300);
+        println("   /  _  \\   _______/  |_____________    ",purple300);
+        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ",purple300);
+        println(" /    |    \\\\___ \\  |  |  |  | \\ //__ \\_ ",purple300);
+        println(" \\____|__  /____  > |__|  |__|  (____  /", purple300);
+        println("         \\/     \\/                   \\/ ", purple300);
+        println("           Version: " + AstraCliUtils.version() + "\n", orange400);
     }
 
     /**
@@ -83,50 +83,17 @@ public class AstraCliConsole {
      * @param color
      *      color for the text
      */
-    public static void print(String text, Ansi.Color color) {
-        if (ctx().isNoColor()) {
-            print(text );
-        } else {
-            print(ansi().fg(color).a(text).reset().toString());
-        }
-    }
-
-    /**
-     * Output.
-     *
-     * @param text
-     *      text to display
-     * @param color
-     *      color for the text
-     */
-    public static void println(String text, Ansi.Color color) {
+    public static void println(String text, AnsiColorRGB color) {
         if (ctx().isNoColor()) {
             print(text + System.lineSeparator());
         } else {
-            print(ansi().fg(color).a(text).reset().toString() + System.lineSeparator());
+            print(ansi()
+                    .fgRgb(color.red(), color.green(), color.blue())
+                    .a(text)
+                    .reset().toString() + System.lineSeparator());
         }
     }
 
-    /**
-     * Display item with colors.
-     *
-     * @param text
-     *      text to display
-     * @param red
-     *      red
-     * @param green
-     *      green
-     * @param blue
-     *      blue
-     */
-    public static void println(String text, int red, int green, int blue) {
-        if (ctx().isNoColor()) {
-            print(text + System.lineSeparator());
-        } else {
-            print(ansi().fgRgb(red, green, blue).a(text).reset().toString() + System.lineSeparator());
-        }
-    }
-    
     /**
      * Output.
      *

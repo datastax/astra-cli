@@ -156,7 +156,7 @@ public class ServiceRegion {
             try {
                 CloudProviderType cloud = db.getInfo().getCloudProvider();
                 if (cloudProvider != null) cloud = CloudProviderType.valueOf(cloudProvider.toUpperCase());
-                apiDevopsDb().database(db.getId()).addRegion(tier, cloud, regionName);
+                apiDevopsDb().id(db.getId()).addRegion(tier, cloud, regionName);
                 LoggerShell.info("%s '%s' is creating.".formatted(REGION, regionName));
             } catch(Exception e) {
                 throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,
@@ -181,7 +181,7 @@ public class ServiceRegion {
         int retries = 0;
         Database db = dbDao.getDatabase(dbName);
         while (((retries++ < timeout) || (timeout == 0)) &&
-                apiDevopsDb().database(db.getId()).findRegion(regionName).isPresent()) {
+                apiDevopsDb().id(db.getId()).findRegion(regionName).isPresent()) {
             try {
                 Thread.sleep(1000);
                 LoggerShell.debug("Waiting for %s to be deleted ( %d / %d )".formatted(REGION, retries, timeout));
@@ -205,7 +205,7 @@ public class ServiceRegion {
         // Throw db not found  exception if database does not exist
         Database db = dbDao.getDatabase(databaseName);
         // Throw region not found exception if region does not exist
-        apiDevopsDb().database(db.getId()).deleteRegion(regionName);
+        apiDevopsDb().id(db.getId()).deleteRegion(regionName);
         LoggerShell.info("%s '%s' is deleting.".formatted(REGION, regionName));
     }
 

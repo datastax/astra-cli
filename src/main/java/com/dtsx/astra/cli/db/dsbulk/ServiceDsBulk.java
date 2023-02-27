@@ -336,7 +336,7 @@ public class ServiceDsBulk implements DsBulkParameters {
 
         try {
             LoggerShell.info("RUNNING: " + String.join(" ", commandDsbulk));
-            LoggerShell.info("\nDSBulk is starting please wait ...");
+            LoggerShell.info("DSBulk is starting please wait ...");
             new ProcessBuilder(commandDsbulk.toArray(new String[0])).inheritIO().start().waitFor();
         } catch (Exception e) {
             Thread.currentThread().interrupt();

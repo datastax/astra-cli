@@ -1,10 +1,4 @@
-/**
- * Defines the entry point (main) for the DataStax Astra Command Line Interface (CLI)
- * <p>
- * Commands are split in different standalone classes and wired with Airline framework.
- * </p>
- */
-package com.dtsx.astra.cli;
+package com.dtsx.astra.cli.db.cdc;
 
 /*-
  * #%L
@@ -25,3 +19,20 @@ package com.dtsx.astra.cli;
  * limitations under the License.
  * #L%
  */
+
+import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
+import com.dtsx.astra.cli.db.ServiceDatabase;
+import com.github.rvesse.airline.annotations.Command;
+
+/**
+ * List Cdc for a db
+ */
+@Command(name = "list-cdc", description = "List CDC available on this databse")
+public class DbListCdcCmd extends AbstractDatabaseCmd {
+
+    /** {@inheritDoc} */
+    public void execute() {
+        ServiceCdc.getInstance().listCdc(db);
+    }
+
+}

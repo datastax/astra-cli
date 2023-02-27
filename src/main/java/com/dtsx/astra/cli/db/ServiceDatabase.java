@@ -23,10 +23,7 @@ package com.dtsx.astra.cli.db;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
-import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.cli.core.out.JsonOutput;
-import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.core.out.ShellTable;
+import com.dtsx.astra.cli.core.out.*;
 import com.dtsx.astra.cli.db.exception.*;
 import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
@@ -53,7 +50,7 @@ import java.util.stream.Collectors;
 /**
  * Service layer to work with database.
  */
-public class ServiceDatabase {
+public class ServiceDatabase implements AstraColorScheme {
     
     /** Default region. **/
     public static final String DEFAULT_REGION        = "us-east1";
@@ -74,8 +71,10 @@ public class ServiceDatabase {
     static final String COLUMN_REGIONS           = "Regions";
     /** column names. */
     static final String COLUMN_DEFAULT_CLOUD     = "Default Cloud Provider";
-    /** column names. */
+    /** column status. */
     static final String COLUMN_STATUS            = "Status";
+    /** column status. */
+    static final int    COLUMN_STATUS_WIDTH      = 10;
     /** column names. */
     static final String COLUMN_DEFAULT_KEYSPACE  = "Default Keyspace";
     /** column names. */
@@ -314,8 +313,9 @@ public class ServiceDatabase {
             if (dbClient.isEmpty()) {
                 LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
                         .formatted(DB, databaseName, databaseName, keyspace));
-                CliContext.getInstance().getApiDevopsDatabases()
-                .createDatabase(DatabaseCreationRequest.builder()
+                CliContext.getInstance()
+                          .getApiDevopsDatabases()
+                          .create(DatabaseCreationRequest.builder()
                         .name(databaseName)
                         .tier(DEFAULT_TIER)
                         .cloudProvider(CloudProviderType.valueOf(regionMap
@@ -368,22 +368,46 @@ public class ServiceDatabase {
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_ID,      37);
         sht.addColumn(COLUMN_DEFAULT_REGION, 20);
-        sht.addColumn(COLUMN_STATUS,  15);
+        sht.addColumn(COLUMN_STATUS,  COLUMN_STATUS_WIDTH);
         CliContext.getInstance()
            .getApiDevopsDatabases()
-           .databasesNonTerminated()
+           .findAllNonTerminated()
            .forEach(db -> {
                 Map <String, String> rf = new HashMap<>();
                 rf.put(COLUMN_NAME,    db.getInfo().getName());
                 rf.put(COLUMN_ID,      db.getId());
                 rf.put(COLUMN_DEFAULT_REGION, db.getInfo().getRegion());
-                rf.put(COLUMN_STATUS,  db.getStatus().name());
+                rf.put(COLUMN_STATUS, StringBuilderAnsi.colored(db.getStatus().name(), getStatusColor(db.getStatus())));
                 sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
     }
-    
 
+    /**
+     * Utility to color the status based on the value.
+     *
+     * @param status
+     *      current db status
+     * @return
+     *      colored status
+     */
+    private AnsiColorRGB getStatusColor(DatabaseStatusType status) {
+        AnsiColorRGB color = neutral500;
+        switch (status) {
+            // Active is Green
+            case ACTIVE -> color = green500;
+            // Error is RED
+            case ERROR, TERMINATED, UNKNOWN  -> color = red500;
+            // Going into error is Yellow
+            case DECOMMISSIONING, TERMINATING, DEGRADED -> color = yellow500;
+            // Dormant is blue
+            case HIBERNATED, PARKED, PREPARED ->  color = blue500;
+            // Temporary states back to active are cyan
+            case INITIALIZING, PENDING, HIBERNATING, PARKING, MAINTENANCE,
+                 PREPARING, RESIZING, RESUMING, UNPARKING -> color = yellow300;
+        }
+        return color;
+    }
     
     /**
      * Delete a database if exist.
