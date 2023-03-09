@@ -5,7 +5,6 @@
  * </p>
  */
 package com.dtsx.astra.cli;
-
 /*-
  * #%L
  * Astra CLI

@@ -21,6 +21,8 @@ package com.dtsx.astra.cli.db;
  */
 
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
+import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
+import com.dtsx.astra.cli.core.exception.InvalidRegionException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
@@ -49,6 +51,12 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1, 
             description = "Cloud provider region to provision")
     protected String region = ServiceDatabase.DEFAULT_REGION;
+
+    /**
+     * Cloud provider for the db
+     */
+    @Option(name = { "-c", "--cloud" }, description = "Cloud Provider to create a db")
+    protected String cloud;
     
     /**
      * Default keyspace created with the Db
@@ -81,8 +89,12 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
     @Override
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
-            InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException {
+           InvalidDatabaseStateException, InvalidArgumentException,
+           KeyspaceAlreadyExistException {
+
+        dbServices.validateCloudAndRegion(cloud, region);
         dbServices.createDb(db, region, keyspace, ifNotExist);
+
         if (!async) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);

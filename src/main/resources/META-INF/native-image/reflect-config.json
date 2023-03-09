@@ -89,11 +89,6 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.DbListCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
-  },
-  {
     "name":"com.dtsx.astra.cli.db.DbResumeCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -151,17 +146,29 @@
   },
 
 
+  {
+    "name":"com.dtsx.astra.cli.db.list.DbListRegionsClassicCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.list.DbListRegionsServerlessCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.list.DbListCloudsCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.list.DbListCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
 
-  {
-    "name":"com.dtsx.astra.cli.db.region.DbListRegionsClassicCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
-  },
-  {
-    "name":"com.dtsx.astra.cli.db.region.DbListRegionsServerlessCmd",
-    "allDeclaredFields":true,
-    "methods":[{"name":"<init>","parameterTypes":[] }]
-  },
+
+
   {
     "name":"com.dtsx.astra.cli.db.region.DbCreateRegionCmd",
     "allDeclaredFields":true,
@@ -180,6 +187,24 @@
 
 
   {
+    "name":"com.dtsx.astra.cli.db.cdc.DbCreateCdcCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.cdc.DbDeleteCdcCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.cdc.DbListCdcCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
+
+  {
     "name":"com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -189,8 +214,6 @@
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
-
-
 
 
 
@@ -323,6 +346,11 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"com.dtsx.astra.cli.streaming.StreamingListCloudsCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"com.dtsx.astra.cli.streaming.StreamingPulsarTokenCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -345,7 +373,7 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.streaming.cdc.StreamingGetCdcCmd",
+    "name":"com.dtsx.astra.cli.streaming.cdc.StreamingListCdcCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },

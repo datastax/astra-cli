@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.streaming;
+package com.dtsx.astra.cli.db.list;
 
 /*-
  * #%L
@@ -23,32 +23,12 @@ package com.dtsx.astra.cli.streaming;
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 
-/**
- * List available regions for Streaming.
- */
-@Command(name = "list-regions" , description = "Display the list of Tenant in an organization")
-public class StreamingListRegionsCmd extends AbstractConnectedCmd {
-
-    /**
-     * Cloud provider
-     */
-    @Option(name = { "-c", "--cloud" }, title = "CLOUD", arity = 1,
-            description = "Filter on Cloud provider")
-    protected String cloud;
-
-    /**
-     * Filter on names
-     */
-    @Option(name = { "-f", "--filter" }, title = "filter", arity = 1,
-            description = "Filter on names")
-    protected String filter;
+@Command(name = "list-clouds", description = "Show available clouds")
+public class DbListCloudsCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceOrganization
-                .getInstance()
-                .listRegionsStreaming(cloud, filter);
+        ServiceOrganization.getInstance().listCloudDb();
     }
 }

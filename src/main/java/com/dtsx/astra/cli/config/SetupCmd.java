@@ -28,7 +28,6 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import org.fusesource.jansi.Ansi;
 
 import java.util.Scanner;
 

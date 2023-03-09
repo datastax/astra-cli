@@ -40,7 +40,7 @@ public class StreamingCreateDotEnvCmd extends AbstractStreamingCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceStreaming.generateDotEnvFile(getTenant(), destination);
+        ServiceStreaming.getInstance().generateDotEnvFile(getTenant(), destination);
     }
 
 }

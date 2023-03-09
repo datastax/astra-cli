@@ -17,7 +17,7 @@
  * limitations under the License.
  * ----------------
  */
-package com.dtsx.astra.cli.db.dsbulk;
+package com.dtsx.astra.cli.db.list;
 
 /*-
  * #%L
@@ -39,7 +39,19 @@ package com.dtsx.astra.cli.db.dsbulk;
  * #L%
  */
 
+import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.dtsx.astra.cli.db.ServiceDatabase;
+import com.github.rvesse.airline.annotations.Command;
+
 /**
- * Configuration Bean.
+ * Show Databases for an organization.
  */
-public record DsBulkConfig(String url, String version) {}
+@Command(name = "list", description = "Display the list of Databases in an organization")
+public class DbListCmd extends AbstractConnectedCmd {
+    
+    /** {@inheritDoc} */
+    public void execute() {
+        ServiceDatabase.getInstance().listDb();
+    }
+
+}

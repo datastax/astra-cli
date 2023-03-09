@@ -23,9 +23,12 @@ package com.dtsx.astra.cli.db;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
+import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
+import com.dtsx.astra.cli.core.exception.InvalidRegionException;
 import com.dtsx.astra.cli.core.out.*;
 import com.dtsx.astra.cli.db.exception.*;
 import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
+import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
 import com.dtsx.astra.sdk.db.DatabaseClient;
@@ -33,6 +36,7 @@ import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.Assert;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -256,6 +260,39 @@ public class ServiceDatabase implements AstraColorScheme {
         }
         return retries;
     }
+
+    /**
+     * Validate that provided region is in the target cloud.
+     *
+     * @param cloud
+     *      provided cloud
+     * @param region
+     *      provided region
+     */
+    public void validateCloudAndRegion(String cloud, String region) {
+        Assert.hasLength(region, "region name");
+
+        if (cloud == null && "".equals(cloud)) {
+            TreeMap<String, TreeMap<String, String>> regions =
+                    ServiceOrganization.getInstance().getDbServerlessRegions();
+            if (!regions.containsKey(cloud.toLowerCase())) {
+                // value provided in --cloud is invalid
+                throw new InvalidCloudProviderException(cloud);
+            } else if (((TreeMap<String, String>) regions.get(cloud.toLowerCase()))
+                    .keySet().contains(region.toLowerCase())) {
+                // cloud ok, but invalid region
+                throw new InvalidRegionException(cloud, region);
+            }
+            // OK
+        } else if (CliContext.getInstance()
+                .getApiDevopsOrganizations()
+                .regionsServerless()
+                .map(DatabaseRegionServerless::getName)
+                .filter(r -> r.equals(region.toLowerCase()))
+                .findFirst().isEmpty()) {
+            throw new InvalidRegionException(region);
+        }
+    }
     
     /**
      * Create a new database
@@ -365,6 +402,7 @@ public class ServiceDatabase implements AstraColorScheme {
      */
     public void listDb() {
         ShellTable sht = new ShellTable();
+        // No color ?
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_ID,      37);
         sht.addColumn(COLUMN_DEFAULT_REGION, 20);

@@ -1,4 +1,7 @@
-package com.dtsx.astra.cli.streaming.cdc;
+/**
+ * Defines command showing URL of integrated tools with AstraDB.
+ */
+package com.dtsx.astra.cli.db.tool;
 
 /*-
  * #%L
@@ -19,19 +22,3 @@ package com.dtsx.astra.cli.streaming.cdc;
  * limitations under the License.
  * #L%
  */
-
-import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.github.rvesse.airline.annotations.Command;
-
-/**
- * Display information relative to a db.
- */
-@Command(name = "delete-cdc", description = "Delete a CDC from a DB to Pulsar if exist")
-public class StreamingDeleteCdcCmd extends AbstractStreamingCmd {
-
-    /** {@inheritDoc} */
-    public void execute() {
-        throw new UnsupportedOperationException("Create Cdc function is under development");
-    }
-
-}

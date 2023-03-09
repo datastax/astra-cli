@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.streaming.cdc;
+package com.dtsx.astra.cli.db.migration;
 
 /*-
  * #%L
@@ -20,19 +20,13 @@ package com.dtsx.astra.cli.streaming.cdc;
  * #L%
  */
 
-import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.dtsx.astra.cli.streaming.ServiceStreaming;
-import com.github.rvesse.airline.annotations.Command;
-
 /**
- * Display information relative to a db.
+ * Wrapper for the options of this command generate-script
+ * from dsbulk-migrator.
  */
-@Command(name = "list-cdc", description = "List CDC available on this tenant")
-public class StreamingListCdcCmd extends AbstractStreamingCmd {
+public class GenerateScriptOptions extends GenerateDdlCmd {
 
-    /** {@inheritDoc} */
-    public void execute() {
-        ServiceStreaming.getInstance().listCdc(tenant);
-    }
+
 
 }
+

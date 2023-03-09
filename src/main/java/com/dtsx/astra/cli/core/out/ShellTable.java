@@ -22,6 +22,7 @@ package com.dtsx.astra.cli.core.out;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.ExitCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -122,22 +123,33 @@ public class ShellTable implements Serializable, AstraColorScheme {
      * Display the table in the shell.
      */
     public void show() {
-        
-        StringBuilderAnsi builder = new StringBuilderAnsi();
-        computeColumnsWidths();
-        
-        // Compute Table Horizontal Line
-        String tableLine = buildTableLines();
-        
-        // Header
-        builder.append(tableLine + "+\n", tableColor);
-        buildTableHeader(builder);
-        builder.append(tableLine + "+\n", tableColor);
-        
-        // Display Data
-        buildTableData(builder);
-        builder.append(tableLine + "+\n", tableColor);
-        AstraCliConsole.println(builder);
+
+        if (!ctx().isNoColor()) {
+            StringBuilderAnsi builder = new StringBuilderAnsi();
+            computeColumnsWidths();
+            String tableLine = buildTableLines();
+
+            // Header
+            builder.append(tableLine + "+\n", tableColor);
+            buildTableHeader(builder);
+            builder.append(tableLine + "+\n", tableColor);
+
+            // Display Data
+            buildTableData(builder);
+            builder.append(tableLine + "+\n", tableColor);
+            AstraCliConsole.println(builder);
+        } else {
+            StringBuilder builder = new StringBuilder();
+            computeColumnsWidths();
+            String tableLine = buildTableLines();
+            builder.append(tableLine + "+\n");
+            buildTableHeaderNoColor(builder);
+            builder.append(tableLine+ "+\n");
+            buildTableDataNoColor(builder);
+            builder.append(tableLine+ "+\n");
+            AstraCliConsole.println(builder.toString());
+        }
+
     }
     
     /**
@@ -152,6 +164,21 @@ public class ShellTable implements Serializable, AstraColorScheme {
                 builder.append(res.get(columnName), cellColor, columnSize.get(columnName));
             }
             builder.append("|\n", tableColor);
+        }
+    }
+
+    /**
+     * Display Column Titles
+     */
+    private void buildTableDataNoColor(StringBuilder builder) {
+        for (Map<String, String > res : cellValues) {
+            // Keep Orders
+            for(String columnName : columnTitlesNames) {
+                builder.append("| ");
+                // Handle color
+                builder.append(StringUtils.rightPad(res.get(columnName), columnSize.get(columnName)));
+            }
+            builder.append("|\n");
         }
     }
     
@@ -169,6 +196,23 @@ public class ShellTable implements Serializable, AstraColorScheme {
         }
         builder.append("|\n", tableColor);
     }
+
+    /**
+     * Display Column Titles
+     */
+    private void buildTableHeaderNoColor(StringBuilder builder) {
+        for(String columnName : columnTitlesNames) {
+            builder.append("| ");
+            Integer size = columnSize.get(columnName);
+            if (null == size) {
+                size = columnName.length() + 1;
+            }
+            builder.append(StringUtils.rightPad(columnName, size));
+        }
+        builder.append("|\n");
+    }
+
+
     
     /**
      * Build column width.

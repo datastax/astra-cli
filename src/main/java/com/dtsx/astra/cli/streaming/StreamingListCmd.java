@@ -31,7 +31,7 @@ public class StreamingListCmd extends AbstractConnectedCmd {
    
     /** {@inheritDoc} */
     public void execute() {
-        ServiceStreaming.listTenants();
+        ServiceStreaming.getInstance().listTenants();
     }
 
 }

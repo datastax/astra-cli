@@ -20,29 +20,38 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.CannotStartProcessException;
 import com.dtsx.astra.cli.core.exception.FileSystemException;
+import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
+import com.dtsx.astra.cli.core.exception.InvalidRegionException;
 import com.dtsx.astra.cli.core.out.*;
+import com.dtsx.astra.cli.iam.user.ServiceUser;
+import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
+import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.StreamingClient;
 import com.dtsx.astra.sdk.streaming.TenantClient;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
+import com.dtsx.astra.sdk.streaming.domain.StreamingRegion;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
+import com.dtsx.astra.sdk.utils.Assert;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Utility class for command `streaming`.
  */
-public class ServiceStreaming {
+public class ServiceStreaming implements AstraColorScheme {
 
     /** Command constants. */
     public static final String CMD_STATUS    = "status";
@@ -82,22 +91,40 @@ public class ServiceStreaming {
     public static final String COLUMN_TABLE = "table";
     /** Working object. */
     static final String TENANT = "Tenant";
-    
-    /** limit resource usage by caching tenant clients. */
-    private static final Map<String, TenantClient> cacheTenantClient = new HashMap<>();
-    
+
+    /**
+     * Singleton Pattern
+     */
+    private static ServiceStreaming instance;
+
     /**
      * Hide default constructor
      */
     private ServiceStreaming() {}
-    
+
+    /**
+     * Singleton Pattern.
+     *
+     * @return
+     *      instance of the service.
+     */
+    public static synchronized ServiceStreaming getInstance() {
+        if (null == instance) {
+            instance = new ServiceStreaming();
+        }
+        return instance;
+    }
+
+    /** limit resource usage by caching tenant clients. */
+    private Map<String, TenantClient> cacheTenantClient = new HashMap<>();
+
     /**
      * Syntax Sugar to work with Streaming Devops Apis.
      * 
      * @return
      *      streaming tenant.
      */
-    private static StreamingClient streamingClient() {
+    private StreamingClient streamingClient() {
         return  CliContext.getInstance().getApiDevopsStreaming();
     }
     
@@ -109,7 +136,7 @@ public class ServiceStreaming {
      * @return
      *      tenant client or error
      */
-    private static TenantClient tenantClient(String tenantName) {
+    private TenantClient tenantClient(String tenantName) {
         return cacheTenantClient.computeIfAbsent(tenantName, (t) -> streamingClient().tenant(t));
     }
     
@@ -123,17 +150,50 @@ public class ServiceStreaming {
      * @throws TenantNotFoundException
      *      tenant has not been found
      */
-    private static Tenant getTenant(String tenantName) 
+    private Tenant getTenant(String tenantName)
     throws TenantNotFoundException {
         return tenantClient(tenantName)
                 .find()
                 .orElseThrow(() -> new TenantNotFoundException(tenantName));
     }
-    
+
+    /**
+     * Validate that provided region is in the target cloud.
+     *
+     * @param cloud
+     *      provided cloud
+     * @param region
+     *      provided region
+     */
+    public void validateCloudRegion(String cloud, String region) {
+        Assert.hasLength(region, "region name");
+
+        if (cloud == null && "".equals(cloud)) {
+            TreeMap<String, TreeMap<String, String>> regions =
+                    ServiceOrganization.getInstance().getStreamingRegions();
+            if (!regions.containsKey(cloud.toLowerCase())) {
+                // value provided in --cloud is invalid
+                throw new InvalidCloudProviderException(cloud);
+            } else if (((TreeMap<String, String>) regions.get(cloud.toLowerCase()))
+                    .keySet().contains(region.toLowerCase())) {
+                // cloud ok, but invalid region
+                throw new InvalidRegionException(cloud, region);
+            }
+            // OK
+        } else if (CliContext.getInstance()
+                    .getApiDevopsStreaming()
+                    .serverlessRegions()
+                    .map(StreamingRegion::getName)
+                    .filter(r -> r.equals(region.toLowerCase()))
+                    .findFirst().isEmpty()) {
+            throw new InvalidRegionException(region);
+        }
+    }
+
     /**
      * List Tenants.
      */
-    public static void listTenants() {
+    public void listTenants() {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_CLOUD,   10);
@@ -146,10 +206,31 @@ public class ServiceStreaming {
                 rf.put(COLUMN_NAME,   tnt.getTenantName());
                 rf.put(COLUMN_CLOUD,  tnt.getCloudProvider());
                 rf.put(COLUMN_REGION, tnt.getCloudRegion());
-                rf.put(COLUMN_STATUS, tnt.getStatus());
+                if (!CliContext.getInstance().isNoColor()) {
+                    rf.put(COLUMN_STATUS, StringBuilderAnsi.colored(tnt.getStatus(), getStatusColor(tnt.getStatus())));
+                } else {
+                    rf.put(COLUMN_STATUS, tnt.getStatus());
+                }
                 sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
+    }
+
+    /**
+     * Utility to color the status based on the value.
+     *
+     * @param tenantStatus
+     *      current tenant status
+     * @return
+     *      color for status
+     */
+    private AnsiColorRGB getStatusColor(String tenantStatus) {
+        Assert.hasLength(tenantStatus, "Status");
+        switch(tenantStatus.toLowerCase()) {
+            case "active" : return green500;
+            case "error"  : return red500;
+            default: return neutral300;
+        }
     }
 
     /**
@@ -160,7 +241,7 @@ public class ServiceStreaming {
      * @throws TenantNotFoundException
      *      tenant has not been found
      */
-    public static void listCdc(String tenantName)
+    public void listCdc(String tenantName)
     throws TenantNotFoundException {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLUSTER,   15);
@@ -195,7 +276,7 @@ public class ServiceStreaming {
      * @throws TenantNotFoundException 
      *      error is tenant is not found
      */
-    public static void showTenant(String tenantName, StreamingGetCmd.StreamingGetKeys key)
+    public void showTenant(String tenantName, StreamingGetCmd.StreamingGetKeys key)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
         if (key == null) {
@@ -235,7 +316,7 @@ public class ServiceStreaming {
      * @throws TenantNotFoundException 
      *      error if tenant name is not unique
      */
-    public static void deleteTenant(String tenantName) 
+    public void deleteTenant(String tenantName)
     throws TenantNotFoundException {
         getTenant(tenantName);
         tenantClient(tenantName).delete();
@@ -250,7 +331,7 @@ public class ServiceStreaming {
      * @throws TenantNotFoundException 
      *      error if tenant is not found
      */
-    public static void showTenantStatus(String tenantName)
+    public void showTenantStatus(String tenantName)
     throws TenantNotFoundException {
         Tenant tnt = getTenant(tenantName);
         AstraCliConsole.outputSuccess("%s '%s' has status '%s'"
@@ -263,7 +344,7 @@ public class ServiceStreaming {
      * @param tenantName
      *      tenant name
      */
-    public static void showTenantExistence(String tenantName) {
+    public void showTenantExistence(String tenantName) {
         if (tenantClient(tenantName).exist()) {
             AstraCliConsole.outputSuccess("%s '%s' exists.".formatted(TENANT, tenantName));
         } else {
@@ -279,7 +360,7 @@ public class ServiceStreaming {
      * @throws TenantNotFoundException 
      *      error if tenant is not found
      */
-    public static void showTenantPulsarToken(String tenantName)
+    public void showTenantPulsarToken(String tenantName)
     throws TenantNotFoundException {
        AstraCliConsole.println(getTenant(tenantName).getPulsarToken());
     }
@@ -289,16 +370,24 @@ public class ServiceStreaming {
      *
      * @param ct
      *      tenant creation request
+     * @param ifNotExistFlag
+     *      will try to create and raise error only if not present
      * @throws TenantAlreadyExistException
      *      already exist exception 
      */
-    public static void createStreamingTenant(CreateTenant ct) 
+    public void createStreamingTenant(CreateTenant ct, boolean ifNotExistFlag)
     throws TenantAlreadyExistException {
-        if (tenantClient(ct.getTenantName()).exist()) {
+        validateCloudRegion(ct.getCloudProvider(), ct.getCloudRegion());
+        boolean tenantExist = tenantClient(ct.getTenantName()).exist();
+        if (tenantExist && !ifNotExistFlag) {
             throw new TenantAlreadyExistException(ct.getTenantName());
         }
-        streamingClient().createTenant(ct);
-        AstraCliConsole.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
+        if (!tenantExist) {
+            streamingClient().createTenant(ct);
+            AstraCliConsole.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
+        } else {
+            AstraCliConsole.outputSuccess("Tenant already existed (--if-not-exist)");
+        }
     }
 
     /**
@@ -324,7 +413,7 @@ public class ServiceStreaming {
      * @param tenant
      *      current tenant
      */
-    public static void createPulsarConf(Tenant tenant) {
+    public void createPulsarConf(Tenant tenant) {
         PulsarShellUtils.generateConf(
                 tenant.getCloudProvider() , 
                 tenant.getCloudRegion(), 
@@ -347,7 +436,7 @@ public class ServiceStreaming {
      * @throws FileSystemException
      *      cannot access configuration file
      */
-    public static void startPulsarShell(PulsarShellOptions options, String tenantName)
+    public void startPulsarShell(PulsarShellOptions options, String tenantName)
     throws TenantNotFoundException, CannotStartProcessException, FileSystemException {
         
         // Retrieve tenant information from devops Apis or exception
@@ -380,7 +469,7 @@ public class ServiceStreaming {
      * @param dest
      *      destination folder
      */
-    public static void generateDotEnvFile(String tenantName, String dest) {
+    public void generateDotEnvFile(String tenantName, String dest) {
         Tenant tenant = getTenant(tenantName);
         EnvFile envFile = new EnvFile(dest);
         // Tenant Information

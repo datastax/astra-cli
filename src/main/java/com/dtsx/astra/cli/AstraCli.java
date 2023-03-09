@@ -39,6 +39,10 @@ import com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.dtsx.astra.cli.db.exception.*;
 import com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd;
+import com.dtsx.astra.cli.db.list.DbListCloudsCmd;
+import com.dtsx.astra.cli.db.list.DbListCmd;
+import com.dtsx.astra.cli.db.list.DbListRegionsClassicCmd;
+import com.dtsx.astra.cli.db.list.DbListRegionsServerlessCmd;
 import com.dtsx.astra.cli.db.region.*;
 import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
 import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
@@ -112,16 +116,16 @@ import java.util.Arrays;
          DbListCmd.class,  DbGetCmd.class, DbDescribeCmd.class, DbStatusCmd.class,
          // Operation
          DbResumeCmd.class, DbDownloadScbCmd.class, DbCreateDotEnvCmd.class,
+         // Keyspaces
+         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
+         // Regions
+         DbCreateRegionCmd.class, DbListRegionsCmd.class, DbDeleteRegionCmd.class,
+         // DB Service Regions and Cloud
+         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class, DbListCloudsCmd.class,
          // DsBulk
          DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
          // Cqlshell
          DbCqlShellCmd.class,
-         // Work with Keyspaces
-         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
-         // Work with Regions
-         DbCreateRegionCmd.class, DbListRegionsCmd.class, DbDeleteRegionCmd.class,
-         // List Region
-         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class,
          // External Tools
          DbSwaggerUICmd.class, DbGraphqlPlaygroundCmd.class,
          // Cdc
@@ -139,8 +143,8 @@ import java.util.Arrays;
          StreamingListCmd.class, StreamingGetCmd.class, StreamingDescribeCmd.class,
          StreamingExistCmd.class, StreamingStatusCmd.class,
          StreamingPulsarTokenCmd.class, StreamingCreateDotEnvCmd.class,
-         // list Regions
-         StreamingListRegionsCmd.class,
+         // list clouds and Regions
+         StreamingListRegionsCmd.class, StreamingListCloudsCmd.class,
          // Pulsar Shell
          PulsarShellCmd.class,
          // Change Data Capture
@@ -239,9 +243,20 @@ public class AstraCli {
             LoggerShell.exception(ex,
                     "You provided an invalid value for option. (-option)");
             return ExitCode.INVALID_OPTION_VALUE;
+        } catch(InvalidRegionException regionException) {
+            LoggerShell.exception(regionException,null);
+            LoggerShell.info("Run " +
+                    "astra db list-regions-serverless or " +
+                    "astra streaming list-regions to list available regions.");
+            return ExitCode.INVALID_OPTION_VALUE;
+        } catch(InvalidCloudProviderException cloudException) {
+            LoggerShell.exception(cloudException,null);
+            LoggerShell.info("Use " +
+                    "astra db list-clouds or " +
+                    "astra streaming list-clouds to list available cloud providers.");
+            return ExitCode.INVALID_OPTION_VALUE;
         } catch(ParseException ex) {
-            LoggerShell.exception(ex,
-                    "Command is not properly formatted.");
+            LoggerShell.exception(ex,"Command is not properly formatted.");
             return ExitCode.UNRECOGNIZED_COMMAND;
         } catch (InvalidTokenException | TokenNotFoundException |
                 FileSystemException | ConfigurationException e) {

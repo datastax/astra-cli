@@ -119,15 +119,39 @@ public class ServiceOrganization {
      *      name of filter
      */
     public void listRegionsStreaming(String cloudProvider, String filter) {
+        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, getStreamingRegions()));
+    }
+
+    /**
+     * List clouds
+     */
+    public void listCloudDb() {
+        AstraCliConsole.printShellTable(
+                buildShellTableClouds(new ArrayList<>(getDbServerlessRegions().keySet())));
+    }
+
+    /**
+     * List clouds regions
+     */
+    public void listCloudStreaming() {
+        AstraCliConsole.printShellTable(
+                buildShellTableClouds(new ArrayList<>(getStreamingRegions().keySet())));
+    }
+
+    /**
+     * List Streaming Region with Cloud - [{name, displayName}]
+     * @return
+     */
+    public TreeMap<String, TreeMap<String, String>> getStreamingRegions() {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         CliContext.getInstance()
-                  .getApiDevopsStreaming()
-                  .serverlessRegions().forEach(r -> {
-            String cloud = r.getCloudProvider().toLowerCase();
-            sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
-            sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());
-        });
-        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, sortedRegion));
+                .getApiDevopsStreaming()
+                .serverlessRegions().forEach(r -> {
+                    String cloud = r.getCloudProvider().toLowerCase();
+                    sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
+                    sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());
+                });
+        return sortedRegion;
     }
 
     /**
@@ -159,13 +183,23 @@ public class ServiceOrganization {
      *      name of filter
      */
     public void listRegionsDbServerless(String cloudProvider, String filter) {
+        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, getDbServerlessRegions()));
+    }
+
+    /**
+     * Access the db serverless regions.
+     *
+     * @return
+     *      db serverless regions
+     */
+    public  TreeMap<String, TreeMap<String, String>> getDbServerlessRegions() {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         apiDevopsOrg().regionsServerless().forEach(r -> {
             String cloud = r.getCloudProvider().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());
         });
-        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, sortedRegion));
+        return sortedRegion;
     }
 
     /**
@@ -195,6 +229,24 @@ public class ServiceOrganization {
                     sht.getCellValues().add(rf);
             }
         }));
+        return sht;
+    }
+
+    /**
+     * Show a table for the clouds.
+     *
+     * @param clouds
+     *      list of clourds
+     * @return
+     */
+    private ShellTable buildShellTableClouds(List<String> clouds) {
+        ShellTable sht = new ShellTable();
+        sht.addColumn(COLUMN_CLOUD, 10);
+        clouds.stream().forEach( cloud -> {
+            Map<String, String> rf = new HashMap<>();
+            rf.put(COLUMN_CLOUD, cloud);
+            sht.getCellValues().add(rf);
+        });
         return sht;
     }
 

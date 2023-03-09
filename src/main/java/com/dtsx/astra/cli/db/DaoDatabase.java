@@ -164,7 +164,7 @@ public class DaoDatabase {
         getRequiredDatabaseClient(databaseName)
             .downloadAllSecureConnectBundles(
                     AstraCliUtils.ASTRA_HOME + File.separator + AstraCliUtils.SCB_FOLDER);
-        LoggerShell.info("Secure connect bundles have been downloaded.");
+        LoggerShell.debug("Secure connect bundles have been downloaded.");
     }
     
     /**

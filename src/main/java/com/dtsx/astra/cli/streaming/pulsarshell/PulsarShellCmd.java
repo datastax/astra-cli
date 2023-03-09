@@ -57,8 +57,6 @@ public class PulsarShellCmd extends AbstractConnectedCmd {
     @Option(name = {"-f", "--filename" }, title = "FILE", arity = 1,  
             description = "Input filename with a list of commands to be executed. Each command must be separated by a newline.")
     protected String fileName;
-
-
     
     /** Cqlsh Options. */
     @Option(name=  {"-np", "--no-progress" }, 
@@ -73,7 +71,7 @@ public class PulsarShellCmd extends AbstractConnectedCmd {
         options.setFailOnError(failOnError);
         options.setFileName(fileName);
         options.setNoProgress(noProgress);
-        ServiceStreaming.startPulsarShell(options, tenant);
+        ServiceStreaming.getInstance().startPulsarShell(options, tenant);
     }
     
 }

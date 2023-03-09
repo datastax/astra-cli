@@ -2,6 +2,7 @@
  * Defines specialized exceptions for core operation like authentication and external processes interactions.
  */
 package com.dtsx.astra.cli.core.exception;
+
 /*-
  * #%L
  * Astra CLI

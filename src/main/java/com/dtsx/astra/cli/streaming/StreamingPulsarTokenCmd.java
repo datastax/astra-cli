@@ -32,7 +32,7 @@ public class StreamingPulsarTokenCmd extends AbstractStreamingCmd {
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        ServiceStreaming.showTenantPulsarToken(getTenant());
+        ServiceStreaming.getInstance().showTenantPulsarToken(getTenant());
     }
 
 }

@@ -29,14 +29,9 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     static String DB_TEST = "astra_cli_test";
 
-    //@BeforeAll
-    //public static void should_create_when_needed() {
-    //    assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
-   // }
-
-    @Test
-    public void demoTest() {
-        assertSuccessCli("db list");
+    @BeforeAll
+    public static void should_create_when_needed() {
+        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
     }
 
     @Test
@@ -213,23 +208,37 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(16)
-    public void showToolsURL() {
+    public void shouldDisplaySwaggerURLTest() {
         assertSuccessCli("db swagger %s".formatted(DB_TEST));
-        assertSuccessCli("db playground %s".formatted(DB_TEST));
     }
 
     @Test
     @Order(17)
-    public void showCdc() {
-        assertSuccessCli("db list-cdc %s".formatted("db2"));
-        //assertSuccessCli("db playground %s".formatted(DB_TEST));
+    public void shouldDisplayPlaygroundTest() {
+        assertSuccessCli("db playground %s".formatted(DB_TEST));
     }
 
+    @Test
+    @Order(18)
+    public void shouldListCdcTest() {
+        // create and delete cdc will have dedicated test class as streaming is involved
+        assertSuccessCli("db list-cdc %s".formatted(DB_TEST));
+    }
 
+    @Test
+    @Order(19)
+    public void testShouldFailOnInvalidRegionAndCloud() throws DatabaseNameNotUniqueException {
+        // When providing invalid region
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --region tropical-island");
+        // When providing invalid cloud
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --cloud cumulonimbus --region us-east1");
+        // When providing a region not in expected cloud (us-east1 is in gcp)
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --cloud aws --region us-east1");
+    }
 
-    //@AfterAll
-    //public static void testShouldDelete() {
-    //    assertSuccessCli("db delete %s".formatted(DB_TEST));
-    //}
+    @AfterAll
+    public static void testShouldDelete() {
+        assertSuccessCli("db delete %s".formatted(DB_TEST));
+    }
 
 }

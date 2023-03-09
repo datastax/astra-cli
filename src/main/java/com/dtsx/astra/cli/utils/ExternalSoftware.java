@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.streaming.cdc;
+package com.dtsx.astra.cli.utils;
 
 /*-
  * #%L
@@ -20,19 +20,12 @@ package com.dtsx.astra.cli.streaming.cdc;
  * #L%
  */
 
-import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.dtsx.astra.cli.streaming.ServiceStreaming;
-import com.github.rvesse.airline.annotations.Command;
-
 /**
- * Display information relative to a db.
+ * Help to locate the expected external software to download.
+ *
+ * @param url
+ *      software download url base
+ * @param version
+ *      software version
  */
-@Command(name = "list-cdc", description = "List CDC available on this tenant")
-public class StreamingListCdcCmd extends AbstractStreamingCmd {
-
-    /** {@inheritDoc} */
-    public void execute() {
-        ServiceStreaming.getInstance().listCdc(tenant);
-    }
-
-}
+public record ExternalSoftware(String url, String version) {}

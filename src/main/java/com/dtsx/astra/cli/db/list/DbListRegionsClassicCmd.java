@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.region;
+package com.dtsx.astra.cli.db.list;
 
 /*-
  * #%L

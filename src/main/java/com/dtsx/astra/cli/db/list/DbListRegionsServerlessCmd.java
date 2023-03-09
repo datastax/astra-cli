@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.streaming;
+package com.dtsx.astra.cli.db.list;
 
 /*-
  * #%L
@@ -26,10 +26,10 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * List available regions for Streaming.
+ * List regions serverless.
  */
-@Command(name = "list-regions" , description = "Display the list of Tenant in an organization")
-public class StreamingListRegionsCmd extends AbstractConnectedCmd {
+@Command(name = "list-regions-serverless", description = "Show available regions (serverless).")
+public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
 
     /**
      * Cloud provider
@@ -47,8 +47,7 @@ public class StreamingListRegionsCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceOrganization
-                .getInstance()
-                .listRegionsStreaming(cloud, filter);
+        ServiceOrganization.getInstance().listRegionsDbServerless(cloud, filter);
     }
+
 }

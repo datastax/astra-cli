@@ -1,3 +1,10 @@
+`0.2.2`
+- Streaming List Clouds
+- All open tickets
+- Validate cloud and regions 
+- Test CDC
+- DS MIGRATOR GENERATE DDL
+- --if-not-exist for Tenant ?
 
 ### TESTS
 

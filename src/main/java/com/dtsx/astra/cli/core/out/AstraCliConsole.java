@@ -25,6 +25,7 @@ import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.fusesource.jansi.Ansi;
 
 import java.util.HashMap;
@@ -43,7 +44,10 @@ public class AstraCliConsole implements AstraColorScheme {
     
 	/** Default constructor. */
 	protected AstraCliConsole() {}
-	
+
+    public static void printVersion() {
+        println(StringUtils.leftPad("Version: " + AstraCliUtils.version(), 40) + "\n", purple300);
+    }
 	/** Start Banner. */
     public static void banner() {
         println("    _____            __                  ", purple300);
@@ -51,8 +55,8 @@ public class AstraCliConsole implements AstraColorScheme {
         println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ",purple300);
         println(" /    |    \\\\___ \\  |  |  |  | \\ //__ \\_ ",purple300);
         println(" \\____|__  /____  > |__|  |__|  (____  /", purple300);
-        println("         \\/     \\/                   \\/ ", purple300);
-        println("           Version: " + AstraCliUtils.version() + "\n", orange400);
+        println("         \\/     \\/                   \\/ \n", purple300);
+        printVersion();
     }
 
     /**

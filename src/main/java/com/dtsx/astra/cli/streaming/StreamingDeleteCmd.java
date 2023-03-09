@@ -32,7 +32,7 @@ public class StreamingDeleteCmd extends AbstractStreamingCmd {
     /** {@inheritDoc} */
     public void execute()
     throws TenantNotFoundException {
-        ServiceStreaming.deleteTenant(getTenant());
+        ServiceStreaming.getInstance().deleteTenant(getTenant());
     }
     
 }

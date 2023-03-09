@@ -20,6 +20,7 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
+import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -53,7 +54,14 @@ public class StreamingCreateCmd extends AbstractStreamingCmd {
     /** option. */
     @Option(name = { "-e", "--email" }, description = "User Email")    
     String email = DEFAULT_EMAIL;
-    
+
+    /**
+     * Create a tenant if it does not exist already
+     **/
+    @Option(name = { "--if-not-exist", "--if-not-exists" },
+            description = "will create a new DB only if none with same name")
+    protected boolean ifNotExist = false;
+
     /** {@inheritDoc} */
     @Override
     public void execute() {
@@ -63,10 +71,7 @@ public class StreamingCreateCmd extends AbstractStreamingCmd {
         ct.setPlan(plan);
         ct.setUserEmail(email);
         ct.setTenantName(getTenant());
-        // Param Validations
-        //throw new ParameterException(cloudProvider)
-        // Does the tenant exist ?
-        ServiceStreaming.createStreamingTenant(ct);
+        ServiceStreaming.getInstance().createStreamingTenant(ct, ifNotExist);
     }
     
 

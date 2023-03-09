@@ -7,7 +7,7 @@
 	<description>Command Line Interface for DataStax Astra</description>
 	<packaging>jar</packaging>
 	<inceptionYear>2022</inceptionYear>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<url>https://github.com/datastax/astra-cli</url>
 	<properties>
 	 	<sonar.organization>clun-datastax</sonar.organization>

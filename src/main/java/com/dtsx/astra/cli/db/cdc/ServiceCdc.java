@@ -21,14 +21,14 @@ package com.dtsx.astra.cli.db.cdc;
  */
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.core.out.ShellTable;
+import com.dtsx.astra.cli.core.out.*;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.db.DatabasesClient;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Group Operations relative to Cdc.
  */
-public class ServiceCdc {
+public class ServiceCdc implements AstraColorScheme {
 
     /** column names. */
     static final String COLUMN_ID               = "id";
@@ -101,7 +101,6 @@ public class ServiceCdc {
      */
     public void listCdc(String databaseName)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        LoggerShell.info("Cdc List for db '%s'".formatted(databaseName));
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_ID,  20);
         sht.addColumn(COLUMN_KEYSPACE,  12);
@@ -120,10 +119,39 @@ public class ServiceCdc {
                     rf.put(COLUMN_CLUSTER,   cdc.getClusterName());
                     rf.put(COLUMN_NAMESPACE,  cdc.getNamespace());
                     rf.put(COLUMN_TENANT, cdc.getTenant());
-                    rf.put(COLUMN_STATUS, cdc.getConnectorStatus());
+                    rf.put(COLUMN_STATUS, getStatus(cdc));
                     sht.getCellValues().add(rf);
                 });
         AstraCliConsole.printShellTable(sht);
+    }
+
+    /**
+     * Utility to color the status based on the value.
+     *
+     * @param cdc
+     *      cdc definition
+     * @return
+     *      colored status
+     */
+    private String getStatus(CdcDefinition cdc) {
+        if (cdc.getCodStatus().startsWith("Error")) {
+            if (CliContext.getInstance().isNoColor()) {
+                return "Error";
+            } else {
+                return StringBuilderAnsi.colored("Error", red500);
+            }
+        } else if  (cdc.getCodStatus().equals("Active")) {
+            if (CliContext.getInstance().isNoColor()) {
+                return "Running";
+            } else {
+                return StringBuilderAnsi.colored("Running", green500);
+            }
+        }
+        if (CliContext.getInstance().isNoColor()) {
+            return cdc.getCodStatus();
+        } else {
+            return StringBuilderAnsi.colored( cdc.getCodStatus(), yellow500);
+        }
     }
 
     /**

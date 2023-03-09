@@ -1,4 +1,7 @@
-package com.dtsx.astra.cli.streaming.cdc;
+/**
+ * Defines specialized exception for Astra Roles
+ */
+package com.dtsx.astra.cli.iam.role.exception;
 
 /*-
  * #%L
@@ -19,20 +22,3 @@ package com.dtsx.astra.cli.streaming.cdc;
  * limitations under the License.
  * #L%
  */
-
-import com.dtsx.astra.cli.streaming.AbstractStreamingCmd;
-import com.dtsx.astra.cli.streaming.ServiceStreaming;
-import com.github.rvesse.airline.annotations.Command;
-
-/**
- * Display information relative to a db.
- */
-@Command(name = "list-cdc", description = "List CDC available on this tenant")
-public class StreamingListCdcCmd extends AbstractStreamingCmd {
-
-    /** {@inheritDoc} */
-    public void execute() {
-        ServiceStreaming.getInstance().listCdc(tenant);
-    }
-
-}

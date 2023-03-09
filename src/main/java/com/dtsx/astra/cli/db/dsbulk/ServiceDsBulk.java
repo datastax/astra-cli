@@ -26,6 +26,7 @@ import com.dtsx.astra.cli.core.exception.FileSystemException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
+import com.dtsx.astra.cli.utils.ExternalSoftware;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
 
@@ -78,7 +79,7 @@ public class ServiceDsBulk implements DsBulkParameters {
     }
     
     /** dsbulk configuration. */
-    DsBulkConfig config;
+    ExternalSoftware config;
     
     /** Installation folder. */
     File dsbulkLocalFolder;
@@ -111,7 +112,7 @@ public class ServiceDsBulk implements DsBulkParameters {
      * Initialization.
      */
     private ServiceDsBulk() {
-        config = new DsBulkConfig(
+        config = new ExternalSoftware(
                 AstraCliUtils.readProperty("dsbulk.url"),
                 AstraCliUtils.readProperty("dsbulk.version"));
         
@@ -152,7 +153,7 @@ public class ServiceDsBulk implements DsBulkParameters {
             }
             Files.delete(Paths.get(tarArchive));
         } catch (IOException e) {
-            throw new FileSystemException("Cannot install CqlShell :" + e.getMessage(), e);
+            throw new FileSystemException("Cannot install DSBULK :" + e.getMessage(), e);
         }
     }
 
@@ -342,6 +343,16 @@ public class ServiceDsBulk implements DsBulkParameters {
             Thread.currentThread().interrupt();
             throw new CannotStartProcessException("dsbulk", e);
         }
+    }
+
+    /**
+     * Return DsBulk executable.
+     *
+     * @return
+     *      dsbulk
+     */
+    public String getDsbulkExecutable() {
+        return dsbulkExecutable;
     }
 
 }

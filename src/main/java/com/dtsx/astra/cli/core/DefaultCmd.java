@@ -44,11 +44,14 @@ public class DefaultCmd extends AbstractCmd {
             AstraCliConsole.outputData("version", AstraCliUtils.version());
         } else {
             AstraCliConsole.banner();
-            AstraCliConsole.println(new StringBuilderAnsi(" - Command list: ")
-                    .append("astra help", Ansi.Color.CYAN));
-            AstraCliConsole.println(new StringBuilderAnsi("️ - Get help: ")
-                    .append("astra help <your command>", Ansi.Color.CYAN));
-            AstraCliConsole.println("");
+            AstraCliConsole.println(new StringBuilderAnsi(" - list commands       : ")
+                    .append("astra help", blue300));
+            AstraCliConsole.println(new StringBuilderAnsi("️ - get command help    : ")
+                    .append("astra help <your command>", blue300));
+            AstraCliConsole.println(new StringBuilderAnsi("️ - list your databases : ")
+                    .append("astra db list", blue300));
+            AstraCliConsole.println(new StringBuilderAnsi("️ - create new database : ")
+                    .append("astra db create demo\n", blue300));
         }
     }    
 
