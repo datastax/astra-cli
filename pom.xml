@@ -20,7 +20,7 @@
 		<slf4j.version>2.0.6</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
-		<commons-compress.version>1.22</commons-compress.version>
+		<commons-compress.version>1.23.0</commons-compress.version>
 		<!-- Junit -->
 		<junit-platform.version>1.9.2</junit-platform.version>
 		<junit-jupiter.version>5.9.2</junit-jupiter.version>
