@@ -25,9 +25,8 @@ import com.dtsx.astra.cli.core.out.*;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
-import com.dtsx.astra.sdk.db.DatabasesClient;
+import com.dtsx.astra.sdk.db.AstraDbClient;
 import com.dtsx.astra.sdk.db.domain.Database;
-import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 
 import java.util.HashMap;
@@ -89,7 +88,7 @@ public class ServiceCdc implements AstraColorScheme {
      * @return
      *      api devops
      */
-    private DatabasesClient apiDevopsDb() {
+    private AstraDbClient apiDevopsDb() {
         return CliContext.getInstance().getApiDevopsDatabases();
     }
 
@@ -110,7 +109,8 @@ public class ServiceCdc implements AstraColorScheme {
         sht.addColumn(COLUMN_NAMESPACE,  15);
         sht.addColumn(COLUMN_STATUS,  15);
         dbDao.getRequiredDatabaseClient(databaseName)
-                .cdcs()
+                .cdc()
+                .findAll()
                 .forEach(cdc -> {
                     Map<String, String> rf = new HashMap<>();
                     rf.put(COLUMN_ID, cdc.getConnectorName());
@@ -166,7 +166,7 @@ public class ServiceCdc implements AstraColorScheme {
         // Throw db not found  exception if database does not exist
         Database db = dbDao.getDatabase(databaseName);
         // Throw cdc not found exception if cdc does not exist
-        apiDevopsDb().id(db.getId()).deleteCdc(cdcId);
+        apiDevopsDb().database(db.getId()).cdc().delete(cdcId);
         LoggerShell.info("Cdc '%s' from db '%s' has been deleted.".formatted(cdcId, databaseName));
     }
 
@@ -183,7 +183,7 @@ public class ServiceCdc implements AstraColorScheme {
      *      tenant name
      */
     public void deleteCdcByDefinition(String databaseName, String keyspace, String table, String tenant) {
-        apiDevopsDb().id(dbDao.getDatabase(databaseName).getId()).deleteCdc(keyspace, table, tenant);
+        apiDevopsDb().database(dbDao.getDatabase(databaseName).getId()).cdc().delete(keyspace, table, tenant);
         LoggerShell.info("Cdc from db '%s' is deleting.".formatted(databaseName));
     }
 
@@ -203,8 +203,9 @@ public class ServiceCdc implements AstraColorScheme {
      */
     public void createCdc(String databaseName, String keyspace, String table, String tenant, int topicPartition) {
         apiDevopsDb()
-                .id(dbDao.getDatabase(databaseName).getId())
-                .createCdc(keyspace,table, tenant, topicPartition );
+                .database(dbDao.getDatabase(databaseName).getId())
+                .cdc()
+                .create(keyspace,table, tenant, topicPartition );
         LoggerShell.info("Creating from db '%s' is creating.".formatted(databaseName));
     }
 

@@ -177,7 +177,7 @@ public class ServiceCqlShell {
             cqlSh.add("--version");
         if (options.execute() != null) {
             cqlSh.add("-e");
-            cqlSh.add(options.execute());
+            cqlSh.add("\"" + options.execute() + "\"");
         }
         if (options.file() != null) {
             cqlSh.add("-f");
@@ -191,6 +191,9 @@ public class ServiceCqlShell {
             cqlSh.add("--encoding");
             cqlSh.add(options.encoding() );
         }
+        // Timeout
+        cqlSh.add("--connect-timeout");cqlSh.add(String.valueOf(options.connectTimeout()));
+        cqlSh.add("--request-timeout");cqlSh.add(String.valueOf(options.requestTimeout()));
         return cqlSh;
     }
     

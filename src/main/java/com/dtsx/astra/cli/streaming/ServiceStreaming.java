@@ -27,15 +27,13 @@ import com.dtsx.astra.cli.core.exception.FileSystemException;
 import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
 import com.dtsx.astra.cli.core.exception.InvalidRegionException;
 import com.dtsx.astra.cli.core.out.*;
-import com.dtsx.astra.cli.iam.user.ServiceUser;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
-import com.dtsx.astra.sdk.streaming.StreamingClient;
+import com.dtsx.astra.sdk.streaming.AstraStreamingClient;
 import com.dtsx.astra.sdk.streaming.TenantClient;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
 import com.dtsx.astra.sdk.streaming.domain.StreamingRegion;
@@ -44,7 +42,6 @@ import com.dtsx.astra.sdk.utils.Assert;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -124,7 +121,7 @@ public class ServiceStreaming implements AstraColorScheme {
      * @return
      *      streaming tenant.
      */
-    private StreamingClient streamingClient() {
+    private AstraStreamingClient getApiDevopsStreaming() {
         return  CliContext.getInstance().getApiDevopsStreaming();
     }
     
@@ -137,7 +134,7 @@ public class ServiceStreaming implements AstraColorScheme {
      *      tenant client or error
      */
     private TenantClient tenantClient(String tenantName) {
-        return cacheTenantClient.computeIfAbsent(tenantName, (t) -> streamingClient().tenant(t));
+        return cacheTenantClient.computeIfAbsent(tenantName, (t) -> getApiDevopsStreaming().tenant(t));
     }
     
     /**
@@ -152,9 +149,7 @@ public class ServiceStreaming implements AstraColorScheme {
      */
     private Tenant getTenant(String tenantName)
     throws TenantNotFoundException {
-        return tenantClient(tenantName)
-                .find()
-                .orElseThrow(() -> new TenantNotFoundException(tenantName));
+        return getApiDevopsStreaming().get(tenantName);
     }
 
     /**
@@ -180,9 +175,9 @@ public class ServiceStreaming implements AstraColorScheme {
                 throw new InvalidRegionException(cloud, region);
             }
             // OK
-        } else if (CliContext.getInstance()
-                    .getApiDevopsStreaming()
-                    .serverlessRegions()
+        } else if (getApiDevopsStreaming()
+                    .regions()
+                    .findAllServerless()
                     .map(StreamingRegion::getName)
                     .filter(r -> r.equals(region.toLowerCase()))
                     .findFirst().isEmpty()) {
@@ -199,8 +194,8 @@ public class ServiceStreaming implements AstraColorScheme {
         sht.addColumn(COLUMN_CLOUD,   10);
         sht.addColumn(COLUMN_REGION,  15);
         sht.addColumn(COLUMN_STATUS,  15);
-        streamingClient()
-           .tenants()
+        getApiDevopsStreaming()
+           .findAll()
            .forEach(tnt -> {
                 Map <String, String> rf = new HashMap<>();
                 rf.put(COLUMN_NAME,   tnt.getTenantName());
@@ -318,8 +313,7 @@ public class ServiceStreaming implements AstraColorScheme {
      */
     public void deleteTenant(String tenantName)
     throws TenantNotFoundException {
-        getTenant(tenantName);
-        tenantClient(tenantName).delete();
+        getApiDevopsStreaming().delete(tenantName);
         AstraCliConsole.outputSuccess("Deleting Tenant '" + tenantName + "'");
     }
     
@@ -345,7 +339,7 @@ public class ServiceStreaming implements AstraColorScheme {
      *      tenant name
      */
     public void showTenantExistence(String tenantName) {
-        if (tenantClient(tenantName).exist()) {
+        if (getApiDevopsStreaming().exist(tenantName)) {
             AstraCliConsole.outputSuccess("%s '%s' exists.".formatted(TENANT, tenantName));
         } else {
             AstraCliConsole.outputSuccess("%s '%s' does not exist.".formatted(TENANT, tenantName));
@@ -378,12 +372,12 @@ public class ServiceStreaming implements AstraColorScheme {
     public void createStreamingTenant(CreateTenant ct, boolean ifNotExistFlag)
     throws TenantAlreadyExistException {
         validateCloudRegion(ct.getCloudProvider(), ct.getCloudRegion());
-        boolean tenantExist = tenantClient(ct.getTenantName()).exist();
+        boolean tenantExist = getApiDevopsStreaming().exist(ct.getTenantName());
         if (tenantExist && !ifNotExistFlag) {
             throw new TenantAlreadyExistException(ct.getTenantName());
         }
         if (!tenantExist) {
-            streamingClient().createTenant(ct);
+            getApiDevopsStreaming().create(ct);
             AstraCliConsole.outputSuccess("Tenant '" + ct.getTenantName() + "' has being created.");
         } else {
             AstraCliConsole.outputSuccess("Tenant already existed (--if-not-exist)");

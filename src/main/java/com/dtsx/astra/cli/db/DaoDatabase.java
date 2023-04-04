@@ -28,7 +28,7 @@ import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.DatabaseClient;
-import com.dtsx.astra.sdk.db.DatabasesClient;
+import com.dtsx.astra.sdk.db.AstraDbClient;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 
@@ -120,15 +120,15 @@ public class DaoDatabase {
      */
     public Optional<DatabaseClient> getDatabaseClient(String db) 
     throws DatabaseNameNotUniqueException {
-        DatabasesClient dbsClient = CliContext.getInstance().getApiDevopsDatabases();
+        AstraDbClient dbsClient = CliContext.getInstance().getApiDevopsDatabases();
         
         // Escape special chars
         db = db.replace("\"", "");
         // Database name containing spaces cannot be an id
         if (!db.contains(" ") ) {
-            DatabaseClient dbClient = dbsClient.id(db);
+            DatabaseClient dbClient = dbsClient.database(db);
             if (dbClient.exist()) {
-                LoggerShell.debug("Database found id=" + dbClient.getDatabaseId());
+                LoggerShell.debug("Database found id=" + db);
                 return Optional.of(dbClient);
             }
         }
@@ -144,7 +144,7 @@ public class DaoDatabase {
         // Database exists and is unique
         if (1 == dbs.size()) {
             LoggerShell.debug("Database found id=" + dbs.get(0).getId());
-            return Optional.ofNullable(dbsClient.id(dbs.get(0).getId()));
+            return Optional.ofNullable(dbsClient.database(dbs.get(0).getId()));
         }
         return Optional.empty();
     }

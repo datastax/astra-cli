@@ -25,7 +25,7 @@ import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -58,8 +58,7 @@ public class ConfigCreateCmd extends AbstractCmd {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
             throw new InvalidTokenException(token);
         }
-        OrganizationsClient apiOrg  = new OrganizationsClient(token);
-        Organization o = apiOrg.organization();
+        Organization o = new AstraDevopsApiClient(token).getOrganization();
         if (sectionName == null) {
             sectionName = o.getName();
         }

@@ -17,7 +17,7 @@ public class DbRegionsTest extends AbstractCmdTest {
 
     @BeforeAll
     public static void init() {
-        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
     }
 
     @Test

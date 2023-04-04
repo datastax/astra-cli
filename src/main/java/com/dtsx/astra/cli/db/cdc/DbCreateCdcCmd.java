@@ -58,7 +58,11 @@ public class DbCreateCdcCmd extends AbstractDatabaseCmd {
     /** {@inheritDoc} */
     public void execute() {
         LoggerShell.info("Creating cdc from keyspace/table/tenant..");
-        ServiceCdc.getInstance().createCdc(db, keyspace, table, tenant, partitionTopics);
+        try {
+            ServiceCdc.getInstance().createCdc(db, keyspace, table, tenant, partitionTopics);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
     
 }

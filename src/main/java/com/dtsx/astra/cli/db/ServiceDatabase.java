@@ -33,7 +33,6 @@ import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
 import com.dtsx.astra.sdk.db.DatabaseClient;
 import com.dtsx.astra.sdk.db.domain.*;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.Assert;
@@ -125,16 +124,6 @@ public class ServiceDatabase implements AstraColorScheme {
                 .build();
     }
 
-    /**
-     * Access Api devops from context.
-     *
-     * @return
-     *      api devops
-     */
-    private OrganizationsClient apiDevopsOrg() {
-        return CliContext.getInstance().getApiDevopsOrganizations();
-    }
-    
     /**
      * Wait for a DB status.
      *
@@ -272,21 +261,22 @@ public class ServiceDatabase implements AstraColorScheme {
     public void validateCloudAndRegion(String cloud, String region) {
         Assert.hasLength(region, "region name");
 
-        if (cloud == null && "".equals(cloud)) {
-            TreeMap<String, TreeMap<String, String>> regions =
+        // Cloud is not null check cloud and region
+
+        if (!StringUtils.isEmpty(cloud)) {
+            TreeMap<String, TreeMap<String, String>> mapCloudRegions =
                     ServiceOrganization.getInstance().getDbServerlessRegions();
-            if (!regions.containsKey(cloud.toLowerCase())) {
-                // value provided in --cloud is invalid
+
+            if (!mapCloudRegions.containsKey(cloud.toLowerCase())) {
                 throw new InvalidCloudProviderException(cloud);
-            } else if (((TreeMap<String, String>) regions.get(cloud.toLowerCase()))
-                    .keySet().contains(region.toLowerCase())) {
-                // cloud ok, but invalid region
+            } else if (!mapCloudRegions
+                    .get(cloud.toLowerCase())
+                    .containsKey(region.toLowerCase())) {
                 throw new InvalidRegionException(cloud, region);
             }
-            // OK
         } else if (CliContext.getInstance()
-                .getApiDevopsOrganizations()
-                .regionsServerless()
+                .getApiDevops().db().regions()
+                .findAllServerless()
                 .map(DatabaseRegionServerless::getName)
                 .filter(r -> r.equals(region.toLowerCase()))
                 .findFirst().isEmpty()) {
@@ -323,10 +313,10 @@ public class ServiceDatabase implements AstraColorScheme {
         
         // Parameter Validations
         Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()
-                .getApiDevopsOrganizations()
-                .regionsServerless()
-                .collect(Collectors
-                .toMap(DatabaseRegionServerless::getName, Function.identity()));
+                .getApiDevops()
+                .db().regions()
+                .findAllServerless()
+                .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity()));
         if (StringUtils.isEmpty(keyspace)) {
             keyspace = databaseName.toLowerCase()
                     .replace(" ", "_")
@@ -616,8 +606,9 @@ public class ServiceDatabase implements AstraColorScheme {
             region = db.getInfo().getRegion();
 
         // Region is valid
-        Set<String> availableRegions = apiDevopsOrg()
-                .regionsServerless()
+        Set<String> availableRegions = CliContext.getInstance()
+                .getApiDevops().db().regions()
+                .findAllServerless()
                 .map(DatabaseRegionServerless::getName)
                 .collect(Collectors.toSet());
         if (!availableRegions.contains(region)) {
@@ -659,7 +650,7 @@ public class ServiceDatabase implements AstraColorScheme {
         EnvFile envFile = new EnvFile(dest);
 
         // Organization Block
-        Organization org = CliContext.getInstance().getApiDevopsOrganizations().organization();
+        Organization org = CliContext.getInstance().getApiDevops().getOrganization();
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_ORG_ID.name(), org.getId());
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_ORG_NAME.name(), org.getName());
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_ORG_TOKEN.name(), CliContext.getInstance().getToken());

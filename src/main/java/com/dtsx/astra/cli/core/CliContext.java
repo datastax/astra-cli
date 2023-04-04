@@ -26,9 +26,9 @@ import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.OutputFormat;
-import com.dtsx.astra.sdk.db.DatabasesClient;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
-import com.dtsx.astra.sdk.streaming.StreamingClient;
+import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.db.AstraDbClient;
+import com.dtsx.astra.sdk.streaming.AstraStreamingClient;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.apache.commons.lang3.StringUtils;
 
@@ -163,7 +163,7 @@ public class CliContext {
             throw new InvalidTokenException(getToken());
         }
         try {
-            new OrganizationsClient(getToken()).organization();
+            getApiDevops().getOrganization();
             LoggerShell.debug("Cli successfully initialized");
         } catch(Exception e) {
             AstraCliConsole.outputError(ExitCode.CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
@@ -196,22 +196,30 @@ public class CliContext {
     public AstraConfiguration getConfiguration() {
         return astraConfig;
     }
-    
-    private DatabasesClient databasesClient;
-    private StreamingClient streamingClient;
-    private OrganizationsClient apiDevopsOrganizations;
-    
+
+    private AstraDevopsApiClient devopsApiClient;
+
     /**
      * Getter accessor for attribute 'apiDevopsDatabases'.
      *
      * @return
      *       current value of 'apiDevopsDatabases'
      */
-    public DatabasesClient getApiDevopsDatabases() {
-        if (databasesClient == null) {
-            databasesClient = new DatabasesClient(getToken());
+    public AstraDevopsApiClient getApiDevops() {
+        if (devopsApiClient == null) {
+            devopsApiClient = new AstraDevopsApiClient(getToken());
         }
-        return databasesClient;
+        return devopsApiClient;
+    }
+
+    /**
+     * Getter accessor for attribute 'apiDevopsDatabases'.
+     *
+     * @return
+     *       current value of 'apiDevopsDatabases'
+     */
+    public AstraDbClient getApiDevopsDatabases() {
+        return getApiDevops().db();
     }
 
     /**
@@ -220,26 +228,9 @@ public class CliContext {
      * @return
      *       current value of 'apiDevopsStreaming'
      */
-    public StreamingClient getApiDevopsStreaming() {
-        if (streamingClient == null) {
-            streamingClient = new StreamingClient(getToken());
-        }
-        return streamingClient;
+    public AstraStreamingClient getApiDevopsStreaming() {
+        return getApiDevops().streaming();
     }
-    
-    /**
-     * Getter accessor for attribute 'apiDevopsOrganizations'.
-     *
-     * @return
-     *       current value of 'apiDevopsOrganizations'
-     */
-    public OrganizationsClient getApiDevopsOrganizations() {
-        if (apiDevopsOrganizations == null) {
-            apiDevopsOrganizations = new OrganizationsClient(getToken());
-        }
-        return apiDevopsOrganizations;
-    }
-    
 
     /**
      * Getter accessor for attribute 'arguments'.

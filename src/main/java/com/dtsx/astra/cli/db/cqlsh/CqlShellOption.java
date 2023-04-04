@@ -24,5 +24,5 @@ package com.dtsx.astra.cli.db.cqlsh;
 /**
  * Record storing options.
  */
-public record CqlShellOption(boolean version, boolean debug, String encoding, String execute, String file, String keyspace) {
+public record CqlShellOption(boolean version, boolean debug, String encoding, String execute, String file, String keyspace, int connectTimeout, int requestTimeout) {
 }

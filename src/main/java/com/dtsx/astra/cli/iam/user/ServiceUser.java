@@ -28,7 +28,7 @@ import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
 import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
 import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Role;
 import com.dtsx.astra.sdk.org.domain.User;
 import com.dtsx.astra.sdk.utils.IdUtils;
@@ -79,8 +79,8 @@ public class ServiceUser {
      * @return
      *      api devops
      */
-    private OrganizationsClient apiDevopsOrg() {
-        return CliContext.getInstance().getApiDevopsOrganizations();
+    private AstraDevopsApiClient apiDevopsOrg() {
+        return CliContext.getInstance().getApiDevops();
     }
 
     /**
@@ -91,7 +91,7 @@ public class ServiceUser {
         sht.addColumn(COLUMN_USER_ID, 37);
         sht.addColumn(COLUMN_USER_EMAIL, 20);
         sht.addColumn(COLUMN_USER_STATUS, 20);
-        apiDevopsOrg().users().forEach(user -> {
+        apiDevopsOrg().users().findAll().forEach(user -> {
              Map <String, String> rf = new HashMap<>();
              rf.put(COLUMN_USER_ID, user.getUserId());
              rf.put(COLUMN_USER_EMAIL, user.getEmail());
@@ -110,10 +110,10 @@ public class ServiceUser {
      *      user has not been found
      */
     public void showUser(String user) throws UserNotFoundException {
-       Optional<User> optUser = apiDevopsOrg().findUserByEmail(user);
+       Optional<User> optUser = apiDevopsOrg().users().findByEmail(user);
             
        if (optUser.isEmpty() && IdUtils.isUUID(user)) {
-           optUser = apiDevopsOrg().user(user).find();
+           optUser = apiDevopsOrg().users().find(user);
        }
        
        User r = optUser.orElseThrow(() -> new UserNotFoundException(user));
@@ -154,15 +154,15 @@ public class ServiceUser {
      *      role does not exist 
      */
     public void inviteUser(String user, String role) throws UserAlreadyExistException, RoleNotFoundException {
-        Optional<User> optUser = apiDevopsOrg().findUserByEmail(user);
+        Optional<User> optUser = apiDevopsOrg().users().findByEmail(user);
         if (optUser.isPresent()) {
             throw new UserAlreadyExistException(user);
         }
-        Optional<Role> optRole = apiDevopsOrg().findRoleByName(role);
+        Optional<Role> optRole = apiDevopsOrg().roles().findByName(role);
         if (optRole.isEmpty() && IdUtils.isUUID(role)) {
-            optRole = apiDevopsOrg().role(role).find();
+            optRole = apiDevopsOrg().roles().find(role);
         }
-        apiDevopsOrg().inviteUser(user, optRole.orElseThrow(()-> new RoleNotFoundException(role)).getId());
+        apiDevopsOrg().users().invite(user, optRole.orElseThrow(()-> new RoleNotFoundException(role)).getId());
         AstraCliConsole.outputSuccess(role);
     }
 
@@ -175,12 +175,14 @@ public class ServiceUser {
      */
     public void deleteUser(String user)
     throws UserNotFoundException {
-        Optional<User> optUser = apiDevopsOrg().findUserByEmail(user);
+        Optional<User> optUser = apiDevopsOrg().users().findByEmail(user);
         if (optUser.isEmpty() && IdUtils.isUUID(user)) {
-            optUser = apiDevopsOrg().user(user).find();
+            optUser = apiDevopsOrg().users().find(user);
         }
-        apiDevopsOrg().user(optUser.orElseThrow(() -> new UserNotFoundException(user)).getUserId())
-                 .delete();
+        if (optUser.isEmpty()) {
+            throw new UserNotFoundException(user);
+        }
+        apiDevopsOrg().users().delete(optUser.get().getUserId());
         AstraCliConsole.outputSuccess("Deleting user '" + user + "' (async operation)");
     }
     

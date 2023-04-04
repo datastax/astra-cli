@@ -20,10 +20,12 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
+import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.dtsx.astra.cli.streaming.ServiceStreaming.*;
 
@@ -46,6 +48,12 @@ public class StreamingCreateCmd extends AbstractStreamingCmd {
     String cloudRegion = DEFAULT_CLOUD_REGION;
 
     /**
+     * Dedicated Cluster (cloud and region would be ignored)
+     */
+    @Option(name = { "-cl", "--cluster" }, description = "Dedicated cluster, replacement for cloud/region")
+    String cluster;
+
+    /**
      * Define proper plan
      */
     @Option(name = { "-p", "--plan" }, description = "Plan for the tenant")    
@@ -66,8 +74,13 @@ public class StreamingCreateCmd extends AbstractStreamingCmd {
     @Override
     public void execute() {
         CreateTenant ct = new CreateTenant();
-        ct.setCloudProvider(cloudProvider);
-        ct.setCloudRegion(cloudRegion);
+        if (!StringUtils.isEmpty(cluster)) {
+            LoggerShell.info("Using dedicated cluster '%s' (cloud and region will be ignored)".formatted(cluster));
+            ct.setClusterName(cluster);
+        } else {
+            ct.setCloudProvider(cloudProvider);
+            ct.setCloudRegion(cloudRegion);
+        }
         ct.setPlan(plan);
         ct.setUserEmail(email);
         ct.setTenantName(getTenant());

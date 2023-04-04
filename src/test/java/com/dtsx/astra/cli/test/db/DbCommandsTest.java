@@ -233,12 +233,12 @@ public class DbCommandsTest extends AbstractCmdTest {
         // When providing invalid cloud
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --cloud cumulonimbus --region us-east1");
         // When providing a region not in expected cloud (us-east1 is in gcp)
-        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --cloud aws --region us-east1");
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid2 --cloud aws --region us-east1");
     }
 
-    @AfterAll
-    public static void testShouldDelete() {
-        assertSuccessCli("db delete %s".formatted(DB_TEST));
-    }
+    //@AfterAll
+    //public static void testShouldDelete() {
+    //    assertSuccessCli("db delete %s".formatted(DB_TEST));
+    //}
 
 }

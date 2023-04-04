@@ -27,7 +27,7 @@ import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.cli.db.exception.RegionAlreadyExistException;
-import com.dtsx.astra.sdk.db.DatabasesClient;
+import com.dtsx.astra.sdk.db.AstraDbClient;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -94,7 +94,7 @@ public class ServiceRegion {
      * @return
      *      api devops
      */
-    private DatabasesClient apiDevopsDb() {
+    private AstraDbClient apiDevopsDb() {
         return CliContext.getInstance().getApiDevopsDatabases();
     }
 
@@ -156,7 +156,7 @@ public class ServiceRegion {
             try {
                 CloudProviderType cloud = db.getInfo().getCloudProvider();
                 if (cloudProvider != null) cloud = CloudProviderType.valueOf(cloudProvider.toUpperCase());
-                apiDevopsDb().id(db.getId()).addRegion(tier, cloud, regionName);
+                apiDevopsDb().database(db.getId()).datacenters().create(tier, cloud, regionName);
                 LoggerShell.info("%s '%s' is creating.".formatted(REGION, regionName));
             } catch(Exception e) {
                 throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,
@@ -181,7 +181,7 @@ public class ServiceRegion {
         int retries = 0;
         Database db = dbDao.getDatabase(dbName);
         while (((retries++ < timeout) || (timeout == 0)) &&
-                apiDevopsDb().id(db.getId()).findRegion(regionName).isPresent()) {
+                apiDevopsDb().database(db.getId()).datacenters().findByRegionName(regionName).isPresent()) {
             try {
                 Thread.sleep(1000);
                 LoggerShell.debug("Waiting for %s to be deleted ( %d / %d )".formatted(REGION, retries, timeout));
@@ -205,7 +205,7 @@ public class ServiceRegion {
         // Throw db not found  exception if database does not exist
         Database db = dbDao.getDatabase(databaseName);
         // Throw region not found exception if region does not exist
-        apiDevopsDb().id(db.getId()).deleteRegion(regionName);
+        apiDevopsDb().database(db.getId()).datacenters().delete(regionName);
         LoggerShell.info("%s '%s' is deleting.".formatted(REGION, regionName));
     }
 

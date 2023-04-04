@@ -26,7 +26,7 @@ import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.JsonOutput;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Role;
 import com.dtsx.astra.sdk.utils.IdUtils;
 
@@ -76,8 +76,8 @@ public class ServiceRole {
      * @return
      *      api devops
      */
-    private OrganizationsClient apiDevopsOrg() {
-        return CliContext.getInstance().getApiDevopsOrganizations();
+    private AstraDevopsApiClient apiDevopsOrg() {
+        return CliContext.getInstance().getApiDevops();
     }
 
     /**
@@ -88,7 +88,7 @@ public class ServiceRole {
         sht.addColumn(COLUMN_ROLE_ID, 37);
         sht.addColumn(COLUMN_ROLE_NAME, 20);
         sht.addColumn(COLUMN_ROLE_DESCRIPTION, 20);
-        apiDevopsOrg().roles().forEach(role -> {
+        apiDevopsOrg().roles().findAll().forEach(role -> {
             Map<String, String> rf = new HashMap<>();
             rf.put(COLUMN_ROLE_ID, role.getId());
             rf.put(COLUMN_ROLE_NAME, role.getName());
@@ -108,10 +108,10 @@ public class ServiceRole {
      */
     public Optional<Role> findRole(String role) {
         // Find with name
-        Optional<Role> optRole = apiDevopsOrg().findRoleByName(role);
+        Optional<Role> optRole = apiDevopsOrg().roles().findByName(role);
         // Find by id if not found by name
         if (optRole.isEmpty() && IdUtils.isUUID(role)) {
-            optRole = apiDevopsOrg().role(role).find();
+            optRole = apiDevopsOrg().roles().find(role);
         }
         return optRole;
     }

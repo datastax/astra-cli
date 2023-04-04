@@ -63,7 +63,17 @@ public class DbCqlShellCmd extends AbstractDatabaseCmd {
     @Option(name = {"-k", "--keyspace" }, title = "KEYSPACE", arity = 1,  
             description = "Authenticate to the given keyspace.")
     protected String cqlshOptionKeyspace;
-    
+
+    /** Cqlsh Options. */
+    @Option(name = { "--connect-timeout" }, title = "TIMEOUT", arity = 1,
+            description = "Connection timeout in seconds (default is 10")
+    protected int cqlshOptionConnectTimeout = 10;
+
+    /** Cqlsh Options. */
+    @Option(name = { "--request-timeout" }, title = "TIMEOUT", arity = 1,
+            description = "Connection timeout in seconds (default is 10")
+    protected int cqlshOptionRequestTimeout = 20;
+
     
     /** {@inheritDoc}  */
     public void execute() 
@@ -71,7 +81,8 @@ public class DbCqlShellCmd extends AbstractDatabaseCmd {
             CannotStartProcessException, FileSystemException {
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
-                cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace);
+                cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace,
+                cqlshOptionConnectTimeout, cqlshOptionRequestTimeout);
         ServiceCqlShell.getInstance().run(options, db);
     }
     

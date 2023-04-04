@@ -27,11 +27,11 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.iam.role.AstraToken;
 import com.dtsx.astra.cli.iam.role.ServiceRole;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.org.TokensClient;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
 import com.dtsx.astra.sdk.org.domain.Role;
-import com.dtsx.astra.sdk.org.iam.TokenClient;
 import com.dtsx.astra.sdk.utils.Assert;
 
 import java.util.HashMap;
@@ -88,8 +88,8 @@ public class ServiceToken {
      * @return
      *      api devops
      */
-    private OrganizationsClient apiDevopsOrg() {
-        return CliContext.getInstance().getApiDevopsOrganizations();
+    private AstraDevopsApiClient apiDevopsOrg() {
+        return CliContext.getInstance().getApiDevops();
     }
 
     /**
@@ -101,7 +101,9 @@ public class ServiceToken {
      *      token when exist
      */
     public Optional<IamToken> findToken(String clientId) {
-        return apiDevopsOrg().tokens()
+        return apiDevopsOrg()
+                      .tokens()
+                      .findAll()
                       .filter(t -> t.getClientId().equals(clientId))
                       .findFirst();
     }
@@ -126,7 +128,7 @@ public class ServiceToken {
         sht.addColumn(COL_GENERATED_ON,    15);
         sht.addColumn(COL_CLIENT_ID,    20);
         sht.addColumn(COL_ROLES,    30);
-        apiDevopsOrg().tokens().forEach(tok -> {
+        apiDevopsOrg().tokens().findAll().forEach(tok -> {
             Map<String, String> currentLine = new HashMap<>();
             currentLine.put(COL_GENERATED_ON, tok.getGeneratedOn());
             currentLine.put(COL_CLIENT_ID, tok.getClientId());
@@ -158,7 +160,7 @@ public class ServiceToken {
         // Validate that role exists.
         Assert.hasLength(role, "role");
         Role r = ServiceRole.getInstance().get(role);
-        CreateTokenResponse iam = apiDevopsOrg().createToken(r.getId());
+        CreateTokenResponse iam = apiDevopsOrg().tokens().create(r.getId());
         LoggerShell.success("A new token has been created.");
         AstraToken astraToken = new AstraToken(iam.getClientId(), iam.getSecret(), iam.getToken());
         // Display Created token as a table
@@ -178,9 +180,9 @@ public class ServiceToken {
      */
     public void deleteToken(String tokenId) {
         Assert.hasLength(tokenId, "tokenId");
-        TokenClient tokenClient = apiDevopsOrg().token(tokenId);
-        if (tokenClient.find().isPresent()) {
-            tokenClient.delete();
+        TokensClient tokensClient = apiDevopsOrg().tokens();
+        if (tokensClient.exist(tokenId)) {
+            tokensClient.delete(tokenId);
             LoggerShell.success("Your token has been deleted.");
         } else {
             throw new TokenNotFoundException(tokenId);

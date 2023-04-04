@@ -194,3 +194,58 @@ astra db cqlsh sdk_tests -e "select * from ks1.user;"
 
 
 
+
+astra db create db_init -k ks1
+
+astra db cqlsh db_init -e "CREATE TABLE user(id text primary key, name text);insert into user(id, name) VALUES('1', 'cedrick')";
+
+-- Create destination
+
+astra db create db_target -k ks1
+
+-- dump DDL
+
+java -jar /Users/cedricklunven/.astra/dsbulk-migrator-1.0/dsbulk-migrator-1.0-dsbulk.jar generate-ddl \
+--export-bundle=/Users/cedricklunven/dev/work/db2.zip \
+--export-password=AstraCS:uZclXTYecCAqPPjiNmkezapR:e87d6edb702acd87516e4ef78e0c0e515c32ab2c3529f5a3242688034149a0e4 \
+--export-username=token \
+-a
+-k=ks1
+
+-- import ddl
+
+astra db cqlsh sdk_tests -f /Users/cedricklunven/dev/work/data/dsbulk-migrator-ddl-tables.cql
+
+-- create scripts
+
+java -jar /Users/cedricklunven/.astra/dsbulk-migrator-1.0/dsbulk-migrator-1.0-dsbulk.jar generate-script \
+--export-bundle=/Users/cedricklunven/dev/work/db2.zip \
+--export-password=AstraCS:uZclXTYecCAqPPjiNmkezapR:e87d6edb702acd87516e4ef78e0c0e515c32ab2c3529f5a3242688034149a0e4 \
+--export-username=token \
+--import-bundle=/Users/cedricklunven/dev/work/sdk_test.zip \
+--import-password=AstraCS:uZclXTYecCAqPPjiNmkezapR:e87d6edb702acd87516e4ef78e0c0e515c32ab2c3529f5a3242688034149a0e4 \
+--import-username=token \
+--dsbulk-cmd=/Users/cedricklunven/.astra/dsbulk-1.10.0/bin/dsbulk \
+-k=ks1
+
+-- export data
+
+dsbulk-migrator-export.sh
+
+-- import data
+
+dsbulk-migrator-import.sh
+
+-- test
+
+astra db cqlsh sdk_tests -e "select * from ks1.user;"
+
+
+
+
+
+
+
+
+
+

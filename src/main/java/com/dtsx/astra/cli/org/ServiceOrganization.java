@@ -22,9 +22,8 @@ package com.dtsx.astra.cli.org;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
-import com.dtsx.astra.sdk.org.OrganizationsClient;
+import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 
 import java.util.*;
@@ -73,8 +72,8 @@ public class ServiceOrganization {
      * @return
      *      api devops
      */
-    private OrganizationsClient apiDevopsOrg() {
-        return CliContext.getInstance().getApiDevopsOrganizations();
+    private AstraDevopsApiClient apiDevopsOrg() {
+        return CliContext.getInstance().getApiDevops();
     }
 
     /**
@@ -88,22 +87,21 @@ public class ServiceOrganization {
      */
     public void getId() {
 
-        AstraCliConsole.println(apiDevopsOrg().organizationId());
+        AstraCliConsole.println(apiDevopsOrg().getOrganizationId());
     }
     
     /**
      * Return organization name.
      */
     public void getName() {
-
-        AstraCliConsole.println(apiDevopsOrg().organization().getName());
+        AstraCliConsole.println(apiDevopsOrg().getOrganization().getName());
     }
     
     /**
      * Return organization info.
      */
     public void showOrg() {
-        Organization org = apiDevopsOrg().organization();
+        Organization org = apiDevopsOrg().getOrganization();
         ShellTable sht = ShellTable.propertyTable(15, 40);
         sht.addPropertyRow(COLUMN_NAME, org.getName());
         sht.addPropertyRow(COLUMN_ID, org.getId());
@@ -140,13 +138,16 @@ public class ServiceOrganization {
 
     /**
      * List Streaming Region with Cloud - [{name, displayName}]
+     *
      * @return
+     *      a tree of regions
      */
     public TreeMap<String, TreeMap<String, String>> getStreamingRegions() {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         CliContext.getInstance()
                 .getApiDevopsStreaming()
-                .serverlessRegions().forEach(r -> {
+                .regions()
+                .findAllServerless().forEach(r -> {
                     String cloud = r.getCloudProvider().toLowerCase();
                     sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
                     sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());
@@ -165,7 +166,7 @@ public class ServiceOrganization {
     public void listRegionsDbClassic(String cloudProvider, String filter) {
         // Sorting Regions per cloud than region name
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
-        apiDevopsOrg().regions().forEach(r -> {
+        apiDevopsOrg().db().regions().findAll().forEach(r -> {
             String cloud = r.getCloudProvider().toString().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getRegion(), r.getRegionDisplay());
@@ -194,7 +195,7 @@ public class ServiceOrganization {
      */
     public  TreeMap<String, TreeMap<String, String>> getDbServerlessRegions() {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
-        apiDevopsOrg().regionsServerless().forEach(r -> {
+        apiDevopsOrg().db().regions().findAllServerless().forEach(r -> {
             String cloud = r.getCloudProvider().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());
@@ -236,13 +237,14 @@ public class ServiceOrganization {
      * Show a table for the clouds.
      *
      * @param clouds
-     *      list of clourds
+     *      list of clouds
      * @return
+     *      shell table for clouds
      */
     private ShellTable buildShellTableClouds(List<String> clouds) {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD, 10);
-        clouds.stream().forEach( cloud -> {
+        clouds.forEach(cloud -> {
             Map<String, String> rf = new HashMap<>();
             rf.put(COLUMN_CLOUD, cloud);
             sht.getCellValues().add(rf);

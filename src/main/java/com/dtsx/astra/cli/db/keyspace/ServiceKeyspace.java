@@ -135,7 +135,7 @@ public class ServiceKeyspace {
             }
         } else {
             try {
-                dbDao.getRequiredDatabaseClient(databaseName).createKeyspace(keyspaceName);
+                dbDao.getRequiredDatabaseClient(databaseName).keyspaces().create(keyspaceName);
                 LoggerShell.info("%s '%s' is creating.".formatted(KS, keyspaceName));
             } catch(Exception e) {
                 throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,
