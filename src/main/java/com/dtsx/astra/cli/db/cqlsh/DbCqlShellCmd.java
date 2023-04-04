@@ -71,7 +71,7 @@ public class DbCqlShellCmd extends AbstractDatabaseCmd {
 
     /** Cqlsh Options. */
     @Option(name = { "--request-timeout" }, title = "TIMEOUT", arity = 1,
-            description = "Connection timeout in seconds (default is 10")
+            description = "Request timeout in seconds (default is 20")
     protected int cqlshOptionRequestTimeout = 20;
 
     
