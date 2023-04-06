@@ -17,7 +17,7 @@
 		<astra-sdk.version>0.5</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
-		<slf4j.version>2.0.6</slf4j.version>
+		<slf4j.version>2.0.7</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<!-- commons -->
 		<commons-compress.version>1.23.0</commons-compress.version>
