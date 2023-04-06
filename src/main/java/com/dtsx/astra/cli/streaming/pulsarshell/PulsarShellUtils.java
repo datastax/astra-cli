@@ -186,8 +186,8 @@ public class PulsarShellUtils {
             pulsarShCommand.add("--filename");
             pulsarShCommand.add(options.getFileName());
         }
-        
-        LoggerShell.info("RUNNING: " + StringUtils.join(pulsarShCommand, " "));
+
+        LoggerShell.debug("RUNNING: " + StringUtils.join(pulsarShCommand, " "));
         ProcessBuilder pb =  new ProcessBuilder(pulsarShCommand.toArray(new String[0]));
         pb.inheritIO();
         return pb.start();

@@ -407,7 +407,12 @@ public class ServiceDatabase implements AstraColorScheme {
                 rf.put(COLUMN_NAME,    db.getInfo().getName());
                 rf.put(COLUMN_ID,      db.getId());
                 rf.put(COLUMN_DEFAULT_REGION, db.getInfo().getRegion());
-                rf.put(COLUMN_STATUS, StringBuilderAnsi.colored(db.getStatus().name(), getStatusColor(db.getStatus())));
+                String status = db.getStatus().name();
+                // Colored if displayed as table
+                if (CliContext.getInstance().getOutputFormat().equals(OutputFormat.HUMAN)) {
+                    status = StringBuilderAnsi.colored(status, getStatusColor(db.getStatus()));
+                }
+                rf.put(COLUMN_STATUS, status);
                 sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);

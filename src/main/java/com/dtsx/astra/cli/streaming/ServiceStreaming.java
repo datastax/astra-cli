@@ -201,7 +201,8 @@ public class ServiceStreaming implements AstraColorScheme {
                 rf.put(COLUMN_NAME,   tnt.getTenantName());
                 rf.put(COLUMN_CLOUD,  tnt.getCloudProvider());
                 rf.put(COLUMN_REGION, tnt.getCloudRegion());
-                if (!CliContext.getInstance().isNoColor()) {
+                if (!CliContext.getInstance().isNoColor() &&
+                     CliContext.getInstance().getOutputFormat().equals(OutputFormat.HUMAN)) {
                     rf.put(COLUMN_STATUS, StringBuilderAnsi.colored(tnt.getStatus(), getStatusColor(tnt.getStatus())));
                 } else {
                     rf.put(COLUMN_STATUS, tnt.getStatus());
@@ -413,7 +414,7 @@ public class ServiceStreaming implements AstraColorScheme {
                 tenant.getCloudRegion(), 
                 tenant.getPulsarToken(),
                 getPulsarConfFile(tenant).getAbsolutePath());
-        LoggerShell.info("Pulsar client.conf has been generated.");
+        LoggerShell.debug("Pulsar client.conf has been generated.");
     }
     
     /**
@@ -445,7 +446,7 @@ public class ServiceStreaming implements AstraColorScheme {
         createPulsarConf(tenant);
         
         try {
-            AstraCliConsole.println("Pulsar-shell is starting please wait for connection establishment...");
+            LoggerShell.info("Pulsar-shell is starting please wait for connection establishment...");
             Process cqlShProcess = PulsarShellUtils.runPulsarShell(options, getPulsarConfFile(tenant));
             cqlShProcess.waitFor();
         } catch (Exception e) {

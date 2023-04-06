@@ -144,10 +144,6 @@ public class ServiceCqlShell {
             cqlSh.add("--debug");
         if (options.version())
             cqlSh.add("--version");
-        if (options.execute() != null) {
-            cqlSh.add("-e");
-            cqlSh.add("\"" + options.execute() + "\"");
-        }
         if (options.file() != null) {
             cqlSh.add("-f");
             cqlSh.add(options.file());
@@ -163,6 +159,10 @@ public class ServiceCqlShell {
         // Timeout
         cqlSh.add("--connect-timeout");cqlSh.add(String.valueOf(options.connectTimeout()));
         cqlSh.add("--request-timeout");cqlSh.add(String.valueOf(options.requestTimeout()));
+        if (options.execute() != null) {
+            cqlSh.add("-e");
+            cqlSh.add(options.execute());
+        }
         return cqlSh;
     }
     
@@ -180,8 +180,8 @@ public class ServiceCqlShell {
         if (!isInstalled()) install();
         
         // Download scb and throw DatabaseNotFound.
-        dbDao.downloadCloudSecureBundles(database);    
-        
+        dbDao.downloadCloudSecureBundles(database);
+
         try {
             List <String > commands = buildCommandLine(options, dbDao.getDatabase(database));
             LoggerShell.debug("RUNNING: " + String.join(" ", commands));

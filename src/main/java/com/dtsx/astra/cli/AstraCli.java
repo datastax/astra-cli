@@ -213,7 +213,6 @@ public class AstraCli {
      */
     public static ExitCode run(Class<?> clazz, String[] args) {
         try {
-            
             // Persist command line to log it later
             CliContext.getInstance().setArguments(Arrays.asList(args));
             

@@ -123,4 +123,23 @@ public class FileUtils {
             throw new IllegalArgumentException("Cannot download file:%s".formatted(e.getMessage()), e);
         }
     }
+
+    /**
+     * Delete Directory.
+     *
+     * @param directoryToBeDeleted
+     *      directory to be deleted
+     */
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        if (directoryToBeDeleted == null || !directoryToBeDeleted.exists()) {
+            return false;
+        }
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
+    }
 }

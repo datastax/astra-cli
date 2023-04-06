@@ -105,4 +105,8 @@ public abstract class AbstractCmdTest {
         Assertions.assertEquals(code, runCli(cmd));
     }
 
+    protected static void assertSuccessCql(String db, String query) {
+        assertSuccessCli("db", "cqlsh",db, "-e", query);
+    }
+
 }

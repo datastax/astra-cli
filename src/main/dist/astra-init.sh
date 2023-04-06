@@ -2199,7 +2199,7 @@ function _complete_astra_group_db_command_createcdc() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
-      -p, --partition)
+      -p)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
