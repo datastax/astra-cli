@@ -132,10 +132,13 @@
   },
 
 
-
-
   {
     "name":"com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.keyspace.DbDeleteKeyspaceCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -251,6 +254,11 @@
   },
   {
     "name":"com.dtsx.astra.cli.iam.token.TokenRevokeCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.iam.token.TokenGetCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },

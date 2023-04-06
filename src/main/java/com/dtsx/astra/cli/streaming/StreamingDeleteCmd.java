@@ -20,7 +20,7 @@ package com.dtsx.astra.cli.streaming;
  * #L%
  */
 
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
+import com.dtsx.astra.sdk.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 
 /**

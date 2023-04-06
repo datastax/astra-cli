@@ -30,7 +30,9 @@ import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseInfo;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.exception.KeyspaceNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -144,5 +146,27 @@ public class ServiceKeyspace {
         }
     }
 
+
+    /**
+     * Delete a keyspace if exists.
+     *
+     * @param databaseName
+     *      db name
+     * @param keyspaceName
+     *      ks name
+     * @throws DatabaseNameNotUniqueException
+     *      error if db name is not unique
+     * @throws DatabaseNotFoundException
+     *      error is db is not found
+     * @throws InvalidArgumentException
+     *      invalid parameter
+     * @throws KeyspaceNotFoundException
+     *      keyspace does not exist
+     */
+    public void deleteKeyspace(String databaseName, String keyspaceName)
+    throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
+            InvalidArgumentException, KeyspaceNotFoundException {
+        dbDao.getRequiredDatabaseClient(databaseName).keyspaces().delete(keyspaceName);
+    }
 
 }

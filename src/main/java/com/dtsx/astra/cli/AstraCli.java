@@ -38,22 +38,22 @@ import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.dtsx.astra.cli.db.exception.*;
 import com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
+import com.dtsx.astra.cli.db.keyspace.DbDeleteKeyspaceCmd;
 import com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd;
 import com.dtsx.astra.cli.db.list.DbListCloudsCmd;
 import com.dtsx.astra.cli.db.list.DbListCmd;
 import com.dtsx.astra.cli.db.list.DbListRegionsClassicCmd;
 import com.dtsx.astra.cli.db.list.DbListRegionsServerlessCmd;
-import com.dtsx.astra.cli.db.region.*;
+import com.dtsx.astra.cli.db.region.DbCreateRegionCmd;
+import com.dtsx.astra.cli.db.region.DbDeleteRegionCmd;
+import com.dtsx.astra.cli.db.region.DbListRegionsCmd;
 import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
 import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
 import com.dtsx.astra.cli.iam.role.RoleDescribeCmd;
 import com.dtsx.astra.cli.iam.role.RoleGetCmd;
 import com.dtsx.astra.cli.iam.role.RoleListCmd;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
-import com.dtsx.astra.cli.iam.token.TokenCreateCmd;
-import com.dtsx.astra.cli.iam.token.TokenDeleteCmd;
-import com.dtsx.astra.cli.iam.token.TokenListCmd;
-import com.dtsx.astra.cli.iam.token.TokenRevokeCmd;
+import com.dtsx.astra.cli.iam.token.*;
 import com.dtsx.astra.cli.iam.user.*;
 import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
 import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
@@ -62,12 +62,12 @@ import com.dtsx.astra.cli.org.OrgIdCmd;
 import com.dtsx.astra.cli.org.OrgNameCmd;
 import com.dtsx.astra.cli.streaming.*;
 import com.dtsx.astra.cli.streaming.cdc.StreamingListCdcCmd;
-import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellCmd;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.sdk.db.exception.ChangeDataCaptureNotFoundException;
 import com.dtsx.astra.sdk.db.exception.RegionNotFoundException;
+import com.dtsx.astra.sdk.streaming.exception.TenantAlreadyExistException;
+import com.dtsx.astra.sdk.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Group;
 import com.github.rvesse.airline.help.Help;
@@ -117,7 +117,7 @@ import java.util.Arrays;
          // Operation
          DbResumeCmd.class, DbDownloadScbCmd.class, DbCreateDotEnvCmd.class,
          // Keyspaces
-         DbCreateKeyspaceCmd.class, DbListKeyspacesCmd.class,
+         DbCreateKeyspaceCmd.class, DbDeleteKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // Regions
          DbCreateRegionCmd.class, DbListRegionsCmd.class, DbDeleteRegionCmd.class,
          // DB Service Regions and Cloud
@@ -172,9 +172,9 @@ import java.util.Arrays;
     @Group(
        name= "token",
        description = "Manage tokens",
-       defaultCommand = TokenListCmd.class,
+       defaultCommand = TokenGetCmd.class,
        commands = {
-         TokenListCmd.class, TokenCreateCmd.class, TokenDeleteCmd.class, TokenRevokeCmd.class
+         TokenListCmd.class, TokenGetCmd.class, TokenCreateCmd.class, TokenDeleteCmd.class, TokenRevokeCmd.class
      })
 })
 public class AstraCli {

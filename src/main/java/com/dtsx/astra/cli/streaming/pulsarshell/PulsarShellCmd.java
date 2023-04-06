@@ -24,7 +24,7 @@ import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.core.exception.CannotStartProcessException;
 import com.dtsx.astra.cli.core.exception.FileSystemException;
 import com.dtsx.astra.cli.streaming.ServiceStreaming;
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
+import com.dtsx.astra.sdk.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;

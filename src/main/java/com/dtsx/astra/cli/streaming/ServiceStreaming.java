@@ -28,8 +28,6 @@ import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
 import com.dtsx.astra.cli.core.exception.InvalidRegionException;
 import com.dtsx.astra.cli.core.out.*;
 import com.dtsx.astra.cli.org.ServiceOrganization;
-import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
@@ -38,6 +36,8 @@ import com.dtsx.astra.sdk.streaming.TenantClient;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
 import com.dtsx.astra.sdk.streaming.domain.StreamingRegion;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
+import com.dtsx.astra.sdk.streaming.exception.TenantAlreadyExistException;
+import com.dtsx.astra.sdk.streaming.exception.TenantNotFoundException;
 import com.dtsx.astra.sdk.utils.Assert;
 
 import java.io.File;

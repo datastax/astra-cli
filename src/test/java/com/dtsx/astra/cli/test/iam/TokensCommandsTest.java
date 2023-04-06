@@ -16,6 +16,13 @@ public class TokensCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(1)
+    public void should_show_token() {
+        assertSuccessCli("token");
+        assertSuccessCli("token get");
+    }
+
+    @Test
+    @Order(2)
     public void should_list_token() {
         assertSuccessCli("token list");
         assertSuccessCli("token list -v");
@@ -25,7 +32,7 @@ public class TokensCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     public void should_list_token_errors() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "token list -w");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "token list DB");
@@ -34,7 +41,7 @@ public class TokensCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void should_create_delete_token() {
         // Given
         assertSuccessCli("token list");
@@ -51,7 +58,7 @@ public class TokensCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @DisplayName("Create a token a revoke it")
     public void createAndRevokeTokenTest() {
         // Given

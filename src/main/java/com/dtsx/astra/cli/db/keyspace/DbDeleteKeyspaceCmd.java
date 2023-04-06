@@ -33,8 +33,8 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 /**
  * Delete a DB if it exists.
  */
-@Command(name = "create-keyspace", description = "Create a new keyspace")
-public class DbCreateKeyspaceCmd extends AbstractDatabaseCmd {
+@Command(name = "delete-keyspace", description = "Delete an existing keyspace")
+public class DbDeleteKeyspaceCmd extends AbstractDatabaseCmd {
    
     /** Provide a keyspace Name. */
     @Required
@@ -43,11 +43,6 @@ public class DbCreateKeyspaceCmd extends AbstractDatabaseCmd {
             arity = 1,  
             description = "Name of the keyspace to create")
     public String keyspace;
-    
-    /** Cqlsh Options. */
-    @Option(name = { "--if-not-exist" }, 
-            description = "will create a new DB only if none with same name")
-    protected boolean ifNotExist = false;
 
     /**
      * Will wait until the database become ACTIVE.
@@ -72,7 +67,7 @@ public class DbCreateKeyspaceCmd extends AbstractDatabaseCmd {
     
     /** {@inheritDoc}  */
     public void execute() {
-        ServiceKeyspace.getInstance().createKeyspace(db, keyspace, ifNotExist);
+        ServiceKeyspace.getInstance().deleteKeyspace(db, keyspace);
         if (!async) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);

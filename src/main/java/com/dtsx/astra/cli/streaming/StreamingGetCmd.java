@@ -21,7 +21,7 @@ package com.dtsx.astra.cli.streaming;
  */
 
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
-import com.dtsx.astra.cli.streaming.exception.TenantNotFoundException;
+import com.dtsx.astra.sdk.streaming.exception.TenantNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 

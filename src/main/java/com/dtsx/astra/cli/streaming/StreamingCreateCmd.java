@@ -21,7 +21,6 @@ package com.dtsx.astra.cli.streaming;
  */
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.streaming.exception.TenantAlreadyExistException;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
