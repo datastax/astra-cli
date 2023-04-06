@@ -46,17 +46,17 @@ static String TENANT_TEST   = "cdc" + UUID.randomUUID()
     @Order(1)
     public void shouldCreateCdcs() throws InterruptedException {
         assertSuccessCli("db create-cdc %s -k %s --table demo --tenant %s -v".formatted(DB_TEST, DB_TEST, TENANT_TEST));
-
         assertSuccessCli("db create-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, TENANT_TEST));
-        Thread.sleep(1000);
-        Assertions.assertEquals(2, dbClient.cdc().findAll().toList().size());
-        Assertions.assertEquals(2, tenantClient.cdc().list());
+        Assertions.assertEquals(2L, dbClient.cdc().findAll().count());
+        Assertions.assertEquals(2L, tenantClient.cdc().list().count());
     }
 
     @Test
     @Order(2)
     public void shouldInsertDataWithCdc() {
-        assertSuccessCli("db cqlsh %s -k %s -e \"INSERT INTO demo(foo,bar) VALUES('2','2');\"".formatted(DB_TEST, DB_TEST));
+        if (!disableTools) {
+            assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_insert.cql".formatted(DB_TEST));
+        }
     }
 
     @Test

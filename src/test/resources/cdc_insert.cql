@@ -1,0 +1,1 @@
+INSERT INTO astra_cli_test.demo(foo,bar) VALUES('2','2');
