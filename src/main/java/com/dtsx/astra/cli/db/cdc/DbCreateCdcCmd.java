@@ -21,7 +21,7 @@ package com.dtsx.astra.cli.db.cdc;
  */
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
+import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -29,7 +29,7 @@ import com.github.rvesse.airline.annotations.Option;
  * Delete a DB is exist.
  */
 @Command(name = "create-cdc", description = "Create a CDC to pulsar")
-public class DbCreateCdcCmd extends AbstractDatabaseCmd {
+public class DbCreateCdcCmd extends AbstractDatabaseCmdAsync {
 
     /**
      * keyspace.
@@ -56,13 +56,9 @@ public class DbCreateCdcCmd extends AbstractDatabaseCmd {
     protected int partitionTopics = 3;
 
     /** {@inheritDoc} */
-    public void execute() {
+    public void executeAsync() {
         LoggerShell.info("Creating cdc from keyspace/table/tenant..");
-        try {
-            ServiceCdc.getInstance().createCdc(db, keyspace, table, tenant, partitionTopics);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        ServiceCdc.getInstance().createCdc(db, keyspace, table, tenant, partitionTopics);
     }
     
 }

@@ -17,14 +17,12 @@ import java.util.UUID;
  * Test commands relative to CDC.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DbCdcCommandsTest extends AbstractCmdTest {
+public class DbCdcCommandsTest  extends AbstractCmdTest {
 
     /** Logger for my test. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DbCdcCommandsTest.class);
 
-    static String DB_TEST       = "astra_cli_test";
-    static String KEYSPACE_TEST = "ks1";
-    static String TENANT_TEST   = "cdc" + UUID.randomUUID()
+static String TENANT_TEST   = "cdc" + UUID.randomUUID()
             .toString().replaceAll("-", "")
             .substring(0, 12);
 
@@ -33,13 +31,12 @@ public class DbCdcCommandsTest extends AbstractCmdTest {
 
     @BeforeAll
     public static void shouldInitializeEnvironment() {
-        TENANT_TEST= "cdca8aefbb2690b";
-        // Create DB
-        //assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, KEYSPACE_TEST));
+        // Create DB and keyspace with
+        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
         // Create TENANT
-        assertSuccessCli("streaming create %s --if-not-exist".formatted(TENANT_TEST));
+        assertSuccessCli("streaming create %s --cloud gcp --region useast1 --if-not-exist".formatted(TENANT_TEST));
         // Create SCHEMA
-        //assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST, KEYSPACE_TEST));
+        assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
         // Access DbClient
         dbClient     = ctx().getApiDevopsDatabases().databaseByName(DB_TEST);
         tenantClient = ctx().getApiDevopsStreaming().tenant(TENANT_TEST);
@@ -48,8 +45,9 @@ public class DbCdcCommandsTest extends AbstractCmdTest {
     @Test
     @Order(1)
     public void shouldCreateCdcs() throws InterruptedException {
-        assertSuccessCli("db create-cdc %s -k %s --table demo --tenant %s -v".formatted(DB_TEST, KEYSPACE_TEST, TENANT_TEST));
-        assertSuccessCli("db create-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, KEYSPACE_TEST, TENANT_TEST));
+        assertSuccessCli("db create-cdc %s -k %s --table demo --tenant %s -v".formatted(DB_TEST, DB_TEST, TENANT_TEST));
+
+        assertSuccessCli("db create-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, TENANT_TEST));
         Thread.sleep(1000);
         Assertions.assertEquals(2, dbClient.cdc().findAll().toList().size());
         Assertions.assertEquals(2, tenantClient.cdc().list());
@@ -58,7 +56,7 @@ public class DbCdcCommandsTest extends AbstractCmdTest {
     @Test
     @Order(2)
     public void shouldInsertDataWithCdc() {
-        assertSuccessCli("db cqlsh %s -k ks1 -e \"INSERT INTO demo(foo,bar) VALUES('2','2');\"".formatted(DB_TEST));
+        assertSuccessCli("db cqlsh %s -k %s -e \"INSERT INTO demo(foo,bar) VALUES('2','2');\"".formatted(DB_TEST, DB_TEST));
     }
 
     @Test
@@ -86,7 +84,7 @@ public class DbCdcCommandsTest extends AbstractCmdTest {
     public void shouldDeleteCdcById() {
         // Given
         Assertions.assertEquals(2, dbClient.cdc().findAll().toList().size());
-        Optional<CdcDefinition> cdc = dbClient.cdc().findByDefinition("ks1", "demo", TENANT_TEST);
+        Optional<CdcDefinition> cdc = dbClient.cdc().findByDefinition(DB_TEST, "demo", TENANT_TEST);
         Assert.assertTrue(cdc.isPresent());
         // When (id is valid)
         Assert.assertTrue(dbClient.cdc().findById(cdc.get().getConnectorName()).isPresent());
@@ -102,14 +100,14 @@ public class DbCdcCommandsTest extends AbstractCmdTest {
         // Given
         Assertions.assertEquals(1, dbClient.cdc().findAll().toList().size());
         // When
-        assertSuccessCli( "db delete-cdc %s -k ks1 --table table2 --tenant %s".formatted(DB_TEST, TENANT_TEST));
+        assertSuccessCli( "db delete-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, TENANT_TEST));
         // Then
         Assertions.assertEquals(0, dbClient.cdc().findAll().toList().size());
     }
 
     @AfterAll
     public static void cleanUp() {
-        //assertSuccessCli("streaming delete %s".formatted(TENANT_TEST));
+        assertSuccessCli("streaming delete %s".formatted(TENANT_TEST));
     }
 
 }

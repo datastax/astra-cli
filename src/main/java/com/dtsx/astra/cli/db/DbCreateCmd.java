@@ -21,14 +21,12 @@ package com.dtsx.astra.cli.db;
  */
 
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
-import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
-import com.dtsx.astra.cli.core.exception.InvalidRegionException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.cli.db.exception.KeyspaceAlreadyExistException;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
+import com.dtsx.astra.sdk.db.exception.KeyspaceAlreadyExistException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -90,7 +88,7 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
            InvalidDatabaseStateException, InvalidArgumentException,
-           KeyspaceAlreadyExistException {
+            KeyspaceAlreadyExistException {
 
         dbServices.validateCloudAndRegion(cloud, region);
         dbServices.createDb(db, region, keyspace, ifNotExist);

@@ -33,6 +33,8 @@ import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
 import com.dtsx.astra.sdk.db.DatabaseClient;
 import com.dtsx.astra.sdk.db.domain.*;
+import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
+import com.dtsx.astra.sdk.db.exception.KeyspaceAlreadyExistException;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.Assert;
@@ -308,8 +310,8 @@ public class ServiceDatabase implements AstraColorScheme {
      */
     public void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist) 
     throws DatabaseAlreadyExistException, DatabaseNotFoundException,
-           InvalidDatabaseStateException, InvalidArgumentException, 
-           KeyspaceAlreadyExistException {
+           InvalidDatabaseStateException, InvalidArgumentException,
+            KeyspaceAlreadyExistException {
         
         // Parameter Validations
         Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()

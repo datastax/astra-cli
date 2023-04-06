@@ -20,12 +20,7 @@ package com.dtsx.astra.cli.db.keyspace;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
-import com.dtsx.astra.cli.db.ServiceDatabase;
-import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
-import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -34,7 +29,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * Delete a DB if it exists.
  */
 @Command(name = "delete-keyspace", description = "Delete an existing keyspace")
-public class DbDeleteKeyspaceCmd extends AbstractDatabaseCmd {
+public class DbDeleteKeyspaceCmd extends AbstractDatabaseCmdAsync {
    
     /** Provide a keyspace Name. */
     @Required
@@ -44,37 +39,9 @@ public class DbDeleteKeyspaceCmd extends AbstractDatabaseCmd {
             description = "Name of the keyspace to create")
     public String keyspace;
 
-    /**
-     * Will wait until the database become ACTIVE.
-     */
-    @Option(name = { "--wait" },
-            description = "Will wait until the database become ACTIVE")
-    protected boolean wait = true;
-
-    /**
-     * Will wait until the database become ACTIVE.
-     */
-    @Option(name = { "--async" },
-            description = "Will not wait for the database to become ACTIVE")
-    protected boolean async = false;
-
-    /**
-     * Provide a limit to the wait period in seconds, default is 180s.
-     */
-    @Option(name = { "--timeout" },
-            description = "Provide a limit to the wait period in seconds, default is 300s.")
-    protected int timeout = ServiceDatabase.DEFAULT_TIMEOUT_SECONDS;
-    
     /** {@inheritDoc}  */
-    public void execute() {
+    public void executeAsync() {
         ServiceKeyspace.getInstance().deleteKeyspace(db, keyspace);
-        if (!async) {
-            switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
-                case NOT_FOUND -> throw new DatabaseNotFoundException(db);
-                case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.MAINTENANCE);
-                default -> LoggerShell.success("Database '%s' is ready.".formatted(db));
-            }
-        }
     }
     
 }

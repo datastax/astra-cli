@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.keyspace;
+package com.dtsx.astra.cli.db;
 
 /*-
  * #%L
@@ -21,43 +21,40 @@ package com.dtsx.astra.cli.db.keyspace;
  */
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
-import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
- * Delete a DB if it exists.
+ * Abstraction for DB Commands.
  */
-@Command(name = "create-keyspace", description = "Create a new keyspace")
-public class DbCreateKeyspaceCmd extends AbstractDatabaseCmdAsync {
-   
-    /** Provide a keyspace Name. */
-    @Required
-    @Option(name = {"-k", "--keyspace" }, 
-            title = "KEYSPACE", 
-            arity = 1,  
-            description = "Name of the keyspace to create")
-    public String keyspace;
-    
-    /** Cqlsh Options. */
-    @Option(name = { "--if-not-exist" }, 
-            description = "will create a new DB only if none with same name")
-    protected boolean ifNotExist = false;
+public abstract class AbstractDatabaseCmdAsync extends AbstractDatabaseCmd {
 
     /**
      * Will wait until the database become ACTIVE.
      */
-    @Option(name = { "--wait" },
-            description = "Will wait until the database become ACTIVE")
-    protected boolean wait = true;
+    @Option(name = { "--async" },
+            description = "Will not wait for the database to become ACTIVE")
+    protected boolean async = false;
 
-    /** {@inheritDoc}  */
-    public void executeAsync() {
-        ServiceKeyspace.getInstance().createKeyspace(db, keyspace, ifNotExist);
+    /**
+     * Provide a limit to the wait period in seconds, default is 180s.
+     */
+    @Option(name = { "--timeout" },
+            description = "Provide a limit to the wait period in seconds, default is 300s.")
+    protected int timeout = ServiceDatabase.DEFAULT_TIMEOUT_SECONDS;
+
+    /**
+     * Function to be implemented by terminal class.
+     */
+    protected abstract void executeAsync();
+
+    /**
+     * Execute and then wait for the DB to become Active.
+     */
+    public void execute() {
+        executeAsync();
         if (!async) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);

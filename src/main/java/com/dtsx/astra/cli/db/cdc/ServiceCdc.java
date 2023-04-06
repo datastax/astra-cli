@@ -24,9 +24,9 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.out.*;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.db.AstraDbClient;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 
 import java.util.HashMap;

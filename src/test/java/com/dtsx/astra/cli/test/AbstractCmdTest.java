@@ -22,6 +22,8 @@ public abstract class AbstractCmdTest {
     /** Use to disable usage of CqlSh, Dsbulk and other during test for CI/CD. */
     public final static String FLAG_TOOLS = "disable_tools";
 
+    public static String DB_TEST = "astra_cli_test";
+
     /** flag coding for tool disabling. */
     public static boolean disableTools = false;
 

@@ -21,6 +21,10 @@ package com.dtsx.astra.cli.db;
  */
 
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
+import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 
@@ -47,6 +51,20 @@ public abstract class AbstractDatabaseCmd extends AbstractConnectedCmd {
      */
     public String getDb() {
         return db;
+    }
+
+    /**
+     * Wait for current database to get back to active state.
+     *
+     * @param timeout
+     *      current timeout
+     */
+    protected void waitForDb(int timeout) {
+       switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
+                case NOT_FOUND -> throw new DatabaseNotFoundException(db);
+                case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.MAINTENANCE);
+                default -> LoggerShell.success("Database '%s' is ready.".formatted(db));
+       }
     }
     
     

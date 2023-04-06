@@ -26,8 +26,6 @@ import java.util.UUID;
  */
 @TestMethodOrder(OrderAnnotation.class)
 public class DbCommandsTest extends AbstractCmdTest {
-    
-    static String DB_TEST = "astra_cli_test";
 
     @BeforeAll
     public static void should_create_when_needed() {
