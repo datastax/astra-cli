@@ -14,7 +14,7 @@
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<astra-sdk.version>0.4.1-SNAPSHOT</astra-sdk.version>
+		<astra-sdk.version>0.5</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.6</slf4j.version>
@@ -82,6 +82,13 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<version>${commons-compress.version}</version>
+		</dependency>
+
+		<!-- Adding JSR310 as not part of JDK17 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.14.2</version>
 		</dependency>
 		
 		<!-- Unit tests -->

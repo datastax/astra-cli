@@ -40,7 +40,7 @@ public class DbSwaggerUICmd extends AbstractDatabaseCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        AstraCliConsole.outputSuccess(dbServices.swaggerUrl(db, region));
+        AstraCliConsole.println(dbServices.swaggerUrl(db, region));
     }
 
 }

@@ -28,7 +28,7 @@ public class StreamingCommandTest extends AbstractCmdTest {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
+        Assertions.assertTrue(ctx().getApiDevopsStreaming().exist(RANDOM_TENANT));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class StreamingCommandTest extends AbstractCmdTest {
         // When
         assertSuccessCli("streaming exist " + RANDOM_TENANT);
         // Then
-        Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
+        Assertions.assertTrue(ctx().getApiDevopsStreaming().exist(RANDOM_TENANT));
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "streaming create " + RANDOM_TENANT);
     }
     
@@ -123,14 +123,14 @@ public class StreamingCommandTest extends AbstractCmdTest {
     @Order(9)
     public void shouldDeleteTenantTest() throws InterruptedException {
         // Given
-        Assertions.assertTrue(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
+        Assertions.assertTrue(ctx().getApiDevopsStreaming().exist(RANDOM_TENANT));
         // When
         assertSuccessCli("streaming delete " + RANDOM_TENANT);
         // Operation is "almost" instantaneous but little tempo to avoid failing test
         Thread.sleep(500);
         // Then
         assertSuccessCli("streaming exist " + RANDOM_TENANT);
-        Assertions.assertFalse(ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist());
+        Assertions.assertFalse(ctx().getApiDevopsStreaming().exist(RANDOM_TENANT));
     }
     
     @Test
@@ -141,7 +141,7 @@ public class StreamingCommandTest extends AbstractCmdTest {
 
     @AfterAll
     public static void testShouldDeleteTemporaryTenant() {
-        if (ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT).exist()) {
+        if (ctx().getApiDevopsStreaming().exist(RANDOM_TENANT)) {
             assertSuccessCli("streaming delete " + RANDOM_TENANT);
         }
     }

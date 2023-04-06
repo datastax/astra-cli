@@ -73,18 +73,17 @@ public class StreamingCreateCmd extends AbstractStreamingCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
-        CreateTenant ct = new CreateTenant();
+        CreateTenant.Builder builder = CreateTenant.builder();
         if (!StringUtils.isEmpty(cluster)) {
             LoggerShell.info("Using dedicated cluster '%s' (cloud and region will be ignored)".formatted(cluster));
-            ct.setClusterName(cluster);
+            builder.clusterName(cluster);
         } else {
-            ct.setCloudProvider(cloudProvider);
-            ct.setCloudRegion(cloudRegion);
+            builder.cloudProvider(cloudProvider).cloudRegion(cloudRegion);
         }
-        ct.setPlan(plan);
-        ct.setUserEmail(email);
-        ct.setTenantName(getTenant());
-        ServiceStreaming.getInstance().createStreamingTenant(ct, ifNotExist);
+        builder.plan(plan)
+               .userEmail(email)
+               .tenantName(getTenant());
+        ServiceStreaming.getInstance().createStreamingTenant(builder.build(), ifNotExist);
     }
     
 

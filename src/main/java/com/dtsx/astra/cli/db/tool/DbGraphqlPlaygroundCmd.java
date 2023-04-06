@@ -40,7 +40,7 @@ public class DbGraphqlPlaygroundCmd extends AbstractDatabaseCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        AstraCliConsole.outputSuccess(dbServices.graphQLPlayground(db, region));
+        AstraCliConsole.println(dbServices.graphQLPlayground(db, region));
     }
 
 }

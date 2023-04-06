@@ -100,36 +100,6 @@ public class ServiceCqlShell {
     }
 
     /**
-     * Waiting for a fix at Cqlsh-Astra system
-     */
-    public void patchCqlshInstallation() {
-        String workingDirectory = cqlshLocalFolder.getAbsolutePath() + File.separator + "bin" + File.separator;
-        File originalCqlsh = new File(cqlshExecutable);
-        File originalCqlshRenamed = new File(workingDirectory + "cqlsh_old");
-        boolean renamedTo = originalCqlsh.renameTo(originalCqlshRenamed);
-        if (!renamedTo) {
-            throw new FileSystemException("Cannot rename cqlsh executable to path it.");
-        }
-        try(FileInputStream fis = new FileInputStream(originalCqlshRenamed)) {
-            try(BufferedReader in = new BufferedReader(new InputStreamReader(fis))) {
-                try(FileWriter fw = new FileWriter(originalCqlsh, true)) {
-                    try(BufferedWriter out = new BufferedWriter(fw)) {
-                        String aLine;
-                        while ((aLine = in.readLine()) != null) {
-                            out.write(aLine.replace(VERSION_TO_REPLACE, VERSION_REPLACED));
-                            out.newLine();
-                        }
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new FileSystemException("Cannot find cql file to patch it", e);
-        } catch (IOException e) {
-            throw new FileSystemException("Cannot edit cql executable to patch it", e);
-        }
-    }
-
-    /**
      * Download tar archive and decompress.
      */
     public void install() {
@@ -140,7 +110,6 @@ public class ServiceCqlShell {
 
             LoggerShell.info("Installing  archive, please wait...");
             FileUtils.extractTarArchiveInAstraCliHome(new File(tarArchive));
-            patchCqlshInstallation();
             if (!new File(cqlshExecutable).setExecutable(true, false)) {
                 throw new FileSystemException("Cannot make cqlshell executable. ");
             }
