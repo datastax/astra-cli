@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 PRG="$0"
@@ -14,5 +15,22 @@ done
 BINDIR=$(dirname "$PRG")
 export ASTRA_HOME=`cd -P $BINDIR/..;pwd`
 
+if type -p java > /dev/null; then
+    _java=java
+elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
+    _java="$JAVA_HOME/bin/java"
+else
+    echo Java has not been found. Java17+ is required to run astra-cli installed with homebrew
+fi
+
 cd "$ASTRA_HOME"
-java -jar $ASTRA_HOME/libexec/astra-cli.jar "$@"
+if [[ "$_java" ]]; then
+    version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    if [[ "$version" > "16" ]]; then
+        cd "$ASTRA_HOME"
+        source $ASTRA_HOME/libexec/astra-init.sh
+        java -jar $ASTRA_HOME/libexec/astra-cli.jar "$@"
+    else
+        echo Java17+ is required to run astra-cli but "$version" was used, please update
+    fi
+fi
