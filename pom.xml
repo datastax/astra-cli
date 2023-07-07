@@ -14,7 +14,7 @@
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<astra-sdk.version>0.5</astra-sdk.version>
+		<astra-sdk.version>0.6.3</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.7</slf4j.version>
