@@ -48,6 +48,7 @@ public class ConfigUseCmd extends AbstractCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
+        sectionName = removeQuotesIfAny(sectionName);
         ServiceConfig.assertSectionExist(sectionName);
         ctx().getConfiguration().copySection(sectionName, AstraConfiguration.ASTRARC_DEFAULT);
         ctx().getConfiguration().save();

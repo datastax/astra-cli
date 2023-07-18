@@ -630,7 +630,7 @@ function _complete_astra_group_db_command_create() {
   PREV_WORD=${COMP_WORDS[COMP_CWORD-1]}
   COMMANDS=$1
 
-  FLAG_OPTS="--no-color --async --if-not-exist -v --verbose --wait --if-not-exists"
+  FLAG_OPTS="--no-color --async --vector --if-not-exist -v --verbose --wait --if-not-exists"
   ARG_OPTS="--token --keyspace --region --config-file -o -r --timeout --config -cf -c -conf --cloud -k --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
@@ -2199,7 +2199,7 @@ function _complete_astra_group_db_command_createcdc() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
-      -p)
+      -p, --partition)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0

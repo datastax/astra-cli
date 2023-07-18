@@ -295,6 +295,8 @@ public class ServiceDatabase implements AstraColorScheme {
      *      db region
      * @param keyspace
      *      db ks
+     * @param vectorSearch
+     *      enable vector search
      * @param ifNotExist
      *      will create if needed
      * @throws DatabaseAlreadyExistException
@@ -308,7 +310,7 @@ public class ServiceDatabase implements AstraColorScheme {
      * @throws InvalidDatabaseStateException
      *      database is hibernating or error state, cannot proceed 
      */
-    public void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist) 
+    public void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist, boolean vectorSearch)
     throws DatabaseAlreadyExistException, DatabaseNotFoundException,
            InvalidDatabaseStateException, InvalidArgumentException,
             KeyspaceAlreadyExistException {

@@ -83,6 +83,8 @@ public abstract class AbstractCmd implements Runnable, AstraColorScheme {
     
     /** {@inheritDoc} */
     public void run() {
+        configFilename = removeQuotesIfAny(configFilename);
+        output = removeQuotesIfAny(output);
         validateOptions();
         ctx().init(new CoreOptions(verbose, noColor, OutputFormat.valueOf(output.toUpperCase()), configFilename));
         execute();
@@ -97,7 +99,22 @@ public abstract class AbstractCmd implements Runnable, AstraColorScheme {
             throw new ParseRestrictionViolatedException("Invalid option value (-o, --output), expecting human,json or csv");
         }
     }
-    
+
+    /**
+     * Remove quotes on arguments.
+     *
+     * @param arg
+     *      argument
+     * @return
+     *     argument without quotes
+     */
+    protected String removeQuotesIfAny(String arg) {
+        if (arg!= null && arg.startsWith("\"") && arg.endsWith("\"")) {
+            return arg.substring(1, arg.length() - 1);
+        }
+        return arg;
+    }
+
     /**
      * Function to be implemented by terminal class.
      */

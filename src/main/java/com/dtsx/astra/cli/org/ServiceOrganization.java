@@ -47,6 +47,7 @@ public class ServiceOrganization {
     public static final String COLUMN_REGION_NAME = "Region";
     /** column names. */
     public static final String COLUMN_REGION_DISPLAY= "Full Name";
+    public static Set<String> FREE_TIER_REGIONS = Set.of("us-east1");
 
     /**
      * Singleton pattern.
@@ -164,7 +165,7 @@ public class ServiceOrganization {
      *      name of filter
      */
     public void listRegionsDbClassic(String cloudProvider, String filter) {
-        // Sorting Regions per cloud than region name
+        // Sort regions per cloud then  name
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         apiDevopsOrg().db().regions().findAll().forEach(r -> {
             String cloud = r.getCloudProvider().toString().toLowerCase();
@@ -217,14 +218,18 @@ public class ServiceOrganization {
      */
     private ShellTable buildShellTable(String cloudProvider, String filter, TreeMap<String, TreeMap<String, String>> sortedRegion) {
         ShellTable sht = new ShellTable();
-        sht.addColumn(COLUMN_CLOUD,          10);
+        sht.addColumn(COLUMN_CLOUD,          16);
         sht.addColumn(COLUMN_REGION_NAME,    20);
         sht.addColumn(COLUMN_REGION_DISPLAY, 30);
         sortedRegion.forEach((cloud, treemap) -> treemap.forEach((region, name) -> {
             Map<String, String> rf = new HashMap<>();
             if ((cloudProvider == null || cloudProvider.equalsIgnoreCase(cloud)) &&
                 (filter == null || region.contains(filter) || name.contains(filter))) {
-                    rf.put(COLUMN_CLOUD, cloud);
+                    if (FREE_TIER_REGIONS.contains(region)) {
+                        rf.put(COLUMN_CLOUD, cloud + " (free-tier)");
+                    } else {
+                        rf.put(COLUMN_CLOUD, cloud);
+                    }
                     rf.put(COLUMN_REGION_NAME, region);
                     rf.put(COLUMN_REGION_DISPLAY, name);
                     sht.getCellValues().add(rf);

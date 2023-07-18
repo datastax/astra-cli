@@ -3,7 +3,13 @@ package com.dtsx.astra.cli.test.db;
 import com.dtsx.astra.cli.db.dsbulk.ServiceDsBulk;
 import com.dtsx.astra.cli.test.AbstractCmdTest;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
 
@@ -31,12 +37,15 @@ public class DbDsBulkTest extends AbstractCmdTest {
     @DisplayName("Installing DsBulk")
     public void testShouldInstallDsbulk() {
         if (!disableTools) {
-            // delete previous install
-            new File(AstraCliUtils.ASTRA_HOME + File.separator
+            // given
+            if (new File(AstraCliUtils.ASTRA_HOME + File.separator
                     + "dsbulk-"
-                    + AstraCliUtils.readProperty("dsbulk.version")).delete();
-            // install
+                    + AstraCliUtils.readProperty("dsbulk.version")).delete()) {
+                System.out.println("Deleted old DsBulk");
+            }
+            // When
             ServiceDsBulk.getInstance().install();
+            // Then
             Assertions.assertTrue(ServiceDsBulk.getInstance().isInstalled());
         }
     }

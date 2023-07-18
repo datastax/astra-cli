@@ -14,35 +14,35 @@
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<astra-sdk.version>0.5</astra-sdk.version>
+		<astra-sdk.version>0.6.4</astra-sdk.version>
 		<jansi.version>2.4.0</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.7</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
+		<jackson-datatype.version>2.15.2</jackson-datatype.version>
 		<!-- commons -->
 		<commons-compress.version>1.23.0</commons-compress.version>
 		<!-- Junit -->
-		<junit-platform.version>1.9.2</junit-platform.version>
 		<junit-jupiter.version>5.9.3</junit-jupiter.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
 		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
 		<maven.plugin.javadoc.source>17</maven.plugin.javadoc.source>
 		<!-- Maven -->
-		<native.maven.plugin.version>0.9.16</native.maven.plugin.version>
-		<maven-plugin-exec.version>3.0.0</maven-plugin-exec.version>
-		<version.maven.plugin.resources>3.3.1</version.maven.plugin.resources>
-		<version.maven.plugin.failsafe>2.22.2</version.maven.plugin.failsafe>
-		<version.maven.plugin.surefire>2.22.2</version.maven.plugin.surefire>
-		<version.maven.plugin.release>2.5.2</version.maven.plugin.release>
+		<version.maven.plugin.assembly>3.6.0</version.maven.plugin.assembly>
+		<version.maven.plugin.compiler>3.11.0</version.maven.plugin.compiler>
+		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
+		<version.maven.plugin.dependency>3.6.0</version.maven.plugin.dependency>
+		<version.maven.plugin.exec>3.0.0</version.maven.plugin.exec>
+		<version.maven.plugin.jacoco>0.8.10</version.maven.plugin.jacoco>
 		<version.maven.plugin.javadoc>3.4.1</version.maven.plugin.javadoc>
 		<version.maven.plugin.jar>3.3.0</version.maven.plugin.jar>
-		<version.maven.plugin.compiler>3.11.0</version.maven.plugin.compiler>
-		<version.maven.plugin.license>2.0.1</version.maven.plugin.license>
-		<version.maven.plugin.dependency>3.5.0</version.maven.plugin.dependency>
-		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
-		<version.maven.plugin.jacoco>0.8.10</version.maven.plugin.jacoco>
-		<version.maven.plugin.assembly>3.6.0</version.maven.plugin.assembly>
+		<version.maven.plugin.license>2.2.0</version.maven.plugin.license>
+		<version.maven.plugin.native>0.9.16</version.maven.plugin.native>
+		<version.maven.plugin.release>2.5.2</version.maven.plugin.release>
+		<version.maven.plugin.resources>3.3.1</version.maven.plugin.resources>
+		<version.maven.plugin.shade>3.5.0</version.maven.plugin.shade>
+		<version.maven.plugin.surefire>3.1.2</version.maven.plugin.surefire>
 	</properties>
 
 	<dependencies>
@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>2.15.0</version>
+			<version>${jackson-datatype.version}</version>
 		</dependency>
 		
 		<!-- Unit tests -->
@@ -96,18 +96,6 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
 			<version>${junit-jupiter.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit-jupiter.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.platform</groupId>
-			<artifactId>junit-platform-runner</artifactId>
-			<version>${junit-platform.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -138,13 +126,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${version.maven.plugin.surefire}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.junit.jupiter</groupId>
-						<artifactId>junit-jupiter-engine</artifactId>
-						<version>${junit-jupiter.version}</version>
-					</dependency>
-				</dependencies>
+				<configuration>
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -213,7 +199,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.4.1</version>
+				<version>${version.maven.plugin.shade}</version>
 				<configuration>
 					<artifactSet>
 						<excludes>
@@ -359,6 +345,7 @@
 					<plugin>
 						<groupId>org.graalvm.buildtools</groupId>
 						<artifactId>native-maven-plugin</artifactId>
+						<version>${version.maven.plugin.native}</version>
 						<extensions>true</extensions>
 						<executions>
 							<execution>

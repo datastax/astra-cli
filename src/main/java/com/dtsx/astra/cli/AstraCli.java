@@ -44,6 +44,7 @@ import com.dtsx.astra.cli.db.list.DbListCloudsCmd;
 import com.dtsx.astra.cli.db.list.DbListCmd;
 import com.dtsx.astra.cli.db.list.DbListRegionsClassicCmd;
 import com.dtsx.astra.cli.db.list.DbListRegionsServerlessCmd;
+import com.dtsx.astra.cli.db.migration.GenerateDdlCmd;
 import com.dtsx.astra.cli.db.region.DbCreateRegionCmd;
 import com.dtsx.astra.cli.db.region.DbDeleteRegionCmd;
 import com.dtsx.astra.cli.db.region.DbListRegionsCmd;
@@ -123,7 +124,7 @@ import java.util.Arrays;
          DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class, DbListCloudsCmd.class,
          // DsBulk
          DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
-         // Cqlshell
+         // Cql Shell
          DbCqlShellCmd.class,
          // External Tools
          DbSwaggerUICmd.class, DbGraphqlPlaygroundCmd.class,

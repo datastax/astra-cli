@@ -91,7 +91,7 @@ public class SetupCmd extends AbstractCmd {
     throws InvalidTokenException {
         try {
             ConfigCreateCmd ccc = new ConfigCreateCmd();
-            ccc.token = token;
+            ccc.token = removeQuotesIfAny(token);
             ccc.sectionName = new AstraDevopsApiClient(token).getOrganization().getName();
             ccc.run();
         } catch(Exception e) {

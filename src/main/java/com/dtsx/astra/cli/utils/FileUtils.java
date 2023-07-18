@@ -23,12 +23,15 @@ package com.dtsx.astra.cli.utils;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -45,7 +48,39 @@ public class FileUtils {
      * Hide Default Constructor
      */
     private FileUtils() {}
-    
+
+    public static void extractZipArchiveInAstraCliHome(String zipFilePath) {
+        byte[] buffer = new byte[1024];
+
+        File folder = new File(AstraCliUtils.ASTRA_HOME);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
+            ZipEntry zipEntry = zipInputStream.getNextEntry();
+            while (zipEntry != null) {
+                String fileName = zipEntry.getName();
+                File newFile = new File(AstraCliUtils.ASTRA_HOME + File.separator + fileName);
+                if (zipEntry.isDirectory()) {
+                    newFile.mkdirs();
+                } else {
+                    new File(newFile.getParent()).mkdirs();
+                    FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+                    int length;
+
+                    while ((length = zipInputStream.read(buffer)) > 0) {
+                        fileOutputStream.write(buffer, 0, length);
+                    }
+                    fileOutputStream.close();
+                }
+                zipEntry = zipInputStream.getNextEntry();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Un Tar file.
      *

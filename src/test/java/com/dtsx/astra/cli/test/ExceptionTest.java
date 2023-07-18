@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests
  */
-public class ExceptionTests extends AbstractCmdTest {
+public class ExceptionTest extends AbstractCmdTest {
 
     @Test
     public void should_throw_common_exceptions() {

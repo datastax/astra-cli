@@ -49,7 +49,7 @@ public class DsBulkMigratorTest extends AbstractCmdTest {
     @Test
     @Order(2)
     public void shouldGenerateDdlTest() {
-        //assertSuccessCli("db generate-ddl %s -k %s".formatted(DB_TEST, KEYSPACE_TEST));
+        assertSuccessCli("db generate-ddl %s -k %s".formatted(DB_TEST, KEYSPACE_TEST));
     }
 
 }

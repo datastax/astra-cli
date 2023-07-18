@@ -23,7 +23,6 @@ else
     echo Java has not been found. Java17+ is required to run astra-cli installed with homebrew
 fi
 
-cd "$ASTRA_HOME"
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
     if [[ "$version" > "16" ]]; then

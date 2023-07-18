@@ -54,6 +54,7 @@ public class ConfigCreateCmd extends AbstractCmd {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Please Provide a token with option -t, --token");
             throw new TokenNotFoundException();
         }
+        token = removeQuotesIfAny(token);
         if (!token.startsWith("AstraCS:")) {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
             throw new InvalidTokenException(token);
@@ -62,6 +63,7 @@ public class ConfigCreateCmd extends AbstractCmd {
         if (sectionName == null) {
             sectionName = o.getName();
         }
+        sectionName = removeQuotesIfAny(sectionName);
         ctx().getConfiguration().createSectionWithToken(sectionName, token);
         ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Configuration has been saved.");

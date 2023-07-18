@@ -5,8 +5,13 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
 import com.dtsx.astra.sdk.db.DatabaseClient;
 import com.dtsx.astra.sdk.streaming.TenantClient;
 import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
-import org.junit.Assert;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +27,7 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
     /** Logger for my test. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DbCdcCommandsTest.class);
 
-static String TENANT_TEST   = "cdc" + UUID.randomUUID()
+    static String RANDOM_TENANT = "cdc" + UUID.randomUUID()
             .toString().replaceAll("-", "")
             .substring(0, 12);
 
@@ -34,19 +39,19 @@ static String TENANT_TEST   = "cdc" + UUID.randomUUID()
         // Create DB and keyspace with
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
         // Create TENANT
-        assertSuccessCli("streaming create %s --cloud gcp --region useast1 --if-not-exist".formatted(TENANT_TEST));
+        assertSuccessCli("streaming create %s --cloud gcp --region useast1 --if-not-exist".formatted(RANDOM_TENANT));
         // Create SCHEMA
         assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
         // Access DbClient
         dbClient     = ctx().getApiDevopsDatabases().databaseByName(DB_TEST);
-        tenantClient = ctx().getApiDevopsStreaming().tenant(TENANT_TEST);
+        tenantClient = ctx().getApiDevopsStreaming().tenant(RANDOM_TENANT);
    }
 
     @Test
     @Order(1)
     public void shouldCreateCdcs() throws InterruptedException {
-        assertSuccessCli("db create-cdc %s -k %s --table demo --tenant %s -v".formatted(DB_TEST, DB_TEST, TENANT_TEST));
-        assertSuccessCli("db create-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, TENANT_TEST));
+        assertSuccessCli("db create-cdc %s -k %s --table demo --tenant %s -v".formatted(DB_TEST, DB_TEST, RANDOM_TENANT));
+        assertSuccessCli("db create-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, RANDOM_TENANT));
         Assertions.assertEquals(2L, dbClient.cdc().findAll().count());
         Assertions.assertEquals(2L, tenantClient.cdc().list().count());
     }
@@ -62,9 +67,9 @@ static String TENANT_TEST   = "cdc" + UUID.randomUUID()
     @Test
     @Order(3)
     public void shouldListCdcStreaming() {
-       assertSuccessCli("streaming list-cdc %s".formatted(TENANT_TEST));
-       assertSuccessCli("streaming list-cdc %s -o json".formatted(TENANT_TEST));
-       assertSuccessCli("streaming list-cdc %s -o csv".formatted(TENANT_TEST));
+       assertSuccessCli("streaming list-cdc %s".formatted(RANDOM_TENANT));
+       assertSuccessCli("streaming list-cdc %s -o json".formatted(RANDOM_TENANT));
+       assertSuccessCli("streaming list-cdc %s -o csv".formatted(RANDOM_TENANT));
    }
 
     @Test
@@ -84,10 +89,10 @@ static String TENANT_TEST   = "cdc" + UUID.randomUUID()
     public void shouldDeleteCdcById() {
         // Given
         Assertions.assertEquals(2, dbClient.cdc().findAll().toList().size());
-        Optional<CdcDefinition> cdc = dbClient.cdc().findByDefinition(DB_TEST, "demo", TENANT_TEST);
-        Assert.assertTrue(cdc.isPresent());
+        Optional<CdcDefinition> cdc = dbClient.cdc().findByDefinition(DB_TEST, "demo", RANDOM_TENANT);
+        Assertions.assertTrue(cdc.isPresent());
         // When (id is valid)
-        Assert.assertTrue(dbClient.cdc().findById(cdc.get().getConnectorName()).isPresent());
+        Assertions.assertTrue(dbClient.cdc().findById(cdc.get().getConnectorName()).isPresent());
         // When (delete by id)
         assertSuccessCli( "db delete-cdc %s -id %s".formatted(DB_TEST,  cdc.get().getConnectorName()));
         // Then
@@ -100,14 +105,14 @@ static String TENANT_TEST   = "cdc" + UUID.randomUUID()
         // Given
         Assertions.assertEquals(1, dbClient.cdc().findAll().toList().size());
         // When
-        assertSuccessCli( "db delete-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, TENANT_TEST));
+        assertSuccessCli( "db delete-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, RANDOM_TENANT));
         // Then
         Assertions.assertEquals(0, dbClient.cdc().findAll().toList().size());
     }
 
     @AfterAll
     public static void cleanUp() {
-        assertSuccessCli("streaming delete %s".formatted(TENANT_TEST));
+       assertSuccessCli("streaming delete %s".formatted(RANDOM_TENANT));
     }
 
 }

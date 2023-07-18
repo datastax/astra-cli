@@ -75,7 +75,13 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "--async" }, description = "Will not wait for the resource to become available")
     protected boolean async = false;
-    
+
+    /**
+     * Will not wait for the database become available.
+     */
+    @Option(name = { "--vector" }, description = "Create a database with vector search enabled")
+    protected boolean vectorSearch = false;
+
     /** 
      * Provide a limit to the wait period in seconds, default is 180s. 
      */
@@ -91,7 +97,7 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
             KeyspaceAlreadyExistException {
 
         dbServices.validateCloudAndRegion(cloud, region);
-        dbServices.createDb(db, region, keyspace, ifNotExist);
+        dbServices.createDb(db, region, keyspace, ifNotExist, vectorSearch);
 
         if (!async) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {

@@ -46,6 +46,7 @@ public class ConfigDeleteCmd extends AbstractCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
+        sectionName = removeQuotesIfAny(sectionName);
         ServiceConfig.assertSectionExist(sectionName);
         ctx().getConfiguration().deleteSection(sectionName);
         ctx().getConfiguration().save();

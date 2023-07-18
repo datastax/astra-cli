@@ -1,4 +1,4 @@
-package com.datastax.astra.bash;
+package com.dtsx.astra.cli.bash;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,7 +13,7 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
 import com.github.rvesse.airline.help.cli.bash.BashCompletionGenerator;
 
-public class TestGenerateBashCompletion {
+public class GenerateBashCompletionTest {
 
     /** Autocompletion file generated. */
     private static final String DESTINATION = "src/main/dist/astra-init.sh";

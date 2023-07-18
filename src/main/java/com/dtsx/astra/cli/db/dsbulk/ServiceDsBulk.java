@@ -143,15 +143,14 @@ public class ServiceDsBulk implements DsBulkParameters {
     public void install() {
         try {
             LoggerShell.info("Downloading Dsbulk, please wait...");
-            String tarArchive = AstraCliUtils.ASTRA_HOME + File.separator + DSBULK_PREFIX + config.version() + ".tar.gz";
-            FileUtils.downloadFile(config.url() + DSBULK_PREFIX + config.version() + ".tar.gz", tarArchive);
-
+            String zipArchive = AstraCliUtils.ASTRA_HOME + File.separator + DSBULK_PREFIX + config.version() + ".zip";
+            FileUtils.downloadFile(config.url(), zipArchive);
             LoggerShell.info("Installing  archive, please wait...");
-            FileUtils.extractTarArchiveInAstraCliHome(new File(tarArchive));
+            FileUtils.extractZipArchiveInAstraCliHome(zipArchive);
             if (!new File(dsbulkExecutable).setExecutable(true, false)) {
                 throw new FileSystemException("Cannot make dsbulk executable. ");
             }
-            Files.delete(Paths.get(tarArchive));
+            Files.delete(Paths.get(zipArchive));
         } catch (IOException e) {
             throw new FileSystemException("Cannot install DSBULK :" + e.getMessage(), e);
         }

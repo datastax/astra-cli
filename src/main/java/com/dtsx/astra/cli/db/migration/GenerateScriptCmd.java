@@ -39,7 +39,7 @@ public class GenerateScriptCmd extends AbstractDatabaseCmd {
     protected String tables;
 
     /** Cqlsh Options. */
-    @Option(name = {"-d", "--data-dir" }, title = "TABLES", arity = 1,
+    @Option(name = {"-d", "--data-dir" }, title = "DATA DIRECTORY", arity = 1,
             description = "The directory where CQL files will be generated.")
     protected String dataDir;
 

@@ -20,6 +20,11 @@ public class ConfigCreateCmdTest extends AbstractCmdTest {
         // When
         Assertions.assertFalse(config().getSection("test-cli").isEmpty());
     }
+
+    @Test
+    public void should_create_config_withQuotes() {
+        assertSuccessCli("config create test-cli-quotes -t \"" + getToken() + "\"");
+    }
     
     @Test
     public void should_not_create_config() {

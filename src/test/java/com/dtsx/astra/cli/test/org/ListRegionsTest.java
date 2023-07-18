@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class ListRegionsTests extends AbstractCmdTest {
+public class ListRegionsTest extends AbstractCmdTest {
 
     @Test
     public void tesListDbRegionsServerless()  {
