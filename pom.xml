@@ -23,7 +23,7 @@
 		<!-- commons -->
 		<commons-compress.version>1.23.0</commons-compress.version>
 		<!-- Junit -->
-		<junit-jupiter.version>5.9.3</junit-jupiter.version>
+		<junit-jupiter.version>5.10.0</junit-jupiter.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
 		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
