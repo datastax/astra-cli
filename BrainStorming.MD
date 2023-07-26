@@ -1,26 +1,5 @@
-## Migrations Operations
+### Backup and Cloning
 
-- Export cassandra `ddl` file  
-
-```
-astra cassandra-export-schema \
-  --host localhost \
-  --username cassandra \
-  --password cassandra \
-  -d ./tmp
-  -k ks1,ks2
-```
-
-- Cassandra local backup
-
-```
-astra cassandra-backup \
-  --host localhost \
-  --username cassandra \
-  --password cassandra \
-  -d ./tmp/backupXXX
-  -k ks1,ks2
-```
 
 - Astra backup
 
@@ -37,19 +16,10 @@ astra db restore mydb \
  -d backup-folder
 ```
 
-- Live migration cassandra->astra
-
-```
-astra cassandra-live mydb
-  --host localhost \
-  --username cassandra \
-  --password cassandra \
-  -k ks1, ks2
-```
 
 - Import a schema
 ```
-astra db import-schema mydb -f tables.cql -k ks1
+astra db cqlsh mydb -f tables.cql -k ks1
 ```
 
 ```

@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.iam.token;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Astra CLI
@@ -24,13 +26,10 @@ import com.dtsx.astra.cli.config.AstraConfiguration;
 import com.dtsx.astra.cli.config.ServiceConfig;
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.core.ExitCode;
-import com.dtsx.astra.cli.core.exception.ConfigurationException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import com.github.rvesse.airline.annotations.Command;
-
-import java.util.Optional;
 
 /**
  * List tokens of an Organization.

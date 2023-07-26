@@ -23,6 +23,7 @@ public abstract class AbstractCmdTest {
     public final static String FLAG_TOOLS = "disable_tools";
 
     public static String DB_TEST = "astra_cli_test";
+    public static String DB_TEST_VECTOR = "astra_cli_vector_test";
 
     /** flag coding for tool disabling. */
     public static boolean disableTools = false;
@@ -106,7 +107,7 @@ public abstract class AbstractCmdTest {
     }
 
     protected static void assertSuccessCql(String db, String query) {
-        assertSuccessCli("db", "cqlsh",db, "-e", query);
+        assertSuccessCli("db", "cqlsh", db, "-e", query);
     }
 
 }

@@ -1,10 +1,8 @@
 package com.dtsx.astra.cli.test.db;
 
-import com.dtsx.astra.cli.core.ExitCode;
-import com.dtsx.astra.cli.test.AbstractCmdTest;
-import com.dtsx.astra.sdk.db.DatabaseClient;
-import com.dtsx.astra.sdk.streaming.TenantClient;
-import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,21 +10,19 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.dtsx.astra.cli.core.ExitCode;
+import com.dtsx.astra.cli.test.AbstractCmdTest;
+import com.dtsx.astra.sdk.db.DatabaseClient;
+import com.dtsx.astra.sdk.streaming.TenantClient;
+import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 
 /**
  * Test commands relative to CDC.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DbCdcCommandsTest  extends AbstractCmdTest {
-
-    /** Logger for my test. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DbCdcCommandsTest.class);
-
+    
     static String RANDOM_TENANT = "cdc" + UUID.randomUUID()
             .toString().replaceAll("-", "")
             .substring(0, 12);

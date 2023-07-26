@@ -26,18 +26,17 @@ import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.fusesource.jansi.Ansi;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.PURPLE_300;
 import static org.fusesource.jansi.Ansi.ansi;
-
 /**
  * Render all component for the FF4J commands.
  */
-public class AstraCliConsole implements AstraColorScheme {
+public class AstraCliConsole {
 
     /** Json Object Mapper. */
     public static final ObjectMapper OM = new ObjectMapper();
@@ -46,16 +45,16 @@ public class AstraCliConsole implements AstraColorScheme {
 	protected AstraCliConsole() {}
 
     public static void printVersion() {
-        println(StringUtils.leftPad("Version: " + AstraCliUtils.version(), 40) + "\n", purple300);
+        println(StringUtils.leftPad("Version: " + AstraCliUtils.version(), 40) + "\n", PURPLE_300);
     }
 	/** Start Banner. */
     public static void banner() {
-        println("    _____            __                  ", purple300);
-        println("   /  _  \\   _______/  |_____________    ",purple300);
-        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ",purple300);
-        println(" /    |    \\\\___ \\  |  |  |  | \\ //__ \\_ ",purple300);
-        println(" \\____|__  /____  > |__|  |__|  (____  /", purple300);
-        println("         \\/     \\/                   \\/ \n", purple300);
+        println("    _____            __                  ", PURPLE_300);
+        println("   /  _  \\   _______/  |_____________    ", PURPLE_300);
+        println("  /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\  ", PURPLE_300);
+        println(" /    |    \\\\___ \\  |  |  |  | \\ //__ \\_ ", PURPLE_300);
+        println(" \\____|__  /____  > |__|  |__|  (____  /", PURPLE_300);
+        println("         \\/     \\/                   \\/ \n", PURPLE_300);
         printVersion();
     }
 
@@ -87,12 +86,12 @@ public class AstraCliConsole implements AstraColorScheme {
      * @param color
      *      color for the text
      */
-    public static void println(String text, AnsiColorRGB color) {
+    public static void println(String text, AstraAnsiColors color) {
         if (ctx().isNoColor()) {
             print(text + System.lineSeparator());
         } else {
             print(ansi()
-                    .fgRgb(color.red(), color.green(), color.blue())
+                    .fgRgb(color.getRed(), color.getGreen(), color.getBlue())
                     .a(text)
                     .reset().toString() + System.lineSeparator());
         }

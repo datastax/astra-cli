@@ -25,14 +25,28 @@ import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
 import com.dtsx.astra.cli.core.exception.InvalidRegionException;
-import com.dtsx.astra.cli.core.out.*;
-import com.dtsx.astra.cli.db.exception.*;
+import com.dtsx.astra.cli.core.out.AstraAnsiColors;
+import com.dtsx.astra.cli.core.out.AstraCliConsole;
+import com.dtsx.astra.cli.core.out.JsonOutput;
+import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.core.out.OutputFormat;
+import com.dtsx.astra.cli.core.out.ShellTable;
+import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
+import com.dtsx.astra.cli.db.exception.DatabaseAlreadyExistException;
+import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
+import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
 import com.dtsx.astra.sdk.db.DatabaseClient;
-import com.dtsx.astra.sdk.db.domain.*;
+import com.dtsx.astra.sdk.db.domain.CloudProviderType;
+import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseCreationBuilder;
+import com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest;
+import com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.db.exception.KeyspaceAlreadyExistException;
 import com.dtsx.astra.sdk.org.domain.Organization;
@@ -48,14 +62,27 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.BLUE_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.GREEN_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.NEUTRAL_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.RED_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_300;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_500;
+
 /**
- * Service layer to work with database.
+ * Service grouping all operations on Astra Db Databases.
  */
-public class ServiceDatabase implements AstraColorScheme {
+public class ServiceDatabase {
     
     /** Default region. **/
     public static final String DEFAULT_REGION        = "us-east1";
@@ -65,17 +92,20 @@ public class ServiceDatabase implements AstraColorScheme {
 
     /** Default timeout for operations. */
     public static final int DEFAULT_TIMEOUT_SECONDS = 300;
+
+    /** Default timeout for connection. */
+    public static final int CONNECT_TIMEOUT_SECONDS = 20;
     
     /** column names. */
     static final String COLUMN_ID                = "id";
     /** column names. */
     static final String COLUMN_NAME              = "Name";
     /** column names. */
-    static final String COLUMN_DEFAULT_REGION    = "Default Region";
+    static final String COLUMN_VECTOR_SEARCH     = "V";
     /** column names. */
     static final String COLUMN_REGIONS           = "Regions";
     /** column names. */
-    static final String COLUMN_DEFAULT_CLOUD     = "Default Cloud Provider";
+    static final String COLUMN_DEFAULT_CLOUD     = "Cloud";
     /** column status. */
     static final String COLUMN_STATUS            = "Status";
     /** column status. */
@@ -122,7 +152,7 @@ public class ServiceDatabase implements AstraColorScheme {
         this.dbDao = DaoDatabase.getInstance();
         client = HttpClient.newBuilder()
                 .version(Version.HTTP_2)
-                .connectTimeout(Duration.ofSeconds(20))
+                .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
                 .build();
     }
 
@@ -285,7 +315,7 @@ public class ServiceDatabase implements AstraColorScheme {
             throw new InvalidRegionException(region);
         }
     }
-    
+
     /**
      * Create a new database
      * 
@@ -293,7 +323,7 @@ public class ServiceDatabase implements AstraColorScheme {
      *      db name
      * @param databaseRegion
      *      db region
-     * @param keyspace
+     * @param keyspaceName
      *      db ks
      * @param vectorSearch
      *      enable vector search
@@ -310,56 +340,22 @@ public class ServiceDatabase implements AstraColorScheme {
      * @throws InvalidDatabaseStateException
      *      database is hibernating or error state, cannot proceed 
      */
-    public void createDb(String databaseName, String databaseRegion, String keyspace, boolean ifNotExist, boolean vectorSearch)
+    public void createDb(String databaseName, String databaseRegion, String keyspaceName, boolean ifNotExist, boolean vectorSearch)
     throws DatabaseAlreadyExistException, DatabaseNotFoundException,
-           InvalidDatabaseStateException, InvalidArgumentException,
-            KeyspaceAlreadyExistException {
-        
-        // Parameter Validations
-        Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()
-                .getApiDevops()
-                .db().regions()
-                .findAllServerless()
-                .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity()));
-        if (StringUtils.isEmpty(keyspace)) {
-            keyspace = databaseName.toLowerCase()
+           InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException {
+        if (StringUtils.isEmpty(keyspaceName)) {
+            keyspaceName = databaseName.toLowerCase()
                     .replace(" ", "_")
                     .replace("-", "_");
         }
-        if (!keyspace.matches(ServiceKeyspace.KEYSPACE_NAME_PATTERN)) {
-            throw new InvalidArgumentException("Keyspace should contain alphanumerics[a-z0-9_]");
-        }
-        if (!regionMap.containsKey(databaseRegion)) {
-            throw new InvalidArgumentException("Database region '" + databaseRegion + "' has not been found.");
-        } 
-        if (databaseName.length() < 3 || databaseName.length() > 50) {
-            throw new InvalidArgumentException("Database name '" + databaseName + "' should have between 2 and 50 characters");
-        }
+        validateNames(databaseName, keyspaceName);
         
         // if multiple databases with same name => error
         try {
             Optional<DatabaseClient> dbClient = dbDao.getDatabaseClient(databaseName);
-
-            // DATABASE DOES NOT EXIST
             if (dbClient.isEmpty()) {
-                LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
-                        .formatted(DB, databaseName, databaseName, keyspace));
-                CliContext.getInstance()
-                          .getApiDevopsDatabases()
-                          .create(DatabaseCreationRequest.builder()
-                        .name(databaseName)
-                        .tier(DEFAULT_TIER)
-                        .cloudProvider(CloudProviderType.valueOf(regionMap
-                                .get(databaseRegion)
-                                .getCloudProvider()
-                                .toUpperCase()))
-                        .cloudRegion(databaseRegion)
-                        .keyspace(keyspace)
-                        .build());
-                LoggerShell.info("%s '%s' and keyspace '%s' are being created."
-                        .formatted(DB, databaseName, keyspace));
+                createNewDb(databaseName, databaseRegion, keyspaceName, vectorSearch);
             } else {
-
                 if (!ifNotExist) {
                     throw new DatabaseAlreadyExistException(databaseName);
                 }
@@ -381,7 +377,7 @@ public class ServiceDatabase implements AstraColorScheme {
 
                 // Create keyspace on existing DB when needed
                 if (DatabaseStatusType.ACTIVE.equals(dbStatus)) {
-                    ServiceKeyspace.getInstance().createKeyspace(databaseName, keyspace, true);
+                    ServiceKeyspace.getInstance().createKeyspace(databaseName, keyspaceName, true);
                 } else {
                     throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
                 }
@@ -390,7 +386,77 @@ public class ServiceDatabase implements AstraColorScheme {
             throw new DatabaseAlreadyExistException(databaseName);
         }
     }
-     
+
+    /**
+     * Create a new Database with provided parameters.
+     * @param databaseName
+     *      database name
+     * @param databaseRegion
+     *      database Region
+     * @param keyspaceName
+     *      keyspace Name
+     * @param vectorSearch
+     *      target database needs vector search
+     */
+    private void createNewDb(String databaseName, String databaseRegion, String keyspaceName, boolean vectorSearch) {
+        LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
+                .formatted(DB, databaseName, databaseName, keyspaceName));
+
+        DatabaseCreationBuilder builder = DatabaseCreationRequest.builder()
+                .name(databaseName).tier(DEFAULT_TIER)
+                .cloudProvider(getCloudProvider(databaseRegion))
+                .cloudRegion(databaseRegion)
+                .keyspace(keyspaceName);
+        if (vectorSearch) {
+            LoggerShell.info("Enabling vector search for database %s".formatted(databaseName));
+            builder.withVector();
+        }
+        CliContext.getInstance()
+                .getApiDevopsDatabases()
+                .create(builder.build());
+        LoggerShell.info("%s '%s' and keyspace '%s' are being created."
+                .formatted(DB, databaseName, keyspaceName));
+    }
+
+    /**
+     * Validate Keyspace and database names
+     * @param databaseName
+     *      database name
+     * @param keyspaceName
+     *      keyspace name
+     */
+    private void validateNames(String databaseName, String keyspaceName) {
+        if (!keyspaceName.matches(ServiceKeyspace.KEYSPACE_NAME_PATTERN)) {
+            throw new InvalidArgumentException("Keyspace should contain alphanumerics[a-z0-9_]");
+        }
+        if (databaseName.length() < 3 || databaseName.length() > 50) {
+            throw new InvalidArgumentException("Database name '" + databaseName + "' should have between 2 and 50 characters");
+        }
+    }
+
+    /**
+     * Access the cloud provider from region name.
+     *
+     * @param databaseRegion
+     *      database region
+     * @return
+     *      cloud provider or error
+     */
+    private CloudProviderType getCloudProvider(String databaseRegion) {
+        Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()
+                .getApiDevops()
+                .db().regions()
+                .findAllServerless()
+                .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity()));
+        if (!regionMap.containsKey(databaseRegion)) {
+            throw new InvalidArgumentException("Database region '" + databaseRegion + "' has not been found.");
+        }
+        return CloudProviderType.valueOf(regionMap
+                .get(databaseRegion)
+                .getCloudProvider()
+                .toUpperCase());
+    }
+
     /**
      * List Databases.
      */
@@ -399,16 +465,24 @@ public class ServiceDatabase implements AstraColorScheme {
         // No color ?
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_ID,      37);
-        sht.addColumn(COLUMN_DEFAULT_REGION, 20);
+        sht.addColumn(COLUMN_REGIONS, 10);
+        sht.addColumn(COLUMN_DEFAULT_CLOUD, 6);
+        sht.addColumn(COLUMN_VECTOR_SEARCH, 2);
         sht.addColumn(COLUMN_STATUS,  COLUMN_STATUS_WIDTH);
         CliContext.getInstance()
            .getApiDevopsDatabases()
            .findAllNonTerminated()
            .forEach(db -> {
                 Map <String, String> rf = new HashMap<>();
+                db.getInfo().getDatacenters().forEach(dc -> rf.put(dc.getRegion(), dc.getRegion()));
                 rf.put(COLUMN_NAME,    db.getInfo().getName());
                 rf.put(COLUMN_ID,      db.getId());
-                rf.put(COLUMN_DEFAULT_REGION, db.getInfo().getRegion());
+                rf.put(COLUMN_REGIONS, db.getInfo().getRegion());
+                rf.put(COLUMN_DEFAULT_CLOUD, db.getInfo().getCloudProvider().toString().toLowerCase());
+                rf.put(COLUMN_VECTOR_SEARCH, "");
+                if (db.getInfo().getDbType() != null) {
+                    rf.put(COLUMN_VECTOR_SEARCH, "■");
+                }
                 String status = db.getStatus().name();
                 // Colored if displayed as table
                 if (CliContext.getInstance().getOutputFormat().equals(OutputFormat.HUMAN)) {
@@ -428,20 +502,20 @@ public class ServiceDatabase implements AstraColorScheme {
      * @return
      *      colored status
      */
-    private AnsiColorRGB getStatusColor(DatabaseStatusType status) {
-        AnsiColorRGB color = neutral500;
+    private AstraAnsiColors getStatusColor(DatabaseStatusType status) {
+        AstraAnsiColors color = NEUTRAL_500;
         switch (status) {
             // Active is Green
-            case ACTIVE -> color = green500;
+            case ACTIVE -> color = GREEN_500;
             // Error is RED
-            case ERROR, TERMINATED, UNKNOWN  -> color = red500;
+            case ERROR, TERMINATED, UNKNOWN  -> color = RED_500;
             // Going into error is Yellow
-            case DECOMMISSIONING, TERMINATING, DEGRADED -> color = yellow500;
+            case DECOMMISSIONING, TERMINATING, DEGRADED -> color = YELLOW_500;
             // Dormant is blue
-            case HIBERNATED, PARKED, PREPARED ->  color = blue500;
+            case HIBERNATED, PARKED, PREPARED ->  color = BLUE_500;
             // Temporary states back to active are cyan
             case INITIALIZING, PENDING, HIBERNATING, PARKING, MAINTENANCE,
-                 PREPARING, RESIZING, RESUMING, UNPARKING -> color = yellow300;
+                 PREPARING, RESIZING, RESUMING, UNPARKING -> color = YELLOW_300;
         }
         return color;
     }
@@ -561,7 +635,7 @@ public class ServiceDatabase implements AstraColorScheme {
             sht.addPropertyRow(COLUMN_ID, db.getId());
             sht.addPropertyRow(COLUMN_STATUS, db.getStatus().toString());
             sht.addPropertyRow(COLUMN_DEFAULT_CLOUD, db.getInfo().getCloudProvider().name());
-            sht.addPropertyRow(COLUMN_DEFAULT_REGION, db.getInfo().getRegion());
+            sht.addPropertyRow(COLUMN_REGIONS, db.getInfo().getRegion());
             sht.addPropertyRow(COLUMN_DEFAULT_KEYSPACE, db.getInfo().getKeyspace());
             sht.addPropertyRow("Creation Time", db.getCreationTime());
             List<String> regions   = db.getInfo().getDatacenters()

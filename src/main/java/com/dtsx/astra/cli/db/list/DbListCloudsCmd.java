@@ -24,6 +24,9 @@ import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.github.rvesse.airline.annotations.Command;
 
+/**
+ * Show available clouds.
+ */
 @Command(name = "list-clouds", description = "Show available clouds")
 public class DbListCloudsCmd extends AbstractConnectedCmd {
 

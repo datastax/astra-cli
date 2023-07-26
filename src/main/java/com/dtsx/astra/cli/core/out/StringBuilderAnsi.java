@@ -73,8 +73,8 @@ public class StringBuilderAnsi {
      * @return
      *      current String
      */
-    public static String colored(String text, AnsiColorRGB color) {
-        return ansi().fgRgb(color.red(), color.green(), color.blue())
+    public static String colored(String text, AstraAnsiColors color) {
+        return ansi().fgRgb(color.getRed(), color.getGreen(), color.getBlue())
                      .a(text)
                      .reset().toString();
     }
@@ -104,7 +104,7 @@ public class StringBuilderAnsi {
      * @return
      *      current reference
      */
-    public StringBuilderAnsi append(String text, AnsiColorRGB color) {
+    public StringBuilderAnsi append(String text, AstraAnsiColors color) {
         builder.append(colored(text, color));
         return this;
     }
@@ -133,7 +133,7 @@ public class StringBuilderAnsi {
      * @param size
      *      size of element
      */
-    public void append(String text, AnsiColorRGB color, int size) {
+    public void append(String text, AstraAnsiColors color, int size) {
         if (text.matches(".*\u001B\\[[;\\d]*m")) {
             // Real length without special char
             String raw = text.replaceAll("\u001B\\[[;\\d]*m", "");

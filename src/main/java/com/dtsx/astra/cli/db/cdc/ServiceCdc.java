@@ -21,7 +21,10 @@ package com.dtsx.astra.cli.db.cdc;
  */
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.out.*;
+import com.dtsx.astra.cli.core.out.AstraCliConsole;
+import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.core.out.ShellTable;
+import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.sdk.db.AstraDbClient;
@@ -32,10 +35,15 @@ import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.GREEN_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.RED_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_500;
+
+
 /**
  * Group Operations relative to Cdc.
  */
-public class ServiceCdc implements AstraColorScheme {
+public class ServiceCdc {
 
     /** column names. */
     static final String COLUMN_ID               = "id";
@@ -51,6 +59,12 @@ public class ServiceCdc implements AstraColorScheme {
     public static final String COLUMN_TABLE     = "table";
     /** column names. */
     static final String COLUMN_STATUS           = "Status";
+    /** db status from API. */
+    static final String STATUS_ERROR           = "Error";
+    /** db status from API. */
+    static final String STATUS_ACTIVE           = "Active";
+    /** db status from API. */
+    static final String STATUS_RUNNING          = "Running";
 
     /**
      * Singleton Pattern
@@ -134,23 +148,23 @@ public class ServiceCdc implements AstraColorScheme {
      *      colored status
      */
     private String getStatus(CdcDefinition cdc) {
-        if (cdc.getCodStatus().startsWith("Error")) {
+        if (cdc.getCodStatus().startsWith(STATUS_ERROR)) {
             if (CliContext.getInstance().isNoColor()) {
-                return "Error";
+                return STATUS_ERROR;
             } else {
-                return StringBuilderAnsi.colored("Error", red500);
+                return StringBuilderAnsi.colored(STATUS_ERROR, RED_500);
             }
-        } else if  (cdc.getCodStatus().equals("Active")) {
+        } else if  (cdc.getCodStatus().equals(STATUS_ACTIVE)) {
             if (CliContext.getInstance().isNoColor()) {
-                return "Running";
+                return STATUS_RUNNING;
             } else {
-                return StringBuilderAnsi.colored("Running", green500);
+                return StringBuilderAnsi.colored(STATUS_RUNNING, GREEN_500);
             }
         }
         if (CliContext.getInstance().isNoColor()) {
             return cdc.getCodStatus();
         } else {
-            return StringBuilderAnsi.colored( cdc.getCodStatus(), yellow500);
+            return StringBuilderAnsi.colored( cdc.getCodStatus(), YELLOW_500);
         }
     }
 

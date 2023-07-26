@@ -47,6 +47,7 @@ public class ServiceOrganization {
     public static final String COLUMN_REGION_NAME = "Region";
     /** column names. */
     public static final String COLUMN_REGION_DISPLAY= "Full Name";
+    /** free regions for the free tier. */
     public static Set<String> FREE_TIER_REGIONS = Set.of("us-east1");
 
     /**

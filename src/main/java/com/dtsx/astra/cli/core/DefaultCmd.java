@@ -23,11 +23,10 @@ package com.dtsx.astra.cli.core;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
-import org.fusesource.jansi.Ansi;
-
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.BLUE_300;
 /**
  * Question mark is a COMMAND from the CLI when no command name is provided.
  */
@@ -45,13 +44,13 @@ public class DefaultCmd extends AbstractCmd {
         } else {
             AstraCliConsole.banner();
             AstraCliConsole.println(new StringBuilderAnsi(" - list commands       : ")
-                    .append("astra help", blue300));
+                    .append("astra help", BLUE_300));
             AstraCliConsole.println(new StringBuilderAnsi("️ - get command help    : ")
-                    .append("astra help <your command>", blue300));
+                    .append("astra help <your command>", BLUE_300));
             AstraCliConsole.println(new StringBuilderAnsi("️ - list your databases : ")
-                    .append("astra db list", blue300));
+                    .append("astra db list", BLUE_300));
             AstraCliConsole.println(new StringBuilderAnsi("️ - create new database : ")
-                    .append("astra db create demo\n", blue300));
+                    .append("astra db create demo\n", BLUE_300));
         }
     }    
 

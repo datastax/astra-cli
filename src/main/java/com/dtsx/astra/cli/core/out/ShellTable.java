@@ -31,35 +31,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.BLUE_300;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.NEUTRAL_300;
+
 /**
  * Standardize output for tables.
  */
-public class ShellTable implements Serializable, AstraColorScheme {
-    
+public class ShellTable implements Serializable {
+
     /** Serial */
     @Serial
     private static final long serialVersionUID = -2134504321420499395L;
-    
+
     /** Column name. */
     public static final String COLUMN_PROPERTY_NAME    = "Attribute";
-    
+
     /** Column name. */
     public static final String COLUMN_PROPERTY_VALUE   = "Value";
 
     /**
-     * Color of table. 
+     * Color of table.
      */
-    private final AnsiColorRGB tableColor = blue300;
-    
+    private final AstraAnsiColors tableColor = BLUE_300;
+
     /**
      * Color of title
      */
-    private final AnsiColorRGB columnTitlesColor = blue300;
+    private final AstraAnsiColors columnTitlesColor = BLUE_300;
 
     /**
      * Color of cell
      */
-    private final AnsiColorRGB cellColor = neutral300;
+    private final AstraAnsiColors cellColor = NEUTRAL_300;
 
     /**
      * Title column names
@@ -70,16 +73,19 @@ public class ShellTable implements Serializable, AstraColorScheme {
      * Columns sizes
      */
     private final Map < String, Integer > columnSize = new HashMap<>();
-    
+
     /**
      * Cell values
      */
     private final List< Map < String, String > > cellValues = new ArrayList<>();
-    
+
     /** Shell Table */
     public ShellTable() {
+        /*
+         * Static initialization for property required a default constructor.
+         */
     }
-    
+
     /**
      * Create a property table
      * 
@@ -142,11 +148,11 @@ public class ShellTable implements Serializable, AstraColorScheme {
             StringBuilder builder = new StringBuilder();
             computeColumnsWidths();
             String tableLine = buildTableLines();
-            builder.append(tableLine + "+\n");
+            builder.append(tableLine).append("+\n");
             buildTableHeaderNoColor(builder);
-            builder.append(tableLine+ "+\n");
+            builder.append(tableLine).append("+\n");
             buildTableDataNoColor(builder);
-            builder.append(tableLine+ "+\n");
+            builder.append(tableLine).append("+\n");
             AstraCliConsole.println(builder.toString());
         }
 

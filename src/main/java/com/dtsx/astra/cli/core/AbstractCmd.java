@@ -40,7 +40,6 @@ package com.dtsx.astra.cli.core;
  */
 
 import com.dtsx.astra.cli.config.AstraConfiguration;
-import com.dtsx.astra.cli.core.out.AstraColorScheme;
 import com.dtsx.astra.cli.core.out.OutputFormat;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
@@ -51,7 +50,7 @@ import java.util.List;
 /**
  * Options, parameters and treatments that you want to apply on all commands.
  */
-public abstract class AbstractCmd implements Runnable, AstraColorScheme {
+public abstract class AbstractCmd implements Runnable {
     
     /** 
      * Each command can have a verbose mode. 

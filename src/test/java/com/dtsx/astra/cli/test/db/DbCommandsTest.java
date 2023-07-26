@@ -30,6 +30,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     @BeforeAll
     public static void should_create_when_needed() {
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
+        assertSuccessCli("db create %s --if-not-exist --vector".formatted(DB_TEST_VECTOR));
     }
 
     @Test
@@ -189,7 +190,7 @@ public class DbCommandsTest extends AbstractCmdTest {
         // Waiting for the db to be started
         assertSuccessCli("db create %s --if-not-exist".formatted("tmp_db"));
         // Delete db
-        assertSuccessCli("db delete %s".formatted("tmp_db"));
+        assertSuccessCli("db delete %s --async".formatted("tmp_db"));
     }
 
     @Test
@@ -232,6 +233,12 @@ public class DbCommandsTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --cloud cumulonimbus --region us-east1");
         // When providing a region not in expected cloud (us-east1 is in gcp)
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid2 --cloud aws --region us-east1");
+    }
+
+    @Test
+    @Order(20)
+    public void testNewList() {
+        assertSuccessCli("db list");
     }
 
     //@AfterAll

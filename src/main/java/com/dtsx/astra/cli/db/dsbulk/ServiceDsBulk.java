@@ -40,10 +40,31 @@ import java.util.List;
 /**
  * Working with external DSBulk.
  */
-public class ServiceDsBulk implements DsBulkParameters {
+public class ServiceDsBulk {
 
     /** prefix in definition. */
-    static String DSBULK_PREFIX = "dsbulk-";
+    public static final String DSBULK_PREFIX = "dsbulk-";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_QUERY = "-query";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_DELIMITER = "-delim";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_HEADER = "-header";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_ENCODING = "-encoding";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_URL = "-url";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_SKIP_RECORDS = "-skipRecords";
+
+    /** Param for dsbulk. */
+    public static final String PARAM_MAX_ERRORS = "-maxErrors";
 
     /** Operations. */
     public enum DsBulkOperations {

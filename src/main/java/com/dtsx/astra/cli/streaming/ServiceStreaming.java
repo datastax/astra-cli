@@ -26,7 +26,13 @@ import com.dtsx.astra.cli.core.exception.CannotStartProcessException;
 import com.dtsx.astra.cli.core.exception.FileSystemException;
 import com.dtsx.astra.cli.core.exception.InvalidCloudProviderException;
 import com.dtsx.astra.cli.core.exception.InvalidRegionException;
-import com.dtsx.astra.cli.core.out.*;
+import com.dtsx.astra.cli.core.out.AstraAnsiColors;
+import com.dtsx.astra.cli.core.out.AstraCliConsole;
+import com.dtsx.astra.cli.core.out.JsonOutput;
+import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.core.out.OutputFormat;
+import com.dtsx.astra.cli.core.out.ShellTable;
+import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellOptions;
 import com.dtsx.astra.cli.streaming.pulsarshell.PulsarShellUtils;
@@ -45,10 +51,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.GREEN_500;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.NEUTRAL_300;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.RED_500;
+
 /**
  * Utility class for command `streaming`.
  */
-public class ServiceStreaming implements AstraColorScheme {
+public class ServiceStreaming {
 
     /** Command constants. */
     public static final String CMD_STATUS    = "status";
@@ -113,7 +123,7 @@ public class ServiceStreaming implements AstraColorScheme {
     }
 
     /** limit resource usage by caching tenant clients. */
-    private Map<String, TenantClient> cacheTenantClient = new HashMap<>();
+    private final Map<String, TenantClient> cacheTenantClient = new HashMap<>();
 
     /**
      * Syntax Sugar to work with Streaming Devops Apis.
@@ -163,14 +173,13 @@ public class ServiceStreaming implements AstraColorScheme {
     public void validateCloudRegion(String cloud, String region) {
         Assert.hasLength(region, "region name");
 
-        if (cloud == null && "".equals(cloud)) {
+        if (cloud != null && !"".equals(cloud)) {
             TreeMap<String, TreeMap<String, String>> regions =
                     ServiceOrganization.getInstance().getStreamingRegions();
             if (!regions.containsKey(cloud.toLowerCase())) {
                 // value provided in --cloud is invalid
                 throw new InvalidCloudProviderException(cloud);
-            } else if (((TreeMap<String, String>) regions.get(cloud.toLowerCase()))
-                    .keySet().contains(region.toLowerCase())) {
+            } else if ((regions.get(cloud.toLowerCase())).containsKey(region.toLowerCase())) {
                 // cloud ok, but invalid region
                 throw new InvalidRegionException(cloud, region);
             }
@@ -220,13 +229,13 @@ public class ServiceStreaming implements AstraColorScheme {
      * @return
      *      color for status
      */
-    private AnsiColorRGB getStatusColor(String tenantStatus) {
+    private AstraAnsiColors getStatusColor(String tenantStatus) {
         Assert.hasLength(tenantStatus, "Status");
-        switch(tenantStatus.toLowerCase()) {
-            case "active" : return green500;
-            case "error"  : return red500;
-            default: return neutral300;
-        }
+        return switch (tenantStatus.toLowerCase()) {
+            case "active" -> GREEN_500;
+            case "error" -> RED_500;
+            default -> NEUTRAL_300;
+        };
     }
 
     /**

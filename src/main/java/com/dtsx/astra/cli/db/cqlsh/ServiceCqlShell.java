@@ -40,12 +40,6 @@ import java.util.List;
  */
 public class ServiceCqlShell {
 
-    /** Patch for cqlShell. */
-    private static final String VERSION_TO_REPLACE = "|| [ \"$version\" = \"2.7\" ]";
-
-    /** Patch for cqlShell. */
-    private static final String VERSION_REPLACED = "|| [ \"$version\" = \"3.10\" ] || [ \"$version\" \\> \"3.10\" ] || [ \"$version\" = \"2.7\" ]";
-
     /** Configuration to Download the archive. */
     CqlShellConfig settings;
 

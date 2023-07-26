@@ -25,15 +25,16 @@ public class GenerateBashCompletionTest {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             helpGenerator.usage(cli.getMetadata(), baos);
-            FileOutputStream fos = new FileOutputStream(DESTINATION);
-            fos.write(baos.toString().replace("#!/bin/bash", "" +
-                    "#!/bin/bash\n\n" +
-                    "# Support for zsh\n" +
-                    "autoload -U +X compinit > /dev/null 2>&1 && compinit\n" +
-                    "autoload -U +X bashcompinit > /dev/null 2>&1 && bashcompinit\n").getBytes());
+            try (FileOutputStream fos = new FileOutputStream(DESTINATION)) {
+				fos.write(baos.toString().replace("#!/bin/bash", "" +
+				        "#!/bin/bash\n\n" +
+				        "# Support for zsh\n" +
+				        "autoload -U +X compinit > /dev/null 2>&1 && compinit\n" +
+				        "autoload -U +X bashcompinit > /dev/null 2>&1 && bashcompinit\n").getBytes());
 
-            //helpGenerator.usage(cli.getMetadata(), fos);
-            fos.write("\n\nexport PATH=\"$PATH:$HOME/.astra/cli\"".getBytes());
+				//helpGenerator.usage(cli.getMetadata(), fos);
+				fos.write("\n\nexport PATH=\"$PATH:$HOME/.astra/cli\"".getBytes());
+			}
             Assertions.assertTrue(new File(DESTINATION).exists());
 
         } catch (IOException e) {

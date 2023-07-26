@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.core.exception;
 
+import java.io.Serial;
+
 /*-
  * #%L
  * Astra CLI
@@ -25,7 +27,10 @@ package com.dtsx.astra.cli.core.exception;
  */
 public class InvalidRegionException extends InvalidArgumentException {
 
-    /**
+	@Serial
+    private static final long serialVersionUID = -6922527090484644547L;
+
+	/**
      * Default constructor.
      *
      * @param cloud

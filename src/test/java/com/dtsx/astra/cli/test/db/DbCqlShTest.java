@@ -1,13 +1,16 @@
 package com.dtsx.astra.cli.test.db;
 
+import java.io.File;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+
 import com.dtsx.astra.cli.db.cqlsh.ServiceCqlShell;
-import com.dtsx.astra.cli.db.dsbulk.ServiceDsBulk;
 import com.dtsx.astra.cli.test.AbstractCmdTest;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
-import org.junit.jupiter.api.*;
-
-import java.io.File;
 
 /**
  * Test on cqlsh.
@@ -19,11 +22,11 @@ public class DbCqlShTest extends AbstractCmdTest {
     public final static String KEYSPACE_TEST = "dsbulk";
     public final static String TABLE_TEST    = "cities_by_country";
 
-    @BeforeAll
-    public static void initForCqlsh() {
-        assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, DB_TEST));
-        assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
-    }
+    //@BeforeAll
+    //public static void initForCqlsh() {
+    //    assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, DB_TEST));
+    //    assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
+   // }
 
     @Test
     @Order(1)

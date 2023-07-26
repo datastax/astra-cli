@@ -23,13 +23,15 @@ package com.dtsx.astra.cli.config;
 import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.cli.core.out.AstraColorScheme;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 import java.util.Scanner;
+
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.CYAN_400;
+import static com.dtsx.astra.cli.core.out.AstraAnsiColors.PURPLE_500;
 
 /**
  * Set up the configuration
@@ -55,10 +57,10 @@ public class SetupCmd extends AbstractCmd {
             try(Scanner scanner = new Scanner(System.in)) {
                 boolean valid_token = false;
                 while (!valid_token) {
-                    AstraCliConsole.println(" -----------------------", AstraColorScheme.purple500);
-                    AstraCliConsole.println(" ---      SETUP      ---", AstraColorScheme.purple500);
-                    AstraCliConsole.println(" -----------------------\n",AstraColorScheme.purple500);
-                    AstraCliConsole.println("$ Enter an Astra token:", AstraColorScheme.cyan400);
+                    AstraCliConsole.println(" -----------------------", PURPLE_500);
+                    AstraCliConsole.println(" ---      SETUP      ---", PURPLE_500);
+                    AstraCliConsole.println(" -----------------------\n", PURPLE_500);
+                    AstraCliConsole.println("$ Enter an Astra token:", CYAN_400);
                     token = scanner.nextLine();
                     if (!token.startsWith("AstraCS:")) {
                         LoggerShell.error("Your token should start with 'AstraCS:'");

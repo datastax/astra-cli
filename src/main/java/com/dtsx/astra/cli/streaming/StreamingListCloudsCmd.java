@@ -23,7 +23,6 @@ package com.dtsx.astra.cli.streaming;
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 
 /**
  * List available cloud for Streaming.

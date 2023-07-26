@@ -21,7 +21,6 @@ package com.dtsx.astra.cli.db.cdc;
  */
 
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
-import com.dtsx.astra.cli.db.ServiceDatabase;
 import com.github.rvesse.airline.annotations.Command;
 
 /**

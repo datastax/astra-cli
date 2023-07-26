@@ -28,19 +28,19 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  * Load data into AstraDB.
  */
 @Command(name = "load", description = "Load data leveraging DSBulk")
-public class DbLoadCmd extends AbstractDsbulkCmd implements DsBulkParameters {
+public class DbLoadCmd extends AbstractDsbulkCmd {
 
     /**
      * Optional filter
      */
     @Required
-    @Option(name = { PARAM_URL }, title = "url", description = "File location to load data")
+    @Option(name = { ServiceDsBulk.PARAM_URL }, title = "url", description = "File location to load data")
     protected String url;
 
     /**
      * Optional filter
      */
-    @Option(name = { PARAM_DELIMITER}, title = "delim", description = " Character(s) use as field delimiter.")
+    @Option(name = { ServiceDsBulk.PARAM_DELIMITER}, title = "delim", description = " Character(s) use as field delimiter.")
     protected String delim = ",";
 
     /**
@@ -52,19 +52,19 @@ public class DbLoadCmd extends AbstractDsbulkCmd implements DsBulkParameters {
     /**
      * Optional filter
      */
-    @Option(name = { PARAM_HEADER }, title = "header", arity = 1, description = "Read, Write Header in input file")
+    @Option(name = { ServiceDsBulk.PARAM_HEADER }, title = "header", arity = 1, description = "Read, Write Header in input file")
     protected boolean header = true;
 
     /**
      * Optional filter
      */
-    @Option(name = { PARAM_SKIP_RECORDS }, title = "skipRecords", description = "Lines to skip before readind")
+    @Option(name = { ServiceDsBulk.PARAM_SKIP_RECORDS }, title = "skipRecords", description = "Lines to skip before readind")
     protected int skipRecords = 0;
 
     /**
      * Optional filter
      */
-    @Option(name = { PARAM_MAX_ERRORS }, title = "maxErrors", description = "Maximum number of errors before aborting the operation.")
+    @Option(name = { ServiceDsBulk.PARAM_MAX_ERRORS }, title = "maxErrors", description = "Maximum number of errors before aborting the operation.")
     protected int maxErrors = 100;
 
     /**

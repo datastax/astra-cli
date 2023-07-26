@@ -20,55 +20,60 @@ package com.dtsx.astra.cli.utils;
  * #L%
  */
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 /**
  * Utility operations on Files.
  */
 public class FileUtils {
+
+    private static final String CREATE_FOLDER_MSG = "Directory %s has been created";
     
     /**
      * Hide Default Constructor
      */
     private FileUtils() {}
 
+    /**
+     * Extract a Zip archive.
+     *
+     * @param zipFilePath
+     *      zip archive path on local disk
+     */
     public static void extractZipArchiveInAstraCliHome(String zipFilePath) {
         byte[] buffer = new byte[1024];
-
-        File folder = new File(AstraCliUtils.ASTRA_HOME);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
+        createFileIfNotExists(new File(AstraCliUtils.ASTRA_HOME));
         try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
-                String fileName = zipEntry.getName();
-                File newFile = new File(AstraCliUtils.ASTRA_HOME + File.separator + fileName);
+                // Escaping fileName to remove malicious entry
+                Path zipEntryPath = Paths.get(zipEntry.getName()).normalize();
+                File newFile = new File(AstraCliUtils.ASTRA_HOME + File.separator + zipEntryPath);
                 if (zipEntry.isDirectory()) {
-                    newFile.mkdirs();
+                    createFileIfNotExists(newFile);
                 } else {
-                    new File(newFile.getParent()).mkdirs();
+                    File parentFolder = new File(newFile.getParent());
+                    createFileIfNotExists(parentFolder);
                     FileOutputStream fileOutputStream = new FileOutputStream(newFile);
                     int length;
-
                     while ((length = zipInputStream.read(buffer)) > 0) {
                         fileOutputStream.write(buffer, 0, length);
                     }
@@ -78,6 +83,12 @@ public class FileUtils {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void createFileIfNotExists(File directory) {
+        if (!directory.exists() && directory.mkdirs()) {
+            LoggerShell.debug(CREATE_FOLDER_MSG.formatted(directory.getAbsolutePath()));
         }
     }
 
@@ -97,40 +108,24 @@ public class FileUtils {
                   TarArchiveEntry tarEntry;
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
                       // Escaping to remove invalid entry
-                      File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME, escapeTarEntry(tarEntry.getName())).toFile();
-                          if (tarEntry.isDirectory()) {
-                              if (!outputFile.exists() && outputFile.mkdirs())
-                                  LoggerShell.debug("Repository %s has been created"
-                                          .formatted(outputFile.getAbsolutePath()));
+                      File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME + File.separator +
+                              Paths.get(tarEntry.getName()).normalize()).toFile();
+                      if (tarEntry.isDirectory()) {
+                        if (!outputFile.exists() && outputFile.mkdirs())
+                          LoggerShell.debug(CREATE_FOLDER_MSG
+                                  .formatted(outputFile.getAbsolutePath()));
                           } else {
                               if (outputFile.getParentFile().mkdirs())
-                                  LoggerShell.debug("Repository %s has been created"
+                                  LoggerShell.debug(CREATE_FOLDER_MSG
                                           .formatted(outputFile.getParentFile().getAbsolutePath()));
                               try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                                   IOUtils.copy(tis, fos);
                               }
                           }
-                      
                   }
               }
           }
        }
-    }
-
-    /**
-     * Escape value for the entry.
-     *
-     * @param tarEntry
-     *      entry
-     * @return
-     *      escaped
-     */
-    private static String escapeTarEntry(String tarEntry) {
-        return tarEntry
-                .replaceAll(">", "")
-                .replace("<", "")
-                .replace("\\*", "")
-                .replace("\\|", "");
     }
     
     /**
@@ -165,16 +160,19 @@ public class FileUtils {
      * @param directoryToBeDeleted
      *      directory to be deleted
      */
-    public static boolean deleteDirectory(File directoryToBeDeleted) {
-        if (directoryToBeDeleted == null || !directoryToBeDeleted.exists()) {
-            return false;
-        }
-        File[] allContents = directoryToBeDeleted.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectory(file);
+    public static void deleteDirectory(File directoryToBeDeleted) {
+        if (directoryToBeDeleted != null && directoryToBeDeleted.exists()) {
+            File[] allContents = directoryToBeDeleted.listFiles();
+            if (allContents != null) {
+                for (File file : allContents) {
+                    deleteDirectory(file);
+                }
+            }
+            try {
+                Files.delete(directoryToBeDeleted.toPath());
+            } catch(IOException e)  {
+                throw new IllegalArgumentException("Cannot delete directory", e);
             }
         }
-        return directoryToBeDeleted.delete();
     }
 }

@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.core.exception;
 
+import java.io.Serial;
+
 /*-
  * #%L
  * Astra CLI
@@ -25,7 +27,10 @@ package com.dtsx.astra.cli.core.exception;
  */
 public class InvalidCloudProviderException extends InvalidArgumentException {
 
-    /**
+	@Serial
+    private static final long serialVersionUID = -5043925977989012038L;
+
+	/**
      * Default constructor.
      *
      * @param cloudProvider
