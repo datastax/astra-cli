@@ -40,7 +40,10 @@ import java.util.Optional;
 
 /**
  * Utility class for command `user`.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceUser {
 
     /** Column name. */

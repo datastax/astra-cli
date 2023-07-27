@@ -50,7 +50,7 @@ public class ConfigUseCmd extends AbstractCmd {
     public void execute() {
         sectionName = removeQuotesIfAny(sectionName);
         ServiceConfig.assertSectionExist(sectionName);
-        ctx().getConfiguration().copySection(sectionName, AstraConfiguration.ASTRARC_DEFAULT);
+        ctx().getConfiguration().copySection(sectionName, AstraCliConfiguration.ASTRARC_DEFAULT);
         ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Section '" + sectionName + "' is set as default.");
     }

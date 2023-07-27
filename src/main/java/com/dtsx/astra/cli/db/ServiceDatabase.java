@@ -68,6 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -81,7 +82,10 @@ import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_500;
 
 /**
  * Service grouping all operations on Astra Db Databases.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceDatabase {
     
     /** Default region. **/
@@ -296,9 +300,8 @@ public class ServiceDatabase {
         // Cloud is not null check cloud and region
 
         if (!StringUtils.isEmpty(cloud)) {
-            TreeMap<String, TreeMap<String, String>> mapCloudRegions =
+            SortedMap<String, TreeMap<String, String>> mapCloudRegions =
                     ServiceOrganization.getInstance().getDbServerlessRegions();
-
             if (!mapCloudRegions.containsKey(cloud.toLowerCase())) {
                 throw new InvalidCloudProviderException(cloud);
             } else if (!mapCloudRegions

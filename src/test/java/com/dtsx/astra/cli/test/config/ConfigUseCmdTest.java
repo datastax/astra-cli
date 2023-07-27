@@ -14,11 +14,11 @@ import org.junit.jupiter.api.TestMethodOrder;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class ConfigUseCmdTest extends AbstractCmdTest {
+class ConfigUseCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_use_config() {
+    void should_use_config() {
         // Given
         assertSuccessCli("config create test-cli -v -t " + getToken());
         Assertions.assertFalse(config().getSection("test-cli").isEmpty());
@@ -28,7 +28,7 @@ public class ConfigUseCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_get_fail_invalidsection() {
+    void shouldGetFailInvalidSection() {
         // Given
         Assertions.assertTrue(config().getSection("does-not-exist").isEmpty());
         // When

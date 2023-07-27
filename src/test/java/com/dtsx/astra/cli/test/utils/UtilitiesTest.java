@@ -9,10 +9,10 @@ import java.io.File;
 /**
  * Utilities Test
  */
-public class UtilitiesTest {
+class UtilitiesTest {
 
     @Test
-    public void testCreateFolders() {
+    void testCreateFolders() {
         AstraCliUtils.createHomeAstraFolders();
         Assertions.assertTrue(new File(AstraCliUtils.ASTRA_HOME
                 + File.separator

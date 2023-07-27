@@ -18,12 +18,12 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class PulsarShellTest extends AbstractCmdTest {
+class PulsarShellTest extends AbstractCmdTest {
     
     /** Logger for my test. */
     private static final Logger LOGGER = LoggerFactory.getLogger(PulsarShellTest.class);
     
-    /** Use to disable usage of CqlSh, DsBulkd and other during test for CI/CD. */
+    /** Use to disable usage of CqlSh, DsBulk and other during test for CI/CD. */
     public final static String FLAG_TOOLS = "disable_tools";
     
     static String RANDOM_TENANT = "cli-" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12);
@@ -32,7 +32,7 @@ public class PulsarShellTest extends AbstractCmdTest {
     public static boolean disableTools = false;
     
     @BeforeAll
-    public static void should_create_when_needed() {
+    static void should_create_when_needed() {
         readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.parseBoolean(flag));
         if (!disableTools) {
             LOGGER.info("Third party tools are enabled in test");
@@ -42,7 +42,7 @@ public class PulsarShellTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_install_pulsarshell()  {
+    void shouldInstallPulsarShell()  {
         if (disableTools) {
             LOGGER.warn("Third Party tool is disabled for this test environment");
         } else {
@@ -53,7 +53,7 @@ public class PulsarShellTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_pulsar_shell() {
+    void should_pulsar_shell() {
         if (disableTools) {
             LOGGER.warn("Third Party tool is disabled for this test environment");
         } else {
@@ -64,7 +64,7 @@ public class PulsarShellTest extends AbstractCmdTest {
     }
     
     @AfterAll
-    public static void should_close_tenant() {
+    static void should_close_tenant() {
         assertSuccessCli("streaming delete " + RANDOM_TENANT);
     }
 

@@ -40,7 +40,10 @@ import java.util.Optional;
 
 /**
  * Work with token.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceToken {
 
     /** column names. */

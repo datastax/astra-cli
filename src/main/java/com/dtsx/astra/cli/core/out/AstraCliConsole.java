@@ -44,6 +44,9 @@ public class AstraCliConsole {
 	/** Default constructor. */
 	protected AstraCliConsole() {}
 
+    /**
+     * Print version in the shell.
+     */
     public static void printVersion() {
         println(StringUtils.leftPad("Version: " + AstraCliUtils.version(), 40) + "\n", PURPLE_300);
     }
@@ -59,11 +62,13 @@ public class AstraCliConsole {
     }
 
     /**
-     * Access to Console.
+     * Write a message in the standard console. Limited to a single place
+     * and preferred to the logger which add metadata in the line.
      *
      * @param message
      *      message to print
      */
+    @SuppressWarnings("java:S106")
     public static void print(String message) {
         System.out.print(message);
     }
@@ -75,7 +80,7 @@ public class AstraCliConsole {
      *      text to display
      */
     public static void println(String text) {
-        System.out.println(text);
+        print(text + System.lineSeparator());
     }
 
     /**

@@ -39,7 +39,10 @@ import java.util.List;
 
 /**
  * Working with external DSBulk.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceDsBulk {
 
     /** prefix in definition. */
@@ -268,19 +271,7 @@ public class ServiceDsBulk {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.LOAD);
         addCredentialsOptions(dsbulkCmd, cmd.getDb());
         addCoreOptions(dsbulkCmd, cmd);
-
-        dsbulkCmd.add(PARAM_DELIMITER);
-        dsbulkCmd.add(cmd.delim);
-        dsbulkCmd.add(PARAM_URL);
-        dsbulkCmd.add(cmd.url);
-        dsbulkCmd.add(PARAM_HEADER);
-        dsbulkCmd.add(String.valueOf(cmd.header));
-        dsbulkCmd.add(PARAM_ENCODING);
-        dsbulkCmd.add(cmd.encoding);
-        dsbulkCmd.add(PARAM_SKIP_RECORDS);
-        dsbulkCmd.add(String.valueOf(cmd.skipRecords));
-        dsbulkCmd.add(PARAM_MAX_ERRORS);
-        dsbulkCmd.add(String.valueOf(cmd.maxErrors));
+        addLoadOptions(cmd, dsbulkCmd);
         if (null != cmd.mapping) {
             dsbulkCmd.add("-m");
             dsbulkCmd.add(cmd.mapping);
@@ -292,7 +283,22 @@ public class ServiceDsBulk {
         }
         run(dsbulkCmd, cmd.getDb());
     }
-    
+
+    private static void addLoadOptions(DbLoadCmd loadCmd, List<String> dsbulkCmd) {
+        dsbulkCmd.add(PARAM_DELIMITER);
+        dsbulkCmd.add(loadCmd.delim);
+        dsbulkCmd.add(PARAM_URL);
+        dsbulkCmd.add(loadCmd.url);
+        dsbulkCmd.add(PARAM_HEADER);
+        dsbulkCmd.add(String.valueOf(loadCmd.header));
+        dsbulkCmd.add(PARAM_ENCODING);
+        dsbulkCmd.add(loadCmd.encoding);
+        dsbulkCmd.add(PARAM_SKIP_RECORDS);
+        dsbulkCmd.add(String.valueOf(loadCmd.skipRecords));
+        dsbulkCmd.add(PARAM_MAX_ERRORS);
+        dsbulkCmd.add(String.valueOf(loadCmd.maxErrors));
+    }
+
     /**
      * Command to count item on a table or query.
      * 
@@ -313,30 +319,30 @@ public class ServiceDsBulk {
     /**
      * Run a Load command.
      * 
-     * @param cmd
+     * @param unloadCmd
      *      current command line
      */
-    public void unload(DbUnLoadCmd cmd) {
+    public void unload(DbUnLoadCmd unloadCmd) {
         List<String> dsbulkCmd = initCommandLine(DsBulkOperations.UNLOAD);
-        addCredentialsOptions(dsbulkCmd, cmd.getDb());
-        addCoreOptions(dsbulkCmd, cmd);
+        addCredentialsOptions(dsbulkCmd, unloadCmd.getDb());
+        addCoreOptions(dsbulkCmd, unloadCmd);
         dsbulkCmd.add(PARAM_DELIMITER);
-        dsbulkCmd.add(cmd.delim);
+        dsbulkCmd.add(unloadCmd.delim);
         dsbulkCmd.add(PARAM_URL);
-        dsbulkCmd.add(cmd.url);
+        dsbulkCmd.add(unloadCmd.url);
         dsbulkCmd.add(PARAM_HEADER);
-        dsbulkCmd.add(String.valueOf(cmd.header));
+        dsbulkCmd.add(String.valueOf(unloadCmd.header));
         dsbulkCmd.add(PARAM_ENCODING);
-        dsbulkCmd.add(cmd.encoding);
+        dsbulkCmd.add(unloadCmd.encoding);
         dsbulkCmd.add(PARAM_SKIP_RECORDS);
-        dsbulkCmd.add(String.valueOf(cmd.skipRecords));
+        dsbulkCmd.add(String.valueOf(unloadCmd.skipRecords));
         dsbulkCmd.add(PARAM_MAX_ERRORS);
-        dsbulkCmd.add(String.valueOf(cmd.maxErrors));
-        if (null != cmd.query) {
+        dsbulkCmd.add(String.valueOf(unloadCmd.maxErrors));
+        if (null != unloadCmd.query) {
             dsbulkCmd.add(PARAM_QUERY);
-            dsbulkCmd.add(cmd.query);
+            dsbulkCmd.add(unloadCmd.query);
         }
-        run(dsbulkCmd, cmd.getDb());
+        run(dsbulkCmd, unloadCmd.getDb());
     }
 
     /**
@@ -363,16 +369,6 @@ public class ServiceDsBulk {
             Thread.currentThread().interrupt();
             throw new CannotStartProcessException("dsbulk", e);
         }
-    }
-
-    /**
-     * Return DsBulk executable.
-     *
-     * @return
-     *      dsbulk
-     */
-    public String getDsbulkExecutable() {
-        return dsbulkExecutable;
     }
 
 }

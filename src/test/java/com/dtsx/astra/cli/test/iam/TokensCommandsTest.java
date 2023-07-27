@@ -12,18 +12,18 @@ import org.junit.jupiter.api.*;
  * Testing CRUD for tokens.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TokensCommandsTest extends AbstractCmdTest {
+class TokensCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(1)
-    public void should_show_token() {
+    void should_show_token() {
         assertSuccessCli("token");
         assertSuccessCli("token get");
     }
 
     @Test
     @Order(2)
-    public void should_list_token() {
+    void should_list_token() {
         assertSuccessCli("token list");
         assertSuccessCli("token list -v");
         assertSuccessCli("token list --no-color");
@@ -33,7 +33,7 @@ public class TokensCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(3)
-    public void should_list_token_errors() {
+    void should_list_token_errors() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "token list -w");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "token list DB");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "token coaster");
@@ -42,7 +42,7 @@ public class TokensCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(4)
-    public void should_create_delete_token() {
+    void should_create_delete_token() {
         // Given
         assertSuccessCli("token list");
         Role role = ServiceRole.getInstance().get("Database Administrator");
@@ -60,7 +60,7 @@ public class TokensCommandsTest extends AbstractCmdTest {
     @Test
     @Order(5)
     @DisplayName("Create a token a revoke it")
-    public void createAndRevokeTokenTest() {
+    void createAndRevokeTokenTest() {
         // Given
         assertSuccessCli("token list");
         Role role = ServiceRole.getInstance().get("Database Administrator");

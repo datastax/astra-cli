@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.test;
 
 import java.util.Optional;
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import com.dtsx.astra.sdk.utils.Utils;
 import org.junit.jupiter.api.Assertions;
@@ -25,11 +25,16 @@ public abstract class AbstractCmdTest {
     public static String DB_TEST = "astra_cli_test";
     public static String DB_TEST_VECTOR = "astra_cli_vector_test";
 
+    public static String ENV_VAR_TOKEN_TEST = "ASTRA_DB_APPLICATION_TOKEN_TEST";
+    public static String ENV_VAR_TOKEN_DEV = "ASTRA_DB_APPLICATION_TOKEN_DEV";
+    public static String SECTION_DEV = "sample-dev";
+    public static String SECTION_TEST = "sample-test";
+
     /** flag coding for tool disabling. */
     public static boolean disableTools = false;
 
     @BeforeAll
-    public static void init() {
+    protected static void init() {
         readEnvVariable(FLAG_TOOLS).ifPresent(flag -> disableTools = Boolean.parseBoolean(flag));
         runCli("--version");
     }
@@ -42,7 +47,7 @@ public abstract class AbstractCmdTest {
      * @return
      *      if the value is there
      */
-    public static Optional<String> readEnvVariable(String key) {
+    protected static Optional<String> readEnvVariable(String key) {
         if (Utils.hasLength(System.getProperty(key))) {
             return Optional.ofNullable(System.getProperty(key));
         } else if (Utils.hasLength(System.getenv(key))) {
@@ -59,13 +64,49 @@ public abstract class AbstractCmdTest {
         if (t2.isPresent()) {
             return t2.get();
         }
-        Optional<String> t1 = new AstraConfiguration().getSectionKey(
-                AstraConfiguration.ASTRARC_DEFAULT, 
+        Optional<String> t1 = new AstraCliConfiguration().getSectionKey(
+                AstraCliConfiguration.ASTRARC_DEFAULT,
                 AstraRc.ASTRA_DB_APPLICATION_TOKEN);
         if (t1.isPresent()) { 
             return t1.get();
         }
         throw new IllegalStateException("Cannot find token");
+    }
+
+    /**
+     * Test usage of Astra development environment.
+     *
+     * @return
+     *      token for dev
+     */
+    protected String getTokenDev() {
+        Optional<String> tokenDev = readEnvVariable(ENV_VAR_TOKEN_DEV);
+        if (tokenDev.isPresent()) {
+            return tokenDev.get();
+        }
+        tokenDev = new AstraCliConfiguration().getSectionKey(SECTION_DEV, AstraRc.ASTRA_DB_APPLICATION_TOKEN);
+        if (tokenDev.isPresent()) {
+            return tokenDev.get();
+        }
+        throw new IllegalStateException("Cannot find token for dev");
+    }
+
+    /**
+     * Test usage of Astra test environment.
+     *
+     * @return
+     *      token for test
+     */
+    protected String getTokenTest() {
+        Optional<String> tokenDev = readEnvVariable(ENV_VAR_TOKEN_TEST);
+        if (tokenDev.isPresent()) {
+            return tokenDev.get();
+        }
+        tokenDev = new AstraCliConfiguration().getSectionKey(SECTION_TEST, AstraRc.ASTRA_DB_APPLICATION_TOKEN);
+        if (tokenDev.isPresent()) {
+            return tokenDev.get();
+        }
+        throw new IllegalStateException("Cannot find token for test");
     }
     
     /**
@@ -74,11 +115,11 @@ public abstract class AbstractCmdTest {
      * @return
      *      utils
      */
-    public static CliContext ctx() {
+    protected static CliContext ctx() {
         return CliContext.getInstance();
     }
    
-    protected AstraConfiguration config() {
+    protected AstraCliConfiguration config() {
         return ctx().getConfiguration();
     }
     

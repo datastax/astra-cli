@@ -31,7 +31,6 @@ import com.github.rvesse.airline.annotations.Option;
 import java.util.Scanner;
 
 import static com.dtsx.astra.cli.core.out.AstraAnsiColors.CYAN_400;
-import static com.dtsx.astra.cli.core.out.AstraAnsiColors.PURPLE_500;
 
 /**
  * Set up the configuration
@@ -55,22 +54,15 @@ public class SetupCmd extends AbstractCmd {
             String token;
             AstraCliConsole.banner();
             try(Scanner scanner = new Scanner(System.in)) {
-                boolean valid_token = false;
-                while (!valid_token) {
-                    AstraCliConsole.println(" -----------------------", PURPLE_500);
-                    AstraCliConsole.println(" ---      SETUP      ---", PURPLE_500);
-                    AstraCliConsole.println(" -----------------------\n", PURPLE_500);
+                boolean validToken = false;
+                while (!validToken) {
                     AstraCliConsole.println("$ Enter an Astra token:", CYAN_400);
-                    token = scanner.nextLine();
-                    if (!token.startsWith("AstraCS:")) {
-                        LoggerShell.error("Your token should start with 'AstraCS:'");
-                    } else {
-                        try {
-                            createDefaultSection(token);
-                            valid_token = true;
-                        } catch(InvalidTokenException ite) {
-                            LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
-                        }
+                    token = removeQuotesIfAny(scanner.nextLine());
+                    try {
+                      createDefaultSection(token);
+                      validToken = true;
+                    } catch(InvalidTokenException ite) {
+                      LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
                     }
                 }
             }

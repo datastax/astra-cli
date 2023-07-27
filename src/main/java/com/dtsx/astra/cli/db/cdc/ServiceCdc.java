@@ -42,7 +42,10 @@ import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_500;
 
 /**
  * Group Operations relative to Cdc.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceCdc {
 
     /** column names. */

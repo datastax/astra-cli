@@ -20,6 +20,8 @@ package com.dtsx.astra.cli.core.exception;
  * #L%
  */
 
+import com.dtsx.astra.sdk.utils.ApiLocator;
+
 import java.io.Serial;
 
 /**
@@ -33,8 +35,6 @@ public class InvalidTokenException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = -7071867151543923236L;
 
-
-    
     /**
      * Constructor with token
      * 

@@ -26,6 +26,7 @@ import com.dtsx.astra.cli.config.ConfigDescribeCmd;
 import com.dtsx.astra.cli.config.ConfigGetCmd;
 import com.dtsx.astra.cli.config.ConfigListCmd;
 import com.dtsx.astra.cli.config.ConfigUseCmd;
+import com.dtsx.astra.cli.config.LoginCmd;
 import com.dtsx.astra.cli.config.SetupCmd;
 import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.CliContext;
@@ -134,7 +135,7 @@ import java.util.Arrays;
   description = "CLI for DataStax Astra™ ",
   defaultCommand = DefaultCmd.class, 
   commands = { 
-    SetupCmd.class, Help.class, DefaultCmd.class
+    SetupCmd.class, LoginCmd.class, Help.class, DefaultCmd.class
   },
   groups = {
     

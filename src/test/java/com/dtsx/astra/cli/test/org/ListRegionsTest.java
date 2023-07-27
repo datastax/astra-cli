@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class ListRegionsTest extends AbstractCmdTest {
+class ListRegionsTest extends AbstractCmdTest {
 
     @Test
-    public void tesListDbRegionsServerless()  {
+    void tesListDbRegionsServerless()  {
         assertSuccessCli("db list-regions-serverless");
         assertSuccessCli("db list-regions-serverless -o csv");
         assertSuccessCli("db list-regions-serverless -o json");
@@ -20,7 +20,7 @@ public class ListRegionsTest extends AbstractCmdTest {
     }
 
     @Test
-    public void testListDbRegionsClassic() {
+    void testListDbRegionsClassic() {
         assertSuccessCli("db list-regions-classic");
         assertSuccessCli("db list-regions-classic --cloud aws");
         assertSuccessCli("db list-regions-classic --cloud aws --filter us");
@@ -30,7 +30,7 @@ public class ListRegionsTest extends AbstractCmdTest {
     }
 
     @Test
-    public void testListDbRegionsStreaming() {
+    void testListDbRegionsStreaming() {
         assertSuccessCli("streaming list-regions");
     }
 }

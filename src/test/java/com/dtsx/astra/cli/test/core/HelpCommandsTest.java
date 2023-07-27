@@ -13,24 +13,24 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class HelpCommandsTest extends AbstractCmdTest {
+class HelpCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_show_help() {
+    void should_show_help() {
         assertSuccessCli("help");
     }
     
     
     @Test
     @Order(2)
-    public void should_show_help_db() {
+    void should_show_help_db() {
         assertSuccessCli("help db");
     }
     
     @Test
     @Order(3)
-    public void should_show_help_db_create() {
+    void should_show_help_db_create() {
         assertSuccessCli("help db create");
     }
     

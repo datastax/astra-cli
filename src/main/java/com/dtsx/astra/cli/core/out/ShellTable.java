@@ -52,17 +52,17 @@ public class ShellTable implements Serializable {
     /**
      * Color of table.
      */
-    private final AstraAnsiColors tableColor = BLUE_300;
+    private static final AstraAnsiColors TABLE_COLOR = BLUE_300;
 
     /**
      * Color of title
      */
-    private final AstraAnsiColors columnTitlesColor = BLUE_300;
+    private static final AstraAnsiColors COLUMN_TITLES_COLOR = BLUE_300;
 
     /**
      * Color of cell
      */
-    private final AstraAnsiColors cellColor = NEUTRAL_300;
+    private static final AstraAnsiColors CELL_COLOR = NEUTRAL_300;
 
     /**
      * Title column names
@@ -136,13 +136,13 @@ public class ShellTable implements Serializable {
             String tableLine = buildTableLines();
 
             // Header
-            builder.append(tableLine + "+\n", tableColor);
+            builder.append(tableLine + "+\n", TABLE_COLOR);
             buildTableHeader(builder);
-            builder.append(tableLine + "+\n", tableColor);
+            builder.append(tableLine + "+\n", TABLE_COLOR);
 
             // Display Data
             buildTableData(builder);
-            builder.append(tableLine + "+\n", tableColor);
+            builder.append(tableLine + "+\n", TABLE_COLOR);
             AstraCliConsole.println(builder);
         } else {
             StringBuilder builder = new StringBuilder();
@@ -165,11 +165,11 @@ public class ShellTable implements Serializable {
         for (Map<String, String > res : cellValues) {
             // Keep Orders
             for(String columnName : columnTitlesNames) {
-                builder.append("| ", tableColor);
+                builder.append("| ", TABLE_COLOR);
                 // Handle color
-                builder.append(res.get(columnName), cellColor, columnSize.get(columnName));
+                builder.append(res.get(columnName), CELL_COLOR, columnSize.get(columnName));
             }
-            builder.append("|\n", tableColor);
+            builder.append("|\n", TABLE_COLOR);
         }
     }
 
@@ -193,14 +193,14 @@ public class ShellTable implements Serializable {
      */
     private void buildTableHeader(StringBuilderAnsi builder) {
         for(String columnName : columnTitlesNames) {
-            builder.append("| ", tableColor);
+            builder.append("| ", TABLE_COLOR);
             Integer size = columnSize.get(columnName);
             if (null == size) {
                 size = columnName.length() + 1;
             }
-            builder.append(columnName , columnTitlesColor, size);
+            builder.append(columnName , COLUMN_TITLES_COLOR, size);
         }
-        builder.append("|\n", tableColor);
+        builder.append("|\n", TABLE_COLOR);
     }
 
     /**
@@ -240,9 +240,10 @@ public class ShellTable implements Serializable {
     private String buildTableLines() {
         StringBuilder tableLine = new StringBuilder();
         for(String columnName : columnTitlesNames) {
-            Integer size = columnSize.get(columnName);
+            int size = columnSize.get(columnName) + 1;
+            String formatPattern = "%-"+(size)+"s";
             tableLine.append("+")
-                    .append(String.format("%-"+(size + 1)+"s", "-")
+                    .append(String.format(formatPattern, "-")
                     .replace(" ", "-"));
         }
         return tableLine.toString();

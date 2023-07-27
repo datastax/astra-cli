@@ -82,7 +82,7 @@ public class FileUtils {
                 zipEntry = zipInputStream.getNextEntry();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Cannot extract zip archive", e);
         }
     }
 

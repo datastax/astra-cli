@@ -14,11 +14,11 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class UsersCommandsTest extends AbstractCmdTest {
+class UsersCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(1)
-    public void should_list_users() {
+    void should_list_users() {
         assertSuccessCli("user list");
         assertSuccessCli("user list -v");
         assertSuccessCli("user list --no-color");
@@ -28,7 +28,7 @@ public class UsersCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_list_users_errors() {
+    void should_list_users_errors() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "user list -w");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "user list DB");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "user coaster");
@@ -37,7 +37,7 @@ public class UsersCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(3)
-    public void should_get_user() {
+    void should_get_user() {
         String USERNAME = "cedrick.lunven@datastax.com";
         assertSuccessCli("user get -v " + USERNAME);
         assertSuccessCli("user get -v " + USERNAME + " -o json");
@@ -51,7 +51,7 @@ public class UsersCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(4)
-    public void should_get_user_error() {
+    void should_get_user_error() {
         String userInvalidId = "dde8a0e9-f4ae-4b42-b642-9f257436c812";
         String userInvalid = "john.doe@datastax.com";
         assertExitCodeCli(ExitCode.NOT_FOUND, "user get " + userInvalid);
@@ -62,7 +62,7 @@ public class UsersCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(5)
-    public void should_create_user() {
+    void should_create_user() {
         // Given
         String USERNAME = "celphys@gmail.com";
         assertExitCodeCli(ExitCode.NOT_FOUND, "user get " + USERNAME);
@@ -76,7 +76,7 @@ public class UsersCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(6)
-    public void should_delete_user() {
+    void should_delete_user() {
         // Given
         String USERNAME = "celphys@gmail.com";
         assertSuccessCli("user get " + USERNAME);

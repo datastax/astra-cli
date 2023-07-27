@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.test.config;
 
 import java.io.ByteArrayInputStream;
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.junit.jupiter.api.Assertions;
@@ -19,41 +19,64 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class ConfigSetupCmdTest extends AbstractCmdTest {
+class ConfigSetupCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_create_with_user_input()  {
+    void should_create_with_user_input()  {
         // Given
         System.setIn(new ByteArrayInputStream((getToken() + "\n").getBytes()));
         // When
         assertSuccessCli("setup");
         // Then
-        Assertions.assertFalse(config().getSection(AstraConfiguration.ASTRARC_DEFAULT).isEmpty());
-        Assertions.assertEquals(
-                getToken(),
-                config().getSection(AstraConfiguration.ASTRARC_DEFAULT)
-                         .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN));
+        validateSection();
     }
     
     @Test
     @Order(2)
-    public void should_create_with_tokenParam() {
+    void shouldCreateWithTokenParam() {
         // When
         assertSuccessCli("setup --token " + getToken());
         // Then
-        Assertions.assertFalse(config().getSection(AstraConfiguration.ASTRARC_DEFAULT).isEmpty());
-        Assertions.assertEquals(
-                getToken(),
-                config().getSection(AstraConfiguration.ASTRARC_DEFAULT)
-                         .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN));
+        validateSection();
         
     }
 
     @Test
     @Order(3)
-    public void shoudReturnedExceptionTest() {
+    void shouldReturnedExceptionTest() {
         assertExitCodeCli(ExitCode.CONFIGURATION, "setup --token stupid");
+    }
+
+    @Test
+    @Order(4)
+    void should_create_with_user_login()  {
+        // Given
+        System.setIn(new ByteArrayInputStream((getToken() + "\n").getBytes()));
+        // When
+        assertSuccessCli("login");
+        // Then
+        validateSection();
+    }
+
+    @Test
+    @Order(5)
+    void shouldLoginWithToken() {
+        // When
+        assertSuccessCli("login --token " + getToken());
+        // Then
+        validateSection();
+    }
+
+    /**
+     * Validate that user input is in the config file
+     */
+    private void validateSection() {
+        Assertions.assertFalse(config().getSection(AstraCliConfiguration.ASTRARC_DEFAULT).isEmpty());
+        Assertions.assertEquals(
+                getToken(),
+                config().getSection(AstraCliConfiguration.ASTRARC_DEFAULT)
+                        .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN));
     }
 
 }

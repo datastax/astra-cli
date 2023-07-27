@@ -13,17 +13,17 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class ShellCommandsTest extends AbstractCmdTest {
+class ShellCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void showVersion() {
+    void showVersion() {
         assertSuccessCli("--version");
     }
 
     @Test
     @Order(2)
-    public void showBanner() {
+    void showBanner() {
         assertSuccessCli("?");
     }
     

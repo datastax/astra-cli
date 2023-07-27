@@ -27,6 +27,7 @@ import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
+import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -46,7 +47,11 @@ public class ConfigCreateCmd extends AbstractCmd {
     /** Authentication token used if not provided in config. */
     @Option(name = { "-t", "--token" }, title = "AuthToken", description = "Key to use authenticate each call.")
     protected String token;
-    
+
+    /** To use Cli on non production environment. */
+    @Option(name = { "-e", "--env" }, title = "Environment", description = "Environment to use for this section.")
+    protected ApiLocator.AstraEnvironment env = ApiLocator.AstraEnvironment.PROD;
+
     /** {@inheritDoc} */
     @Override
     public void execute() {
@@ -59,12 +64,14 @@ public class ConfigCreateCmd extends AbstractCmd {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Your token should start with 'AstraCS:'");
             throw new InvalidTokenException(token);
         }
-        Organization o = new AstraDevopsApiClient(token).getOrganization();
+        // validate token at the same time
+        Organization o = new AstraDevopsApiClient(token, env).getOrganization();
         if (sectionName == null) {
             sectionName = o.getName();
         }
         sectionName = removeQuotesIfAny(sectionName);
-        ctx().getConfiguration().createSectionWithToken(sectionName, token);
+        ctx().validateCredentials(token, env);
+        ctx().getConfiguration().createSectionWithToken(sectionName, token, env);
         ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Configuration has been saved.");
     }

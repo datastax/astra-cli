@@ -10,28 +10,28 @@ import static com.dtsx.astra.cli.core.ExitCode.NOT_FOUND;
 /**
  * Crud on Db Region.
  */
-public class DbRegionsTest extends AbstractCmdTest {
+class DbRegionsTest extends AbstractCmdTest {
 
     /** make the test StandAlone. */
-    private static String DB_TEST = "astra_cli_test";
+    static String DB_TEST = "astra_cli_test";
 
     @BeforeAll
-    public static void init() {
+    static void initDb() {
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
     }
 
     @Test
-    public void listRegionsTest() {
+    void listRegionsTest() {
         assertSuccessCli("db list-regions %s".formatted(DB_TEST));
     }
 
     @Test
-    public void shouldThrowRegionAlreadyExistTest() {
+    void shouldThrowRegionAlreadyExistTest() {
         assertExitCodeCli(ALREADY_EXIST, "db create-region %s -r us-east1".formatted(DB_TEST));
     }
 
     @Test
-    public void shouldThrowRegionNotFoundTest() {
+    void shouldThrowRegionNotFoundTest() {
         assertExitCodeCli(NOT_FOUND, "db delete-region %s -r eu-west-1".formatted(DB_TEST));
     }
 

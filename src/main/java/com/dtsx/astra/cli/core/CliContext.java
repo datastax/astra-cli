@@ -20,7 +20,8 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
+import com.dtsx.astra.cli.core.exception.AstraEnvironmentNotFoundException;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
@@ -28,7 +29,9 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.OutputFormat;
 import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.db.AstraDbClient;
+import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.streaming.AstraStreamingClient;
+import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,7 +39,10 @@ import java.util.List;
 
 /**
  * Hold the context of CLI to know where we are.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class CliContext {
 
     /**
@@ -72,7 +78,7 @@ public class CliContext {
     private TokenOptions tokenOptions;
     
     /** Configuration. */
-    private AstraConfiguration astraConfig;
+    private AstraCliConfiguration astraConfig;
      
     /**
      * Should initialize the client based on provided parameters.
@@ -82,7 +88,7 @@ public class CliContext {
      */
     public void init(CoreOptions options)  {
         this.coreOptions = options;
-        this.astraConfig = new AstraConfiguration(coreOptions.configFilename());
+        this.astraConfig = new AstraCliConfiguration(coreOptions.configFilename());
     }
     
     /**
@@ -94,7 +100,7 @@ public class CliContext {
     public void initToken(TokenOptions options) {
         this.tokenOptions = options;
         if (null == this.tokenOptions.token()) {
-            updateTokenWithSectionValue();
+            loadCredentialsFromSection();
         }
         validateToken();
     }
@@ -137,15 +143,22 @@ public class CliContext {
      * @throws TokenNotFoundException
      *      token has not been found
      */
-    private void updateTokenWithSectionValue() 
+    private void loadCredentialsFromSection()
     throws TokenNotFoundException {
         if (astraConfig.isSectionExists(tokenOptions.section()) &&
             astraConfig.getSection(tokenOptions.section())
                        .containsKey(AstraRc.ASTRA_DB_APPLICATION_TOKEN)) {
-            LoggerShell.debug("configuration: Using token in section %s".formatted(tokenOptions.section()));
+            LoggerShell.debug("Configuration: Using token in section %s".formatted(tokenOptions.section()));
+            ApiLocator.AstraEnvironment targetEnv = ApiLocator.AstraEnvironment.PROD;
+            if (astraConfig.getSection(tokenOptions.section()).containsKey(AstraCliConfiguration.KEY_ENV)) {
+                targetEnv = ApiLocator.AstraEnvironment.valueOf(
+                        astraConfig.getSection(tokenOptions.section()).get(AstraCliConfiguration.KEY_ENV));
+                LoggerShell.debug("Configuration: Targeting env %s".formatted(targetEnv));
+            }
             this.tokenOptions = new TokenOptions(
                     astraConfig.getSection(tokenOptions.section())
-                               .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN), tokenOptions.section());
+                               .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN),
+                                tokenOptions.section(), targetEnv);
            
         } else {
             throw new TokenNotFoundException();
@@ -162,13 +175,7 @@ public class CliContext {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER, "Token provided is invalid. It should start with 'AstraCS:...'. Try [astra setup]");
             throw new InvalidTokenException(getToken());
         }
-        try {
-            getApiDevops().getOrganization();
-            LoggerShell.debug("Cli successfully initialized");
-        } catch(Exception e) {
-            AstraCliConsole.outputError(ExitCode.CANNOT_CONNECT, "Token provided is invalid. Try [astra setup]");
-            throw new InvalidTokenException(getToken());
-        }
+        getApiDevops();
     }
    
     /**
@@ -188,12 +195,29 @@ public class CliContext {
     }
 
     /**
+     * Access the target environment for Astra Platform.
+     *
+     * @return
+     *       current value of 'astra environment'
+     *       current value of 'astra environment'
+     * @throws TokenNotFoundException
+     *      token as not been found
+     */
+    public ApiLocator.AstraEnvironment getAstraEnvironment()
+    throws TokenNotFoundException {
+        if (tokenOptions == null || tokenOptions.env() == null) {
+            throw new AstraEnvironmentNotFoundException();
+        }
+        return tokenOptions.env();
+    }
+
+    /**
      * Getter accessor for attribute 'astraRc'.
      *
      * @return
      *       current value of 'astraRc'
      */
-    public AstraConfiguration getConfiguration() {
+    public AstraCliConfiguration getConfiguration() {
         return astraConfig;
     }
 
@@ -207,9 +231,39 @@ public class CliContext {
      */
     public AstraDevopsApiClient getApiDevops() {
         if (devopsApiClient == null) {
-            devopsApiClient = new AstraDevopsApiClient(getToken());
+            devopsApiClient = new AstraDevopsApiClient(getToken(), getAstraEnvironment());
+            if (!getAstraEnvironment().equals(ApiLocator.AstraEnvironment.PROD)) {
+                LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
+            }
+            validateDevopsClientConnection(devopsApiClient);
         }
         return devopsApiClient;
+    }
+
+    /**
+     * Validate a token for a target environment.
+     *
+     * @param token
+     *      current token
+     * @param env
+     *      target environment
+     */
+    public void validateCredentials(String token, ApiLocator.AstraEnvironment env) {
+        validateDevopsClientConnection(new AstraDevopsApiClient(token, env));
+    }
+
+    /**
+     * Validate that current Api Client is valid.
+     */
+    private void validateDevopsClientConnection(AstraDevopsApiClient client) {
+        Organization org = client.getOrganization();
+        if (org.getId() == null) {
+            if (!client.getEnvironment().equals(ApiLocator.AstraEnvironment.PROD)) {
+                AstraCliConsole.outputError(ExitCode.CANNOT_CONNECT,
+                        "Make sure token targets proper environment '%s'".formatted(client.getEnvironment()));
+            }
+            throw new InvalidTokenException(getToken());
+        }
     }
 
     /**
@@ -219,7 +273,10 @@ public class CliContext {
      *       current value of 'apiDevopsDatabases'
      */
     public AstraDbClient getApiDevopsDatabases() {
-        return getApiDevops().db();
+        AstraDevopsApiClient cli = getApiDevops();
+        AstraDbClient dbCli =  cli.db();;
+        return dbCli;
+
     }
 
     /**

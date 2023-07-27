@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.test.db;
 import java.io.File;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,23 +16,23 @@ import com.dtsx.astra.cli.utils.FileUtils;
 /**
  * Test on cqlsh.
  */
-public class DbCqlShTest extends AbstractCmdTest {
+class DbCqlShTest extends AbstractCmdTest {
 
     /** dataset. */
-    public final static String DB_TEST       = "astra_cli_test";
-    public final static String KEYSPACE_TEST = "dsbulk";
-    public final static String TABLE_TEST    = "cities_by_country";
+    final static String DB_TEST       = "astra_cli_test";
+    final static String KEYSPACE_TEST = "dsbulk";
+    final static String TABLE_TEST    = "cities_by_country";
 
-    //@BeforeAll
-    //public static void initForCqlsh() {
-    //    assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, DB_TEST));
-    //    assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
-   // }
+    @BeforeAll
+    static void initForCqlsh() {
+        assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, DB_TEST));
+        assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
+    }
 
     @Test
     @Order(1)
     @DisplayName("Installing cqlsh")
-    public void testShouldInstallCqlSh() {
+    void testShouldInstallCqlSh() {
         if (!disableTools) {
             File cqlshFolder = new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra");
             FileUtils.deleteDirectory(cqlshFolder);
@@ -44,7 +45,7 @@ public class DbCqlShTest extends AbstractCmdTest {
     @Test
     @Order(1)
     @DisplayName("Execute command")
-    public void testShouldExecute() {
+    void testShouldExecute() {
         assertSuccessCql(DB_TEST, "select * from astra_cli_test.demo LIMIT 20;");
     }
 }

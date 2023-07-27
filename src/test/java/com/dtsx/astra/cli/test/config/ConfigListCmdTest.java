@@ -9,10 +9,10 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class ConfigListCmdTest extends AbstractCmdTest {
+class ConfigListCmdTest extends AbstractCmdTest {
     
     @Test
-    public void should_list_config() {
+    void should_list_config() {
         assertSuccessCli("config list");
         assertSuccessCli("config list -v");
         assertSuccessCli("config list --no-color");

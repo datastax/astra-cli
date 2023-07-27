@@ -17,15 +17,15 @@ import java.io.File;
  * Class to test specific DsBulk Commands
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DbDsBulkTest extends AbstractCmdTest {
+class DbDsBulkTest extends AbstractCmdTest {
 
     /** dataset. */
-    public final static String DB_TEST       = "astra_cli_test";
-    public final static String KEYSPACE_TEST = "dsbulk";
-    public final static String TABLE_TEST    = "cities_by_country";
+    final static String DB_TEST       = "astra_cli_test";
+    final static String KEYSPACE_TEST = "dsbulk";
+    final static String TABLE_TEST    = "cities_by_country";
 
     @BeforeAll
-    public static void initForDsBulk() {
+    static void initForDsBulk() {
         // Create expected DB is not Exist
         assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, KEYSPACE_TEST));
         // Create expected table
@@ -35,7 +35,7 @@ public class DbDsBulkTest extends AbstractCmdTest {
     @Test
     @Order(1)
     @DisplayName("Installing DsBulk")
-    public void testShouldInstallDsbulk() {
+    void testShouldInstallDsbulk() {
         if (!disableTools) {
             // given
             if (new File(AstraCliUtils.ASTRA_HOME + File.separator
@@ -53,7 +53,7 @@ public class DbDsBulkTest extends AbstractCmdTest {
     @Test
     @Order(2)
     @DisplayName("Load Data")
-    public void testShouldLoad() {
+    void testShouldLoad() {
         if (!disableTools){
             assertSuccessCli("db", "load", DB_TEST,
                     "-k", KEYSPACE_TEST,
@@ -67,7 +67,7 @@ public class DbDsBulkTest extends AbstractCmdTest {
     @Test
     @Order(3)
     @DisplayName("Count Data")
-    public void testShouldCount() {
+    void testShouldCount() {
         if (!disableTools) {
 
             // Sample with table name
@@ -88,7 +88,7 @@ public class DbDsBulkTest extends AbstractCmdTest {
     @Test
     @Order(4)
     @DisplayName("Unload Data")
-    public void testShouldUnload() {
+    void testShouldUnload() {
         if (!disableTools) {
             assertSuccessCli("db", "unload", DB_TEST,
                     "-k", KEYSPACE_TEST,

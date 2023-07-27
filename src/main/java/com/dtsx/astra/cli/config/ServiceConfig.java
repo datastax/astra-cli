@@ -83,8 +83,8 @@ public class ServiceConfig {
         List<String> returnedList = new ArrayList<>();
         Optional<String> defaultOrg = findDefaultOrganizationName(sections);
         for (Entry<String, Map<String, String>> section : sections.entrySet()) {
-            if (AstraConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
-                returnedList.add(AstraConfiguration.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
+            if (AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
+                returnedList.add(AstraCliConfiguration.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
             } else {
                 returnedList.add(section.getKey());
             }
@@ -101,9 +101,9 @@ public class ServiceConfig {
      *      organization name if exists
      */
     public static Optional<String> findDefaultOrganizationName(Map<String, Map<String, String>> sections) {
-        if (sections.containsKey(AstraConfiguration.ASTRARC_DEFAULT)) {
+        if (sections.containsKey(AstraCliConfiguration.ASTRARC_DEFAULT)) {
             String defaultToken = sections
-                    .get(AstraConfiguration.ASTRARC_DEFAULT)
+                    .get(AstraCliConfiguration.ASTRARC_DEFAULT)
                     .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN);
             return sections
                     .entrySet().stream()

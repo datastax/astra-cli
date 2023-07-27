@@ -37,7 +37,10 @@ import java.util.List;
 
 /**
  * Working with external cqlsh.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceCqlShell {
 
     /** Configuration to Download the archive. */

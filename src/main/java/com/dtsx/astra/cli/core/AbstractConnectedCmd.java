@@ -20,8 +20,9 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.out.OutputFormat;
+import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.github.rvesse.airline.annotations.Option;
 
 import java.util.Locale;
@@ -38,11 +39,17 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
             description = "Key to use authenticate each call.")
     protected String token;
 
+    /**
+     * Astra Environment, could be DEV or TEST instead of PROD.
+     */
+    @Option(name = { "--env" }, title = "Environment", description = "Astra Environment to use")
+    protected ApiLocator.AstraEnvironment env = ApiLocator.AstraEnvironment.PROD;
+
     /** Section. */
     @Option(name = { "-conf","--config" }, 
             title = "CONFIG_SECTION",
             description= "Section in configuration file (default = ~/.astrarc)")
-    protected String configSectionName = AstraConfiguration.ASTRARC_DEFAULT;
+    protected String configSectionName = AstraCliConfiguration.ASTRARC_DEFAULT;
 
     /** {@inheritDoc} */
     @Override
@@ -51,7 +58,7 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
         configSectionName = removeQuotesIfAny(configSectionName);
         validateOptions();
         ctx().init(new CoreOptions(verbose, noColor, OutputFormat.valueOf(output.toUpperCase(Locale.ROOT)), configFilename));
-        ctx().initToken(new TokenOptions(token, configSectionName));
+        ctx().initToken(new TokenOptions(token, configSectionName, env));
         execute();
     }
 

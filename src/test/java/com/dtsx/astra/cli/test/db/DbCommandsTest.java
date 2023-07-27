@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.test.db;
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CoreOptions;
 import com.dtsx.astra.cli.core.ExitCode;
@@ -25,17 +25,17 @@ import java.util.UUID;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class DbCommandsTest extends AbstractCmdTest {
+class DbCommandsTest extends AbstractCmdTest {
 
     @BeforeAll
-    public static void should_create_when_needed() {
+    static void should_create_when_needed() {
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
         assertSuccessCli("db create %s --if-not-exist --vector".formatted(DB_TEST_VECTOR));
     }
 
     @Test
     @Order(1)
-    public void testShouldShowHelp() {
+    void testShouldShowHelp() {
         assertSuccessCli("help");
         assertSuccessCli("help db");
         assertSuccessCli("help db create");
@@ -51,7 +51,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void testShouldListDb() {
+    void testShouldListDb() {
         assertSuccessCli("db list");
         assertSuccessCli("db list -v");
         assertSuccessCli("db list --no-color");
@@ -64,7 +64,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(3)
-    public void testShouldCreateDb() throws DatabaseNameNotUniqueException {
+    void testShouldCreateDb() throws DatabaseNameNotUniqueException {
         // When
         assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
         // Then
@@ -75,7 +75,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(4)
-    public void testShouldGetDb() throws DatabaseNameNotUniqueException {
+    void testShouldGetDb() throws DatabaseNameNotUniqueException {
         assertSuccessCli("db get %s".formatted(DB_TEST));
         assertSuccessCli("db get %s -o json".formatted(DB_TEST));
         assertSuccessCli("db get %s -o csv".formatted(DB_TEST));
@@ -93,7 +93,7 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(5)
-    public void testShouldDescribeDb() throws DatabaseNameNotUniqueException {
+    void testShouldDescribeDb() throws DatabaseNameNotUniqueException {
         assertSuccessCli("db describe %s".formatted(DB_TEST));
         assertSuccessCli("db describe %s -o json".formatted(DB_TEST));
         assertSuccessCli("db describe %s -o csv".formatted(DB_TEST));
@@ -111,7 +111,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(6)
-    public void testShouldListKeyspaces()  {
+    void testShouldListKeyspaces()  {
         assertSuccessCli("db list-keyspaces %s".formatted(DB_TEST));
         assertSuccessCli("db list-keyspaces %s -v".formatted(DB_TEST));
         assertSuccessCli("db list-keyspaces %s --no-color".formatted(DB_TEST));
@@ -122,7 +122,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(7)
-    public void testShouldCreateKeyspaces()  {
+    void testShouldCreateKeyspaces()  {
         String randomKS = "ks_" + UUID
                 .randomUUID().toString()
                 .replaceAll("-", "").substring(0, 8);
@@ -132,14 +132,14 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(8)
-    public void testShouldDownloadScb()  {
+    void testShouldDownloadScb()  {
         assertSuccessCli("db download-scb %s -f %s".formatted(DB_TEST, "/tmp/sample.zip"));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db download-scb %s".formatted("invalid"));
     }
 
     @Test
     @Order(9)
-    public void testShouldCreateDotenv()  {
+    void testShouldCreateDotenv()  {
         if (!disableTools) {
             assertSuccessCli("db create-dotenv %s -d %s".formatted(DB_TEST, "/tmp/"));
         }
@@ -147,7 +147,7 @@ public class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(10)
-    public void testShouldResumeDb()  {
+    void testShouldResumeDb()  {
         assertSuccessCli("db create-keyspace %s -k %s --if-not-exist --wait".formatted(DB_TEST, "kkk2"));
         assertSuccessCli("db resume %s --wait".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db resume %s".formatted("invalid"));
@@ -155,7 +155,7 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(11)
-    public void testShouldInstallCqlsh() {
+    void testShouldInstallCqlsh() {
         if (!disableTools) {
             new File(AstraCliUtils.ASTRA_HOME + File.separator + "cqlsh-astra").delete();
             ServiceCqlShell.getInstance().install();
@@ -165,7 +165,7 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(12)
-    public void testShouldStartShell() {
+    void testShouldStartShell() {
         if (!disableTools) {
             assertSuccessCli("db", "cqlsh", DB_TEST, "-e", "SELECT cql_version FROM system.local");
         }
@@ -174,14 +174,14 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(13)
-    public void testShouldThrowDatabaseAlreadyExist() {
+    void testShouldThrowDatabaseAlreadyExist() {
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create %s".formatted(DB_TEST));
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create-keyspace %s -k %s".formatted(DB_TEST, DB_TEST));
     }
 
     @Test
     @Order(14)
-    public void testShouldThrowDatabaseInvalidState() {
+    void testShouldThrowDatabaseInvalidState() {
         // Given
         // Create a temporary db without waiting, expecting status PENDING
         assertSuccessCli("db create %s --async".formatted("tmp_db"));
@@ -195,38 +195,39 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(15)
-    public void testShouldThrowInvalidArgument()  {
+    void testShouldThrowInvalidArgument()  {
         CliContext.getInstance().init(new CoreOptions(false,false,
                 OutputFormat.HUMAN,
-                AstraConfiguration.getDefaultConfigurationFileName()));
-        CliContext.getInstance().initToken(new TokenOptions(null, AstraConfiguration.ASTRARC_DEFAULT));
+                AstraCliConfiguration.getDefaultConfigurationFileName()));
+        CliContext.getInstance().initToken(new TokenOptions(null, AstraCliConfiguration.ASTRARC_DEFAULT, null));
+        ServiceDatabase service = ServiceDatabase.getInstance();
         Assertions.assertThrows(InvalidArgumentException.class, () -> {
-            ServiceDatabase.getInstance().generateDotEnvFile(DB_TEST, DB_TEST, "invalid", "/tmp");
+            service.generateDotEnvFile(DB_TEST, DB_TEST, "invalid", "/tmp");
         });
     }
 
     @Test
     @Order(16)
-    public void shouldDisplaySwaggerURLTest() {
+    void shouldDisplaySwaggerURLTest() {
         assertSuccessCli("db swagger %s".formatted(DB_TEST));
     }
 
     @Test
     @Order(17)
-    public void shouldDisplayPlaygroundTest() {
+    void shouldDisplayPlaygroundTest() {
         assertSuccessCli("db playground %s".formatted(DB_TEST));
     }
 
     @Test
     @Order(18)
-    public void shouldListCdcTest() {
+    void shouldListCdcTest() {
         // create and delete cdc will have dedicated test class as streaming is involved
         assertSuccessCli("db list-cdc %s".formatted(DB_TEST));
     }
 
     @Test
     @Order(19)
-    public void testShouldFailOnInvalidRegionAndCloud() throws DatabaseNameNotUniqueException {
+    void testShouldFailOnInvalidRegionAndCloud() throws DatabaseNameNotUniqueException {
         // When providing invalid region
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --region tropical-island");
         // When providing invalid cloud
@@ -237,13 +238,8 @@ public class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(20)
-    public void testNewList() {
+    void testNewList() {
         assertSuccessCli("db list");
     }
-
-    //@AfterAll
-    //public static void testShouldDelete() {
-    //    assertSuccessCli("db delete %s".formatted(DB_TEST));
-    //}
 
 }

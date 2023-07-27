@@ -49,6 +49,7 @@ import com.dtsx.astra.sdk.utils.Assert;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static com.dtsx.astra.cli.core.out.AstraAnsiColors.GREEN_500;
@@ -57,7 +58,10 @@ import static com.dtsx.astra.cli.core.out.AstraAnsiColors.RED_500;
 
 /**
  * Utility class for command `streaming`.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceStreaming {
 
     /** Command constants. */
@@ -144,7 +148,7 @@ public class ServiceStreaming {
      *      tenant client or error
      */
     private TenantClient tenantClient(String tenantName) {
-        return cacheTenantClient.computeIfAbsent(tenantName, (t) -> getApiDevopsStreaming().tenant(t));
+        return cacheTenantClient.computeIfAbsent(tenantName, t -> getApiDevopsStreaming().tenant(t));
     }
     
     /**
@@ -174,12 +178,12 @@ public class ServiceStreaming {
         Assert.hasLength(region, "region name");
 
         if (cloud != null && !"".equals(cloud)) {
-            TreeMap<String, TreeMap<String, String>> regions =
+            SortedMap<String, TreeMap<String, String>> regions =
                     ServiceOrganization.getInstance().getStreamingRegions();
             if (!regions.containsKey(cloud.toLowerCase())) {
                 // value provided in --cloud is invalid
                 throw new InvalidCloudProviderException(cloud);
-            } else if ((regions.get(cloud.toLowerCase())).containsKey(region.toLowerCase())) {
+            } else if (!(regions.get(cloud.toLowerCase())).containsKey(region.toLowerCase())) {
                 // cloud ok, but invalid region
                 throw new InvalidRegionException(cloud, region);
             }

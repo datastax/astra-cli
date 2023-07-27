@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.core;
+package com.dtsx.astra.cli.config;
 
 /*-
  * #%L
@@ -9,9 +9,9 @@ package com.dtsx.astra.cli.core;
  * Licensed under the Apache License, Version 2.0
  * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,10 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.github.rvesse.airline.annotations.Command;
 
 /**
- * Options when you need a token.
+ * Alias for setup.
  */
-public record TokenOptions(
-        String token,   // Token Value
-        String section, //Section Value
-        ApiLocator.AstraEnvironment env //Target environment.
-) {}
+@Command(name = "login", description = "Authenticate against Astra.")
+public class LoginCmd extends SetupCmd {}

@@ -15,11 +15,11 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class ConfigGetCmdTest extends AbstractCmdTest {
+class ConfigGetCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_get_config() {
+    void should_get_config() {
         // Given
         assertSuccessCli("config create test-cli -v -t " + getToken());
         Assertions.assertFalse(config().getSection("test-cli").isEmpty());
@@ -30,7 +30,7 @@ public class ConfigGetCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_get_fail_invalidsection() {
+    void should_get_fail_invalidSection() {
         // Given
         Assertions.assertTrue(config().getSection("does-not-exist").isEmpty());
         // When

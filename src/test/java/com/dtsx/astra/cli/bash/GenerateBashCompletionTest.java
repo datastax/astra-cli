@@ -13,13 +13,13 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.help.GlobalUsageGenerator;
 import com.github.rvesse.airline.help.cli.bash.BashCompletionGenerator;
 
-public class GenerateBashCompletionTest {
+class GenerateBashCompletionTest {
 
     /** Autocompletion file generated. */
     private static final String DESTINATION = "src/main/dist/astra-init.sh";
     
     @Test
-    public void testGenerateAutoComplete() {
+    void testGenerateAutoComplete() {
         Cli<Runnable> cli = new Cli<>(AstraCli.class);
         GlobalUsageGenerator<Runnable> helpGenerator = new BashCompletionGenerator<>();
         try {

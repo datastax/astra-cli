@@ -15,11 +15,11 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class ConfigDeleteCmdTest extends AbstractCmdTest {
+class ConfigDeleteCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_delete_config() {
+    void should_delete_config() {
         // Given
         assertSuccessCli("config create test-cli -v -t " + getToken());
         Assertions.assertFalse(config().getSection("test-cli").isEmpty());
@@ -31,7 +31,7 @@ public class ConfigDeleteCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_delete_fail_with_invalidsection() {
+    void should_delete_fail_with_invalidsection() {
         // Given and invalid section
         Assertions.assertTrue(config().getSection("test-cli").isEmpty());
         // When

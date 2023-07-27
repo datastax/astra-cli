@@ -26,11 +26,20 @@ import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Operations on organizations.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceOrganization {
     
     /** cmd. */
@@ -48,7 +57,7 @@ public class ServiceOrganization {
     /** column names. */
     public static final String COLUMN_REGION_DISPLAY= "Full Name";
     /** free regions for the free tier. */
-    public static Set<String> FREE_TIER_REGIONS = Set.of("us-east1");
+    public static final Set<String> FREE_TIER_REGIONS = Set.of("us-east1");
 
     /**
      * Singleton pattern.
@@ -144,7 +153,7 @@ public class ServiceOrganization {
      * @return
      *      a tree of regions
      */
-    public TreeMap<String, TreeMap<String, String>> getStreamingRegions() {
+    public SortedMap<String, TreeMap<String, String>> getStreamingRegions() {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         CliContext.getInstance()
                 .getApiDevopsStreaming()
@@ -195,7 +204,7 @@ public class ServiceOrganization {
      * @return
      *      db serverless regions
      */
-    public  TreeMap<String, TreeMap<String, String>> getDbServerlessRegions() {
+    public  SortedMap<String, TreeMap<String, String>> getDbServerlessRegions() {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
         apiDevopsOrg().db().regions().findAllServerless().forEach(r -> {
             String cloud = r.getCloudProvider().toLowerCase();
@@ -217,7 +226,7 @@ public class ServiceOrganization {
      * @return
      *      the table
      */
-    private ShellTable buildShellTable(String cloudProvider, String filter, TreeMap<String, TreeMap<String, String>> sortedRegion) {
+    private ShellTable buildShellTable(String cloudProvider, String filter, SortedMap<String, TreeMap<String, String>> sortedRegion) {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_CLOUD,          16);
         sht.addColumn(COLUMN_REGION_NAME,    20);

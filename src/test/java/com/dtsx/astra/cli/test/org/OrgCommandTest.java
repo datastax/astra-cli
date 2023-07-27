@@ -10,21 +10,19 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class OrgCommandTest extends AbstractCmdTest {
+class OrgCommandTest extends AbstractCmdTest {
     
     @Test
-    public void should_display_org() {
+    void should_display_org() {
         assertSuccessCli("org");
         assertSuccessCli("org -o json");
         assertSuccessCli("org -o csv");
         assertSuccessCli("org id");
         assertSuccessCli("org name");
     }
-
-
     
     @Test
-    public void testThrowErrors() {
+    void testThrowErrors() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "organ");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "org invalid");
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "org -o yaml");

@@ -21,6 +21,7 @@ package com.dtsx.astra.cli.config;
  */
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.AstraRc;
 
 import java.io.File;
@@ -35,7 +36,7 @@ import java.util.Scanner;
 /**
  * Utility class to load/save .astrarc file. This file is used to store Astra configuration.
  */
-public class AstraConfiguration {
+public class AstraCliConfiguration {
     
     /** Default filename we are looking for. */
     public static final String ASTRARC_FILENAME = ".astrarc";
@@ -52,6 +53,11 @@ public class AstraConfiguration {
     /** line separator. */
     public static final String LINE_SEPARATOR = System.getProperty(ENV_LINE_SEPARATOR);
 
+    /**
+     * If provided in the section, it will target another environment than PROD.
+     */
+    public static final String KEY_ENV = "ASTRA_ENV";
+
     /** Sections in the file. [sectionName] -> key=Value. */
     private final Map<String, Map<String, String>> sections = new HashMap<>();
     
@@ -61,7 +67,7 @@ public class AstraConfiguration {
     /**
      * Load from ~/.astrarc
      */
-    public AstraConfiguration() {
+    public AstraCliConfiguration() {
         this(getDefaultConfigurationFileName());
     }
     
@@ -71,7 +77,7 @@ public class AstraConfiguration {
      * @param fileName
      *            String
      */
-    public AstraConfiguration(String fileName) {
+    public AstraCliConfiguration(String fileName) {
         this.file = new File(fileName);
         if (!file.exists()) {
             createConfigFileIfNotExists();
@@ -282,8 +288,11 @@ public class AstraConfiguration {
      * @param token
      *      token to authenticate
      */
-    public void createSectionWithToken(String sectionName, String token) {
+    public void createSectionWithToken(String sectionName, String token, ApiLocator.AstraEnvironment env) {
         updateSectionKey(sectionName, AstraRc.ASTRA_DB_APPLICATION_TOKEN, token);
+        if (ApiLocator.AstraEnvironment.PROD != env) {
+            updateSectionKey(sectionName, KEY_ENV, env.name());
+        }
         if (!isSectionExists(ASTRARC_DEFAULT))
             copySection(sectionName, ASTRARC_DEFAULT);
     }

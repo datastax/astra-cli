@@ -22,7 +22,7 @@ import java.util.Optional;
  * #L%
  */
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.config.ServiceConfig;
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.core.ExitCode;
@@ -39,10 +39,10 @@ public class TokenGetCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceConfig.assertSectionExist(AstraConfiguration.ASTRARC_DEFAULT);
+        ServiceConfig.assertSectionExist(AstraCliConfiguration.ASTRARC_DEFAULT);
         Optional<String> optKey = ctx()
                 .getConfiguration()
-                .getSectionKey(AstraConfiguration.ASTRARC_DEFAULT, AstraRc.ASTRA_DB_APPLICATION_TOKEN);
+                .getSectionKey(AstraCliConfiguration.ASTRARC_DEFAULT, AstraRc.ASTRA_DB_APPLICATION_TOKEN);
         if (optKey.isEmpty()) {
             AstraCliConsole.outputError(ExitCode.INVALID_PARAMETER,"Token not found");
             throw new TokenNotFoundException();

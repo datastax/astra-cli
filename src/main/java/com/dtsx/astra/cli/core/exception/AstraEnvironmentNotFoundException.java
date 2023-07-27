@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.core;
+package com.dtsx.astra.cli.core.exception;
 
 /*-
  * #%L
@@ -22,11 +22,22 @@ package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.sdk.utils.ApiLocator;
 
+import java.io.Serial;
+import java.util.Arrays;
+
 /**
- * Options when you need a token.
+ * Astra platform not found.
  */
-public record TokenOptions(
-        String token,   // Token Value
-        String section, //Section Value
-        ApiLocator.AstraEnvironment env //Target environment.
-) {}
+public class AstraEnvironmentNotFoundException extends RuntimeException {
+
+    /** serial. */
+    @Serial
+    private static final long serialVersionUID = -5461243744804311589L;
+
+    /**
+     * Default constructor
+     */
+    public AstraEnvironmentNotFoundException() {
+        super("Astra Environment has not been found, must be one of " + Arrays.toString(ApiLocator.AstraEnvironment.values()));
+    }
+}

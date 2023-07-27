@@ -21,17 +21,17 @@ import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
  * Test commands relative to CDC.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DbCdcCommandsTest  extends AbstractCmdTest {
+class DbCdcCommandsTest  extends AbstractCmdTest {
     
     static String RANDOM_TENANT = "cdc" + UUID.randomUUID()
             .toString().replaceAll("-", "")
             .substring(0, 12);
 
     static DatabaseClient dbClient;
-    static TenantClient   tenantClient;
+    static TenantClient  tenantClient;
 
     @BeforeAll
-    public static void shouldInitializeEnvironment() {
+    static void shouldInitializeEnvironment() {
         // Create DB and keyspace with
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
         // Create TENANT
@@ -45,7 +45,7 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
 
     @Test
     @Order(1)
-    public void shouldCreateCdcs() throws InterruptedException {
+    void shouldCreateCdcs() throws InterruptedException {
         assertSuccessCli("db create-cdc %s -k %s --table demo --tenant %s -v".formatted(DB_TEST, DB_TEST, RANDOM_TENANT));
         assertSuccessCli("db create-cdc %s -k %s --table table2 --tenant %s".formatted(DB_TEST, DB_TEST, RANDOM_TENANT));
         Assertions.assertEquals(2L, dbClient.cdc().findAll().count());
@@ -54,7 +54,7 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
 
     @Test
     @Order(2)
-    public void shouldInsertDataWithCdc() {
+    void shouldInsertDataWithCdc() {
         if (!disableTools) {
             assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_insert.cql".formatted(DB_TEST));
         }
@@ -62,7 +62,7 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
 
     @Test
     @Order(3)
-    public void shouldListCdcStreaming() {
+    void shouldListCdcStreaming() {
        assertSuccessCli("streaming list-cdc %s".formatted(RANDOM_TENANT));
        assertSuccessCli("streaming list-cdc %s -o json".formatted(RANDOM_TENANT));
        assertSuccessCli("streaming list-cdc %s -o csv".formatted(RANDOM_TENANT));
@@ -70,19 +70,19 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
 
     @Test
     @Order(4)
-    public void shouldListCdcFromDb() {
+    void shouldListCdcFromDb() {
         assertSuccessCli("db list-cdc %s --no-color".formatted(DB_TEST));
     }
 
     @Test
     @Order(5)
-    public void shouldDeleteCdcDbInvalid() {
+    void shouldDeleteCdcDbInvalid() {
         assertExitCodeCli(ExitCode.NOT_FOUND, "db delete-cdc %s -id invalid".formatted(DB_TEST));
     }
 
     @Test
     @Order(6)
-    public void shouldDeleteCdcById() {
+    void shouldDeleteCdcById() {
         // Given
         Assertions.assertEquals(2, dbClient.cdc().findAll().toList().size());
         Optional<CdcDefinition> cdc = dbClient.cdc().findByDefinition(DB_TEST, "demo", RANDOM_TENANT);
@@ -97,7 +97,7 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
 
     @Test
     @Order(7)
-    public void shouldDeleteCdcByDefinition() {
+    void shouldDeleteCdcByDefinition() {
         // Given
         Assertions.assertEquals(1, dbClient.cdc().findAll().toList().size());
         // When
@@ -107,7 +107,7 @@ public class DbCdcCommandsTest  extends AbstractCmdTest {
     }
 
     @AfterAll
-    public static void cleanUp() {
+    static void cleanUp() {
        assertSuccessCli("streaming delete %s".formatted(RANDOM_TENANT));
     }
 

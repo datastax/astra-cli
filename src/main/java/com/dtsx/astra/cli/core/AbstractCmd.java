@@ -39,7 +39,7 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
-import com.dtsx.astra.cli.config.AstraConfiguration;
+import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.out.OutputFormat;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
@@ -78,7 +78,7 @@ public abstract class AbstractCmd implements Runnable {
     @Option(name = { "-cf", "--config-file" }, 
             title = "CONFIG_FILE",
             description= "Configuration file (default = ~/.astrarc)")
-    protected String configFilename = AstraConfiguration.getDefaultConfigurationFileName();
+    protected String configFilename = AstraCliConfiguration.getDefaultConfigurationFileName();
     
     /** {@inheritDoc} */
     public void run() {

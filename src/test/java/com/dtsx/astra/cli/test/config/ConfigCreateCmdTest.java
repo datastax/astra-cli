@@ -11,10 +11,10 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  *
  * @author Cedrick LUNVEN (@clunven)
  */
-public class ConfigCreateCmdTest extends AbstractCmdTest {
+class ConfigCreateCmdTest extends AbstractCmdTest {
     
     @Test
-    public void should_create_config() {
+    void should_create_config() {
         // Given
         assertSuccessCli("config create test-cli -t " + getToken());
         // When
@@ -22,12 +22,24 @@ public class ConfigCreateCmdTest extends AbstractCmdTest {
     }
 
     @Test
-    public void should_create_config_withQuotes() {
+    void should_create_config_withQuotes() {
         assertSuccessCli("config create test-cli-quotes -t \"" + getToken() + "\"");
     }
-    
+
     @Test
-    public void should_not_create_config() {
+    void shouldThrowErrorAsCannotConnectToDev() {
+        assertExitCodeCli(ExitCode.CONFIGURATION, "config create error --env DEV --token " + getToken());
+        assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE, "config create error --env INVALID --token " + getToken());
+    }
+
+    @Test
+    void shouldCreateConfigWithProd() {
+        assertSuccessCli( "config create ok --env PROD --token " + getToken());
+        assertSuccessCli( "config delete ok");
+    }
+
+    @Test
+    void should_not_create_config() {
         assertExitCodeCli(ExitCode.CONFIGURATION, "config create demo");
         assertExitCodeCli(ExitCode.CONFIGURATION, "config create demo -t invalid");
     }

@@ -38,7 +38,10 @@ import java.util.Map;
 
 /**
  * Group services related to keyspaces.
+ * The singleton pattern is validated with a Lazy initialization
+ * and a thread safe implementation.
  */
+@SuppressWarnings("java:S6548")
 public class ServiceKeyspace {
 
     /** column names. */

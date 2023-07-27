@@ -14,11 +14,11 @@ import com.dtsx.astra.cli.test.AbstractCmdTest;
  * @author Cedrick LUNVEN (@clunven)
  */
 @TestMethodOrder(OrderAnnotation.class)
-public class RolesCommandsTest extends AbstractCmdTest {
+class RolesCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    public void should_list_roles() {
+    void should_list_roles() {
         assertSuccessCli("role list");
         assertSuccessCli("role list -v");
         assertSuccessCli("role list --no-color");
@@ -28,7 +28,7 @@ public class RolesCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(2)
-    public void should_list_roles_errors() {
+    void should_list_roles_errors() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "role list -w");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "role list DB");
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "role coaster");
@@ -37,7 +37,7 @@ public class RolesCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(3)
-    public void should_get_role() {
+    void should_get_role() {
         String ADMIN_ROLE_ID = "dde8a0e9-f4ae-4b42-b642-9f257436c8da";
         assertSuccessCli("role get -v " + ADMIN_ROLE_ID);
         assertSuccessCli("role get -v " + ADMIN_ROLE_ID + " -o json");
@@ -51,7 +51,7 @@ public class RolesCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(4)
-    public void should_get_role_error() {
+    void should_get_role_error() {
         String roleInvalidId = "dde8a0e9-f4ae-4b42-b642-9f257436c812";
         String roleInvalid = "jgrkjhlkjrheglkrehgrlejk";
         assertExitCodeCli(ExitCode.NOT_FOUND, "role get " + roleInvalid);
