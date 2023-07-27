@@ -20,8 +20,6 @@ package com.dtsx.astra.cli.core.exception;
  * #L%
  */
 
-import com.dtsx.astra.sdk.utils.ApiLocator;
-
 import java.io.Serial;
 
 /**

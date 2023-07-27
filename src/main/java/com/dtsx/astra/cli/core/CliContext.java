@@ -221,8 +221,6 @@ public class CliContext {
         return astraConfig;
     }
 
-    private AstraDevopsApiClient devopsApiClient;
-
     /**
      * Getter accessor for attribute 'apiDevopsDatabases'.
      *
@@ -230,13 +228,11 @@ public class CliContext {
      *       current value of 'apiDevopsDatabases'
      */
     public AstraDevopsApiClient getApiDevops() {
-        if (devopsApiClient == null) {
-            devopsApiClient = new AstraDevopsApiClient(getToken(), getAstraEnvironment());
-            if (!getAstraEnvironment().equals(ApiLocator.AstraEnvironment.PROD)) {
-                LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
-            }
-            validateDevopsClientConnection(devopsApiClient);
+        AstraDevopsApiClient devopsApiClient = new AstraDevopsApiClient(getToken(), getAstraEnvironment());
+        if (!getAstraEnvironment().equals(ApiLocator.AstraEnvironment.PROD)) {
+          LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
         }
+        validateDevopsClientConnection(devopsApiClient);
         return devopsApiClient;
     }
 
@@ -273,10 +269,7 @@ public class CliContext {
      *       current value of 'apiDevopsDatabases'
      */
     public AstraDbClient getApiDevopsDatabases() {
-        AstraDevopsApiClient cli = getApiDevops();
-        AstraDbClient dbCli =  cli.db();;
-        return dbCli;
-
+        return getApiDevops().db();
     }
 
     /**

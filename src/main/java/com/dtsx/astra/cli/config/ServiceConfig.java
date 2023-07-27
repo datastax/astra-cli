@@ -22,12 +22,19 @@ package com.dtsx.astra.cli.config;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exception.ConfigurationException;
+import com.dtsx.astra.cli.core.out.AstraAnsiColors;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.ShellTable;
+import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
+import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.AstraRc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * Group configuration actions.
@@ -38,6 +45,11 @@ public class ServiceConfig {
      * Title of the table.
      */
     private static final String COLUMN_TITLE = "configuration";
+
+    /**
+     * Title of environment column.
+     */
+    private static final String COLUMN_ENV = "env";
     
     /**
      * Hide default constructor
@@ -59,59 +71,56 @@ public class ServiceConfig {
      */
     public static void listConfigurations() {
         Map<String, Map<String, String>> sections = ctx().getConfiguration().getSections();
-        List<String> listOrg = listOrganizations(sections);
         ShellTable sht = new ShellTable();
+        boolean isMultiEnv = isMultiEnvironment(sections);
+        if (isMultiEnv) {
+            sht.getColumnTitlesNames().add(COLUMN_ENV);
+            sht.getColumnSize().put(COLUMN_ENV, 5);
+        }
         sht.getColumnTitlesNames().add(COLUMN_TITLE);
         sht.getColumnSize().put(COLUMN_TITLE, 40);
-        for (String org : listOrg) {
-            Map<String, String> rf = new HashMap<>();
-            rf.put(COLUMN_TITLE, org);
-            sht.getCellValues().add(rf);
+        // Find Token in use (default)
+        Optional<String> defaultToken = Optional.empty();
+        if (sections.containsKey(AstraCliConfiguration.ASTRARC_DEFAULT)) {
+            defaultToken = Optional.of(sections
+                    .get(AstraCliConfiguration.ASTRARC_DEFAULT)
+                    .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN));
+        }
+        for (String sectionName : sections.keySet()) {
+            if (!AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(sectionName)) {
+                Map<String, String> rf = new HashMap<>();
+                String currentToken = sections.get(sectionName).get(AstraRc.ASTRA_DB_APPLICATION_TOKEN);
+                if (defaultToken.isPresent() && defaultToken.get().equals(currentToken)) {
+                    rf.put(COLUMN_TITLE, StringBuilderAnsi.colored(sectionName + " (in use)", AstraAnsiColors.PURPLE_300));
+                } else {
+                    rf.put(COLUMN_TITLE, sectionName);
+                }
+                if (isMultiEnv) {
+                    rf.put(COLUMN_ENV, Optional.ofNullable(sections.get(sectionName)
+                                    .get(AstraCliConfiguration.KEY_ENV))
+                            .orElse(ApiLocator.AstraEnvironment.PROD.name()));
+                }
+                sht.getCellValues().add(rf);
+            }
         }
         AstraCliConsole.printShellTable(sht);
     }
 
     /**
-     * Build List as expected on screen.
+     * Show configuration in the output.
      *
      * @param sections
-     *      section in AstraRc.
-     * @return
-     *      organization list
+     *     sections in AstraRc.
      */
-    public static List<String> listOrganizations(Map<String, Map<String, String>> sections) {
-        List<String> returnedList = new ArrayList<>();
-        Optional<String> defaultOrg = findDefaultOrganizationName(sections);
-        for (Entry<String, Map<String, String>> section : sections.entrySet()) {
-            if (AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey()) &&  defaultOrg.isPresent()) {
-                returnedList.add(AstraCliConfiguration.ASTRARC_DEFAULT + " (" + defaultOrg.get() + ")");
-            } else {
-                returnedList.add(section.getKey());
-            }
-        }
-        return returnedList;
+    public static boolean isMultiEnvironment(Map<String, Map<String, String>> sections) {
+        return sections.values().stream()
+                .flatMap(map -> map.keySet().stream())
+                .anyMatch(key -> key.equals(AstraCliConfiguration.KEY_ENV));
     }
-    
-    /**
-     * Find the default org name in the configuration file.
-     * 
-     * @param sections
-     *      list of sections
-     * @return
-     *      organization name if exists
-     */
-    public static Optional<String> findDefaultOrganizationName(Map<String, Map<String, String>> sections) {
-        if (sections.containsKey(AstraCliConfiguration.ASTRARC_DEFAULT)) {
-            String defaultToken = sections
-                    .get(AstraCliConfiguration.ASTRARC_DEFAULT)
-                    .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN);
-            return sections
-                    .entrySet().stream()
-                    .filter(e -> e.getValue().get(AstraRc.ASTRA_DB_APPLICATION_TOKEN).equals(defaultToken))
-                    .map(Entry::getKey)
-                    .findFirst();
-        }
-        return Optional.empty();
+
+    public static boolean isDefaultSection(Map<String, Map<String, String>> sections, String sectionName) {
+        return AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(sectionName)
+                && sections.containsKey(AstraCliConfiguration.ASTRARC_DEFAULT);
     }
     
     /**

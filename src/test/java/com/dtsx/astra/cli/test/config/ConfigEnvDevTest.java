@@ -9,9 +9,9 @@ import java.util.UUID;
 /**
  * Create Tests Against Astra Dev and Astra Test
  */
-public class ConfigDevTest extends AbstractCmdTest  {
+class ConfigEnvDevTest extends AbstractCmdTest  {
 
-    //@Test
+    @Test
     void shouldWorkWithDev() {
         String configDev = "dev-" + UUID.randomUUID().toString().replaceAll("-", "").substring(0,5);
         // Given
@@ -37,7 +37,7 @@ public class ConfigDevTest extends AbstractCmdTest  {
         Assertions.assertTrue(config().getSection(configDev).isEmpty());
     }
 
-    //@Test
+    @Test
     void shouldWorkWithTest() {
         String configTest = "test-" + UUID.randomUUID().toString().replaceAll("-", "").substring(0,5);
         // Given
@@ -53,7 +53,7 @@ public class ConfigDevTest extends AbstractCmdTest  {
         assertSuccessCli("config list ");
         assertSuccessCli("config describe " + configTest);
         assertSuccessCli("db list --config " + configTest);
-        assertSuccessCli("db list --token " + getTokenDev() + " --env TEST");
+        assertSuccessCli("db list --token " + getTokenTest() + " --env TEST");
 
         // --- Delete Configuration ---
 

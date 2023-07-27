@@ -75,7 +75,7 @@ public class AstraCliConfiguration {
      * Load from specified file
      * 
      * @param fileName
-     *            String
+     *          configuration file name
      */
     public AstraCliConfiguration(String fileName) {
         this.file = new File(fileName);
