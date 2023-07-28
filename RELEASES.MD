@@ -108,7 +108,7 @@ chmod 755 src/main/dist/astra-init.sh
 zip astra-cli-0.4.zip *
 zip astra-cli-0.4-linux.zip *
 zip astra-cli-0.4-mac.zip *
-tar -czf astra-cli-0.4-brew.tar.gz *
+tar -czf astra-cli-0.4-homebrew.tar.gz *
 brew create https://github.com/datastax/astra-cli/releases/download/0.4/astra-cli-0.4-homebrew.tar.gz
 ```
 
