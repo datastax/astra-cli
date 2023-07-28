@@ -29,11 +29,8 @@ import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.AstraRc;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 
 /**
@@ -86,17 +83,17 @@ public class ServiceConfig {
                     .get(AstraCliConfiguration.ASTRARC_DEFAULT)
                     .get(AstraRc.ASTRA_DB_APPLICATION_TOKEN));
         }
-        for (String sectionName : sections.keySet()) {
-            if (!AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(sectionName)) {
+        for (Map.Entry<String, Map<String, String>> section : sections.entrySet()) {
+            if (!AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(section.getKey())) {
                 Map<String, String> rf = new HashMap<>();
-                String currentToken = sections.get(sectionName).get(AstraRc.ASTRA_DB_APPLICATION_TOKEN);
+                String currentToken = sections.get(section.getKey()).get(AstraRc.ASTRA_DB_APPLICATION_TOKEN);
                 if (defaultToken.isPresent() && defaultToken.get().equals(currentToken)) {
-                    rf.put(COLUMN_TITLE, StringBuilderAnsi.colored(sectionName + " (in use)", AstraAnsiColors.PURPLE_300));
+                    rf.put(COLUMN_TITLE, StringBuilderAnsi.colored(section.getKey() + " (in use)", AstraAnsiColors.PURPLE_300));
                 } else {
-                    rf.put(COLUMN_TITLE, sectionName);
+                    rf.put(COLUMN_TITLE, section.getKey());
                 }
                 if (isMultiEnv) {
-                    rf.put(COLUMN_ENV, Optional.ofNullable(sections.get(sectionName)
+                    rf.put(COLUMN_ENV, Optional.ofNullable(sections.get(section.getKey())
                                     .get(AstraCliConfiguration.KEY_ENV))
                             .orElse(ApiLocator.AstraEnvironment.PROD.name()));
                 }
@@ -118,11 +115,6 @@ public class ServiceConfig {
                 .anyMatch(key -> key.equals(AstraCliConfiguration.KEY_ENV));
     }
 
-    public static boolean isDefaultSection(Map<String, Map<String, String>> sections, String sectionName) {
-        return AstraCliConfiguration.ASTRARC_DEFAULT.equalsIgnoreCase(sectionName)
-                && sections.containsKey(AstraCliConfiguration.ASTRARC_DEFAULT);
-    }
-    
     /**
      * Test existence of section in document.
      * 

@@ -12,9 +12,6 @@ import static com.dtsx.astra.cli.core.ExitCode.NOT_FOUND;
  */
 class DbRegionsTest extends AbstractCmdTest {
 
-    /** make the test StandAlone. */
-    static String DB_TEST = "astra_cli_test";
-
     @BeforeAll
     static void initDb() {
         assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
@@ -27,7 +24,7 @@ class DbRegionsTest extends AbstractCmdTest {
 
     @Test
     void shouldThrowRegionAlreadyExistTest() {
-        assertExitCodeCli(ALREADY_EXIST, "db create-region %s -r us-east1".formatted(DB_TEST));
+        assertExitCodeCli(ALREADY_EXIST, "db create-region %s -r us-east1 -c gcp".formatted(DB_TEST));
     }
 
     @Test

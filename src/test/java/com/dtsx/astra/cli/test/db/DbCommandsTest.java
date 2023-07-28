@@ -13,8 +13,12 @@ import com.dtsx.astra.cli.db.cqlsh.ServiceCqlShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.test.AbstractCmdTest;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
 import java.util.UUID;
@@ -122,12 +126,17 @@ class DbCommandsTest extends AbstractCmdTest {
     
     @Test
     @Order(7)
-    void testShouldCreateKeyspaces()  {
+    void testShouldCreateAndDropKeyspaces()  {
+        // Given
         String randomKS = "ks_" + UUID
                 .randomUUID().toString()
                 .replaceAll("-", "").substring(0, 8);
+        // When,Then
         assertSuccessCli("db create-keyspace %s -k %s -v ".formatted(DB_TEST, randomKS));
         assertExitCodeCli(ExitCode.NOT_FOUND, "db create-keyspace %s -k %s -v".formatted("does-not-exist", randomKS));
+        // When,Then
+        assertSuccessCli("db delete-keyspace %s -k %s -v ".formatted(DB_TEST, randomKS));
+        assertExitCodeCli(ExitCode.NOT_FOUND, "db delete-keyspace %s -k %s -v ".formatted(DB_TEST, randomKS));
     }
     
     @Test
@@ -238,8 +247,16 @@ class DbCommandsTest extends AbstractCmdTest {
 
     @Test
     @Order(20)
-    void testNewList() {
-        assertSuccessCli("db list");
+    void testShouldTestException() {
+        Assertions.assertThrows(DatabaseNameNotUniqueException.class, () -> {
+            throw new DatabaseNameNotUniqueException(DB_TEST);
+        });
+    }
+
+    @Test
+    @Order(21)
+    void testShouldListClouds() {
+        assertSuccessCli("db list-clouds");
     }
 
 }

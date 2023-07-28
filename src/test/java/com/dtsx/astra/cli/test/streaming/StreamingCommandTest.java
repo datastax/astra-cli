@@ -144,6 +144,12 @@ class StreamingCommandTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.NOT_FOUND, "streaming delete does-not-exist");
     }
 
+    @Test
+    @Order(10)
+    void testShouldListClouds() {
+        assertSuccessCli("streaming list-clouds");
+    }
+
     @AfterAll
     static void testShouldDeleteTemporaryTenant() {
         if (ctx().getApiDevopsStreaming().exist(RANDOM_TENANT)) {

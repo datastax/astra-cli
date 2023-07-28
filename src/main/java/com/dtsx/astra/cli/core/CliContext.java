@@ -21,7 +21,6 @@ package com.dtsx.astra.cli.core;
  */
 
 import com.dtsx.astra.cli.config.AstraCliConfiguration;
-import com.dtsx.astra.cli.core.exception.AstraEnvironmentNotFoundException;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
@@ -205,8 +204,8 @@ public class CliContext {
      */
     public ApiLocator.AstraEnvironment getAstraEnvironment()
     throws TokenNotFoundException {
-        if (tokenOptions == null || tokenOptions.env() == null) {
-            throw new AstraEnvironmentNotFoundException();
+        if (tokenOptions == null) {
+            return null;
         }
         return tokenOptions.env();
     }

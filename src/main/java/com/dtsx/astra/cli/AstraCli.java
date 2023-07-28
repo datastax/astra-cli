@@ -107,6 +107,7 @@ import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.sdk.db.exception.ChangeDataCaptureNotFoundException;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.db.exception.KeyspaceAlreadyExistException;
+import com.dtsx.astra.sdk.db.exception.KeyspaceNotFoundException;
 import com.dtsx.astra.sdk.db.exception.RegionAlreadyExistException;
 import com.dtsx.astra.sdk.db.exception.RegionNotFoundException;
 import com.dtsx.astra.sdk.streaming.exception.TenantAlreadyExistException;
@@ -315,7 +316,7 @@ public class AstraCli {
         } catch (InvalidArgumentException | IllegalArgumentException dex) {
            AstraCliConsole.outputError(ExitCode.INVALID_ARGUMENT, dex.getMessage());
            return  ExitCode.INVALID_ARGUMENT;
-        } catch (DatabaseNotFoundException |
+        } catch (DatabaseNotFoundException | KeyspaceNotFoundException |
                 TenantNotFoundException |
                 RoleNotFoundException | ChangeDataCaptureNotFoundException |
                 UserNotFoundException | RegionNotFoundException ex) {
