@@ -563,7 +563,7 @@ public class ServiceDatabase {
                 LoggerShell.success("Resuming %s '%s' ...".formatted(DB, databaseName));
             }
             case MAINTENANCE,INITIALIZING,PENDING ->
-                    LoggerShell.info("%s '%s' will be available soon");
+                    LoggerShell.info("%s '%s' will be available soon".formatted(DB, databaseName));
             case RESUMING ->
                     LoggerShell.info("%s '%s is already resuming".formatted(DB, databaseName));
             default -> throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.HIBERNATED, db.getStatus());
