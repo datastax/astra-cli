@@ -21,7 +21,7 @@
 		<httpclient.version>5.1.2</httpclient.version>
 		<jackson-datatype.version>2.15.2</jackson-datatype.version>
 		<!-- commons -->
-		<commons-compress.version>1.23.0</commons-compress.version>
+		<commons-compress.version>1.24.0</commons-compress.version>
 		<!-- Junit -->
 		<junit-jupiter.version>5.10.0</junit-jupiter.version>
 		<awaitibility.version>4.2.0</awaitibility.version>
