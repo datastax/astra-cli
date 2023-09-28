@@ -20,7 +20,7 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 /**
  * Options when you need a token.
@@ -28,5 +28,5 @@ import com.dtsx.astra.sdk.utils.ApiLocator;
 public record TokenOptions(
         String token,   // Token Value
         String section, //Section Value
-        ApiLocator.AstraEnvironment env //Target environment.
+        AstraEnvironment env //Target environment.
 ) {}
