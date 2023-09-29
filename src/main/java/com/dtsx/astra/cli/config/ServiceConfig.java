@@ -26,7 +26,7 @@ import com.dtsx.astra.cli.core.out.AstraAnsiColors;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.dtsx.astra.sdk.utils.AstraRc;
 
 import java.util.HashMap;
@@ -95,7 +95,7 @@ public class ServiceConfig {
                 if (isMultiEnv) {
                     rf.put(COLUMN_ENV, Optional.ofNullable(sections.get(section.getKey())
                                     .get(AstraCliConfiguration.KEY_ENV))
-                            .orElse(ApiLocator.AstraEnvironment.PROD.name()));
+                            .orElse(AstraEnvironment.PROD.name()));
                 }
                 sht.getCellValues().add(rf);
             }

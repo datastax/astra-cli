@@ -21,7 +21,7 @@ package com.dtsx.astra.cli.config;
  */
 
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.dtsx.astra.sdk.utils.AstraRc;
 
 import java.io.File;
@@ -288,9 +288,9 @@ public class AstraCliConfiguration {
      * @param token
      *      token to authenticate
      */
-    public void createSectionWithToken(String sectionName, String token, ApiLocator.AstraEnvironment env) {
+    public void createSectionWithToken(String sectionName, String token, AstraEnvironment env) {
         updateSectionKey(sectionName, AstraRc.ASTRA_DB_APPLICATION_TOKEN, token);
-        if (ApiLocator.AstraEnvironment.PROD != env) {
+        if (AstraEnvironment.PROD != env) {
             updateSectionKey(sectionName, KEY_ENV, env.name());
         }
         if (!isSectionExists(ASTRARC_DEFAULT))

@@ -27,7 +27,7 @@ import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -50,7 +50,7 @@ public class ConfigCreateCmd extends AbstractCmd {
 
     /** To use Cli on non production environment. */
     @Option(name = { "-e", "--env" }, title = "Environment", description = "Environment to use for this section.")
-    protected ApiLocator.AstraEnvironment env = ApiLocator.AstraEnvironment.PROD;
+    protected AstraEnvironment env = AstraEnvironment.PROD;
 
     /** {@inheritDoc} */
     @Override

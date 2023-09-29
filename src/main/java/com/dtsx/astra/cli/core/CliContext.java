@@ -30,7 +30,7 @@ import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.dtsx.astra.sdk.db.AstraDbClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.streaming.AstraStreamingClient;
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.dtsx.astra.sdk.utils.AstraRc;
 import org.apache.commons.lang3.StringUtils;
 
@@ -148,9 +148,9 @@ public class CliContext {
             astraConfig.getSection(tokenOptions.section())
                        .containsKey(AstraRc.ASTRA_DB_APPLICATION_TOKEN)) {
             LoggerShell.debug("Configuration: Using token in section %s".formatted(tokenOptions.section()));
-            ApiLocator.AstraEnvironment targetEnv = ApiLocator.AstraEnvironment.PROD;
+            AstraEnvironment targetEnv = AstraEnvironment.PROD;
             if (astraConfig.getSection(tokenOptions.section()).containsKey(AstraCliConfiguration.KEY_ENV)) {
-                targetEnv = ApiLocator.AstraEnvironment.valueOf(
+                targetEnv = AstraEnvironment.valueOf(
                         astraConfig.getSection(tokenOptions.section()).get(AstraCliConfiguration.KEY_ENV));
                 LoggerShell.debug("Configuration: Targeting env %s".formatted(targetEnv));
             }
@@ -202,7 +202,7 @@ public class CliContext {
      * @throws TokenNotFoundException
      *      token as not been found
      */
-    public ApiLocator.AstraEnvironment getAstraEnvironment()
+    public AstraEnvironment getAstraEnvironment()
     throws TokenNotFoundException {
         if (tokenOptions == null) {
             return null;
@@ -228,7 +228,7 @@ public class CliContext {
      */
     public AstraDevopsApiClient getApiDevops() {
         AstraDevopsApiClient devopsApiClient = new AstraDevopsApiClient(getToken(), getAstraEnvironment());
-        if (!getAstraEnvironment().equals(ApiLocator.AstraEnvironment.PROD)) {
+        if (!getAstraEnvironment().equals(AstraEnvironment.PROD)) {
           LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
         }
         validateDevopsClientConnection(devopsApiClient);
@@ -243,7 +243,7 @@ public class CliContext {
      * @param env
      *      target environment
      */
-    public void validateCredentials(String token, ApiLocator.AstraEnvironment env) {
+    public void validateCredentials(String token, AstraEnvironment env) {
         validateDevopsClientConnection(new AstraDevopsApiClient(token, env));
     }
 
@@ -253,7 +253,7 @@ public class CliContext {
     private void validateDevopsClientConnection(AstraDevopsApiClient client) {
         Organization org = client.getOrganization();
         if (org.getId() == null) {
-            if (!client.getEnvironment().equals(ApiLocator.AstraEnvironment.PROD)) {
+            if (!client.getEnvironment().equals(AstraEnvironment.PROD)) {
                 AstraCliConsole.outputError(ExitCode.CANNOT_CONNECT,
                         "Make sure token targets proper environment '%s'".formatted(client.getEnvironment()));
             }

@@ -22,7 +22,7 @@ package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.out.OutputFormat;
-import com.dtsx.astra.sdk.utils.ApiLocator;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Option;
 
 import java.util.Locale;
@@ -43,7 +43,7 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
      * Astra Environment, could be DEV or TEST instead of PROD.
      */
     @Option(name = { "--env" }, title = "Environment", description = "Astra Environment to use")
-    protected ApiLocator.AstraEnvironment env = ApiLocator.AstraEnvironment.PROD;
+    protected AstraEnvironment env = AstraEnvironment.PROD;
 
     /** Section. */
     @Option(name = { "-conf","--config" }, 
