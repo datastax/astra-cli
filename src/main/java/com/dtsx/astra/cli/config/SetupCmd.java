@@ -28,6 +28,8 @@ import com.dtsx.astra.sdk.AstraDevopsApiClient;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
+import java.io.Console;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static com.dtsx.astra.cli.core.out.AstraAnsiColors.CYAN_400;
@@ -51,19 +53,29 @@ public class SetupCmd extends AbstractCmd {
     public void execute() {
         if (tokenParam == null || tokenParam.isBlank()) {
             verbose = true;
-            String token;
+            String token = null;
             AstraCliConsole.banner();
-            try(Scanner scanner = new Scanner(System.in)) {
-                boolean validToken = false;
-                while (!validToken) {
-                    AstraCliConsole.println("$ Enter an Astra token:", CYAN_400);
-                    token = removeQuotesIfAny(scanner.nextLine());
-                    try {
-                      createDefaultSection(token);
-                      validToken = true;
-                    } catch(InvalidTokenException ite) {
-                      LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
+            boolean validToken = false;
+            Console cons;
+            char[] tokenFromConsole;
+            while (!validToken) {
+                try {
+                    if ((cons = System.console()) != null &&
+                            (tokenFromConsole = cons.readPassword("[%s]", "$ Enter an Astra token:")) != null) {
+                        token = String.valueOf(tokenFromConsole);
+
+                        // Clear the password from memory immediately when done
+                        Arrays.fill(tokenFromConsole, ' ');
+                    } else {
+                        try (Scanner scanner = new Scanner(System.in)) {
+                            AstraCliConsole.println("$ Enter an Astra token:", CYAN_400);
+                            token = scanner.nextLine();
+                        }
                     }
+                    createDefaultSection(removeQuotesIfAny(token));
+                    validToken = true;
+                } catch(InvalidTokenException ite) {
+                    LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
                 }
             }
         } else {
