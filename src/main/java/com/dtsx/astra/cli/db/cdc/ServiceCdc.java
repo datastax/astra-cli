@@ -223,7 +223,7 @@ public class ServiceCdc {
                 .database(dbDao.getDatabase(databaseName).getId())
                 .cdc()
                 .create(keyspace,table, tenant, topicPartition );
-        LoggerShell.info("Creating from db '%s' is creating.".formatted(databaseName));
+        LoggerShell.info("Cdc from db '%s' is creating.".formatted(databaseName));
     }
 
 }
