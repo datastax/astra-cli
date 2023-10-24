@@ -24,7 +24,7 @@ import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -53,7 +53,7 @@ public class SetupCmd extends AbstractCmd {
     public void execute() {
         if (tokenParam == null || tokenParam.isBlank()) {
             verbose = true;
-            String token = null;
+            String token;
             AstraCliConsole.banner();
             boolean validToken = false;
             Console cons;
@@ -98,7 +98,7 @@ public class SetupCmd extends AbstractCmd {
         try {
             ConfigCreateCmd ccc = new ConfigCreateCmd();
             ccc.token = removeQuotesIfAny(token);
-            ccc.sectionName = new AstraDevopsApiClient(token).getOrganization().getName();
+            ccc.sectionName = new AstraOpsClient(token).getOrganization().getName();
             ccc.run();
         } catch(Exception e) {
             LoggerShell.warning("Invalid token: It must be start with 'AstraCS:..' and have Organization Administrator privileges.");

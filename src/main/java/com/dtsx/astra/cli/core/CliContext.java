@@ -26,8 +26,8 @@ import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.OutputFormat;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
-import com.dtsx.astra.sdk.db.AstraDbClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
+import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.streaming.AstraStreamingClient;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -226,8 +226,8 @@ public class CliContext {
      * @return
      *       current value of 'apiDevopsDatabases'
      */
-    public AstraDevopsApiClient getApiDevops() {
-        AstraDevopsApiClient devopsApiClient = new AstraDevopsApiClient(getToken(), getAstraEnvironment());
+    public AstraOpsClient getApiDevops() {
+        AstraOpsClient devopsApiClient = new AstraOpsClient(getToken(), getAstraEnvironment());
         if (!getAstraEnvironment().equals(AstraEnvironment.PROD)) {
           LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
         }
@@ -244,13 +244,13 @@ public class CliContext {
      *      target environment
      */
     public void validateCredentials(String token, AstraEnvironment env) {
-        validateDevopsClientConnection(new AstraDevopsApiClient(token, env));
+        validateDevopsClientConnection(new AstraOpsClient(token, env));
     }
 
     /**
      * Validate that current Api Client is valid.
      */
-    private void validateDevopsClientConnection(AstraDevopsApiClient client) {
+    private void validateDevopsClientConnection(AstraOpsClient client) {
         Organization org = client.getOrganization();
         if (org.getId() == null) {
             if (!client.getEnvironment().equals(AstraEnvironment.PROD)) {
@@ -267,7 +267,7 @@ public class CliContext {
      * @return
      *       current value of 'apiDevopsDatabases'
      */
-    public AstraDbClient getApiDevopsDatabases() {
+    public AstraDBOpsClient getApiDevopsDatabases() {
         return getApiDevops().db();
     }
 

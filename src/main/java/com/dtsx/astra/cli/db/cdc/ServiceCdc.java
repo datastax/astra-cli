@@ -27,7 +27,7 @@ import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
-import com.dtsx.astra.sdk.db.AstraDbClient;
+import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
@@ -105,7 +105,7 @@ public class ServiceCdc {
      * @return
      *      api devops
      */
-    private AstraDbClient apiDevopsDb() {
+    private AstraDBOpsClient apiDevopsDb() {
         return CliContext.getInstance().getApiDevopsDatabases();
     }
 

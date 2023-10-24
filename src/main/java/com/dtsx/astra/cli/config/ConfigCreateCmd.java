@@ -25,7 +25,7 @@ import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Arguments;
@@ -65,7 +65,7 @@ public class ConfigCreateCmd extends AbstractCmd {
             throw new InvalidTokenException(token);
         }
         // validate token at the same time
-        Organization o = new AstraDevopsApiClient(token, env).getOrganization();
+        Organization o = new AstraOpsClient(token, env).getOrganization();
         if (sectionName == null) {
             sectionName = o.getName();
         }

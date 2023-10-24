@@ -27,7 +27,7 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.iam.role.AstraToken;
 import com.dtsx.astra.cli.iam.role.ServiceRole;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.TokensClient;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
@@ -91,7 +91,7 @@ public class ServiceToken {
      * @return
      *      api devops
      */
-    private AstraDevopsApiClient apiDevopsOrg() {
+    private AstraOpsClient apiDevopsOrg() {
         return CliContext.getInstance().getApiDevops();
     }
 

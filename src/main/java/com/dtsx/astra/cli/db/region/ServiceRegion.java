@@ -26,7 +26,7 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.db.DaoDatabase;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.sdk.db.AstraDbClient;
+import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -97,7 +97,7 @@ public class ServiceRegion {
      * @return
      *      api devops
      */
-    private AstraDbClient apiDevopsDb() {
+    private AstraDBOpsClient apiDevopsDb() {
         return CliContext.getInstance().getApiDevopsDatabases();
     }
 

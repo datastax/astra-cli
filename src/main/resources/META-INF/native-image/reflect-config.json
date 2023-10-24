@@ -719,7 +719,8 @@
       {"name":"getCloudRegion","parameterTypes":[] },
       {"name":"getPlan","parameterTypes":[] },
       {"name":"getTenantName","parameterTypes":[] },
-      {"name":"getUserEmail","parameterTypes":[] }
+      {"name":"getUserEmail", "parameterTypes":[] },
+      {"name":"getClusterName", "parameterTypes":[] }
     ]
   },
   {

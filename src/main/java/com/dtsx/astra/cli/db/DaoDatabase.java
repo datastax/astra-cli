@@ -26,8 +26,8 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
-import com.dtsx.astra.sdk.db.DatabaseClient;
-import com.dtsx.astra.sdk.db.AstraDbClient;
+import com.dtsx.astra.sdk.db.AstraDBOpsClient;
+import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
@@ -103,8 +103,8 @@ public class DaoDatabase {
      * @throws DatabaseNotFoundException
      *      error when db does not exist
      */
-    public DatabaseClient getRequiredDatabaseClient(String databaseName) {
-        Optional<DatabaseClient> dbClient = getDatabaseClient(databaseName);
+    public DbOpsClient getRequiredDatabaseClient(String databaseName) {
+        Optional<DbOpsClient> dbClient = getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
             return dbClient.get();
         }
@@ -121,15 +121,15 @@ public class DaoDatabase {
      * @throws DatabaseNameNotUniqueException 
      *      cli does not work if multiple db with same name
      */
-    public Optional<DatabaseClient> getDatabaseClient(String db) 
+    public Optional<DbOpsClient> getDatabaseClient(String db)
     throws DatabaseNameNotUniqueException {
-        AstraDbClient dbsClient = CliContext.getInstance().getApiDevopsDatabases();
+        AstraDBOpsClient dbsClient = CliContext.getInstance().getApiDevopsDatabases();
         
         // Escape special chars
         db = db.replace("\"", "");
         // Database name containing spaces cannot be an id
         if (!db.contains(" ") ) {
-            DatabaseClient dbClient = dbsClient.database(db);
+            DbOpsClient dbClient = dbsClient.database(db);
             if (dbClient.exist()) {
                 LoggerShell.debug("Database found id=" + db);
                 return Optional.of(dbClient);
@@ -193,16 +193,16 @@ public class DaoDatabase {
         Datacenter      dc  = dcs.iterator().next();
         if (dcs.size() > 1) {
             if (null == region) {
-                throw new InvalidArgumentException(""
-                        + "Your database is deployed on multiple regions. "
+                throw new InvalidArgumentException(
+                         "Your database is deployed on multiple regions. "
                         + "A scb is associated to only one region. "
                         + "Add -r or --region in the command to select one.");
             }
             Optional<Datacenter> optDc = dcs.stream()
                .filter(d -> d.getName().equals(region)).findFirst();
             if (optDc.isEmpty()) {
-                throw new InvalidArgumentException(""
-                        + "Your database is deployed on multiple regions. "
+                throw new InvalidArgumentException(
+                        "Your database is deployed on multiple regions. "
                         + "You select and invalid region name. "
                         + "Please use one from %s".formatted(
                                 dcs.stream().map(Datacenter::getName)

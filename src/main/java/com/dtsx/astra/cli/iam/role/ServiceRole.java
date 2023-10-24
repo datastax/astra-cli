@@ -26,7 +26,7 @@ import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.JsonOutput;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Role;
 import com.dtsx.astra.sdk.utils.IdUtils;
 
@@ -79,7 +79,7 @@ public class ServiceRole {
      * @return
      *      api devops
      */
-    private AstraDevopsApiClient apiDevopsOrg() {
+    private AstraOpsClient apiDevopsOrg() {
         return CliContext.getInstance().getApiDevops();
     }
 

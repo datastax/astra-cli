@@ -43,4 +43,5 @@ class ConfigCreateCmdTest extends AbstractCmdTest {
         assertExitCodeCli(ExitCode.CONFIGURATION, "config create demo");
         assertExitCodeCli(ExitCode.CONFIGURATION, "config create demo -t invalid");
     }
+
 }

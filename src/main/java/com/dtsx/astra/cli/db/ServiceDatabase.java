@@ -39,7 +39,7 @@ import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
-import com.dtsx.astra.sdk.db.DatabaseClient;
+import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseCreationBuilder;
@@ -178,9 +178,9 @@ public class ServiceDatabase {
      */
     public ExitCode waitForDbStatus(String databaseName, DatabaseStatusType status, int timeout)
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException {
-        Optional<DatabaseClient> dbClient = dbDao.getDatabaseClient(databaseName);
+        Optional<DbOpsClient> dbClient = dbDao.getDatabaseClient(databaseName);
         if (dbClient.isPresent()) {
-           DatabaseClient     dbc   = dbClient.get();
+           DbOpsClient     dbc   = dbClient.get();
            Optional<Database> optDb = dbc.find();
            if (optDb.isPresent()) {
                Database db = optDb.get();
@@ -271,7 +271,7 @@ public class ServiceDatabase {
      */
     public int retryUntilDbDeleted(String dbName, int timeout) {
         int retries = 0;
-        Optional<DatabaseClient> optDbClient = dbDao.getDatabaseClient(dbName);
+        Optional<DbOpsClient> optDbClient = dbDao.getDatabaseClient(dbName);
         while (retries++ < timeout && optDbClient.isPresent()) {
             try {
                 Thread.sleep(1000);
@@ -355,7 +355,7 @@ public class ServiceDatabase {
         
         // if multiple databases with same name => error
         try {
-            Optional<DatabaseClient> dbClient = dbDao.getDatabaseClient(databaseName);
+            Optional<DbOpsClient> dbClient = dbDao.getDatabaseClient(databaseName);
             if (dbClient.isEmpty()) {
                 createNewDb(databaseName, databaseRegion, keyspaceName, vectorSearch);
             } else {

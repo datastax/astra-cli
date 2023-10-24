@@ -23,7 +23,7 @@ package com.dtsx.astra.cli.org;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.ShellTable;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class ServiceOrganization {
      * @return
      *      api devops
      */
-    private AstraDevopsApiClient apiDevopsOrg() {
+    private AstraOpsClient apiDevopsOrg() {
         return CliContext.getInstance().getApiDevops();
     }
 

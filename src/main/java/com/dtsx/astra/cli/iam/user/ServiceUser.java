@@ -28,7 +28,7 @@ import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.iam.role.exception.RoleNotFoundException;
 import com.dtsx.astra.cli.iam.user.exception.UserAlreadyExistException;
 import com.dtsx.astra.cli.iam.user.exception.UserNotFoundException;
-import com.dtsx.astra.sdk.AstraDevopsApiClient;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Role;
 import com.dtsx.astra.sdk.org.domain.User;
 import com.dtsx.astra.sdk.utils.IdUtils;
@@ -82,7 +82,7 @@ public class ServiceUser {
      * @return
      *      api devops
      */
-    private AstraDevopsApiClient apiDevopsOrg() {
+    private AstraOpsClient apiDevopsOrg() {
         return CliContext.getInstance().getApiDevops();
     }
 

@@ -1,8 +1,10 @@
 package com.dtsx.astra.cli.test.db;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import com.dtsx.astra.cli.core.ExitCode;
+import com.dtsx.astra.cli.test.AbstractCmdTest;
+import com.dtsx.astra.sdk.db.DbOpsClient;
+import com.dtsx.astra.sdk.streaming.TenantClient;
+import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,11 +13,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.dtsx.astra.cli.core.ExitCode;
-import com.dtsx.astra.cli.test.AbstractCmdTest;
-import com.dtsx.astra.sdk.db.DatabaseClient;
-import com.dtsx.astra.sdk.streaming.TenantClient;
-import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Test commands relative to CDC.
@@ -27,7 +26,7 @@ class DbCdcCommandsTest  extends AbstractCmdTest {
             .toString().replaceAll("-", "")
             .substring(0, 12);
 
-    static DatabaseClient dbClient;
+    static DbOpsClient dbClient;
     static TenantClient  tenantClient;
 
     @BeforeAll
