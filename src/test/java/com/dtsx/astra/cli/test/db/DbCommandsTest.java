@@ -193,7 +193,7 @@ class DbCommandsTest extends AbstractCmdTest {
     void testShouldThrowDatabaseInvalidState() {
         // Given
         // Create a temporary db without waiting, expecting status PENDING
-        assertSuccessCli("db create %s --async".formatted("tmp_db"));
+        assertSuccessCli("db create %s --if-not-exist --async".formatted("tmp_db"));
         // When, Then
         assertExitCodeCli(ExitCode.UNAVAILABLE, "db create-keyspace %s -k %s".formatted("tmp_db", "ks"));
         // Waiting for the db to be started
@@ -257,6 +257,13 @@ class DbCommandsTest extends AbstractCmdTest {
     @Order(21)
     void testShouldListClouds() {
         assertSuccessCli("db list-clouds");
+    }
+
+
+    @Test
+    @Order(22)
+    void testShouldCreateAClassicAstra() {
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "db create cli5 --tier C20 --capacity-units 1");
     }
 
 }

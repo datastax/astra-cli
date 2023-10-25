@@ -78,7 +78,10 @@ public class CliContext {
     
     /** Configuration. */
     private AstraCliConfiguration astraConfig;
-     
+
+    /** Single for Ops Client. */
+    private AstraOpsClient devopsApiClient;
+
     /**
      * Should initialize the client based on provided parameters.
      *
@@ -227,11 +230,13 @@ public class CliContext {
      *       current value of 'apiDevopsDatabases'
      */
     public AstraOpsClient getApiDevops() {
-        AstraOpsClient devopsApiClient = new AstraOpsClient(getToken(), getAstraEnvironment());
-        if (!getAstraEnvironment().equals(AstraEnvironment.PROD)) {
-          LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
+        if (devopsApiClient == null) {
+            devopsApiClient = new AstraOpsClient(getToken(), getAstraEnvironment());
+            if (!getAstraEnvironment().equals(AstraEnvironment.PROD)) {
+                LoggerShell.info("You are using a non-production environment '%s' ".formatted(getAstraEnvironment()));
+            }
+            validateDevopsClientConnection(devopsApiClient);
         }
-        validateDevopsClientConnection(devopsApiClient);
         return devopsApiClient;
     }
 

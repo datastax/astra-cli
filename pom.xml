@@ -10,17 +10,19 @@
 	<version>0.4</version>
 	<url>https://github.com/datastax/astra-cli</url>
 	<properties>
-	 	<sonar.organization>clun-datastax</sonar.organization>
-  		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
+
+		<imageName>astra</imageName>
+		<app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<sonar.organization>clun-datastax</sonar.organization>
+  		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
 		<astra-sdk.version>0.7.1</astra-sdk.version>
 		<jansi.version>2.4.1</jansi.version>
 		<airline.version>2.9.0</airline.version>
 		<slf4j.version>2.0.9</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<jackson-datatype.version>2.15.3</jackson-datatype.version>
-		<!-- commons -->
 		<commons-compress.version>1.24.0</commons-compress.version>
 		<!-- Junit -->
 		<junit-jupiter.version>5.10.0</junit-jupiter.version>
@@ -33,17 +35,17 @@
 		<version.maven.plugin.assembly>3.6.0</version.maven.plugin.assembly>
 		<version.maven.plugin.compiler>3.11.0</version.maven.plugin.compiler>
 		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
-		<version.maven.plugin.dependency>3.6.0</version.maven.plugin.dependency>
-		<version.maven.plugin.exec>3.0.0</version.maven.plugin.exec>
+		<version.maven.plugin.dependency>3.6.1</version.maven.plugin.dependency>
+		<version.maven.plugin.exec>3.1.0</version.maven.plugin.exec>
 		<version.maven.plugin.jacoco>0.8.11</version.maven.plugin.jacoco>
-		<version.maven.plugin.javadoc>3.4.1</version.maven.plugin.javadoc>
+		<version.maven.plugin.javadoc>3.6.0</version.maven.plugin.javadoc>
 		<version.maven.plugin.jar>3.3.0</version.maven.plugin.jar>
 		<version.maven.plugin.license>2.2.0</version.maven.plugin.license>
 		<version.maven.plugin.native>0.9.28</version.maven.plugin.native>
-		<version.maven.plugin.release>2.5.2</version.maven.plugin.release>
+		<version.maven.plugin.release>3.0.1</version.maven.plugin.release>
 		<version.maven.plugin.resources>3.3.1</version.maven.plugin.resources>
 		<version.maven.plugin.shade>3.5.1</version.maven.plugin.shade>
-		<version.maven.plugin.surefire>3.1.2</version.maven.plugin.surefire>
+		<version.maven.plugin.surefire>3.2.1</version.maven.plugin.surefire>
 	</properties>
 
 	<dependencies>
@@ -91,11 +93,17 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>${jackson-datatype.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.graalvm.buildtools</groupId>
+			<artifactId>junit-platform-native</artifactId>
+			<version>${version.maven.plugin.native}</version>
+		</dependency>
 		
 		<!-- Unit tests -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
+			<artifactId>junit-jupiter</artifactId>
 			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -105,21 +113,17 @@
 			<version>${airline.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
 		<dependency>
 			<groupId>org.awaitility</groupId>
 			<artifactId>awaitility</artifactId>
 			<version>${awaitibility.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
 
 		<plugins>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -130,7 +134,6 @@
 					<showWarnings>false</showWarnings>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -141,13 +144,11 @@
 					</includes>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>${version.maven.plugin.dependency}</version>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -179,7 +180,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -194,7 +194,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -204,7 +203,11 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${version.maven.plugin.release}</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -245,7 +248,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>com.github.rvesse</groupId>
 				<artifactId>airline-maven-plugin</artifactId>
@@ -272,8 +274,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			 <!-- Coveralls.io -->
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
@@ -289,7 +289,6 @@
 				</dependency>  
 			   </dependencies>
             </plugin>
-            
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -321,7 +320,6 @@
                     </execution>
                 </executions>
             </plugin>
-            
             <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -342,7 +340,6 @@
 					</execution>
 				</executions>
 		    </plugin>
-
 		</plugins>
 	</build>
 
@@ -358,15 +355,28 @@
 						<extensions>true</extensions>
 						<executions>
 							<execution>
+								<id>test-native</id>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<phase>test</phase>
+							</execution>
+							<execution>
 								<id>build-native</id>
+								<!--
 								<goals>
 									<goal>build</goal>
+								</goals>-->
+								<goals>
+									<goal>compile-no-fork</goal>
 								</goals>
 								<phase>package</phase>
 							</execution>
 						</executions>
 						<configuration>
-							<imageName>astra-native</imageName>
+							<imageName>${imageName}</imageName>
+							<skip>false</skip>
+							<fallback>false</fallback>
 							<mainClass>${app.main.class}</mainClass>
 							<buildArgs>
 								<buildArg>-H:+ReportExceptionStackTraces</buildArg>
@@ -378,11 +388,144 @@
 							<classpath>
 								<param>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</param>
 							</classpath>
+							<agent>
+								<enabled>true</enabled>
+							</agent>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>${version.maven.plugin.exec}</version>
+						<executions>
+							<execution>
+								<id>java-agent</id>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>java</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>-classpath</argument>
+										<classpath/>
+										<argument>${app.main.class}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>java</id>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<configuration>
+									<mainClass>${app.main.class}</mainClass>
+								</configuration>
+							</execution>
+							<execution>
+								<id>native</id>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.build.directory}/${imageName}</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>shaded</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.graalvm.buildtools</groupId>
+					<artifactId>junit-platform-native</artifactId>
+					<version>${version.maven.plugin.native}</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>${version.maven.plugin.shade}</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>${version.maven.plugin.assembly}</version>
+						<configuration>
+							<descriptors>
+								<descriptor>src/assembly/test-jar-with-dependencies.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-test-jar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>${version.maven.plugin.native}</version>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<id>test-native</id>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<configuration>
+									<classpath>
+										<param>${project.build.directory}/${project.artifactId}-${project.version}-tests.jar</param>
+									</classpath>
+								</configuration>
+							</execution>
+							<execution>
+								<id>build-native</id>
+								<goals>
+									<goal>compile-no-fork</goal>
+								</goals>
+								<phase>package</phase>
+								<configuration>
+									<classpath>
+										<param>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</param>
+									</classpath>
+								</configuration>
+							</execution>
+						</executions>
+						<configuration>
+							<skip>false</skip>
+							<useArgFile>false</useArgFile>
+							<imageName>${imageName}</imageName>
+							<fallback>false</fallback>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
+
 	</profiles>
 
 	<scm>

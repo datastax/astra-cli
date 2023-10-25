@@ -623,6 +623,7 @@
       {"name":"setUsers","parameterTypes":["java.util.List"] }
     ]
   },
+
   {
     "name":"com.dtsx.astra.sdk.org.domain.Role",
     "allDeclaredFields":true,
@@ -649,6 +650,40 @@
     ]
   },
   {
+    "name":"com.dtsx.astra.sdk.org.domain.RoleDefinition",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setName","parameterTypes":["java.lang.String"] },
+      {"name":"setPolicy","parameterTypes":["com.dtsx.astra.sdk.org.domain.RolePolicy"] },
+      {"name":"getName","parameterTypes":[] },
+      {"name":"getPolicy","parameterTypes":[] }
+    ]
+  },
+  {
+    "name":"com.dtsx.astra.sdk.org.domain.CreateRoleResponse",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setOrganizationId","parameterTypes":["java.lang.String"] },
+      {"name":"setRoleId","parameterTypes":["java.lang.String"] },
+      {"name":"setRoleName","parameterTypes":["java.lang.String"] },
+      {"name":"setPolicy","parameterTypes":["com.dtsx.astra.sdk.org.domain.RolePolicy"] },
+      {"name":"setLastUpdateDateTime","parameterTypes":["java.lang.String"] },
+      {"name":"setLastUpdateUserID","parameterTypes":["java.lang.String"] },
+      {"name":"getOrganizationId","parameterTypes":[] },
+      {"name":"getRoleId","parameterTypes":[] },
+      {"name":"getRoleName","parameterTypes":[] },
+      {"name":"getPolicy","parameterTypes":[] },
+      {"name":"getLastUpdateDateTime","parameterTypes":[] },
+      {"name":"getLastUpdateUserID","parameterTypes":[] }
+    ]
+  },
+  {
     "name":"com.dtsx.astra.sdk.org.domain.User",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true,
@@ -662,11 +697,26 @@
     ]
   },
   {
+    "name":"com.dtsx.astra.sdk.org.domain.InviteUserRequest",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setOrgId","parameterTypes":["java.lang.String"] },
+      {"name":"getOrgId","parameterTypes":[] },
+      {"name":"setEmail","parameterTypes":["java.lang.String"] },
+      {"name":"getEmail","parameterTypes":[] },
+      {"name":"setRoles","parameterTypes":["java.util.List"] },
+      {"name":"getRoles","parameterTypes":[] },
+      {"name":"addRoles","parameterTypes":["[Ljava.lang.String;"] }
+    ]
+  },
+  {
     "name":"com.dtsx.astra.sdk.org.domain.UserStatus",
     "allDeclaredFields":true,
     "queryAllDeclaredMethods":true
   },
-
 
 
   {
@@ -745,6 +795,29 @@
       {"name":"setClients","parameterTypes":["java.util.List"] }
     ]
   },
+  {
+    "name":"com.dtsx.astra.sdk.org.domain.CreateTokenResponse",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"getClientId","parameterTypes":[] },
+      {"name":"getOrgId","parameterTypes":[] },
+      {"name":"getSecret","parameterTypes":[] },
+      {"name":"getToken","parameterTypes":[] },
+      {"name":"getGeneratedOn","parameterTypes":[] },
+      {"name":"getRoles","parameterTypes":[] },
+      {"name":"setClientId","parameterTypes":["java.lang.String"] },
+      {"name":"setRoles","parameterTypes":["java.util.List"] },
+      {"name":"setOrgId","parameterTypes":["java.lang.String"] },
+      {"name":"setSecret","parameterTypes":["java.lang.String"] },
+      {"name":"setToken","parameterTypes":["java.lang.String"] },
+      {"name":"setGeneratedOn","parameterTypes":["java.lang.String"] }
+    ]
+  },
+
+
   {
     "name":"com.dtsx.astra.sdk.utils.ApiResponse",
     "allDeclaredFields":true,

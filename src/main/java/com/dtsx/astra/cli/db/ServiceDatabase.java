@@ -44,6 +44,7 @@ import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseCreationBuilder;
 import com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest;
+import com.dtsx.astra.sdk.db.domain.DatabaseRegion;
 import com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
@@ -87,12 +88,6 @@ import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_500;
  */
 @SuppressWarnings("java:S6548")
 public class ServiceDatabase {
-    
-    /** Default region. **/
-    public static final String DEFAULT_REGION        = "us-east1";
-    
-    /** Default tier. **/
-    public static final String DEFAULT_TIER          = "serverless";
 
     /** Default timeout for operations. */
     public static final int DEFAULT_TIMEOUT_SECONDS = 300;
@@ -322,16 +317,8 @@ public class ServiceDatabase {
     /**
      * Create a new database
      * 
-     * @param databaseName
-     *      db name
-     * @param databaseRegion
-     *      db region
-     * @param keyspaceName
-     *      db ks
-     * @param vectorSearch
-     *      enable vector search
-     * @param ifNotExist
-     *      will create if needed
+     * @param options
+     *      Database creation options
      * @throws DatabaseAlreadyExistException
      *      db name already exist
      * @throws InvalidArgumentException
@@ -343,82 +330,72 @@ public class ServiceDatabase {
      * @throws InvalidDatabaseStateException
      *      database is hibernating or error state, cannot proceed 
      */
-    public void createDb(String databaseName, String databaseRegion, String keyspaceName, boolean ifNotExist, boolean vectorSearch)
+    public void createDb(DbCreationOptions options)
     throws DatabaseAlreadyExistException, DatabaseNotFoundException,
            InvalidDatabaseStateException, InvalidArgumentException, KeyspaceAlreadyExistException {
-        if (StringUtils.isEmpty(keyspaceName)) {
-            keyspaceName = databaseName.toLowerCase()
-                    .replace(" ", "_")
-                    .replace("-", "_");
-        }
-        validateNames(databaseName, keyspaceName);
-        
+        validateNames(options.databaseName(), options.keyspaceName());
         // if multiple databases with same name => error
         try {
-            Optional<DbOpsClient> dbClient = dbDao.getDatabaseClient(databaseName);
+            Optional<DbOpsClient> dbClient = dbDao.getDatabaseClient(options.databaseName());
             if (dbClient.isEmpty()) {
-                createNewDb(databaseName, databaseRegion, keyspaceName, vectorSearch);
+                createNewDb(options);
             } else {
-                if (!ifNotExist) {
-                    throw new DatabaseAlreadyExistException(databaseName);
+                if (!options.flagIfNotExist()) {
+                    throw new DatabaseAlreadyExistException(options.databaseName());
                 }
 
-                Database db = dbDao.getDatabase(databaseName);
+                Database db = dbDao.getDatabase(options.databaseName());
                 DatabaseStatusType dbStatus = db.getStatus();
                 switch (dbStatus) {
                     case HIBERNATED -> {
-                        resumeDb(databaseName);
-                        waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
-                        dbStatus = dbDao.getDatabase(databaseName).getStatus();
+                        resumeDb(options.databaseName());
+                        waitForDbStatus(options.databaseName(), DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
+                        dbStatus = dbDao.getDatabase(options.databaseName()).getStatus();
                     }
                     case PENDING, RESUMING, INITIALIZING, MAINTENANCE -> {
-                        waitForDbStatus(databaseName, DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
-                        dbStatus = dbDao.getDatabase(databaseName).getStatus();
+                        waitForDbStatus(options.databaseName(), DatabaseStatusType.ACTIVE, DEFAULT_TIMEOUT_SECONDS);
+                        dbStatus = dbDao.getDatabase(options.databaseName()).getStatus();
                     }
-                    default -> LoggerShell.info("%s '%s' already exist. Connecting to database.".formatted(DB, databaseName));
+                    default -> LoggerShell.info("%s '%s' already exist. Connecting to database.".formatted(DB, options.databaseName()));
                 }
 
                 // Create keyspace on existing DB when needed
                 if (DatabaseStatusType.ACTIVE.equals(dbStatus)) {
-                    ServiceKeyspace.getInstance().createKeyspace(databaseName, keyspaceName, true);
+                    ServiceKeyspace.getInstance().createKeyspace(options.databaseName(), options.keyspaceName(), true);
                 } else {
-                    throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE, dbStatus);
+                    throw new InvalidDatabaseStateException(options.databaseName(), DatabaseStatusType.ACTIVE, dbStatus);
                 }
             }
         } catch (DatabaseNameNotUniqueException ex) {
-            throw new DatabaseAlreadyExistException(databaseName);
+            throw new DatabaseAlreadyExistException(options.databaseName());
         }
     }
 
     /**
      * Create a new Database with provided parameters.
-     * @param databaseName
-     *      database name
-     * @param databaseRegion
-     *      database Region
-     * @param keyspaceName
-     *      keyspace Name
-     * @param vectorSearch
-     *      target database needs vector search
+     *
+     * @param options
+     *      database creation options
      */
-    private void createNewDb(String databaseName, String databaseRegion, String keyspaceName, boolean vectorSearch) {
+    private void createNewDb(DbCreationOptions options) {
         LoggerShell.info("%s '%s' does not exist. Creating database '%s' with keyspace '%s'"
-                .formatted(DB, databaseName, databaseName, keyspaceName));
-
+                .formatted(DB, options.databaseName(), options.databaseName(), options.keyspaceName()));
         DatabaseCreationBuilder builder = DatabaseCreationRequest.builder()
-                .name(databaseName).tier(DEFAULT_TIER)
-                .cloudProvider(getCloudProvider(databaseRegion))
-                .cloudRegion(databaseRegion)
-                .keyspace(keyspaceName);
-        if (vectorSearch) {
-            LoggerShell.info("Enabling vector search for database %s".formatted(databaseName));
+                .name(options.databaseName())
+                .tier(options.tier())
+                .capacityUnit(options.capacityUnits())
+                .cloudProvider(getCloudProvider(options.tier(), options.databaseRegion()))
+                .cloudRegion(options.databaseRegion())
+                .keyspace(options.keyspaceName());
+        if (options.flagVector()) {
+            LoggerShell.info("Enabling vector search for database %s".formatted(options.databaseName()));
             builder.withVector();
         }
         CliContext.getInstance()
-                .getApiDevopsDatabases()
-                .create(builder.build());
+                    .getApiDevopsDatabases()
+                    .create(builder.build());
         LoggerShell.info("%s '%s' and keyspace '%s' are being created."
-                .formatted(DB, databaseName, keyspaceName));
+                .formatted(DB, options.databaseName(), options.keyspaceName()));
     }
 
     /**
@@ -440,24 +417,40 @@ public class ServiceDatabase {
     /**
      * Access the cloud provider from region name.
      *
+     * @param tier
+     *      adapting control with tier
      * @param databaseRegion
      *      database region
      * @return
      *      cloud provider or error
      */
-    private CloudProviderType getCloudProvider(String databaseRegion) {
-        Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()
-                .getApiDevops()
-                .db().regions()
-                .findAllServerless()
-                .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity()));
-        if (!regionMap.containsKey(databaseRegion)) {
-            throw new InvalidArgumentException("Database region '" + databaseRegion + "' has not been found.");
+    private CloudProviderType getCloudProvider(String tier, String databaseRegion) {
+        if (DatabaseCreationBuilder.DEFAULT_TIER.equals(tier)) {
+            Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()
+                    .getApiDevops()
+                    .db().regions()
+                    .findAllServerless()
+                    .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity()));
+            if (!regionMap.containsKey(databaseRegion)) {
+                throw new InvalidArgumentException("Region '" + databaseRegion + "' has not been found for serverless");
+            }
+            return CloudProviderType.valueOf(regionMap
+                    .get(databaseRegion)
+                    .getCloudProvider()
+                    .toUpperCase());
+        } else {
+            // Used to deduplicate regions, some have same keys (?!)
+            Map<String, DatabaseRegion> regionMap = new HashMap<>();
+            for (DatabaseRegion db : CliContext.getInstance()
+                    .getApiDevops().db().regions()
+                    .findAll().toList()) {
+                regionMap.put(db.getRegion(), db);
+            }
+            if (!regionMap.containsKey(databaseRegion)) {
+                throw new InvalidArgumentException("Database region '" + databaseRegion + "' has not been found for classic");
+            }
+            return regionMap.get(databaseRegion).getCloudProvider();
         }
-        return CloudProviderType.valueOf(regionMap
-                .get(databaseRegion)
-                .getCloudProvider()
-                .toUpperCase());
     }
 
     /**

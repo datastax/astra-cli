@@ -165,7 +165,8 @@ public class ServiceUser {
         if (optRole.isEmpty() && IdUtils.isUUID(role)) {
             optRole = apiDevopsOrg().roles().find(role);
         }
-        apiDevopsOrg().users().invite(user, optRole.orElseThrow(()-> new RoleNotFoundException(role)).getId());
+        String roleId = optRole.orElseThrow(()-> new RoleNotFoundException(role)).getId();
+        apiDevopsOrg().users().invite(user, roleId);
         AstraCliConsole.outputSuccess(role);
     }
 

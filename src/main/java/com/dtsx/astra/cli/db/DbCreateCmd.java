@@ -22,8 +22,10 @@ package com.dtsx.astra.cli.db;
 
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.db.cqlsh.CqlShellOption;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
+import com.dtsx.astra.sdk.db.domain.DatabaseCreationBuilder;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.db.exception.KeyspaceAlreadyExistException;
@@ -48,39 +50,53 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
      */
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1, 
             description = "Cloud provider region to provision")
-    protected String region = ServiceDatabase.DEFAULT_REGION;
+    protected String region = DatabaseCreationBuilder.DEFAULT_REGION;
 
     /**
      * Cloud provider for the db
      */
     @Option(name = { "-c", "--cloud" }, description = "Cloud Provider to create a db")
-    protected String cloud;
+    protected String cloud = DatabaseCreationBuilder.DEFAULT_CLOUD.name().toLowerCase();
     
     /**
      * Default keyspace created with the Db
      */
     @Option(name = { "-k", "--keyspace" }, title = "KEYSPACE", arity = 1, 
             description = "Default keyspace created with the Db")
-    protected String keyspace;
+    protected String keyspace = "default_keyspace";
+
+    /**
+     * Default keyspace created with the Db
+     */
+    @Option(name = { "--tier" }, title = "TIER", arity = 1,
+            description = "Tier to create the database in")
+    protected String tier = DatabaseCreationBuilder.DEFAULT_TIER;
+
+    /**
+     * Default keyspace created with the Db
+     */
+    @Option(name = { "--capacity-units" }, title = "CAPACITY UNITS", arity = 1,
+            description = "Capacity units to create the database with (default 1)")
+    protected Integer capacityUnits = 1;
     
     /** 
      * Will wait until the database become ACTIVE.
      */
     @Option(name = { "--wait" }, 
             description = "Will wait until the database become ACTIVE")
-    protected boolean wait = true;
+    protected boolean flagWait = true;
 
     /**
      * Will not wait for the database become available.
      */
     @Option(name = { "--async" }, description = "Will not wait for the resource to become available")
-    protected boolean async = false;
+    protected boolean flagAsync = false;
 
     /**
      * Will not wait for the database become available.
      */
     @Option(name = { "--vector" }, description = "Create a database with vector search enabled")
-    protected boolean vectorSearch = false;
+    protected boolean flagVector = false;
 
     /** 
      * Provide a limit to the wait period in seconds, default is 180s. 
@@ -97,9 +113,9 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
             KeyspaceAlreadyExistException {
 
         dbServices.validateCloudAndRegion(cloud, region);
-        dbServices.createDb(db, region, keyspace, ifNotExist, vectorSearch);
+        dbServices.createDb(new DbCreationOptions(db, region, keyspace, tier, capacityUnits, ifNotExist, flagVector));
 
-        if (!async) {
+        if (!flagAsync) {
             switch (dbServices.waitForDbStatus(db, DatabaseStatusType.ACTIVE, timeout)) {
                 case NOT_FOUND -> throw new DatabaseNotFoundException(db);
                 case UNAVAILABLE -> throw new InvalidDatabaseStateException(db, DatabaseStatusType.ACTIVE, DatabaseStatusType.PENDING);

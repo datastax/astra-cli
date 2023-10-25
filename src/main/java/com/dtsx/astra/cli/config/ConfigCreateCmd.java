@@ -25,6 +25,7 @@ import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
+import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -50,7 +51,7 @@ public class ConfigCreateCmd extends AbstractCmd {
 
     /** To use Cli on non production environment. */
     @Option(name = { "-e", "--env" }, title = "Environment", description = "Environment to use for this section.")
-    protected AstraEnvironment env = AstraEnvironment.PROD;
+    protected String env = "prod";
 
     /** {@inheritDoc} */
     @Override
@@ -65,13 +66,14 @@ public class ConfigCreateCmd extends AbstractCmd {
             throw new InvalidTokenException(token);
         }
         // validate token at the same time
-        Organization o = new AstraOpsClient(token, env).getOrganization();
+        AstraEnvironment targetEnv = AstraCliUtils.lookupEnvironment(env);
+        Organization o = new AstraOpsClient(token, targetEnv).getOrganization();
         if (sectionName == null) {
             sectionName = o.getName();
         }
         sectionName = removeQuotesIfAny(sectionName);
-        ctx().validateCredentials(token, env);
-        ctx().getConfiguration().createSectionWithToken(sectionName, token, env);
+        ctx().validateCredentials(token, targetEnv);
+        ctx().getConfiguration().createSectionWithToken(sectionName, token, targetEnv);
         ctx().getConfiguration().save();
         AstraCliConsole.outputSuccess("Configuration has been saved.");
     }

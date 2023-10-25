@@ -22,9 +22,13 @@ package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.out.OutputFormat;
+import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -43,7 +47,7 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
      * Astra Environment, could be DEV or TEST instead of PROD.
      */
     @Option(name = { "--env" }, title = "Environment", description = "Astra Environment to use")
-    protected AstraEnvironment env = AstraEnvironment.PROD;
+    protected String env = "prod";
 
     /** Section. */
     @Option(name = { "-conf","--config" }, 
@@ -57,8 +61,9 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
         token = removeQuotesIfAny(token);
         configSectionName = removeQuotesIfAny(configSectionName);
         validateOptions();
+
         ctx().init(new CoreOptions(verbose, noColor, OutputFormat.valueOf(output.toUpperCase(Locale.ROOT)), configFilename));
-        ctx().initToken(new TokenOptions(token, configSectionName, env));
+        ctx().initToken(new TokenOptions(token, configSectionName, AstraCliUtils.lookupEnvironment(env)));
         execute();
     }
 
