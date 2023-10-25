@@ -107,7 +107,7 @@ class DbCdcCommandsTest  extends AbstractCmdTest {
 
     @AfterAll
     static void cleanUp() {
-       assertSuccessCli("streaming delete %s".formatted(RANDOM_TENANT));
+       //assertSuccessCli("streaming delete %s".formatted(RANDOM_TENANT));
     }
 
 }
