@@ -115,6 +115,8 @@ public class ServiceDatabase {
     static final String COLUMN_KEYSPACES         = "Keyspaces";
     /** working object. */
     static final String DB                       = "Database";
+    /** working object. */
+    static final String COLUMN_VECTOR            = "Vector";
 
     /**
      * Access to databases object.
@@ -629,9 +631,10 @@ public class ServiceDatabase {
             ShellTable sht = ShellTable.propertyTable(15, 40);
             sht.addPropertyRow(COLUMN_NAME, db.getInfo().getName());
             sht.addPropertyRow(COLUMN_ID, db.getId());
-            sht.addPropertyRow(COLUMN_STATUS, db.getStatus().toString());
             sht.addPropertyRow(COLUMN_DEFAULT_CLOUD, db.getInfo().getCloudProvider().name());
             sht.addPropertyRow(COLUMN_REGIONS, db.getInfo().getRegion());
+            sht.addPropertyRow(COLUMN_STATUS, db.getStatus().toString());
+            sht.addPropertyRow(COLUMN_VECTOR, db.getInfo().getDbType() != null ? "Enabled" : "Disabled");
             sht.addPropertyRow(COLUMN_DEFAULT_KEYSPACE, db.getInfo().getKeyspace());
             sht.addPropertyRow("Creation Time", db.getCreationTime());
             List<String> regions   = db.getInfo().getDatacenters()

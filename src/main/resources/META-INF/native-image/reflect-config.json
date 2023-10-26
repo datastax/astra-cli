@@ -490,23 +490,41 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setAvailableActions","parameterTypes":["java.util.Set"] },
+      {"name":"getAvailableActions","parameterTypes":[] },
       {"name":"setCost","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseCost"] },
+      {"name":"getCost","parameterTypes":[] },
       {"name":"setCqlshUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getCqlshUrl","parameterTypes":[] },
       {"name":"setCreationTime","parameterTypes":["java.lang.String"] },
+      {"name":"getCreationTime","parameterTypes":[] },
       {"name":"setDataEndpointUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getDataEndpointUrl","parameterTypes":[] },
       {"name":"setGrafanaUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getGrafanaUrl","parameterTypes":[] },
       {"name":"setGraphqlUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getGraphqlUrl","parameterTypes":[] },
       {"name":"setId","parameterTypes":["java.lang.String"] },
+      {"name":"getId","parameterTypes":[] },
       {"name":"setInfo","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseInfo"] },
+      {"name":"getInfo","parameterTypes":[] },
       {"name":"setLastUsageTime","parameterTypes":["java.lang.String"] },
+      {"name":"getLastUsageTime","parameterTypes":[] },
       {"name":"setMetrics","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseMetrics"] },
+      {"name":"getMetrics","parameterTypes":[] },
       {"name":"setObservedStatus","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseStatusType"] },
+      {"name":"getObservedStatus","parameterTypes":[] },
       {"name":"setOrgId","parameterTypes":["java.lang.String"] },
+      {"name":"getOrgId","parameterTypes":[] },
       {"name":"setOwnerId","parameterTypes":["java.lang.String"] },
+      {"name":"getOwnerId","parameterTypes":[] },
       {"name":"setStatus","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseStatusType"] },
+      {"name":"getStatus","parameterTypes":[] },
       {"name":"setStorage","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseStorage"] },
+      {"name":"getStorage","parameterTypes":[] },
       {"name":"setStudioUrl","parameterTypes":["java.lang.String"] },
-      {"name":"setTerminationTime","parameterTypes":["java.lang.String"] }
+      {"name":"getStudioUrl","parameterTypes":[] },
+      {"name":"setTerminationTime","parameterTypes":["java.lang.String"] },
+      {"name":"getTerminationTime","parameterTypes":[] }
     ]
   },
   {
@@ -517,20 +535,35 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setCostPerDayCents","parameterTypes":["double"] },
+      {"name":"getCostPerDayCents","parameterTypes":[] },
       {"name":"setCostPerDayMRCents","parameterTypes":["double"] },
+      {"name":"getCostPerDayMRCents","parameterTypes":[] },
       {"name":"setCostPerDayParkedCents","parameterTypes":["double"] },
+      {"name":"getCostPerDayParkedCents","parameterTypes":[] },
       {"name":"setCostPerHourCents","parameterTypes":["double"] },
+      {"name":"getCostPerHourCents","parameterTypes":[] },
       {"name":"setCostPerHourMRCents","parameterTypes":["double"] },
+      {"name":"getCostPerHourMRCents","parameterTypes":[] },
       {"name":"setCostPerHourParkedCents","parameterTypes":["double"] },
+      {"name":"getCostPerHourParkedCents","parameterTypes":[] },
       {"name":"setCostPerMinCents","parameterTypes":["double"] },
+      {"name":"getCostPerMinCents","parameterTypes":[] },
       {"name":"setCostPerMinMRCents","parameterTypes":["double"] },
+      {"name":"getCostPerMinMRCents","parameterTypes":[] },
       {"name":"setCostPerMinParkedCents","parameterTypes":["double"] },
+      {"name":"getCostPerMinParkedCents","parameterTypes":[] },
       {"name":"setCostPerMonthCents","parameterTypes":["double"] },
+      {"name":"getCostPerMonthCents","parameterTypes":[] },
       {"name":"setCostPerMonthMRCents","parameterTypes":["double"] },
+      {"name":"getCostPerMonthMRCents","parameterTypes":[] },
       {"name":"setCostPerMonthParkedCents","parameterTypes":["double"] },
+      {"name":"getCostPerMonthParkedCents","parameterTypes":[] },
       {"name":"setCostPerNetworkGbCents","parameterTypes":["double"] },
+      {"name":"getCostPerNetworkGbCents","parameterTypes":[] },
       {"name":"setCostPerReadGbCents","parameterTypes":["double"] },
-      {"name":"setCostPerWrittenGbCents","parameterTypes":["double"] }
+      {"name":"getCostPerReadGbCents","parameterTypes":[] },
+      {"name":"setCostPerWrittenGbCents","parameterTypes":["double"] },
+      {"name":"getCostPerWrittenGbCents","parameterTypes":[] }
     ]
   },
   {
@@ -558,15 +591,28 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setAdditionalKeyspaces","parameterTypes":["java.util.Set"] },
+      {"name":"getAdditionalKeyspaces","parameterTypes":[] },
       {"name":"setCapacityUnits","parameterTypes":["int"] },
+      {"name":"getCapacityUnits","parameterTypes":[] },
       {"name":"setCloudProvider","parameterTypes":["com.dtsx.astra.sdk.db.domain.CloudProviderType"] },
+      {"name":"getCloudProvider","parameterTypes":[] },
       {"name":"setDatacenters","parameterTypes":["java.util.Set"] },
+      {"name":"getDatacenters","parameterTypes":[] },
       {"name":"setKeyspace","parameterTypes":["java.lang.String"] },
+      {"name":"getKeyspace","parameterTypes":[] },
+      {"name":"setKeyspace","parameterTypes":["java.lang.String"] },
+      {"name":"setEngineType","parameterTypes":["java.lang.String"] },
+      {"name":"getEngineType","parameterTypes":[] },
       {"name":"setKeyspaces","parameterTypes":["java.util.Set"] },
+      {"name":"getKeyspaces","parameterTypes":[] },
       {"name":"setName","parameterTypes":["java.lang.String"] },
+      {"name":"getName","parameterTypes":[] },
       {"name":"setDbType","parameterTypes":["java.lang.String"] },
+      {"name":"getDbType","parameterTypes":[] },
       {"name":"setRegion","parameterTypes":["java.lang.String"] },
-      {"name":"setTier","parameterTypes":["java.lang.String"] }
+      {"name":"getRegion","parameterTypes":[] },
+      {"name":"setTier","parameterTypes":["java.lang.String"] },
+      {"name":"getTier","parameterTypes":[] }
     ]},
   {
     "name":"com.dtsx.astra.sdk.db.domain.DatabaseMetrics",
@@ -576,9 +622,13 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setErrorsTotalCount","parameterTypes":["int"] },
+      {"name":"getErrorsTotalCount","parameterTypes":[] },
       {"name":"setLiveDataSizeBytes","parameterTypes":["int"] },
+      {"name":"getLiveDataSizeBytes","parameterTypes":[] },
       {"name":"setReadRequestsTotalCount","parameterTypes":["int"] },
-      {"name":"setWriteRequestsTotalCount","parameterTypes":["int"] }
+      {"name":"getReadRequestsTotalCount","parameterTypes":[] },
+      {"name":"setWriteRequestsTotalCount","parameterTypes":["int"] },
+      {"name":"getWriteRequestsTotalCount","parameterTypes":[] }
     ]
   },
   {
@@ -589,8 +639,13 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setNodeCount","parameterTypes":["int"] },
+      {"name":"getNodeCount","parameterTypes":[] },
       {"name":"setReplicationFactor","parameterTypes":["int"] },
-      {"name":"setTotalStorage","parameterTypes":["int"] }
+      {"name":"getReplicationFactor","parameterTypes":[] },
+      {"name":"setTotalStorage","parameterTypes":["int"] },
+      {"name":"getTotalStorage","parameterTypes":[] },
+      {"name":"setUsedStorage","parameterTypes":["int"] },
+      {"name":"getUsedStorage","parameterTypes":[] }
     ]
   },
   {
@@ -601,19 +656,33 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setCapacityUnits","parameterTypes":["int"] },
+      {"name":"getCapacityUnits","parameterTypes":[] },
       {"name":"setCloudProvider","parameterTypes":["com.dtsx.astra.sdk.db.domain.CloudProviderType"] },
+      {"name":"getCloudProvider","parameterTypes":[] },
       {"name":"setDateCreated","parameterTypes":["java.lang.String"] },
+      {"name":"getDateCreated","parameterTypes":[] },
       {"name":"setId","parameterTypes":["java.lang.String"] },
+      {"name":"getId","parameterTypes":[] },
       {"name":"setName","parameterTypes":["java.lang.String"] },
+      {"name":"getName","parameterTypes":[] },
       {"name":"setRegion","parameterTypes":["java.lang.String"] },
+      {"name":"getRegion","parameterTypes":[] },
       {"name":"setRegionClassification","parameterTypes":["java.lang.String"] },
+      {"name":"getRegionClassification","parameterTypes":[] },
       {"name":"setRegionZone","parameterTypes":["java.lang.String"] },
+      {"name":"getRegionZone","parameterTypes":[] },
       {"name":"setSecureBundleInternalUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getSecureBundleInternalUrl","parameterTypes":[] },
       {"name":"setSecureBundleMigrationProxyInternalUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getSecureBundleMigrationProxyInternalUrl","parameterTypes":[] },
       {"name":"setSecureBundleMigrationProxyUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getSecureBundleMigrationProxyUrl","parameterTypes":[] },
       {"name":"setSecureBundleUrl","parameterTypes":["java.lang.String"] },
+      {"name":"getSecureBundleUrl","parameterTypes":[] },
       {"name":"setStatus","parameterTypes":["java.lang.String"] },
-      {"name":"setTier","parameterTypes":["java.lang.String"] }
+      {"name":"getStatus","parameterTypes":[] },
+      {"name":"setTier","parameterTypes":["java.lang.String"] },
+      {"name":"getTier","parameterTypes":[] }
     ]
   },
   {
@@ -624,12 +693,19 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setClassification","parameterTypes":["java.lang.String"] },
+      {"name":"getClassification","parameterTypes":[] },
       {"name":"setCloudProvider","parameterTypes":["java.lang.String"] },
+      {"name":"getCloudProvider","parameterTypes":[] },
       {"name":"setDisplayName","parameterTypes":["java.lang.String"] },
+      {"name":"getDisplayName","parameterTypes":[] },
       {"name":"setEnabled","parameterTypes":["boolean"] },
+      {"name":"isEnabled","parameterTypes":[] },
       {"name":"setName","parameterTypes":["java.lang.String"] },
+      {"name":"getName","parameterTypes":[] },
       {"name":"setReservedForQualifiedUsers","parameterTypes":["boolean"] },
-      {"name":"setZone","parameterTypes":["java.lang.String"] }
+      {"name":"getReservedForQualifiedUsers","parameterTypes":[] },
+      {"name":"setZone","parameterTypes":["java.lang.String"] },
+      {"name":"getZone","parameterTypes":[] }
     ]
   },
   {
@@ -640,20 +716,31 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setCapacityUnitsLimit","parameterTypes":["int"] },
+      {"name":"getCapacityUnitsLimit","parameterTypes":[] },
       {"name":"setCapacityUnitsUsed","parameterTypes":["int"] },
+      {"name":"getCapacityUnitsUsed","parameterTypes":[] },
       {"name":"setCloudProvider","parameterTypes":["com.dtsx.astra.sdk.db.domain.CloudProviderType"] },
+      {"name":"getCloudProvider","parameterTypes":[] },
       {"name":"setCost","parameterTypes":["com.dtsx.astra.sdk.db.domain.DatabaseCost"] },
+      {"name":"getCost","parameterTypes":[] },
       {"name":"setDatabaseCountLimit","parameterTypes":["int"] },
+      {"name":"getDatabaseCountLimit","parameterTypes":[] },
       {"name":"setDatabaseCountUsed","parameterTypes":["int"] },
+      {"name":"getDatabaseCountUsed","parameterTypes":[] },
       {"name":"setDefaultStoragePerCapacityUnitGb","parameterTypes":["int"] },
+      {"name":"getDefaultStoragePerCapacityUnitGb","parameterTypes":[] },
       {"name":"setDescription","parameterTypes":["java.lang.String"] },
+      {"name":"getDescription","parameterTypes":[] },
       {"name":"setRegion","parameterTypes":["java.lang.String"] },
+      {"name":"getRegion","parameterTypes":[] },
       {"name":"setRegionContinent","parameterTypes":["java.lang.String"] },
+      {"name":"getRegionContinent","parameterTypes":[] },
       {"name":"setRegionDisplay","parameterTypes":["java.lang.String"] },
-      {"name":"setTier","parameterTypes":["java.lang.String"] }
+      {"name":"getRegionDisplay","parameterTypes":[] },
+      {"name":"setTier","parameterTypes":["java.lang.String"] },
+      {"name":"getTier","parameterTypes":[] }
     ]
   },
-
 
 
   {
@@ -664,8 +751,11 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setOrgId","parameterTypes":["java.lang.String"] },
+      {"name":"getOrgId","parameterTypes":[] },
       {"name":"setOrgName","parameterTypes":["java.lang.String"] },
-      {"name":"setUsers","parameterTypes":["java.util.List"] }
+      {"name":"getOrgName","parameterTypes":[] },
+      {"name":"setUsers","parameterTypes":["java.util.List"] },
+      {"name":"getUsers","parameterTypes":[] }
     ]
   },
 
@@ -677,8 +767,11 @@
     "methods":[
       {"name":"<init>","parameterTypes":[] },
       {"name":"setId","parameterTypes":["java.lang.String"] },
+      {"name":"getId","parameterTypes":[] },
       {"name":"setName","parameterTypes":["java.lang.String"] },
-      {"name":"setPolicy","parameterTypes":["com.dtsx.astra.sdk.org.domain.RolePolicy"] }
+      {"name":"getName","parameterTypes":[] },
+      {"name":"setPolicy","parameterTypes":["com.dtsx.astra.sdk.org.domain.RolePolicy"] },
+      {"name":"getPolicy","parameterTypes":[] }
     ]
   },
   {
