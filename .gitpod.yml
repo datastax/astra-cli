@@ -8,5 +8,5 @@ tasks:
     init: |
       sed -i '1,$s/sdkman_auto_answer=false/sdkman_auto_answer=true/' /home/gitpod/.sdkman/etc/config 
       sed -i '1,$s/sdkman_selfupdate_enable=true/sdkman_selfupdate_enable=false/' /home/gitpod/.sdkman/etc/config 
-      sdk install java 22.1.0.r17-grl -y
+      sdk install java 22.3.3.r17-grl -y
       gu install native-image
