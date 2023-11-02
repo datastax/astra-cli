@@ -127,6 +127,7 @@ public class ServiceToken {
      * List tokens of an organization.
      */
     public void listTokens() {
+        Map<String, String> roles = new HashMap<>();
         ShellTable sht = new ShellTable();
         sht.addColumn(COL_GENERATED_ON,    15);
         sht.addColumn(COL_CLIENT_ID,    20);
@@ -135,7 +136,8 @@ public class ServiceToken {
             Map<String, String> currentLine = new HashMap<>();
             currentLine.put(COL_GENERATED_ON, tok.getGeneratedOn());
             currentLine.put(COL_CLIENT_ID, tok.getClientId());
-            currentLine.put(COL_ROLES, tok.getRoles().get(0));
+            roles.computeIfAbsent(tok.getRoles().get(0), k -> ServiceRole.getInstance().get(k).getName());
+            currentLine.put(COL_ROLES, roles.get(tok.getRoles().get(0)));
             sht.getCellValues().add(currentLine);
             // Add multiple lines for a single token if multiple Roles
             if (tok.getRoles().size() > 1) {
@@ -143,7 +145,8 @@ public class ServiceToken {
                     Map<String, String> line = new HashMap<>();
                     line.put(COL_GENERATED_ON, "");
                     line.put(COL_CLIENT_ID, "");
-                    line.put(COL_ROLES, tok.getRoles().get(i));
+                    roles.computeIfAbsent(tok.getRoles().get(0), k -> ServiceRole.getInstance().get(k).getName());
+                    line.put(COL_ROLES, roles.get(tok.getRoles().get(0)));
                     sht.getCellValues().add(line);
                 }
             }

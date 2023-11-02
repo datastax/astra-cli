@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.tool;
+package com.dtsx.astra.cli.db.endpoint;
 
 /*-
  * #%L
@@ -28,8 +28,8 @@ import com.github.rvesse.airline.annotations.Option;
 /**
  * Open a browser with playground.
  */
-@Command(name = "playground", description = "Expand database to a new region")
-public class DbGraphqlPlaygroundCmd extends AbstractDatabaseCmd {
+@Command(name = "get-endpoint-api", description = "Open the json api endpoint")
+public class DbGetEndpointApiCmd extends AbstractDatabaseCmd {
 
     /**
      * Specified a region explicitly
@@ -37,10 +37,12 @@ public class DbGraphqlPlaygroundCmd extends AbstractDatabaseCmd {
     @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1,
             description = "Cloud provider region")
     protected String region;
-
+    
     /** {@inheritDoc} */
     public void execute() {
-        AstraCliConsole.println(dbServices.graphQLPlayground(db, region));
+        // Available only for Vector Databases
+
+        AstraCliConsole.println(dbServices.getEndpointJsonApi(db, region));
     }
 
 }

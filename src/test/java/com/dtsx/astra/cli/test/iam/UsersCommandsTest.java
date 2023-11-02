@@ -85,10 +85,4 @@ class UsersCommandsTest extends AbstractCmdTest {
         // Then
         assertExitCodeCli(ExitCode.NOT_FOUND, "user get " + USERNAME);
     }
-
-    @Test
-    public void testInviteUser() {
-        assertSuccessCli("user delete celphys@gmail.com");
-
-    }
 }

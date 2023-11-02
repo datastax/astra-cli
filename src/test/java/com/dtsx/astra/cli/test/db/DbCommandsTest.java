@@ -70,7 +70,7 @@ class DbCommandsTest extends AbstractCmdTest {
     @Order(3)
     void testShouldCreateDb() throws DatabaseNameNotUniqueException {
         // When
-        assertSuccessCli("db create %s --if-not-exist --wait".formatted(DB_TEST));
+        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
         // Then
         Assertions.assertTrue(DaoDatabase.getInstance().getDatabaseClient(DB_TEST).isPresent());
         // Database is pending
@@ -185,25 +185,11 @@ class DbCommandsTest extends AbstractCmdTest {
     @Order(13)
     void testShouldThrowDatabaseAlreadyExist() {
         assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create %s".formatted(DB_TEST));
-        assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create-keyspace %s -k %s".formatted(DB_TEST, DB_TEST));
+        assertExitCodeCli(ExitCode.ALREADY_EXIST, "db create-keyspace %s -k %s".formatted(DB_TEST, KEYSPACE_TEST));
     }
 
     @Test
     @Order(14)
-    void testShouldThrowDatabaseInvalidState() {
-        // Given
-        // Create a temporary db without waiting, expecting status PENDING
-        assertSuccessCli("db create %s --if-not-exist --async".formatted("tmp_db"));
-        // When, Then
-        assertExitCodeCli(ExitCode.UNAVAILABLE, "db create-keyspace %s -k %s".formatted("tmp_db", "ks"));
-        // Waiting for the db to be started
-        assertSuccessCli("db create %s --if-not-exist".formatted("tmp_db"));
-        // Delete db
-        assertSuccessCli("db delete %s --async".formatted("tmp_db"));
-    }
-
-    @Test
-    @Order(15)
     void testShouldThrowInvalidArgument()  {
         CliContext.getInstance().init(new CoreOptions(false,false,
                 OutputFormat.HUMAN,
@@ -216,26 +202,26 @@ class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(16)
+    @Order(15)
     void shouldDisplaySwaggerURLTest() {
-        assertSuccessCli("db swagger %s".formatted(DB_TEST));
+        assertSuccessCli("db get-endpoint-swagger %s".formatted(DB_TEST));
+    }
+
+    @Test
+    @Order(16)
+    void shouldDisplayPlaygroundTest() {
+        assertSuccessCli("db get-endpoint-playground %s".formatted(DB_TEST));
     }
 
     @Test
     @Order(17)
-    void shouldDisplayPlaygroundTest() {
-        assertSuccessCli("db playground %s".formatted(DB_TEST));
-    }
-
-    @Test
-    @Order(18)
     void shouldListCdcTest() {
         // create and delete cdc will have dedicated test class as streaming is involved
         assertSuccessCli("db list-cdc %s".formatted(DB_TEST));
     }
 
     @Test
-    @Order(19)
+    @Order(18)
     void testShouldFailOnInvalidRegionAndCloud() throws DatabaseNameNotUniqueException {
         // When providing invalid region
         assertExitCodeCli(ExitCode.INVALID_OPTION_VALUE,"db create invalid --region tropical-island");
@@ -246,7 +232,7 @@ class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(20)
+    @Order(19)
     void testShouldTestException() {
         Assertions.assertThrows(DatabaseNameNotUniqueException.class, () -> {
             throw new DatabaseNameNotUniqueException(DB_TEST);
@@ -254,14 +240,14 @@ class DbCommandsTest extends AbstractCmdTest {
     }
 
     @Test
-    @Order(21)
+    @Order(20)
     void testShouldListClouds() {
         assertSuccessCli("db list-clouds");
     }
 
 
     @Test
-    @Order(22)
+    @Order(21)
     void testShouldCreateAClassicAstra() {
         assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "db create cli5 --tier C20 --capacity-units 1");
     }

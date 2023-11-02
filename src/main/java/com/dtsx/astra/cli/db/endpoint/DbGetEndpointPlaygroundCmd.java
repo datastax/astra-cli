@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.list;
+package com.dtsx.astra.cli.db.endpoint;
 
 /*-
  * #%L
@@ -20,34 +20,27 @@ package com.dtsx.astra.cli.db.list;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.AbstractConnectedCmd;
-import com.dtsx.astra.cli.org.ServiceOrganization;
+import com.dtsx.astra.cli.core.out.AstraCliConsole;
+import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * List regions serverless.
+ * Open a browser with playground.
  */
-@Command(name = "list-regions-serverless", description = "Show available regions (serverless).")
-public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
+@Command(name = "get-endpoint-playground", description = "Expand database to a new region")
+public class DbGetEndpointPlaygroundCmd extends AbstractDatabaseCmd {
 
     /**
-     * Cloud provider
+     * Specified a region explicitly
      */
-    @Option(name = { "-c", "--cloud" }, title = "CLOUD", arity = 1,
-            description = "Filter on Cloud provider")
-    protected String cloud;
-
-    /**
-     * Filter on names
-     */
-    @Option(name = { "-f", "--filter" }, title = "filter", arity = 1,
-            description = "Filter on names")
-    protected String filter;
+    @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1,
+            description = "Cloud provider region")
+    protected String region;
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceOrganization.getInstance().listRegionsDbServerless(cloud, filter, false);
+        AstraCliConsole.println(dbServices.getEndpointPlayground(db, region));
     }
 
 }

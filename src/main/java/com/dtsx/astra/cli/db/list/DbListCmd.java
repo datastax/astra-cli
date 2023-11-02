@@ -42,16 +42,23 @@ package com.dtsx.astra.cli.db.list;
 import com.dtsx.astra.cli.core.AbstractConnectedCmd;
 import com.dtsx.astra.cli.db.ServiceDatabase;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
  * Show Databases for an organization.
  */
 @Command(name = "list", description = "Display the list of Databases in an organization")
 public class DbListCmd extends AbstractConnectedCmd {
-    
+
+    /**
+     * Will not wait for the database become available.
+     */
+    @Option(name = { "--vector" }, description = "Create a database with vector search enabled")
+    protected boolean flagVector = false;
+
     /** {@inheritDoc} */
     public void execute() {
-        ServiceDatabase.getInstance().listDb();
+        ServiceDatabase.getInstance().listDb(flagVector);
     }
 
 }

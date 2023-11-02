@@ -26,6 +26,8 @@ import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
+import com.dtsx.astra.sdk.AstraDB;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.Database;
@@ -36,6 +38,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Unitary operation for databases.
@@ -90,7 +93,24 @@ public class DaoDatabase {
         }
         throw new DatabaseNotFoundException(databaseName);
     }
-    
+
+    /**
+     * Accessing the AstraDB client for a vectorDB.
+     *
+     * @param databaseName
+     *      database name
+     * @return
+     *      astraDB
+     */
+    public AstraDB getAstraDB(String databaseName) {
+        Database db = getDatabase(databaseName);
+        if (db.getInfo().getDbType() == null) {
+            throw new IllegalArgumentException("Database %s is not a vector database".formatted(databaseName));
+        }
+        AstraOpsClient ops = CliContext.getInstance().getApiDevops();
+        return new AstraDB(ops.getToken(), UUID.fromString(db.getId()), db.getInfo().getRegion(),ops.getEnvironment());
+    }
+
     /**
      * Access unique db.
      * 

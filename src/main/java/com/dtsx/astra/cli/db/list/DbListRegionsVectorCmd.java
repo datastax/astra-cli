@@ -28,8 +28,8 @@ import com.github.rvesse.airline.annotations.Option;
 /**
  * List regions serverless.
  */
-@Command(name = "list-regions-serverless", description = "Show available regions (serverless).")
-public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
+@Command(name = "list-regions-vector", description = "Show available regions (vector).")
+public class DbListRegionsVectorCmd extends AbstractConnectedCmd {
 
     /**
      * Cloud provider
@@ -47,7 +47,7 @@ public class DbListRegionsServerlessCmd extends AbstractConnectedCmd {
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceOrganization.getInstance().listRegionsDbServerless(cloud, filter, false);
+        ServiceOrganization.getInstance().listRegionsDbServerless(cloud, filter, true);
     }
 
 }

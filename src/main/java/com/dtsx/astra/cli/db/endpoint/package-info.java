@@ -1,7 +1,7 @@
 /**
  * Defines command showing URL of integrated tools with AstraDB.
  */
-package com.dtsx.astra.cli.db.tool;
+package com.dtsx.astra.cli.db.endpoint;
 
 /*-
  * #%L

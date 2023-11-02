@@ -24,6 +24,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.sdk.AstraOpsClient;
+import com.dtsx.astra.sdk.db.domain.RegionType;
 import com.dtsx.astra.sdk.org.domain.Organization;
 
 import java.util.ArrayList;
@@ -136,7 +137,8 @@ public class ServiceOrganization {
      */
     public void listCloudDb() {
         AstraCliConsole.printShellTable(
-                buildShellTableClouds(new ArrayList<>(getDbServerlessRegions().keySet())));
+                buildShellTableClouds(new ArrayList<>(
+                        getDbServerlessRegions(RegionType.ALL).keySet())));
     }
 
     /**
@@ -189,24 +191,27 @@ public class ServiceOrganization {
     /**
      * Show serverless regions.
      *
+     * @param flagVector
+     *      only show vector regions
      * @param cloudProvider
      *      name of cloud provider
      * @param filter
      *      name of filter
      */
-    public void listRegionsDbServerless(String cloudProvider, String filter) {
-        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, getDbServerlessRegions()));
+    public void listRegionsDbServerless(String cloudProvider, String filter, boolean flagVector) {
+        AstraCliConsole.printShellTable(buildShellTable(cloudProvider, filter, getDbServerlessRegions(flagVector ? RegionType.VECTOR:RegionType.ALL)));
     }
 
     /**
      * Access the db serverless regions.
-     *
+     * @param regionType
+     *      provide the region for a particular region type
      * @return
      *      db serverless regions
      */
-    public  SortedMap<String, TreeMap<String, String>> getDbServerlessRegions() {
+    public  SortedMap<String, TreeMap<String, String>> getDbServerlessRegions(RegionType regionType) {
         TreeMap<String, TreeMap<String, String>> sortedRegion = new TreeMap<>();
-        apiDevopsOrg().db().regions().findAllServerless().forEach(r -> {
+        apiDevopsOrg().db().regions().findAllServerless(regionType).forEach(r -> {
             String cloud = r.getCloudProvider().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, k -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());

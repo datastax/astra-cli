@@ -78,13 +78,6 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
     @Option(name = { "--capacity-units" }, title = "CAPACITY UNITS", arity = 1,
             description = "Capacity units to create the database with (default 1)")
     protected Integer capacityUnits = 1;
-    
-    /** 
-     * Will wait until the database become ACTIVE.
-     */
-    @Option(name = { "--wait" }, 
-            description = "Will wait until the database become ACTIVE")
-    protected boolean flagWait = true;
 
     /**
      * Will not wait for the database become available.
@@ -111,8 +104,7 @@ public class DbCreateCmd extends AbstractDatabaseCmd {
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
            InvalidDatabaseStateException, InvalidArgumentException,
             KeyspaceAlreadyExistException {
-
-        dbServices.validateCloudAndRegion(cloud, region);
+        dbServices.validateCloudAndRegion(cloud, region, flagVector);
         dbServices.createDb(new DbCreationOptions(db, region, keyspace, tier, capacityUnits, ifNotExist, flagVector));
 
         if (!flagAsync) {

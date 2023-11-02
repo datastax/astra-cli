@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.tool;
+package com.dtsx.astra.cli.db.collection;
 
 /*-
  * #%L
@@ -20,27 +20,19 @@ package com.dtsx.astra.cli.db.tool;
  * #L%
  */
 
-import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
+import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 
 /**
- * Open a browser with playground.
+ * Show Keyspaces for Databases.
  */
-@Command(name = "swagger", description = "Open the swagger user interface")
-public class DbSwaggerUICmd extends AbstractDatabaseCmd {
-
-    /**
-     * Specified a region explicitly
-     */
-    @Option(name = { "-r", "--region" }, title = "DB_REGION", arity = 1,
-            description = "Cloud provider region")
-    protected String region;
+@Command(name = "list-collections", description = "Display the list of collections in an database")
+public class DbListCollectionsCmd extends AbstractDatabaseCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        AstraCliConsole.println(dbServices.swaggerUrl(db, region));
+        ServiceCollection.getInstance().listCollections(db);
     }
 
 }

@@ -24,11 +24,11 @@ import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
+import io.stargate.sdk.json.domain.SimilarityMetric;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -75,13 +75,36 @@ public class AstraCliUtils {
      *      select environment
      */
     public static AstraEnvironment lookupEnvironment(String envKey) {
-        if (envKey == null) envKey = "prod";
-        List<String> validFormats = Arrays.stream(AstraEnvironment.values()).map(AstraEnvironment::name).toList();
-        if (!validFormats.contains(envKey.toUpperCase())) {
-            throw new ParseRestrictionViolatedException("Invalid option value (--env), expecting " + Arrays.toString(AstraEnvironment.values()));
+        try {
+            if (envKey == null) envKey = "prod";
+            return AstraEnvironment.valueOf(envKey.toUpperCase());
+        } catch(Exception e) {
+            throw new ParseRestrictionViolatedException(
+                    "Invalid option value (--env), expecting "
+                            + Arrays.toString(AstraEnvironment.values()));
         }
-        return AstraEnvironment.valueOf(envKey.toUpperCase());
     }
+
+    /**
+     * Parse key for similarity.
+     *
+     * @param metric
+     *      value provided for metric
+     * @return
+     *      select metric
+     */
+    public static SimilarityMetric lookupMetric(String metric) {
+        try {
+            if (metric == null) return SimilarityMetric.cosine;
+            return SimilarityMetric.valueOf(metric);
+        } catch(Exception e) {
+            throw new ParseRestrictionViolatedException(
+                    "Invalid option value (--metric), expecting "
+                            + Arrays.toString(SimilarityMetric.values()));
+        }
+    }
+
+
 
     /**
      * Helper to build the path (use multiple times).

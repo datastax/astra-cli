@@ -217,6 +217,25 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
 
+
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbCreateCollectionCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbDeleteCollectionCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbListCollectionsCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
+
   {
     "name":"com.dtsx.astra.cli.db.list.DbListCloudsCmd",
     "allDeclaredFields":true,
@@ -237,9 +256,11 @@
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
-
-
-
+  {
+    "name":"com.dtsx.astra.cli.db.list.DbListRegionsVectorCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
 
 
   {
@@ -276,14 +297,18 @@
   },
 
 
-
   {
-    "name":"com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd",
+    "name":"com.dtsx.astra.cli.db.endpoint.DbGetEndpointApiCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.tool.DbSwaggerUICmd",
+    "name":"com.dtsx.astra.cli.db.endpoint.DbGetEndpointSwaggerCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.endpoint.DbGetEndpointPlaygroundCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -966,6 +991,107 @@
       {"name":"setData","parameterTypes":["java.lang.Object"] }
     ]
   },
+
+  {
+    "name":"io.stargate.sdk.json.domain.JsonApiResponse",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setStatus","parameterTypes":["java.util.Map"] },
+      {"name":"getStatus","parameterTypes":[""] },
+      {"name":"setData","parameterTypes":["io.stargate.sdk.json.domain.JsonApiData"] },
+      {"name":"getData","parameterTypes":[""] },
+      {"name":"setErrors","parameterTypes":["java.util.List"] },
+      {"name":"getErrors","parameterTypes":[""] }
+    ]
+  },
+  {
+    "name":"io.stargate.sdk.json.domain.JsonApiData",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setDocuments","parameterTypes":["java.util.List"] },
+      {"name":"getDocuments","parameterTypes":[""] },
+      {"name":"setDocument","parameterTypes":["io.stargate.sdk.json.domain.JsonResult"] },
+      {"name":"getDocument","parameterTypes":[""] },
+      {"name":"setNextPageState","parameterTypes":["java.lang.String"] },
+      {"name":"getNextPageState","parameterTypes":[""] }
+    ]
+  },
+  {
+    "name":"io.stargate.sdk.json.domain.JsonResult",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setData","parameterTypes":["java.util.Map"] },
+      {"name":"getData","parameterTypes":[""] },
+      {"name":"setVector","parameterTypes":["[F"] },
+      {"name":"getVector","parameterTypes":[""] },
+      {"name":"setSimilarity","parameterTypes":["java.lang.Float"] },
+      {"name":"getSimilarity","parameterTypes":[""] }
+    ]
+  },
+  {
+    "name":"io.stargate.sdk.json.domain.JsonApiError",
+    "allDeclaredFields":true,
+    "queryAllDeclaredMethods":true,
+    "queryAllDeclaredConstructors":true,
+    "methods":[
+      {"name":"<init>","parameterTypes":[] },
+      {"name":"setMessage","parameterTypes":["java.lang.String"] },
+      {"name":"getMessage","parameterTypes":[""] },
+      {"name":"setErrorCode","parameterTypes":["java.lang.String"] },
+      {"name":"getErrorCode","parameterTypes":[""] },
+      {"name":"setExceptionClass","parameterTypes":["java.lang.String"] },
+      {"name":"getExceptionClass","parameterTypes":[""] }
+    ]
+  },
+
+  {
+    "name": "io.stargate.sdk.json.domain.CollectionDefinition",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options$Vector",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options$Vectorize",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options$Vectorize$OptionsForVectorize",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Builder",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+
+
+
   {
     "name": "com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
     "methods": [

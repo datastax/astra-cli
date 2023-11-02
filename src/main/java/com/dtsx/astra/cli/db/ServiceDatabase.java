@@ -48,11 +48,13 @@ import com.dtsx.astra.sdk.db.domain.DatabaseRegion;
 import com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
+import com.dtsx.astra.sdk.db.domain.RegionType;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.dtsx.astra.sdk.db.exception.KeyspaceAlreadyExistException;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.Assert;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -90,7 +92,7 @@ import static com.dtsx.astra.cli.core.out.AstraAnsiColors.YELLOW_500;
 public class ServiceDatabase {
 
     /** Default timeout for operations. */
-    public static final int DEFAULT_TIMEOUT_SECONDS = 300;
+    public static final int DEFAULT_TIMEOUT_SECONDS = 400;
 
     /** Default timeout for connection. */
     public static final int CONNECT_TIMEOUT_SECONDS = 20;
@@ -286,19 +288,20 @@ public class ServiceDatabase {
     /**
      * Validate that provided region is in the target cloud.
      *
+     * @param flagVector
+     *      enable flag for vector
      * @param cloud
      *      provided cloud
      * @param region
      *      provided region
      */
-    public void validateCloudAndRegion(String cloud, String region) {
+    public void validateCloudAndRegion(String cloud, String region, boolean flagVector) {
         Assert.hasLength(region, "region name");
-
-        // Cloud is not null check cloud and region
-
         if (!StringUtils.isEmpty(cloud)) {
             SortedMap<String, TreeMap<String, String>> mapCloudRegions =
-                    ServiceOrganization.getInstance().getDbServerlessRegions();
+                    ServiceOrganization.getInstance()
+                            .getDbServerlessRegions(flagVector ? RegionType.VECTOR : RegionType.ALL);
+            System.out.println("REGION OK");
             if (!mapCloudRegions.containsKey(cloud.toLowerCase())) {
                 throw new InvalidCloudProviderException(cloud);
             } else if (!mapCloudRegions
@@ -308,7 +311,7 @@ public class ServiceDatabase {
             }
         } else if (CliContext.getInstance()
                 .getApiDevops().db().regions()
-                .findAllServerless()
+                .findAllServerless(flagVector ? RegionType.VECTOR : RegionType.ALL)
                 .map(DatabaseRegionServerless::getName)
                 .filter(r -> r.equals(region.toLowerCase()))
                 .findFirst().isEmpty()) {
@@ -345,7 +348,6 @@ public class ServiceDatabase {
                 if (!options.flagIfNotExist()) {
                     throw new DatabaseAlreadyExistException(options.databaseName());
                 }
-
                 Database db = dbDao.getDatabase(options.databaseName());
                 DatabaseStatusType dbStatus = db.getStatus();
                 switch (dbStatus) {
@@ -386,7 +388,7 @@ public class ServiceDatabase {
                 .name(options.databaseName())
                 .tier(options.tier())
                 .capacityUnit(options.capacityUnits())
-                .cloudProvider(getCloudProvider(options.tier(), options.databaseRegion()))
+                .cloudProvider(getCloudProvider(options.tier(), options.databaseRegion(), options.flagVector()))
                 .cloudRegion(options.databaseRegion())
                 .keyspace(options.keyspaceName());
         if (options.flagVector()) {
@@ -417,22 +419,38 @@ public class ServiceDatabase {
     }
 
     /**
+     * Get serverless region with dedup.
+     *
+     * @param flagVector
+     *      vector
+     * @return
+     *      dedup map
+     */
+    private Map<String, DatabaseRegionServerless> getRegionMapServerless(boolean flagVector) {
+        return CliContext.getInstance()
+                .getApiDevops()
+                .db().regions()
+                .findAllServerless(flagVector ? RegionType.VECTOR : RegionType.ALL)
+                .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity(), (a, b) -> a));
+    }
+
+    /**
      * Access the cloud provider from region name.
      *
      * @param tier
      *      adapting control with tier
      * @param databaseRegion
      *      database region
+     * @param flagVector
+     *      will only list supported region for vector
      * @return
      *      cloud provider or error
      */
-    private CloudProviderType getCloudProvider(String tier, String databaseRegion) {
+    private CloudProviderType getCloudProvider(String tier, String databaseRegion, boolean flagVector) {
+        // SERVERLESS
         if (DatabaseCreationBuilder.DEFAULT_TIER.equals(tier)) {
-            Map<String, DatabaseRegionServerless> regionMap = CliContext.getInstance()
-                    .getApiDevops()
-                    .db().regions()
-                    .findAllServerless()
-                    .collect(Collectors.toMap(DatabaseRegionServerless::getName, Function.identity()));
+            System.out.println("get CLoud provider");
+            Map<String, DatabaseRegionServerless> regionMap = getRegionMapServerless(flagVector);
             if (!regionMap.containsKey(databaseRegion)) {
                 throw new InvalidArgumentException("Region '" + databaseRegion + "' has not been found for serverless");
             }
@@ -457,8 +475,11 @@ public class ServiceDatabase {
 
     /**
      * List Databases.
+     *
+     * @param flagVector
+     *      only show the databases vector
      */
-    public void listDb() {
+    public void listDb(boolean flagVector) {
         ShellTable sht = new ShellTable();
         // No color ?
         sht.addColumn(COLUMN_NAME,    20);
@@ -470,6 +491,7 @@ public class ServiceDatabase {
         CliContext.getInstance()
            .getApiDevopsDatabases()
            .findAllNonTerminated()
+           .filter(db -> !flagVector || (db.getInfo().getDbType() != null))
            .forEach(db -> {
                 Map <String, String> rf = new HashMap<>();
                 db.getInfo().getDatacenters().forEach(dc -> rf.put(dc.getRegion(), dc.getRegion()));
@@ -684,17 +706,8 @@ public class ServiceDatabase {
      */
     private String retrieveDatabaseRegion(Database db, String region) {
 
-        if (region == null)
+        if (region == null) {
             region = db.getInfo().getRegion();
-
-        // Region is valid
-        Set<String> availableRegions = CliContext.getInstance()
-                .getApiDevops().db().regions()
-                .findAllServerless()
-                .map(DatabaseRegionServerless::getName)
-                .collect(Collectors.toSet());
-        if (!availableRegions.contains(region)) {
-            throw new InvalidArgumentException("Provided region is invalid pick one of " + availableRegions);
         }
 
         // Db is actually present in that region
@@ -733,6 +746,7 @@ public class ServiceDatabase {
 
         // Organization Block
         Organization org = CliContext.getInstance().getApiDevops().getOrganization();
+        AstraEnvironment astraEnvironment = CliContext.getInstance().getAstraEnvironment();
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_ORG_ID.name(), org.getId());
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_ORG_NAME.name(), org.getName());
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_ORG_TOKEN.name(), CliContext.getInstance().getToken());
@@ -763,7 +777,7 @@ public class ServiceDatabase {
                 + File.separator + AstraCliUtils.SCB_FOLDER + File.separator
                 + "scb_" + db.getId() + "_" + region + ".zip");
         // GraphQL URL
-        String graphQLEndpoint = ApiLocator.getApiGraphQLEndPoint(db.getId(), region);
+        String graphQLEndpoint = getEndpointGraphQL(dbName, region);
         // Keyspace
         if (ks == null) ks = db.getInfo().getKeyspace();
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_KEYSPACE.name(), ks);
@@ -773,9 +787,13 @@ public class ServiceDatabase {
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_GRAPHQL_URL_ADMIN.name(), graphQLEndpoint + "/graphql-admin");
 
         // Rest URL
-        String restEndpoint = ApiLocator.getApiRestEndpoint(db.getId(), region);
+        String restEndpoint = getEndpointRest(dbName, region);
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REST_URL.name(), restEndpoint);
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REST_URL_SWAGGER.name(), restEndpoint + "/swagger-ui/");
+
+        // JSON Api URL
+        String jsonApiEndpoint = ApiLocator.getApiJsonEndpoint(astraEnvironment, db.getId(), region);
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_API_ENDPOINT.name(), jsonApiEndpoint);
         envFile.save();
     }
 
@@ -789,9 +807,70 @@ public class ServiceDatabase {
      * @return
      *      swagger url
      */
-    public String swaggerUrl(String dbName, String region) {
+    public String getEndpointRest(String dbName, String region) {
         Database db = dbDao.getDatabase(dbName);
-        return ApiLocator.getApiRestEndpoint(db.getId(), retrieveDatabaseRegion(db, region)) + "/swagger-ui/";
+        if (db.getInfo().getDbType() != null) {
+            throw new InvalidArgumentException("Vector database '%s' does not provide Cassandra Rest API".formatted(dbName));
+        }
+        return ApiLocator.getApiRestEndpoint(
+                CliContext.getInstance().getAstraEnvironment(),
+                db.getId(),
+                retrieveDatabaseRegion(db, region));
+    }
+
+    /**
+     * Build Swagger Url based on db and region.
+     *
+     * @param dbName
+     *      database name
+     * @param region
+     *      database region
+     * @return
+     *      swagger url
+     */
+    public String getEndpointSwagger(String dbName, String region) {
+        return getEndpointRest(dbName, region) + "/swagger-ui/";
+    }
+
+    /**
+     * Build Swagger Url based on db and region.
+     *
+     * @param dbName
+     *      database name
+     * @param region
+     *      database region
+     * @return
+     *      swagger url
+     */
+    public String getEndpointJsonApi(String dbName, String region) {
+        Database db = dbDao.getDatabase(dbName);
+        if (db.getInfo().getDbType() == null) {
+            throw new InvalidArgumentException("Database '%s' does not have vector search enabled".formatted(dbName));
+        }
+        return ApiLocator.getApiJsonEndpoint(
+                CliContext.getInstance().getAstraEnvironment(),
+                db.getId(),
+                retrieveDatabaseRegion(db, region));
+    }
+
+
+
+    /**
+     * Build Swagger Url based on db and region.
+     *
+     * @param dbName
+     *      database name
+     * @param region
+     *      database region
+     * @return
+     *      swagger url
+     */
+    public String getEndpointGraphQL(String dbName, String region) {
+        Database db = dbDao.getDatabase(dbName);
+        if (db.getInfo().getDbType() != null) {
+            throw new InvalidArgumentException("Vector database '%s' does not provide graphQL".formatted(dbName));
+        }
+        return ApiLocator.getApiGraphQLEndPoint(db.getId(), retrieveDatabaseRegion(db, region));
     }
 
     /**
@@ -804,9 +883,8 @@ public class ServiceDatabase {
      * @return
      *      swagger url
      */
-    public String graphQLPlayground(String dbName, String region) {
-        Database db = dbDao.getDatabase(dbName);
-        return ApiLocator.getApiGraphQLEndPoint(db.getId(), retrieveDatabaseRegion(db, region)) + "/playground";
+    public String getEndpointPlayground(String dbName, String region) {
+        return getEndpointGraphQL(dbName, region) +  "/playground";
     }
 
 

@@ -24,7 +24,11 @@ import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.sdk.AstraOpsClient;
+import com.dtsx.astra.sdk.org.domain.Organization;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import com.dtsx.astra.sdk.utils.AstraRc;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -46,14 +50,21 @@ public class SetupCmd extends AbstractCmd {
     @Option(name = { "-t", "--token" }, 
             title = "TOKEN", 
             description = "Key to use authenticate each call.")
-    protected String tokenParam;
-    
+    protected String token;
+
+    /** To use Cli on non production environment. */
+    @Option(name = { "-e", "--env" }, title = "Environment", description = "Environment to use for this section.")
+    protected String env = "prod";
+
+    protected String sectionName;
+
     /** {@inheritDoc} */
     @Override
     public void execute() {
-        if (tokenParam == null || tokenParam.isBlank()) {
+        AstraEnvironment targetEnv = AstraCliUtils.lookupEnvironment(env);
+        // As not token is provided we ask for it in the console
+        if (token == null || token.isBlank()) {
             verbose = true;
-            String token;
             AstraCliConsole.banner();
             boolean validToken = false;
             Console cons;
@@ -72,38 +83,34 @@ public class SetupCmd extends AbstractCmd {
                             token = scanner.nextLine();
                         }
                     }
-                    createDefaultSection(removeQuotesIfAny(token));
+                    sectionName = new AstraOpsClient(token, targetEnv).getOrganization().getName();
                     validToken = true;
                 } catch(InvalidTokenException ite) {
                     LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
                 }
             }
-        } else {
-            createDefaultSection(tokenParam);
         }
-        LoggerShell.info("Enter 'astra help' to list available commands.");
-        AstraCliConsole.outputSuccess("Setup completed.");
+        createDefaultSection();
     }
     
     /**
      * Based on provided token create the default section.
      * 
-     * @param token
-     *      token to create a section
      * @throws InvalidTokenException
      *      invalid token provided 
      */
-    private void createDefaultSection(String token) 
+    private void createDefaultSection()
     throws InvalidTokenException {
         try {
             ConfigCreateCmd ccc = new ConfigCreateCmd();
-            ccc.token = removeQuotesIfAny(token);
-            ccc.sectionName = new AstraOpsClient(token).getOrganization().getName();
+            ccc.token       = removeQuotesIfAny(token);
+            ccc.sectionName = sectionName;
+            ccc.env         = env;
             ccc.run();
+            AstraCliConsole.outputSuccess("Setup completed.");
+            LoggerShell.info("Enter 'astra help' to list available commands.");
         } catch(Exception e) {
-            LoggerShell.warning("Invalid token: It must be start with 'AstraCS:..' and have Organization Administrator privileges.");
-            LoggerShell.warning("Generated token at database creation cannot be used.");
-            LoggerShell.warning("Please enter a valid token or quit with CTRL+C.");
+            LoggerShell.warning("Invalid token: Must be start with 'AstraCS:..' and have Organization Administrator privileges.");
             throw new InvalidTokenException(token, e);
         }
     }

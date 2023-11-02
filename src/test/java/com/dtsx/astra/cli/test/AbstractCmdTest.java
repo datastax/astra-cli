@@ -21,10 +21,9 @@ public abstract class AbstractCmdTest {
 
     /** Use to disable usage of CqlSh, Dsbulk and other during test for CI/CD. */
     public final static String FLAG_TOOLS = "disable_tools";
-
-    public static String DB_TEST = "astra_cli_test";
-    public static String DB_TEST_VECTOR = "astra_cli_vector_test";
-
+    public static String DB_TEST = "test_astra_cli";
+    public static String DB_TEST_VECTOR = "test_astra_cli_vector";
+    public static String KEYSPACE_TEST = "default_keyspace";
     public static String ENV_VAR_TOKEN_TEST = "ASTRA_DB_APPLICATION_TOKEN_TEST";
     public static String ENV_VAR_TOKEN_DEV = "ASTRA_DB_APPLICATION_TOKEN_DEV";
     public static String SECTION_DEV = "sample-dev";

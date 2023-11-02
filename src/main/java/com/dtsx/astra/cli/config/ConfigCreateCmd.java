@@ -41,7 +41,6 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 public class ConfigCreateCmd extends AbstractCmd {
     
     /** Section in configuration file to as default. */
-    @Required
     @Arguments(title = "sectionName", description = "Section in configuration file to as as default.")
     protected String sectionName;
    

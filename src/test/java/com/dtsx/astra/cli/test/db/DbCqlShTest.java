@@ -18,14 +18,11 @@ import com.dtsx.astra.cli.utils.FileUtils;
  */
 class DbCqlShTest extends AbstractCmdTest {
 
-    /** dataset. */
-    final static String DB_TEST       = "astra_cli_test";
-    final static String KEYSPACE_TEST = "dsbulk";
-    final static String TABLE_TEST    = "cities_by_country";
+    final static String TABLE_TEST = "cities_by_country";
 
     @BeforeAll
     static void initForCqlsh() {
-        assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, DB_TEST));
+        assertSuccessCli("db create %s -k %s --if-not-exist".formatted(DB_TEST, KEYSPACE_TEST));
         assertSuccessCli("db cqlsh %s -f src/test/resources/cdc_dataset.cql".formatted(DB_TEST));
     }
 

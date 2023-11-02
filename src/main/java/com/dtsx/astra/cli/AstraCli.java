@@ -52,10 +52,14 @@ import com.dtsx.astra.cli.db.DbStatusCmd;
 import com.dtsx.astra.cli.db.cdc.DbCreateCdcCmd;
 import com.dtsx.astra.cli.db.cdc.DbDeleteCdcCmd;
 import com.dtsx.astra.cli.db.cdc.DbListCdcCmd;
+import com.dtsx.astra.cli.db.collection.DbCreateCollectionCmd;
+import com.dtsx.astra.cli.db.collection.DbDeleteCollectionCmd;
+import com.dtsx.astra.cli.db.collection.DbListCollectionsCmd;
 import com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbCountCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd;
+import com.dtsx.astra.cli.db.endpoint.DbGetEndpointApiCmd;
 import com.dtsx.astra.cli.db.exception.DatabaseAlreadyExistException;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
@@ -66,11 +70,12 @@ import com.dtsx.astra.cli.db.list.DbListCloudsCmd;
 import com.dtsx.astra.cli.db.list.DbListCmd;
 import com.dtsx.astra.cli.db.list.DbListRegionsClassicCmd;
 import com.dtsx.astra.cli.db.list.DbListRegionsServerlessCmd;
+import com.dtsx.astra.cli.db.list.DbListRegionsVectorCmd;
 import com.dtsx.astra.cli.db.region.DbCreateRegionCmd;
 import com.dtsx.astra.cli.db.region.DbDeleteRegionCmd;
 import com.dtsx.astra.cli.db.region.DbListRegionsCmd;
-import com.dtsx.astra.cli.db.tool.DbGraphqlPlaygroundCmd;
-import com.dtsx.astra.cli.db.tool.DbSwaggerUICmd;
+import com.dtsx.astra.cli.db.endpoint.DbGetEndpointPlaygroundCmd;
+import com.dtsx.astra.cli.db.endpoint.DbGetEndpointSwaggerCmd;
 import com.dtsx.astra.cli.iam.role.RoleDescribeCmd;
 import com.dtsx.astra.cli.iam.role.RoleGetCmd;
 import com.dtsx.astra.cli.iam.role.RoleListCmd;
@@ -170,16 +175,18 @@ import java.util.Arrays;
          DbResumeCmd.class, DbDownloadScbCmd.class, DbCreateDotEnvCmd.class,
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbDeleteKeyspaceCmd.class, DbListKeyspacesCmd.class,
+         // Collections
+         DbListCollectionsCmd.class, DbDeleteCollectionCmd.class, DbCreateCollectionCmd.class,
          // Regions
          DbCreateRegionCmd.class, DbListRegionsCmd.class, DbDeleteRegionCmd.class,
          // DB Service Regions and Cloud
-         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class, DbListCloudsCmd.class,
+         DbListRegionsClassicCmd.class, DbListRegionsServerlessCmd.class, DbListRegionsVectorCmd.class, DbListCloudsCmd.class,
          // DsBulk
          DbCountCmd.class, DbLoadCmd.class, DbUnLoadCmd.class,
          // Cql Shell
          DbCqlShellCmd.class,
-         // External Tools
-         DbSwaggerUICmd.class, DbGraphqlPlaygroundCmd.class,
+         // Endpoints
+         DbGetEndpointSwaggerCmd.class, DbGetEndpointPlaygroundCmd.class, DbGetEndpointApiCmd.class,
          // Cdc
          DbListCdcCmd.class, DbDeleteCdcCmd.class, DbCreateCdcCmd.class
      }),

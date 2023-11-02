@@ -70,6 +70,8 @@ public class EnvFile {
         ASTRA_DB_GRAPHQL_URL_ADMIN,
         /** rest and document Api endpoint */
         ASTRA_DB_REST_URL,
+        /** json Api endpoint*/
+        ASTRA_DB_API_ENDPOINT,
         /** swagger specification URL */
         ASTRA_DB_REST_URL_SWAGGER,
         /** Tenant Name. */
