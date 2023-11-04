@@ -105,6 +105,12 @@ chmod 755 src/main/dist/astra-init.sh
 - Packaging
 
 ```
+export ASTRA_CLI_VERSION=0.5
+tar -czf astra-cli-0.5-x86_64_linux.bottle.tar.gz *
+zip astra-cli-$ASTRA_CLI_VERSION-linux.zip *
+```
+
+```
 zip astra-cli-0.4.zip *
 zip astra-cli-0.4-linux.zip *
 zip astra-cli-0.5-mac.zip *
@@ -117,3 +123,17 @@ brew create https://github.com/datastax/astra-cli/releases/download/0.4/astra-cl
 ```
 https://github.com/datastax/astra-cli/releases
 ```
+
+### Homebrew
+
+```
+export ASTRA_CLI_VERSION=0.5
+tar -czf astra-cli-$ASTRA_CLI_VERSION.x86_64_linux.bottle.tar.gz *
+shasum -a 256 astra-cli-$ASTRA_CLI_VERSION.x86_64_linux.bottle.tar.gz
+zip astra-cli-$ASTRA_CLI_VERSION-linux.zip *
+```
+
+```
+```
+
+
