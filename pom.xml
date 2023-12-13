@@ -45,7 +45,7 @@
 		<version.maven.plugin.release>3.0.1</version.maven.plugin.release>
 		<version.maven.plugin.resources>3.3.1</version.maven.plugin.resources>
 		<version.maven.plugin.shade>3.5.1</version.maven.plugin.shade>
-		<version.maven.plugin.surefire>3.2.1</version.maven.plugin.surefire>
+		<version.maven.plugin.surefire>3.2.3</version.maven.plugin.surefire>
 	</properties>
 
 	<dependencies>
