@@ -301,7 +301,6 @@ public class ServiceDatabase {
             SortedMap<String, TreeMap<String, String>> mapCloudRegions =
                     ServiceOrganization.getInstance()
                             .getDbServerlessRegions(flagVector ? RegionType.VECTOR : RegionType.ALL);
-            System.out.println("REGION OK");
             if (!mapCloudRegions.containsKey(cloud.toLowerCase())) {
                 throw new InvalidCloudProviderException(cloud);
             } else if (!mapCloudRegions
@@ -449,7 +448,6 @@ public class ServiceDatabase {
     private CloudProviderType getCloudProvider(String tier, String databaseRegion, boolean flagVector) {
         // SERVERLESS
         if (DatabaseCreationBuilder.DEFAULT_TIER.equals(tier)) {
-            System.out.println("get CLoud provider");
             Map<String, DatabaseRegionServerless> regionMap = getRegionMapServerless(flagVector);
             if (!regionMap.containsKey(databaseRegion)) {
                 throw new InvalidArgumentException("Region '" + databaseRegion + "' has not been found for serverless");
