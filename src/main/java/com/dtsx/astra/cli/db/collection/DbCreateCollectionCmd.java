@@ -20,18 +20,17 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
+import com.datastax.astra.client.Collection;
+import com.datastax.astra.client.admin.AstraDBAdmin;
+import com.datastax.astra.client.model.Document;
+import com.datastax.astra.client.model.SimilarityMetric;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
-import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
-import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
-import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
-import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
-import io.stargate.sdk.json.domain.SimilarityMetric;
 
 /**
  * Creating a new collection.
@@ -52,6 +51,15 @@ public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
     /**
      * Collection creation options.
      */
+    @Option(name = {"-k", "--keyspace" },
+            title = "KEYSPACE",
+            arity = 1,
+            description = "Name of the keyspace to create the collection")
+    public String keyspace = AstraDBAdmin.DEFAULT_NAMESPACE;
+
+    /**
+     * Collection creation options.
+     */
     @Option(name = {"-d", "--dimension" },
             title = "DIMENSION",
             arity = 1,
@@ -65,16 +73,81 @@ public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
             title = "METRIC",
             arity = 1,
             description = "Name of the collection to create")
-    public String metric = SimilarityMetric.cosine.name();
+    public String metric;
+
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"--indexing-allow" },
+            title = "INDEXING_ALLOW",
+            arity = 1,
+            description = "List of attribute to add into index (comma separated)")
+    public String indexAllow;
+
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"--indexing-deny" },
+            title = "INDEXING_DENY",
+            arity = 1,
+            description = "List of attribute to remove from index (comma separated)")
+    public String indexDeny;
+
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"--default-id" },
+            title = "DEFAULT_ID",
+            arity = 1,
+            description = "Default identifier to use for the collection")
+    public String defaultId;
+
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"--embedding-provider" },
+            title = "EMBEDDING_PROVIDER",
+            arity = 1,
+            description = "Using Vectorize, embedding provider to use")
+    public String embeddingProvider;
+
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"--embedding-model" },
+            title = "EMBEDDING_MODEL",
+            arity = 1,
+            description = "Using Vectorize, embedding mode to use")
+    public String embeddingModel;
 
     /** {@inheritDoc}  */
     public void executeAsync() {
+        // Parameters Validation at Command Level
         if (dimension != null && dimension < 1) {
             throw new InvalidArgumentException("Dimension must be a positive integer.");
         }
-        ServiceCollection.getInstance()
-                .createCollection(db, new CreateCollectionOption(collection, dimension,
-                        AstraCliUtils.lookupMetric(metric)));
+        if (indexAllow!= null && indexDeny != null) {
+            throw new InvalidArgumentException("Cannot have both --indexing-deny and --indexing-allow");
+        }
+        if (embeddingModel != null && embeddingProvider == null) {
+            throw new IllegalArgumentException("Cannot have --embedding-model without --embedding-provider");
+        }
+        if (embeddingModel == null && embeddingProvider != null) {
+            throw new IllegalArgumentException("Cannot have --embedding-provider without --embedding-model");
+        }
+        // Defaulting Metric if a dimension is provided
+        if (dimension != null && metric == null) {
+            metric = SimilarityMetric.COSINE.name();
+        }
+        Collection<Document> col = ServiceCollection.getInstance()
+                .createCollection(db, keyspace, new CreateCollectionOption(
+                        collection, dimension,
+                        AstraCliUtils.parseMetric(metric),
+                        AstraCliUtils.parseIndex(indexAllow),
+                        AstraCliUtils.parseIndex(indexDeny),
+                        AstraCliUtils.parseDefaultId(defaultId),
+                        embeddingModel, embeddingProvider));
+        LoggerShell.success("Collection '%s' as been created from db '%s' on keyspace  '%s'".formatted(collection, db, keyspace));
     }
     
 }

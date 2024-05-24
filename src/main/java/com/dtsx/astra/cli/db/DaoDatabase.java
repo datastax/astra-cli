@@ -19,15 +19,13 @@ package com.dtsx.astra.cli.db;
  * limitations under the License.
  * #L%
  */
-
+import com.datastax.astra.client.admin.AstraDBAdmin;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
-import com.dtsx.astra.sdk.AstraDB;
-import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.Database;
@@ -72,7 +70,6 @@ public class DaoDatabase {
     private DaoDatabase() {
     }
     
-    
     /**
      * Access unique db.
      * 
@@ -102,13 +99,24 @@ public class DaoDatabase {
      * @return
      *      astraDB
      */
-    public AstraDB getAstraDB(String databaseName) {
+    public com.datastax.astra.client.Database getDataAPIDatabase(String databaseName) {
+        return getDataAPIDatabase(databaseName, AstraDBAdmin.DEFAULT_NAMESPACE);
+    }
+
+    /**
+     * Accessing the AstraDB client for a vectorDB.
+     *
+     * @param databaseName
+     *      database name
+     * @return
+     *      instance of a client for the DataAPI
+     */
+    public com.datastax.astra.client.Database getDataAPIDatabase(String databaseName, String keyspace) {
         Database db = getDatabase(databaseName);
         if (db.getInfo().getDbType() == null) {
             throw new IllegalArgumentException("Database %s is not a vector database".formatted(databaseName));
         }
-        AstraOpsClient ops = CliContext.getInstance().getApiDevops();
-        return new AstraDB(ops.getToken(), UUID.fromString(db.getId()), db.getInfo().getRegion(),ops.getEnvironment());
+        return CliContext.getInstance().getDataAPIClient().getDatabase(UUID.fromString(db.getId()), keyspace);
     }
 
     /**

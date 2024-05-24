@@ -32,7 +32,7 @@ class DbCdcCommandsTest  extends AbstractCmdTest {
     @BeforeAll
     static void shouldInitializeEnvironment() {
         // Create DB and keyspace with
-        assertSuccessCli("db create %s --if-not-exist".formatted(DB_TEST));
+        assertSuccessCli("db create %s --keyspace %s --if-not-exist".formatted(DB_TEST, DB_TEST));
         // Create TENANT
         assertSuccessCli("streaming create %s --cloud gcp --region useast1 --if-not-exist".formatted(RANDOM_TENANT));
         // Create SCHEMA

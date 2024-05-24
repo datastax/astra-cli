@@ -20,7 +20,8 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
-import io.stargate.sdk.json.domain.SimilarityMetric;
+import com.datastax.astra.client.model.CollectionIdTypes;
+import com.datastax.astra.client.model.SimilarityMetric;
 
 /**
  * Option for creating a collection.
@@ -28,10 +29,25 @@ import io.stargate.sdk.json.domain.SimilarityMetric;
 public record CreateCollectionOption(
 
         /* Name of the collection to create. */
-        String collection,
+        String name,
 
         /* Name of the dimension to create. */
         Integer dimension,
 
         /* Name of the metric to create. */
-        SimilarityMetric metric) {}
+        SimilarityMetric metric,
+
+        /* List of fields to add in indexing allow. */
+        String[] indexingAllow,
+
+        /* List of fields to add in indexing deny. */
+        String[] indexingDeny,
+
+        /* Default Id type. */
+        CollectionIdTypes defaultId,
+
+        /* Embedding model for vectorize. */
+        String embeddingModel,
+
+        /* Embedding provider for vectorize. */
+        String embeddingProvider) {}

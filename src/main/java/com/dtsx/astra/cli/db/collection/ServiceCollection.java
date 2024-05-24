@@ -20,12 +20,15 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
+import com.datastax.astra.client.Collection;
+import com.datastax.astra.client.Database;
+import com.datastax.astra.client.model.CollectionIdTypes;
+import com.datastax.astra.client.model.CollectionOptions;
+import com.datastax.astra.client.model.Document;
+import com.datastax.astra.client.model.SimilarityMetric;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.db.DaoDatabase;
-import com.dtsx.astra.sdk.db.domain.Database;
-import io.stargate.sdk.json.domain.CollectionDefinition;
-import io.stargate.sdk.json.domain.SimilarityMetric;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +49,22 @@ public class ServiceCollection {
      * column names.
      */
     static final String COLUMN_DIMENSION = "Dimension";
+
+    /**
+     * column names.
+     */
+    static final String COLUMN_SERVICE = "AI Provider";
+
+    /**
+     * column names.
+     */
+    static final String COLUMN_MODEL = "AI Model";
+
+    /**
+     * column names.
+     */
+    static final String COLUMN_UUID = "id type";
+
 
     /**
      * Singleton Pattern
@@ -81,21 +100,41 @@ public class ServiceCollection {
      *
      * @param databaseName database name
      */
-    public void listCollections(String databaseName) {
+    public void listCollections(String databaseName, String keyspace) {
         ShellTable sht = new ShellTable();
         sht.addColumn(COLUMN_NAME, 20);
+        sht.addColumn(COLUMN_UUID, 10);
         sht.addColumn(COLUMN_DIMENSION, 10);
         sht.addColumn(COLUMN_METRIC, 10);
-        dbDao.getAstraDB(databaseName).findAllCollections().forEach(col -> {
+        sht.addColumn(COLUMN_SERVICE, 10);
+        sht.addColumn(COLUMN_MODEL, 20);
+
+        dbDao.getDataAPIDatabase(databaseName, keyspace).listCollections().forEach(col -> {
             Map<String, String> rf = new HashMap<>();
             rf.put(COLUMN_NAME,      col.getName());
-            if (col.getOptions() == null || col.getOptions().getVector() == null) {
-                rf.put(COLUMN_DIMENSION, "");
-                rf.put(COLUMN_METRIC,    "");
-            } else {
-                rf.put(COLUMN_DIMENSION, String.valueOf(col.getOptions().getVector().getDimension()));
-                rf.put(COLUMN_METRIC, col.getOptions().getVector().getMetric().name());
+            rf.put(COLUMN_DIMENSION, "");
+            rf.put(COLUMN_METRIC,    "");
+            rf.put(COLUMN_SERVICE,   "");
+            rf.put(COLUMN_MODEL,     "");
+            rf.put(COLUMN_UUID,      "default");
+
+            if (col.getOptions() != null && col.getOptions().getVector() != null) {
+              CollectionOptions.VectorOptions vOptions =  col.getOptions().getVector();
+              rf.put(COLUMN_DIMENSION, String.valueOf(vOptions.getDimension()));
+              rf.put(COLUMN_METRIC, vOptions.getMetric());
+              if (vOptions.getService() != null) {
+                  rf.put(COLUMN_SERVICE, vOptions.getService().getProvider());
+                  rf.put(COLUMN_MODEL, vOptions.getService().getModelName());
+              }
             }
+            if (col.getOptions().getIndexing() != null) {
+                System.out.println("Allow: " + col.getOptions().getIndexing().getAllow());
+                System.out.println("Deny: " + col.getOptions().getIndexing().getDeny());
+            }
+            if (col.getOptions().getDefaultId() != null) {
+                rf.put(COLUMN_UUID, col.getOptions().getDefaultId().getType());
+            }
+
             sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
@@ -105,16 +144,41 @@ public class ServiceCollection {
      * Create collection based on arguments.
      * @param databaseName
      *      current database name
+     * @param keyspace
+     *      name of the keyspace to target this collection
      * @param cco
      *      current collection creation arguments
      */
-    public void createCollection(String databaseName, CreateCollectionOption cco) {
-        CollectionDefinition.Builder builder = CollectionDefinition.builder().name(cco.collection());
-        if (cco.dimension() != null) {
-            builder.vectorDimension(cco.dimension());
-            builder.similarityMetric(cco.metric());
+    public Collection<Document> createCollection(String databaseName, String keyspace, CreateCollectionOption cco) {
+        Database db = dbDao.getDataAPIDatabase(databaseName, keyspace);
+        CollectionOptions.CollectionOptionsBuilder options = CollectionOptions.builder();
+
+        // Parameters Validations
+        if (cco.indexingAllow() != null && cco.indexingAllow().length > 0) {
+            options.indexingAllow(cco.indexingAllow());
+        } else if (cco.indexingDeny() != null && cco.indexingDeny().length > 0) {
+            options.indexingDeny(cco.indexingDeny());
         }
-        dbDao.getAstraDB(databaseName).createCollection(builder.build());
+
+        // Vectorize
+        if (cco.embeddingModel() != null) {
+            options.vectorize(cco.embeddingProvider(), cco.embeddingModel());
+        }
+
+        if (cco.defaultId() != null) {
+            options.defaultIdType(cco.defaultId());
+        }
+
+        // Dimension
+        if (cco.dimension() != null) {
+            options.vectorDimension(cco.dimension());
+        }
+
+        // Metrics
+        if (cco.metric() != null) {
+            options.vectorSimilarity(cco.metric());
+        }
+        return db.createCollection(cco.name(), options.build());
     }
 
     /**
@@ -122,11 +186,13 @@ public class ServiceCollection {
      *
      * @param databaseName
      *      database name
+     * @param keyspace
+     *      name of the keyspace to target this collection
      * @param collectionName
      *      collection name
      */
-    public void deleteCollection(String databaseName, String collectionName) {
-        dbDao.getAstraDB(databaseName).deleteCollection(collectionName);
+    public void deleteCollection(String databaseName, String keyspace, String collectionName) {
+        dbDao.getDataAPIDatabase(databaseName, keyspace).dropCollection(collectionName);
     }
 
     /**
@@ -134,10 +200,12 @@ public class ServiceCollection {
      *
      * @param databaseName
      *      database name
+     * @param keyspace
+     *      name of the keyspace to target this collection
      * @param collectionName
      *      collection name
      */
-    public boolean isCollectionExists(String databaseName, String collectionName) {
-        return dbDao.getAstraDB(databaseName).isCollectionExists(collectionName);
+    public boolean isCollectionExists(String databaseName,  String keyspace, String collectionName) {
+        return dbDao.getDataAPIDatabase(databaseName, keyspace).collectionExists(collectionName);
     }
 }

@@ -20,11 +20,12 @@ package com.dtsx.astra.cli.utils;
  * #L%
  */
 
+import com.datastax.astra.client.model.CollectionIdTypes;
+import com.datastax.astra.client.model.SimilarityMetric;
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
-import io.stargate.sdk.json.domain.SimilarityMetric;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +75,7 @@ public class AstraCliUtils {
      * @return
      *      select environment
      */
-    public static AstraEnvironment lookupEnvironment(String envKey) {
+    public static AstraEnvironment parseEnvironment(String envKey) {
         try {
             if (envKey == null) envKey = "prod";
             return AstraEnvironment.valueOf(envKey.toUpperCase());
@@ -93,10 +94,10 @@ public class AstraCliUtils {
      * @return
      *      select metric
      */
-    public static SimilarityMetric lookupMetric(String metric) {
+    public static SimilarityMetric parseMetric(String metric) {
         try {
-            if (metric == null) return SimilarityMetric.cosine;
-            return SimilarityMetric.valueOf(metric);
+            if (metric == null) return null;
+            return SimilarityMetric.valueOf(metric.toUpperCase());
         } catch(Exception e) {
             throw new ParseRestrictionViolatedException(
                     "Invalid option value (--metric), expecting "
@@ -104,6 +105,41 @@ public class AstraCliUtils {
         }
     }
 
+    /**
+     * Parse key for defaultId.
+     *
+     * @param defaultId
+     *      value provided for defaultId
+     * @return
+     *      select metric
+     */
+    public static CollectionIdTypes parseDefaultId(String defaultId) {
+        try {
+            if (defaultId == null) return null;
+            return CollectionIdTypes.fromValue(defaultId);
+        } catch(Exception e) {
+            throw new ParseRestrictionViolatedException(
+                    "Invalid option value (--default-id), expecting "
+                            + Arrays.toString(CollectionIdTypes.values()));
+        }
+    }
+
+    /**
+     * Parse key for similarity.
+     *
+     * @param index
+     *      value for an index
+     * @return
+     *      select metric
+     */
+    public static String[] parseIndex(String index) {
+        try {
+            if (index == null) return null;
+            return index.split(",");
+        } catch(Exception e) {
+            throw new ParseRestrictionViolatedException("Invalid option value (--indexing-*), expecting an array separated by comma");
+        }
+    }
 
 
     /**

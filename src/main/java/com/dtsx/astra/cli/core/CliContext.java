@@ -20,6 +20,8 @@ package com.dtsx.astra.cli.core;
  * #L%
  */
 
+import com.datastax.astra.client.DataAPIClient;
+import com.datastax.astra.client.DataAPIOptions;
 import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
@@ -81,6 +83,9 @@ public class CliContext {
 
     /** Single for Ops Client. */
     private AstraOpsClient devopsApiClient;
+
+    /** Singleton for Data API Client. */
+    private DataAPIClient dataAPIClient;
 
     /**
      * Should initialize the client based on provided parameters.
@@ -238,6 +243,36 @@ public class CliContext {
             validateDevopsClientConnection(devopsApiClient);
         }
         return devopsApiClient;
+    }
+
+    /**
+     * Initializing and Retrieving the Data API Client for vector Operations.
+     *
+     * @return
+     *      instance od DataAPIClient for current configuration
+     */
+    public DataAPIClient getDataAPIClient() {
+        if (dataAPIClient == null) {
+            dataAPIClient = new DataAPIClient(getToken(),
+                    DataAPIOptions.builder()
+                    .withDestination(getDestination())
+                    .build());
+        }
+        return dataAPIClient;
+    }
+
+    /**
+     * Mapping for AstraEnvironment to DataApiDestination which is broader to work with DSE.
+     *
+     * @return
+     *      destination for the data api
+     */
+    private DataAPIOptions.DataAPIDestination getDestination() {
+        return switch (getAstraEnvironment()) {
+            case DEV -> DataAPIOptions.DataAPIDestination.ASTRA_DEV;
+            case TEST -> DataAPIOptions.DataAPIDestination.ASTRA_TEST;
+            default -> DataAPIOptions.DataAPIDestination.ASTRA;
+        };
     }
 
     /**

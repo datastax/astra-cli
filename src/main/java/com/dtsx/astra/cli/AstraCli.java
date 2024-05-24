@@ -20,6 +20,7 @@ package com.dtsx.astra.cli;
  * #L%
  */
 
+import com.datastax.astra.client.exception.AuthenticationException;
 import com.dtsx.astra.cli.config.ConfigCreateCmd;
 import com.dtsx.astra.cli.config.ConfigDeleteCmd;
 import com.dtsx.astra.cli.config.ConfigDescribeCmd;
@@ -316,7 +317,7 @@ public class AstraCli {
         } catch(ParseException ex) {
             LoggerShell.exception(ex,"Command is not properly formatted.");
             return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch (InvalidTokenException | TokenNotFoundException |
+        } catch (InvalidTokenException | TokenNotFoundException | AuthenticationException | com.dtsx.astra.sdk.exception.AuthenticationException |
                 FileSystemException | ConfigurationException e) {
             AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;

@@ -20,19 +20,30 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
+import com.datastax.astra.client.admin.AstraDBAdmin;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
 import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 
 /**
  * Show Keyspaces for Databases.
  */
 @Command(name = "list-collections", description = "Display the list of collections in an database")
 public class DbListCollectionsCmd extends AbstractDatabaseCmd {
-    
+
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"-k", "--keyspace" },
+            title = "KEYSPACE",
+            arity = 1,
+            description = "Name of the keyspace to create the collection")
+    public String keyspace = AstraDBAdmin.DEFAULT_NAMESPACE;
+
     /** {@inheritDoc} */
     public void execute() {
-        ServiceCollection.getInstance().listCollections(db);
+        ServiceCollection.getInstance().listCollections(db, keyspace);
     }
 
 }

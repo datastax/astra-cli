@@ -26,9 +26,7 @@ import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.sdk.AstraOpsClient;
-import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import com.dtsx.astra.sdk.utils.AstraRc;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
@@ -61,7 +59,7 @@ public class SetupCmd extends AbstractCmd {
     /** {@inheritDoc} */
     @Override
     public void execute() {
-        AstraEnvironment targetEnv = AstraCliUtils.lookupEnvironment(env);
+        AstraEnvironment targetEnv = AstraCliUtils.parseEnvironment(env);
         // As not token is provided we ask for it in the console
         if (token == null || token.isBlank()) {
             verbose = true;

@@ -39,7 +39,7 @@ public class InvalidRegionException extends InvalidArgumentException {
      *      current region
      */
     public InvalidRegionException(String cloud, String region) {
-        super(String.format("Region '%s' is valid for cloud '%s'.", region, cloud));
+        super(String.format("Region '%s' is invalid for the cloud '%s'.", region, cloud));
     }
 
     /**

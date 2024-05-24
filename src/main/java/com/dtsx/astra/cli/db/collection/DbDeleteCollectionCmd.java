@@ -20,6 +20,7 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
+import com.datastax.astra.client.admin.AstraDBAdmin;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
@@ -44,10 +45,19 @@ public class DbDeleteCollectionCmd extends AbstractDatabaseCmdAsync {
             description = "Name of the collection to delete")
     public String collection;
 
+    /**
+     * Collection creation options.
+     */
+    @Option(name = {"-k", "--keyspace" },
+            title = "KEYSPACE",
+            arity = 1,
+            description = "Name of the keyspace to create the collection")
+    public String keyspace = AstraDBAdmin.DEFAULT_NAMESPACE;
+
     /** {@inheritDoc}  */
     public void executeAsync() {
-        if (ServiceCollection.getInstance().isCollectionExists(db, collection)) {
-            ServiceCollection.getInstance().deleteCollection(db, collection);
+        if (ServiceCollection.getInstance().isCollectionExists(db, keyspace, collection)) {
+            ServiceCollection.getInstance().deleteCollection(db, keyspace, collection);
             LoggerShell.success("Collection '%s' as been deleted from '%s'.".formatted(collection, db));
         } else {
             throw new InvalidArgumentException("Collection '%s' does not exist in '%s'.".formatted(collection, db));

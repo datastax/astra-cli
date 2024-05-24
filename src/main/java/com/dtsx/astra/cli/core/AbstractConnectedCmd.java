@@ -23,12 +23,8 @@ package com.dtsx.astra.cli.core;
 import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.out.OutputFormat;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.parser.errors.ParseRestrictionViolatedException;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -63,7 +59,7 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
         validateOptions();
 
         ctx().init(new CoreOptions(verbose, noColor, OutputFormat.valueOf(output.toUpperCase(Locale.ROOT)), configFilename));
-        ctx().initToken(new TokenOptions(token, configSectionName, AstraCliUtils.lookupEnvironment(env)));
+        ctx().initToken(new TokenOptions(token, configSectionName, AstraCliUtils.parseEnvironment(env)));
         execute();
     }
 

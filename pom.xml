@@ -17,34 +17,35 @@
 		<sonar.organization>clun-datastax</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-		<astra-sdk.version>0.7.3</astra-sdk.version>
+		<astra-sdk.version>1.2.8-SNAPSHOT</astra-sdk.version>
+		<astra-db-java.version>1.2.0</astra-db-java.version>
 		<jansi.version>2.4.1</jansi.version>
-		<airline.version>2.9.0</airline.version>
-		<slf4j.version>2.0.9</slf4j.version>
+		<airline.version>3.0.0</airline.version>
+		<slf4j.version>2.0.13</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<jackson-datatype.version>2.15.3</jackson-datatype.version>
-		<commons-compress.version>1.25.0</commons-compress.version>
+		<commons-compress.version>1.26.2</commons-compress.version>
 		<!-- Junit -->
-		<junit-jupiter.version>5.10.1</junit-jupiter.version>
-		<awaitibility.version>4.2.0</awaitibility.version>
+		<junit-jupiter.version>5.10.2</junit-jupiter.version>
+		<awaitibility.version>4.2.1</awaitibility.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
 		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
 		<maven.plugin.javadoc.source>17</maven.plugin.javadoc.source>
 		<!-- Maven -->
-		<version.maven.plugin.assembly>3.6.0</version.maven.plugin.assembly>
-		<version.maven.plugin.compiler>3.11.0</version.maven.plugin.compiler>
+		<version.maven.plugin.assembly>3.7.1</version.maven.plugin.assembly>
+		<version.maven.plugin.compiler>3.12.1</version.maven.plugin.compiler>
 		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
 		<version.maven.plugin.dependency>3.6.1</version.maven.plugin.dependency>
-		<version.maven.plugin.exec>3.1.0</version.maven.plugin.exec>
+		<version.maven.plugin.exec>3.3.0</version.maven.plugin.exec>
 		<version.maven.plugin.jacoco>0.8.11</version.maven.plugin.jacoco>
 		<version.maven.plugin.javadoc>3.6.0</version.maven.plugin.javadoc>
-		<version.maven.plugin.jar>3.3.0</version.maven.plugin.jar>
-		<version.maven.plugin.license>2.3.0</version.maven.plugin.license>
-		<version.maven.plugin.native>0.9.28</version.maven.plugin.native>
+		<version.maven.plugin.jar>3.4.1</version.maven.plugin.jar>
+		<version.maven.plugin.license>2.4.0</version.maven.plugin.license>
+		<version.maven.plugin.native>0.10.2</version.maven.plugin.native>
 		<version.maven.plugin.release>3.0.1</version.maven.plugin.release>
 		<version.maven.plugin.resources>3.3.1</version.maven.plugin.resources>
-		<version.maven.plugin.shade>3.5.1</version.maven.plugin.shade>
+		<version.maven.plugin.shade>3.5.3</version.maven.plugin.shade>
 		<version.maven.plugin.surefire>3.2.5</version.maven.plugin.surefire>
 	</properties>
 
@@ -64,19 +65,13 @@
 		<!-- Http client wrapping Calls -->
 		<dependency>
 			<groupId>com.datastax.astra</groupId>
-			<artifactId>astra-db-client</artifactId>
+			<artifactId>astra-sdk-devops</artifactId>
 			<version>${astra-sdk.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.datastax.stargate</groupId>
-					<artifactId>stargate-sdk-grpc</artifactId>
-				</exclusion>
-
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.datastax.astra</groupId>
+			<artifactId>astra-db-java</artifactId>
+			<version>${astra-db-java.version}</version>
 		</dependency>
 
 		<dependency>

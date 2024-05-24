@@ -32,7 +32,6 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import com.github.rvesse.airline.annotations.restrictions.Required;
 
 /**
  * Create a new section in configuration.
@@ -65,7 +64,7 @@ public class ConfigCreateCmd extends AbstractCmd {
             throw new InvalidTokenException(token);
         }
         // validate token at the same time
-        AstraEnvironment targetEnv = AstraCliUtils.lookupEnvironment(env);
+        AstraEnvironment targetEnv = AstraCliUtils.parseEnvironment(env);
         Organization o = new AstraOpsClient(token, targetEnv).getOrganization();
         if (sectionName == null) {
             sectionName = o.getName();

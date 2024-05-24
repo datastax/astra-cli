@@ -840,12 +840,12 @@ public class ServiceDatabase {
      * @return
      *      swagger url
      */
-    public String getEndpointJsonApi(String dbName, String region) {
+    public String getEndpointDataAPI(String dbName, String region) {
         Database db = dbDao.getDatabase(dbName);
         if (db.getInfo().getDbType() == null) {
             throw new InvalidArgumentException("Database '%s' does not have vector search enabled".formatted(dbName));
         }
-        return ApiLocator.getApiJsonEndpoint(
+        return ApiLocator.getApiEndpoint(
                 CliContext.getInstance().getAstraEnvironment(),
                 db.getId(),
                 retrieveDatabaseRegion(db, region));

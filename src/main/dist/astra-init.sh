@@ -1371,7 +1371,7 @@ function _complete_astra_group_db_command_listcollections() {
   COMMANDS=$1
 
   FLAG_OPTS="--no-color -v --verbose"
-  ARG_OPTS="--token -cf --config-file -o -conf --env --config --output"
+  ARG_OPTS="--token -cf --config-file --keyspace -o -conf --env -k --config --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
   SAW_ARG=$?
@@ -1385,6 +1385,11 @@ function _complete_astra_group_db_command_listcollections() {
         return 0
         ;;
       -cf|--config-file)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      -k|--keyspace)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1421,7 +1426,7 @@ function _complete_astra_group_db_command_deletecollection() {
   COMMANDS=$1
 
   FLAG_OPTS="--no-color --async -v --verbose"
-  ARG_OPTS="--token -cf --config-file -o -c -conf --timeout --collection --env --config --output"
+  ARG_OPTS="--token --config-file --keyspace -o --timeout --config -cf -c -conf --collection --env -k --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
   SAW_ARG=$?
@@ -1435,6 +1440,11 @@ function _complete_astra_group_db_command_deletecollection() {
         return 0
         ;;
       -cf|--config-file)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      -k|--keyspace)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1481,7 +1491,7 @@ function _complete_astra_group_db_command_createcollection() {
   COMMANDS=$1
 
   FLAG_OPTS="--no-color --async -v --verbose"
-  ARG_OPTS="--token -m --config-file -o --metric --timeout --config -cf --dimension -c -d -conf --collection --env --output"
+  ARG_OPTS="--token -m --keyspace --config-file --indexing-allow -o --metric --embedding-model --default-id --timeout --config --indexing-deny -cf --dimension -c -d -conf --collection --embedding-provider --env -k --output"
 
   $( containsElement ${PREV_WORD} ${ARG_OPTS[@]} )
   SAW_ARG=$?
@@ -1494,7 +1504,12 @@ function _complete_astra_group_db_command_createcollection() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
-      -cf|--config-file)
+      --indexing-allow)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      -k|--keyspace)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1504,12 +1519,17 @@ function _complete_astra_group_db_command_createcollection() {
         echo ${COMPREPLY[@]}
         return 0
         ;;
+      --embedding-model)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
       -conf|--config)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
         ;;
-      -c|--collection)
+      --default-id)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -1520,6 +1540,26 @@ function _complete_astra_group_db_command_createcollection() {
         return 0
         ;;
       --timeout)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      --indexing-deny)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      -cf|--config-file)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      -c|--collection)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      --embedding-provider)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
@@ -2680,6 +2720,11 @@ function _complete_astra_group_db_command_createcdc() {
         return 0
         ;;
       -cf|--config-file)
+        COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
+        echo ${COMPREPLY[@]}
+        return 0
+        ;;
+      -p, --partition)
         COMPREPLY=( $(compgen -W "${ARG_VALUES} ${ARG_GENERATED_VALUES}" -- ${CURR_WORD}) )
         echo ${COMPREPLY[@]}
         return 0
