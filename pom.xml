@@ -40,7 +40,7 @@
 		<version.maven.plugin.exec>3.3.0</version.maven.plugin.exec>
 		<version.maven.plugin.jacoco>0.8.12</version.maven.plugin.jacoco>
 		<version.maven.plugin.javadoc>3.6.0</version.maven.plugin.javadoc>
-		<version.maven.plugin.jar>3.4.1</version.maven.plugin.jar>
+		<version.maven.plugin.jar>3.4.2</version.maven.plugin.jar>
 		<version.maven.plugin.license>2.4.0</version.maven.plugin.license>
 		<version.maven.plugin.native>0.10.2</version.maven.plugin.native>
 		<version.maven.plugin.release>3.0.1</version.maven.plugin.release>
