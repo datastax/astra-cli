@@ -20,6 +20,7 @@ package com.dtsx.astra.cli.core.out;
  * #L%
  */
 
+import com.datastax.astra.internal.utils.AnsiUtils;
 import com.dtsx.astra.cli.core.CliContext;
 
 import java.util.Arrays;
@@ -154,7 +155,11 @@ public class LoggerShell extends AstraCliConsole {
        if (customMessage != null)
            error(customMessage);
        error(e.getMessage() + " ("+ e.getClass().getSimpleName() + ")");
-       error("Try 'astra help <your_command>' to get help");
+       if (isColor()) {
+           error("Try " + AnsiUtils.cyan("astra help <your_command>") + " to get help");
+       } else {
+           error("Try 'astra help <your_command' to get help");
+       }
        if (CliContext.getInstance().isVerbose())
            Arrays.stream(e.getStackTrace())
                  .map(StackTraceElement::toString)

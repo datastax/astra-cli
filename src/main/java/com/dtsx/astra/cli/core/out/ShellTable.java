@@ -271,7 +271,6 @@ public class ShellTable implements Serializable {
      */
     public void addPropertyListRows(String name, List<String> values) {
         if (values != null && !values.isEmpty()) {
-            addPropertyRow(" ", "  ");
             int idx = 0;
             for(String rsc: values) {
                 if (idx == 0) {
@@ -281,7 +280,6 @@ public class ShellTable implements Serializable {
                 }
                 idx++;
             }
-            addPropertyRow(" ", "  ");
         }
     }
     

@@ -23,15 +23,12 @@ class ConfigSetupCmdTest extends AbstractCmdTest {
     
     @Test
     @Order(1)
-    void should_create_with_user_input()  {
+    void should_fail_if_no_token()  {
         // Given
-        System.setIn(new ByteArrayInputStream((getToken() + "\n").getBytes()));
         // When
-        assertSuccessCli("setup");
-        // Then
-        validateSection();
+        assertExitCodeCli(ExitCode.INVALID_OPTION, "setup --no-color");
     }
-    
+
     @Test
     @Order(2)
     void shouldCreateWithTokenParam() {
@@ -39,7 +36,6 @@ class ConfigSetupCmdTest extends AbstractCmdTest {
         assertSuccessCli("setup --token " + getToken());
         // Then
         validateSection();
-        
     }
 
     @Test
@@ -50,17 +46,6 @@ class ConfigSetupCmdTest extends AbstractCmdTest {
 
     @Test
     @Order(4)
-    void should_create_with_user_login()  {
-        // Given
-        System.setIn(new ByteArrayInputStream((getToken() + "\n").getBytes()));
-        // When
-        assertSuccessCli("login");
-        // Then
-        validateSection();
-    }
-
-    @Test
-    @Order(5)
     void shouldLoginWithToken() {
         // When
         assertSuccessCli("login --token " + getToken());

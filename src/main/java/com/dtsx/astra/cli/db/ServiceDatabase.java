@@ -479,6 +479,7 @@ public class ServiceDatabase {
      */
     public void listDb(boolean flagVector) {
         ShellTable sht = new ShellTable();
+
         // No color ?
         sht.addColumn(COLUMN_NAME,    20);
         sht.addColumn(COLUMN_ID,      37);

@@ -11,21 +11,23 @@
 	<url>https://github.com/datastax/astra-cli</url>
 	<properties>
 
+		<!-- Core Properties -->
 		<imageName>astra</imageName>
+		<required-maven.version>3.6.3</required-maven.version>
 		<app.main.class>com.dtsx.astra.cli.AstraCli</app.main.class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonar.organization>clun-datastax</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-		<astra-sdk.version>1.2.8-SNAPSHOT</astra-sdk.version>
-		<astra-db-java.version>1.2.0</astra-db-java.version>
+		<astra-sdk.version>1.2.8</astra-sdk.version>
+		<astra-db-java.version>1.4.3</astra-db-java.version>
 		<jansi.version>2.4.1</jansi.version>
 		<airline.version>3.0.0</airline.version>
 		<slf4j.version>2.0.13</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
-		<jackson-datatype.version>2.17.1</jackson-datatype.version>
+		<jackson-datatype.version>2.17.2</jackson-datatype.version>
 		<commons-compress.version>1.26.2</commons-compress.version>
-		<!-- Junit -->
+		<!-- TEST -->
 		<junit-jupiter.version>5.10.2</junit-jupiter.version>
 		<awaitibility.version>4.2.1</awaitibility.version>
 		<!-- Java -->
@@ -37,6 +39,7 @@
 		<version.maven.plugin.compiler>3.12.1</version.maven.plugin.compiler>
 		<version.maven.plugin.coveralls>4.3.0</version.maven.plugin.coveralls>
 		<version.maven.plugin.dependency>3.6.1</version.maven.plugin.dependency>
+		<version.maven.plugin.enforcer>3.5.0</version.maven.plugin.enforcer>
 		<version.maven.plugin.exec>3.3.0</version.maven.plugin.exec>
 		<version.maven.plugin.jacoco>0.8.12</version.maven.plugin.jacoco>
 		<version.maven.plugin.javadoc>3.6.0</version.maven.plugin.javadoc>
@@ -143,6 +146,26 @@
 						<include>**/*Test.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${version.maven.plugin.enforcer}</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>${required-maven.version}</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

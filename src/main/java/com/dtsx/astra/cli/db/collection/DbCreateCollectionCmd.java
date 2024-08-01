@@ -114,6 +114,15 @@ public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
     /**
      * Collection creation options.
      */
+    @Option(name = {"--embedding-key" },
+            title = "EMBEDDING_KEY",
+            arity = 1,
+            description = "Using Vectorize, embedding key used for shared secret")
+    public String embeddingKey;
+
+    /**
+     * Collection creation options.
+     */
     @Option(name = {"--embedding-model" },
             title = "EMBEDDING_MODEL",
             arity = 1,
@@ -146,7 +155,7 @@ public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
                         AstraCliUtils.parseIndex(indexAllow),
                         AstraCliUtils.parseIndex(indexDeny),
                         AstraCliUtils.parseDefaultId(defaultId),
-                        embeddingModel, embeddingProvider));
+                        embeddingModel, embeddingProvider, embeddingKey));
         LoggerShell.success("Collection '%s' as been created from db '%s' on keyspace  '%s'".formatted(collection, db, keyspace));
     }
     

@@ -20,7 +20,12 @@ package com.dtsx.astra.cli.core.exception;
  * #L%
  */
 
+import org.fusesource.jansi.AnsiConsole;
+
 import java.io.Serial;
+
+import static com.datastax.astra.internal.utils.AnsiUtils.cyan;
+import static com.datastax.astra.internal.utils.AnsiUtils.yellow;
 
 /**
  * Tenant not found.
@@ -36,6 +41,15 @@ public class TokenNotFoundException extends RuntimeException {
      */
     public TokenNotFoundException() {
         super("Token has not been found.");
+    }
+
+    /**
+     * Default constructor
+     */
+    public TokenNotFoundException(String section, String tokenId) {
+        super("Configuration " + yellow(section) + " has not been found. \n- list available: "
+                + cyan("astra config list")
+                + " \n- create new: "+ cyan("astra help config create"));
     }
 
     /**

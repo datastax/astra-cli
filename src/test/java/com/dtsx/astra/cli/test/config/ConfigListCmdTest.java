@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.test.config;
 
+import com.dtsx.astra.cli.core.ExitCode;
 import org.junit.jupiter.api.Test;
 
 import com.dtsx.astra.cli.test.AbstractCmdTest;
@@ -18,5 +19,10 @@ class ConfigListCmdTest extends AbstractCmdTest {
         //assertSuccessCli("config list --no-color");
         //assertSuccessCli("config list -o json");
         //assertSuccessCli("config list -o csv");
+    }
+
+    @Test
+    void should_return_explicit_error() {
+        assertExitCodeCli(ExitCode.CONFIGURATION, "db list --config invalid");
     }
 }

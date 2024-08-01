@@ -21,6 +21,7 @@ package com.dtsx.astra.cli;
  */
 
 import com.datastax.astra.client.exception.AuthenticationException;
+import com.datastax.astra.internal.utils.AnsiUtils;
 import com.dtsx.astra.cli.config.ConfigCreateCmd;
 import com.dtsx.astra.cli.config.ConfigDeleteCmd;
 import com.dtsx.astra.cli.config.ConfigDescribeCmd;
@@ -55,7 +56,10 @@ import com.dtsx.astra.cli.db.cdc.DbDeleteCdcCmd;
 import com.dtsx.astra.cli.db.cdc.DbListCdcCmd;
 import com.dtsx.astra.cli.db.collection.DbCreateCollectionCmd;
 import com.dtsx.astra.cli.db.collection.DbDeleteCollectionCmd;
+import com.dtsx.astra.cli.db.collection.DbDescribeCollectionCmd;
+import com.dtsx.astra.cli.db.collection.DbDescribeEmbeddingProviderCmd;
 import com.dtsx.astra.cli.db.collection.DbListCollectionsCmd;
+import com.dtsx.astra.cli.db.collection.DbListEmbeddingProvidersCmd;
 import com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbCountCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
@@ -177,7 +181,9 @@ import java.util.Arrays;
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbDeleteKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // Collections
-         DbListCollectionsCmd.class, DbDeleteCollectionCmd.class, DbCreateCollectionCmd.class,
+         DbListCollectionsCmd.class, DbDeleteCollectionCmd.class, DbCreateCollectionCmd.class, DbDescribeCollectionCmd.class,
+         // Vectorize
+         DbListEmbeddingProvidersCmd.class, DbDescribeEmbeddingProviderCmd.class,
          // Regions
          DbCreateRegionCmd.class, DbListRegionsCmd.class, DbDeleteRegionCmd.class,
          // DB Service Regions and Cloud
@@ -295,12 +301,11 @@ public class AstraCli {
                     "You provided unknown or not well formatted argument.");
             return ExitCode.INVALID_ARGUMENT;
         } catch(ParseOptionIllegalValueException | ParseOptionMissingException ex) {
-            LoggerShell.exception(ex,
-                    "You provided unknown or not well formatted option. (-option)");
+            LoggerShell.exception(ex, null);
             return ExitCode.INVALID_OPTION;
         } catch(ParseRestrictionViolatedException | ParseOptionConversionException ex) {
             LoggerShell.exception(ex,
-                    "You provided an invalid value for option. (-option)");
+                    "You provided an invalid value for option.");
             return ExitCode.INVALID_OPTION_VALUE;
         } catch(InvalidRegionException regionException) {
             LoggerShell.exception(regionException,null);

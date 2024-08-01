@@ -57,7 +57,6 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
         token = removeQuotesIfAny(token);
         configSectionName = removeQuotesIfAny(configSectionName);
         validateOptions();
-
         ctx().init(new CoreOptions(verbose, noColor, OutputFormat.valueOf(output.toUpperCase(Locale.ROOT)), configFilename));
         ctx().initToken(new TokenOptions(token, configSectionName, AstraCliUtils.parseEnvironment(env)));
         execute();

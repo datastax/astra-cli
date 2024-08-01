@@ -233,9 +233,21 @@
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
-
-
-
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbListEmbeddingProvidersCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbDescribeCollectionCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbDescribeEmbeddingProviderCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
   {
     "name":"com.dtsx.astra.cli.db.list.DbListCloudsCmd",
     "allDeclaredFields":true,

@@ -20,6 +20,7 @@ package com.dtsx.astra.cli.config;
  * #L%
  */
 
+import com.datastax.astra.internal.utils.AnsiUtils;
 import com.dtsx.astra.cli.core.AbstractCmd;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
@@ -29,6 +30,7 @@ import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 
 import java.io.Console;
 import java.util.Arrays;
@@ -45,8 +47,9 @@ import static com.dtsx.astra.cli.core.out.AstraAnsiColors.CYAN_400;
 public class SetupCmd extends AbstractCmd {
     
     /** Authentication token used if not provided in config. */
-    @Option(name = { "-t", "--token" }, 
-            title = "TOKEN", 
+    @Required
+    @Option(name = { "--token" },
+            title = "TOKEN",
             description = "Key to use authenticate each call.")
     protected String token;
 
@@ -62,31 +65,7 @@ public class SetupCmd extends AbstractCmd {
         AstraEnvironment targetEnv = AstraCliUtils.parseEnvironment(env);
         // As not token is provided we ask for it in the console
         if (token == null || token.isBlank()) {
-            verbose = true;
-            AstraCliConsole.banner();
-            boolean validToken = false;
-            Console cons;
-            char[] tokenFromConsole;
-            while (!validToken) {
-                try {
-                    if ((cons = System.console()) != null &&
-                            (tokenFromConsole = cons.readPassword("[%s]", "$ Enter an Astra token:")) != null) {
-                        token = String.valueOf(tokenFromConsole);
 
-                        // Clear the password from memory immediately when done
-                        Arrays.fill(tokenFromConsole, ' ');
-                    } else {
-                        try (Scanner scanner = new Scanner(System.in)) {
-                            AstraCliConsole.println("$ Enter an Astra token:", CYAN_400);
-                            token = scanner.nextLine();
-                        }
-                    }
-                    sectionName = new AstraOpsClient(token, targetEnv).getOrganization().getName();
-                    validToken = true;
-                } catch(InvalidTokenException ite) {
-                    LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
-                }
-            }
         }
         createDefaultSection();
     }
@@ -108,7 +87,12 @@ public class SetupCmd extends AbstractCmd {
             AstraCliConsole.outputSuccess("Setup completed.");
             LoggerShell.info("Enter 'astra help' to list available commands.");
         } catch(Exception e) {
-            LoggerShell.warning("Invalid token: Must be start with 'AstraCS:..' and have Organization Administrator privileges.");
+            LoggerShell.error(AnsiUtils.yellow("Invalid Token") + ", please check that:" +
+                    "\n- Your token starts with " + AnsiUtils.cyan("AstraCS:") +
+                    "\n- Your token has " + AnsiUtils.cyan("Organization Administrator") + " permissions to run all commands." +
+                    "\n- Your token has " + AnsiUtils.cyan("97") + " characters, for information yours had " + AnsiUtils.cyan(String.valueOf(token.length())) +
+                    "\n- You are targeting " + AnsiUtils.cyan("Astra Production") + ". if not, use " + AnsiUtils.cyan("astra config create default --token ${token} --env ${env}") +
+                    "\n- Your token is not expired.");
             throw new InvalidTokenException(token, e);
         }
     }

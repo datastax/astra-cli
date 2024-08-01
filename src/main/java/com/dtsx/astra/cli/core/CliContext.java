@@ -168,7 +168,7 @@ public class CliContext {
                                 tokenOptions.section(), targetEnv);
            
         } else {
-            throw new TokenNotFoundException();
+            throw new TokenNotFoundException(tokenOptions.section(), null);
         }
     }
     

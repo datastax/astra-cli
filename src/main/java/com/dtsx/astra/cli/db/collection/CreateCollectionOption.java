@@ -50,4 +50,7 @@ public record CreateCollectionOption(
         String embeddingModel,
 
         /* Embedding provider for vectorize. */
-        String embeddingProvider) {}
+        String embeddingProvider,
+
+        /* Embedding key for vectorize. */
+        String embeddingKey) {}

@@ -23,16 +23,31 @@ package com.dtsx.astra.cli.core;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.StringBuilderAnsi;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
+import com.github.rvesse.airline.annotations.AirlineModule;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.help.Help;
+import com.github.rvesse.airline.model.CommandMetadata;
+import com.github.rvesse.airline.model.GlobalMetadata;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static com.dtsx.astra.cli.core.out.AstraAnsiColors.BLUE_300;
+import static com.github.rvesse.airline.help.Help.help;
+
 /**
  * Question mark is a COMMAND from the CLI when no command name is provided.
  */
 @Command(name = "?", description = "Display this help version")
 public class DefaultCmd extends AbstractCmd {
-    
+
+    @AirlineModule
+    public GlobalMetadata<?> global;
+
     /** Ask for version number. s*/
     @Option(name = { "--version" }, description = "Show version")
     protected boolean version = false;
@@ -43,14 +58,20 @@ public class DefaultCmd extends AbstractCmd {
             AstraCliConsole.outputData("version", AstraCliUtils.version());
         } else {
             AstraCliConsole.banner();
-            AstraCliConsole.println(new StringBuilderAnsi(" - list commands       : ")
-                    .append("astra help", BLUE_300));
-            AstraCliConsole.println(new StringBuilderAnsi("️ - get command help    : ")
-                    .append("astra help <your command>", BLUE_300));
-            AstraCliConsole.println(new StringBuilderAnsi("️ - list your databases : ")
+            AstraCliConsole.println(new StringBuilderAnsi("️Documentation : ")
+                    .append("https://awesome-astra.github.io/docs/pages/astra/astra-cli/\n", BLUE_300));
+            try {
+                Help.help(global, new ArrayList<>());
+            } catch(Exception e) {
+                AstraCliConsole.println("Error while displaying help");
+            }
+            AstraCliConsole.println("\nSample commands : ");
+            AstraCliConsole.println(new StringBuilderAnsi("️    List databases         : ")
                     .append("astra db list", BLUE_300));
-            AstraCliConsole.println(new StringBuilderAnsi("️ - create new database : ")
-                    .append("astra db create demo\n", BLUE_300));
+            AstraCliConsole.println(new StringBuilderAnsi("️    Create vector database : ")
+                    .append("astra db create demo --vector", BLUE_300));
+            AstraCliConsole.println(new StringBuilderAnsi("️    List collections       : ")
+                    .append("astra db list-collections demo", BLUE_300));
         }
     }    
 
