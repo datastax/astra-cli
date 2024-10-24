@@ -23,7 +23,7 @@
 		<astra-db-java.version>1.4.3</astra-db-java.version>
 		<jansi.version>2.4.1</jansi.version>
 		<airline.version>3.0.0</airline.version>
-		<slf4j.version>2.0.13</slf4j.version>
+		<slf4j.version>2.0.16</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<jackson-datatype.version>2.17.2</jackson-datatype.version>
 		<commons-compress.version>1.26.2</commons-compress.version>
