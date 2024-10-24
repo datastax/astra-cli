@@ -29,7 +29,7 @@
 		<commons-compress.version>1.26.2</commons-compress.version>
 		<!-- TEST -->
 		<junit-jupiter.version>5.10.2</junit-jupiter.version>
-		<awaitibility.version>4.2.1</awaitibility.version>
+		<awaitibility.version>4.2.2</awaitibility.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
 		<maven.plugin.compiler.target>17</maven.plugin.compiler.target>
