@@ -65,9 +65,34 @@ public class SetupCmd extends AbstractCmd {
         AstraEnvironment targetEnv = AstraCliUtils.parseEnvironment(env);
         // As not token is provided we ask for it in the console
         if (token == null || token.isBlank()) {
+            verbose = true;
+            AstraCliConsole.banner();
+            boolean validToken = false;
+            Console cons;
+            char[] tokenFromConsole;
+            while (!validToken) {
+                try {
+                    if ((cons = System.console()) != null &&
+                            (tokenFromConsole = cons.readPassword("[%s]", "$ Enter an Astra token:")) != null) {
+                        token = String.valueOf(tokenFromConsole);
 
+                        // Clear the password from memory immediately when done
+                        Arrays.fill(tokenFromConsole, ' ');
+                    } else {
+                        try (Scanner scanner = new Scanner(System.in)) {
+                            AstraCliConsole.println("$ Enter an Astra token:", CYAN_400);
+                            token = scanner.nextLine();
+                        }
+                    }
+                    createDefaultSection();
+                    validToken = true;
+                } catch(InvalidTokenException ite) {
+                    LoggerShell.error("Your token in invalid please retry " + ite.getMessage());
+                }
+            }
+        } else {
+            createDefaultSection();
         }
-        createDefaultSection();
     }
     
     /**
