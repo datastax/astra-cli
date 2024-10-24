@@ -26,7 +26,7 @@
 		<slf4j.version>2.0.13</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
 		<jackson-datatype.version>2.17.2</jackson-datatype.version>
-		<commons-compress.version>1.26.2</commons-compress.version>
+		<commons-compress.version>1.27.1</commons-compress.version>
 		<!-- TEST -->
 		<junit-jupiter.version>5.10.2</junit-jupiter.version>
 		<awaitibility.version>4.2.1</awaitibility.version>
