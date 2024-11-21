@@ -90,9 +90,15 @@ public class ServiceKeyspace {
      *      database name
      */
     public void listKeyspaces(String databaseName) {
-        Database db  = dbDao.getDatabase(databaseName);
+        Database db = dbDao.getDatabase(databaseName);
         ShellTable sht = new ShellTable();
-        sht.addColumn(COLUMN_NAME,    20);
+        sht.addColumn(COLUMN_NAME, 20);
+
+        if (db.getInfo().getKeyspaces() == null || db.getInfo().getKeyspaces().isEmpty()) {
+            AstraCliConsole.print("No keyspaces found for database: " + databaseName + "\n");
+            return;
+        }
+
         db.getInfo().getKeyspaces().forEach(ks -> {
             Map<String, String> rf = new HashMap<>();
             if (db.getInfo().getKeyspace().equals(ks)) {
@@ -102,6 +108,7 @@ public class ServiceKeyspace {
             }
             sht.getCellValues().add(rf);
         });
+
         AstraCliConsole.printShellTable(sht);
     }
 
