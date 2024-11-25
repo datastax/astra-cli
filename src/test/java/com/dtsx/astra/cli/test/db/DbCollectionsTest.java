@@ -30,7 +30,6 @@ public class DbCollectionsTest extends AbstractCmdTest {
         assertSuccessCli("help db delete-collection");
         assertSuccessCli("help db create-collection");
         assertSuccessCli("help db list-collections");
-
     }
 
     @Test
@@ -99,7 +98,6 @@ public class DbCollectionsTest extends AbstractCmdTest {
         assertSuccessCli("db delete-collection %s --collection %s".formatted(DB_TEST_VECTOR, TEST_COLLECTION_VECTOR));
     }
 
-
     @Test
     @Order(9)
     public void shouldFindEmbeddingProvider() {
@@ -113,7 +111,9 @@ public class DbCollectionsTest extends AbstractCmdTest {
         //        ("db describe-embedding-provider %s --embedding-provider %s"
         //                .formatted(DB_TEST_VECTOR, "invalid")));
 
-        assertSuccessCli("db describe-embedding-provider %s --embedding-provider %s --output json"
+        assertSuccessCli("help db describe-embedding-provider");
+
+        assertSuccessCli("db describe-embedding-provider %s --embedding-provider %s"
                 .formatted(DB_TEST_VECTOR, "openai"));
     }
 

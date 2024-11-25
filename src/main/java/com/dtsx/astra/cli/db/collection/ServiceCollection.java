@@ -175,7 +175,8 @@ public class ServiceCollection {
         Map<String, EmbeddingProvider> myCollec = dbDao
                 .getDataAPIDatabase(databaseName)
                 .getDatabaseAdmin()
-                .listEmbeddingProviders();
+                .findEmbeddingProviders()
+                .getEmbeddingProviders();
         for (Map.Entry<String, EmbeddingProvider> entry : myCollec.entrySet()) {
             EmbeddingProvider vOptions = entry.getValue();
             Map<String, String> rf = new HashMap<>();
@@ -312,7 +313,8 @@ public class ServiceCollection {
         Map<String, EmbeddingProvider> providers = dbDao
                 .getDataAPIDatabase(databaseName)
                 .getDatabaseAdmin()
-                .listEmbeddingProviders();
+                .findEmbeddingProviders()
+                .getEmbeddingProviders();
         if (!providers.containsKey(key)) {
             throw new IllegalArgumentException("Embedding provider '" + key + "' has not been found");
         }

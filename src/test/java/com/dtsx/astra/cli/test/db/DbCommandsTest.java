@@ -37,6 +37,7 @@ class DbCommandsTest extends AbstractCmdTest {
         assertSuccessCli("db create %s --if-not-exist --vector".formatted(DB_TEST_VECTOR));
     }
 
+
     @Test
     @Order(1)
     void testShouldShowHelp() {
