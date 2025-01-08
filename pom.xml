@@ -28,7 +28,7 @@
 		<jackson-datatype.version>2.17.2</jackson-datatype.version>
 		<commons-compress.version>1.27.1</commons-compress.version>
 		<!-- TEST -->
-		<junit-jupiter.version>5.10.2</junit-jupiter.version>
+		<junit-jupiter.version>5.11.4</junit-jupiter.version>
 		<awaitibility.version>4.2.2</awaitibility.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
