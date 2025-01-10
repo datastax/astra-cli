@@ -59,7 +59,7 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build native image on Linux
-        run: native-image --enable-url-protocols=https --static -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-linux
+        run: native-image --enable-url-protocols=https -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-linux
         if: runner.os == 'Linux'
       - name: Build native image on Mac OS X
         run: native-image --enable-url-protocols=https -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-macos
