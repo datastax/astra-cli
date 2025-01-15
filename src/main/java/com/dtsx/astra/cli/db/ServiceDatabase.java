@@ -39,11 +39,13 @@ import com.dtsx.astra.cli.db.keyspace.ServiceKeyspace;
 import com.dtsx.astra.cli.org.ServiceOrganization;
 import com.dtsx.astra.cli.utils.AstraCliUtils;
 import com.dtsx.astra.cli.utils.EnvFile;
+import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseCreationBuilder;
 import com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest;
+import com.dtsx.astra.sdk.db.domain.DatabaseFilter;
 import com.dtsx.astra.sdk.db.domain.DatabaseRegion;
 import com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -489,7 +491,8 @@ public class ServiceDatabase {
         sht.addColumn(COLUMN_STATUS,  COLUMN_STATUS_WIDTH);
         CliContext.getInstance()
            .getApiDevopsDatabases()
-           .findAllNonTerminated()
+           // Increase the limit to 1000 for this request
+           .search(DatabaseFilter.builder().limit(1000).build())
            .filter(db -> !flagVector || (db.getInfo().getDbType() != null))
            .forEach(db -> {
                 Map <String, String> rf = new HashMap<>();
