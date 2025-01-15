@@ -27,7 +27,7 @@ echo "         \/     \/                   \/ "
 echo " "
 
 # Global variables
-ASTRA_CLI_VERSION="0.5"
+ASTRA_CLI_VERSION="0.6"
 
 echo "Installing Astra Cli$(tput setaf 6) $ASTRA_CLI_VERSION $(tput setaf 7) please wait...      "
 
@@ -58,31 +58,44 @@ darwin=false;
 solaris=false;
 freebsd=false;
 linux=false;
+arch=$(uname -m)
 case "$(uname)" in
-    CYGWIN*)
-        cygwin=true
-        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-windows.zip"
-        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-windows.zip"
-        ;;
+
     Darwin*)
         darwin=true
-        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-mac.zip"
-        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-mac.zip"
+        case "$arch" in
+          x86_64)
+            download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-mac-x86_64.zip"
+            astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-mac-x86_64.zip"
+            ;;
+          arm64)
+            download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-mac-arm64.zip"
+            astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-mac-arm64.zip"
+            ;;
+        esac
         ;;
     SunOS*)
         solaris=true
-        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux-x86_64.zip"
         astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
         ;;
     FreeBSD*)
         freebsd=true
-        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux-x86_64.zip"
         astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
         ;;
     Linux*)
         linux=true
-        download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
-        astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux.zip"
+        case "$arch" in
+          x86_64)
+            download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux-x86_64.zip"
+            astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux-x86_64.zip"
+            ;;
+          arm64)
+            download_url="https://github.com/datastax/astra-cli/releases/download/${ASTRA_CLI_VERSION}/astra-cli-${ASTRA_CLI_VERSION}-linux-arm64.zip"
+            astra_zip_file="${astra_tmp_folder}/astra-cli-${ASTRA_CLI_VERSION}-linux-arm64.zip"
+            ;;
+        esac
         ;;
 esac
 
@@ -205,7 +218,9 @@ if [[ "$darwin" == 'true' ]]; then
   echo "+---------------------------------------------------------------------+"
   echo ""
 fi
-echo "Open $(tput setaf 2)A NEW TERMINAL$(tput setaf 7) and run: $(tput setaf 3)astra setup$(tput setaf 7)"
+echo "- Create a token with role $(tput setaf 2)Organization Administrator $(tput setaf 7) and copy the value of 'token' in the presented JSON (look like AstraCS:....)"
+echo ""
+echo "- Open $(tput setaf 2)A NEW TERMINAL$(tput setaf 7) and run: $(tput setaf 3)astra setup --token YOUR_TOKEN_HERE$(tput setaf 7)"
 echo ""
 echo "You can close this window.$(tput sgr0)"
 tput init
