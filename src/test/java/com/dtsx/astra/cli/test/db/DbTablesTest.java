@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.test.db;
 
 import com.datastax.astra.client.DataAPIClient;
+import com.datastax.astra.client.collections.definition.CollectionDefinition;
 import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.client.tables.Table;
 import com.datastax.astra.client.tables.commands.options.CreateTableOptions;
@@ -10,6 +11,7 @@ import com.datastax.astra.client.tables.definition.columns.ColumnTypes;
 import com.datastax.astra.client.tables.definition.rows.Row;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.db.DaoDatabase;
+import com.dtsx.astra.cli.db.cdc.DbDeleteCdcCmd;
 import com.dtsx.astra.cli.test.AbstractCmdTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -121,6 +123,12 @@ public class DbTablesTest extends AbstractCmdTest {
         // Should Create collection
         assertSuccessCli("db delete-table %s --table %s --if-exists".formatted(DB_TEST_VECTOR, TEST_TABLE_SIMPLE));
         assertSuccessCli("db delete-table %s --table %s --if-exists".formatted(DB_TEST_VECTOR, TEST_TABLE_SIMPLE));
+    }
+
+    @Test
+    public void test() {
+        CollectionDefinition cd;
+
     }
 
 }

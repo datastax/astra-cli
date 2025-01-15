@@ -110,12 +110,12 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.cdc.DbgDeleteCdcCmd",
+    "name":"com.dtsx.astra.cli.db.cdc.DbDeleteCdcCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.cdc.DbgListCdcCmd",
+    "name":"com.dtsx.astra.cli.db.cdc.DbListCdcCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -176,10 +176,6 @@
 
   {
     "name":"com.dtsx.astra.cli.db.dsbulk.AbstractDsbulkCmd",
-    "allDeclaredFields":true
-  },
-  {
-    "name":"com.dtsx.astra.cli.db.dsbulk.AbstractDsbulkDataCmd",
     "allDeclaredFields":true
   },
   {
@@ -247,7 +243,7 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.collection.DbTruncateCollectionsCmd",
+    "name":"com.dtsx.astra.cli.db.collection.DbTruncateCollectionCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
@@ -1031,68 +1027,6 @@
     ]
   },
 
-  {
-    "name":"io.stargate.sdk.json.domain.JsonApiResponse",
-    "allDeclaredFields":true,
-    "queryAllDeclaredMethods":true,
-    "queryAllDeclaredConstructors":true,
-    "methods":[
-      {"name":"<init>","parameterTypes":[] },
-      {"name":"setStatus","parameterTypes":["java.util.Map"] },
-      {"name":"getStatus","parameterTypes":[""] },
-      {"name":"setData","parameterTypes":["io.stargate.sdk.json.domain.JsonApiData"] },
-      {"name":"getData","parameterTypes":[""] },
-      {"name":"setErrors","parameterTypes":["java.util.List"] },
-      {"name":"getErrors","parameterTypes":[""] }
-    ]
-  },
-  {
-    "name":"io.stargate.sdk.json.domain.JsonApiData",
-    "allDeclaredFields":true,
-    "queryAllDeclaredMethods":true,
-    "queryAllDeclaredConstructors":true,
-    "methods":[
-      {"name":"<init>","parameterTypes":[] },
-      {"name":"setDocuments","parameterTypes":["java.util.List"] },
-      {"name":"getDocuments","parameterTypes":[""] },
-      {"name":"setDocument","parameterTypes":["io.stargate.sdk.json.domain.JsonResult"] },
-      {"name":"getDocument","parameterTypes":[""] },
-      {"name":"setNextPageState","parameterTypes":["java.lang.String"] },
-      {"name":"getNextPageState","parameterTypes":[""] }
-    ]
-  },
-  {
-    "name":"io.stargate.sdk.json.domain.JsonResult",
-    "allDeclaredFields":true,
-    "queryAllDeclaredMethods":true,
-    "queryAllDeclaredConstructors":true,
-    "methods":[
-      {"name":"<init>","parameterTypes":[] },
-      {"name":"setData","parameterTypes":["java.util.Map"] },
-      {"name":"getData","parameterTypes":[""] },
-      {"name":"setVector","parameterTypes":["[F"] },
-      {"name":"getVector","parameterTypes":[""] },
-      {"name":"setSimilarity","parameterTypes":["java.lang.Float"] },
-      {"name":"getSimilarity","parameterTypes":[""] }
-    ]
-  },
-  {
-    "name":"io.stargate.sdk.json.domain.JsonApiError",
-    "allDeclaredFields":true,
-    "queryAllDeclaredMethods":true,
-    "queryAllDeclaredConstructors":true,
-    "methods":[
-      {"name":"<init>","parameterTypes":[] },
-      {"name":"setMessage","parameterTypes":["java.lang.String"] },
-      {"name":"getMessage","parameterTypes":[""] },
-      {"name":"setErrorCode","parameterTypes":["java.lang.String"] },
-      {"name":"getErrorCode","parameterTypes":[""] },
-      {"name":"setExceptionClass","parameterTypes":["java.lang.String"] },
-      {"name":"getExceptionClass","parameterTypes":[""] }
-    ]
-  },
-
-
 
   {
     "name": "com.datastax.astra.client.core.commands.Command",
@@ -1133,12 +1067,6 @@
   },
   {
     "name": "com.datastax.astra.client.collections.definition.CollectionDefinition$DefaultIdOptions",
-    "allDeclaredFields": true,
-    "allDeclaredMethods": true,
-    "allDeclaredConstructors": true
-  },
-  {
-    "name": "com.datastax.astra.client.collections.definition.CollectionDefinition$VectorOptions",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
@@ -1211,7 +1139,7 @@
     "allDeclaredConstructors": true
   },
   {
-    "name": "com.datastax.astra.client.collections.definition.CollectionDefaultIdTypes,",
+    "name": "com.datastax.astra.client.collections.definition.CollectionDefaultIdTypes",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
@@ -1371,10 +1299,6 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
 
-
-  {
-    "name":"jakarta.inject.Inject"
-  },
   {
     "name":"java.io.Serializable",
     "queryAllDeclaredMethods":true
@@ -1411,9 +1335,6 @@
     "queryAllDeclaredMethods":true,
     "queryAllDeclaredConstructors":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
-  },
-  {
-    "name":"javax.inject.Inject"
   },
   {
     "name":"javax.security.auth.x500.X500Principal",
