@@ -25,6 +25,7 @@ import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.db.DaoDatabase;
+import com.dtsx.astra.cli.db.exception.CannotCreateRegionException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
 import com.dtsx.astra.sdk.db.AstraDBOpsClient;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
@@ -32,6 +33,7 @@ import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.db.exception.RegionAlreadyExistException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,6 +126,12 @@ public class ServiceRegion {
             }
             rf.put(COLUMN_REGION_TIER, dc.getTier());
             rf.put(COLUMN_REGION_STATUS, dc.getStatus());
+            try {
+                System.out.println(new ObjectMapper().writeValueAsString(dc));
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
             sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
@@ -162,8 +170,8 @@ public class ServiceRegion {
                 apiDevopsDb().database(db.getId()).datacenters().create(tier, cloud, regionName);
                 LoggerShell.info("%s '%s' is creating.".formatted(REGION, regionName));
             } catch(Exception e) {
-                throw new InvalidDatabaseStateException(databaseName, DatabaseStatusType.ACTIVE,
-                        dbDao.getDatabase(databaseName).getStatus());
+                LoggerShell.error("Error when creating a region : %s".formatted(e.getMessage()));
+                throw new CannotCreateRegionException(databaseName, regionName, e);
             }
         }
     }

@@ -20,8 +20,6 @@ package com.dtsx.astra.cli;
  * #L%
  */
 
-import com.datastax.astra.client.exception.AuthenticationException;
-import com.datastax.astra.internal.utils.AnsiUtils;
 import com.dtsx.astra.cli.config.ConfigCreateCmd;
 import com.dtsx.astra.cli.config.ConfigDeleteCmd;
 import com.dtsx.astra.cli.config.ConfigDescribeCmd;
@@ -60,14 +58,20 @@ import com.dtsx.astra.cli.db.collection.DbDescribeCollectionCmd;
 import com.dtsx.astra.cli.db.collection.DbDescribeEmbeddingProviderCmd;
 import com.dtsx.astra.cli.db.collection.DbListCollectionsCmd;
 import com.dtsx.astra.cli.db.collection.DbListEmbeddingProvidersCmd;
+import com.dtsx.astra.cli.db.collection.DbTruncateCollectionCmd;
 import com.dtsx.astra.cli.db.cqlsh.DbCqlShellCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbCountCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbLoadCmd;
 import com.dtsx.astra.cli.db.dsbulk.DbUnLoadCmd;
 import com.dtsx.astra.cli.db.endpoint.DbGetEndpointApiCmd;
+import com.dtsx.astra.cli.db.endpoint.DbGetEndpointPlaygroundCmd;
+import com.dtsx.astra.cli.db.endpoint.DbGetEndpointSwaggerCmd;
+import com.dtsx.astra.cli.db.exception.CollectionAlreadyExistException;
+import com.dtsx.astra.cli.db.exception.CollectionNotFoundException;
 import com.dtsx.astra.cli.db.exception.DatabaseAlreadyExistException;
 import com.dtsx.astra.cli.db.exception.DatabaseNameNotUniqueException;
 import com.dtsx.astra.cli.db.exception.InvalidDatabaseStateException;
+import com.dtsx.astra.cli.db.exception.TableNotFoundException;
 import com.dtsx.astra.cli.db.keyspace.DbCreateKeyspaceCmd;
 import com.dtsx.astra.cli.db.keyspace.DbDeleteKeyspaceCmd;
 import com.dtsx.astra.cli.db.keyspace.DbListKeyspacesCmd;
@@ -79,8 +83,10 @@ import com.dtsx.astra.cli.db.list.DbListRegionsVectorCmd;
 import com.dtsx.astra.cli.db.region.DbCreateRegionCmd;
 import com.dtsx.astra.cli.db.region.DbDeleteRegionCmd;
 import com.dtsx.astra.cli.db.region.DbListRegionsCmd;
-import com.dtsx.astra.cli.db.endpoint.DbGetEndpointPlaygroundCmd;
-import com.dtsx.astra.cli.db.endpoint.DbGetEndpointSwaggerCmd;
+import com.dtsx.astra.cli.db.table.DbDeleteTableCmd;
+import com.dtsx.astra.cli.db.table.DbDescribeTableCmd;
+import com.dtsx.astra.cli.db.table.DbListTablesCmd;
+import com.dtsx.astra.cli.db.table.DbTruncateTableCmd;
 import com.dtsx.astra.cli.iam.role.RoleDescribeCmd;
 import com.dtsx.astra.cli.iam.role.RoleGetCmd;
 import com.dtsx.astra.cli.iam.role.RoleListCmd;
@@ -181,7 +187,9 @@ import java.util.Arrays;
          // Keyspaces
          DbCreateKeyspaceCmd.class, DbDeleteKeyspaceCmd.class, DbListKeyspacesCmd.class,
          // Collections
-         DbListCollectionsCmd.class, DbDeleteCollectionCmd.class, DbCreateCollectionCmd.class, DbDescribeCollectionCmd.class,
+         DbListCollectionsCmd.class, DbDeleteCollectionCmd.class, DbCreateCollectionCmd.class, DbDescribeCollectionCmd.class, DbTruncateCollectionCmd.class,
+         // Tables
+         DbListTablesCmd.class, DbDeleteTableCmd.class, DbDeleteTableCmd.class, DbTruncateTableCmd.class, DbDescribeTableCmd.class,
          // Vectorize
          DbListEmbeddingProvidersCmd.class, DbDescribeEmbeddingProviderCmd.class,
          // Regions
@@ -314,39 +322,50 @@ public class AstraCli {
                     "astra streaming list-regions to list available regions.");
             return ExitCode.INVALID_OPTION_VALUE;
         } catch(InvalidCloudProviderException cloudException) {
+            cloudException.printStackTrace();
             LoggerShell.exception(cloudException,null);
             LoggerShell.info("Use " +
                     "astra db list-clouds or " +
                     "astra streaming list-clouds to list available cloud providers.");
             return ExitCode.INVALID_OPTION_VALUE;
         } catch(ParseException ex) {
+            ex.printStackTrace();
             LoggerShell.exception(ex,"Command is not properly formatted.");
             return ExitCode.UNRECOGNIZED_COMMAND;
-        } catch (InvalidTokenException | TokenNotFoundException | AuthenticationException | com.dtsx.astra.sdk.exception.AuthenticationException |
+        } catch (InvalidTokenException | TokenNotFoundException | com.dtsx.astra.sdk.exception.AuthenticationException |
                 FileSystemException | ConfigurationException e) {
+            e.printStackTrace();
             AstraCliConsole.outputError(ExitCode.CONFIGURATION, e.getMessage());
             return ExitCode.CONFIGURATION;
         } catch (InvalidArgumentException | IllegalArgumentException dex) {
+            dex.printStackTrace();
            AstraCliConsole.outputError(ExitCode.INVALID_ARGUMENT, dex.getMessage());
            return  ExitCode.INVALID_ARGUMENT;
         } catch (DatabaseNotFoundException | KeyspaceNotFoundException |
                 TenantNotFoundException |
+                CollectionNotFoundException | TableNotFoundException |
                 RoleNotFoundException | ChangeDataCaptureNotFoundException |
                 UserNotFoundException | RegionNotFoundException ex) {
+            ex.printStackTrace();
             AstraCliConsole.outputError(ExitCode.NOT_FOUND, ex.getMessage());
             return ExitCode.NOT_FOUND;
        } catch (DatabaseNameNotUniqueException name) {
+            name.printStackTrace();
             AstraCliConsole.outputError(ExitCode.CONFLICT, name.getMessage());
             return ExitCode.CONFLICT;
-       } catch (DatabaseAlreadyExistException | KeyspaceAlreadyExistException |
+       } catch (DatabaseAlreadyExistException | CollectionAlreadyExistException |
+                KeyspaceAlreadyExistException |
                 TenantAlreadyExistException | UserAlreadyExistException |
                 RegionAlreadyExistException e) {
-           AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
+            e.printStackTrace();
+            AstraCliConsole.outputError(ExitCode.ALREADY_EXIST, e.getMessage());
            return ExitCode.ALREADY_EXIST;
        } catch(InvalidDatabaseStateException ex) {
+            ex.printStackTrace();
             AstraCliConsole.outputError(ExitCode.UNAVAILABLE, ex.getMessage());
             return ExitCode.UNAVAILABLE;
-        } catch (Exception ex) {
+       } catch (Exception ex) {
+            ex.printStackTrace();
             AstraCliConsole.outputError(ExitCode.INTERNAL_ERROR, ex.getMessage());
             return ExitCode.INTERNAL_ERROR;
        }

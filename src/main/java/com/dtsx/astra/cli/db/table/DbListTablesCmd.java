@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.collection;
+package com.dtsx.astra.cli.db.table;
 
 /*-
  * #%L
@@ -22,14 +22,15 @@ package com.dtsx.astra.cli.db.collection;
 
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
+import com.dtsx.astra.cli.db.collection.ServiceCollection;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 
 /**
- * Show Keyspaces for Databases.
+ * Show Tables for Databases.
  */
-@Command(name = "list-collections", description = "Display the list of collections in an database")
-public class DbListCollectionsCmd extends AbstractDatabaseCmd {
+@Command(name = "list-tables", description = "Display the list of tables in a database/keyspace couple")
+public class DbListTablesCmd extends AbstractDatabaseCmd {
 
     /**
      * Collection creation options.
@@ -37,12 +38,12 @@ public class DbListCollectionsCmd extends AbstractDatabaseCmd {
     @Option(name = {"-k", "--keyspace" },
             title = "KEYSPACE",
             arity = 1,
-            description = "Name of the keyspace to create the collection")
+            description = "Name of the keyspace")
     public String keyspace = DataAPIClientOptions.DEFAULT_KEYSPACE;
 
     /** {@inheritDoc} */
     public void execute() {
-        ServiceCollection.getInstance().listCollections(db, keyspace);
+        ServiceTables.getInstance().listTables(db, keyspace);
     }
 
 }

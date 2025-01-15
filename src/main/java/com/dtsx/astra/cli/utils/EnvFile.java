@@ -56,10 +56,12 @@ public class EnvFile {
         ASTRA_DB_KEYSPACE,
         /** credentials. */
         ASTRA_DB_APPLICATION_TOKEN,
+
         /** bundle PATH.*/
         ASTRA_DB_SECURE_BUNDLE_PATH,
         /** download link.*/
         ASTRA_DB_SECURE_BUNDLE_URL,
+
         /** graphql dml endpoint.*/
         ASTRA_DB_GRAPHQL_URL,
         /** graphql playground. */
@@ -68,10 +70,14 @@ public class EnvFile {
         ASTRA_DB_GRAPHQL_URL_SCHEMA,
         /** graphql schema-first endpoint. */
         ASTRA_DB_GRAPHQL_URL_ADMIN,
+
+        /** data api Api endpoint*/
+        ASTRA_DB_API_ENDPOINT,
+        /** data api Api endpoint*/
+        ASTRA_DB_API_ENDPOINT_SWAGGER,
+
         /** rest and document Api endpoint */
         ASTRA_DB_REST_URL,
-        /** json Api endpoint*/
-        ASTRA_DB_API_ENDPOINT,
         /** swagger specification URL */
         ASTRA_DB_REST_URL_SWAGGER,
         /** Tenant Name. */

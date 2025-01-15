@@ -20,21 +20,21 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
-import com.datastax.astra.client.Collection;
-import com.datastax.astra.client.Database;
-import com.datastax.astra.client.model.CollectionIdTypes;
-import com.datastax.astra.client.model.CollectionInfo;
-import com.datastax.astra.client.model.CollectionOptions;
-import com.datastax.astra.client.model.Document;
-import com.datastax.astra.client.model.EmbeddingProvider;
-import com.datastax.astra.client.model.SimilarityMetric;
+import com.datastax.astra.client.collections.Collection;
+import com.datastax.astra.client.collections.commands.options.CreateCollectionOptions;
+import com.datastax.astra.client.collections.definition.CollectionDefinition;
+import com.datastax.astra.client.collections.definition.documents.Document;
+import com.datastax.astra.client.core.vector.VectorOptions;
+import com.datastax.astra.client.core.vectorize.EmbeddingProvider;
+import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.internal.utils.AnsiUtils;
-import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.ExitCode;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
-import com.dtsx.astra.cli.core.out.JsonOutput;
+import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.core.out.ShellTable;
 import com.dtsx.astra.cli.db.DaoDatabase;
+import com.dtsx.astra.cli.db.exception.CollectionAlreadyExistException;
+import com.dtsx.astra.cli.db.exception.CollectionNotFoundException;
+import com.dtsx.astra.cli.db.exception.TableNotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -223,7 +223,7 @@ public class ServiceCollection {
             rf.put(COLUMN_UUID,      "default");
 
             if (col.getOptions() != null && col.getOptions().getVector() != null) {
-              CollectionOptions.VectorOptions vOptions =  col.getOptions().getVector();
+              VectorOptions vOptions =  col.getOptions().getVector();
               rf.put(COLUMN_DIMENSION, String.valueOf(vOptions.getDimension()));
               rf.put(COLUMN_METRIC, vOptions.getMetric());
               if (vOptions.getService() != null) {
@@ -232,35 +232,46 @@ public class ServiceCollection {
               }
             }
             if (col.getOptions().getDefaultId() != null) {
-                rf.put(COLUMN_UUID, col.getOptions().getDefaultId().getType());
+                rf.put(COLUMN_UUID, col.getOptions().getDefaultId().getType().name());
             }
             sht.getCellValues().add(rf);
         });
         AstraCliConsole.printShellTable(sht);
     }
 
+    public void truncateCollection(String databaseName, String keyspace, String collectionName) {
+        Database db = dbDao.getDataAPIDatabase(databaseName, keyspace);
+        // Expected collection is not there
+        if (!db.collectionExists(collectionName)) {
+            throw new CollectionNotFoundException(databaseName, collectionName);
+        } else {
+            dbDao.getDataAPIDatabase(databaseName, keyspace).getCollection(collectionName).deleteAll();
+            LoggerShell.success("Collection '%s' as been truncated from '%s'.".formatted(collectionName, databaseName));
+        }
+    }
+
     public void describeCollection(String databaseName, String keyspace, String collection) {
         Collection<Document> myCollec = dbDao
                 .getDataAPIDatabase(databaseName, keyspace)
                 .getCollection(collection);
-        CollectionInfo info = myCollec.getDefinition();
+        CollectionDefinition info = myCollec.getDefinition();
         ShellTable sht = ShellTable.propertyTable(15, 40);
-        sht.addPropertyRow(COLUMN_NAME, info.getName());
+        sht.addPropertyRow(COLUMN_NAME, collection);
         sht.addPropertyRow(COLUMN_COUNT, String.valueOf(myCollec.estimatedDocumentCount()));
 
-        if (info.getOptions().getDefaultId() != null) {
-            sht.addPropertyRow(COLUMN_UUID, info.getOptions().getDefaultId().getType());
+        if (info.getDefaultId() != null) {
+            sht.addPropertyRow(COLUMN_UUID, info.getDefaultId().getType().name());
         }
 
-        if (info.getOptions().getIndexing() != null) {
+        if (info.getIndexing() != null) {
             sht.addPropertyRow("", "");
             sht.addPropertyRow(AnsiUtils.yellow("Indexing:"), "");
-            List<String> allows = info.getOptions().getIndexing().getAllow();
+            List<String> allows = info.getIndexing().getAllow();
             String allowsStr = "--";
             if (allows != null && !allows.isEmpty()) {
                 allowsStr = allows.toString();
             }
-            List<String> denies = info.getOptions().getIndexing().getDeny();
+            List<String> denies = info.getIndexing().getDeny();
             String deniesStr = "--";
             if (denies != null && !denies.isEmpty()) {
                 deniesStr = denies.toString();
@@ -269,11 +280,11 @@ public class ServiceCollection {
             sht.addPropertyRow(COLUMN_DENIES, deniesStr);
         }
 
-        if (info.getOptions() != null) {
-            if (info.getOptions().getVector() != null) {
+        if (info.getVector() != null) {
+            if (info.getVector() != null) {
                 sht.addPropertyRow("", "");
                 sht.addPropertyRow(AnsiUtils.yellow("Vector:"), "");
-                CollectionOptions.VectorOptions vOptions = info.getOptions().getVector();
+                VectorOptions vOptions = info.getVector();
                 sht.addPropertyRow(COLUMN_DIMENSION, String.valueOf(vOptions.getDimension()));
                 sht.addPropertyRow(COLUMN_METRIC, vOptions.getMetric());
                 if (vOptions.getService() != null) {
@@ -394,36 +405,39 @@ public class ServiceCollection {
      * @param cco
      *      current collection creation arguments
      */
-    public Collection<Document> createCollection(String databaseName, String keyspace, CreateCollectionOption cco) {
+    public Collection<Document> createCollection(String databaseName, String keyspace, CollectionCreationOptions cco) {
         Database db = dbDao.getDataAPIDatabase(databaseName, keyspace);
-        CollectionOptions.CollectionOptionsBuilder options = CollectionOptions.builder();
-
+        CollectionDefinition collectionDefinition = new CollectionDefinition();
         // Parameters Validations
         if (cco.indexingAllow() != null && cco.indexingAllow().length > 0) {
-            options.indexingAllow(cco.indexingAllow());
+            collectionDefinition.indexingAllow(cco.indexingAllow());
         } else if (cco.indexingDeny() != null && cco.indexingDeny().length > 0) {
-            options.indexingDeny(cco.indexingDeny());
+            collectionDefinition.indexingDeny(cco.indexingDeny());
         }
-
         // Vectorize
         if (cco.embeddingModel() != null) {
-            options.vectorize(cco.embeddingProvider(), cco.embeddingModel(), cco.embeddingKey());
+            collectionDefinition.vectorize(cco.embeddingProvider(), cco.embeddingModel(), cco.embeddingKey());
         }
-
         if (cco.defaultId() != null) {
-            options.defaultIdType(cco.defaultId());
+            collectionDefinition.defaultId(cco.defaultId());
         }
-
         // Dimension
         if (cco.dimension() != null) {
-            options.vectorDimension(cco.dimension());
+            collectionDefinition.vectorDimension(cco.dimension());
         }
-
         // Metrics
         if (cco.metric() != null) {
-            options.vectorSimilarity(cco.metric());
+            collectionDefinition.vectorSimilarity(cco.metric());
         }
-        return db.createCollection(cco.name(), options.build());
+
+        if (db.collectionExists(cco.name())) {
+            if (cco.flagIfNotExist()) {
+                return db.getCollection(cco.name());
+            } else {
+                throw new CollectionAlreadyExistException(cco.name());
+            }
+        }
+        return db.createCollection(cco.name(), collectionDefinition);
     }
 
     /**
@@ -435,9 +449,22 @@ public class ServiceCollection {
      *      name of the keyspace to target this collection
      * @param collectionName
      *      collection name
+     * @param ifExist
+     *      will delete only if exists and does not give error
      */
-    public void deleteCollection(String databaseName, String keyspace, String collectionName) {
-        dbDao.getDataAPIDatabase(databaseName, keyspace).dropCollection(collectionName);
+    public void deleteCollection(String databaseName, String keyspace, String collectionName, boolean ifExist) {
+        Database db = dbDao.getDataAPIDatabase(databaseName, keyspace);
+        // Expected collection is not there
+        if (!db.collectionExists(collectionName)) {
+            if (ifExist) {
+                LoggerShell.info("Collection '%s' does not exist in '%s'.".formatted(collectionName, databaseName));
+            } else {
+                throw new CollectionNotFoundException(databaseName, collectionName);
+            }
+        } else {
+            dbDao.getDataAPIDatabase(databaseName, keyspace).dropCollection(collectionName);
+            LoggerShell.success("Collection '%s' as been deleted from '%s'.".formatted(collectionName, databaseName));
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.db.collection;
+package com.dtsx.astra.cli.db.table;
 
 /*-
  * #%L
@@ -22,8 +22,10 @@ package com.dtsx.astra.cli.db.collection;
 
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
-import com.dtsx.astra.cli.core.out.LoggerShell;
+import com.dtsx.astra.cli.db.AbstractDatabaseCmd;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
+import com.dtsx.astra.cli.db.collection.ServiceCollection;
+import com.dtsx.astra.cli.db.exception.TableNotFoundException;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Required;
@@ -31,18 +33,18 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 /**
  * Delete a collection if it exists
  */
-@Command(name = "delete-collection", description = "Delete an existing collection")
-public class DbDeleteCollectionCmd extends AbstractDatabaseCmdAsync {
+@Command(name = "describe-table", description = "Describe an existing table")
+public class DbDescribeTableCmd extends AbstractDatabaseCmd {
 
     /**
-     * Collection creation options.
+     * Table
      */
     @Required
-    @Option(name = {"-c", "--collection" },
-            title = "COLLECTION",
+    @Option(name = {"-t", "--table" },
+            title = "TABLE",
             arity = 1,
-            description = "Name of the collection to delete")
-    public String collection;
+            description = "Name of the table")
+    public String table;
 
     /**
      * Collection creation options.
@@ -53,16 +55,13 @@ public class DbDeleteCollectionCmd extends AbstractDatabaseCmdAsync {
             description = "Name of the keyspace to create the collection")
     public String keyspace = DataAPIClientOptions.DEFAULT_KEYSPACE;
 
-    /**
-     * Database or keyspace are created when needed
-     **/
-    @Option(name = { "--if-exists"},
-            description = "will delete the collection only if it exists")
-    protected boolean ifExist = false;
-
     /** {@inheritDoc}  */
-    public void executeAsync() {
-        ServiceCollection.getInstance().deleteCollection(db, keyspace, collection, ifExist);
+    public void execute() {
+        if (ServiceTables.getInstance().isTableExists(db, keyspace, table)) {
+            ServiceTables.getInstance().describeTable(db, keyspace, table);
+        } else {
+            throw new TableNotFoundException(db, table);
+        }
     }
     
 }

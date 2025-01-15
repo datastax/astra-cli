@@ -12,7 +12,7 @@ echo " "
 
 runCommand () {
   echo "$(tput setaf 3)- $1$(tput sgr0)"
-  target/astra-native $1
+  target/astra $1
 }
 
 echo "$(tput setaf 4)[ORGANIZATION]$(tput sgr0)"

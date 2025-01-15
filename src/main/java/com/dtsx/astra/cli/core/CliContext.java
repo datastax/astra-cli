@@ -21,7 +21,8 @@ package com.dtsx.astra.cli.core;
  */
 
 import com.datastax.astra.client.DataAPIClient;
-import com.datastax.astra.client.DataAPIOptions;
+import com.datastax.astra.client.DataAPIDestination;
+import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.dtsx.astra.cli.config.AstraCliConfiguration;
 import com.dtsx.astra.cli.core.exception.InvalidTokenException;
 import com.dtsx.astra.cli.core.exception.TokenNotFoundException;
@@ -254,9 +255,7 @@ public class CliContext {
     public DataAPIClient getDataAPIClient() {
         if (dataAPIClient == null) {
             dataAPIClient = new DataAPIClient(getToken(),
-                    DataAPIOptions.builder()
-                    .withDestination(getDestination())
-                    .build());
+                    new DataAPIClientOptions().destination(getDestination()));
         }
         return dataAPIClient;
     }
@@ -267,11 +266,11 @@ public class CliContext {
      * @return
      *      destination for the data api
      */
-    private DataAPIOptions.DataAPIDestination getDestination() {
+    private DataAPIDestination getDestination() {
         return switch (getAstraEnvironment()) {
-            case DEV -> DataAPIOptions.DataAPIDestination.ASTRA_DEV;
-            case TEST -> DataAPIOptions.DataAPIDestination.ASTRA_TEST;
-            default -> DataAPIOptions.DataAPIDestination.ASTRA;
+            case DEV -> DataAPIDestination.ASTRA_DEV;
+            case TEST -> DataAPIDestination.ASTRA_TEST;
+            default -> DataAPIDestination.ASTRA;
         };
     }
 

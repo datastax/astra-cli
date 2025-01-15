@@ -7,7 +7,7 @@
 	<description>Command Line Interface for DataStax Astra</description>
 	<packaging>jar</packaging>
 	<inceptionYear>2022</inceptionYear>
-	<version>0.5</version>
+	<version>0.6</version>
 	<url>https://github.com/datastax/astra-cli</url>
 	<properties>
 
@@ -19,16 +19,16 @@
 		<sonar.organization>clun-datastax</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-		<astra-sdk.version>1.2.8</astra-sdk.version>
-		<astra-db-java.version>1.4.5</astra-db-java.version>
+		<astra-sdk.version>1.2.9</astra-sdk.version>
+		<astra-db-java.version>2.0.0-PREVIEW</astra-db-java.version>
 		<jansi.version>2.4.1</jansi.version>
 		<airline.version>3.0.0</airline.version>
 		<slf4j.version>2.0.16</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
-		<jackson-datatype.version>2.17.2</jackson-datatype.version>
+		<jackson.version>2.18.2</jackson.version>
 		<commons-compress.version>1.27.1</commons-compress.version>
 		<!-- TEST -->
-		<junit-jupiter.version>5.10.2</junit-jupiter.version>
+		<junit-jupiter.version>5.11.4</junit-jupiter.version>
 		<awaitibility.version>4.2.2</awaitibility.version>
 		<!-- Java -->
 		<maven.plugin.compiler.source>17</maven.plugin.compiler.source>
@@ -45,7 +45,7 @@
 		<version.maven.plugin.javadoc>3.6.0</version.maven.plugin.javadoc>
 		<version.maven.plugin.jar>3.4.2</version.maven.plugin.jar>
 		<version.maven.plugin.license>2.4.0</version.maven.plugin.license>
-		<version.maven.plugin.native>0.10.3</version.maven.plugin.native>
+		<version.maven.plugin.native>0.10.4</version.maven.plugin.native>
 		<version.maven.plugin.release>3.1.1</version.maven.plugin.release>
 		<version.maven.plugin.resources>3.3.1</version.maven.plugin.resources>
 		<version.maven.plugin.shade>3.6.0</version.maven.plugin.shade>
@@ -94,7 +94,22 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>${jackson-datatype.version}</version>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>

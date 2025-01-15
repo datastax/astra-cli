@@ -785,14 +785,19 @@ public class ServiceDatabase {
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_GRAPHQL_URL_SCHEMA.name(), graphQLEndpoint + "/graphql-schema");
         envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_GRAPHQL_URL_ADMIN.name(), graphQLEndpoint + "/graphql-admin");
 
-        // Rest URL
-        String restEndpoint = getEndpointRest(dbName, region);
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REST_URL.name(), restEndpoint);
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REST_URL_SWAGGER.name(), restEndpoint + "/swagger-ui/");
+        // Data API
+        boolean isVectorDB = (db.getInfo().getDbType() != null);
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_API_ENDPOINT.name(),
+                isVectorDB ? getEndpointDataAPI(dbName, region) : "");
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_API_ENDPOINT_SWAGGER.name(),
+                isVectorDB ? getEndpointSwagger(dbName, region) : "");
 
-        // JSON Api URL
-        String jsonApiEndpoint = ApiLocator.getApiJsonEndpoint(astraEnvironment, db.getId(), region);
-        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_API_ENDPOINT.name(), jsonApiEndpoint);
+        // Rest URL
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REST_URL.name(),
+                isVectorDB ? "" :  getEndpointAPI(dbName, region));
+        envFile.getKeys().put(EnvFile.EnvKey.ASTRA_DB_REST_URL_SWAGGER.name(),
+                isVectorDB ? "" : getEndpointSwagger(dbName, region));
+
         envFile.save();
     }
 
@@ -828,7 +833,11 @@ public class ServiceDatabase {
      *      swagger url
      */
     public String getEndpointSwagger(String dbName, String region) {
-        return getEndpointRest(dbName, region) + "/swagger-ui/";
+        Database db = dbDao.getDatabase(dbName);
+        if (db.getInfo().getDbType() == null) {
+            return getEndpointRest(dbName, region) + "/swagger-ui/";
+        }
+        return getEndpointDataAPI(dbName, region) + "/api/json/swagger-ui/";
     }
 
     /**
@@ -852,6 +861,22 @@ public class ServiceDatabase {
                 retrieveDatabaseRegion(db, region));
     }
 
+    /**
+     * Build Swagger Url based on db and region.
+     *
+     * @param dbName
+     *      database name
+     * @param region
+     *      database region
+     * @return
+     *      swagger url
+     */
+    public String getEndpointAPI(String dbName, String region) {
+        Database db = dbDao.getDatabase(dbName);
+        return (db.getInfo().getDbType() == null) ?
+                getEndpointRest(dbName, region) :
+                getEndpointDataAPI(dbName, region);
+    }
 
 
     /**
@@ -866,9 +891,6 @@ public class ServiceDatabase {
      */
     public String getEndpointGraphQL(String dbName, String region) {
         Database db = dbDao.getDatabase(dbName);
-        if (db.getInfo().getDbType() != null) {
-            throw new InvalidArgumentException("Vector database '%s' does not provide graphQL".formatted(dbName));
-        }
         return ApiLocator.getApiGraphQLEndPoint(db.getId(), retrieveDatabaseRegion(db, region));
     }
 

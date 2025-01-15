@@ -20,9 +20,8 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
-import com.datastax.astra.client.admin.AstraDBAdmin;
+import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
-import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
@@ -51,7 +50,7 @@ public class DbDescribeCollectionCmd extends AbstractDatabaseCmdAsync {
             title = "KEYSPACE",
             arity = 1,
             description = "Name of the keyspace to create the collection")
-    public String keyspace = AstraDBAdmin.DEFAULT_NAMESPACE;
+    public String keyspace = DataAPIClientOptions.DEFAULT_KEYSPACE;
 
     /** {@inheritDoc}  */
     public void executeAsync() {

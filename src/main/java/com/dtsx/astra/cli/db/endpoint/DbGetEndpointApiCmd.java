@@ -40,9 +40,7 @@ public class DbGetEndpointApiCmd extends AbstractDatabaseCmd {
     
     /** {@inheritDoc} */
     public void execute() {
-        // Available only for Vector Databases
-
-        AstraCliConsole.println(dbServices.getEndpointDataAPI(db, region));
+        AstraCliConsole.println(dbServices.getEndpointAPI(db, region));
     }
 
 }

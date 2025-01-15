@@ -132,7 +132,7 @@ class StreamingCommandTest extends AbstractCmdTest {
         assertSuccessCli("streaming delete " + RANDOM_TENANT);
         // Operation is "almost" instantaneous but little tempo to avoid failing test
         await("Tenant Deletion")
-                .atMost(1, SECONDS)
+                .atMost(10, SECONDS)
                 .until(() -> !ctx().getApiDevopsStreaming().exist(RANDOM_TENANT));
         // Then
         assertSuccessCli("streaming exist " + RANDOM_TENANT);

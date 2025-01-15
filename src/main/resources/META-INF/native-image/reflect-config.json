@@ -174,8 +174,6 @@
   },
 
 
-
-
   {
     "name":"com.dtsx.astra.cli.db.dsbulk.AbstractDsbulkCmd",
     "allDeclaredFields":true
@@ -229,6 +227,16 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
+    "name":"com.dtsx.astra.cli.db.collection.DbDescribeCollectionCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.collection.DbDescribeEmbeddingProviderCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
     "name":"com.dtsx.astra.cli.db.collection.DbListCollectionsCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -239,15 +247,34 @@
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.collection.DbDescribeCollectionCmd",
+    "name":"com.dtsx.astra.cli.db.collection.DbTruncateCollectionsCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
+  {
+    "name":"com.dtsx.astra.cli.db.table.DbDeleteTableCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
   {
-    "name":"com.dtsx.astra.cli.db.collection.DbDescribeEmbeddingProviderCmd",
+    "name":"com.dtsx.astra.cli.db.table.DbDescribeTableCmd",
     "allDeclaredFields":true,
     "methods":[{"name":"<init>","parameterTypes":[] }]
   },
+  {
+    "name":"com.dtsx.astra.cli.db.table.DbListTablesCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+  {
+    "name":"com.dtsx.astra.cli.db.table.DbTruncateTableCmd",
+    "allDeclaredFields":true,
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  },
+
+
   {
     "name":"com.dtsx.astra.cli.db.list.DbListCloudsCmd",
     "allDeclaredFields":true,
@@ -1065,44 +1092,214 @@
     ]
   },
 
+
+
   {
-    "name": "io.stargate.sdk.json.domain.CollectionDefinition",
+    "name": "com.datastax.astra.client.core.commands.Command",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
   },
   {
-    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options",
+    "name": "com.datastax.astra.client.core.commands.Command$CommandSerializer",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
   },
   {
-    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options$Vector",
+    "name": "com.datastax.astra.internal.api.DataAPIResponse",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
   },
   {
-    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options$Vectorize",
+    "name": "com.datastax.astra.internal.api.DataAPIStatus",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
   },
   {
-    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Options$Vectorize$OptionsForVectorize",
-    "allDeclaredFields": true,
-    "allDeclaredMethods": true,
-    "allDeclaredConstructors": true
-  },
-  {
-    "name": "io.stargate.sdk.json.domain.CollectionDefinition$Builder",
+    "name": "com.datastax.astra.client.collections.definition.documents.Document",
     "allDeclaredFields": true,
     "allDeclaredMethods": true,
     "allDeclaredConstructors": true
   },
 
+  {
+    "name": "com.datastax.astra.client.collections.definition.CollectionDefinition",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.collections.definition.CollectionDefinition$DefaultIdOptions",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.collections.definition.CollectionDefinition$VectorOptions",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.collections.definition.CollectionDefinition$IndexingOptions",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vector.VectorOptions",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
 
+  {
+    "name": "com.datastax.astra.client.collections.definition.CollectionDescriptor",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.internal.serdes.collections.DocumentSerializer",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vector.SimilarityMetric",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.columns.ColumnTypes",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.columns.ColumnDefinition",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.internal.api.DataAPIDocumentResponse",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vector.DataAPIVector",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.exceptions.DataAPIErrorDescriptor",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.internal.api.DataAPIData",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.collections.definition.CollectionDefaultIdTypes,",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.VectorServiceOptions",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.EmbeddingProvider",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.EmbeddingProvider$AuthenticationMethod",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.EmbeddingProvider$Token",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.EmbeddingProvider$Parameter",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.EmbeddingProvider$Model",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.core.vectorize.EmbeddingProvider$Validation",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.TableDescriptor",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.TableDefinition",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.TablePrimaryKey",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.columns.ColumnTypes",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.columns.ColumnDefinition",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.client.tables.definition.columns.ColumnDefinitionApiSupport",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.datastax.astra.internal.serdes.tables.RowSerializer",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
 
   {
     "name": "com.fasterxml.jackson.databind.ext.Java7HandlersImpl",

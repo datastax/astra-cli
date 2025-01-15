@@ -20,13 +20,13 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
-import com.datastax.astra.client.model.CollectionIdTypes;
-import com.datastax.astra.client.model.SimilarityMetric;
+import com.datastax.astra.client.collections.definition.CollectionDefaultIdTypes;
+import com.datastax.astra.client.core.vector.SimilarityMetric;
 
 /**
  * Option for creating a collection.
  */
-public record CreateCollectionOption(
+public record CollectionCreationOptions(
 
         /* Name of the collection to create. */
         String name,
@@ -44,7 +44,7 @@ public record CreateCollectionOption(
         String[] indexingDeny,
 
         /* Default Id type. */
-        CollectionIdTypes defaultId,
+        CollectionDefaultIdTypes defaultId,
 
         /* Embedding model for vectorize. */
         String embeddingModel,
@@ -53,4 +53,7 @@ public record CreateCollectionOption(
         String embeddingProvider,
 
         /* Embedding key for vectorize. */
-        String embeddingKey) {}
+        String embeddingKey,
+
+        /* only execute if database does not exists. */
+        boolean flagIfNotExist) {}

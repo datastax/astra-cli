@@ -25,7 +25,7 @@ class DbRegionsTest extends AbstractCmdTest {
     @Test
     void shouldThrowRegionAlreadyExistTest() {
         assertExitCodeCli(ALREADY_EXIST, "db create-region %s -r us-east1 -c gcp".formatted(DB_TEST));
-        
+
     }
 
     @Test

@@ -20,10 +20,9 @@ package com.dtsx.astra.cli.db.collection;
  * #L%
  */
 
-import com.datastax.astra.client.Collection;
-import com.datastax.astra.client.admin.AstraDBAdmin;
-import com.datastax.astra.client.model.Document;
-import com.datastax.astra.client.model.SimilarityMetric;
+import com.datastax.astra.client.collections.definition.documents.Document;
+import com.datastax.astra.client.core.options.DataAPIClientOptions;
+import com.datastax.astra.client.core.vector.SimilarityMetric;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
 import com.dtsx.astra.cli.db.AbstractDatabaseCmdAsync;
@@ -37,6 +36,13 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
  */
 @Command(name = "create-collection", description = "Create a new collection")
 public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
+
+    /**
+     * Database or keyspace are created when needed
+     **/
+    @Option(name = { "--if-not-exists" },
+            description = "will create a new collection only if none with same name")
+    protected boolean ifNotExist = false;
 
     /**
      * Collection creation options.
@@ -55,7 +61,7 @@ public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
             title = "KEYSPACE",
             arity = 1,
             description = "Name of the keyspace to create the collection")
-    public String keyspace = AstraDBAdmin.DEFAULT_NAMESPACE;
+    public String keyspace = DataAPIClientOptions.DEFAULT_KEYSPACE;
 
     /**
      * Collection creation options.
@@ -148,14 +154,14 @@ public class DbCreateCollectionCmd extends AbstractDatabaseCmdAsync {
         if (dimension != null && metric == null) {
             metric = SimilarityMetric.COSINE.name();
         }
-        Collection<Document> col = ServiceCollection.getInstance()
-                .createCollection(db, keyspace, new CreateCollectionOption(
+        com.datastax.astra.client.collections.Collection<Document> col = ServiceCollection.getInstance()
+                .createCollection(db, keyspace, new CollectionCreationOptions(
                         collection, dimension,
                         AstraCliUtils.parseMetric(metric),
                         AstraCliUtils.parseIndex(indexAllow),
                         AstraCliUtils.parseIndex(indexDeny),
                         AstraCliUtils.parseDefaultId(defaultId),
-                        embeddingModel, embeddingProvider, embeddingKey));
+                        embeddingModel, embeddingProvider, embeddingKey, ifNotExist));
         LoggerShell.success("Collection '%s' as been created from db '%s' on keyspace  '%s'".formatted(collection, db, keyspace));
     }
     

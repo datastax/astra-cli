@@ -20,8 +20,8 @@ package com.dtsx.astra.cli.utils;
  * #L%
  */
 
-import com.datastax.astra.client.model.CollectionIdTypes;
-import com.datastax.astra.client.model.SimilarityMetric;
+import com.datastax.astra.client.collections.definition.CollectionDefaultIdTypes;
+import com.datastax.astra.client.core.vector.SimilarityMetric;
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.out.AstraCliConsole;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -113,14 +113,14 @@ public class AstraCliUtils {
      * @return
      *      select metric
      */
-    public static CollectionIdTypes parseDefaultId(String defaultId) {
+    public static CollectionDefaultIdTypes parseDefaultId(String defaultId) {
         try {
             if (defaultId == null) return null;
-            return CollectionIdTypes.fromValue(defaultId);
+            return CollectionDefaultIdTypes.fromValue(defaultId);
         } catch(Exception e) {
             throw new ParseRestrictionViolatedException(
                     "Invalid option value (--default-id), expecting "
-                            + Arrays.toString(CollectionIdTypes.values()));
+                            + Arrays.toString(CollectionDefaultIdTypes.values()));
         }
     }
 

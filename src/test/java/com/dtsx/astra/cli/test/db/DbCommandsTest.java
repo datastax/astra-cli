@@ -250,7 +250,25 @@ class DbCommandsTest extends AbstractCmdTest {
     @Test
     @Order(21)
     void testShouldCreateAClassicAstra() {
-        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "db create cli5 --tier C20 --capacity-units 1");
+        assertExitCodeCli(ExitCode.INVALID_ARGUMENT, "db create cli5 --tier C20 --capacity-units 1 --if-not-exist");
     }
+
+    @Test
+    @Order(22)
+    void shouldDisplayProperEndpoints () {
+        assertSuccessCli("db get-endpoint-api %s".formatted(DB_TEST));
+        assertSuccessCli("db get-endpoint-api %s".formatted(DB_TEST_VECTOR));
+        assertSuccessCli("db get-endpoint-swagger %s".formatted(DB_TEST));
+        assertSuccessCli("db get-endpoint-swagger %s".formatted(DB_TEST_VECTOR));
+    }
+
+    @Test
+    @Order(22)
+    void shouldCreateDotEnvWithVectorAndNotVector () {
+        //assertSuccessCli("db create-dotenv %s".formatted(DB_TEST));
+        assertSuccessCli("db create-dotenv %s".formatted(DB_TEST_VECTOR));
+    }
+
+
 
 }

@@ -73,12 +73,12 @@ public class DbCqlShellCmd extends AbstractDatabaseCmd {
     @Option(name = { "--request-timeout" }, title = "TIMEOUT", arity = 1,
             description = "Request timeout in seconds (default is 20")
     protected int cqlshOptionRequestTimeout = 20;
-
     
     /** {@inheritDoc}  */
     public void execute() 
     throws DatabaseNameNotUniqueException, DatabaseNotFoundException,
             CannotStartProcessException, FileSystemException {
+
         CqlShellOption options = new CqlShellOption(
                 cqlShOptionVersion, cqlShOptionDebug, cqlshOptionEncoding,
                 cqlshOptionExecute,cqlshOptionFile,cqlshOptionKeyspace,

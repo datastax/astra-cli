@@ -43,6 +43,6 @@ class DbCqlShTest extends AbstractCmdTest {
     @Order(1)
     @DisplayName("Execute command")
     void testShouldExecute() {
-        assertSuccessCql(DB_TEST, "select * from astra_cli_test.demo LIMIT 20;");
+        assertSuccessCql(DB_TEST, "select * from default_keyspace.demo LIMIT 20;");
     }
 }

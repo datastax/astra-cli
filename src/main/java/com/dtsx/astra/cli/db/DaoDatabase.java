@@ -19,7 +19,10 @@ package com.dtsx.astra.cli.db;
  * limitations under the License.
  * #L%
  */
+import com.datastax.astra.client.DataAPIClient;
 import com.datastax.astra.client.admin.AstraDBAdmin;
+import com.datastax.astra.client.core.options.DataAPIClientOptions;
+import com.datastax.astra.client.databases.DatabaseOptions;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exception.InvalidArgumentException;
 import com.dtsx.astra.cli.core.out.LoggerShell;
@@ -99,8 +102,8 @@ public class DaoDatabase {
      * @return
      *      astraDB
      */
-    public com.datastax.astra.client.Database getDataAPIDatabase(String databaseName) {
-        return getDataAPIDatabase(databaseName, AstraDBAdmin.DEFAULT_NAMESPACE);
+    public com.datastax.astra.client.databases.Database getDataAPIDatabase(String databaseName) {
+        return getDataAPIDatabase(databaseName, DataAPIClientOptions.DEFAULT_KEYSPACE);
     }
 
     /**
@@ -111,12 +114,16 @@ public class DaoDatabase {
      * @return
      *      instance of a client for the DataAPI
      */
-    public com.datastax.astra.client.Database getDataAPIDatabase(String databaseName, String keyspace) {
+    public com.datastax.astra.client.databases.Database getDataAPIDatabase(String databaseName, String keyspace) {
         Database db = getDatabase(databaseName);
         if (db.getInfo().getDbType() == null) {
             throw new IllegalArgumentException("Database %s is not a vector database".formatted(databaseName));
         }
-        return CliContext.getInstance().getDataAPIClient().getDatabase(UUID.fromString(db.getId()), keyspace);
+        return CliContext.getInstance()
+                .getDataAPIClient()
+                .getDatabase(UUID.fromString(db.getId()), new DatabaseOptions()
+                        .token(CliContext.getInstance().getToken())
+                        .keyspace(keyspace));
     }
 
     /**
