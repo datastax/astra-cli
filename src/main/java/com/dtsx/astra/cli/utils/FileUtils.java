@@ -108,8 +108,12 @@ public class FileUtils {
                   TarArchiveEntry tarEntry;
                   while ((tarEntry = tis.getNextTarEntry()) != null) {
                       // Escaping to remove invalid entry
-                      File outputFile = Paths.get(AstraCliUtils.ASTRA_HOME + File.separator +
-                              Paths.get(tarEntry.getName()).normalize()).toFile();
+                      Path outputPath = Paths.get(AstraCliUtils.ASTRA_HOME).resolve(Paths.get(tarEntry.getName()).normalize());
+                      if (!outputPath.normalize().startsWith(Paths.get(AstraCliUtils.ASTRA_HOME))) {
+                          LoggerShell.warn("Skipping invalid tar entry: " + tarEntry.getName());
+                          continue;
+                      }
+                      File outputFile = outputPath.toFile();
                       if (tarEntry.isDirectory()) {
                         if (!outputFile.exists() && outputFile.mkdirs())
                           LoggerShell.debug(CREATE_FOLDER_MSG
