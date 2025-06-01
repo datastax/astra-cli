@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="42c4b7eb-3d7a-46c6-8064-5c01fce3e814" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/mavenHomeManager.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reflected.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractConnectedCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCreateCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigDeleteCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigGetCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigListCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigListImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigUseCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/AbstractDbCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/AbstractDbSpecificCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/AbstractLongRunningDbSpecificCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbListCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbListImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/CompletionsCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/DynamicCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/ProfileLinkedCompletionsCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/StaticCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/caches/DbCompletionsCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/impls/AstraEnvCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/impls/AvailableProfilesCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/impls/DbNamesCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/impls/OutputTypeCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/completions/impls/ProfileKeysCompletion.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/config/AstraConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/config/AstraConfigFileMixin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/config/Ini.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/AstraColors.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/AstraConsole.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/ExitCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/output/OutputAll.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/output/OutputCsv.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/output/OutputHuman.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/output/OutputJson.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/output/OutputType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/table/RenderableShellTable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/table/ShellTable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/table/ShellTableRendererCsv.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/table/ShellTableRendererHuman.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/table/ShellTableRendererJson.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/output/table/ShellTableSerializer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/services/DbService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/services/impls/DbServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/FileUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/StringUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/TypeConverters.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="astra-cli-pico" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$PROJECT_DIR$/../../.gradle/caches/modules-2/files-2.1/info.picocli/picocli/4.7.7/16db0e451d9787cf794c789afcf56d0b56b5658e/picocli-4.7.7-sources.jar!/picocli/CommandLine.java" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="Security Analysis" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2xjOANTpLeb78dGNvV5LTtQ6aUy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Download Sources.executor": "Run",
+    "Gradle.astra-cli-pico [:com.dtsx.astra.cli.Main.main()].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "NIXITCH_NIXPKGS_CONFIG": "",
+    "NIXITCH_NIX_CONF_DIR": "",
+    "NIXITCH_NIX_OTHER_STORES": "",
+    "NIXITCH_NIX_PATH": "",
+    "NIXITCH_NIX_PROFILES": "",
+    "NIXITCH_NIX_REMOTE": "",
+    "NIXITCH_NIX_USER_PROFILE_DIR": "",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHELLCHECK.PATH": "I do mind",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/buildSrc",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/main/java/com/dtsx/astra/cli/Main.java",
+    "project.structure.last.edited": "Problems",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="\\wsl.localhost\Ubuntu\home\me\work\astra-cli-pico\buildSrc" />
+      <recent name="\\wsl.localhost\Ubuntu\home\me\work\astra-cli-pico" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="\\wsl.localhost\Ubuntu\home\me\work\astra-cli-pico\src\main\resources\META-INF\native-image " />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.dtsx.astra.cli.completions" />
+      <recent name="com.dtsx.astra.cli.completions.caches" />
+      <recent name="com.dtsx.astra.cli.output.table" />
+      <recent name="com.dtsx.astra.cli.output.output" />
+      <recent name="com.dtsx.astra.cli.output" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="AstraCli" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.dtsx.astra.cli.AstraCli" />
+      <module name="com.dtsx.astra.cli.astra-cli-pico.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.dtsx.astra.cli.completions.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.AstraCli" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="42c4b7eb-3d7a-46c6-8064-5c01fce3e814" name="Changes" comment="" />
+      <created>1748447873819</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1748447873819</updated>
+      <workItem from="1748447875067" duration="5497000" />
+      <workItem from="1748459195876" duration="442000" />
+      <workItem from="1748459687342" duration="232000" />
+      <workItem from="1748459928704" duration="1000" />
+      <workItem from="1748459954869" duration="124660000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
