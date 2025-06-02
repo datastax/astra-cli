@@ -65,7 +65,7 @@ public enum AstraColors implements Ansi.IStyle {
     }
 
     public static class Mixin {
-        @Option(names = "--color", negatable = true)
+        @Option(names = "--color", negatable = true, description = "Force colored output")
         public void setAnsi(boolean ansi) {
             AstraColors.ansi = (ansi) ? Ansi.ON : Ansi.OFF;
         }

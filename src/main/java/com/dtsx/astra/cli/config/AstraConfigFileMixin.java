@@ -6,7 +6,7 @@ import picocli.CommandLine.*;
 import java.io.File;
 
 public class AstraConfigFileMixin {
-    @Option(names = { "--config-file", "-cf" })
+    @Option(names = { "--config-file", "-cf" }, description = "The astrarc file to use", paramLabel = "PATH")
     private File configFile;
 
     @Nullable

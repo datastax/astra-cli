@@ -1,0 +1,54 @@
+package com.dtsx.astra.cli.exceptions.external;
+
+import com.dtsx.astra.cli.exceptions.AstraCliException;
+import com.dtsx.astra.cli.exceptions.ExecutionExceptionHandler;
+import com.dtsx.astra.cli.output.AstraColors;
+import com.dtsx.astra.cli.output.ExitCode;
+import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
+import lombok.val;
+import picocli.CommandLine;
+
+public class DatabaseNotFoundExceptionMapper implements ExecutionExceptionHandler.ExternalExceptionMapper<DatabaseNotFoundException> {
+    @Override
+    public Class<DatabaseNotFoundException> getExceptionClass() {
+        return DatabaseNotFoundException.class;
+    }
+
+    @Override
+    public AstraCliException mapExceptionInternal(DatabaseNotFoundException ex, CommandLine commandLine, CommandLine.ParseResult fullParseResult) {
+        val message = ex.getMessage();
+
+        val dbName = (message != null && message.startsWith("Database '") && message.endsWith("' has not been found."))
+            ? message.substring(10, message.length() - 21)
+            : null;
+
+        val msg = """
+            %s
+            
+            Please ensure that:
+              - You are using the correct organization.
+              - You are using the correct database name.
+            
+            You may use %s to list all databases in the current org.
+            
+            You may use the %s and %s flags to use a different organizational token."""
+            .stripIndent().formatted(
+                AstraColors.RED_500.use("@|bold ERROR: The %s could not be found|@").formatted((dbName != null) ? "database '" + dbName + "'" : "given database"),
+                AstraColors.BLUE_300.use("astra db list"),
+                AstraColors.BLUE_300.use("--profile"),
+                AstraColors.BLUE_300.use("--token")
+            );
+
+        return new AstraCliException(msg) {
+            @Override
+            public boolean shouldDumpLogs() {
+                return false;
+            }
+
+            @Override
+            public ExitCode getExitCode() {
+                return ExitCode.CANNOT_CONNECT;
+            }
+        };
+    }
+}

@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.output.table;
 
 import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.output.output.OutputHuman;
+import com.dtsx.astra.cli.output.serializers.OutputSerializer;
 import lombok.val;
 
 import java.util.*;
@@ -15,7 +16,7 @@ public record ShellTableRendererHuman(RenderableShellTable table) implements Out
 
     @Override
     public String renderAsHuman() {
-        val serialized = serialize(table.raw(), table.serializers());
+        val serialized = serialize(table.raw());
         val colSizes = computeColumnWidths(serialized, table.columns());
 
         val fullWidthLine = buildFullWidthTableLine(table.columns(), colSizes);
@@ -34,14 +35,13 @@ public record ShellTableRendererHuman(RenderableShellTable table) implements Out
         return joiner.add(fullWidthLine) + NL;
     }
 
-    private List<Map<String, List<String>>> serialize(List<? extends Map<String, ?>> raw, List<ShellTableSerializer<?>> serializers) {
+    private List<Map<String, List<String>>> serialize(List<? extends Map<String, ?>> raw) {
         return raw.stream()
             .map((map) -> {
                 Map<String, List<String>> ret = new HashMap<>();
 
                 for (val entry : map.entrySet()) {
-                    val serialized = ShellTableSerializer.findSerializerForObj(entry.getKey(), entry.getValue(), serializers)
-                        .serializeHuman(entry.getKey(), entry.getValue())
+                    val serialized = OutputSerializer.trySerializeAsHuman(entry.getValue())
                         .split(NL);
 
                     ret.put(entry.getKey(), List.of(serialized));
@@ -56,9 +56,9 @@ public record ShellTableRendererHuman(RenderableShellTable table) implements Out
     private Map<String, Integer> computeColumnWidths(List<Map<String, List<String>>> data, List<String> columns) {
         val colSizes = columns.stream().collect(Collectors.toMap(key -> key, val -> val.length() + 1, Integer::max, HashMap::new));
 
-        data.forEach((row) -> table.columns().forEach((col) -> {
-            colSizes.compute(col, (_, v) -> Math.max(v, maxStringWidth(row.get(col))));
-        }));
+        data.forEach((row) -> table.columns().forEach((col) ->
+            colSizes.compute(col, (_, v) -> Math.max(v, maxStringWidth(row.get(col))))
+        ));
 
         return colSizes;
     }

@@ -6,7 +6,8 @@ import picocli.CommandLine.Command;
     name = "db",
     subcommands = {
         DbListCmd.class,
-        DbGetCmd.class
+        DbGetCmd.class,
+        DbCreateCmd.class,
     }
 )
 public class DbCmd extends DbListImpl {}

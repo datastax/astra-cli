@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.completions;
 
+import com.dtsx.astra.cli.utils.AstraHome;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,7 @@ public abstract class CompletionsCache {
     @SneakyThrows
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void update(@Nullable List<String> candidates) {
-        if (!getAstraDir().exists()) {
+        if (!AstraHome.exists()) {
             return;
         }
 
@@ -36,12 +37,7 @@ public abstract class CompletionsCache {
 
     protected abstract File getCacheFile();
 
-    private File getAstraDir() {
-        val homeDir = System.getProperty("user.home");
-        return new File(homeDir, ".astra");
-    }
-
     protected File getCacheDir() {
-        return new File(getAstraDir(), "completions-cache");
+        return AstraHome.Dirs.COMPLETIONS_CACHE;
     }
 }

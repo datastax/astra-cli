@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.output.table;
 
 import com.dtsx.astra.cli.output.output.OutputCsv;
+import com.dtsx.astra.cli.output.serializers.OutputSerializer;
 import lombok.val;
 
 import java.util.List;
@@ -13,22 +14,20 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public record ShellTableRendererCsv(RenderableShellTable table) implements OutputCsv {
     @Override
     public String renderAsCsv() {
-        return buildHeaders(table.columns()) + NL + buildValues(table.raw(), table.columns(), table.serializers());
+        return buildHeaders(table.columns()) + NL + buildValues(table.raw(), table.columns());
     }
 
     private String buildHeaders(List<String> columns) {
         return String.join(",", columns);
     }
 
-    private String buildValues(List<? extends Map<String, ?>> raw, List<String> columns, List<ShellTableSerializer<?>> serializers) {
+    private String buildValues(List<? extends Map<String, ?>> raw, List<String> columns) {
         return raw.stream()
             .map((row) -> {
                 val ret = new StringJoiner(",");
 
                 for (val col : columns) {
-                    val serializer = ShellTableSerializer.findSerializerForObj(col, row.get(col), serializers);
-                    val serialized = serializer.serializeCsv(col, row.get(col));
-                    ret.add(serialized);
+                    ret.add(OutputSerializer.trySerializeAsCsv(row.get(col)));
                 }
 
                 return ret.toString();

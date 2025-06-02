@@ -3,13 +3,14 @@ package com.dtsx.astra.cli;
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
+import com.dtsx.astra.cli.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.output.AstraColors;
+import com.dtsx.astra.cli.output.output.OutputHuman;
 import com.dtsx.astra.cli.utils.TypeConverters;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine;
-import picocli.CommandLine.*;
+import picocli.CommandLine.Command;
 
 import java.util.StringJoiner;
 
@@ -23,6 +24,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         DbCmd.class,
         ConfigCmd.class,
         AutoComplete.GenerateCompletion.class,
+        CommandLine.HelpCommand.class,
     }
 )
 public class AstraCli extends AbstractCmd {
@@ -40,7 +42,7 @@ public class AstraCli extends AbstractCmd {
     """.stripIndent().formatted(VERSION));
 
     @Override
-    public String executeHuman() {
+    public OutputHuman executeHuman() {
         val sj = new StringJoiner(NL);
 
         sj.add(BANNER);
@@ -54,7 +56,7 @@ public class AstraCli extends AbstractCmd {
         sj.add(" → Create vector database   " + BLUE_300.use("astra db create demo --vector"));
         sj.add(" → List collections         " + BLUE_300.use("astra db list-collections demo"));
 
-        return sj.toString();
+        return OutputHuman.message(sj);
     }
 
     public static void main(String... args) {
@@ -62,10 +64,15 @@ public class AstraCli extends AbstractCmd {
 
         val cmd = new CommandLine(cli)
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
-            .registerConverter(AstraEnvironment.class, new TypeConverters.ToAstraEnvironment())
+            .setExecutionExceptionHandler(new ExecutionExceptionHandler())
             .setOverwrittenOptionsAllowed(true);
 
+        for (val converter : TypeConverters.INSTANCES) {
+            cmd.registerConverter(converter.getClazz(), converter);
+        }
+
         cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
+        cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
 
         cmd.execute(args);
     }

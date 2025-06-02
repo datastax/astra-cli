@@ -4,6 +4,6 @@ import com.dtsx.astra.cli.completions.impls.DbNamesCompletion;
 import picocli.CommandLine.*;
 
 public abstract class AbstractDbSpecificCmd extends AbstractDbCmd {
-    @Parameters(index = "0", completionCandidates = DbNamesCompletion.class)
+    @Parameters(index = "0", completionCandidates = DbNamesCompletion.class, paramLabel = "NAME")
     protected String dbName;
 }

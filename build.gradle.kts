@@ -43,7 +43,7 @@ application {
 
 graalvmNative {
     binaries.all {
-        buildArgs.add("-Ob")
+        buildArgs.add("-O0")
     }
 }
 
@@ -93,4 +93,8 @@ tasks.register("generateGraalReflectionConfig") {
 
 tasks.jar {
     dependsOn("generateGraalReflectionConfig")
+}
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }

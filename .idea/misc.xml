@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DiscordProjectSettings">
+    <option name="show" value="ASK" />
+    <option name="description" value="" />
+  </component>
   <component name="EntryPointsManager">
     <list size="2">
       <item index="0" class="java.lang.String" itemvalue="picocli.CommandLine.Mixin" />
       <item index="1" class="java.lang.String" itemvalue="picocli.CommandLine.Option" />
     </list>
     <writeAnnotations>
-      <writeAnnotation name="lombok.experimental.Accessors" />
       <writeAnnotation name="picocli.CommandLine.ArgGroup" />
       <writeAnnotation name="picocli.CommandLine.Mixin" />
       <writeAnnotation name="picocli.CommandLine.Option" />
       <writeAnnotation name="picocli.CommandLine.Parameters" />
-      <writeAnnotation name="picocli.CommandLine.Spec" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="graalvm-ce-24 (WSL)" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="graalvm-ce-24 (WSL)" project-jdk-type="JavaSDK" />
 </project>

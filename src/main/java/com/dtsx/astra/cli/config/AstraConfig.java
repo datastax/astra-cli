@@ -2,6 +2,9 @@ package com.dtsx.astra.cli.config;
 
 import com.dtsx.astra.cli.completions.CompletionsCache;
 import com.dtsx.astra.cli.completions.ProfileLinkedCompletionsCache;
+import com.dtsx.astra.cli.config.ini.Ini;
+import com.dtsx.astra.cli.config.ini.IniParseException;
+import com.dtsx.astra.cli.exceptions.db.AstraConfigFileException;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
@@ -11,6 +14,7 @@ import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,7 +23,7 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
-    public record Profile(String name, String token, AstraEnvironment env) {}
+    public record Profile(ProfileName name, String token, AstraEnvironment env) {}
 
     @Getter
     private final ArrayList<Profile> profiles;
@@ -30,33 +34,44 @@ public class AstraConfig {
     public static AstraConfig readAstraConfigFile(@Nullable File file) {
         if (file == null) {
             file = resolveDefaultAstraConfigFile();
-
-            if (!FileUtils.createFileIfNotExists(file)) {
-                throw new IllegalStateException("Cannot create configuration file: " + file.getPath());
-            }
+            FileUtils.createFileIfNotExists(file, () -> "");
         }
 
-        val iniFile = Ini.readIniFile(file);
+        try {
+            val iniFile = Ini.readIniFile(file);
+            val finalFile = file;
 
-        val profiles = iniFile.getSections().stream()
-            .map((section) -> new Profile(
-                section.name(),
-                section.lookupKey(TOKEN_KEY).orElseThrow(() -> new NoSuchElementException("Missing " + TOKEN_KEY + " for profile " + section.name())),
-                AstraEnvironment.valueOf(section.lookupKey(ENV_KEY).orElse("PROD").toUpperCase())
-            ))
-            .toList();
+            val profiles = iniFile.getSections().stream()
+                .map((section) -> {
+                    val profileName = ProfileName.mkUnsafe(section.name()); // If it were invalid, it would've been rejected by the Ini parser itself
 
-        return new AstraConfig(new ArrayList<>(profiles), iniFile, file);
+                    val token = section.lookupKey(TOKEN_KEY)
+                        .orElseThrow(() -> new AstraConfigFileException("Given configuration file '" + finalFile.getPath() + "' is missing the " + TOKEN_KEY + " for profile '" + section.name() + "'", null));
+
+                    val env = AstraEnvironment.valueOf(
+                        section.lookupKey(ENV_KEY).orElse("PROD").toUpperCase()
+                    );
+
+                    return new Profile(profileName, token, env);
+                })
+                .toList();
+
+            return new AstraConfig(new ArrayList<>(profiles), iniFile, file);
+        } catch (IniParseException e) {
+            throw new AstraConfigFileException(e.getMessage(), e);
+        } catch (FileNotFoundException e) {
+            throw new AstraConfigFileException("Given configuration file '" + file.getPath() + "' could not be found.", e);
+        }
     }
 
     public static File resolveDefaultAstraConfigFile() {
         return new File(System.getProperty("user.home") + File.separator + ASTRARC_FILE_NAME);
     }
 
-    public void createProfile(String name, String token, AstraEnvironment env) {
+    public void createProfile(ProfileName name, String token, AstraEnvironment env) {
         profiles.add(new Profile(name, token, env));
 
-        backingIni.addSection(name, new HashMap<>() {{
+        backingIni.addSection(name.unwrap(), new HashMap<>() {{
             put(TOKEN_KEY, token);
 
             if (env != AstraEnvironment.PROD) {
@@ -67,22 +82,22 @@ public class AstraConfig {
         backingIni.writeToFile(backingFile);
     }
 
-    public Optional<Profile> lookupProfile(String profileName) {
+    public Optional<Profile> lookupProfile(ProfileName profileName) {
         return profiles.stream()
             .filter((p) -> p.name().equals(profileName))
             .findFirst();
     }
 
-    public void deleteProfile(String profileName) {
+    public void deleteProfile(ProfileName profileName) {
         profiles.removeIf((p) -> p.name().equals(profileName));
-        backingIni.deleteSection(profileName);
+        backingIni.deleteSection(profileName.unwrap());
         ProfileLinkedCompletionsCache.mkInstances(profileName).forEach(CompletionsCache::delete);
         backingIni.writeToFile(backingFile);
     }
 
-    public Ini.IniSection getProfileSection(String profileName) {
+    public Ini.IniSection getProfileSection(ProfileName profileName) {
         return backingIni.getSections().stream()
-            .filter(s -> s.name().equals(profileName))
+            .filter(s -> s.name().equals(profileName.unwrap()))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException("Profile '" + profileName + "' not found"));
     }
