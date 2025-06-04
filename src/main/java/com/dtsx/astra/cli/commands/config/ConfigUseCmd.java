@@ -29,7 +29,7 @@ public class ConfigUseCmd extends AbstractCmd {
     }
 
     @Override
-    public OutputAll executeHuman() {
+    public OutputAll execute() {
         val targetProfile = config().lookupProfile(profileName)
             .orElseThrow(() -> new ParameterException(spec.commandLine(), "Profile '" + profileName + "' not found"));
 

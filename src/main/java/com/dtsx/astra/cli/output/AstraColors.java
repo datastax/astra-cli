@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.output;
 
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.Setter;
 import lombok.val;
 import picocli.CommandLine.Help;
@@ -97,5 +98,18 @@ public enum AstraColors implements Ansi.IStyle {
 
     public String use(String string) {
         return enabled() ? (enableString + string + DISABLE_STRING) : string;
+    }
+
+    public static String colorStatus(DatabaseStatusType status) {
+        val color = switch (status) {
+            case ACTIVE -> AstraColors.GREEN_500;
+            case ERROR, TERMINATED, UNKNOWN -> AstraColors.RED_500;
+            case DECOMMISSIONING, TERMINATING, DEGRADED -> AstraColors.YELLOW_500;
+            case HIBERNATED, PARKED, PREPARED -> AstraColors.BLUE_500;
+            case INITIALIZING, PENDING, HIBERNATING, PARKING, MAINTENANCE, PREPARING, RESIZING, RESUMING, UNPARKING -> AstraColors.YELLOW_300;
+            default -> AstraColors.NEUTRAL_500;
+        };
+
+        return color.use(status.name());
     }
 }

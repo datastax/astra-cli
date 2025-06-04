@@ -1,11 +1,9 @@
 package com.dtsx.astra.cli.output;
 
-import com.dtsx.astra.cli.exceptions.db.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.utils.AstraHome;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
-import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 
 import java.io.File;
@@ -22,7 +20,7 @@ import java.util.function.Function;
 public class AstraLogger {
     @Getter
     private static Level level = Level.REGULAR;
-    private static volatile LoadingSpinner currentSpinner;
+    private static LoadingSpinner globalSpinner;
 
     private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
@@ -58,69 +56,53 @@ public class AstraLogger {
         }
     }
 
-    public static void info(String... msg) {
-        append(AstraColors.NEUTRAL_300.use("[INFO] ") + String.join("", msg), Level.VERBOSE, true);
+    public static void debug(String... msg) {
+        append(AstraColors.NEUTRAL_300.use("[DEBUG] ") + String.join("", msg), Level.VERBOSE);
     }
 
-    public static void success(String... msg) {
-        append(AstraColors.GREEN_500.use("[OK] ") + String.join("", msg), Level.VERBOSE, true);
+    public static void info(String... msg) {
+        append(AstraColors.CYAN_600.use("[INFO] ") + String.join("", msg), Level.REGULAR);
     }
 
     public static void warn(String... msg) {
-        append(AstraColors.ORANGE_400.use("[WARN]  ") + String.join("", msg), Level.REGULAR, true);
+        append(AstraColors.ORANGE_400.use("[WARN] ") + String.join("", msg), Level.REGULAR);
     }
 
-    public static <T> T loading(@NonNull String initialMsg, @Nullable String doneMsg, Function<Consumer<String>, T> supplier) {
-        // Handle nested loading calls
-        if (currentSpinner != null) {
-            accumulated.add("[LOADING:STARTED] " + initialMsg);
-            
-            Consumer<String> consumer = (updatedMsg) -> {
-                accumulated.add("[LOADING:UPDATED] " + updatedMsg);
-            };
-            
-            try {
-                return supplier.apply(consumer);
-            } finally {
-                if (doneMsg != null) {
-                    append("@|green [DONE]|@ " + doneMsg, Level.REGULAR, false);
-                    accumulated.add("[LOADING:FINISHED] " + doneMsg);
-                } else {
-                    accumulated.add("[LOADING:FINISHED] " + initialMsg);
-                }
-            }
-        }
-        
-        // Normal loading with spinner
+    public static void done(String... msg) {
+        append("@|green [DONE]|@ " + String.join("", msg), Level.VERBOSE);
+    }
+
+    public static <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
         accumulated.add("[LOADING:STARTED] " + initialMsg);
 
-        val spinner = new LoadingSpinner(initialMsg);
-        currentSpinner = spinner;
-
-        Consumer<String> consumer = (updatedMsg) -> {
-            spinner.updateMessage(updatedMsg);
-            accumulated.add("[LOADING:UPDATED] " + updatedMsg);
-        };
-
-        spinner.start();
+        boolean isFirstLoading = globalSpinner == null;
         
+        if (isFirstLoading) {
+            globalSpinner = new LoadingSpinner(initialMsg);
+            globalSpinner.start();
+        } else {
+            globalSpinner.pushMessage(initialMsg);
+        }
+
         try {
+            Consumer<String> consumer = (msg) -> {
+                globalSpinner.updateMessage(msg);
+                accumulated.add("[LOADING:UPDATED] " + msg);
+            };
             return supplier.apply(consumer);
         } finally {
-            spinner.stop();
-            currentSpinner = null;
-
-            if (doneMsg != null) {
-                append("@|green [DONE]|@ " + doneMsg, Level.REGULAR, false);
-                accumulated.add("[LOADING:FINISHED] " + doneMsg);
+            if (isFirstLoading) {
+                globalSpinner.stop();
+                globalSpinner = null;
             } else {
-                accumulated.add("[LOADING:FINISHED] " + initialMsg);
+                globalSpinner.popMessage();
             }
+            done(initialMsg);
         }
     }
 
     public static void exception(String... msg) {
-        append(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE, true);
+        append(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE);
     }
 
     public static <E extends Exception> E exception(E e) {
@@ -139,25 +121,22 @@ public class AstraLogger {
         } catch (Exception _) {}
     }
 
-    private static void append(String msg, Level minLevel, boolean appendToAccumulated) {
-        if (appendToAccumulated) {
-            accumulated.add(msg);
-        }
+    private static void append(String msg, Level minLevel) {
+        accumulated.add(msg);
 
         if (level.ordinal() < minLevel.ordinal()) {
             return;
         }
 
-        LoadingSpinner spinner = currentSpinner;
-        if (spinner != null) {
-            spinner.pause();
+        if (globalSpinner != null) {
+            globalSpinner.pause();
         }
 
         try {
             AstraConsole.errorln(msg);
         } finally {
-            if (spinner != null) {
-                spinner.resume();
+            if (globalSpinner != null) {
+                globalSpinner.resume();
             }
         }
     }

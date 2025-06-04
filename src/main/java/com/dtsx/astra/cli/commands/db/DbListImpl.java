@@ -62,17 +62,6 @@ public class DbListImpl extends AbstractDbCmd {
     }
 
     private String status(Database db) {
-        val status = db.getStatus();
-
-        val color = switch (status) {
-            case ACTIVE -> AstraColors.GREEN_500;
-            case ERROR, TERMINATED, UNKNOWN -> AstraColors.RED_500;
-            case DECOMMISSIONING, TERMINATING, DEGRADED -> AstraColors.YELLOW_500;
-            case HIBERNATED, PARKED, PREPARED -> AstraColors.BLUE_500;
-            case INITIALIZING, PENDING, HIBERNATING, PARKING, MAINTENANCE, PREPARING, RESIZING, RESUMING, UNPARKING -> AstraColors.YELLOW_300;
-            default -> AstraColors.NEUTRAL_500;
-        };
-
-        return color.use(status.name());
+        return AstraColors.colorStatus(db.getStatus());
     }
 }

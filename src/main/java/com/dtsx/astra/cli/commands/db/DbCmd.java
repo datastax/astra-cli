@@ -8,6 +8,7 @@ import picocli.CommandLine.Command;
         DbListCmd.class,
         DbGetCmd.class,
         DbCreateCmd.class,
+        DbResumeCmd.class
     }
 )
 public class DbCmd extends DbListImpl {}

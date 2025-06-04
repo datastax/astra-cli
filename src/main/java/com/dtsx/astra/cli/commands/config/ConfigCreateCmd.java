@@ -74,7 +74,7 @@ public class ConfigCreateCmd extends AbstractCmd {
 
     private Organization fetchTokenOrg(String token, AstraEnvironment env) {
         try {
-            return AstraLogger.loading("Validating your Astra token...", null, (_) -> (
+            return AstraLogger.loading("Validating your Astra token", (_) -> (
                 new AstraOpsClient(token, env).getOrganization()
             ));
         } catch (Exception e) {

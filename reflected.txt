@@ -10,3 +10,5 @@ com.dtsx.astra.sdk.db.domain.DatabaseCost
 com.dtsx.astra.sdk.db.domain.DatabaseMetrics
 com.dtsx.astra.sdk.db.domain.CloudProviderType
 com.dtsx.astra.sdk.db.domain.Datacenter
+com.datastax.astra.client.core.commands.Command$CommandSerializer
+com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless

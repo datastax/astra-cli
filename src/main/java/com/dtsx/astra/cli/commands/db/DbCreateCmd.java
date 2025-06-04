@@ -1,13 +1,14 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.output.AstraLogger;
 import com.dtsx.astra.cli.output.output.OutputAll;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
-import com.dtsx.astra.sdk.db.domain.DatabaseCreationBuilder;
+import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
+import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
     protected boolean ifNotExists;
 
     @ArgGroup(validate = false, heading = "%nDatabase configuration options:%n")
-    private @Nullable DatabaseCreationOptions databaseCreationOptions;
+    private DatabaseCreationOptions databaseCreationOptions;
 
     static class DatabaseCreationOptions {
         @Option(
@@ -36,10 +37,9 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
 
         @Option(
             names = { "-c", "--cloud" },
-            description = "Cloud Provider to create a db",
-            required = true
+            description = "Cloud Provider to create a db"
         )
-        protected CloudProviderType cloud;
+        protected Optional<CloudProviderType> cloud;
 
         @Option(
             names = { "-k", "--keyspace" },
@@ -52,9 +52,10 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
         @Option(
             names = { "--tier" },
             paramLabel = "TIER",
-            description = "Tier to create the database in"
+            description = "Tier to create the database in",
+            defaultValue = "serverless"
         )
-        protected String tier = DatabaseCreationBuilder.DEFAULT_TIER;
+        protected String tier;
 
         @Option(
             names = { "--capacity-units" },
@@ -72,31 +73,61 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
         protected boolean vector;
     }
 
-    @Option(
-        names = "--timeout",
-        description = TIMEOUT_DESC,
-        defaultValue = "600"
-    )
+    @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
         this.timeout = Optional.of(timeout);
     }
 
     @Override
     public OutputAll execute() {
-        AstraLogger.loading("Creating database", null, (updateMsg) -> {
-            try {
-                Thread.sleep(1500);
-                updateMsg.accept("Step 1 done...");
-                Thread.sleep(1500);
-                updateMsg.accept("Step 2 done...");
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        val coloredDbName = AstraColors.BLUE_300.use(dbName);
 
-            return null;
-        });
+        try {
+            val database = AstraLogger.loading("Checking if database already exists", (_) -> (
+                dbService.getDbInfo(dbName)
+            ));
 
-        return OutputAll.serializeValue(String.valueOf(timeout));
+            AstraLogger.info("Database '%s' already exists with id %s'".formatted(dbName, database.getId()));
+
+            val hadToBeResumed = dbService.resumeDb(dbName);
+            val hadToBeAwaited = dbService.waitUntilDbActive(dbName, timeout.orElseThrow());
+
+            val message =
+                (hadToBeResumed)
+                    ? "already existed with id %s, but needed to be resumed and is now active." :
+                (hadToBeAwaited)
+                    ? "already existed with id %s, and is now active."
+                    : "already exists with id %s, and was already active; no action was required.";
+
+            return OutputAll.message("Database " + coloredDbName + " " + message.formatted(AstraColors.BLUE_300.use(database.getId())));
+        } catch (DatabaseNotFoundException _) {}
+
+        AstraLogger.debug("Database '%s' does not already exist".formatted(coloredDbName));
+
+        val cloudProvider = dbService.validateRegion(
+            databaseCreationOptions.cloud,
+            databaseCreationOptions.region,
+            databaseCreationOptions.vector
+        );
+
+        val dbId = dbService.createDb(
+            dbName,
+            databaseCreationOptions.keyspace,
+            databaseCreationOptions.region,
+            cloudProvider,
+            databaseCreationOptions.tier,
+            databaseCreationOptions.capacityUnits,
+            databaseCreationOptions.vector
+        );
+
+        if (async) {
+            return OutputAll.message("Database %s has been created with id %s, but it may not be active yet.".formatted(coloredDbName, AstraColors.BLUE_300.use(dbId)));
+        }
+
+        dbService.waitUntilDbActive(dbName, timeout.orElseThrow());
+
+        return OutputAll.message(
+            "Database %s has been created with id %s and is now active.".formatted(coloredDbName, AstraColors.BLUE_300.use(dbId))
+        );
     }
 }

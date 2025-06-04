@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.output.AstraLogger;
 import com.dtsx.astra.cli.output.output.OutputAll;
 import com.dtsx.astra.cli.output.output.OutputJson;
 import com.dtsx.astra.cli.output.table.RenderableShellTable;
@@ -72,7 +73,9 @@ public class DbGetCmd extends AbstractDbSpecificCmd {
 
     private Database dbInfo() {
         if (cachedDbInfo == null) {
-            cachedDbInfo = dbService.getDbInfo(dbName);
+            cachedDbInfo = AstraLogger.loading("Fetching information for db '%s'".formatted(dbName), (_) -> (
+                dbService.getDbInfo(dbName)
+            ));
         }
         return cachedDbInfo;
     }

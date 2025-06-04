@@ -35,9 +35,5 @@ public abstract class AbstractLongRunningDbSpecificCmd extends AbstractDbSpecifi
     @MustBeInvokedByOverriders
     protected void postlude() {
         super.postlude();
-
-//        if (!async) {
-//            dbService.waitUntilDbActive(dbName, timeout.orElseThrow());
-//        }
     }
 }

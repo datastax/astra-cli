@@ -2,32 +2,35 @@ package com.dtsx.astra.cli.output;
 
 import lombok.val;
 
+import java.util.ArrayDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.CountDownLatch;
+import java.util.Stack;
 
 public class LoadingSpinner {
     private static final String[] SPINNER_FRAMES = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
     private static final int FRAME_DELAY_MS = 80;
 
-    private final AtomicReference<String> message;
+    private final ArrayDeque<String> messageStack = new ArrayDeque<>();
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final AtomicBoolean isPaused = new AtomicBoolean(false);
     private final AtomicInteger lastLineLength = new AtomicInteger(0);
     private Thread spinnerThread;
-
-    public String getMessage() {
-        return message.get();
-    }
+    private volatile CountDownLatch pauseLatch;
     
     public LoadingSpinner(String initialMessage) {
-        this.message = new AtomicReference<>(initialMessage);
+        messageStack.push(initialMessage);
     }
     
     public void start() {
         if (isRunning.compareAndSet(false, true)) {
-            spinnerThread = new Thread(this::runSpinner);
-            spinnerThread.start();
+            if (AstraConsole.isTty()) {
+                spinnerThread = new Thread(this::runSpinner);
+                spinnerThread.start();
+            }
+            // In non-TTY environment, don't print anything - just run silently
         }
     }
     
@@ -39,34 +42,94 @@ public class LoadingSpinner {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            clearLine();
         }
-        clearLine();
+        // In non-TTY environment, don't print anything - just complete silently
     }
     
     public void updateMessage(String newMessage) {
-        message.set(newMessage);
+        synchronized (messageStack) {
+            if (!messageStack.isEmpty()) {
+                messageStack.pop();
+                messageStack.push(newMessage);
+            }
+        }
+        // In non-TTY environment, don't print updates - just update silently
+    }
+    
+    public void pushMessage(String message) {
+        synchronized (messageStack) {
+            messageStack.push(message);
+        }
+    }
+    
+    public void popMessage() {
+        synchronized (messageStack) {
+            if (!messageStack.isEmpty()) {
+                messageStack.pop();
+            }
+        }
+    }
+    
+    private String getCurrentMessage() {
+        synchronized (messageStack) {
+            return messageStack.isEmpty() ? "" : messageStack.peekFirst();
+        }
     }
     
     public void pause() {
-        isPaused.set(true);
-        clearLine();
+        if (AstraConsole.isTty() && spinnerThread != null) {
+            pauseLatch = new CountDownLatch(1);
+            isPaused.set(true);
+            
+            // Wait for the spinner thread to acknowledge the pause and clear the line
+            try {
+                pauseLatch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        // In non-TTY mode, no action needed
     }
     
     public void resume() {
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        if (AstraConsole.isTty() && spinnerThread != null) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            isPaused.set(false);
         }
-        isPaused.set(false);
+        // In non-TTY mode, no action needed
     }
     
     private void runSpinner() {
         int frameIndex = 0;
         
         while (isRunning.get()) {
-            if (!isPaused.get() && AstraLogger.getLevel() != AstraLogger.Level.QUIET) {
-                val currentLine = AstraColors.BLUE_300.use(SPINNER_FRAMES[frameIndex] + " ") + message.get();
+            if (isPaused.get()) {
+                // Clear the line when paused and signal that we've done so
+                clearLine();
+                CountDownLatch latch = pauseLatch;
+                if (latch != null) {
+                    latch.countDown();
+                }
+                
+                // Wait while paused
+                while (isPaused.get() && isRunning.get()) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+                continue;
+            }
+            
+            if (AstraLogger.getLevel() != AstraLogger.Level.QUIET && AstraConsole.isTty()) {
+                val currentLine = AstraColors.BLUE_300.use(SPINNER_FRAMES[frameIndex] + " ") + getCurrentMessage() + "...";
                 val clearLine = "\r" + " ".repeat(lastLineLength.get()) + "\r";
                 AstraConsole.error(clearLine + currentLine);
                 lastLineLength.set(AstraColors.stripAnsi(currentLine).length());
@@ -84,7 +147,7 @@ public class LoadingSpinner {
     }
     
     private void clearLine() {
-        if (AstraLogger.getLevel() != AstraLogger.Level.QUIET) {
+        if (AstraLogger.getLevel() != AstraLogger.Level.QUIET && AstraConsole.isTty()) {
             val clearSpaces = Math.max(50, lastLineLength.get());
             AstraConsole.error("\r" + " ".repeat(clearSpaces) + "\r");
         }

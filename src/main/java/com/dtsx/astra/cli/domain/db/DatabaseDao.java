@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.services.db;
+package com.dtsx.astra.cli.domain.db;
 
 /*-
  * #%L
@@ -21,24 +21,25 @@ package com.dtsx.astra.cli.services.db;
  */
 
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
-import com.datastax.astra.client.databases.DatabaseOptions;
 import com.dtsx.astra.cli.exceptions.db.DatabaseNameNotUniqueException;
-import com.dtsx.astra.cli.services.APIProvider;
+import com.dtsx.astra.cli.domain.APIProvider;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class DatabaseDao {
     private final APIProvider apiProvider;
+    private final String token;
+    private final AstraEnvironment env;
 
     public Database getDatabase(String dbName) {
-        return getRequiredDatabaseClient(dbName)
+        return getRequiredDbOptsClient(dbName)
             .find()
             .orElseThrow(() -> new DatabaseNotFoundException(dbName));
     }
@@ -54,14 +55,15 @@ public class DatabaseDao {
             throw new IllegalArgumentException("Database %s is not a vector database".formatted(dbName));
         }
 
-        return apiProvider.dataApiClient().getDatabase(UUID.fromString(db.getId()), new DatabaseOptions().keyspace(keyspace));
+        return apiProvider.dataApiDatabase(db.getId(), db.getInfo().getRegion(), keyspace)
+            .orElseThrow(() -> new DatabaseNotFoundException(dbName));
     }
 
-    public DbOpsClient getRequiredDatabaseClient(String databaseName) {
-        return getDatabaseClient(databaseName).orElseThrow(() -> new DatabaseNotFoundException(databaseName));
+    public DbOpsClient getRequiredDbOptsClient(String databaseName) {
+        return getDbOptsClient(databaseName).orElseThrow(() -> new DatabaseNotFoundException(databaseName));
     }
 
-    public Optional<DbOpsClient> getDatabaseClient(String dbName) throws DatabaseNameNotUniqueException {
+    public Optional<DbOpsClient> getDbOptsClient(String dbName) throws DatabaseNameNotUniqueException {
         val dbsClient = apiProvider.devopsApiClient().db();
 
         dbName = dbName.replace("\"", "");

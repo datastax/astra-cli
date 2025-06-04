@@ -25,6 +25,11 @@ public class AstraConsole {
 
     private static boolean noInput = false;
 
+    public static boolean isTty() {
+        // Check current console state, not just the cached one
+        return System.console() != null;
+    }
+
     public static class Mixin {
         @Option(names = "--no-input", description = "Never ask for user input (e.g. confirmation prompts)")
         public void setNoInput(boolean noInput) {

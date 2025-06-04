@@ -20,6 +20,21 @@ public sealed interface Either<L, R> {
         };
     }
 
+    default <E extends Exception> L getLeft(Function<R, E> exceptionSupplier) throws E {
+        return switch (this) {
+            case Left<L, R> left -> left.value;
+            case Right<L, R> right -> throw exceptionSupplier.apply(right.value);
+        };
+    }
+
+    default boolean isLeft() {
+        return this instanceof Left<?, ?>;
+    }
+
+    default boolean isRight() {
+        return this instanceof Right<?, ?>;
+    }
+
     static <L, R> Either<L, R> left(L value) {
         return new Left<>(value);
     }
