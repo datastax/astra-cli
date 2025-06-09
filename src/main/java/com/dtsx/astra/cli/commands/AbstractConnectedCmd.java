@@ -30,7 +30,7 @@ public abstract class AbstractConnectedCmd extends AbstractCmd {
 
     private @Nullable Profile cachedProfile;
 
-    protected Profile profile() {
+    protected final Profile profile() {
         if (cachedProfile != null) {
             return cachedProfile;
         }

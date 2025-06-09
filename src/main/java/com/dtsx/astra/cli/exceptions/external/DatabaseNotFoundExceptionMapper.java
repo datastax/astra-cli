@@ -8,6 +8,8 @@ import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
 import lombok.val;
 import picocli.CommandLine;
 
+import static com.dtsx.astra.cli.output.AstraColors.highlight;
+
 public class DatabaseNotFoundExceptionMapper implements ExecutionExceptionHandler.ExternalExceptionMapper<DatabaseNotFoundException> {
     @Override
     public Class<DatabaseNotFoundException> getExceptionClass() {
@@ -34,9 +36,9 @@ public class DatabaseNotFoundExceptionMapper implements ExecutionExceptionHandle
             You may use the %s and %s flags to use a different organizational token."""
             .stripIndent().formatted(
                 AstraColors.RED_500.use("@|bold ERROR: The %s could not be found|@").formatted((dbName != null) ? "database '" + dbName + "'" : "given database"),
-                AstraColors.BLUE_300.use("astra db list"),
-                AstraColors.BLUE_300.use("--profile"),
-                AstraColors.BLUE_300.use("--token")
+                highlight("astra db list"),
+                highlight("--profile"),
+                highlight("--token")
             );
 
         return new AstraCliException(msg) {

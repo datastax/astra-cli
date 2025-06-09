@@ -3,14 +3,12 @@ package com.dtsx.astra.cli.exceptions.db;
 import com.dtsx.astra.cli.exceptions.AstraCliException;
 import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.output.ExitCode;
-import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 
-import java.util.List;
-
-public class UnexpectedDatabaseStatusException extends AstraCliException {
-    public UnexpectedDatabaseStatusException(String dbName, DatabaseStatusType got, List<DatabaseStatusType> expected) {
+public class DbNameNotUniqueException extends AstraCliException {
+    public DbNameNotUniqueException(String dbName) {
         super(AstraColors.RED_500.use("""
-            """
+            @|bold Multiple databases with same name '%s' detected.|@
+            Please fallback to database id to resolve the conflict."""
             .stripIndent().formatted(dbName)));
     }
 

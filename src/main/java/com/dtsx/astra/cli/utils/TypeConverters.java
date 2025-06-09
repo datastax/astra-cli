@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.utils;
 
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.exceptions.db.OptionValidationException;
+import com.dtsx.astra.cli.domain.db.DbRef;
+import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.output.output.OutputType;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.Getter;
 import picocli.CommandLine.ITypeConverter;
@@ -14,7 +14,8 @@ public abstract class TypeConverters {
     public static List<TypeConverterWithClass> INSTANCES = List.of(
         new ToAstraEnvironment(),
         new ToOutputType(),
-        new ToProfileName()
+        new ToProfileName(),
+        new ToDbRef()
     );
 
     public abstract static class TypeConverterWithClass implements ITypeConverter<Object> {
@@ -58,6 +59,19 @@ public abstract class TypeConverters {
         public Object convert(String value) {
             return ProfileName.parse(value).getRight((msg) -> {
                 throw new OptionValidationException("profile name", msg);
+            });
+        }
+    }
+
+    private static class ToDbRef extends TypeConverterWithClass {
+        public ToDbRef() {
+            super(DbRef.class);
+        }
+
+        @Override
+        public Object convert(String value) {
+            return DbRef.parse(value).getRight((msg) -> {
+                throw new OptionValidationException("database name/id", msg);
             });
         }
     }

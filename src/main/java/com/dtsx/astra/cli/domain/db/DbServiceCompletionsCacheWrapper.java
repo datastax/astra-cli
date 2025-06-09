@@ -5,9 +5,12 @@ import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.graalvm.collections.Pair;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class DbServiceCompletionsCacheWrapper implements DbService {
@@ -15,8 +18,8 @@ public class DbServiceCompletionsCacheWrapper implements DbService {
     private final DbCompletionsCache cache;
 
     @Override
-    public boolean waitUntilDbActive(String dbName, int timeout) {
-        return delegate.waitUntilDbActive(dbName, timeout);
+    public Duration waitUntilDbActive(DbRef ref, int timeout) {
+        return delegate.waitUntilDbActive(ref, timeout);
     }
 
     @Override
@@ -27,22 +30,32 @@ public class DbServiceCompletionsCacheWrapper implements DbService {
     }
 
     @Override
-    public Database getDbInfo(String dbName) {
-        return delegate.getDbInfo(dbName);
+    public Database getDbInfo(DbRef ref) {
+        return delegate.getDbInfo(ref);
     }
 
     @Override
-    public boolean resumeDb(String dbName) {
-        return delegate.resumeDb(dbName);
+    public Optional<Database> tryGetDbInfo(DbRef ref) {
+        return delegate.tryGetDbInfo(ref);
     }
 
     @Override
-    public CloudProviderType validateRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
-        return delegate.validateRegion(cloud, region, vectorOnly);
+    public boolean dbExists(DbRef ref) {
+        return delegate.dbExists(ref);
     }
 
     @Override
-    public String createDb(String dbName, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
-        return delegate.createDb(dbName, keyspace, region, cloud, tier, capacityUnits, vector);
+    public ResumeDbResult resumeDb(DbRef ref, int timeout) {
+        return delegate.resumeDb(ref, timeout);
+    }
+
+    @Override
+    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
+        return delegate.findCloudForRegion(cloud, region, vectorOnly);
+    }
+
+    @Override
+    public UUID createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
+        return delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector);
     }
 }

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.output.table;
 
+import com.dtsx.astra.cli.output.AstraColors;
 import lombok.val;
 
 import java.util.List;
@@ -8,6 +9,10 @@ import java.util.Map;
 public record ShellTable(List<? extends Map<String, ?>> raw) {
     public static Map<String, Object> attr(String key, Object value) {
         return Map.of("Attribute", key, "Value", value);
+    }
+
+    public static String highlight(String s) {
+        return AstraColors.PURPLE_300.use(s);
     }
 
     public RenderableShellTable withAttributeColumns() {

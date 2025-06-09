@@ -1,11 +1,9 @@
 package com.dtsx.astra.cli.utils;
 
-import com.dtsx.astra.cli.exceptions.db.CannotCreateFileException;
+import com.dtsx.astra.cli.exceptions.misc.CannotCreateFileException;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 @UtilityClass

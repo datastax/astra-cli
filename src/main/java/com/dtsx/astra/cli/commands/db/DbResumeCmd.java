@@ -1,12 +1,15 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.output.output.OutputAll;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.Optional;
+
+import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.output.AstraColors.highlightStatus;
 
 @Command(
     name = "resume"
@@ -14,30 +17,34 @@ import java.util.Optional;
 public class DbResumeCmd extends AbstractLongRunningDbSpecificCmd {
     @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
     protected void setTimeout(int timeout) {
-        this.timeout = Optional.of(timeout);
+        this.timeout = timeout;
     }
 
     @Override
     public OutputAll execute() {
-        val hadToBeResumed = dbService.resumeDb(dbName);
-        val coloredDbName = AstraColors.BLUE_300.use(dbName);
+        return (dontWait) ? resumeNoWait() : resumeWaiting();
+    }
 
-        if (async) {
-            return OutputAll.message((hadToBeResumed)
-                ? "Database " + coloredDbName + " was resumed, but may not be active yet."
-                : "Database " + coloredDbName + " was not in a state that required resuming, but will be active shortly, if it isn't already."
-            );
-        }
+    private OutputAll resumeNoWait() {
+        val hadToBeResumed = dbService.resumeDb(dbRef, 0).hadToBeResumed();
+        val currentStatus = dbService.getDbInfo(dbRef).getStatus();
 
-        val hadToBeAwaited = dbService.waitUntilDbActive(dbName, timeout.orElseThrow());
-
-        val message =
+        return OutputAll.message(
             (hadToBeResumed)
-                ? "has been resumed and is now active." :
-            (hadToBeAwaited)
-                ? "is now active."
-                : "is already active; no action was required.";
+                ? "Database " + highlight(dbRef) + " was resumed, and " + ((currentStatus == DatabaseStatusType.ACTIVE) ? "is now active." : "currently has status " + highlightStatus(currentStatus) + ".")
+                : "Database " + highlight(dbRef) + " was not in a state that required resuming, but will be active shortly, if it isn't already (current status: " + highlightStatus(currentStatus) + ")."
+        );
+    }
 
-        return OutputAll.message("Database " + coloredDbName + " " + message);
+    private OutputAll resumeWaiting() {
+        val resumedResult = dbService.resumeDb(dbRef, timeout);
+
+        return OutputAll.message(
+            (resumedResult.hadToBeResumed())
+                ? "Database " + highlight(dbRef) + " was resumed, and is now active after waiting " + resumedResult.timeWaited().getSeconds() + " seconds." :
+            (resumedResult.wasAwaited())
+                ? "Database " + highlight(dbRef) + " was not in a state that required resuming, but is now active after waiting " + resumedResult.timeWaited().getSeconds() + " seconds."
+                : "Database " + highlight(dbRef) + " is already active; no action was required."
+        );
     }
 }

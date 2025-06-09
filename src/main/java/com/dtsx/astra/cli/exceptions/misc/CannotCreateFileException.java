@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.exceptions.db;
+package com.dtsx.astra.cli.exceptions.misc;
 
 import com.dtsx.astra.cli.exceptions.AstraCliException;
 import com.dtsx.astra.cli.output.AstraColors;

@@ -3,7 +3,6 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.output.output.OutputAll;
 import com.dtsx.astra.cli.output.table.ShellTable;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -24,7 +23,7 @@ public class ConfigListImpl extends AbstractCmd {
                 !p.name().equals(ProfileName.DEFAULT)
             ))
             .map((p) -> Map.of(
-                "configuration", (p.token().equals(defaultToken)) ? AstraColors.PURPLE_300.use(p.name() + " (in use)") : p.name(),
+                "configuration", (p.token().equals(defaultToken)) ? ShellTable.highlight(p.name() + " (in use)") : p.name(),
                 "env", p.env().name()
             ))
             .toList();

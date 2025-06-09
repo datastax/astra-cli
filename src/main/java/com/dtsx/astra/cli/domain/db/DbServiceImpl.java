@@ -1,91 +1,92 @@
 package com.dtsx.astra.cli.domain.db;
 
-import com.datastax.astra.client.admin.AstraDBAdmin;
-import com.dtsx.astra.cli.exceptions.db.OptionValidationException;
-import com.dtsx.astra.cli.exceptions.db.UnexpectedDatabaseStatusException;
-import com.dtsx.astra.cli.output.AstraColors;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.domain.APIProvider;
 import com.dtsx.astra.cli.domain.org.OrgService;
+import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.exceptions.db.DbNotFoundException;
+import com.dtsx.astra.cli.exceptions.db.UnexpectedDbStatusException;
+import com.dtsx.astra.cli.output.AstraLogger;
 import com.dtsx.astra.cli.utils.EnumFolder;
-import com.dtsx.astra.cli.utils.StringUtils;
-import com.dtsx.astra.sdk.db.domain.*;
-import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import com.dtsx.astra.sdk.db.domain.CloudProviderType;
+import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import com.dtsx.astra.sdk.db.domain.RegionType;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.output.AstraColors.highlightStatus;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 
+@RequiredArgsConstructor
 public class DbServiceImpl implements DbService {
-    private final APIProvider apiProvider;
-    private final DatabaseDao databaseDao;
+    private final DbDao dbDao;
     private final OrgService orgService;
-
-    public DbServiceImpl(APIProvider apiProvider, String token, AstraEnvironment env, OrgService orgService) {
-        this.apiProvider = apiProvider;
-        this.databaseDao = new DatabaseDao(apiProvider, token, env);
-        this.orgService = orgService;
-    }
-
-    @Override
-    public boolean waitUntilDbActive(String dbName, int timeout) {
-        val astraAdmin = apiProvider.dataApiAstraAdmin(dbName);
-        val db = apiProvider.dataApiDatabase(dbName, null, null).orElseThrow(() -> new DatabaseNotFoundException(dbName));
-
-        val dbId = (!StringUtils.isUUID(dbName))
-            ? apiProvider.dataApiDatabase(dbName, null, null).orElseThrow(() -> new DatabaseNotFoundException(dbName)).getId()
-            : db.getId();
-
-        return retryUntilTimeoutOrSuccess(astraAdmin, dbName, dbId, timeout);
-    }
 
     @Override
     public List<Database> findDatabases() {
-        return AstraLogger.loading("Fetching databases", (_) -> (
-            apiProvider.devopsApiClient().db()
-                .search(DatabaseFilter.builder().limit(1000).build())
-                .toList()
-        ));
+        return AstraLogger.loading("Fetching all databases", (_) -> dbDao.findAll());
     }
 
     @Override
-    public Database getDbInfo(String dbName) {
-        return databaseDao.getDatabase(dbName);
+    public Database getDbInfo(DbRef ref) {
+        return AstraLogger.loading("Fetching info for database " + highlight(ref), (_) -> dbDao.findOne(ref));
     }
 
     @Override
-    public boolean resumeDb(String dbName) {
-        val currentStatus = AstraLogger.loading("Fetching current status of db '%s'".formatted(dbName), (_) -> getDbInfo(dbName))
+    public Optional<Database> tryGetDbInfo(DbRef ref) {
+        try {
+            return Optional.of(getDbInfo(ref));
+        } catch (DbNotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean dbExists(DbRef ref) {
+        try {
+            dbDao.findOne(ref);
+            return true;
+        } catch (DbNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public ResumeDbResult resumeDb(DbRef ref, int timeout) {
+        val currentStatus = AstraLogger.loading("Fetching current status of db " + highlight(ref), (_) -> getDbInfo(ref))
             .getStatus();
 
-        return new EnumFolder<DatabaseStatusType, Boolean>(DatabaseStatusType.class)
+        return new EnumFolder<DatabaseStatusType, ResumeDbResult>(DatabaseStatusType.class)
             .on(ACTIVE, () -> {
-                AstraLogger.debug("Database '%s' is already active".formatted(dbName));
-                return false;
+                AstraLogger.debug("Database '%s' is already active".formatted(ref));
+                return new ResumeDbResult(false, Duration.ZERO);
             })
-            .on(HIBERNATED, () -> AstraLogger.loading("Resuming database '%s'".formatted(dbName), (_) -> {
-                try {
-                    apiProvider.dataApiDatabase(dbName, null, null).orElseThrow(() -> new DatabaseNotFoundException(dbName)).listCollections();
-                } catch (IllegalStateException _) {}
-                return true;
-            }))
+            .on(HIBERNATED, () -> {
+                AstraLogger.loading("Resuming database '%s'".formatted(ref), (_) -> {
+                    dbDao.resume(ref);
+                    return null;
+                });
+
+                return new ResumeDbResult(true, waitUntilDbActive(ref, timeout));
+            })
             .on(MAINTENANCE, INITIALIZING, PENDING, () -> {
-                AstraLogger.debug("Database '%s' is of status '%s', and will be available soon".formatted(dbName, currentStatus));
-                return false;
+                AstraLogger.debug("Database '%s' is of status '%s', and will be available soon".formatted(ref, currentStatus));
+                return new ResumeDbResult(false, Duration.ZERO);
             })
             .exhaustive((expected, _) -> {
-                throw new UnexpectedDatabaseStatusException(dbName, currentStatus, expected);
+                throw new UnexpectedDbStatusException(ref, currentStatus, expected);
             })
             .run(currentStatus);
     }
 
     @Override
-    public CloudProviderType validateRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
+    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
         val regionType = (vectorOnly) ? RegionType.VECTOR : RegionType.ALL;
         val cloudRegions = orgService.getDbServerlessRegions(regionType);
 
@@ -121,53 +122,56 @@ public class DbServiceImpl implements DbService {
     }
 
     @Override
-    public String createDb(String dbName, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
-        val builder = DatabaseCreationRequest.builder()
-            .name(dbName)
-            .tier(tier)
-            .capacityUnit(capacityUnits)
-            .cloudProvider(cloud)
-            .cloudRegion(region)
-            .keyspace(keyspace);
-
-        if (vector) {
-            builder.withVector();
-        }
-
-        return AstraLogger.loading("Creating database '%s'".formatted(dbName), (_) -> (
-            apiProvider.devopsApiClient().db().create(builder.build())
+    public UUID createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
+        return AstraLogger.loading("Creating database %s".formatted(highlight(name)), (_) -> (
+            dbDao.create(name, keyspace, region, cloud, tier, capacityUnits, vector)
         ));
     }
 
-    private boolean retryUntilTimeoutOrSuccess(AstraDBAdmin astraAdmin, String dbName, UUID dbId, int timeout) {
-        final int[] retries = {0};
+    @Override
+    public Duration waitUntilDbActive(DbRef ref, int timeout) {
+        val timeoutDuration = Duration.ofSeconds(timeout);
+        val startTime = System.currentTimeMillis();
 
         var status = new AtomicReference<>(
-            astraAdmin.getDatabaseInfo(dbId).getRawDevopsResponse().getStatus()
+            AstraLogger.loading("Fetching initial status of database %s".formatted(highlight(ref)), (_) -> lookupDbStatus(ref))
         );
 
-        val initialMessage = "Waiting for database '%s' to become active (currently %s)"
-            .formatted(AstraColors.BLUE_300.use(dbName), AstraColors.colorStatus(status.get()));
+        if (status.get().equals(ACTIVE)) {
+            return Duration.ZERO;
+        }
+
+        val initialMessage = "Waiting for database %s to become active (currently %s)"
+            .formatted(highlight(ref), highlightStatus(status.get()));
 
         return AstraLogger.loading(initialMessage, (updateMsg) -> {
-            while (((timeout == 0) || (retries[0]++ < timeout)) && !status.get().equals(ACTIVE)) {
+            while (!status.get().equals(ACTIVE)) {
+                val elapsed = Duration.ofMillis(System.currentTimeMillis() - startTime);
+                
+                if (timeout > 0 && elapsed.compareTo(timeoutDuration) >= 0) {
+                    break;
+                }
+
                 try {
                     updateMsg.accept(
-                        "Waiting for database '%s' to become active (currently %s, attempt #%d)".formatted(AstraColors.BLUE_300.use(dbName), AstraColors.colorStatus(status.get()), retries[0] + 1)
+                        "Waiting for database %s to become active (currently %s, elapsed: %ds)"
+                            .formatted(highlight(ref), highlightStatus(status.get()), elapsed.toSeconds())
                     );
 
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
 
-                    AstraLogger.loading("Checking if database '%s' is active (currently %s, attempt #%d)".formatted(AstraColors.BLUE_300.use(dbName), AstraColors.colorStatus(status.get()), retries[0] + 1), (_) -> {
-                        status.set(astraAdmin.getDatabaseInfo(dbId).getRawDevopsResponse().getStatus());
-                        return null;
-                    });
+                    status.set(lookupDbStatus(ref));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    break;
                 }
             }
 
-            return retries[0] > 1;
+            return Duration.ofMillis(System.currentTimeMillis() - startTime);
         });
+    }
+
+    private DatabaseStatusType lookupDbStatus(DbRef ref) {
+        return dbDao.findOne(ref).getStatus();
     }
 }

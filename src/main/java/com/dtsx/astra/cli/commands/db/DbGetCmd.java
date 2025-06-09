@@ -73,9 +73,7 @@ public class DbGetCmd extends AbstractDbSpecificCmd {
 
     private Database dbInfo() {
         if (cachedDbInfo == null) {
-            cachedDbInfo = AstraLogger.loading("Fetching information for db '%s'".formatted(dbName), (_) -> (
-                dbService.getDbInfo(dbName)
-            ));
+            cachedDbInfo = dbService.getDbInfo(dbRef);
         }
         return cachedDbInfo;
     }

@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.completions.CompletionsCache;
 import com.dtsx.astra.cli.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.config.ini.Ini;
 import com.dtsx.astra.cli.config.ini.IniParseException;
-import com.dtsx.astra.cli.exceptions.db.AstraConfigFileException;
+import com.dtsx.astra.cli.exceptions.config.AstraConfigFileException;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;

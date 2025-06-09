@@ -43,7 +43,7 @@ application {
 
 graalvmNative {
     binaries.all {
-        buildArgs.add("-O0")
+        buildArgs.add("-Os")
     }
 }
 
@@ -66,7 +66,7 @@ tasks.register("generateGraalReflectionConfig") {
         val classpath = sourceSets.main.get().runtimeClasspath
         val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray())
 
-        val classes = inputFile.readLines().filter { it.isNotBlank() }
+        val classes = inputFile.readLines().map(String::trim).filter { it.isNotBlank() && !it.startsWith("#") }
 
         classes.forEach {
             try {
@@ -82,7 +82,6 @@ tasks.register("generateGraalReflectionConfig") {
                 "allDeclaredConstructors" to true,
                 "allPublicConstructors" to true,
                 "allDeclaredMethods" to true,
-                "allPublicMethods" to true,
             )
         }
 

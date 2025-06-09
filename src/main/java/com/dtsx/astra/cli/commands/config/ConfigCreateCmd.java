@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.exceptions.db.ExecutionCancelledException;
+import com.dtsx.astra.cli.exceptions.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.output.AstraConsole;
 import com.dtsx.astra.cli.output.AstraLogger;

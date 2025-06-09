@@ -16,7 +16,6 @@ public class DbListImpl extends AbstractDbCmd {
     @Option(names = "--vector", description = "Only show vector-enabled databases")
     protected boolean vectorOnly;
 
-    @NotNull
     @Override
     public OutputAll execute() {
         val data = dbService.findDatabases().stream()
@@ -62,6 +61,6 @@ public class DbListImpl extends AbstractDbCmd {
     }
 
     private String status(Database db) {
-        return AstraColors.colorStatus(db.getStatus());
+        return AstraColors.highlightStatus(db.getStatus());
     }
 }

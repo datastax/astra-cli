@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.output.AstraColors;
+import com.dtsx.astra.cli.output.AstraLogger;
 import com.dtsx.astra.cli.output.output.OutputHuman;
 import com.dtsx.astra.cli.utils.TypeConverters;
 import lombok.val;
@@ -14,8 +15,7 @@ import picocli.CommandLine.Command;
 
 import java.util.StringJoiner;
 
-import static com.dtsx.astra.cli.output.AstraColors.BLUE_300;
-import static com.dtsx.astra.cli.output.AstraColors.PURPLE_300;
+import static com.dtsx.astra.cli.output.AstraColors.*;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
@@ -47,14 +47,14 @@ public class AstraCli extends AbstractCmd {
 
         sj.add(BANNER);
 
-        sj.add("Documentation: " + BLUE_300.use("https://awesome-astra.github.io/docs/pages/astra/astra-cli/"));
+        sj.add("Documentation: " + highlight("https://awesome-astra.github.io/docs/pages/astra/astra-cli/"));
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
 
         sj.add("Sample commands:");
-        sj.add(" → List databases           " + BLUE_300.use("astra db list"));
-        sj.add(" → Create vector database   " + BLUE_300.use("astra db create demo --vector"));
-        sj.add(" → List collections         " + BLUE_300.use("astra db list-collections demo"));
+        sj.add(" → List databases           " + highlight("astra db list"));
+        sj.add(" → Create vector database   " + highlight("astra db create demo --vector"));
+        sj.add(" → List collections         " + highlight("astra db list-collections demo"));
 
         return OutputHuman.message(sj);
     }

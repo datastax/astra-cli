@@ -1,16 +1,23 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.output.AstraColors;
+import com.dtsx.astra.cli.domain.db.DbRef;
+import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.output.AstraLogger;
 import com.dtsx.astra.cli.output.output.OutputAll;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
-import com.dtsx.astra.sdk.db.exception.DatabaseNotFoundException;
+import com.dtsx.astra.sdk.db.domain.Database;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.output.AstraColors.highlightStatus;
 
 @Command(
     name = "create"
@@ -66,68 +73,120 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
         protected Integer capacityUnits;
 
         @Option(
-            names = { "--vector" },
-            description = { "Create a database with vector search enabled", DEFAULT_VALUE },
+            names = { "--non-vector" },
+            description = { "Create a non-vector database", DEFAULT_VALUE },
             defaultValue = "false"
         )
-        protected boolean vector;
+        protected boolean nonVector;
     }
 
     @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
-        this.timeout = Optional.of(timeout);
+        this.timeout = timeout;
     }
 
     @Override
     public OutputAll execute() {
-        val coloredDbName = AstraColors.BLUE_300.use(dbName);
+        val database = AstraLogger.loading("Checking if database exists", (_) -> (
+            dbService.tryGetDbInfo(dbRef)
+        ));
 
-        try {
-            val database = AstraLogger.loading("Checking if database already exists", (_) -> (
-                dbService.getDbInfo(dbName)
-            ));
+        return database
+            .<Supplier<OutputAll>>map(DbAlreadyExistsHandler::new)
+            .orElseGet(CreateNewDbHandler::new)
+            .get();
+    }
 
-            AstraLogger.info("Database '%s' already exists with id %s'".formatted(dbName, database.getId()));
+    @RequiredArgsConstructor
+    private class DbAlreadyExistsHandler implements Supplier<OutputAll> {
+        private final Database db;
 
-            val hadToBeResumed = dbService.resumeDb(dbName);
-            val hadToBeAwaited = dbService.waitUntilDbActive(dbName, timeout.orElseThrow());
-
-            val message =
-                (hadToBeResumed)
-                    ? "already existed with id %s, but needed to be resumed and is now active." :
-                (hadToBeAwaited)
-                    ? "already existed with id %s, and is now active."
-                    : "already exists with id %s, and was already active; no action was required.";
-
-            return OutputAll.message("Database " + coloredDbName + " " + message.formatted(AstraColors.BLUE_300.use(database.getId())));
-        } catch (DatabaseNotFoundException _) {}
-
-        AstraLogger.debug("Database '%s' does not already exist".formatted(coloredDbName));
-
-        val cloudProvider = dbService.validateRegion(
-            databaseCreationOptions.cloud,
-            databaseCreationOptions.region,
-            databaseCreationOptions.vector
-        );
-
-        val dbId = dbService.createDb(
-            dbName,
-            databaseCreationOptions.keyspace,
-            databaseCreationOptions.region,
-            cloudProvider,
-            databaseCreationOptions.tier,
-            databaseCreationOptions.capacityUnits,
-            databaseCreationOptions.vector
-        );
-
-        if (async) {
-            return OutputAll.message("Database %s has been created with id %s, but it may not be active yet.".formatted(coloredDbName, AstraColors.BLUE_300.use(dbId)));
+        @Override
+        public OutputAll get() {
+            return
+                (!ifNotExists)
+                    ? throwDbAlreadyExists() :
+                (dontWait)
+                    ? returnCurrentStatus()
+                    : resumeDbAndWait();
         }
 
-        dbService.waitUntilDbActive(dbName, timeout.orElseThrow());
+        private <T> T throwDbAlreadyExists() {
+            throw new OptionValidationException("database name", "Database %s already exists with id %s".formatted(highlight(dbRef), highlight(db.getId())));
+        }
 
-        return OutputAll.message(
-            "Database %s has been created with id %s and is now active.".formatted(coloredDbName, AstraColors.BLUE_300.use(dbId))
-        );
+        private OutputAll returnCurrentStatus() {
+            return mkDbExistsMsg(" and status " + highlightStatus(db.getStatus()));
+        }
+
+        private OutputAll resumeDbAndWait() {
+            val resumeResult = dbService.resumeDb(dbRef, timeout);
+
+            if (!resumeResult.wasAwaited()) {
+                return mkDbExistsMsg(", and was already active; no action was required.");
+            }
+
+            val status = highlightStatus(db.getStatus());
+            val resumeStatus = (resumeResult.hadToBeResumed()) ? " and needed to be resumed" : "";
+            val timeWaited = highlight(resumeResult.timeWaited().toSeconds());
+
+            return mkDbExistsMsg(
+                ", but had status %s%s. It is now active after waiting %s seconds.".formatted(status, resumeStatus, timeWaited)
+            );
+        }
+
+        private OutputAll mkDbExistsMsg(String rest) {
+            return OutputAll.message("Database %s already exists with id %s".formatted(highlight(dbRef), highlight(db.getId())) + rest);
+        }
+    }
+
+    private class CreateNewDbHandler implements Supplier<OutputAll> {
+        @Override
+        public OutputAll get() {
+            val dbName = dbRef.fold(
+                id -> { throw new OptionValidationException("database name", "may not provide an id (%s) when creating a new database; must be a human-readable database name".formatted(id.toString())); },
+                name -> name
+            );
+
+            val createdId = createDb(dbName);
+
+            return (dontWait)
+                ? returnCurrentStatus(dbName, createdId)
+                : resumeDbAndWait(dbName, createdId);
+        }
+
+        private UUID createDb(String dbName) {
+            val cloudProvider = dbService.findCloudForRegion(
+                databaseCreationOptions.cloud,
+                databaseCreationOptions.region,
+                !databaseCreationOptions.nonVector
+            );
+
+            return dbService.createDb(
+                dbName,
+                databaseCreationOptions.keyspace,
+                databaseCreationOptions.region,
+                cloudProvider,
+                databaseCreationOptions.tier,
+                databaseCreationOptions.capacityUnits,
+                !databaseCreationOptions.nonVector
+            );
+        }
+
+        private OutputAll returnCurrentStatus(String dbName, UUID dbId) {
+            val db = dbService.getDbInfo(DbRef.fromId(dbId));
+
+            return OutputAll.message("Database %s has been created with id %s, and currently has status %s".formatted(
+                highlight(dbName), highlight(dbId.toString()), highlightStatus(db.getStatus())
+            ));
+        }
+
+        private OutputAll resumeDbAndWait(String dbName, UUID dbId) {
+            val awaitedDuration = dbService.waitUntilDbActive(dbRef, timeout);
+
+            return OutputAll.message(
+                "Database %s has been created with id %s, and is now active after %s seconds.".formatted(highlight(dbName), highlight(dbId.toString()), highlight(awaitedDuration.toSeconds()))
+            );
+        }
     }
 }

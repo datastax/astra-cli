@@ -100,7 +100,23 @@ public enum AstraColors implements Ansi.IStyle {
         return enabled() ? (enableString + string + DISABLE_STRING) : string;
     }
 
-    public static String colorStatus(DatabaseStatusType status) {
+    public static String highlight(String s) {
+        return enabled() ? AstraColors.BLUE_300.use(s) : "'" + s + "'";
+    }
+
+    public static String highlight(long l) {
+        return highlight(String.valueOf(l));
+    }
+
+    public static String highlight(Highlightable h) {
+        return h.highlight();
+    }
+
+    public static String highlightStatus(DatabaseStatusType status) {
+        if (!enabled()) {
+            return "'" + status.name() + "'";
+        }
+
         val color = switch (status) {
             case ACTIVE -> AstraColors.GREEN_500;
             case ERROR, TERMINATED, UNKNOWN -> AstraColors.RED_500;
@@ -111,5 +127,9 @@ public enum AstraColors implements Ansi.IStyle {
         };
 
         return color.use(status.name());
+    }
+
+    public interface Highlightable {
+        String highlight();
     }
 }

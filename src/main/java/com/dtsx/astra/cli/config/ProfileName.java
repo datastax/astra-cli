@@ -1,11 +1,12 @@
 package com.dtsx.astra.cli.config;
 
+import com.dtsx.astra.cli.output.AstraColors;
 import com.dtsx.astra.cli.utils.Either;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.Value;
 
 @Value
-public class ProfileName {
+public class ProfileName implements AstraColors.Highlightable {
     public static final ProfileName DEFAULT = ProfileName.mkUnsafe("default");
 
     public static final String PARAM_LABEL = "PROFILE_NAME";
@@ -39,5 +40,10 @@ public class ProfileName {
     @Override
     public String toString() {
         return unwrap();
+    }
+
+    @Override
+    public String highlight() {
+        return AstraColors.highlight(unwrap());
     }
 }

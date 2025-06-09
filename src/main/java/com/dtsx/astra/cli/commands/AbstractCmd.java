@@ -65,7 +65,7 @@ public abstract class AbstractCmd implements Runnable {
     protected void postlude() {}
 
     @Override
-    public void run() {
+    public final void run() {
         if (OutputType.isNotHuman()) {
             AstraColors.setAnsi(OFF);
         }
@@ -97,7 +97,7 @@ public abstract class AbstractCmd implements Runnable {
         }
     }
 
-    protected AstraConfig config() {
+    protected final AstraConfig config() {
         return cfgMixin.getAstraConfig();
     }
 }

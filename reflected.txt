@@ -10,5 +10,13 @@ com.dtsx.astra.sdk.db.domain.DatabaseCost
 com.dtsx.astra.sdk.db.domain.DatabaseMetrics
 com.dtsx.astra.sdk.db.domain.CloudProviderType
 com.dtsx.astra.sdk.db.domain.Datacenter
-com.datastax.astra.client.core.commands.Command$CommandSerializer
 com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless
+com.datastax.astra.client.core.commands.Command$CommandSerializer
+#com.datastax.astra.client.collections.definition.CollectionDescriptor
+#com.datastax.astra.client.collections.definition.CollectionDefinition
+#com.datastax.astra.client.collections.definition.CollectionDefinition$DefaultIdOptions
+#com.datastax.astra.client.collections.definition.CollectionDefinition$IndexingOptions
+#com.datastax.astra.client.core.vector.VectorOptions
+#com.datastax.astra.client.core.lexical.LexicalOptions
+com.datastax.astra.internal.api.DataAPIResponse
+com.datastax.astra.internal.api.DataAPIStatus

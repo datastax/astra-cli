@@ -16,7 +16,7 @@ public class OrgServiceImpl implements OrgService {
     public SortedMap<String, TreeMap<String, String>> getDbServerlessRegions(RegionType regionType) {
         val sortedRegion = new TreeMap<String, TreeMap<String, String>>();
 
-        apiProvider.devopsApiClient().db().regions().findAllServerless(regionType).forEach(r -> {
+        apiProvider.astraOpsClient().db().regions().findAllServerless(regionType).forEach((r) -> {
             val cloud = r.getCloudProvider().toLowerCase();
             sortedRegion.computeIfAbsent(cloud, _ -> new TreeMap<>());
             sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());

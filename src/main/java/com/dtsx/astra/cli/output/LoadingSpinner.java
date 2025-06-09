@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.output;
 
+import com.dtsx.astra.cli.output.output.OutputType;
 import lombok.val;
 
 import java.util.ArrayDeque;
@@ -26,11 +27,11 @@ public class LoadingSpinner {
     
     public void start() {
         if (isRunning.compareAndSet(false, true)) {
-            if (AstraConsole.isTty()) {
+            if (AstraConsole.isTty() && OutputType.isHuman()) {
                 spinnerThread = new Thread(this::runSpinner);
                 spinnerThread.start();
             }
-            // In non-TTY environment, don't print anything - just run silently
+            // In non-TTY environment or non-human output, don't print anything - just run silently
         }
     }
     
@@ -44,7 +45,7 @@ public class LoadingSpinner {
             }
             clearLine();
         }
-        // In non-TTY environment, don't print anything - just complete silently
+        // In non-TTY environment or non-human output, don't print anything - just complete silently
     }
     
     public void updateMessage(String newMessage) {
@@ -54,7 +55,7 @@ public class LoadingSpinner {
                 messageStack.push(newMessage);
             }
         }
-        // In non-TTY environment, don't print updates - just update silently
+        // In non-TTY environment or non-human output, don't print updates - just update silently
     }
     
     public void pushMessage(String message) {
@@ -73,12 +74,12 @@ public class LoadingSpinner {
     
     private String getCurrentMessage() {
         synchronized (messageStack) {
-            return messageStack.isEmpty() ? "" : messageStack.peekFirst();
+            return messageStack.isEmpty() ? "" : messageStack.peekLast();
         }
     }
     
     public void pause() {
-        if (AstraConsole.isTty() && spinnerThread != null) {
+        if (AstraConsole.isTty() && OutputType.isHuman() && spinnerThread != null) {
             pauseLatch = new CountDownLatch(1);
             isPaused.set(true);
             
@@ -89,11 +90,11 @@ public class LoadingSpinner {
                 Thread.currentThread().interrupt();
             }
         }
-        // In non-TTY mode, no action needed
+        // In non-TTY mode or non-human output, no action needed
     }
     
     public void resume() {
-        if (AstraConsole.isTty() && spinnerThread != null) {
+        if (AstraConsole.isTty() && OutputType.isHuman() && spinnerThread != null) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
@@ -101,7 +102,7 @@ public class LoadingSpinner {
             }
             isPaused.set(false);
         }
-        // In non-TTY mode, no action needed
+        // In non-TTY mode or non-human output, no action needed
     }
     
     private void runSpinner() {

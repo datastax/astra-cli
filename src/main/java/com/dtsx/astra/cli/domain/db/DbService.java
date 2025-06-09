@@ -1,29 +1,40 @@
 package com.dtsx.astra.cli.domain.db;
 
 import com.dtsx.astra.cli.completions.caches.DbCompletionsCache;
-import com.dtsx.astra.cli.domain.APIProvider;
 import com.dtsx.astra.cli.domain.org.OrgService;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface DbService {
     static DbService mkDefault(String token, AstraEnvironment env, DbCompletionsCache dbCompletionsCache) {
-        return new DbServiceCompletionsCacheWrapper(new DbServiceImpl(APIProvider.mkDefault(token, env), token, env, OrgService.mkDefault(token, env)), dbCompletionsCache);
+        return new DbServiceCompletionsCacheWrapper(new DbServiceImpl(DbDao.mkDefault(token, env), OrgService.mkDefault(token, env)), dbCompletionsCache);
     }
 
-    boolean waitUntilDbActive(String dbName, int timeout);
+    Duration waitUntilDbActive(DbRef ref, int timeout);
 
     List<Database> findDatabases();
 
-    Database getDbInfo(String dbName);
+    Database getDbInfo(DbRef ref);
 
-    boolean resumeDb(String dbName);
+    Optional<Database> tryGetDbInfo(DbRef ref);
 
-    CloudProviderType validateRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly);
+    boolean dbExists(DbRef ref);
 
-    String createDb(String dbName, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector);
+    record ResumeDbResult(boolean hadToBeResumed, Duration timeWaited) {
+        public boolean wasAwaited() {
+            return hadToBeResumed && !timeWaited.isZero();
+        }
+    }
+
+    ResumeDbResult resumeDb(DbRef ref, int timeout);
+
+    CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly);
+
+    UUID createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector);
 }
