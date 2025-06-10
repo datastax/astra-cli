@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.config.ini;
 
-import com.dtsx.astra.cli.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.*;
 

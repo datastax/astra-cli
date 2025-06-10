@@ -1,17 +1,14 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.exceptions.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
-
-import java.util.Optional;
 
 public abstract class AbstractLongRunningDbSpecificCmd extends AbstractDbSpecificCmd {
     protected static final String TIMEOUT_DESC = "How long the command should wait for the database to become active%n" + DEFAULT_VALUE;
 
-    @Option(names = "--async", description = { "Do not wait for operation to complete", DEFAULT_VALUE })
+    @Option(names = "--async", description = { "Do not wait for operation to complete", DEFAULT_VALUE }, negatable = true)
     protected boolean dontWait;
 
     protected Integer timeout;

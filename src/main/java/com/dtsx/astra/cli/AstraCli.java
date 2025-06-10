@@ -3,11 +3,10 @@ package com.dtsx.astra.cli;
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
-import com.dtsx.astra.cli.exceptions.ExecutionExceptionHandler;
-import com.dtsx.astra.cli.output.AstraColors;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputHuman;
-import com.dtsx.astra.cli.utils.TypeConverters;
+import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
+import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.TypeConverters;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine;
@@ -15,7 +14,7 @@ import picocli.CommandLine.Command;
 
 import java.util.StringJoiner;
 
-import static com.dtsx.astra.cli.output.AstraColors.*;
+import static com.dtsx.astra.cli.core.output.AstraColors.*;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(

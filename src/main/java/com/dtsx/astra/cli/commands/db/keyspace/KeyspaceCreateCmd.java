@@ -1,13 +1,12 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
-import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.keyspace.KeyspaceCreateOperation;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "create"
@@ -20,23 +19,31 @@ public class KeyspaceCreateCmd extends AbstractKeyspaceRequiredCmd {
     )
     protected boolean ifNotExists;
 
+    private KeyspaceCreateOperation keyspaceCreateOperation;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        this.keyspaceCreateOperation = new KeyspaceCreateOperation(keyspaceGateway);
+    }
+
     @Override
     public OutputAll execute() {
-        if (keyspaceService.keyspaceExists(keyspaceRef)) {
-            if (ifNotExists) {
-                return OutputAll.message("Keyspace " + highlight(keyspaceRef) + " already exists");
-            } else {
-                throw new OptionValidationException("keyspace", "Keyspace '%s' already exists. Use --if-not-exists to ignore this error".formatted(keyspaceRef.name()));
+        val request = new KeyspaceCreateOperation.KeyspaceCreateRequest(keyspaceRef, ifNotExists);
+        val result = keyspaceCreateOperation.execute(request);
+
+        return switch (result) {
+            case KeyspaceCreateOperation.KeyspaceCreateResult.KeyspaceAlreadyExists(var ksRef) -> {
+                yield OutputAll.message("Keyspace " + highlight(ksRef) + " already exists");
             }
-        }
-
-        keyspaceService.createKeyspace(keyspaceRef);
-
-        return OutputAll.message(
-            "Keyspace %s has been created in database %s".formatted(
-                highlight(keyspaceRef),
-                highlight(keyspaceRef.getDatabaseName())
-            )
-        );
+            case KeyspaceCreateOperation.KeyspaceCreateResult.KeyspaceCreated(var ksRef) -> {
+                yield OutputAll.message(
+                    "Keyspace %s has been created in database %s".formatted(
+                        highlight(ksRef),
+                        highlight(ksRef.db())
+                    )
+                );
+            }
+        };
     }
 }

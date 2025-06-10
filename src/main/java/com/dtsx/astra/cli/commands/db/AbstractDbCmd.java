@@ -1,17 +1,17 @@
 package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd;
-import com.dtsx.astra.cli.completions.caches.DbCompletionsCache;
-import com.dtsx.astra.cli.domain.db.DbService;
+import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
+import com.dtsx.astra.cli.gateways.db.DbGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 public abstract class AbstractDbCmd extends AbstractConnectedCmd {
-    protected DbService dbService;
+    protected DbGateway dbGateway;
 
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        dbService = DbService.mkDefault(profile().token(), profile().env(), new DbCompletionsCache(profile().name()));
+        dbGateway = DbGateway.mkDefault(profile().token(), profile().env(), new DbCompletionsCache(profile().name()));
     }
 }

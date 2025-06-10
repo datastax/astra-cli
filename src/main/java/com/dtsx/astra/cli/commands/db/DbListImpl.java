@@ -1,12 +1,12 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.output.AstraColors;
-import com.dtsx.astra.cli.output.output.OutputAll;
-import com.dtsx.astra.cli.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.db.DbListOperation;
+import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
-import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine.Option;
 
 import java.util.List;
@@ -16,10 +16,19 @@ public class DbListImpl extends AbstractDbCmd {
     @Option(names = "--vector", description = "Only show vector-enabled databases")
     protected boolean vectorOnly;
 
+    private DbListOperation dbListOperation;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        this.dbListOperation = new DbListOperation(dbGateway);
+    }
+
     @Override
     public OutputAll execute() {
-        val data = dbService.findDatabases().stream()
-            .filter(this::filterDbType)
+        val databases = dbListOperation.execute(vectorOnly);
+
+        val data = databases.stream()
             .map((db) -> Map.of(
                 "Name", name(db),
                 "id", id(db),
@@ -31,13 +40,6 @@ public class DbListImpl extends AbstractDbCmd {
             .toList();
 
         return new ShellTable(data).withColumns("Name", "id", "Regions", "Cloud", "V", "Status");
-    }
-
-    private boolean filterDbType(Database db) {
-        if (vectorOnly) {
-            return db.getInfo().getDbType() != null;
-        }
-        return true;
     }
 
     private String name(Database db) {
@@ -61,6 +63,6 @@ public class DbListImpl extends AbstractDbCmd {
     }
 
     private String status(Database db) {
-        return AstraColors.highlightStatus(db.getStatus());
+        return AstraColors.highlight(db.getStatus());
     }
 }

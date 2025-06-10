@@ -1,32 +1,21 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.completions.impls.AvailableProfilesCompletion;
-import com.dtsx.astra.cli.completions.impls.ProfileKeysCompletion;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
+import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.config.ini.Ini;
-import com.dtsx.astra.cli.output.output.OutputAll;
-import com.dtsx.astra.cli.output.output.OutputHuman;
-import com.dtsx.astra.cli.output.output.OutputType;
-import com.dtsx.astra.cli.output.table.RenderableShellTable;
-import com.dtsx.astra.cli.output.table.ShellTable;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
+import com.dtsx.astra.cli.core.output.table.ShellTable;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
-import java.util.List;
 import java.util.Optional;
-
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.creation_time;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.keyspace;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.keyspaces;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.region;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.regions;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.status;
-import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.vector;
 
 @Command(
     name = "get",

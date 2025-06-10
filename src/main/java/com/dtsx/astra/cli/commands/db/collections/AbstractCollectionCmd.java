@@ -1,16 +1,16 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.commands.db.keyspace.AbstractKeyspaceSpecificCmd;
-import com.dtsx.astra.cli.domain.db.collections.CollectionService;
+import com.dtsx.astra.cli.gateways.collection.CollectionGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 public abstract class AbstractCollectionCmd extends AbstractKeyspaceSpecificCmd {
-    protected CollectionService collectionService;
+    protected CollectionGateway collectionGateway;
 
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        collectionService = CollectionService.mkDefault(profile().token(), profile().env());
+        collectionGateway = CollectionGateway.mkDefault(profile().token(), profile().env());
     }
 }

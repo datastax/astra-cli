@@ -1,17 +1,15 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.collection.CollectionCreateOperation;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.List;
-import java.util.Optional;
 
-import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "create"
@@ -94,39 +92,44 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
         protected String embeddingKey;
     }
 
+    private CollectionCreateOperation collectionCreateOperation;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        this.collectionCreateOperation = new CollectionCreateOperation(collectionGateway);
+    }
+
     @Override
     public OutputAll execute() {
-        // Validate that indexing-allow and indexing-deny are mutually exclusive
-        if (collectionCreationOptions.indexingAllow != null && collectionCreationOptions.indexingDeny != null) {
-            throw new OptionValidationException("indexing options", "indexing-allow and indexing-deny are mutually exclusive");
-        }
 
-        if (collectionService.collectionExists(collRef)) {
-            if (ifNotExists) {
-                return OutputAll.message("Collection " + highlight(collRef) + " already exists");
-            } else {
-                throw new OptionValidationException("collection", "Collection '%s' already exists. Use --if-not-exists to ignore this error".formatted(collRef.name()));
-            }
-        }
-
-        // Create the collection with the specified options
-        collectionService.createCollection(
+        val request = new CollectionCreateOperation.CollectionCreateRequest(
             collRef,
             collectionCreationOptions.dimension,
-            Optional.ofNullable(collectionCreationOptions.metric).orElse("cosine"),
+            collectionCreationOptions.metric,
             collectionCreationOptions.defaultId,
             vectorizeOptions != null ? vectorizeOptions.embeddingProvider : null,
             vectorizeOptions != null ? vectorizeOptions.embeddingModel : null,
             vectorizeOptions != null ? vectorizeOptions.embeddingKey : null,
             collectionCreationOptions.indexingAllow,
-            collectionCreationOptions.indexingDeny
+            collectionCreationOptions.indexingDeny,
+            ifNotExists
         );
 
-        return OutputAll.message(
-            "Collection %s has been created in keyspace %s".formatted(
-                highlight(collRef),
-                highlight(collRef.keyspace())
-            )
-        );
+        val result = collectionCreateOperation.execute(request);
+
+        return switch (result) {
+            case CollectionCreateOperation.CollectionCreateResult.CollectionAlreadyExists(var collectionRef) -> {
+                yield OutputAll.message("Collection " + highlight(collectionRef) + " already exists");
+            }
+            case CollectionCreateOperation.CollectionCreateResult.CollectionCreated(var collectionRef) -> {
+                yield OutputAll.message(
+                    "Collection %s has been created in keyspace %s".formatted(
+                        highlight(collectionRef),
+                        highlight(collectionRef.keyspace())
+                    )
+                );
+            }
+        };
     }
 }

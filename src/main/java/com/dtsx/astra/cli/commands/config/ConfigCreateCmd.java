@@ -1,13 +1,14 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.completions.impls.AstraEnvCompletion;
+import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.exceptions.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.output.AstraColors;
-import com.dtsx.astra.cli.output.AstraConsole;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputAll;
+import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.utils.StringUtils;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
@@ -30,7 +31,7 @@ public class ConfigCreateCmd extends AbstractCmd {
     @Option(names = { "-t", "--token" }, required = true, description = "Astra authentication token (must start with 'AstraCS:')", paramLabel = "<token>")
     protected void setToken(String token) {
         if (!token.startsWith("AstraCS:")) {
-            throw new ParameterException(spec.commandLine(), "Astra token should start with 'AstraCS:'");
+            throw new OptionValidationException("token", "Astra token should start with 'AstraCS:'");
         }
         this.token = StringUtils.removeQuotesIfAny(token);
     }

@@ -3,8 +3,8 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.output.output.OutputAll;
-import com.dtsx.astra.cli.output.table.ShellTable;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 

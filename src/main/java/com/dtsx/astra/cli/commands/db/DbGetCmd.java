@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputAll;
-import com.dtsx.astra.cli.output.output.OutputJson;
-import com.dtsx.astra.cli.output.table.RenderableShellTable;
-import com.dtsx.astra.cli.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.db.DbGetOperation;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
+import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
+import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
     name = "get",
     aliases = { "describe" }
 )
-public class DbGetCmd extends AbstractDbSpecificCmd {
+public final class DbGetCmd extends AbstractDbSpecificCmd {
     public enum DbGetKeys {
         name,
         id,
@@ -37,6 +37,14 @@ public class DbGetCmd extends AbstractDbSpecificCmd {
 
     @Option(names = { "-k", "--key" }, description = "Specific database attribute to retrieve", paramLabel = "<key>")
     private Optional<DbGetKeys> key;
+
+    private DbGetOperation dbGetOperation;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        this.dbGetOperation = new DbGetOperation(dbGateway);
+    }
 
     @Override
     public OutputJson executeJson() {
@@ -73,7 +81,8 @@ public class DbGetCmd extends AbstractDbSpecificCmd {
 
     private Database dbInfo() {
         if (cachedDbInfo == null) {
-            cachedDbInfo = dbService.getDbInfo(dbRef);
+            val result = dbGetOperation.execute(dbRef);
+            cachedDbInfo = result.database();
         }
         return cachedDbInfo;
     }

@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.domain.db.collections.CollectionRef;
-import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.models.CollectionRef;
+import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 

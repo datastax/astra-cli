@@ -5,4 +5,4 @@ import picocli.CommandLine.Command;
 @Command(
     name = "list"
 )
-public class DbListCmd extends DbListImpl {}
+public final class DbListCmd extends DbListImpl {}

@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.config;
 
-import com.dtsx.astra.cli.completions.CompletionsCache;
-import com.dtsx.astra.cli.completions.ProfileLinkedCompletionsCache;
+import com.dtsx.astra.cli.core.completions.CompletionsCache;
+import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.config.ini.Ini;
 import com.dtsx.astra.cli.config.ini.IniParseException;
-import com.dtsx.astra.cli.exceptions.config.AstraConfigFileException;
+import com.dtsx.astra.cli.core.exceptions.config.AstraConfigFileException;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;

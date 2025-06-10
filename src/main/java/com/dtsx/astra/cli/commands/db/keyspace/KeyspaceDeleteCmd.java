@@ -1,14 +1,12 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
-import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.exceptions.db.KeyspaceNotFoundException;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.keyspace.KeyspaceDeleteOperation;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "delete",
@@ -23,39 +21,31 @@ public class KeyspaceDeleteCmd extends AbstractKeyspaceRequiredCmd {
     )
     protected boolean ifExists;
 
+    private KeyspaceDeleteOperation keyspaceDeleteOperation;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        this.keyspaceDeleteOperation = new KeyspaceDeleteOperation(keyspaceGateway);
+    }
+
     @Override
     public OutputAll execute() {
-        try {
-            val existingKeyspaces = AstraLogger.loading("Checking if keyspace exists", (_) -> (
-                keyspaceService.listKeyspaces(dbRef)
-            ));
+        val request = new KeyspaceDeleteOperation.KeyspaceDeleteRequest(keyspaceRef, ifExists);
+        val result = keyspaceDeleteOperation.execute(request);
 
-            if (!existingKeyspaces.keyspaces().contains(keyspaceRef.name())) {
-                if (ifExists) {
-                    AstraLogger.info("Keyspace '%s' does not exist".formatted(keyspaceRef.name()));
-                    return OutputAll.message("Keyspace " + highlight(keyspaceRef) + " does not exist; nothing to delete");
-                } else {
-                    throw new OptionValidationException("keyspace", "Keyspace '%s' does not exist. Use --if-exists to ignore this error".formatted(keyspaceRef.name()));
-                }
+        return switch (result) {
+            case KeyspaceDeleteOperation.KeyspaceDeleteResult.KeyspaceNotFound(var ksRef) -> {
+                yield OutputAll.message("Keyspace " + highlight(ksRef) + " does not exist; nothing to delete");
             }
-
-            AstraLogger.debug("Keyspace %s exists, deleting it".formatted(highlight(keyspaceRef)));
-            
-            keyspaceService.deleteKeyspace(keyspaceRef);
-            
-            return OutputAll.message(
-                "Keyspace %s has been deleted from database %s".formatted(
-                    highlight(keyspaceRef),
-                    highlight(keyspaceRef.getDatabaseName())
-                )
-            );
-        } catch (KeyspaceNotFoundException e) {
-            if (ifExists) {
-                AstraLogger.info("Keyspace '%s' does not exist".formatted(keyspaceRef.name()));
-                return OutputAll.message("Keyspace " + highlight(keyspaceRef) + " does not exist; nothing to delete");
-            } else {
-                throw e;
+            case KeyspaceDeleteOperation.KeyspaceDeleteResult.KeyspaceDeleted(var ksRef) -> {
+                yield OutputAll.message(
+                    "Keyspace %s has been deleted from database %s".formatted(
+                        highlight(ksRef),
+                        highlight(ksRef.db())
+                    )
+                );
             }
-        }
+        };
     }
 }

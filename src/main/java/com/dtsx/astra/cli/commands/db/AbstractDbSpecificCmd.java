@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.completions.impls.DbNamesCompletion;
-import com.dtsx.astra.cli.domain.db.DbRef;
+import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
+import com.dtsx.astra.cli.core.models.DbRef;
 import picocli.CommandLine.*;
 
 public abstract class AbstractDbSpecificCmd extends AbstractDbCmd {

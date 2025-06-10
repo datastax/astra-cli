@@ -1,14 +1,12 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.exceptions.db.CollectionNotFoundException;
-import com.dtsx.astra.cli.output.AstraLogger;
-import com.dtsx.astra.cli.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.collection.CollectionDeleteOperation;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import static com.dtsx.astra.cli.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "delete",
@@ -23,27 +21,31 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
     )
     protected boolean ifExists;
 
+    private CollectionDeleteOperation collectionDeleteOperation;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        this.collectionDeleteOperation = new CollectionDeleteOperation(collectionGateway);
+    }
+
     @Override
     public OutputAll execute() {
-        try {
-            val existingCollection = AstraLogger.loading("Checking if collection exists", (_) -> (
-                collectionService.getCollection(collRef)
-            ));
-            
-            collectionService.deleteCollection(collRef);
-            
-            return OutputAll.message(
-                "Collection %s has been deleted from keyspace %s".formatted(
-                    highlight(collRef), 
-                    highlight(keyspaceRef)
-                )
-            );
-        } catch (CollectionNotFoundException e) {
-            if (ifExists) {
-                return OutputAll.message("Collection " + highlight(collRef) + " does not exist; nothing to delete");
-            } else {
-                throw e;
+        val request = new CollectionDeleteOperation.CollectionDeleteRequest(collRef, ifExists);
+        val result = collectionDeleteOperation.execute(request);
+
+        return switch (result) {
+            case CollectionDeleteOperation.CollectionDeleteResult.CollectionNotFound(var collectionRef) -> {
+                yield OutputAll.message("Collection " + highlight(collectionRef) + " does not exist; nothing to delete");
             }
-        }
+            case CollectionDeleteOperation.CollectionDeleteResult.CollectionDeleted(var collectionRef, var descriptor) -> {
+                yield OutputAll.message(
+                    "Collection %s has been deleted from keyspace %s".formatted(
+                        highlight(collectionRef), 
+                        highlight(keyspaceRef)
+                    )
+                );
+            }
+        };
     }
 }
