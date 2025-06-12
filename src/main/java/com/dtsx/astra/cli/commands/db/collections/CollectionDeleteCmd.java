@@ -1,7 +1,8 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.operations.collection.CollectionDeleteOperation;
+import com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation.*;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -9,11 +10,9 @@ import picocli.CommandLine.Option;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
-    name = "delete",
-    aliases = { "rm" }
+    name = "delete-collection"
 )
 public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
-    
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if collection does not exist", DEFAULT_VALUE },
@@ -35,13 +34,13 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
         val result = collectionDeleteOperation.execute(request);
 
         return switch (result) {
-            case CollectionDeleteOperation.CollectionDeleteResult.CollectionNotFound(var collectionRef) -> {
-                yield OutputAll.message("Collection " + highlight(collectionRef) + " does not exist; nothing to delete");
+            case CollectionNotFound() -> {
+                yield OutputAll.message("Collection " + highlight(collRef) + " does not exist; nothing to delete");
             }
-            case CollectionDeleteOperation.CollectionDeleteResult.CollectionDeleted(var collectionRef, var descriptor) -> {
+            case CollectionDeleted() -> {
                 yield OutputAll.message(
                     "Collection %s has been deleted from keyspace %s".formatted(
-                        highlight(collectionRef), 
+                        highlight(collRef),
                         highlight(keyspaceRef)
                     )
                 );

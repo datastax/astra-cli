@@ -1,18 +1,20 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
-import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.config.ini.Ini;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
+import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.config.ConfigGetOperation;
+import com.dtsx.astra.cli.operations.config.ConfigGetOperation.ProfileSection;
+import com.dtsx.astra.cli.operations.config.ConfigGetOperation.SpecificKeyValue;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
 import java.util.Optional;
@@ -30,20 +32,21 @@ public class ConfigGetCmd extends AbstractCmd {
 
     @Override
     public OutputAll execute() {
-        val section = config().getProfileSection(profileName);
+        val operation = new ConfigGetOperation(config());
+        val result = operation.execute(profileName, key);
 
-        if (key.isPresent()) {
-            return section
-                .lookupKey(key.get())
-                .map(OutputAll::serializeValue)
-                .orElseThrow(() -> new ParameterException(spec.commandLine(), "Key '" + key.get() + "' not found in profile '" + profileName + "'"));
-        }
-
-        return OutputAll.instance(
-            () -> OutputHuman.message(section.render(true)),
-            () -> mkTable(section),
-            () -> mkTable(section)
-        );
+        return switch (result) {
+            case SpecificKeyValue(var value) -> {
+                yield OutputAll.serializeValue(value);
+            }
+            case ProfileSection(var section) -> {
+                yield OutputAll.instance(
+                    () -> OutputHuman.message(section.render(true)),
+                    () -> mkTable(section),
+                    () -> mkTable(section)
+                );
+            }
+        };
     }
 
     private RenderableShellTable mkTable(Ini.IniSection section) {

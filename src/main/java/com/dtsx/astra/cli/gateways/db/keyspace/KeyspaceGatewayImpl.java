@@ -1,14 +1,10 @@
-package com.dtsx.astra.cli.gateways.keyspace;
+package com.dtsx.astra.cli.gateways.db.keyspace;
 
 import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.APIProviderImpl;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.exceptions.db.KeyspaceNotFoundException;
-import com.dtsx.astra.cli.gateways.db.DbGatewayImpl;
 import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -37,19 +33,20 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
 
     @Override
     public boolean keyspaceExists(KeyspaceRef keyspaceRef) {
-        try {
+        return AstraLogger.loading("Checking if keyspace " + highlight(keyspaceRef) + " exists", (_) -> (
             findAllKeyspaces(keyspaceRef.db()).keyspaces().stream()
-                .filter(ks -> ks.equals(keyspaceRef.name()))
-                .findFirst()
-                .orElseThrow(() -> new KeyspaceNotFoundException(keyspaceRef));
-            return true;
-        } catch (KeyspaceNotFoundException e) {
-            return false;
-        }
+                .anyMatch(ks -> ks.equals(keyspaceRef.name()))
+        ));
     }
 
     @Override
-    public void createKeyspace(KeyspaceRef keyspaceRef) {
+    public void createKeyspace(KeyspaceRef keyspaceRef) throws InternalKeyspaceAlreadyExistsException {
+        val exists = keyspaceExists(keyspaceRef);
+
+        if (exists) {
+            throw new KeyspaceGateway.InternalKeyspaceAlreadyExistsException(keyspaceRef);
+        }
+
         AstraLogger.loading("Creating keyspace " + highlight(keyspaceRef), (_) -> {
             api.dbOpsClient(keyspaceRef.db()).keyspaces().create(keyspaceRef.name());
             return null;
@@ -57,7 +54,13 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
     }
 
     @Override
-    public void deleteKeyspace(KeyspaceRef keyspaceRef) {
+    public void deleteKeyspace(KeyspaceRef keyspaceRef) throws InternalKeyspaceNotFoundException {
+        val exists = keyspaceExists(keyspaceRef);
+
+        if (!exists) {
+            throw new KeyspaceGateway.InternalKeyspaceNotFoundException(keyspaceRef);
+        }
+
         AstraLogger.loading("Deleting keyspace " + highlight(keyspaceRef), (_) -> {
             api.dbOpsClient(keyspaceRef.db()).keyspaces().delete(keyspaceRef.name());
             return null;

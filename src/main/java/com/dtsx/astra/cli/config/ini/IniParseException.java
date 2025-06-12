@@ -1,23 +1,23 @@
 package com.dtsx.astra.cli.config.ini;
 
-import java.io.File;
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 public class IniParseException extends Exception {
-    public IniParseException(File file, String message, int lineNumber, String line) {
-        super("""
-            Failed to parse the configuration file at line %d in '%s':
-            
-            "%s"
-            
-            Problematic line:
-                %s
-            
-            Please check the syntax near the reported line."""
-            .stripIndent().formatted(
-                lineNumber,
-                file.getAbsolutePath(),
-                message,
-                line
-            ));
+    public IniParseException(String message, int lineNumber, String line) {
+        super(trimIndent("""
+          Failed to parse the configuration file at line %s:
+
+          "%s"
+
+          Problematic line:
+              %s
+
+          Please check the syntax near the reported line.
+        """.formatted(
+            highlight(lineNumber),
+            message,
+            line
+        )));
     }
 }

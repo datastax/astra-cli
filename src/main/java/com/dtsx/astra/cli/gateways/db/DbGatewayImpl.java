@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.db;
 
+import com.dtsx.astra.cli.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.db.CouldNotResumeDbException;
 import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
@@ -12,11 +13,13 @@ import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.utils.EnumFolder;
 import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import com.dtsx.astra.sdk.utils.Utils;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
@@ -94,6 +98,26 @@ public class DbGatewayImpl implements DbGateway {
                 throw new UnexpectedDbStatusException(ref, currentStatus, expected);
             })
             .run(currentStatus);
+    }
+
+    @Override
+    public List<String> downloadCloudSecureBundles(DbRef ref, String dbName, List<Datacenter> datacenters) {
+        val dbOpsClient = api.dbOpsClient(ref);
+
+        return datacenters.stream()
+            .map((datacenter) -> (
+                AstraLogger.loading("Downloading secure connect bundle for database %s in region %s".formatted(highlight(ref), highlight(datacenter.getRegion())), (_) -> {
+                    val scbName = dbOpsClient.buildScbFileName(dbName, datacenter.getRegion());
+                    val scbPath = new File(AstraHome.Dirs.useScb(), scbName);
+
+                    if (!scbPath.exists()) {
+                        Utils.downloadFile(datacenter.getSecureBundleUrl(), scbPath.getAbsolutePath());
+                    }
+
+                    return scbPath.getAbsolutePath();
+                })
+            ))
+            .toList();
     }
 
     @SneakyThrows

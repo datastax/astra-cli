@@ -16,6 +16,7 @@ import java.util.StringJoiner;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.*;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "ast",

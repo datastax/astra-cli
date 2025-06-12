@@ -33,6 +33,11 @@ public class CollectionRef implements AstraColors.Highlightable {
 
     @Override
     public String highlight() {
-        return AstraColors.highlight(ksRef + "." + name);
+        return AstraColors.highlight(toString());
+    }
+
+    @Override
+    public String toString() {
+        return ksRef + "." + name;
     }
 }

@@ -64,7 +64,8 @@ public class AstraConsole {
             return Optional.empty();
         }
 
-        val ret = console.readLine(prompt);
+        console.printf("%s ", format(prompt));
+        val ret = console.readLine();
 
         if (ret == null) {
             println();

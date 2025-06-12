@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.exceptions;
 
-import com.dtsx.astra.cli.core.output.ExitCode;
+import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,11 +19,11 @@ public abstract class AstraCliException extends RuntimeException {
     }
 
     public AstraCliException(String formatted, @Nullable Map<String, Object> metadata, @Nullable Throwable cause) {
-        super(formatted, cause);
+        super(StringUtils.trimIndent(formatted), cause);
         this.metadata = metadata;
     }
 
-    public abstract boolean shouldDumpLogs();
-
-    public abstract ExitCode getExitCode();
+    public boolean shouldDumpLogs() {
+        return false;
+    }
 }

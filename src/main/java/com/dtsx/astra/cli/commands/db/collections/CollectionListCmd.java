@@ -1,10 +1,12 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.operations.collection.CollectionListOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.db.collection.CollectionListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
 
 import java.util.Map;
 
@@ -12,22 +14,36 @@ import java.util.Map;
     name = "list-collections"
 )
 public class CollectionListCmd extends AbstractCollectionCmd {
-    private CollectionListOperation collectionListOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.collectionListOperation = new CollectionListOperation(collectionGateway);
-    }
+    @Option(
+        names = { "--all", "-a" },
+        description = "List collections in all keyspaces",
+        defaultValue = "false"
+    )
+    private boolean all;
 
     @Override
     protected OutputAll execute() {
-        val result = collectionListOperation.execute(keyspaceRef);
+        if (all && !keyspaceRef.isDefaultKeyspace()) {
+            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
+        }
 
-        val data = result.collections().stream()
-            .map((coll) -> Map.of("Name", coll))
+        val operation = new CollectionListOperation(collectionGateway, keyspaceGateway);
+        val result = operation.execute(keyspaceRef, all);
+
+        val data = result.stream()
+            .flatMap((res) -> (
+                res.collections().stream()
+                    .map(desc -> Map.of(
+                        "Keyspace", res.keyspace(),
+                        "Name", desc.getName()
+                    ))
+            ))
             .toList();
 
-        return new ShellTable(data).withColumns("Name");
+        if (all) {
+            return new ShellTable(data).withColumns("Keyspace", "Name");
+        } else {
+            return new ShellTable(data).withColumns("Name");
+        }
     }
 }

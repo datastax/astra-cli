@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.utils;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public sealed interface Either<L, R> {
@@ -49,5 +48,12 @@ public sealed interface Either<L, R> {
 
     static <L, R> Either<L, R> right(R value) {
         return new Right<>(value);
+    }
+
+    default <R2> Either<L, R2> flatMap(Function<R, Either<L, R2>> mapper) {
+        return switch (this) {
+            case Left<L, R> left -> new Left<>(left.value);
+            case Right<L, R> right -> mapper.apply(right.value);
+        };
     }
 }

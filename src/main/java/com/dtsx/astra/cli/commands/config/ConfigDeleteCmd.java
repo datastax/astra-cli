@@ -5,11 +5,17 @@ import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
+import com.dtsx.astra.cli.operations.config.ConfigDeleteOperation;
+import com.dtsx.astra.cli.operations.config.ConfigDeleteOperation.ProfileDeleted;
+import com.dtsx.astra.cli.operations.config.ConfigDeleteOperation.ProfileDoesNotExist;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
+
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "delete",
@@ -22,19 +28,25 @@ public class ConfigDeleteCmd extends AbstractCmd {
     @Option(names = { "-f", "--force" }, description = "Do not fail if profile does not exist")
     private boolean force;
 
+    private ConfigDeleteOperation operation;
+
+    @Override
+    public void prelude() {
+        super.prelude();
+        operation = new ConfigDeleteOperation(config());
+    }
+
     @Override
     public OutputAll execute() {
-        val config = config();
-        
-        if (config.lookupProfile(profileName).isEmpty()) {
-            if (!force) {
-                throw new ParameterException(spec.commandLine(), "Profile '" + profileName + "' not found");
-            }
-            return OutputAll.message("Profile " + AstraColors.BLUE_300.use(profileName.unwrap()) + " does not exist; nothing to delete");
-        }
+        val result = operation.execute(profileName, force);
 
-        config.deleteProfile(profileName);
-        
-        return OutputAll.message("Profile " + AstraColors.BLUE_300.use(profileName.unwrap()) + " deleted successfully");
+        return switch (result) {
+            case ProfileDoesNotExist _ -> OutputAll.message(
+                "Profile " + highlight(profileName) + " does not exist; nothing to delete"
+            );
+            case ProfileDeleted _ -> OutputAll.message(
+                "Profile " + highlight(profileName) + " deleted successfully"
+            );
+        };
     }
 }

@@ -24,10 +24,12 @@ public class AstraLogger {
 
     private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
-    private static final File SESSION_LOG_FILE = new File(AstraHome.Dirs.LOGS, Instant.now().toString().replace(":", "-") + ".log");
+    public static String useSessionLogFilePath() {
+        return useSessionLogFile().getAbsolutePath();
+    }
 
-    public static String getSessionLogFilePath() {
-        return SESSION_LOG_FILE.getAbsolutePath();
+    private static File useSessionLogFile() {
+        return new File(AstraHome.Dirs.useLogs(), Instant.now().toString().replace(":", "-") + ".log");
     }
 
     enum Level {
@@ -68,12 +70,18 @@ public class AstraLogger {
         append(AstraColors.ORANGE_400.use("[WARN] ") + String.join("", msg), Level.REGULAR);
     }
 
+    public static void started(String... msg) {
+        append("@|green [STARTED]|@ " + String.join("", msg), Level.VERBOSE);
+    }
+
     public static void done(String... msg) {
         append("@|green [DONE]|@ " + String.join("", msg), Level.VERBOSE);
     }
 
     public static <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
-        accumulated.add("[LOADING:STARTED] " + initialMsg);
+//        accumulated.add("[LOADING:STARTED] " + initialMsg);
+
+        started(initialMsg);
 
         boolean isFirstLoading = globalSpinner == null;
         
@@ -85,11 +93,10 @@ public class AstraLogger {
         }
 
         try {
-            Consumer<String> consumer = (msg) -> {
+            return supplier.apply((msg) -> {
                 globalSpinner.updateMessage(msg);
                 accumulated.add("[LOADING:UPDATED] " + msg);
-            };
-            return supplier.apply(consumer);
+            });
         } finally {
             if (isFirstLoading) {
                 globalSpinner.stop();
@@ -113,7 +120,7 @@ public class AstraLogger {
     }
 
     public static void dumpLogs() {
-        try (var writer = new FileWriter(SESSION_LOG_FILE)) {
+        try (var writer = new FileWriter(useSessionLogFile())) {
             for (String line : accumulated) {
                 writer.write(AstraColors.stripAnsi(line));
                 writer.write(System.lineSeparator());

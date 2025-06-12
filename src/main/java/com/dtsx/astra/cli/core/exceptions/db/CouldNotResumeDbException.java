@@ -10,14 +10,4 @@ public class CouldNotResumeDbException extends AstraCliException {
     public CouldNotResumeDbException(DbRef dbRef, String error) {
         super("Could not resume database %s: %s".formatted(highlight(dbRef), error));
     }
-
-    @Override
-    public boolean shouldDumpLogs() {
-        return false;
-    }
-
-    @Override
-    public ExitCode getExitCode() {
-        return ExitCode.CANNOT_CONNECT;
-    }
 }

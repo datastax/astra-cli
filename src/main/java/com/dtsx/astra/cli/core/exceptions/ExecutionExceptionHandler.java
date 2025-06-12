@@ -29,7 +29,13 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
             : unmappedE;
 
         if (e instanceof AstraCliException cliErr) {
-            AstraConsole.errorln(cliErr.getMessage());
+            val formatted = AstraConsole.format(cliErr.getMessage());
+
+            if (formatted.stripTrailing().endsWith("\n")) {
+                AstraConsole.getErr().print(formatted);
+            } else {
+                AstraConsole.getErr().println(formatted);
+            }
 
             AstraLogger.exception(cliErr);
 
@@ -37,7 +43,7 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
                 AstraLogger.dumpLogs();
             }
 
-            return cliErr.getExitCode().getCode();
+            return 2;
         }
         e.printStackTrace(AstraConsole.getErr());
 

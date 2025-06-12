@@ -11,14 +11,10 @@ import java.util.*;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Ini {
-    @Getter
-    private final ArrayList<TopLevelIniNode> nodes;
-
+public record Ini(@Getter ArrayList<TopLevelIniNode> nodes) {
     public static Ini readIniFile(File file) throws IniParseException, FileNotFoundException {
         try (val scanner = new Scanner(file)) {
-            return new IniParser().parseIniFile(file, scanner);
+            return new IniParser().parseIniFile(scanner);
         }
     }
 
@@ -52,11 +48,16 @@ public class Ini {
         }
     }
 
-    private sealed interface IniNode {
+    private sealed
+
+    interface IniNode {
         String render(boolean colored);
     }
 
-    private sealed interface TopLevelIniNode extends IniNode {}
+    private sealed
+
+    interface TopLevelIniNode extends IniNode {
+    }
 
     public record IniSection(String name, List<IniKVPair> pairs) implements TopLevelIniNode {
         @Override
@@ -72,7 +73,7 @@ public class Ini {
 
             return sj.toString();
         }
-        
+
         public Optional<String> lookupKey(String key) {
             for (int i = pairs.size() - 1; i >= 0; i--) {
                 if (key.equals(pairs.get(i).key())) {
@@ -98,6 +99,7 @@ public class Ini {
 
     public record IniKVPair(List<String> comments, String key, String value) implements IniNode {
         @Override
+        @SuppressWarnings("DuplicatedCode")
         public String render(boolean colored) {
             val sb = new StringBuilder();
 
@@ -116,12 +118,12 @@ public class Ini {
         }
     }
 
-    static class IniParser {
+    private static class IniParser {
         private final ArrayList<TopLevelIniNode> nodes = new ArrayList<>();
         private final List<String> currentComments = new ArrayList<>();
         private int lineNumber = 0;
 
-        public Ini parseIniFile(File file, Scanner scanner) throws IniParseException {
+        public Ini parseIniFile(Scanner scanner) throws IniParseException {
             while (scanner.hasNextLine()) {
                 lineNumber++;
                 String line = scanner.nextLine();
@@ -134,11 +136,11 @@ public class Ini {
                 if (trimmedLine.startsWith("#")) {
                     handleCommentedLine(trimmedLine);
                 } else if (trimmedLine.startsWith("[")) {
-                    handleSectionHeader(trimmedLine, file, lineNumber);
-                } else if (trimmedLine.contains("=")){
-                    handleKVPair(trimmedLine, file, lineNumber);
+                    handleSectionHeader(trimmedLine, lineNumber);
+                } else if (trimmedLine.contains("=")) {
+                    handleKVPair(trimmedLine, lineNumber);
                 } else if (!trimmedLine.isBlank()) {
-                    throw new IniParseException(file, "Unknown syntax", lineNumber, trimmedLine);
+                    throw new IniParseException("Unknown syntax", lineNumber, trimmedLine);
                 }
             }
 
@@ -154,15 +156,15 @@ public class Ini {
             currentComments.add(line);
         }
 
-        private void handleSectionHeader(String line, File file, int lineNumber) throws IniParseException {
+        private void handleSectionHeader(String line, int lineNumber) throws IniParseException {
             if (!line.endsWith("]")) {
-                throw new IniParseException(file, "Invalid section header: missing ending closing bracket", lineNumber, line);
+                throw new IniParseException("Invalid section header: missing ending closing bracket", lineNumber, line);
             }
 
             val sectionName = line.substring(1, line.length() - 1).trim();
 
             if (sectionName.isBlank()) {
-                throw new IniParseException(file, "Invalid section header: section name cannot be blank or empty", lineNumber, line);
+                throw new IniParseException("Invalid section header: section name cannot be blank or empty", lineNumber, line);
             }
 
             if (!currentComments.isEmpty()) {
@@ -172,7 +174,7 @@ public class Ini {
             nodes.add(new IniSection(sectionName, new ArrayList<>()));
         }
 
-        private void handleKVPair(String line, File file, int lineNumber) throws IniParseException {
+        private void handleKVPair(String line, int lineNumber) throws IniParseException {
             val lastNode = nodes.getLast();
 
             if (lastNode instanceof IniSection lastSection) {
@@ -181,7 +183,7 @@ public class Ini {
                 val key = line.substring(0, equalIndex).trim();
 
                 if (key.isEmpty()) {
-                    throw new IniParseException(file, "Invalid key-value pair: key cannot be empty", lineNumber, line);
+                    throw new IniParseException("Invalid key-value pair: key cannot be empty", lineNumber, line);
                 }
 
                 val value = StringUtils.removeQuotesIfAny(line.substring(equalIndex + 1).trim());
@@ -189,7 +191,7 @@ public class Ini {
                 lastSection.pairs().add(new IniKVPair(new ArrayList<>(currentComments), key, value));
                 currentComments.clear();
             } else {
-                throw new IniParseException(file, "Key-value pair found outside of section", lineNumber, line);
+                throw new IniParseException("Key-value pair found outside of section", lineNumber, line);
             }
         }
     }

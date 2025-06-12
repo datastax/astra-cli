@@ -1,10 +1,12 @@
 package com.dtsx.astra.cli.config;
 
-import com.dtsx.astra.cli.core.completions.CompletionsCache;
-import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.config.ini.Ini;
+import com.dtsx.astra.cli.config.ini.Ini.IniSection;
 import com.dtsx.astra.cli.config.ini.IniParseException;
+import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.exceptions.config.AstraConfigFileException;
+import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.utils.Either;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
@@ -16,6 +18,12 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
@@ -24,43 +32,75 @@ public class AstraConfig {
     public static final String ENV_KEY = "ASTRA_ENV";
 
     public record Profile(ProfileName name, String token, AstraEnvironment env) {}
+    private record InvalidProfile(IniSection section, String issue) {}
 
     @Getter
-    private final ArrayList<Profile> profiles;
+    private final ArrayList<Either<InvalidProfile, Profile>> profiles;
 
     private final Ini backingIni;
     private final File backingFile;
 
+    public List<Profile> getValidatedProfiles() {
+        return profiles.stream().map((e) -> e.fold(
+            (invalid) -> {
+                throw new AstraConfigFileException(invalid.issue, backingFile);
+            },
+            Function.identity()
+        )).toList();
+    }
+
     public static AstraConfig readAstraConfigFile(@Nullable File file) {
         if (file == null) {
             file = resolveDefaultAstraConfigFile();
-            FileUtils.createFileIfNotExists(file, () -> "");
+            FileUtils.createFileIfNotExists(file, "");
         }
 
         try {
             val iniFile = Ini.readIniFile(file);
-            val finalFile = file;
 
             val profiles = iniFile.getSections().stream()
                 .map((section) -> {
-                    val profileName = ProfileName.mkUnsafe(section.name()); // If it were invalid, it would've been rejected by the Ini parser itself
-
-                    val token = section.lookupKey(TOKEN_KEY)
-                        .orElseThrow(() -> new AstraConfigFileException("Given configuration file '" + finalFile.getPath() + "' is missing the " + TOKEN_KEY + " for profile '" + section.name() + "'", null));
-
-                    val env = AstraEnvironment.valueOf(
-                        section.lookupKey(ENV_KEY).orElse("PROD").toUpperCase()
+                    val maybeProfileName = ProfileName.parse(section.name()).bimap(
+                        (msg) -> new InvalidProfile(section, "Error parsing profile name " + highlight(section.name()) + ": " + msg),
+                        Function.identity()
                     );
 
-                    return new Profile(profileName, token, env);
+                    return maybeProfileName.flatMap((profileName) -> {
+                        val token = section.lookupKey(TOKEN_KEY);
+
+                        if (token.isEmpty()) {
+                            return Either.left(
+                                new InvalidProfile(section, trimIndent("""
+                                  The configuration is missing the required %s key for profile %s.
+                             
+                                  You can fix this by either:
+                                  - Manually editing the configuration file to add the key,
+                                  - Running %s to delete this profile, or
+                                  - Running %s to set the token for this profile.
+                                """.formatted(
+                                    AstraColors.PURPLE_300.useOrQuote(TOKEN_KEY),
+                                    highlight(section.name()),
+                                    highlight("astra config delete '" + profileName.unwrap() + "'"),
+                                    highlight("astra config create '" + profileName.unwrap() + "' --token <token> [--env <env>] -f")
+                                )))
+                            );
+                        }
+
+                        val env = section.lookupKey(ENV_KEY)
+                            .map(String::toUpperCase)
+                            .map(AstraEnvironment::valueOf)
+                            .orElse(AstraEnvironment.PROD);
+
+                        return Either.right(new Profile(profileName, token.get(), env));
+                    });
                 })
                 .toList();
 
             return new AstraConfig(new ArrayList<>(profiles), iniFile, file);
         } catch (IniParseException e) {
-            throw new AstraConfigFileException(e.getMessage(), e);
+            throw new AstraConfigFileException(e.getMessage(), file);
         } catch (FileNotFoundException e) {
-            throw new AstraConfigFileException("Given configuration file '" + file.getPath() + "' could not be found.", e);
+            throw new AstraConfigFileException("The configuration file could not be found.", file);
         }
     }
 
@@ -68,37 +108,73 @@ public class AstraConfig {
         return new File(System.getProperty("user.home") + File.separator + ASTRARC_FILE_NAME);
     }
 
-    public void createProfile(ProfileName name, String token, AstraEnvironment env) {
-        profiles.add(new Profile(name, token, env));
-
-        backingIni.addSection(name.unwrap(), new HashMap<>() {{
-            put(TOKEN_KEY, token);
-
-            if (env != AstraEnvironment.PROD) {
-                put(ENV_KEY, env.name());
-            }
-        }});
-
-        backingIni.writeToFile(backingFile);
+    public boolean profileExists(ProfileName profileName) {
+        return profiles.stream().anyMatch(isProfileName(profileName));
     }
 
     public Optional<Profile> lookupProfile(ProfileName profileName) {
-        return profiles.stream()
-            .filter((p) -> p.name().equals(profileName))
-            .findFirst();
+        val matching = profiles.stream().filter(isProfileName(profileName)).toList();
+
+        if (matching.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (matching.size() > 1) {
+            throw new AstraConfigFileException(trimIndent("""
+              Multiple profiles were found for name %s. Please ensure profile names are unique.
+ 
+              You can fix this by either
+              - Manually editing the configuration file to remove duplicates, or
+              - Running %s to delete all profiles with this name, then re-create the profile correctly.
+            """.formatted(
+                highlight(profileName),
+                highlight("astra config delete '" + profileName.unwrap() + "'")
+            )), backingFile);
+        }
+
+        return matching.getFirst().fold(
+            (invalid) -> {
+                throw new AstraConfigFileException(invalid.issue, backingFile);
+            },
+            Optional::of
+        );
     }
 
-    public void deleteProfile(ProfileName profileName) {
-        profiles.removeIf((p) -> p.name().equals(profileName));
-        backingIni.deleteSection(profileName.unwrap());
-        ProfileLinkedCompletionsCache.mkInstances(profileName).forEach(CompletionsCache::delete);
+    public class ProfileModificationCtx {
+        public void createProfile(ProfileName name, String token, AstraEnvironment env) {
+            profiles.add(Either.right(new Profile(name, token, env)));
+
+            backingIni.addSection(name.unwrap(), new HashMap<>() {{
+                put(TOKEN_KEY, token);
+
+                if (env != AstraEnvironment.PROD) {
+                    put(ENV_KEY, env.name());
+                }
+            }});
+        }
+
+        public void deleteProfile(ProfileName profileName) {
+            profiles.removeIf(isProfileName(profileName));
+            backingIni.deleteSection(profileName.unwrap());
+            ProfileLinkedCompletionsCache.mkInstances(profileName).forEach((c) -> c.update((_) -> Set.of()));
+        }
+    }
+
+    public void modify(Consumer<ProfileModificationCtx> consumer) {
+        consumer.accept(new ProfileModificationCtx());
         backingIni.writeToFile(backingFile);
     }
 
-    public Ini.IniSection getProfileSection(ProfileName profileName) {
+    public Optional<Ini.IniSection> getProfileSection(ProfileName profileName) {
         return backingIni.getSections().stream()
             .filter(s -> s.name().equals(profileName.unwrap()))
-            .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Profile '" + profileName + "' not found"));
+            .findFirst();
+    }
+
+    private Predicate<Either<InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
+        return (p) -> p.fold(
+            (invalid) -> invalid.section.name().equals(profileName.unwrap()),
+            (profile) -> profile.name().equals(profileName)
+        );
     }
 }

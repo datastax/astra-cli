@@ -23,14 +23,4 @@ public class UnexpectedDbStatusException extends AstraCliException {
                 expected.stream().map(DatabaseStatusType::toString).toList()
             )));
     }
-
-    @Override
-    public boolean shouldDumpLogs() {
-        return false;
-    }
-
-    @Override
-    public ExitCode getExitCode() {
-        return ExitCode.CONFLICT;
-    }
 }

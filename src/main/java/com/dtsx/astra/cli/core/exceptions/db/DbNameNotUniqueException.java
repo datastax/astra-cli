@@ -11,14 +11,4 @@ public class DbNameNotUniqueException extends AstraCliException {
             Please fallback to database id to resolve the conflict."""
             .stripIndent().formatted(dbName)));
     }
-
-    @Override
-    public boolean shouldDumpLogs() {
-        return false;
-    }
-
-    @Override
-    public ExitCode getExitCode() {
-        return ExitCode.CONFLICT;
-    }
 }

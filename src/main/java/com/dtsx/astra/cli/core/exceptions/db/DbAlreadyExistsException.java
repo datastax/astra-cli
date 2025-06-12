@@ -10,14 +10,4 @@ public class DbAlreadyExistsException extends AstraCliException {
     public DbAlreadyExistsException(DbRef dbRef, UUID dbId) {
         super("Database %s already exists with id %s".formatted(dbRef, dbId));
     }
-
-    @Override
-    public boolean shouldDumpLogs() {
-        return false;
-    }
-
-    @Override
-    public ExitCode getExitCode() {
-        return ExitCode.ALREADY_EXIST;
-    }
 }

@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.operations.collection.CollectionCreateOperation;
+import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
@@ -12,10 +12,9 @@ import java.util.List;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
-    name = "create"
+    name = "create-collection"
 )
 public class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
-    
     @Option(
         names = { "--if-not-exists" },
         description = { "Will create a new collection only if none with same name", DEFAULT_VALUE },
@@ -102,7 +101,6 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
 
     @Override
     public OutputAll execute() {
-
         val request = new CollectionCreateOperation.CollectionCreateRequest(
             collRef,
             collectionCreationOptions.dimension,

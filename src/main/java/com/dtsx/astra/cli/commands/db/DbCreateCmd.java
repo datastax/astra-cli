@@ -27,7 +27,7 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
         description = { "Don't error if the database already exists", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    protected boolean ifNotExists;
+    private boolean ifNotExists;
 
     @ArgGroup(validate = false, heading = "%nDatabase configuration options:%n")
     private DatabaseCreationOptions databaseCreationOptions;
@@ -84,22 +84,16 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
         this.timeout = timeout;
     }
 
-    private DbCreateOperation dbCreateOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.dbCreateOperation = new DbCreateOperation(dbGateway);
-    }
-
     @Override
     public OutputAll execute() {
+        val operation = new DbCreateOperation(dbGateway);
+
         val dbName = dbRef.fold(
             id -> { throw new OptionValidationException("database name", "may not provide an id (%s) when creating a new database; must be a human-readable database name".formatted(id.toString())); },
             name -> name
         );
 
-        val result = dbCreateOperation.execute(new CreateDbRequest(
+        val result = operation.execute(new CreateDbRequest(
             dbName,
             databaseCreationOptions.region,
             databaseCreationOptions.cloud,

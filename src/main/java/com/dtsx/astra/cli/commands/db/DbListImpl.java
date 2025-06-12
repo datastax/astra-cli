@@ -16,17 +16,9 @@ public class DbListImpl extends AbstractDbCmd {
     @Option(names = "--vector", description = "Only show vector-enabled databases")
     protected boolean vectorOnly;
 
-    private DbListOperation dbListOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.dbListOperation = new DbListOperation(dbGateway);
-    }
-
     @Override
     public OutputAll execute() {
-        val databases = dbListOperation.execute(vectorOnly);
+        val databases = new DbListOperation(dbGateway).execute(vectorOnly);
 
         val data = databases.stream()
             .map((db) -> Map.of(

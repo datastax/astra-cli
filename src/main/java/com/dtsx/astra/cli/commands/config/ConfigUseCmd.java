@@ -1,14 +1,23 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.UseConfigRequest;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.*;
+import picocli.CommandLine.ArgGroup;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+
+import java.util.Optional;
+
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "use"
@@ -30,36 +39,17 @@ public class ConfigUseCmd extends AbstractCmd {
 
     @Override
     public OutputAll execute() {
-        val targetProfile = config().lookupProfile(profileName)
-            .orElseThrow(() -> new ParameterException(spec.commandLine(), "Profile '" + profileName + "' not found"));
+        new ConfigUseOperation(config()).execute(new UseConfigRequest(
+            profileName,
+            Optional.ofNullable(uniqueDefaultBehavior).map(ub -> ub.force).orElse(false),
+            Optional.ofNullable(uniqueDefaultBehavior).map(ub -> ub.failIfUniqueDefault).orElse(false),
+            this::assertCanOverwriteDefaultProfile
+        ));
 
-        if (defaultProfileIsUnique()) {
-            assertCanOverwriteDefaultProfile();
-            config().deleteProfile(ProfileName.DEFAULT);
-        }
-
-        config().createProfile(ProfileName.DEFAULT, targetProfile.token(), targetProfile.env());
-
-        return OutputAll.message("Default profile set to '" + profileName + "'");
-    }
-
-    private boolean defaultProfileIsUnique() {
-        val defaultProfile = config().lookupProfile(ProfileName.DEFAULT);
-
-        return defaultProfile.isPresent() && config().getProfiles().stream()
-            .filter(p -> !p.name().equals(ProfileName.DEFAULT))
-            .noneMatch(p -> p.token().equals(defaultProfile.get().token()) && p.env().equals(defaultProfile.get().env()));
+        return OutputAll.message("Default profile set to " + highlight(profileName));
     }
 
     private void assertCanOverwriteDefaultProfile() {
-        if (uniqueDefaultBehavior != null && uniqueDefaultBehavior.force) {
-            return;
-        }
-
-        if (uniqueDefaultBehavior != null && uniqueDefaultBehavior.failIfUniqueDefault) {
-            throw new ExecutionException(spec.commandLine(), "Current default profile has unique configuration and --fail-if-unique-default was specified");
-        }
-
         val msg = """
             Current default profile has unique token+environment configuration that will be lost.
 

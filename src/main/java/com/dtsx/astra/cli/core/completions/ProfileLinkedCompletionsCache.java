@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.completions;
 
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
@@ -17,7 +18,7 @@ public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
         );
     }
 
-    protected File getCacheDir() {
-        return new File(super.getCacheDir(), profileName.unwrap());
+    protected File useCacheDir() {
+        return new File(super.useCacheDir(), FileUtils.sanitizeFileName(profileName.unwrap()));
     }
 }

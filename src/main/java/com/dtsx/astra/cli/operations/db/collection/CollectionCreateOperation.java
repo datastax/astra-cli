@@ -1,9 +1,11 @@
-package com.dtsx.astra.cli.operations.collection;
+package com.dtsx.astra.cli.operations.db.collection;
 
 import com.dtsx.astra.cli.core.models.CollectionRef;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.gateways.collection.CollectionGateway;
+import com.dtsx.astra.cli.core.exceptions.collection.CollectionAlreadyExistsException;
+import com.dtsx.astra.cli.core.exceptions.collection.InvalidIndexingOptionsException;
+import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
@@ -29,18 +31,7 @@ public class CollectionCreateOperation {
         record CollectionCreated(CollectionRef collectionRef) implements CollectionCreateResult {}
     }
 
-    public static class CollectionAlreadyExistsException extends OptionValidationException {
-        public CollectionAlreadyExistsException(CollectionRef collectionRef) {
-            super("collection", "Collection '%s' already exists. Use --if-not-exists to ignore this error".formatted(collectionRef.name()));
-        }
-    }
-
-    public static class InvalidIndexingOptionsException extends OptionValidationException {
-        public InvalidIndexingOptionsException() {
-            super("indexing options", "indexing-allow and indexing-deny are mutually exclusive");
-        }
-    }
-
+    @SneakyThrows
     public CollectionCreateResult execute(CollectionCreateRequest request) {
         if (request.indexingAllow != null && request.indexingDeny != null) {
             throw new InvalidIndexingOptionsException();

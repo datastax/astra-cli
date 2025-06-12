@@ -41,16 +41,6 @@ public class DatabaseNotFoundExceptionMapper implements ExecutionExceptionHandle
                 highlight("--token")
             );
 
-        return new AstraCliException(msg) {
-            @Override
-            public boolean shouldDumpLogs() {
-                return false;
-            }
-
-            @Override
-            public ExitCode getExitCode() {
-                return ExitCode.CANNOT_CONNECT;
-            }
-        };
+        return new AstraCliException(msg) {};
     }
 }

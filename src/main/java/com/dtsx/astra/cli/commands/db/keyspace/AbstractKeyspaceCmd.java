@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
-import com.dtsx.astra.cli.gateways.keyspace.KeyspaceGateway;
+import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 public abstract class AbstractKeyspaceCmd extends AbstractDbSpecificCmd {

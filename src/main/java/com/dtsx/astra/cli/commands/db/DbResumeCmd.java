@@ -20,17 +20,9 @@ public final class DbResumeCmd extends AbstractLongRunningDbSpecificCmd {
         this.timeout = timeout;
     }
 
-    private DbResumeOperation dbResumeOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.dbResumeOperation = new DbResumeOperation(dbGateway);
-    }
-
     @Override
     public OutputAll execute() {
-        val result = dbResumeOperation.execute(dbRef, dontWait, timeout);
+        val result = new DbResumeOperation(dbGateway).execute(dbRef, dontWait, timeout);
 
         if (dontWait) {
             val hadToBeResumed = result.resumeResult().hadToBeResumed();

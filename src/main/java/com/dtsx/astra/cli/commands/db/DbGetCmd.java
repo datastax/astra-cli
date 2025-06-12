@@ -38,14 +38,6 @@ public final class DbGetCmd extends AbstractDbSpecificCmd {
     @Option(names = { "-k", "--key" }, description = "Specific database attribute to retrieve", paramLabel = "<key>")
     private Optional<DbGetKeys> key;
 
-    private DbGetOperation dbGetOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.dbGetOperation = new DbGetOperation(dbGateway);
-    }
-
     @Override
     public OutputJson executeJson() {
         if (key.isPresent()) {
@@ -81,7 +73,7 @@ public final class DbGetCmd extends AbstractDbSpecificCmd {
 
     private Database dbInfo() {
         if (cachedDbInfo == null) {
-            val result = dbGetOperation.execute(dbRef);
+            val result = new DbGetOperation(dbGateway).execute(dbRef);
             cachedDbInfo = result.database();
         }
         return cachedDbInfo;

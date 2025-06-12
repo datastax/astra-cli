@@ -1,25 +1,25 @@
 package com.dtsx.astra.cli.core.output.serializers;
 
-enum BoolSerializer implements OutputSerializer<Boolean> {
+enum CatchAllSerializer implements OutputSerializer<Object> {
     INSTANCE;
 
     @Override
     public boolean canSerialize(Object o) {
-        return o instanceof Boolean;
+        return true;
     }
 
     @Override
-    public String serializeAsHumanInternal(Boolean s) {
+    public String serializeAsHumanInternal(Object s) {
         return s.toString();
     }
 
     @Override
-    public Object serializeAsJsonInternal(Boolean s) {
+    public Object serializeAsJsonInternal(Object s) {
         return s;
     }
 
     @Override
-    public String serializeAsCsvInternal(Boolean s) {
+    public String serializeAsCsvInternal(Object s) {
         return s.toString();
     }
 }

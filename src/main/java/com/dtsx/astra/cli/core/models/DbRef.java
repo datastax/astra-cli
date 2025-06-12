@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -43,10 +44,6 @@ public class DbRef implements AstraColors.Highlightable {
 
     public <T> T fold(Function<UUID, T> idMapper, Function<String, T> nameMapper) {
         return ref.fold(idMapper, nameMapper);
-    }
-
-    public Either<UUID, String> asEither() {
-        return ref;
     }
 
     @Override

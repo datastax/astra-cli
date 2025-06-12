@@ -1,21 +1,47 @@
 package com.dtsx.astra.cli.core.exceptions.db;
 
-import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.output.ExitCode;
+import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.output.AstraColors;
+
+import java.util.UUID;
 
 public class DbNotFoundException extends AstraCliException {
     public DbNotFoundException(DbRef dbRef) {
-        super("Database %s not found. Please check that the database name or ID is correct and that you have access to it.".formatted(dbRef.toString()));
+        super(dbRef.fold(DbNotFoundException::mkIdMsg, DbNotFoundException::mkNameMsg));
     }
 
-    @Override
-    public boolean shouldDumpLogs() {
-        return false;
+    private static String mkIdMsg(UUID id) {
+        return """
+          @|bold,red Error: A database with ID '%s' was not found.|@
+
+          You can:
+          - Check your credentials with %s or %s
+          - List your org's databases with %s
+          - Create a new database with %s
+        """.formatted(
+            id,
+            AstraColors.highlight("astra config list"),
+            AstraColors.highlight("astra config get <profile>"),
+            AstraColors.highlight("astra db list"),
+            AstraColors.highlight("astra db create <name> <options>")
+        );
     }
 
-    @Override
-    public ExitCode getExitCode() {
-        return ExitCode.CANNOT_CONNECT;
+    private static String mkNameMsg(String name) {
+        return """
+          @|bold,red Error: A database named '%s' was not found.|@
+
+          You can:
+          - Check your credentials with %s or %s
+          - List your org's databases with %s
+          - Create a new database with %s
+        """.formatted(
+            name,
+            AstraColors.highlight("astra config list"),
+            AstraColors.highlight("astra config get <profile>"),
+            AstraColors.highlight("astra db list"),
+            AstraColors.highlight("astra db create '" + name + "' <options>")
+        );
     }
 }

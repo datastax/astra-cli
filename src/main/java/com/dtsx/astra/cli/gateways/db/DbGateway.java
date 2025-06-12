@@ -1,12 +1,13 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
+import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.GlobalInfoCache;
-import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.time.Duration;
@@ -26,6 +27,8 @@ public interface DbGateway {
     Optional<Database> tryFindOneDb(DbRef ref);
 
     boolean dbExists(DbRef ref);
+
+    List<String> downloadCloudSecureBundles(DbRef ref, String dbName, List<Datacenter> datacenters);
 
     record ResumeDbResult(boolean hadToBeResumed, Duration timeWaited) {
         public boolean wasAwaited() {

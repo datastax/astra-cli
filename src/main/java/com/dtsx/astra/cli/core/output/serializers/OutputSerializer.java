@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.serializers;
 
+import com.dtsx.astra.cli.core.exceptions.cli.CongratsYouFoundABugException;
 import lombok.val;
 
 import java.util.List;
@@ -9,9 +10,8 @@ public interface OutputSerializer<T> {
     List<OutputSerializer<?>> SERIALIZERS = List.of(
         StringSerializer.INSTANCE,
         ListSerializer.INSTANCE,
-        BoolSerializer.INSTANCE,
         EnumSerializer.INSTANCE,
-        ProfileNameSerializer.INSTANCE
+        CatchAllSerializer.INSTANCE
     );
 
     boolean canSerialize(Object o);
@@ -38,7 +38,7 @@ public interface OutputSerializer<T> {
                 return serializer;
             }
         }
-        throw new IllegalArgumentException("No serializer found for object: " + o.getClass().getName());
+        throw new CongratsYouFoundABugException("No serializer found for object: " + o.getClass().getName());
     }
 
     static String trySerializeAsHuman(Object o) {

@@ -102,8 +102,12 @@ public enum AstraColors implements Ansi.IStyle {
         return enabled() ? (enableString + string + DISABLE_STRING) : string;
     }
 
+    public String useOrQuote(String string) {
+        return enabled() ? (enableString + string + DISABLE_STRING) : "'" + string + "'";
+    }
+
     public static String highlight(String s) {
-        return enabled() ? AstraColors.BLUE_300.use(s) : "'" + s + "'";
+        return AstraColors.BLUE_300.useOrQuote(s);
     }
 
     public static String highlight(UUID u) {

@@ -11,7 +11,7 @@ public class DbCompletionsCache extends ProfileLinkedCompletionsCache {
     }
 
     @Override
-    protected File getCacheFile() {
-        return new File(getCacheDir(), "db_names");
+    protected File useCacheFile() {
+        return new File(useCacheDir(), "db_names");
     }
 }

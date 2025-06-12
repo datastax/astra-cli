@@ -17,7 +17,6 @@ public class DbResumeOperation {
     public DbResumeResult execute(DbRef dbRef, boolean dontWait, Integer timeout) {
         var resumeResult = dbGateway.resumeDb(dbRef, dontWait ? 0 : timeout);
         var finalDatabase = dbGateway.findOneDb(dbRef);
-        
         return new DbResumeResult(finalDatabase, resumeResult);
     }
 }
