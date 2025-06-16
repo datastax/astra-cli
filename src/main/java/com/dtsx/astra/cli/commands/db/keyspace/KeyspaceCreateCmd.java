@@ -14,7 +14,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 @Command(
     name = "create-keyspace"
 )
-public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd {
+public final class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd {
     @Option(
         names = { "--if-not-exists" },
         description = { "Will create a new keyspace only if none with same name", DEFAULT_VALUE },

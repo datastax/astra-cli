@@ -12,7 +12,7 @@ import picocli.CommandLine.Option;
 import java.util.List;
 import java.util.Map;
 
-public class DbListImpl extends AbstractDbCmd {
+public abstract class DbListImpl extends AbstractDbCmd {
     @Option(names = "--vector", description = "Only show vector-enabled databases")
     protected boolean vectorOnly;
 

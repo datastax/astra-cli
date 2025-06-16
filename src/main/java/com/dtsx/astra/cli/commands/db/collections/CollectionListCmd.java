@@ -13,7 +13,7 @@ import java.util.Map;
 @Command(
     name = "list-collections"
 )
-public class CollectionListCmd extends AbstractCollectionCmd {
+public final class CollectionListCmd extends AbstractCollectionCmd {
     @Option(
         names = { "--all", "-a" },
         description = "List collections in all keyspaces",

@@ -1,15 +1,17 @@
 package com.dtsx.astra.cli.operations.db.keyspace;
 
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
-import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway.InternalKeyspaceAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.time.Duration;
+
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
 public class KeyspaceCreateOperation {
@@ -22,22 +24,29 @@ public class KeyspaceCreateOperation {
     public record KeyspaceCreatedAndDbActive(Duration waitTime) implements KeyspaceCreateResult {}
 
     public KeyspaceCreateResult execute(KeyspaceRef keyspaceRef, boolean ifNotExists, boolean dontWait, int timeout) {
-        try {
-            keyspaceGateway.createKeyspace(keyspaceRef);
-        } catch (InternalKeyspaceAlreadyExistsException e) {
-            if (ifNotExists) {
-                return new KeyspaceAlreadyExists();
-            } else {
-                throw new KeyspaceAlreadyExistsException(e.keyspaceRef);
-            }
-        }
+        val status = keyspaceGateway.createKeyspace(keyspaceRef);
 
+        return switch (status) {
+            case CreationStatus.Created<?> _ -> handleKsCreated(keyspaceRef, dontWait, timeout);
+            case CreationStatus.AlreadyExists<?> _ -> handleKsAlreadyExists(keyspaceRef, ifNotExists);
+        };
+    }
+
+    private KeyspaceCreateResult handleKsCreated(KeyspaceRef keyspaceRef, boolean dontWait, int timeout) {
         if (dontWait) {
             return new KeyspaceCreated();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbActive(keyspaceRef.db(), timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(keyspaceRef.db(), ACTIVE, timeout);
         return new KeyspaceCreatedAndDbActive(awaitedDuration);
+    }
+
+    private KeyspaceCreateResult handleKsAlreadyExists(KeyspaceRef keyspaceRef, boolean ifNotExists) {
+        if (ifNotExists) {
+            return new KeyspaceAlreadyExists();
+        } else {
+            throw new KeyspaceAlreadyExistsException(keyspaceRef);
+        }
     }
 
     public static class KeyspaceAlreadyExistsException extends AstraCliException {

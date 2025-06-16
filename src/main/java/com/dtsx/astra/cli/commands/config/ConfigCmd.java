@@ -12,4 +12,4 @@ import picocli.CommandLine.Command;
         ConfigUseCmd.class
     }
 )
-public class ConfigCmd extends ConfigListImpl {}
+public final class ConfigCmd extends ConfigListImpl {}

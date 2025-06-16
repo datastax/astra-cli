@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
     name = "delete",
     aliases = { "rm" }
 )
-public class ConfigDeleteCmd extends AbstractCmd {
+public final class ConfigDeleteCmd extends AbstractCmd {
     @Parameters(completionCandidates = AvailableProfilesCompletion.class, description = "Name of the profile to delete", paramLabel = "<profile>")
     private ProfileName profileName;
 

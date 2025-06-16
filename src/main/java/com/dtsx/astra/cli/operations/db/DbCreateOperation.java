@@ -1,7 +1,9 @@
 package com.dtsx.astra.cli.operations.db;
 
-import com.dtsx.astra.cli.core.exceptions.db.DbAlreadyExistsException;
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
@@ -13,6 +15,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
+
 @RequiredArgsConstructor
 public class DbCreateOperation {
     private final DbGateway dbGateway;
@@ -21,7 +25,7 @@ public class DbCreateOperation {
         String dbName,
         String region,
         Optional<CloudProviderType> cloud,
-        String keyspace,
+        String db,
         String tier,
         Integer capacityUnits,
         boolean nonVector,
@@ -30,49 +34,22 @@ public class DbCreateOperation {
         int timeout
     ) {}
 
-    public sealed interface CreateDbResult {}
+    public sealed interface DbCreateResult {}
+    public record DatabaseAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) implements DbCreateResult {}
+    public record DatabaseAlreadyExistsAndIsNowActive(UUID dbId, DatabaseStatusType prevStatus, DbGateway.ResumeDbResult resumeResult) implements DbCreateResult {}
+    public record DatabaseCreated(UUID dbId, Duration waitTime) implements DbCreateResult {}
+    public record DatabaseCreationStarted(UUID dbId, DatabaseStatusType currStatus) implements DbCreateResult {}
 
-    public record DatabaseAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) implements CreateDbResult {}
-    public record DatabaseAlreadyExistsAndIsNowActive(UUID dbId, DatabaseStatusType prevStatus, DbGateway.ResumeDbResult resumeResult) implements CreateDbResult {}
-    public record DatabaseCreated(UUID dbId, Duration waitTime) implements CreateDbResult {}
-    public record DatabaseCreationStarted(UUID dbId, DatabaseStatusType currStatus) implements CreateDbResult {}
-
-    public CreateDbResult execute(CreateDbRequest request) {
-        val dbRef = DbRef.fromNameUnsafe(request.dbName);
-        val database = dbGateway.tryFindOneDb(dbRef);
-
-        return database
-            .map(value -> handleExistingDatabase(value, dbRef, request))
-            .orElseGet(() -> handleCreateNewDatabase(dbRef, request));
-    }
-
-    private CreateDbResult handleExistingDatabase(Database db, DbRef dbRef, CreateDbRequest request) {
-        val dbId = UUID.fromString(db.getId());
-
-        if (!request.ifNotExists) {
-            throw new DbAlreadyExistsException(dbRef, dbId);
-        }
-
-        if (request.dontWait) {
-            return new DatabaseAlreadyExistsWithStatus(dbId, db.getStatus());
-        }
-
-        val originalStatus = db.getStatus();
-        val resumeResult = dbGateway.resumeDb(dbRef, request.timeout);
-
-        return new DatabaseAlreadyExistsAndIsNowActive(dbId, originalStatus, resumeResult);
-    }
-
-    private CreateDbResult handleCreateNewDatabase(DbRef dbRef, CreateDbRequest request) {
+    public DbCreateResult execute(CreateDbRequest request) {
         val cloudProvider = dbGateway.findCloudForRegion(
             request.cloud,
             request.region,
             !request.nonVector
         );
 
-        val createdId = dbGateway.createDb(
+        val status = dbGateway.createDb(
             request.dbName,
-            request.keyspace,
+            request.db,
             request.region,
             cloudProvider,
             request.tier,
@@ -80,14 +57,50 @@ public class DbCreateOperation {
             !request.nonVector
         );
 
-        val currentDb = dbGateway.findOneDb(DbRef.fromId(createdId));
+        return switch (status) {
+            case CreationStatus.AlreadyExists<Database>(var db) -> connectToExistingDb(request.dbName, UUID.fromString(db.getId()), db.getStatus(), request);
+            case CreationStatus.Created<Database>(var db) -> connectToNewDb(UUID.fromString(db.getId()), db.getStatus(), request);
+        };
+    }
 
-        if (request.dontWait) {
-            return new DatabaseCreationStarted(createdId, currentDb.getStatus());
+    private DbCreateResult connectToExistingDb(String dbName, UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
+        if (!request.ifNotExists) {
+            throw new DbAlreadyExistsException(dbName, dbId);
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbActive(dbRef, request.timeout);
+        if (request.dontWait) {
+            return new DatabaseAlreadyExistsWithStatus(dbId, dbStatus);
+        }
 
-        return new DatabaseCreated(createdId, awaitedDuration);
+        val resumeResult = dbGateway.resumeDb(DbRef.fromId(dbId), request.timeout);
+
+        return new DatabaseAlreadyExistsAndIsNowActive(dbId, dbStatus, resumeResult);
+    }
+
+    private DbCreateResult connectToNewDb(UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
+        if (request.dontWait) {
+            return new DatabaseCreationStarted(dbId, dbStatus);
+        }
+
+        val awaitedDuration = dbGateway.waitUntilDbStatus(DbRef.fromId(dbId), ACTIVE, request.timeout);
+
+        return new DatabaseCreated(dbId, awaitedDuration);
+    }
+
+    public static class DbAlreadyExistsException extends AstraCliException {
+        public DbAlreadyExistsException(String dbName, UUID dbId) {
+            super("""
+              @|bold,red Error: Database '%s' already exists with ID '%s'.|@
+            
+              This may be expected, but to avoid this error:
+              - Run %s to see the existing dbs in your current org.
+              - Pass the %s flag to skip this error if the db already exists.
+            """.formatted(
+                dbName,
+                dbId,
+                AstraColors.highlight("astra db list"),
+                AstraColors.highlight("--if-not-exists")
+            ));
+        }
     }
 }

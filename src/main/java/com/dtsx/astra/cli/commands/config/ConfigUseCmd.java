@@ -22,7 +22,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 @Command(
     name = "use"
 )
-public class ConfigUseCmd extends AbstractCmd {
+public final class ConfigUseCmd extends AbstractCmd {
     @Parameters(description = "Profile name to set as default", completionCandidates = AvailableProfilesCompletion.class, paramLabel = "<profile>")
     private ProfileName profileName;
 

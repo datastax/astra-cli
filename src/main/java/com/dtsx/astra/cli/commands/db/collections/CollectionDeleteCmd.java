@@ -12,7 +12,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 @Command(
     name = "delete-collection"
 )
-public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
+public final class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if collection does not exist", DEFAULT_VALUE },
@@ -38,12 +38,7 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
                 yield OutputAll.message("Collection " + highlight(collRef) + " does not exist; nothing to delete");
             }
             case CollectionDeleted() -> {
-                yield OutputAll.message(
-                    "Collection %s has been deleted from keyspace %s".formatted(
-                        highlight(collRef),
-                        highlight(keyspaceRef)
-                    )
-                );
+                yield OutputAll.message("Collection %s has been deleted from keyspace %s".formatted(highlight(collRef.name()), highlight(keyspaceRef)));
             }
         };
     }

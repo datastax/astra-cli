@@ -12,7 +12,7 @@ import java.util.Map;
 @Command(
     name = "list-keyspaces"
 )
-public class KeyspaceListCmd extends AbstractKeyspaceCmd {
+public final class KeyspaceListCmd extends AbstractKeyspaceCmd {
     @Override
     protected OutputAll execute() {
         val keyspaces = new KeyspaceListOperation(keyspaceGateway).execute(dbRef);

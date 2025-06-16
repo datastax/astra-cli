@@ -1,11 +1,12 @@
 package com.dtsx.astra.cli.operations.db.collection;
 
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.CollectionRef;
-import com.dtsx.astra.cli.core.exceptions.collection.CollectionAlreadyExistsException;
-import com.dtsx.astra.cli.core.exceptions.collection.InvalidIndexingOptionsException;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.val;
 
 import java.util.List;
 
@@ -26,28 +27,12 @@ public class CollectionCreateOperation {
         boolean ifNotExists
     ) {}
 
-    public sealed interface CollectionCreateResult {
-        record CollectionAlreadyExists(CollectionRef collectionRef) implements CollectionCreateResult {}
-        record CollectionCreated(CollectionRef collectionRef) implements CollectionCreateResult {}
-    }
+    public sealed interface CollectionCreateResult {}
+    public record CollectionAlreadyExists() implements CollectionCreateResult {}
+    public record CollectionCreated() implements CollectionCreateResult {}
 
-    @SneakyThrows
     public CollectionCreateResult execute(CollectionCreateRequest request) {
-        if (request.indexingAllow != null && request.indexingDeny != null) {
-            throw new InvalidIndexingOptionsException();
-        }
-
-        boolean exists = collectionGateway.collectionExists(request.collectionRef);
-        
-        if (exists) {
-            if (request.ifNotExists) {
-                return new CollectionCreateResult.CollectionAlreadyExists(request.collectionRef);
-            } else {
-                throw new CollectionAlreadyExistsException(request.collectionRef);
-            }
-        }
-
-        collectionGateway.createCollection(
+        val status = collectionGateway.createCollection(
             request.collectionRef,
             request.dimension,
             request.metric != null ? request.metric : "cosine",
@@ -59,6 +44,38 @@ public class CollectionCreateOperation {
             request.indexingDeny
         );
 
-        return new CollectionCreateResult.CollectionCreated(request.collectionRef);
+        return switch (status) {
+            case CreationStatus.Created<?> _ -> handleCollCreated();
+            case CreationStatus.AlreadyExists<?> _ -> handleCollAlreadyExists(request.collectionRef, request.ifNotExists);
+        };
+    }
+
+    private CollectionCreateResult handleCollCreated() {
+        return new CollectionCreated();
+    }
+
+    private CollectionCreateResult handleCollAlreadyExists(CollectionRef collRef, boolean ifExists) {
+        if (ifExists) {
+            return new CollectionAlreadyExists();
+        } else {
+            throw new CollectionAlreadyExistsException(collRef);
+        }
+    }
+
+    public static class CollectionAlreadyExistsException extends AstraCliException {
+        public CollectionAlreadyExistsException(CollectionRef collectionRef) {
+            super("""
+              @|bold,red Error: Collection '%s' already exists in database '%s'.|@
+            
+              This may be expected, but to avoid this error:
+              - Run %s to see all existing collections in this database.
+              - Pass the %s flag to skip this error if the collection already exists.
+            """.formatted(
+                collectionRef,
+                collectionRef.db(),
+                AstraColors.highlight("astra db list-collections " + collectionRef.db() + " --all"),
+                AstraColors.highlight("--if-not-exists")
+            ));
+        }
     }
 }

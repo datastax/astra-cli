@@ -10,7 +10,7 @@ import lombok.val;
 
 import java.util.Map;
 
-public class ConfigListImpl extends AbstractCmd {
+public abstract class ConfigListImpl extends AbstractCmd {
     @Override
     public OutputAll execute() {
         val result = new ConfigListOperation(config()).execute();

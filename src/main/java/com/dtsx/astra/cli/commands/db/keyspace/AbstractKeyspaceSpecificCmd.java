@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
-public class AbstractKeyspaceSpecificCmd extends AbstractKeyspaceCmd {
+public abstract class AbstractKeyspaceSpecificCmd extends AbstractKeyspaceCmd {
     protected KeyspaceRef keyspaceRef;
 
     @Option(

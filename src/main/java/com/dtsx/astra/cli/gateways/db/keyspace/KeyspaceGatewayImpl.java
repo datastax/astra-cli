@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.gateways.db.keyspace;
 
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -40,30 +42,30 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
     }
 
     @Override
-    public void createKeyspace(KeyspaceRef keyspaceRef) throws InternalKeyspaceAlreadyExistsException {
-        val exists = keyspaceExists(keyspaceRef);
-
-        if (exists) {
-            throw new KeyspaceGateway.InternalKeyspaceAlreadyExistsException(keyspaceRef);
+    public CreationStatus<KeyspaceRef> createKeyspace(KeyspaceRef keyspaceRef) {
+        if (keyspaceExists(keyspaceRef)) {
+            return CreationStatus.alreadyExists(keyspaceRef);
         }
 
         AstraLogger.loading("Creating keyspace " + highlight(keyspaceRef), (_) -> {
             api.dbOpsClient(keyspaceRef.db()).keyspaces().create(keyspaceRef.name());
             return null;
         });
+
+        return CreationStatus.created(keyspaceRef);
     }
 
     @Override
-    public void deleteKeyspace(KeyspaceRef keyspaceRef) throws InternalKeyspaceNotFoundException {
-        val exists = keyspaceExists(keyspaceRef);
-
-        if (!exists) {
-            throw new KeyspaceGateway.InternalKeyspaceNotFoundException(keyspaceRef);
+    public DeletionStatus<KeyspaceRef> deleteKeyspace(KeyspaceRef keyspaceRef) {
+        if (!keyspaceExists(keyspaceRef)) {
+            return DeletionStatus.notFound(keyspaceRef);
         }
 
         AstraLogger.loading("Deleting keyspace " + highlight(keyspaceRef), (_) -> {
             api.dbOpsClient(keyspaceRef.db()).keyspaces().delete(keyspaceRef.name());
             return null;
         });
+
+        return DeletionStatus.deleted(keyspaceRef);
     }
 }

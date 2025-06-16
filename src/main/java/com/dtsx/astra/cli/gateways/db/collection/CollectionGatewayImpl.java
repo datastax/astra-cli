@@ -1,11 +1,10 @@
 package com.dtsx.astra.cli.gateways.db.collection;
 
-import com.datastax.astra.client.collections.commands.options.ListCollectionOptions;
 import com.datastax.astra.client.collections.definition.CollectionDefinition;
 import com.datastax.astra.client.collections.definition.CollectionDescriptor;
-import com.datastax.astra.client.collections.definition.documents.Document;
-import com.datastax.astra.client.core.commands.Command;
 import com.datastax.astra.client.exceptions.DataAPIException;
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -59,7 +58,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
     }
 
     @Override
-    public void createCollection(
+    public CreationStatus<CollectionRef> createCollection(
         CollectionRef collRef,
         Integer dimension,
         String metric,
@@ -69,11 +68,11 @@ public class CollectionGatewayImpl implements CollectionGateway {
         String embeddingKey,
         List<String> indexingAllow,
         List<String> indexingDeny
-    ) throws InternalCollectionAlreadyExistsException {
+    ) {
         val exists = collectionExists(collRef);
 
         if (exists) {
-            throw new InternalCollectionAlreadyExistsException(collRef);
+            return CreationStatus.alreadyExists(collRef);
         }
 
         AstraLogger.loading("Creating collection " + highlight(collRef), (_) -> {
@@ -123,19 +122,21 @@ public class CollectionGatewayImpl implements CollectionGateway {
 //            api.dataApiDatabase(collRef).createCollection(collectionDefBuilder.build());
             return null;
         });
+
+        return CreationStatus.created(collRef);
     }
 
     @Override
-    public void deleteCollection(CollectionRef collRef) throws InternalCollectionNotFoundException {
-        val exists = collectionExists(collRef);
-
-        if (!exists) {
-            throw new InternalCollectionNotFoundException(collRef);
+    public DeletionStatus<CollectionRef> deleteCollection(CollectionRef collRef) {
+        if (!collectionExists(collRef)) {
+            return DeletionStatus.notFound(collRef);
         }
 
         AstraLogger.loading("Deleting collection " + highlight(collRef), (_) -> {
             api.dataApiDatabase(collRef.keyspace()).dropCollection(collRef.name());
             return null;
         });
+
+        return DeletionStatus.deleted(collRef);
     }
 }

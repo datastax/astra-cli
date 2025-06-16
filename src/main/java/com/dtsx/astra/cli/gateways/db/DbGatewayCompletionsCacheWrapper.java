@@ -1,9 +1,12 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -12,8 +15,6 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Predicate;
 
 import static com.dtsx.astra.cli.utils.MiscUtils.*;
 
@@ -70,8 +71,8 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public Duration waitUntilDbActive(DbRef ref, int timeout) {
-        val duration = delegate.waitUntilDbActive(ref, timeout);
+    public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout) {
+        val duration = delegate.waitUntilDbStatus(ref, target, timeout);
         addToCache(ref);
         return duration;
     }
@@ -89,10 +90,17 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public UUID createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
-        val id = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector);
+    public CreationStatus<Database> createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
+        val status = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector);
         addToCache(name);
-        return id;
+        return status;
+    }
+
+    @Override
+    public DeletionStatus<DbRef> deleteDb(DbRef ref) {
+        val status = delegate.deleteDb(ref);
+        removeFromCache(ref);
+        return status;
     }
 
     private void setCache(List<String> dbNames) {

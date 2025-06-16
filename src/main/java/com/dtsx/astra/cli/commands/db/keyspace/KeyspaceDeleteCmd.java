@@ -14,13 +14,13 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 @Command(
     name = "delete-keyspace"
 )
-public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd {
+public final class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd {
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if keyspace does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    protected boolean ifExists;
+    private boolean ifExists;
 
     @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
@@ -39,8 +39,7 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd {
                 yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " has been deleted from database " + highlight(keyspaceRef.db()) + " (database may not be active yet)");
             }
             case KeyspaceDeletedAndDbActive(var waitTime) -> {
-                yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " has been deleted from database " + highlight(keyspaceRef.db()) + 
-                    " (waited " + waitTime.toSeconds() + "s for database to become active)");
+                yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " has been deleted from database " + highlight(keyspaceRef.db()) + " (waited " + waitTime.toSeconds() + "s for database to become active)");
             }
         };
     }

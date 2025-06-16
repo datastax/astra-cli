@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.dtsx.astra.cli.config.AstraHome;
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.db.CouldNotResumeDbException;
 import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
@@ -29,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
@@ -69,7 +70,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public boolean dbExists(DbRef ref) {
-        return tryFindOneDb(ref).isPresent();
+        return AstraLogger.loading("Checking if database " + highlight(ref) + " exists", (_) -> tryFindOneDb(ref).isPresent());
     }
 
     @Override
@@ -88,7 +89,7 @@ public class DbGatewayImpl implements DbGateway {
                     return null;
                 });
 
-                return new ResumeDbResult(true, waitUntilDbActive(ref, timeout));
+                return new ResumeDbResult(true, waitUntilDbStatus(ref, ACTIVE, timeout));
             })
             .on(MAINTENANCE, INITIALIZING, PENDING, () -> {
                 AstraLogger.debug("Database '%s' is of currStatus '%s', and will be available soon".formatted(ref, currentStatus));
@@ -149,23 +150,23 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public Duration waitUntilDbActive(DbRef ref, int timeout) {
+    public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout) {
         val timeoutDuration = Duration.ofSeconds(timeout);
         val startTime = System.currentTimeMillis();
 
         var status = new AtomicReference<>(
-            AstraLogger.loading("Fetching initial currStatus of database %s".formatted(highlight(ref)), (_) -> findOneDb(ref).getStatus())
+            AstraLogger.loading("Fetching initial sttaus of database %s".formatted(highlight(ref)), (_) -> findOneDb(ref).getStatus())
         );
 
-        if (status.get().equals(ACTIVE)) {
+        if (status.get().equals(target)) {
             return Duration.ZERO;
         }
 
-        val initialMessage = "Waiting for database %s to become active (currently %s)"
-            .formatted(highlight(ref), AstraColors.highlight(status.get()));
+        val initialMessage = "Waiting for database %s to become %s (currently %s)"
+            .formatted(highlight(ref), highlight(target), highlight(status.get()));
 
         return AstraLogger.loading(initialMessage, (updateMsg) -> {
-            while (!status.get().equals(ACTIVE)) {
+            while (!status.get().equals(target)) {
                 val elapsed = Duration.ofMillis(System.currentTimeMillis() - startTime);
                 
                 if (timeout > 0 && elapsed.compareTo(timeoutDuration) >= 0) {
@@ -174,8 +175,8 @@ public class DbGatewayImpl implements DbGateway {
 
                 try {
                     updateMsg.accept(
-                        "Waiting for database %s to become active (currently %s, elapsed: %ds)"
-                            .formatted(highlight(ref), AstraColors.highlight(status.get()), elapsed.toSeconds())
+                        "Waiting for database %s to become %s (currently %s, elapsed: %ds)"
+                            .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
                     );
 
                     Thread.sleep(5000);
@@ -228,8 +229,16 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public UUID createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
-        return AstraLogger.loading("Creating database %s".formatted(highlight(name)), (_) -> {
+    public CreationStatus<Database> createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
+        val existingDb = AstraLogger.loading("Checking if database " + highlight(name) + " already exists", (_) -> (
+            tryFindOneDb(DbRef.fromNameUnsafe(name))
+        ));
+
+        if (existingDb.isPresent()) {
+            return CreationStatus.alreadyExists(existingDb.get());
+        }
+
+        val id = AstraLogger.loading("Creating database %s".formatted(highlight(name)), (_) -> {
             val builder = DatabaseCreationRequest.builder()
                 .name(name)
                 .tier(tier)
@@ -242,13 +251,30 @@ public class DbGatewayImpl implements DbGateway {
                 builder.withVector();
             }
 
-            val id = UUID.fromString(
+            return UUID.fromString(
                 api.astraOpsClient().db().create(builder.build())
             );
-
-            dbCache.cacheDbId(name, id);
-            dbCache.cacheDbRegion(id, region);
-            return id;
         });
+
+        dbCache.cacheDbId(name, id);
+        dbCache.cacheDbRegion(id, region);
+
+        val newDb = AstraLogger.loading("Fetching info for newly created database " + highlight(name), (_) -> findOneDb(DbRef.fromId(id)));
+
+        return CreationStatus.created(newDb);
+    }
+
+    @Override
+    public DeletionStatus<DbRef> deleteDb(DbRef ref) {
+        if (!dbExists(ref)) {
+            return DeletionStatus.notFound(ref);
+        }
+
+        AstraLogger.loading("Deleting database " + highlight(ref), (_) -> {
+            api.dbOpsClient(ref).delete();
+            return null;
+        });
+
+        return DeletionStatus.deleted(ref);
     }
 }

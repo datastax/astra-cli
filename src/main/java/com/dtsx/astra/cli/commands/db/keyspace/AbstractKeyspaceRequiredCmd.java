@@ -5,12 +5,12 @@ import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
-public class AbstractKeyspaceRequiredCmd extends AbstractKeyspaceCmd {
+public abstract class AbstractKeyspaceRequiredCmd extends AbstractKeyspaceCmd {
     protected KeyspaceRef keyspaceRef;
 
     @Option(
         names = { "--keyspace", "-k" },
-        description = { "The keyspace to use", DEFAULT_VALUE },
+        description = "The keyspace to use",
         paramLabel = "KEYSPACE",
         required = true
     )

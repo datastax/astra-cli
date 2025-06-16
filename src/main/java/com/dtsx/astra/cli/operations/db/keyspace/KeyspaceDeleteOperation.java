@@ -1,15 +1,18 @@
 package com.dtsx.astra.cli.operations.db.keyspace;
 
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
-import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway.InternalKeyspaceNotFoundException;
+import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.time.Duration;
+
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
 public class KeyspaceDeleteOperation {
@@ -22,22 +25,29 @@ public class KeyspaceDeleteOperation {
     public record KeyspaceDeletedAndDbActive(Duration waitTime) implements KeyspaceDeleteResult {}
 
     public KeyspaceDeleteResult execute(KeyspaceRef keyspaceRef, boolean ifExists, boolean dontWait, int timeout) {
-        try {
-            keyspaceGateway.deleteKeyspace(keyspaceRef);
-        } catch (InternalKeyspaceNotFoundException e) {
-            if (ifExists) {
-                return new KeyspaceNotFound();
-            } else {
-                throw new KeyspaceNotFoundException(e.keyspaceRef);
-            }
-        }
+        val status = keyspaceGateway.deleteKeyspace(keyspaceRef);
 
+        return switch (status) {
+            case DeletionStatus.Deleted<?> _ -> handleKsDeleted(keyspaceRef.db(), dontWait, timeout);
+            case DeletionStatus.NotFound<?> _ -> handleKsNotFound(keyspaceRef, ifExists);
+        };
+    }
+
+    private KeyspaceDeleteResult handleKsDeleted(DbRef dbRef, boolean dontWait, int timeout) {
         if (dontWait) {
             return new KeyspaceDeleted();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbActive(keyspaceRef.db(), timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, timeout);
         return new KeyspaceDeletedAndDbActive(awaitedDuration);
+    }
+
+    private KeyspaceDeleteResult handleKsNotFound(KeyspaceRef keyspaceRef, boolean ifExists) {
+        if (ifExists) {
+            return new KeyspaceNotFound();
+        } else {
+            throw new KeyspaceNotFoundException(keyspaceRef);
+        }
     }
 
     public static class KeyspaceNotFoundException extends AstraCliException {

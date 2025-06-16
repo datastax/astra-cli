@@ -5,4 +5,4 @@ import picocli.CommandLine.Command;
 @Command(
     name = "list"
 )
-public class ConfigListCmd extends ConfigListImpl {}
+public final class ConfigListCmd extends ConfigListImpl {}

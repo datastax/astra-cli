@@ -23,7 +23,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 @Command(
     name = "create"
 )
-public class ConfigCreateCmd extends AbstractCmd {
+public final class ConfigCreateCmd extends AbstractCmd {
     @Parameters(arity = "0..1", description = "Profile name (defaults to organization name if not specified)", paramLabel = "<profile>")
     private Optional<ProfileName> profileName;
 

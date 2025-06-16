@@ -1,7 +1,9 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation;
+import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionAlreadyExists;
+import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionCreated;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -14,13 +16,13 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 @Command(
     name = "create-collection"
 )
-public class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
+public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
     @Option(
         names = { "--if-not-exists" },
         description = { "Will create a new collection only if none with same name", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    protected boolean ifNotExists;
+    private boolean ifNotExists;
 
     @ArgGroup(validate = false, heading = "%nCollection configuration options:%n")
     private CollectionCreationOptions collectionCreationOptions;
@@ -117,16 +119,11 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
         val result = collectionCreateOperation.execute(request);
 
         return switch (result) {
-            case CollectionCreateOperation.CollectionCreateResult.CollectionAlreadyExists(var collectionRef) -> {
-                yield OutputAll.message("Collection " + highlight(collectionRef) + " already exists");
+            case CollectionAlreadyExists _ -> {
+                yield OutputAll.message("Collection " + highlight(collRef) + " already exists");
             }
-            case CollectionCreateOperation.CollectionCreateResult.CollectionCreated(var collectionRef) -> {
-                yield OutputAll.message(
-                    "Collection %s has been created in keyspace %s".formatted(
-                        highlight(collectionRef),
-                        highlight(collectionRef.keyspace())
-                    )
-                );
+            case CollectionCreated _ -> {
+                yield OutputAll.message("Collection %s has been created in keyspace %s".formatted(highlight(collRef.name()), highlight(collRef.keyspace())));
             }
         };
     }

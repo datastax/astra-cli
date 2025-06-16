@@ -2,10 +2,11 @@ package com.dtsx.astra.cli.gateways.db.collection;
 
 import com.datastax.astra.client.collections.definition.CollectionDefinition;
 import com.datastax.astra.client.collections.definition.CollectionDescriptor;
+import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public interface CollectionGateway {
 
     boolean collectionExists(CollectionRef collRef);
 
-    void createCollection(
+    CreationStatus<CollectionRef> createCollection(
         CollectionRef collRef,
         Integer dimension,
         String metric,
@@ -31,17 +32,7 @@ public interface CollectionGateway {
         String embeddingKey,
         List<String> indexingAllow,
         List<String> indexingDeny
-    ) throws InternalCollectionAlreadyExistsException;
+    );
 
-    void deleteCollection(CollectionRef collRef) throws InternalCollectionNotFoundException;
-
-    @RequiredArgsConstructor
-    class InternalCollectionAlreadyExistsException extends Exception {
-        public final CollectionRef collectionRef;
-    }
-
-    @RequiredArgsConstructor
-    class InternalCollectionNotFoundException extends Exception {
-        public final CollectionRef collectionRef;
-    }
+    DeletionStatus<CollectionRef> deleteCollection(CollectionRef collRef);
 }

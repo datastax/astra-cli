@@ -65,6 +65,7 @@ public class AstraCli extends AbstractCmd {
         val cmd = new CommandLine(cli)
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
             .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+            .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
         for (val converter : TypeConverters.INSTANCES) {

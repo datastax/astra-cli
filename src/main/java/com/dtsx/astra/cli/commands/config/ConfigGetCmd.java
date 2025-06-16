@@ -23,7 +23,7 @@ import java.util.Optional;
     name = "get",
     aliases = { "describe" }
 )
-public class ConfigGetCmd extends AbstractCmd {
+public final class ConfigGetCmd extends AbstractCmd {
     @Parameters(completionCandidates = AvailableProfilesCompletion.class, description = "Name of the profile to display", paramLabel = "<profile>")
     private ProfileName profileName;
 
