@@ -12,6 +12,7 @@ import lombok.val;
 
 import java.time.Duration;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -24,21 +25,21 @@ public class KeyspaceDeleteOperation {
     public record KeyspaceDeleted() implements KeyspaceDeleteResult {}
     public record KeyspaceDeletedAndDbActive(Duration waitTime) implements KeyspaceDeleteResult {}
 
-    public KeyspaceDeleteResult execute(KeyspaceRef keyspaceRef, boolean ifExists, boolean dontWait, int timeout) {
+    public KeyspaceDeleteResult execute(KeyspaceRef keyspaceRef, boolean ifExists, LongRunningOptions lrOptions) {
         val status = keyspaceGateway.deleteKeyspace(keyspaceRef);
 
         return switch (status) {
-            case DeletionStatus.Deleted<?> _ -> handleKsDeleted(keyspaceRef.db(), dontWait, timeout);
+            case DeletionStatus.Deleted<?> _ -> handleKsDeleted(keyspaceRef.db(), lrOptions);
             case DeletionStatus.NotFound<?> _ -> handleKsNotFound(keyspaceRef, ifExists);
         };
     }
 
-    private KeyspaceDeleteResult handleKsDeleted(DbRef dbRef, boolean dontWait, int timeout) {
-        if (dontWait) {
+    private KeyspaceDeleteResult handleKsDeleted(DbRef dbRef, LongRunningOptions lrOptions) {
+        if (lrOptions.dontWait()) {
             return new KeyspaceDeleted();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, lrOptions.timeout());
         return new KeyspaceDeletedAndDbActive(awaitedDuration);
     }
 

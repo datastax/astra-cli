@@ -23,10 +23,10 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 )
 public final class ConfigDeleteCmd extends AbstractCmd {
     @Parameters(completionCandidates = AvailableProfilesCompletion.class, description = "Name of the profile to delete", paramLabel = "<profile>")
-    private ProfileName profileName;
+    public ProfileName profileName;
 
     @Option(names = { "-f", "--force" }, description = "Do not fail if profile does not exist")
-    private boolean force;
+    public boolean force;
 
     private ConfigDeleteOperation operation;
 

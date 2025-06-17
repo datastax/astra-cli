@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -30,8 +31,7 @@ public class DbCreateOperation {
         Integer capacityUnits,
         boolean nonVector,
         boolean ifNotExists,
-        boolean dontWait,
-        int timeout
+        LongRunningOptions lrOptions
     ) {}
 
     public sealed interface DbCreateResult {}
@@ -68,21 +68,21 @@ public class DbCreateOperation {
             throw new DbAlreadyExistsException(dbName, dbId);
         }
 
-        if (request.dontWait) {
+        if (request.lrOptions.dontWait()) {
             return new DatabaseAlreadyExistsWithStatus(dbId, dbStatus);
         }
 
-        val resumeResult = dbGateway.resumeDb(DbRef.fromId(dbId), request.timeout);
+        val resumeResult = dbGateway.resumeDb(DbRef.fromId(dbId), request.lrOptions.timeout());
 
         return new DatabaseAlreadyExistsAndIsNowActive(dbId, dbStatus, resumeResult);
     }
 
     private DbCreateResult connectToNewDb(UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
-        if (request.dontWait) {
+        if (request.lrOptions.dontWait()) {
             return new DatabaseCreationStarted(dbId, dbStatus);
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbStatus(DbRef.fromId(dbId), ACTIVE, request.timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(DbRef.fromId(dbId), ACTIVE, request.lrOptions.timeout());
 
         return new DatabaseCreated(dbId, awaitedDuration);
     }

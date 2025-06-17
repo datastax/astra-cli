@@ -25,9 +25,9 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 )
 public final class ConfigCreateCmd extends AbstractCmd {
     @Parameters(arity = "0..1", description = "Profile name (defaults to organization name if not specified)", paramLabel = "<profile>")
-    private Optional<ProfileName> profileName;
+    public Optional<ProfileName> profileName;
 
-    protected String token;
+    public String token;
 
     @Option(names = { "-t", "--token" }, required = true, description = "Astra authentication token (must start with 'AstraCS:')", paramLabel = "<token>")
     protected void setToken(String token) {
@@ -38,17 +38,17 @@ public final class ConfigCreateCmd extends AbstractCmd {
     }
 
     @Option(names = { "-e", "--env" }, completionCandidates = AstraEnvCompletion.class, defaultValue = "prod", description = "Astra environment to connect to", paramLabel = "<environment>")
-    protected AstraEnvironment env;
+    public AstraEnvironment env;
 
     @ArgGroup
-    private @Nullable ExistingProfileBehavior existingProfileBehavior;
+    public @Nullable ExistingProfileBehavior existingProfileBehavior;
 
-    static class ExistingProfileBehavior {
+    public static class ExistingProfileBehavior {
         @Option(names = { "-f", "--force" }, description = "Force creation without confirmation prompts")
-        boolean force;
+        public boolean force;
 
         @Option(names = { "-F", "--fail-if-exists" }, description = "Fail if profile already exists instead of prompting")
-        boolean failIfExists;
+        public boolean failIfExists;
     }
 
     @Override

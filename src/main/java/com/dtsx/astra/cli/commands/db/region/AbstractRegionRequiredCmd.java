@@ -1,9 +1,8 @@
 package com.dtsx.astra.cli.commands.db.region;
 
-import com.dtsx.astra.cli.commands.db.keyspace.AbstractKeyspaceCmd;
 import picocli.CommandLine.Option;
 
-public abstract class AbstractRegionRequiredCmd extends AbstractKeyspaceCmd {
+public abstract class AbstractRegionRequiredCmd extends AbstractDbSpecificRegionCmd {
     @Option(
         names = { "--region", "-r" },
         description = { "The region to use" },

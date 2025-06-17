@@ -12,6 +12,8 @@ com.dtsx.astra.sdk.db.domain.CloudProviderType
 com.dtsx.astra.sdk.db.domain.Datacenter
 com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless
 com.dtsx.astra.sdk.db.domain.DatabaseRegion
+com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest
+com.dtsx.astra.sdk.db.domain.DatabaseCreationType
 com.datastax.astra.client.core.commands.Command$CommandSerializer
 com.datastax.astra.client.collections.definition.CollectionDescriptor
 com.datastax.astra.client.collections.definition.CollectionDefinition

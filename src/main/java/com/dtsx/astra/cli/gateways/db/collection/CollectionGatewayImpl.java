@@ -139,4 +139,18 @@ public class CollectionGatewayImpl implements CollectionGateway {
 
         return DeletionStatus.deleted(collRef);
     }
+
+    @Override
+    public DeletionStatus<CollectionRef> truncateCollection(CollectionRef collRef) {
+        if (!collectionExists(collRef)) {
+            return DeletionStatus.notFound(collRef);
+        }
+
+        AstraLogger.loading("Truncating collection " + highlight(collRef), (_) -> {
+            api.dataApiDatabase(collRef.keyspace()).getCollection(collRef.name()).deleteAll();
+            return null;
+        });
+
+        return DeletionStatus.deleted(collRef);
+    }
 }

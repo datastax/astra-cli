@@ -20,20 +20,4 @@ public class OrgGatewayImpl implements OrgGateway {
             return apiProvider.astraOpsClient().getOrganization();
         });
     }
-
-    @Override
-    public SortedMap<String, TreeMap<String, String>> getDbServerlessRegions(RegionType regionType) {
-        val sortedRegion = new TreeMap<String, TreeMap<String, String>>();
-
-        AstraLogger.loading("Fetching " + regionType.name().toLowerCase() + " regions", (_) -> {
-            apiProvider.astraOpsClient().db().regions().findAllServerless(regionType).forEach((r) -> {
-                val cloud = r.getCloudProvider().toLowerCase();
-                sortedRegion.computeIfAbsent(cloud, _ -> new TreeMap<>());
-                sortedRegion.get(cloud).put(r.getName(), r.getDisplayName());
-            });
-            return null;
-        });
-
-        return sortedRegion;
-    }
 }

@@ -24,17 +24,17 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 )
 public final class ConfigUseCmd extends AbstractCmd {
     @Parameters(description = "Profile name to set as default", completionCandidates = AvailableProfilesCompletion.class, paramLabel = "<profile>")
-    private ProfileName profileName;
+    public ProfileName profileName;
 
     @ArgGroup
-    private @Nullable UniqueDefaultBehavior uniqueDefaultBehavior;
+    public @Nullable UniqueDefaultBehavior uniqueDefaultBehavior;
 
-    static class UniqueDefaultBehavior {
+    public static class UniqueDefaultBehavior {
         @Option(names = { "-f", "--force" }, description = "Force setting default profile without confirmation prompts")
-        boolean force;
+        public boolean force;
 
         @Option(names = { "-F", "--fail-if-unique-default" }, description = "Fail if default profile has unique configuration")
-        boolean failIfUniqueDefault;
+        public boolean failIfUniqueDefault;
     }
 
     @Override

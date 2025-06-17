@@ -5,6 +5,8 @@ import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
+
 @RequiredArgsConstructor
 public class DbResumeOperation {
     private final DbGateway dbGateway;
@@ -14,8 +16,8 @@ public class DbResumeOperation {
         DbGateway.ResumeDbResult resumeResult
     ) {}
 
-    public DbResumeResult execute(DbRef dbRef, boolean dontWait, Integer timeout) {
-        var resumeResult = dbGateway.resumeDb(dbRef, dontWait ? 0 : timeout);
+    public DbResumeResult execute(DbRef dbRef, LongRunningOptions lrOptions) {
+        var resumeResult = dbGateway.resumeDb(dbRef, lrOptions.dontWait() ? 0 : lrOptions.timeout());
         var finalDatabase = dbGateway.findOneDb(dbRef);
         return new DbResumeResult(finalDatabase, resumeResult);
     }

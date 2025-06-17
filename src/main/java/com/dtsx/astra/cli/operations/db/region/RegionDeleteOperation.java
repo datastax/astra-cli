@@ -11,6 +11,7 @@ import lombok.val;
 
 import java.time.Duration;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -23,21 +24,21 @@ public class RegionDeleteOperation {
     public record RegionDeleted() implements RegionDeleteResult {}
     public record RegionDeletedAndDbActive(Duration waitTime) implements RegionDeleteResult {}
 
-    public RegionDeleteResult execute(DbRef dbRef, String region, boolean ifExists, boolean dontWait, int timeout) {
+    public RegionDeleteResult execute(DbRef dbRef, String region, boolean ifExists, LongRunningOptions lrOptions) {
         val status = regionGateway.deleteRegion(dbRef, region);
 
         return switch (status) {
-            case DeletionStatus.Deleted<?> _ -> handleRegionDeleted(dbRef, dontWait, timeout);
+            case DeletionStatus.Deleted<?> _ -> handleRegionDeleted(dbRef, lrOptions);
             case DeletionStatus.NotFound<?> _ -> handleRegionNotFound(dbRef, region, ifExists);
         };
     }
 
-    private RegionDeleteResult handleRegionDeleted(DbRef dbRef, boolean dontWait, int timeout) {
-        if (dontWait) {
+    private RegionDeleteResult handleRegionDeleted(DbRef dbRef, LongRunningOptions lrOptions) {
+        if (lrOptions.dontWait()) {
             return new RegionDeleted();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, lrOptions.timeout());
         return new RegionDeletedAndDbActive(awaitedDuration);
     }
 

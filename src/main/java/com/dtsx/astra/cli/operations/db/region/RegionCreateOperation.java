@@ -11,6 +11,7 @@ import lombok.val;
 
 import java.time.Duration;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -23,21 +24,23 @@ public class RegionCreateOperation {
     public record RegionCreated() implements RegionCreateResult {}
     public record RegionCreatedAndDbActive(Duration waitTime) implements RegionCreateResult {}
 
-    public RegionCreateResult execute(DbRef dbRef, String region, boolean ifNotExists, boolean dontWait, int timeout) {
-        val status = regionGateway.createRegion(dbRef, region);
+    public RegionCreateResult execute(DbRef dbRef, String region, boolean ifNotExists, LongRunningOptions lrOptions) {
+        val dbInfo = dbGateway.findOneDb(dbRef);
+
+        val status = regionGateway.createRegion(dbRef, region, dbInfo.getInfo().getTier(), dbInfo.getInfo().getCloudProvider());
 
         return switch (status) {
-            case CreationStatus.Created<?> _ -> handleRegionCreated(dbRef, dontWait, timeout);
+            case CreationStatus.Created<?> _ -> handleRegionCreated(dbRef, lrOptions);
             case CreationStatus.AlreadyExists<?> _ -> handleRegionAlreadyExists(dbRef, region, ifNotExists);
         };
     }
 
-    private RegionCreateResult handleRegionCreated(DbRef dbRef, boolean dontWait, int timeout) {
-        if (dontWait) {
+    private RegionCreateResult handleRegionCreated(DbRef dbRef, LongRunningOptions lrOptions) {
+        if (lrOptions.dontWait()) {
             return new RegionCreated();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, ACTIVE, lrOptions.timeout());
         return new RegionCreatedAndDbActive(awaitedDuration);
     }
 

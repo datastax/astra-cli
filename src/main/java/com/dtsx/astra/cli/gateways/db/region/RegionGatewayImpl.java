@@ -92,7 +92,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public CreationStatus<String> createRegion(DbRef ref, String region) {
+    public CreationStatus<String> createRegion(DbRef ref, String region, String tier, CloudProviderType cp) {
         val exists = regionExistsInDb(ref, region);
 
         if (exists) {
@@ -100,7 +100,7 @@ public class RegionGatewayImpl implements RegionGateway {
         }
 
         AstraLogger.loading("Creating region " + highlight(region) + " for db " + highlight(ref), (_) -> {
-            api.dbOpsClient(ref).datacenters().delete(region);
+            api.dbOpsClient(ref).datacenters().create(tier, cp, region);
             return null;
         });
 

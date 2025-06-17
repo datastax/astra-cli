@@ -1,12 +1,12 @@
 package com.dtsx.astra.cli.config;
 
-import com.dtsx.astra.cli.config.ini.Ini;
-import com.dtsx.astra.cli.config.ini.Ini.IniSection;
-import com.dtsx.astra.cli.config.ini.IniParseException;
+import com.dtsx.astra.cli.core.parsers.ini.Ini;
+import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
+import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.exceptions.config.AstraConfigFileException;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.utils.Either;
+import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;

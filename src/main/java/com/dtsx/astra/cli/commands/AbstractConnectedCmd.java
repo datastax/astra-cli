@@ -15,17 +15,17 @@ import java.util.Optional;
 
 public abstract class AbstractConnectedCmd extends AbstractCmd {
     @Option(names = { "-e", "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
-    private Optional<AstraEnvironment> env;
+    public Optional<AstraEnvironment> env;
 
     @ArgGroup
-    private @Nullable TokenProvider tokenProvider;
+    public @Nullable TokenProvider tokenProvider;
 
-    static class TokenProvider {
+    public static class TokenProvider {
         @Option(names = { "--profile", "-p" }, completionCandidates = AvailableProfilesCompletion.class, description = "Specify the astrarc profile to use", paramLabel = "NAME")
-        private Optional<ProfileName> profileName;
+        public Optional<ProfileName> profileName;
 
         @Option(names = { "--token" }, description = "Override the default astra token", paramLabel = "TOKEN")
-        private Optional<String> token;
+        public Optional<String> token;
     }
 
     private @Nullable Profile cachedProfile;

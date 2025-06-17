@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.utils.env;
+package com.dtsx.astra.cli.core.parsers.env;
 
 /*-
  * #%L

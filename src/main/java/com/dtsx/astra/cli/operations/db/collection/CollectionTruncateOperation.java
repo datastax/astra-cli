@@ -9,30 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class CollectionDeleteOperation {
+public class CollectionTruncateOperation {
     private final CollectionGateway collectionGateway;
 
-    public sealed interface CollectionDeleteResult {}
-    public record CollectionNotFound() implements CollectionDeleteResult {}
-    public record CollectionDeleted() implements CollectionDeleteResult {}
+    public void execute(CollectionRef collRef) {
+        val status = collectionGateway.truncateCollection(collRef);
 
-    public CollectionDeleteResult execute(CollectionRef collRef, boolean ifExists) {
-        val status = collectionGateway.deleteCollection(collRef);
-
-        return switch (status) {
-            case DeletionStatus.Deleted<?> _ -> handleCollDeleted();
-            case DeletionStatus.NotFound<?> _ -> handleCollNotFound(collRef, ifExists);
-        };
-    }
-
-    private CollectionDeleteResult handleCollDeleted() {
-        return new CollectionDeleted();
-    }
-
-    private CollectionDeleteResult handleCollNotFound(CollectionRef collRef, boolean ifExists) {
-        if (ifExists) {
-            return new CollectionNotFound();
-        } else {
+        if (status instanceof DeletionStatus.NotFound<?>) {
             throw new CollectionNotFoundException(collRef);
         }
     }

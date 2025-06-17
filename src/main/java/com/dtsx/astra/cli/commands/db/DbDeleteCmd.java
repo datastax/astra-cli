@@ -7,8 +7,11 @@ import com.dtsx.astra.cli.operations.db.DbDeleteOperation.DatabaseDeletedAndTerm
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation.DatabaseNotFound;
 import lombok.val;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
@@ -20,16 +23,16 @@ public final class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd {
         description = { "Do not fail if database does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    protected boolean ifExists;
+    public boolean ifExists;
 
-    @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
-        this.timeout = timeout;
+        lrMixin.setTimeout(timeout);
     }
 
     @Override
     public OutputAll execute() {
-        val result = new DbDeleteOperation(dbGateway).execute(dbRef, ifExists, dontWait, timeout);
+        val result = new DbDeleteOperation(dbGateway).execute(dbRef, ifExists, lrMixin.options());
 
         return switch (result) {
             case DatabaseNotFound _ -> {

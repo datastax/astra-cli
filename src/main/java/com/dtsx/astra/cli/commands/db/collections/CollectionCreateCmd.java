@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands.db.collections;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation;
 import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionAlreadyExists;
+import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionCreateRequest;
 import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionCreated;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
@@ -22,33 +23,33 @@ public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
         description = { "Will create a new collection only if none with same name", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    private boolean ifNotExists;
+    public boolean ifNotExists;
 
     @ArgGroup(validate = false, heading = "%nCollection configuration options:%n")
-    private CollectionCreationOptions collectionCreationOptions;
+    public CollectionCreationOptions collectionCreationOptions;
 
-    static class CollectionCreationOptions {
+    public static class CollectionCreationOptions {
         @Option(
             names = { "-d", "--dimension" },
             paramLabel = "DIMENSION",
             description = "Dimension of the vector space for this collection",
             required = true
         )
-        protected Integer dimension;
+        public Integer dimension;
 
         @Option(
             names = { "--default-id" },
             paramLabel = "DEFAULT_ID",
             description = "Default identifier to use for the collection"
         )
-        protected String defaultId;
+        public String defaultId;
 
         @Option(
             names = { "-m", "--metric" },
             paramLabel = "METRIC",
             description = "Distance metric to use for vector similarity searches"
         )
-        protected String metric;
+        public String metric;
 
         @Option(
             names = { "--indexing-allow" },
@@ -56,7 +57,7 @@ public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
             description = "List of attributes to add into index (comma separated)",
             split = ","
         )
-        protected List<String> indexingAllow;
+        public List<String> indexingAllow;
 
         @Option(
             names = { "--indexing-deny" },
@@ -64,46 +65,40 @@ public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
             description = "List of attributes to remove from index (comma separated)",
             split = ","
         )
-        protected List<String> indexingDeny;
+        public List<String> indexingDeny;
     }
 
     @ArgGroup(validate = false, heading = "%nVectorize options:%n")
-    private VectorizeOptions vectorizeOptions;
+    public VectorizeOptions vectorizeOptions;
 
-    static class VectorizeOptions {
+    public static class VectorizeOptions {
         @Option(
             names = { "--embedding-provider" },
             paramLabel = "EMBEDDING_PROVIDER",
             description = "Using Vectorize, embedding provider to use"
         )
-        protected String embeddingProvider;
+        public String embeddingProvider;
 
         @Option(
             names = { "--embedding-model" },
             paramLabel = "EMBEDDING_MODEL",
             description = "Using Vectorize, embedding model to use"
         )
-        protected String embeddingModel;
+        public String embeddingModel;
 
         @Option(
             names = { "--embedding-key" },
             paramLabel = "EMBEDDING_KEY",
             description = "Using Vectorize, embedding key used for shared secret"
         )
-        protected String embeddingKey;
-    }
-
-    private CollectionCreateOperation collectionCreateOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.collectionCreateOperation = new CollectionCreateOperation(collectionGateway);
+        public String embeddingKey;
     }
 
     @Override
     public OutputAll execute() {
-        val request = new CollectionCreateOperation.CollectionCreateRequest(
+        val operation = new CollectionCreateOperation(collectionGateway);
+
+        val result = operation.execute(new CollectionCreateRequest(
             collRef,
             collectionCreationOptions.dimension,
             collectionCreationOptions.metric,
@@ -114,9 +109,7 @@ public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
             collectionCreationOptions.indexingAllow,
             collectionCreationOptions.indexingDeny,
             ifNotExists
-        );
-
-        val result = collectionCreateOperation.execute(request);
+        ));
 
         return switch (result) {
             case CollectionAlreadyExists _ -> {

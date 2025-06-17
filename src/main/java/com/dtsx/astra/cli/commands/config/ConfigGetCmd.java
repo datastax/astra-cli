@@ -2,13 +2,13 @@ package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.config.ini.Ini;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation.ProfileSection;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation.SpecificKeyValue;
@@ -24,11 +24,11 @@ import java.util.Optional;
     aliases = { "describe" }
 )
 public final class ConfigGetCmd extends AbstractCmd {
-    @Parameters(completionCandidates = AvailableProfilesCompletion.class, description = "Name of the profile to display", paramLabel = "<profile>")
-    private ProfileName profileName;
+    @Parameters(completionCandidates = AvailableProfilesCompletion.class, description = "Name of the profile to display", paramLabel = "PROFILE", defaultValue = "default")
+    public ProfileName profileName;
 
-    @Option(names = { "-k", "--key" }, completionCandidates = ProfileKeysCompletion.class, description = "Specific configuration key to retrieve", paramLabel = "<key>")
-    private Optional<String> key = Optional.empty();
+    @Option(names = { "-k", "--key" }, completionCandidates = ProfileKeysCompletion.class, description = "Specific configuration key to retrieve", paramLabel = "KEY")
+    public Optional<String> key = Optional.empty();
 
     @Override
     public OutputAll execute() {

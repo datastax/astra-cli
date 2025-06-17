@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.config.ini;
+package com.dtsx.astra.cli.core.parsers.ini;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;

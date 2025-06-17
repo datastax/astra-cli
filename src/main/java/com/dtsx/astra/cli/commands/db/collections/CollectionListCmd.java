@@ -19,7 +19,7 @@ public final class CollectionListCmd extends AbstractCollectionCmd {
         description = "List collections in all keyspaces",
         defaultValue = "false"
     )
-    private boolean all;
+    public boolean all;
 
     @Override
     protected OutputAll execute() {

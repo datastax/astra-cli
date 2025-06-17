@@ -1,15 +1,18 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
-import com.dtsx.astra.cli.commands.db.AbstractLongRunningDbSpecificCmd;
-import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
+import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
-public abstract class AbstractLongRunningKeyspaceRequiredCmd extends AbstractLongRunningDbSpecificCmd {
-    protected KeyspaceGateway keyspaceGateway;
+public abstract class AbstractLongRunningKeyspaceRequiredCmd extends AbstractKeyspaceCmd implements WithSetTimeout {
     protected KeyspaceRef keyspaceRef;
+
+    @Mixin
+    protected LongRunningOptionsMixin lrMixin;
 
     @Option(
         names = { "--keyspace", "-k" },
@@ -23,9 +26,7 @@ public abstract class AbstractLongRunningKeyspaceRequiredCmd extends AbstractLon
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        
-        keyspaceGateway = KeyspaceGateway.mkDefault(profile().token(), profile().env());
-        
+
         this.keyspaceRef = KeyspaceRef.parse(dbRef, actualKeyspaceRefOption).getRight((msg) -> {
             throw new OptionValidationException("keyspace name", msg);
         });

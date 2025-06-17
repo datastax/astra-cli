@@ -18,20 +18,11 @@ public final class CollectionDeleteCmd extends AbstractCollectionSpecificCmd {
         description = { "Do not fail if collection does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    protected boolean ifExists;
-
-    private CollectionDeleteOperation collectionDeleteOperation;
-
-    @Override
-    protected void prelude() {
-        super.prelude();
-        this.collectionDeleteOperation = new CollectionDeleteOperation(collectionGateway);
-    }
+    public boolean ifExists;
 
     @Override
     public OutputAll execute() {
-        val request = new CollectionDeleteOperation.CollectionDeleteRequest(collRef, ifExists);
-        val result = collectionDeleteOperation.execute(request);
+        val result = new CollectionDeleteOperation(collectionGateway).execute(collRef, ifExists);
 
         return switch (result) {
             case CollectionNotFound() -> {

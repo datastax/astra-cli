@@ -11,6 +11,7 @@ import lombok.val;
 
 import java.time.Duration;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -23,21 +24,21 @@ public class KeyspaceCreateOperation {
     public record KeyspaceCreated() implements KeyspaceCreateResult {}
     public record KeyspaceCreatedAndDbActive(Duration waitTime) implements KeyspaceCreateResult {}
 
-    public KeyspaceCreateResult execute(KeyspaceRef keyspaceRef, boolean ifNotExists, boolean dontWait, int timeout) {
+    public KeyspaceCreateResult execute(KeyspaceRef keyspaceRef, boolean ifNotExists, LongRunningOptions lrOptions) {
         val status = keyspaceGateway.createKeyspace(keyspaceRef);
 
         return switch (status) {
-            case CreationStatus.Created<?> _ -> handleKsCreated(keyspaceRef, dontWait, timeout);
+            case CreationStatus.Created<?> _ -> handleKsCreated(keyspaceRef, lrOptions);
             case CreationStatus.AlreadyExists<?> _ -> handleKsAlreadyExists(keyspaceRef, ifNotExists);
         };
     }
 
-    private KeyspaceCreateResult handleKsCreated(KeyspaceRef keyspaceRef, boolean dontWait, int timeout) {
-        if (dontWait) {
+    private KeyspaceCreateResult handleKsCreated(KeyspaceRef keyspaceRef, LongRunningOptions lrOptions) {
+        if (lrOptions.dontWait()) {
             return new KeyspaceCreated();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbStatus(keyspaceRef.db(), ACTIVE, timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(keyspaceRef.db(), ACTIVE, lrOptions.timeout());
         return new KeyspaceCreatedAndDbActive(awaitedDuration);
     }
 

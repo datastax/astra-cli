@@ -10,6 +10,7 @@ import lombok.val;
 
 import java.time.Duration;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.TERMINATED;
 
 @RequiredArgsConstructor
@@ -21,21 +22,21 @@ public class DbDeleteOperation {
     public record DatabaseDeleted() implements DbDeleteResult {}
     public record DatabaseDeletedAndTerminated(Duration waitTime) implements DbDeleteResult {}
 
-    public DbDeleteResult execute(DbRef dbRef, boolean ifExists, boolean dontWait, int timeout) {
+    public DbDeleteResult execute(DbRef dbRef, boolean ifExists, LongRunningOptions lrOptions) {
         val status = dbGateway.deleteDb(dbRef);
 
         return switch (status) {
-            case DeletionStatus.Deleted<?> _ -> handleDbDeleted(dbRef, dontWait, timeout);
+            case DeletionStatus.Deleted<?> _ -> handleDbDeleted(dbRef, lrOptions);
             case DeletionStatus.NotFound<?> _ -> handleDbNotFound(dbRef, ifExists);
         };
     }
 
-    private DbDeleteResult handleDbDeleted(DbRef dbRef, boolean dontWait, int timeout) {
-        if (dontWait) {
+    private DbDeleteResult handleDbDeleted(DbRef dbRef, LongRunningOptions lrOptions) {
+        if (lrOptions.dontWait()) {
             return new DatabaseDeleted();
         }
 
-        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, TERMINATED, timeout);
+        val awaitedDuration = dbGateway.waitUntilDbStatus(dbRef, TERMINATED, lrOptions.timeout());
         return new DatabaseDeletedAndTerminated(awaitedDuration);
     }
 

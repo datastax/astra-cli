@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.GlobalInfoCache;
-import com.dtsx.astra.cli.gateways.org.OrgGateway;
+import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 public interface DbGateway {
     static DbGateway mkDefault(String token, AstraEnvironment env, DbCompletionsCache dbCompletionsCache) {
-        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(APIProvider.mkDefault(token, env), token, env, GlobalInfoCache.INSTANCE, OrgGateway.mkDefault(token, env)), dbCompletionsCache);
+        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(APIProvider.mkDefault(token, env), token, env, GlobalInfoCache.INSTANCE, RegionGateway.mkDefault(token, env)), dbCompletionsCache);
     }
 
     List<Database> findAllDbs();

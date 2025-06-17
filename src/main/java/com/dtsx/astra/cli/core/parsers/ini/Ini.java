@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.config.ini;
+package com.dtsx.astra.cli.core.parsers.ini;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.utils.StringUtils;

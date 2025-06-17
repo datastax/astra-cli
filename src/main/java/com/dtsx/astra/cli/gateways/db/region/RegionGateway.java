@@ -29,7 +29,7 @@ public interface RegionGateway {
 
     Set<String> findRegionClouds();
 
-    CreationStatus<String> createRegion(DbRef ref, String region);
+    CreationStatus<String> createRegion(DbRef ref, String region, String tier, CloudProviderType cp);
 
     DeletionStatus<String> deleteRegion(DbRef ref, String region);
 }

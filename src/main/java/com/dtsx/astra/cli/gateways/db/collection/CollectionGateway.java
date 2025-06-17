@@ -35,4 +35,6 @@ public interface CollectionGateway {
     );
 
     DeletionStatus<CollectionRef> deleteCollection(CollectionRef collRef);
+
+    DeletionStatus<CollectionRef> truncateCollection(CollectionRef collRef);
 }

@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
@@ -27,10 +29,10 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
         description = { "Don't error if the database already exists", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    private boolean ifNotExists;
+    public boolean ifNotExists;
 
     @ArgGroup(validate = false, heading = "%nDatabase configuration options:%n")
-    private DatabaseCreationOptions databaseCreationOptions;
+    public DatabaseCreationOptions databaseCreationOptions;
 
     static class DatabaseCreationOptions {
         @Option(
@@ -39,13 +41,13 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             description = "Cloud provider region to provision",
             required = true
         )
-        protected String region;
+        public String region;
 
         @Option(
             names = { "-c", "--cloud" },
             description = "Cloud Provider to create a db"
         )
-        protected Optional<CloudProviderType> cloud;
+        public Optional<CloudProviderType> cloud;
 
         @Option(
             names = { "-k", "--keyspace" },
@@ -53,7 +55,7 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             description = { "Default keyspace for the database", DEFAULT_VALUE },
             defaultValue = "default_keyspace"
         )
-        protected String keyspace;
+        public String keyspace;
 
         @Option(
             names = { "--tier" },
@@ -61,7 +63,7 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             description = "Tier to create the database in",
             defaultValue = "serverless"
         )
-        protected String tier;
+        public String tier;
 
         @Option(
             names = { "--capacity-units" },
@@ -69,19 +71,19 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             description = { "Capacity units to create the database with", DEFAULT_VALUE },
             defaultValue = "1"
         )
-        protected Integer capacityUnits;
+        public Integer capacityUnits;
 
         @Option(
             names = { "--non-vector" },
             description = { "Create a non-vector database", DEFAULT_VALUE },
             defaultValue = "false"
         )
-        protected boolean nonVector;
+        public boolean nonVector;
     }
 
-    @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
-        this.timeout = timeout;
+        lrMixin.setTimeout(timeout);
     }
 
     @Override
@@ -102,8 +104,7 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             databaseCreationOptions.capacityUnits,
             databaseCreationOptions.nonVector,
             ifNotExists,
-            dontWait,
-            timeout
+            lrMixin.options()
         ));
 
         val message = switch (result) {

@@ -2,11 +2,9 @@ package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.config.ini.Ini;
+import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.utils;
+package com.dtsx.astra.cli.core.datatypes;
 
 import java.util.function.Function;
 

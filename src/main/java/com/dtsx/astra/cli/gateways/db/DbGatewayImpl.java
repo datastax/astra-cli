@@ -11,7 +11,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.org.OrgGateway;
+import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.utils.EnumFolder;
 import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -28,6 +28,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,7 +42,7 @@ public class DbGatewayImpl implements DbGateway {
     private final String token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
-    private final OrgGateway orgGateway;
+    private final RegionGateway regionGateway;
 
     @Override
     public List<Database> findAllDbs() {
@@ -179,9 +180,16 @@ public class DbGatewayImpl implements DbGateway {
                             .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
                     );
 
-                    Thread.sleep(5000);
+                    if (elapsed.toSeconds() % 5 == 0) {
+                        updateMsg.accept(
+                            "Checking if database %s is status %s (currently %s, elapsed: %ds)"
+                                .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
+                        );
 
-                    status.set(findOneDb(ref).getStatus());
+                        status.set(findOneDb(ref).getStatus());
+                    }
+
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -194,18 +202,17 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
-        val regionType = (vectorOnly) ? RegionType.VECTOR : RegionType.ALL;
-        val cloudRegions = orgGateway.getDbServerlessRegions(regionType);
+        val cloudRegions = regionGateway.findServerlessRegions(false);
 
         if (cloud.isPresent()) {
-            val cloudName = cloud.get().name();
+            val cloudName = cloud.get().name().toLowerCase();
 
-            if (!cloudRegions.containsKey(cloudName.toLowerCase())) {
+            if (!cloudRegions.containsKey(cloud.get())) {
                 throw new OptionValidationException("cloud", "Cloud provider '%s' does not have any available%s regions".formatted(cloudName, (vectorOnly) ? " vector" : ""));
             }
 
-            if (!cloudRegions.get(cloudName.toLowerCase()).containsKey(region.toLowerCase())) {
-                throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(region, cloudName));
+            if (!cloudRegions.get(cloud.get()).containsKey(region.toLowerCase())) {
+                throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(cloudName, cloud.get()));
             }
 
             return cloud.get();
@@ -213,7 +220,7 @@ public class DbGatewayImpl implements DbGateway {
 
         val matchingClouds = cloudRegions.entrySet().stream()
             .filter(entry -> entry.getValue().containsKey(region.toLowerCase()))
-            .map(entry -> CloudProviderType.valueOf(entry.getKey().toUpperCase()))
+            .map(Entry::getKey)
             .toList();
 
         return switch (matchingClouds.size()) {

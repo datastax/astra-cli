@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.utils.Either;
+import com.dtsx.astra.cli.core.datatypes.Either;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

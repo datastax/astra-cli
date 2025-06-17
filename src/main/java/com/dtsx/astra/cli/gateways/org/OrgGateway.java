@@ -14,6 +14,4 @@ public interface OrgGateway {
     }
 
     Organization getCurrentOrg();
-
-    SortedMap<String, TreeMap<String, String>> getDbServerlessRegions(RegionType regionType);
 }

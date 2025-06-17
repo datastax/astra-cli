@@ -9,6 +9,8 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
@@ -20,16 +22,16 @@ public final class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequired
         description = { "Will create a new keyspace only if none with same name", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    protected boolean ifNotExists;
+    public boolean ifNotExists;
 
-    @Option(names = "--timeout", description = TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
-        this.timeout = timeout;
+        lrMixin.setTimeout(timeout);
     }
 
     @Override
     public OutputAll execute() {
-        val result = new KeyspaceCreateOperation(keyspaceGateway, dbGateway).execute(keyspaceRef, ifNotExists, dontWait, timeout);
+        val result = new KeyspaceCreateOperation(keyspaceGateway, dbGateway).execute(keyspaceRef, ifNotExists, lrMixin.options());
 
         return switch (result) {
             case KeyspaceAlreadyExists _ -> {

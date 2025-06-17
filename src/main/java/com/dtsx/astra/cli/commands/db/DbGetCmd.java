@@ -36,7 +36,7 @@ public final class DbGetCmd extends AbstractDbSpecificCmd {
     }
 
     @Option(names = { "-k", "--key" }, description = "Specific database attribute to retrieve", paramLabel = "<key>")
-    private Optional<DbGetKeys> key;
+    public Optional<DbGetKeys> key;
 
     @Override
     public OutputJson executeJson() {

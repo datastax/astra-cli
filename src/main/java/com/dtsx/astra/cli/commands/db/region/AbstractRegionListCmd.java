@@ -20,7 +20,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd {
         description = "Comma-separated case-insensitive partial-match filters on the region name",
         paramLabel = "FILTER"
     )
-    protected @Nullable List<String> nameFilter;
+    public @Nullable List<String> nameFilter;
 
     @Option(
         names = { "-c", "--cloud" },
@@ -28,7 +28,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd {
         split = ",",
         paramLabel = "FILTER"
     )
-    protected @Nullable List<CloudProviderType> cloudFilter;
+    public @Nullable List<CloudProviderType> cloudFilter;
 
     @Option(
         names = { "-z", "--zone" },
@@ -36,7 +36,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd {
         split = ",",
         paramLabel = "FILTER"
     )
-    protected @Nullable List<String> zoneFilter;
+    public @Nullable List<String> zoneFilter;
 
     protected abstract Supplier<? extends SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>>> getRegionListMethod();
 
