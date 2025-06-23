@@ -21,7 +21,7 @@
 
 		<astra-sdk.version>1.2.9</astra-sdk.version>
 		<astra-db-java.version>2.0.0-PREVIEW</astra-db-java.version>
-		<jansi.version>2.4.1</jansi.version>
+		<jansi.version>2.4.2</jansi.version>
 		<airline.version>3.0.0</airline.version>
 		<slf4j.version>2.0.17</slf4j.version>
 		<httpclient.version>5.1.2</httpclient.version>
