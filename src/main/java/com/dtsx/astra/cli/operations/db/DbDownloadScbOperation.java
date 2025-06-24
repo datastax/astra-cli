@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -14,30 +15,40 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
+
 @RequiredArgsConstructor
-public class DbDownloadScbOperation {
+public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
     private final DbGateway dbGateway;
+    private final DbDownloadScbRequest request;
 
     public sealed interface DownloadScbResult {}
 
     public record ScbDownloaded(String path) implements DownloadScbResult {}
     public record ScbDownloadedAndMoved(String originalPath, String destinationPath) implements DownloadScbResult {}
 
-    public DownloadScbResult execute(DbRef dbRef, Optional<RegionName> region, Optional<File> destination) {
-        val db = dbGateway.findOneDb(dbRef);
+    public record DbDownloadScbRequest(
+        DbRef dbRef,
+        Optional<RegionName> region,
+        Optional<File> destination
+    ) {}
+
+    @Override
+    public DownloadScbResult execute() {
+        val db = dbGateway.findOneDb(request.dbRef);
         val dbName = db.getInfo().getName();
         
-        val datacenter = region
+        val datacenter = request.region
             .map(r -> db.getInfo().getDatacenters().stream()
                 .filter(dc -> dc.getRegion().equalsIgnoreCase(r.unwrap()))
                 .findFirst()
-                .orElseThrow(() -> new RegionNotFoundException(dbRef, r))
+                .orElseThrow(() -> new RegionNotFoundException(request.dbRef, r))
             )
             .orElseGet(() -> {
                 val datacenters = db.getInfo().getDatacenters();
 
                 if (datacenters.size() > 1) {
-                    throw new MultipleRegionsFoundException(dbRef, datacenters.stream().map(Datacenter::getRegion).toList());
+                    throw new MultipleRegionsFoundException(request.dbRef, datacenters.stream().map(Datacenter::getRegion).toList());
                 }
 
                 return datacenters.stream()
@@ -45,7 +56,7 @@ public class DbDownloadScbOperation {
                     .orElseThrow(() -> new RuntimeException("No datacenters found for database"));
             });
 
-        val paths = dbGateway.downloadCloudSecureBundles(dbRef, dbName, List.of(datacenter));
+        val paths = dbGateway.downloadCloudSecureBundles(request.dbRef, dbName, List.of(datacenter));
         
         if (paths.isEmpty()) {
             throw new RuntimeException("Failed to download secure connect bundle");
@@ -53,8 +64,8 @@ public class DbDownloadScbOperation {
         
         val downloadedPath = paths.getFirst();
         
-        if (destination.isPresent()) {
-            val destFile = destination.get();
+        if (request.destination.isPresent()) {
+            val destFile = request.destination.get();
             val sourceFile = new File(downloadedPath);
             
             if (sourceFile.renameTo(destFile)) {

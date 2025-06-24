@@ -5,6 +5,8 @@ import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.ConfigCreateResult;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -15,8 +17,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-public class ConfigCreateOperation {
+public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     private final AstraConfig config;
+    private final CreateConfigRequest request;
 
     public record CreateConfigRequest(
         Optional<ProfileName> profileName,
@@ -27,10 +30,13 @@ public class ConfigCreateOperation {
         Runnable assertShouldSetDefaultProfile,
         Consumer<ProfileName> assertCanOverwriteProfile
     ) {}
-    
-    public record ProfileCreatedResult(ProfileName profileName, boolean profileWasOverwritten) {}
 
-    public ProfileCreatedResult execute(CreateConfigRequest request) {
+    public sealed interface ConfigCreateResult { ProfileName profileName(); }
+    public record ProfileWasCreated(ProfileName profileName) implements ConfigCreateResult {}
+    public record ProfileWasOverwritten(ProfileName profileName) implements ConfigCreateResult {}
+
+    @Override
+    public ConfigCreateResult execute() {
         val org = validateTokenAndFetchOrg(request.token, request.env);
         val profileName = mkProfileName(org, request);
 
@@ -45,7 +51,9 @@ public class ConfigCreateOperation {
             ctx.createProfile(profileName, request.token, request.env);
         });
 
-        return new ProfileCreatedResult(profileName, profileExists);
+        return (profileExists)
+            ? new ProfileWasOverwritten(profileName)
+            : new ProfileWasCreated(profileName);
     }
 
     private Organization validateTokenAndFetchOrg(String token, AstraEnvironment env) {
@@ -66,10 +74,6 @@ public class ConfigCreateOperation {
         }
 
         return profileName;
-    }
-
-    private boolean profileExists(ProfileName profileName) {
-        return config.lookupProfile(profileName).isPresent();
     }
 
     private void assertShouldSetDefaultProfile(CreateConfigRequest request) {

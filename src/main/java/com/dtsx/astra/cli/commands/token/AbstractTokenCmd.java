@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public abstract class AbstractTokenCmd extends AbstractConnectedCmd {
+public abstract class AbstractTokenCmd<OpRes> extends AbstractConnectedCmd<OpRes> {
     protected TokenGateway tokenGateway;
     protected RoleGateway roleGateway;
 

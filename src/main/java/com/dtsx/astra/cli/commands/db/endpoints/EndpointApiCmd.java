@@ -1,19 +1,17 @@
 package com.dtsx.astra.cli.commands.db.endpoints;
 
-import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.sdk.db.domain.Database;
-import com.dtsx.astra.sdk.utils.ApiLocator;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.endpoints.EndpointApiOperation;
 import picocli.CommandLine.Command;
+
+import static com.dtsx.astra.cli.operations.db.endpoints.EndpointApiOperation.EndpointApiRequest;
 
 @Command(
     name = "get-endpoint-api"
 )
 public class EndpointApiCmd extends AbstractEndpointGetCmd {
     @Override
-    protected String extractEndpoint(Database db, RegionName region, AstraEnvironment env) {
-        return (db.getInfo().getDbType() == null)
-            ? ApiLocator.getApiRestEndpoint(env, db.getId(), region.unwrap())
-            : ApiLocator.getApiEndpoint(env, db.getId(), region.unwrap());
+    protected Operation<String> mkOperation() {
+        return new EndpointApiOperation(dbGateway, new EndpointApiRequest(dbRef, region, profile().env()));
     }
 }

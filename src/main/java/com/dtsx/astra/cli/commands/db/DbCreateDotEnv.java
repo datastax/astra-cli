@@ -24,12 +24,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "create-dotenv"
 )
-public final class DbCreateDotEnv extends AbstractDbSpecificCmd {
+public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
     @Option(
         names = { "--print" },
         description = {"Output the .env file to stdout instead of saving it to the .env file.", DEFAULT_VALUE},
@@ -97,15 +99,13 @@ public final class DbCreateDotEnv extends AbstractDbSpecificCmd {
     }
 
     @Override
-    public OutputAll execute() {
-        val operation = new DbCreateDotEnvOperation(dbGateway, orgGateway);
-
+    protected DbCreateDotEnvOperation mkOperation() {
         val ksRef = keyspace.map(ks -> KeyspaceRef.parse(dbRef, ks).fold(
             err -> { throw new OptionValidationException("keyspace", err); },
             Function.identity()
         ));
 
-        val result = operation.execute(new CreateDotEnvRequest(
+        return new DbCreateDotEnvOperation(dbGateway, orgGateway, new CreateDotEnvRequest(
             profile(),
             dbRef,
             ksRef,
@@ -116,7 +116,10 @@ public final class DbCreateDotEnv extends AbstractDbSpecificCmd {
             overwrite,
             this::askIfShouldOverwrite
         ));
+    }
 
+    @Override
+    protected final OutputAll execute(CreateDotEnvResult result) {
         return switch (result) {
             case CreatedDotEnvContent(var content) -> OutputAll.message(content.render(true));
             case CreatedDotEnvFile(var outputFile) -> OutputAll.message(trimIndent("""
@@ -162,7 +165,7 @@ public final class DbCreateDotEnv extends AbstractDbSpecificCmd {
         var duplicatesStr = duplicates.stream()
             .limit(4)
             .map(k -> "- " + highlight(k))
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining(NL));
 
         if (duplicates.size() > 4) {
             duplicatesStr += "\n- and %s more...".formatted(AstraColors.PURPLE_300.use(String.valueOf(duplicates.size() - 5)));

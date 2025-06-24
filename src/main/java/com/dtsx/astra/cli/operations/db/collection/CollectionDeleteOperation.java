@@ -1,27 +1,32 @@
 package com.dtsx.astra.cli.operations.db.collection;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.CollectionRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation.CollectionDeleteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class CollectionDeleteOperation {
+public class CollectionDeleteOperation implements Operation<CollectionDeleteResult> {
     private final CollectionGateway collectionGateway;
+    private final CollectionDeleteRequest request;
 
     public sealed interface CollectionDeleteResult {}
     public record CollectionNotFound() implements CollectionDeleteResult {}
+    public record CollectionIllegallyNotFound() implements CollectionDeleteResult {}
     public record CollectionDeleted() implements CollectionDeleteResult {}
 
-    public CollectionDeleteResult execute(CollectionRef collRef, boolean ifExists) {
-        val status = collectionGateway.deleteCollection(collRef);
+    public record CollectionDeleteRequest(CollectionRef collRef, boolean ifExists) {}
+
+    @Override
+    public CollectionDeleteResult execute() {
+        val status = collectionGateway.deleteCollection(request.collRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleCollDeleted();
-            case DeletionStatus.NotFound<?> _ -> handleCollNotFound(collRef, ifExists);
+            case DeletionStatus.NotFound<?> _ -> handleCollNotFound(request.collRef, request.ifExists);
         };
     }
 
@@ -33,24 +38,8 @@ public class CollectionDeleteOperation {
         if (ifExists) {
             return new CollectionNotFound();
         } else {
-            throw new CollectionNotFoundException(collRef);
+            return new CollectionIllegallyNotFound();
         }
     }
 
-    public static class CollectionNotFoundException extends AstraCliException {
-        public CollectionNotFoundException(CollectionRef collectionRef) {
-            super("""
-              @|bold,red Error: Collection '%s' does not exist in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see all existing collections in this database.
-              - Pass the %s flag to skip this error if the collection doesn't exist.
-            """.formatted(
-                collectionRef,
-                collectionRef.db(),
-                AstraColors.highlight("astra db list-collections " + collectionRef.db() + " --all"),
-                AstraColors.highlight("--if-exists")
-            ));
-        }
-    }
 }

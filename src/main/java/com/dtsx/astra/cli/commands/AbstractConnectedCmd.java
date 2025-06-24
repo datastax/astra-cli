@@ -13,7 +13,7 @@ import picocli.CommandLine.ParameterException;
 
 import java.util.Optional;
 
-public abstract class AbstractConnectedCmd extends AbstractCmd {
+public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @Option(names = { "-e", "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
     public Optional<AstraEnvironment> env;
 

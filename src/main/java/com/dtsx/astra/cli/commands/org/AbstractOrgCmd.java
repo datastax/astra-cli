@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.commands.AbstractConnectedCmd;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public abstract class AbstractOrgCmd extends AbstractConnectedCmd {
+public abstract class AbstractOrgCmd<OpRes> extends AbstractConnectedCmd<OpRes> {
     protected OrgGateway orgGateway;
 
     @Override

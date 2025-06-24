@@ -1,19 +1,26 @@
 package com.dtsx.astra.cli.operations.db;
 
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-public class DbListOperation {
-    private final DbGateway dbGateway;
+import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
 
-    public List<Database> execute(boolean vectorOnly) {
+@RequiredArgsConstructor
+public class DbListOperation implements Operation<List<Database>> {
+    private final DbGateway dbGateway;
+    private final DbListRequest request;
+
+    public record DbListRequest(boolean vectorOnly) {}
+
+    @Override
+    public List<Database> execute() {
         var databases = dbGateway.findAllDbs();
 
-        if (vectorOnly) {
+        if (request.vectorOnly) {
             databases = databases.stream()
                 .filter(db -> db.getInfo().getDbType() != null)
                 .toList();

@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.output.*;
+import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Command;
@@ -22,7 +23,7 @@ import static picocli.CommandLine.Help.Ansi.OFF;
     commandListHeading = "%nCommands:%n",
     footer = "%nSee 'astra <command> --help' for more information on a specific command."
 )
-public abstract class AbstractCmd implements Runnable {
+public abstract class AbstractCmd<OpRes> implements Runnable {
     public static final String DEFAULT_VALUE = "  @|faint (default: |@@|faint,italic ${DEFAULT-VALUE}|@@|faint )|@";
 
     @Spec
@@ -40,21 +41,23 @@ public abstract class AbstractCmd implements Runnable {
     @Mixin
     private AstraLogger.Mixin loggerMixin;
 
-    protected OutputAll execute() {
+    protected OutputAll execute(OpRes _result) {
         throw new UnsupportedOperationException("Operation does not supporting outputting in the '" + OutputType.requested().name().toLowerCase() + "' format");
     }
 
-    protected OutputHuman executeHuman() {
+    protected OutputHuman executeHuman(OpRes _result) {
         throw new UnsupportedOperationException();
     }
 
-    protected OutputJson executeJson() {
+    protected OutputJson executeJson(OpRes _result) {
         throw new UnsupportedOperationException();
     }
 
-    protected OutputCsv executeCsv() {
+    protected OutputCsv executeCsv(OpRes _result) {
         throw new UnsupportedOperationException();
     }
+
+    protected abstract Operation<OpRes> mkOperation();
 
     @MustBeInvokedByOverriders
     protected void prelude() {
@@ -86,14 +89,16 @@ public abstract class AbstractCmd implements Runnable {
     }
 
     private String evokeProperExecuteFunction() {
+        val result = mkOperation().execute();
+
         try {
             return switch (OutputType.requested()) {
-                case HUMAN -> executeHuman().renderAsHuman();
-                case JSON -> executeJson().renderAsJson();
-                case CSV -> executeCsv().renderAsCsv();
+                case HUMAN -> executeHuman(result).renderAsHuman();
+                case JSON -> executeJson(result).renderAsJson();
+                case CSV -> executeCsv(result).renderAsCsv();
             };
         } catch (UnsupportedOperationException e) {
-            return execute().render(OutputType.requested());
+            return execute(result).render(OutputType.requested());
         }
     }
 

@@ -4,10 +4,10 @@ import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.*;
 import com.dtsx.astra.cli.utils.StringUtils;
@@ -19,13 +19,14 @@ import picocli.CommandLine.*;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "create"
 )
-public final class ConfigCreateCmd extends AbstractCmd {
+public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
     @Parameters(arity = "0..1", description = "Profile name (defaults to organization name if not specified)", paramLabel = "<profile>")
-    public Optional<ProfileName> profileName;
+    public Optional<ProfileName> maybeProfileName;
 
     public String token;
 
@@ -44,7 +45,7 @@ public final class ConfigCreateCmd extends AbstractCmd {
     public @Nullable ExistingProfileBehavior existingProfileBehavior;
 
     public static class ExistingProfileBehavior {
-        @Option(names = { "-f", "--force" }, description = "Force creation without confirmation prompts")
+        @Option(names = { "-y", "--yes" }, description = "Force creation without confirmation prompts")
         public boolean force;
 
         @Option(names = { "-F", "--fail-if-exists" }, description = "Fail if profile already exists instead of prompting")
@@ -52,11 +53,32 @@ public final class ConfigCreateCmd extends AbstractCmd {
     }
 
     @Override
-    public OutputAll execute() {
-        val operation = new ConfigCreateOperation(config());
+    public final OutputAll execute(ConfigCreateResult result) {
+        val addendum = (result.profileName().isDefault())
+            ? "It is now the default profile."
+            : "Run %s to set it as the default profile.".formatted(highlight("astra config use " + result.profileName()));
 
-        val result = operation.execute(new CreateConfigRequest(
-            profileName,
+        val message = switch (result) {
+            case ProfileWasCreated(var profileName) -> """
+                Configuration profile %s successfully created.
+                
+                %s
+                """.formatted(highlight(profileName), addendum);
+
+            case ProfileWasOverwritten(var profileName) -> """
+                Configuration profile %s successfully overwritten.
+                
+                %s
+                """.formatted(highlight(profileName), addendum);
+        };
+
+        return OutputAll.message(trimIndent(message));
+    }
+
+    @Override
+    public Operation<ConfigCreateResult> mkOperation() {
+        return new ConfigCreateOperation(config(), new CreateConfigRequest(
+            maybeProfileName,
             token,
             env,
             Optional.ofNullable(existingProfileBehavior).map(eb -> eb.force).orElse(false),
@@ -64,12 +86,6 @@ public final class ConfigCreateCmd extends AbstractCmd {
             this::assertShouldSetDefaultProfile,
             this::assertCanOverwriteProfile
         ));
-
-        return OutputAll.message(
-            "Configuration %s successfully %s.".formatted(highlight(result.profileName()), (result.profileWasOverwritten()) ? "overwritten" : "created")
-            +
-            (result.profileName().isDefault() ? "\n\nIt is now the default profile." : "\n\nRun %s to set it as the default profile.".formatted(highlight("astra config use " + result.profileName())))
-        );
     }
 
     private void assertShouldSetDefaultProfile() {

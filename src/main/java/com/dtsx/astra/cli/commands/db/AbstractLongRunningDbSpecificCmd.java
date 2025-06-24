@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import picocli.CommandLine.Mixin;
 
-public abstract class AbstractLongRunningDbSpecificCmd extends AbstractDbSpecificCmd implements WithSetTimeout {
+public abstract class AbstractLongRunningDbSpecificCmd<OpRes> extends AbstractDbSpecificCmd<OpRes> implements WithSetTimeout {
     @Mixin
     protected LongRunningOptionsMixin lrMixin;
 }

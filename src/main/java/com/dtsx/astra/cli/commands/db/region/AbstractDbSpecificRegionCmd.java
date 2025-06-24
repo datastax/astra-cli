@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public abstract class AbstractDbSpecificRegionCmd extends AbstractDbSpecificCmd {
+public abstract class AbstractDbSpecificRegionCmd<OpRes> extends AbstractDbSpecificCmd<OpRes> {
     protected RegionGateway regionGateway;
 
     @Override

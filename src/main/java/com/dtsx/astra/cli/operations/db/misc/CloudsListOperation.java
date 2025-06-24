@@ -1,15 +1,21 @@
 package com.dtsx.astra.cli.operations.db.misc;
 
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.Set;
 
-@RequiredArgsConstructor
-public class CloudsListOperation {
-    private final RegionGateway regionGateway;
+import static com.dtsx.astra.cli.operations.db.misc.CloudsListOperation.*;
 
+@RequiredArgsConstructor
+public class CloudsListOperation implements Operation<Set<String>> {
+    private final RegionGateway regionGateway;
+    private final CloudsListRequest request;
+
+    public record CloudsListRequest() {}
+
+    @Override
     public Set<String> execute() {
         return regionGateway.findRegionClouds();
     }

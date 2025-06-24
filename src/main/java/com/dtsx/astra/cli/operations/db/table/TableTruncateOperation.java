@@ -1,37 +1,32 @@
 package com.dtsx.astra.cli.operations.db.table;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.TableRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.table.TableGateway;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.TableTruncateResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class TableTruncateOperation {
+public class TableTruncateOperation implements Operation<TableTruncateResult> {
     private final TableGateway tableGateway;
+    private final TableTruncateRequest request;
 
-    public void execute(TableRef tableRef) {
-        val status = tableGateway.truncateTable(tableRef);
+    public sealed interface TableTruncateResult {}
+    public record TableTruncated() implements TableTruncateResult {}
+    public record TableNotFound() implements TableTruncateResult {}
 
-        if (status instanceof DeletionStatus.NotFound<?>) {
-            throw new TableNotFoundException(tableRef);
-        }
+    public record TableTruncateRequest(TableRef tableRef) {}
+
+    @Override
+    public TableTruncateResult execute() {
+        val status = tableGateway.truncateTable(request.tableRef);
+
+        return switch (status) {
+            case DeletionStatus.Deleted<?> _ -> new TableTruncated();
+            case DeletionStatus.NotFound<?> _ -> new TableNotFound();
+        };
     }
 
-    public static class TableNotFoundException extends AstraCliException {
-        public TableNotFoundException(TableRef tableRef) {
-            super("""
-              @|bold,red Error: Table '%s' does not exist in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see all existing tables in this database.
-            """.formatted(
-                tableRef,
-                tableRef.db(),
-                AstraColors.highlight("astra db list-tables " + tableRef.db() + " --all")
-            ));
-        }
-    }
 }

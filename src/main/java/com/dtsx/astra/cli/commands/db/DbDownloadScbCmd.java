@@ -10,11 +10,13 @@ import picocli.CommandLine.Option;
 import java.io.File;
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
+
 @Command(
     name = "download-scb",
     description = "Download secure connect bundle archive for a region"
 )
-public final class DbDownloadScbCmd extends AbstractDbSpecificCmd {
+public class DbDownloadScbCmd extends AbstractDbSpecificCmd<DownloadScbResult> {
 
     @Option(
         names = { "-r", "--region" },
@@ -31,14 +33,16 @@ public final class DbDownloadScbCmd extends AbstractDbSpecificCmd {
     private Optional<File> destination;
 
     @Override
-    public OutputAll execute() {
-        val operation = new DbDownloadScbOperation(dbGateway);
-        val result = operation.execute(dbRef, region, destination);
-        
+    protected DbDownloadScbOperation mkOperation() {
+        return new DbDownloadScbOperation(dbGateway, new DbDownloadScbRequest(dbRef, region, destination));
+    }
+
+    @Override
+    protected final OutputAll execute(DownloadScbResult result) {
         return switch (result) {
-            case DbDownloadScbOperation.ScbDownloaded(var path) -> 
+            case ScbDownloaded(var path) -> 
                 OutputAll.message("Secure connect bundle downloaded to: " + path);
-            case DbDownloadScbOperation.ScbDownloadedAndMoved(var originalPath, var destinationPath) -> 
+            case ScbDownloadedAndMoved(var originalPath, var destinationPath) -> 
                 OutputAll.message("Secure connect bundle downloaded to: " + destinationPath);
         };
     }

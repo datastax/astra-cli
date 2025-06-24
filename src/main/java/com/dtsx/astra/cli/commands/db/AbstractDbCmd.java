@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public abstract class AbstractDbCmd extends AbstractConnectedCmd {
+public abstract class AbstractDbCmd<OpRes> extends AbstractConnectedCmd<OpRes> {
     protected DbGateway dbGateway;
     protected OrgGateway orgGateway;
 

@@ -20,11 +20,12 @@ import java.util.UUID;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
 
 @Command(
     name = "create"
 )
-public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
+public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd<DbCreateResult> {
     @Option(
         names = { "--if-not-exist", "--if-not-exists" },
         description = { "Don't error if the database already exists", DEFAULT_VALUE },
@@ -88,15 +89,13 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
     }
 
     @Override
-    public OutputAll execute() {
-        val operation = new DbCreateOperation(dbGateway);
-
+    protected DbCreateOperation mkOperation() {
         val dbName = dbRef.fold(
             id -> { throw new OptionValidationException("database name", "may not provide an id (%s) when creating a new database; must be a human-readable database name".formatted(id.toString())); },
             name -> name
         );
 
-        val result = operation.execute(new CreateDbRequest(
+        return new DbCreateOperation(dbGateway, new CreateDbRequest(
             dbName,
             databaseCreationOptions.region,
             databaseCreationOptions.cloud,
@@ -107,7 +106,10 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             ifNotExists,
             lrMixin.options()
         ));
+    }
 
+    @Override
+    protected final OutputAll execute(DbCreateResult result) {
         val message = switch (result) {
             case DatabaseAlreadyExistsWithStatus(var dbId, var currStatus) -> handleDbAlreadyExistsWithStatus(dbId, currStatus);
             case DatabaseAlreadyExistsAndIsNowActive(var dbId, var prevStatus, var resumeResult) -> handleDbAlreadyExistsAndIsNowActive(dbId, prevStatus, resumeResult);

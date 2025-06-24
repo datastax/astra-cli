@@ -3,6 +3,8 @@ package com.dtsx.astra.cli.operations.config;
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -10,7 +12,7 @@ import lombok.val;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ConfigListOperation {
+public class ConfigListOperation implements Operation<ListConfigResult> {
     private final AstraConfig config;
 
     public record ListConfigResult(
@@ -24,6 +26,7 @@ public class ConfigListOperation {
         boolean isInUse
     ) {}
 
+    @Override
     public ListConfigResult execute() {
         val defaultToken = config
             .lookupProfile(ProfileName.DEFAULT)

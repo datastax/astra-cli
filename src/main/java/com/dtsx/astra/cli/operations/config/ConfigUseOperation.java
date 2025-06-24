@@ -3,13 +3,19 @@ package com.dtsx.astra.cli.operations.config;
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class ConfigUseOperation {
+public class ConfigUseOperation implements Operation<ConfigUseResult> {
     private final AstraConfig config;
+    private final UseConfigRequest request;
+
+    public sealed interface ConfigUseResult {}
+    public record ProfileSetAsDefault() implements ConfigUseResult {}
+    public record ProfileNotFound() implements ConfigUseResult {}
 
     public record UseConfigRequest(
         ProfileName profileName,
@@ -18,11 +24,12 @@ public class ConfigUseOperation {
         Runnable assertCanOverwriteDefaultProfile
     ) {}
 
-    public void execute(UseConfigRequest request) {
+    @Override
+    public ConfigUseResult execute() {
         val targetProfile = config.lookupProfile(request.profileName);
-        
+
         if (targetProfile.isEmpty()) {
-            throw new ProfileNotFoundException(request.profileName);
+            return new ProfileNotFound();
         }
 
         val profile = targetProfile.get();
@@ -35,6 +42,8 @@ public class ConfigUseOperation {
             ctx.deleteProfile(ProfileName.DEFAULT);
             ctx.createProfile(ProfileName.DEFAULT, profile.token(), profile.env());
         });
+
+        return new ProfileSetAsDefault();
     }
 
     private boolean defaultProfileIsUnique() {

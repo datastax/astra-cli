@@ -1,26 +1,28 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.CdcId;
 import com.dtsx.astra.cli.core.models.CdcRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.TenantName;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation;
-import com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.CdcDeleted;
-import com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.CdcNotFound;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
 
 @Command(
     name = "delete-cdc"
 )
-public final class CdcDeleteCmd extends AbstractCdcCmd {
+public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
     @ArgGroup(exclusive = true, multiplicity = "1")
     CdcIdentifier cdcIdentifier;
 
@@ -71,14 +73,29 @@ public final class CdcDeleteCmd extends AbstractCdcCmd {
     public boolean ifExists;
 
     @Override
-    protected OutputAll execute() {
-        CdcRef cdcRef;
+    public final OutputAll execute(CdcDeleteResult result) {
+        val cdcRef = getCdcRef();
+        
+        val message = switch (result) {
+            case CdcNotFound() -> "CDC " + highlight(cdcRef.toString()) + " does not exist; nothing to delete";
+            case CdcIllegallyNotFound() -> throw new CdcNotFoundException(cdcRef);
+            case CdcDeleted() -> "CDC " + highlight(cdcRef.toString()) + " has been deleted";
+        };
+        
+        return OutputAll.message(message);
+    }
 
+    @Override
+    protected Operation<CdcDeleteResult> mkOperation() {
+        return new CdcDeleteOperation(cdcGateway, new CdcDeleteRequest(getCdcRef(), ifExists));
+    }
+
+    private CdcRef getCdcRef() {
         if (cdcIdentifier.cdcId != null) {
             val cdcId = CdcId.parse(cdcIdentifier.cdcId).getRight((msg) -> {
                 throw new OptionValidationException("cdc id", msg);
             });
-            cdcRef = CdcRef.fromId(dbRef, cdcId);
+            return CdcRef.fromId(dbRef, cdcId);
         } else {
             val tableTenant = cdcIdentifier.tableTenant;
             val keyspaceRef = KeyspaceRef.parse(dbRef, tableTenant.keyspace).getRight((msg) -> {
@@ -90,18 +107,24 @@ public final class CdcDeleteCmd extends AbstractCdcCmd {
             val tenantName = TenantName.parse(tableTenant.tenant).getRight((msg) -> {
                 throw new OptionValidationException("tenant", msg);
             });
-            cdcRef = CdcRef.fromDefinition(tableRef, tenantName);
+            return CdcRef.fromDefinition(tableRef, tenantName);
         }
+    }
 
-        val result = new CdcDeleteOperation(cdcGateway).execute(cdcRef, ifExists);
-
-        return switch (result) {
-            case CdcNotFound() -> {
-                yield OutputAll.message("CDC " + highlight(cdcRef.toString()) + " does not exist; nothing to delete");
-            }
-            case CdcDeleted() -> {
-                yield OutputAll.message("CDC " + highlight(cdcRef.toString()) + " has been deleted");
-            }
-        };
+    public static class CdcNotFoundException extends AstraCliException {
+        public CdcNotFoundException(CdcRef cdcRef) {
+            super("""
+              @|bold,red Error: Cdc '%s' does not exist in database '%s'.|@
+            
+              This may be expected, but to avoid this error:
+              - Run %s to see the existing cdcs.
+              - Pass the %s flag to skip this error if the cdc doesn't exist.
+            """.formatted(
+                cdcRef,
+                cdcRef.db(),
+                AstraColors.highlight("astra db list-cdcs " + cdcRef.db()),
+                AstraColors.highlight("--if-exists")
+            ));
+        }
     }
 }

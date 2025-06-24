@@ -2,19 +2,20 @@ package com.dtsx.astra.cli.commands.token;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.token.TokenListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
+import java.util.List;
 import java.util.Map;
 
+import static com.dtsx.astra.cli.operations.token.TokenListOperation.*;
+
 @Command(name = "list", description = "Display the list of tokens in an organization")
-public final class TokenListCmd extends AbstractTokenCmd {
+public class TokenListCmd extends AbstractTokenCmd<List<TokenInfo>> {
     @Override
-    public OutputAll execute() {
-        val operation = new TokenListOperation(tokenGateway, roleGateway);
-        val tokens = operation.execute();
-        
+    public final OutputAll execute(List<TokenInfo> tokens) {
         val rows = tokens.stream()
             .map(token -> Map.of(
                 "Generated On", token.generatedOn(),
@@ -24,5 +25,10 @@ public final class TokenListCmd extends AbstractTokenCmd {
             .toList();
         
         return new ShellTable(rows).withColumns("Generated On", "Client Id", "Role");
+    }
+
+    @Override
+    protected Operation<List<TokenInfo>> mkOperation() {
+        return new TokenListOperation(tokenGateway, roleGateway);
     }
 }

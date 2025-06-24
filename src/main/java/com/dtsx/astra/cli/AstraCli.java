@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.TypeConverters;
+import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine;
@@ -31,7 +32,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
         CommandLine.HelpCommand.class,
     }
 )
-public class AstraCli extends AbstractCmd {
+public class AstraCli extends AbstractCmd<Void> {
     public static final String VERSION = "1.0.0-alpha.0";
 
     public static final String BANNER = PURPLE_300.use("""
@@ -46,7 +47,7 @@ public class AstraCli extends AbstractCmd {
     """.stripIndent().formatted(VERSION));
 
     @Override
-    public OutputHuman executeHuman() {
+    public OutputHuman executeHuman(Void v) {
         val sj = new StringJoiner(NL);
 
         sj.add(BANNER);
@@ -61,6 +62,11 @@ public class AstraCli extends AbstractCmd {
         sj.add(" → List collections         " + highlight("astra db list-collections demo"));
 
         return OutputHuman.message(sj);
+    }
+
+    @Override
+    protected Operation<Void> mkOperation() {
+        return null;
     }
 
     public static void main(String... args) {

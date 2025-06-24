@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.utils;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
 
 import java.util.UUID;
 
@@ -25,22 +26,24 @@ public class StringUtils {
     }
 
     public static String trimIndent(String input) {
-        String[] lines = input.split("\n", -1);
+        val lines = input.split("\n", -1);
 
-        int start = 0;
+        var start = 0;
         while (start < lines.length && lines[start].trim().isEmpty()) {
             start++;
         }
-        int end = lines.length;
+
+        var end = lines.length;
         while (end > start && lines[end - 1].trim().isEmpty()) {
             end--;
         }
 
-        String[] trimmedLines = new String[end - start];
+        val trimmedLines = new String[end - start];
         System.arraycopy(lines, start, trimmedLines, 0, end - start);
 
-        int minIndent = Integer.MAX_VALUE;
-        for (String line : trimmedLines) {
+        var minIndent = Integer.MAX_VALUE;
+
+        for (val line : trimmedLines) {
             if (!line.trim().isEmpty()) {
                 int indent = line.indexOf(line.trim());
                 if (indent < minIndent) {
@@ -55,20 +58,6 @@ public class StringUtils {
             }
         }
 
-        return String.join("\n", trimmedLines);
-    }
-
-    public static String obfuscateToken(String token) {
-        if (token.startsWith("AstraCS:")) {
-            if (token.length() <= 14) {
-                return token;
-            }
-            return token.substring(0, 14) + "***";
-        } else {
-            if (token.length() <= 6) {
-                return token;
-            }
-            return token.substring(0, 6) + "***";
-        }
+        return String.join(NL, trimmedLines);
     }
 }

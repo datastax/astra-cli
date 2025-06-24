@@ -8,7 +8,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
-public abstract class AbstractLongRunningKeyspaceRequiredCmd extends AbstractKeyspaceCmd implements WithSetTimeout {
+public abstract class AbstractLongRunningKeyspaceRequiredCmd<OpRes> extends AbstractKeyspaceCmd<OpRes> implements WithSetTimeout {
     protected KeyspaceRef keyspaceRef;
 
     @Mixin

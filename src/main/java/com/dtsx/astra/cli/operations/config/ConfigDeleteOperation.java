@@ -2,30 +2,38 @@ package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.config.ConfigDeleteOperation.ConfigDeleteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class ConfigDeleteOperation {
+public class ConfigDeleteOperation implements Operation<ConfigDeleteResult> {
     private final AstraConfig config;
+    private final CreateDeleteRequest request;
 
-    public sealed interface DeleteConfigResult {}
+    public record CreateDeleteRequest(
+        ProfileName profileName,
+        boolean ifNotExists
+    ) {}
 
-    public record ProfileDoesNotExist() implements DeleteConfigResult {}
-    public record ProfileDeleted() implements DeleteConfigResult {}
+    public sealed interface ConfigDeleteResult {}
+    public record ProfileDoesNotExist() implements ConfigDeleteResult {}
+    public record ProfileIllegallyDoesNotExist() implements ConfigDeleteResult {}
+    public record ProfileDeleted() implements ConfigDeleteResult {}
 
-    public DeleteConfigResult execute(ProfileName profileName, boolean force) {
-        val profileExists = config.profileExists(profileName);
-        
+    @Override
+    public ConfigDeleteResult execute() {
+        val profileExists = config.profileExists(request.profileName);
+
         if (!profileExists) {
-            if (!force) {
-                throw new ProfileNotFoundException(profileName, "; use --force to ignore this error");
+            if (request.ifNotExists) {
+                return new ProfileDoesNotExist();
             }
-            return new ProfileDoesNotExist();
+            return new ProfileIllegallyDoesNotExist();
         }
 
-        config.modify((ctx) -> ctx.deleteProfile(profileName));
+        config.modify((ctx) -> ctx.deleteProfile(request.profileName));
 
         return new ProfileDeleted();
     }

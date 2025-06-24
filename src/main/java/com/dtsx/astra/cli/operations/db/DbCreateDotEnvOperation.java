@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile.EnvComment;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile.EnvKVPair;
@@ -33,13 +34,15 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.EnvKey.*;
+import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
 
 @RequiredArgsConstructor
-public class DbCreateDotEnvOperation {
+public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
     private static final File DEFAULT_ENV_FILE = new File(".env");
 
     private final DbGateway dbGateway;
     private final OrgGateway orgGateway;
+    private final CreateDotEnvRequest request;
 
     public record CreateDotEnvRequest(
         Profile profile,
@@ -60,7 +63,8 @@ public class DbCreateDotEnvOperation {
     public record CreatedDotEnvContent(EnvFile content) implements CreateDotEnvResult {}
     public record NothingToUpdate(File file) implements CreateDotEnvResult {}
 
-    public CreateDotEnvResult execute(CreateDotEnvRequest request) {
+    @Override
+    public CreateDotEnvResult execute() {
         val source = resolveSourceContent(request.file(), request.print());
 
         val shouldOverwrite = shouldOverwrite(source, request);

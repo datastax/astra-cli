@@ -6,30 +6,41 @@ import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.time.Duration;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
+import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.*;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
-public class KeyspaceCreateOperation {
+public class KeyspaceCreateOperation implements Operation<KeyspaceCreateResult> {
     private final KeyspaceGateway keyspaceGateway;
     private final DbGateway dbGateway;
+    private final KeyspaceCreateRequest request;
 
     public sealed interface KeyspaceCreateResult {}
     public record KeyspaceAlreadyExists() implements KeyspaceCreateResult {}
     public record KeyspaceCreated() implements KeyspaceCreateResult {}
     public record KeyspaceCreatedAndDbActive(Duration waitTime) implements KeyspaceCreateResult {}
+    public record KeyspaceIllegallyAlreadyExists() implements KeyspaceCreateResult {}
 
-    public KeyspaceCreateResult execute(KeyspaceRef keyspaceRef, boolean ifNotExists, LongRunningOptions lrOptions) {
-        val status = keyspaceGateway.createKeyspace(keyspaceRef);
+    public record KeyspaceCreateRequest(
+        KeyspaceRef keyspaceRef,
+        boolean ifNotExists,
+        LongRunningOptions lrOptions
+    ) {}
+
+    @Override
+    public KeyspaceCreateResult execute() {
+        val status = keyspaceGateway.createKeyspace(request.keyspaceRef);
 
         return switch (status) {
-            case CreationStatus.Created<?> _ -> handleKsCreated(keyspaceRef, lrOptions);
-            case CreationStatus.AlreadyExists<?> _ -> handleKsAlreadyExists(keyspaceRef, ifNotExists);
+            case CreationStatus.Created<?> _ -> handleKsCreated(request.keyspaceRef, request.lrOptions);
+            case CreationStatus.AlreadyExists<?> _ -> handleKsAlreadyExists(request.ifNotExists);
         };
     }
 
@@ -42,11 +53,11 @@ public class KeyspaceCreateOperation {
         return new KeyspaceCreatedAndDbActive(awaitedDuration);
     }
 
-    private KeyspaceCreateResult handleKsAlreadyExists(KeyspaceRef keyspaceRef, boolean ifNotExists) {
+    private KeyspaceCreateResult handleKsAlreadyExists(boolean ifNotExists) {
         if (ifNotExists) {
             return new KeyspaceAlreadyExists();
         } else {
-            throw new KeyspaceAlreadyExistsException(keyspaceRef);
+            return new KeyspaceIllegallyAlreadyExists();
         }
     }
 

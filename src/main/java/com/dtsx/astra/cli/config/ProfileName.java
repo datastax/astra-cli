@@ -14,8 +14,8 @@ public class ProfileName implements AstraColors.Highlightable {
     String name;
 
     public static Either<String, ProfileName> parse(String name) {
-        if (name.contains("\n") || name.contains("\r")) {
-            return Either.left("Profile name cannot contain newlines or carriage returns.");
+        if (name.contains("\n")) {
+            return Either.left("Profile name cannot contain newlines.");
         }
 
         if (name.isBlank()) {

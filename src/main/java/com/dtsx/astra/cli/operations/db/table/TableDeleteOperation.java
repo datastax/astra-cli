@@ -1,27 +1,32 @@
 package com.dtsx.astra.cli.operations.db.table;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.TableRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.table.TableGateway;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.table.TableDeleteOperation.TableDeleteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
-public class TableDeleteOperation {
+public class TableDeleteOperation implements Operation<TableDeleteResult> {
     private final TableGateway tableGateway;
+    private final TableDeleteRequest request;
 
     public sealed interface TableDeleteResult {}
     public record TableNotFound() implements TableDeleteResult {}
+    public record TableIllegallyNotFound() implements TableDeleteResult {}
     public record TableDeleted() implements TableDeleteResult {}
 
-    public TableDeleteResult execute(TableRef tableRef, boolean ifExists) {
-        val status = tableGateway.deleteTable(tableRef);
+    public record TableDeleteRequest(TableRef tableRef, boolean ifExists) {}
+
+    @Override
+    public TableDeleteResult execute() {
+        val status = tableGateway.deleteTable(request.tableRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleTableDeleted();
-            case DeletionStatus.NotFound<?> _ -> handleTableNotFound(tableRef, ifExists);
+            case DeletionStatus.NotFound<?> _ -> handleTableNotFound(request.tableRef, request.ifExists);
         };
     }
 
@@ -33,24 +38,8 @@ public class TableDeleteOperation {
         if (ifExists) {
             return new TableNotFound();
         } else {
-            throw new TableNotFoundException(tableRef);
+            return new TableIllegallyNotFound();
         }
     }
 
-    public static class TableNotFoundException extends AstraCliException {
-        public TableNotFoundException(TableRef tableRef) {
-            super("""
-              @|bold,red Error: Table '%s' does not exist in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see all existing tables in this database.
-              - Pass the %s flag to skip this error if the table doesn't exist.
-            """.formatted(
-                tableRef,
-                tableRef.db(),
-                AstraColors.highlight("astra db list-tables " + tableRef.db() + " --all"),
-                AstraColors.highlight("--if-exists")
-            ));
-        }
-    }
 }

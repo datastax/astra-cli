@@ -2,22 +2,19 @@ package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
-import com.dtsx.astra.cli.operations.db.DbDeleteOperation.DatabaseDeleted;
-import com.dtsx.astra.cli.operations.db.DbDeleteOperation.DatabaseDeletedAndTerminated;
-import com.dtsx.astra.cli.operations.db.DbDeleteOperation.DatabaseNotFound;
 import lombok.val;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
 
 @Command(
     name = "delete"
 )
-public final class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd {
+public class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd<DbDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if database does not exist", DEFAULT_VALUE },
@@ -31,9 +28,12 @@ public final class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd {
     }
 
     @Override
-    public OutputAll execute() {
-        val result = new DbDeleteOperation(dbGateway).execute(dbRef, ifExists, lrMixin.options());
+    protected DbDeleteOperation mkOperation() {
+        return new DbDeleteOperation(dbGateway, new DbDeleteRequest(dbRef, ifExists, lrMixin.options()));
+    }
 
+    @Override
+    protected final OutputAll execute(DbDeleteResult result) {
         return switch (result) {
             case DatabaseNotFound _ -> {
                 yield OutputAll.message("Database " + highlight(dbRef) + " does not exist in current org; nothing to delete");
@@ -43,6 +43,9 @@ public final class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd {
             }
             case DatabaseDeletedAndTerminated(var waitTime) -> {
                 yield OutputAll.message("Database " + highlight(dbRef) + " has been deleted; (waited " + waitTime.toSeconds() + "s for database to be fully terminated)");
+            }
+            case DatabaseIllegallyNotFound _ -> {
+                throw new DbDeleteOperation.DbNotFoundException(dbRef);
             }
         };
     }

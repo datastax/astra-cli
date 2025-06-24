@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
-public abstract class AbstractCollectionSpecificCmd extends AbstractCollectionCmd {
+public abstract class AbstractCollectionSpecificCmd<OpRes> extends AbstractCollectionCmd<OpRes> {
     protected CollectionRef collRef;
 
     @Option(

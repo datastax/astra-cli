@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -17,11 +18,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
+import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
-public class DbCreateOperation {
+public class DbCreateOperation implements Operation<DbCreateResult> {
     private final DbGateway dbGateway;
+    private final CreateDbRequest request;
 
     public record CreateDbRequest(
         String dbName,
@@ -41,7 +44,8 @@ public class DbCreateOperation {
     public record DatabaseCreated(UUID dbId, Duration waitTime) implements DbCreateResult {}
     public record DatabaseCreationStarted(UUID dbId, DatabaseStatusType currStatus) implements DbCreateResult {}
 
-    public DbCreateResult execute(CreateDbRequest request) {
+    @Override
+    public DbCreateResult execute() {
         val cloudProvider = dbGateway.findCloudForRegion(
             request.cloud,
             request.region,

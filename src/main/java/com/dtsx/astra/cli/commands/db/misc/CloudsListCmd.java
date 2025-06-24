@@ -8,15 +8,23 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+
+import static com.dtsx.astra.cli.operations.db.misc.CloudsListOperation.*;
 
 @Command(
     name = "list-clouds"
 )
-public final class CloudsListCmd extends AbstractRegionCmd {
+public class CloudsListCmd extends AbstractRegionCmd<Set<String>> {
     @Override
-    protected OutputAll execute() {
-        val set = new TreeSet<>(new CloudsListOperation(regionGateway).execute());
+    protected CloudsListOperation mkOperation() {
+        return new CloudsListOperation(regionGateway, new CloudsListRequest());
+    }
+
+    @Override
+    protected final OutputAll execute(Set<String> result) {
+        val set = new TreeSet<>(result);
 
         return new ShellTable(
             set.stream()

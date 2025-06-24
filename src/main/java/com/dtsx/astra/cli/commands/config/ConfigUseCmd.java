@@ -4,8 +4,10 @@ import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation.UseConfigRequest;
 import lombok.val;
@@ -18,11 +20,12 @@ import picocli.CommandLine.Parameters;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.config.ConfigUseOperation.*;
 
 @Command(
     name = "use"
 )
-public final class ConfigUseCmd extends AbstractCmd {
+public class ConfigUseCmd extends AbstractCmd<ConfigUseResult> {
     @Parameters(description = "Profile name to set as default", completionCandidates = AvailableProfilesCompletion.class, paramLabel = "<profile>")
     public ProfileName profileName;
 
@@ -30,7 +33,7 @@ public final class ConfigUseCmd extends AbstractCmd {
     public @Nullable UniqueDefaultBehavior uniqueDefaultBehavior;
 
     public static class UniqueDefaultBehavior {
-        @Option(names = { "-f", "--force" }, description = "Force setting default profile without confirmation prompts")
+        @Option(names = { "-y", "--yes" }, description = "Force setting default profile without confirmation prompts")
         public boolean force;
 
         @Option(names = { "-F", "--fail-if-unique-default" }, description = "Fail if default profile has unique configuration")
@@ -38,15 +41,23 @@ public final class ConfigUseCmd extends AbstractCmd {
     }
 
     @Override
-    public OutputAll execute() {
-        new ConfigUseOperation(config()).execute(new UseConfigRequest(
+    public final OutputAll execute(ConfigUseResult result) {
+        val message = switch (result) {
+            case ProfileSetAsDefault() -> "Default profile set to " + highlight(profileName);
+            case ProfileNotFound() -> throw new ProfileNotFoundException(profileName);
+        };
+
+        return OutputAll.message(message);
+    }
+
+    @Override
+    protected Operation<ConfigUseResult> mkOperation() {
+        return new ConfigUseOperation(config(), new UseConfigRequest(
             profileName,
             Optional.ofNullable(uniqueDefaultBehavior).map(ub -> ub.force).orElse(false),
             Optional.ofNullable(uniqueDefaultBehavior).map(ub -> ub.failIfUniqueDefault).orElse(false),
             this::assertCanOverwriteDefaultProfile
         ));
-
-        return OutputAll.message("Default profile set to " + highlight(profileName));
     }
 
     private void assertCanOverwriteDefaultProfile() {

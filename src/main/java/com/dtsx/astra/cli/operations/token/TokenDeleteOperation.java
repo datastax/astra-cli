@@ -1,34 +1,29 @@
 package com.dtsx.astra.cli.operations.token;
 
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
-import com.dtsx.astra.cli.utils.StringUtils;
+import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 
+import static com.dtsx.astra.cli.operations.token.TokenDeleteOperation.*;
+
 @RequiredArgsConstructor
-public class TokenDeleteOperation {
+public class TokenDeleteOperation implements Operation<TokenDeleteResult> {
     private final TokenGateway tokenGateway;
+    private final TokenDeleteRequest request;
 
-    public void execute(String tokenId) {
-        if (!tokenGateway.exists(tokenId)) {
-            throw new TokenNotFoundException(tokenId);
+    public sealed interface TokenDeleteResult {}
+    public record TokenDeleted() implements TokenDeleteResult {}
+    public record TokenNotFound() implements TokenDeleteResult {}
+
+    public record TokenDeleteRequest(String tokenId) {}
+
+    @Override
+    public TokenDeleteResult execute() {
+        if (!tokenGateway.exists(request.tokenId)) {
+            return new TokenNotFound();
         }
-        tokenGateway.delete(tokenId);
+        tokenGateway.delete(request.tokenId);
+        return new TokenDeleted();
     }
 
-    public static class TokenNotFoundException extends AstraCliException {
-        public TokenNotFoundException(String tokenId) {
-            super("""
-              @|bold,red Error: Token '%s' not found.|@
-            
-              The specified token does not exist.
-            
-              Use %s to see all available tokens.
-            """.formatted(
-                tokenId,
-                AstraColors.highlight("astra token list")
-            ));
-        }
-    }
 }

@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.commands.db.keyspace.AbstractKeyspaceSpecificCmd;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public abstract class AbstractCollectionCmd extends AbstractKeyspaceSpecificCmd {
+public abstract class AbstractCollectionCmd<OpRes> extends AbstractKeyspaceSpecificCmd<OpRes> {
     protected CollectionGateway collectionGateway;
 
     @Override

@@ -11,20 +11,24 @@ import picocli.CommandLine.Option;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
 
 @Command(
     name = "resume"
 )
-public final class DbResumeCmd extends AbstractLongRunningDbSpecificCmd {
+public class DbResumeCmd extends AbstractLongRunningDbSpecificCmd<DbResumeResult> {
     @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
-    public OutputAll execute() {
-        val result = new DbResumeOperation(dbGateway).execute(dbRef, lrMixin.options());
+    protected DbResumeOperation mkOperation() {
+        return new DbResumeOperation(dbGateway, new DbResumeRequest(dbRef, lrMixin.options()));
+    }
 
+    @Override
+    protected final OutputAll execute(DbResumeResult result) {
         if (lrMixin.options().dontWait()) {
             val hadToBeResumed = result.resumeResult().hadToBeResumed();
             val currentStatus = result.finalDatabase().getStatus();

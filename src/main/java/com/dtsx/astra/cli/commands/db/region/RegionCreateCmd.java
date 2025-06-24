@@ -2,9 +2,6 @@ package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.region.RegionCreateOperation;
-import com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.RegionAlreadyExists;
-import com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.RegionCreated;
-import com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.RegionCreatedAndDbActive;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -12,11 +9,12 @@ import picocli.CommandLine.Option;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.*;
 
 @Command(
     name = "create-region"
 )
-public final class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd {
+public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<RegionCreateResult> {
     @Option(
         names = { "--if-not-exists" },
         description = { "Will create a new region only if none with same name", DEFAULT_VALUE },
@@ -30,9 +28,12 @@ public final class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd 
     }
 
     @Override
-    public OutputAll execute() {
-        val result = new RegionCreateOperation(regionGateway, dbGateway).execute(dbRef, region, ifNotExists, lrMixin.options());
+    protected RegionCreateOperation mkOperation() {
+        return new RegionCreateOperation(regionGateway, dbGateway, new RegionCreateRequest(dbRef, region, ifNotExists, lrMixin.options()));
+    }
 
+    @Override
+    protected final OutputAll execute(RegionCreateResult result) {
         return switch (result) {
             case RegionAlreadyExists() -> {
                 yield OutputAll.message("Region " + highlight(region) + " already exists in database " + highlight(dbRef.toString()));
@@ -43,6 +44,9 @@ public final class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd 
             case RegionCreatedAndDbActive(var waitTime) -> {
                 yield OutputAll.message("Region " + highlight(region) + " has been created in database " + highlight(dbRef.toString()) + 
                     " (waited " + waitTime.toSeconds() + "s for database to become active)");
+            }
+            case RegionIllegallyAlreadyExists() -> {
+                throw new RegionCreateOperation.RegionAlreadyExistsException(region, dbRef);
             }
         };
     }

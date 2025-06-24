@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
-import java.util.function.Supplier;
 
-public abstract class AbstractRegionListCmd extends AbstractRegionCmd {
+public abstract class AbstractRegionListCmd extends AbstractRegionCmd<SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>>> {
     @Option(
         names = { "-f", "--filter" },
         description = "Comma-separated case-insensitive partial-match filters on the region name",
@@ -38,12 +37,8 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd {
     )
     public @Nullable List<String> zoneFilter;
 
-    protected abstract Supplier<? extends SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>>> getRegionListMethod();
-
     @Override
-    protected OutputAll execute() {
-        val regions = getRegionListMethod().get();
-
+    protected OutputAll execute(SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> regions) {
         val data = regions.sequencedEntrySet()
             .reversed()
             .stream()

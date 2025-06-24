@@ -1,18 +1,19 @@
 package com.dtsx.astra.cli.operations.db.collection;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.CollectionRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionCreateResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
 
 @RequiredArgsConstructor
-public class CollectionCreateOperation {
+public class CollectionCreateOperation implements Operation<CollectionCreateResult> {
     private final CollectionGateway collectionGateway;
+    private final CollectionCreateRequest request;
 
     public record CollectionCreateRequest(
         CollectionRef collectionRef,
@@ -29,9 +30,11 @@ public class CollectionCreateOperation {
 
     public sealed interface CollectionCreateResult {}
     public record CollectionAlreadyExists() implements CollectionCreateResult {}
+    public record CollectionIllegallyAlreadyExists() implements CollectionCreateResult {}
     public record CollectionCreated() implements CollectionCreateResult {}
 
-    public CollectionCreateResult execute(CollectionCreateRequest request) {
+    @Override
+    public CollectionCreateResult execute() {
         val status = collectionGateway.createCollection(
             request.collectionRef,
             request.dimension,
@@ -54,28 +57,12 @@ public class CollectionCreateOperation {
         return new CollectionCreated();
     }
 
-    private CollectionCreateResult handleCollAlreadyExists(CollectionRef collRef, boolean ifExists) {
-        if (ifExists) {
+    private CollectionCreateResult handleCollAlreadyExists(CollectionRef collRef, boolean ifNotExists) {
+        if (ifNotExists) {
             return new CollectionAlreadyExists();
         } else {
-            throw new CollectionAlreadyExistsException(collRef);
+            return new CollectionIllegallyAlreadyExists();
         }
     }
 
-    public static class CollectionAlreadyExistsException extends AstraCliException {
-        public CollectionAlreadyExistsException(CollectionRef collectionRef) {
-            super("""
-              @|bold,red Error: Collection '%s' already exists in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see all existing collections in this database.
-              - Pass the %s flag to skip this error if the collection already exists.
-            """.formatted(
-                collectionRef,
-                collectionRef.db(),
-                AstraColors.highlight("astra db list-collections " + collectionRef.db() + " --all"),
-                AstraColors.highlight("--if-not-exists")
-            ));
-        }
-    }
 }

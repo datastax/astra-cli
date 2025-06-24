@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
-public abstract class AbstractTableSpecificCmd extends AbstractTableCmd {
+public abstract class AbstractTableSpecificCmd<OpRes> extends AbstractTableCmd<OpRes> {
     protected TableRef tableRef;
 
     @Option(

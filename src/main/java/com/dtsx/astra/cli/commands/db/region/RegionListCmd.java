@@ -8,14 +8,19 @@ import picocli.CommandLine.Command;
 
 import java.util.Map;
 
+import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
+
 @Command(
     name = "list-regions"
 )
-public final class RegionListCmd extends AbstractDbSpecificRegionCmd {
+public class RegionListCmd extends AbstractDbSpecificRegionCmd<FoundRegions> {
     @Override
-    protected OutputAll execute() {
-        val result = new RegionListOperation(regionGateway, dbGateway).execute(dbRef);
+    protected RegionListOperation mkOperation() {
+        return new RegionListOperation(regionGateway, dbGateway, new RegionListRequest(dbRef));
+    }
 
+    @Override
+    protected final OutputAll execute(FoundRegions result) {
         val data = result.regions().stream()
             .map((dc) -> Map.of(
                 "Cloud Provider", dc.getCloudProvider().name().toLowerCase(),

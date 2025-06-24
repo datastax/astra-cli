@@ -2,9 +2,6 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.KeyspaceAlreadyExists;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.KeyspaceCreated;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.KeyspaceCreatedAndDbActive;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -12,11 +9,12 @@ import picocli.CommandLine.Option;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.*;
 
 @Command(
     name = "create-keyspace"
 )
-public final class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd {
+public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceCreateResult> {
     @Option(
         names = { "--if-not-exists" },
         description = { "Will create a new keyspace only if none with same name", DEFAULT_VALUE },
@@ -30,9 +28,12 @@ public final class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequired
     }
 
     @Override
-    public OutputAll execute() {
-        val result = new KeyspaceCreateOperation(keyspaceGateway, dbGateway).execute(keyspaceRef, ifNotExists, lrMixin.options());
+    protected KeyspaceCreateOperation mkOperation() {
+        return new KeyspaceCreateOperation(keyspaceGateway, dbGateway, new KeyspaceCreateRequest(keyspaceRef, ifNotExists, lrMixin.options()));
+    }
 
+    @Override
+    protected final OutputAll execute(KeyspaceCreateResult result) {
         return switch (result) {
             case KeyspaceAlreadyExists _ -> {
                 yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " already exists in database " + highlight(keyspaceRef.db()));
@@ -43,6 +44,9 @@ public final class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequired
             case KeyspaceCreatedAndDbActive(var waitTime) -> {
                 yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " has been created in database " + highlight(keyspaceRef.db()) + 
                     " (waited " + waitTime.toSeconds() + "s for database to become active)");
+            }
+            case KeyspaceIllegallyAlreadyExists _ -> {
+                throw new KeyspaceCreateOperation.KeyspaceAlreadyExistsException(keyspaceRef);
             }
         };
     }

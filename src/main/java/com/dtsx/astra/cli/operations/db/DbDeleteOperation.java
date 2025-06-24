@@ -5,29 +5,40 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.time.Duration;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
+import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.TERMINATED;
 
 @RequiredArgsConstructor
-public class DbDeleteOperation {
+public class DbDeleteOperation implements Operation<DbDeleteResult> {
     private final DbGateway dbGateway;
+    private final DbDeleteRequest request;
 
     public sealed interface DbDeleteResult {}
     public record DatabaseNotFound() implements DbDeleteResult {}
     public record DatabaseDeleted() implements DbDeleteResult {}
     public record DatabaseDeletedAndTerminated(Duration waitTime) implements DbDeleteResult {}
+    public record DatabaseIllegallyNotFound() implements DbDeleteResult {}
 
-    public DbDeleteResult execute(DbRef dbRef, boolean ifExists, LongRunningOptions lrOptions) {
-        val status = dbGateway.deleteDb(dbRef);
+    public record DbDeleteRequest(
+        DbRef dbRef,
+        boolean ifExists,
+        LongRunningOptions lrOptions
+    ) {}
+
+    @Override
+    public DbDeleteResult execute() {
+        val status = dbGateway.deleteDb(request.dbRef);
 
         return switch (status) {
-            case DeletionStatus.Deleted<?> _ -> handleDbDeleted(dbRef, lrOptions);
-            case DeletionStatus.NotFound<?> _ -> handleDbNotFound(dbRef, ifExists);
+            case DeletionStatus.Deleted<?> _ -> handleDbDeleted(request.dbRef, request.lrOptions);
+            case DeletionStatus.NotFound<?> _ -> handleDbNotFound(request.ifExists);
         };
     }
 
@@ -40,11 +51,11 @@ public class DbDeleteOperation {
         return new DatabaseDeletedAndTerminated(awaitedDuration);
     }
 
-    private DbDeleteResult handleDbNotFound(DbRef dbRef, boolean ifExists) {
+    private DbDeleteResult handleDbNotFound(boolean ifExists) {
         if (ifExists) {
             return new DatabaseNotFound();
         } else {
-            throw new DbNotFoundException(dbRef);
+            return new DatabaseIllegallyNotFound();
         }
     }
 

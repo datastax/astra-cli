@@ -1,10 +1,11 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.models.CollectionRef;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation;
-import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionAlreadyExists;
-import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionCreateRequest;
-import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.CollectionCreated;
 import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -13,11 +14,12 @@ import picocli.CommandLine.Option;
 import java.util.List;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.*;
 
 @Command(
     name = "create-collection"
 )
-public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
+public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<CollectionCreateResult> {
     @Option(
         names = { "--if-not-exists" },
         description = { "Will create a new collection only if none with same name", DEFAULT_VALUE },
@@ -95,10 +97,19 @@ public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
     }
 
     @Override
-    public OutputAll execute() {
-        val operation = new CollectionCreateOperation(collectionGateway);
+    public final OutputAll execute(CollectionCreateResult result) {
+        val message = switch (result) {
+            case CollectionAlreadyExists() -> "Collection " + highlight(collRef) + " already exists";
+            case CollectionIllegallyAlreadyExists() -> throw new CollectionAlreadyExistsException(collRef);
+            case CollectionCreated() -> "Collection %s has been created in keyspace %s".formatted(highlight(collRef.name()), highlight(collRef.keyspace()));
+        };
+        
+        return OutputAll.message(message);
+    }
 
-        val result = operation.execute(new CollectionCreateRequest(
+    @Override
+    protected Operation<CollectionCreateResult> mkOperation() {
+        return new CollectionCreateOperation(collectionGateway, new CollectionCreateRequest(
             collRef,
             collectionCreationOptions.dimension,
             collectionCreationOptions.metric,
@@ -110,14 +121,22 @@ public final class CollectionCreateCmd extends AbstractCollectionSpecificCmd {
             collectionCreationOptions.indexingDeny,
             ifNotExists
         ));
+    }
 
-        return switch (result) {
-            case CollectionAlreadyExists _ -> {
-                yield OutputAll.message("Collection " + highlight(collRef) + " already exists");
-            }
-            case CollectionCreated _ -> {
-                yield OutputAll.message("Collection %s has been created in keyspace %s".formatted(highlight(collRef.name()), highlight(collRef.keyspace())));
-            }
-        };
+    public static class CollectionAlreadyExistsException extends AstraCliException {
+        public CollectionAlreadyExistsException(CollectionRef collectionRef) {
+            super("""
+              @|bold,red Error: Collection '%s' already exists in database '%s'.|@
+            
+              This may be expected, but to avoid this error:
+              - Run %s to see all existing collections in this database.
+              - Pass the %s flag to skip this error if the collection already exists.
+            """.formatted(
+                collectionRef,
+                collectionRef.db(),
+                AstraColors.highlight("astra db list-collections " + collectionRef.db() + " --all"),
+                AstraColors.highlight("--if-not-exists")
+            ));
+        }
     }
 }

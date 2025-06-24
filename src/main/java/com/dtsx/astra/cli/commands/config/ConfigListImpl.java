@@ -4,17 +4,18 @@ import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 
 import java.util.Map;
 
-public abstract class ConfigListImpl extends AbstractCmd {
-    @Override
-    public OutputAll execute() {
-        val result = new ConfigListOperation(config()).execute();
+import static com.dtsx.astra.cli.operations.config.ConfigListOperation.*;
 
+public abstract class ConfigListImpl extends AbstractCmd<ListConfigResult> {
+    @Override
+    public final OutputAll execute(ListConfigResult result) {
         val cells = result.profiles().stream()
             .map((p) -> Map.of(
                 "configuration", mkConfigDisplayName(p.name(), p.isInUse()),
@@ -32,6 +33,11 @@ public abstract class ConfigListImpl extends AbstractCmd {
         } else {
             return table.withColumns("configuration");
         }
+    }
+
+    @Override
+    protected Operation<ListConfigResult> mkOperation() {
+        return new ConfigListOperation(config());
     }
 
     private String mkConfigDisplayName(String name, boolean isInUse) {

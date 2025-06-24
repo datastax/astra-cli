@@ -2,9 +2,6 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.KeyspaceDeleted;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.KeyspaceNotFound;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.KeyspaceDeletedAndDbActive;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -12,11 +9,12 @@ import picocli.CommandLine.Option;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.*;
 
 @Command(
     name = "delete-keyspace"
 )
-public final class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd {
+public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if keyspace does not exist", DEFAULT_VALUE },
@@ -30,9 +28,12 @@ public final class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequired
     }
 
     @Override
-    public OutputAll execute() {
-        val result = new KeyspaceDeleteOperation(keyspaceGateway, dbGateway).execute(keyspaceRef, ifExists, lrMixin.options());
+    protected KeyspaceDeleteOperation mkOperation() {
+        return new KeyspaceDeleteOperation(keyspaceGateway, dbGateway, new KeyspaceDeleteRequest(keyspaceRef, ifExists, lrMixin.options()));
+    }
 
+    @Override
+    protected final OutputAll execute(KeyspaceDeleteResult result) {
         return switch (result) {
             case KeyspaceNotFound _ -> {
                 yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " does not exist in database " + highlight(keyspaceRef.db()) + "; nothing to delete");
@@ -42,6 +43,9 @@ public final class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequired
             }
             case KeyspaceDeletedAndDbActive(var waitTime) -> {
                 yield OutputAll.message("Keyspace " + highlight(keyspaceRef) + " has been deleted from database " + highlight(keyspaceRef.db()) + " (waited " + waitTime.toSeconds() + "s for database to become active)");
+            }
+            case KeyspaceIllegallyNotFound _ -> {
+                throw new KeyspaceDeleteOperation.KeyspaceNotFoundException(keyspaceRef);
             }
         };
     }

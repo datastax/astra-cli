@@ -7,24 +7,30 @@ import com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
+import java.util.List;
 import java.util.Map;
+
+import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.*;
 
 @Command(
     name = "list-embedding-providers"
 )
-public final class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd {
+public class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd<List<EmbeddingProviderResult>> {
     @Override
-    protected OutputAll execute() {
-        val results = new EmbeddingProvidersListOperation(dbGateway).execute(dbRef);
+    protected EmbeddingProvidersListOperation mkOperation() {
+        return new EmbeddingProvidersListOperation(dbGateway, new EmbeddingProvidersListRequest(dbRef));
+    }
 
-        val data = results.stream()
-            .map(result -> Map.of(
-                "Key", result.key(),
-                "Display Name", result.displayName().orElse("N/A"),
-                "Models", String.valueOf(result.modelsCount()),
-                "Parameters", String.valueOf(result.parametersCount()),
-                "Auth Header", result.hasAuthHeader() ? "■" : "",
-                "Auth Secret", result.hasAuthSecret() ? "■" : ""
+    @Override
+    protected final OutputAll execute(List<EmbeddingProviderResult> result) {
+        val data = result.stream()
+            .map(r -> Map.of(
+                "Key", r.key(),
+                "Display Name", r.displayName().orElse("N/A"),
+                "Models", String.valueOf(r.modelsCount()),
+                "Parameters", String.valueOf(r.parametersCount()),
+                "Auth Header", r.hasAuthHeader() ? "■" : "",
+                "Auth Secret", r.hasAuthSecret() ? "■" : ""
             ))
             .toList();
 

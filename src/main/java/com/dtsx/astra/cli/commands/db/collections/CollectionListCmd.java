@@ -2,18 +2,22 @@ package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.collection.CollectionListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
+import java.util.List;
 import java.util.Map;
+
+import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperation.*;
 
 @Command(
     name = "list-collections"
 )
-public final class CollectionListCmd extends AbstractCollectionCmd {
+public class CollectionListCmd extends AbstractCollectionCmd<List<CollectionListResult>> {
     @Option(
         names = { "--all", "-a" },
         description = "List collections in all keyspaces",
@@ -22,13 +26,10 @@ public final class CollectionListCmd extends AbstractCollectionCmd {
     public boolean all;
 
     @Override
-    protected OutputAll execute() {
+    public final OutputAll execute(List<CollectionListResult> result) {
         if (all && !keyspaceRef.isDefaultKeyspace()) {
             throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
         }
-
-        val operation = new CollectionListOperation(collectionGateway, keyspaceGateway);
-        val result = operation.execute(keyspaceRef, all);
 
         val data = result.stream()
             .flatMap((res) -> (
@@ -45,5 +46,10 @@ public final class CollectionListCmd extends AbstractCollectionCmd {
         } else {
             return new ShellTable(data).withColumns("Name");
         }
+    }
+
+    @Override
+    protected Operation<List<CollectionListResult>> mkOperation() {
+        return new CollectionListOperation(collectionGateway, keyspaceGateway, new CollectionListRequest(keyspaceRef, all));
     }
 }

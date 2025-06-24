@@ -1,14 +1,13 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.operations.db.DbGetOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.db.DbGetOperation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
-import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -16,12 +15,14 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
+import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetRequest;
+import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
 
 @Command(
     name = "get",
     aliases = { "describe" }
 )
-public final class DbGetCmd extends AbstractDbSpecificCmd {
+public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     public enum DbGetKeys {
         name,
         id,
@@ -39,49 +40,44 @@ public final class DbGetCmd extends AbstractDbSpecificCmd {
     public Optional<DbGetKeys> key;
 
     @Override
-    public OutputJson executeJson() {
-        if (key.isPresent()) {
-            return execute();
-        }
-        return OutputJson.serializeValue(dbInfo());
+    protected DbGetOperation mkOperation() {
+        return new DbGetOperation(dbGateway, new DbGetRequest(dbRef));
     }
 
     @Override
-    public OutputAll execute() {
-        return key
-            .map(this::dbInfo4Key)
-            .map(OutputAll::serializeValue)
-            .orElseGet(this::mkTable);
+    public OutputJson executeJson(DbGetResult result) {
+        if (key.isPresent()) {
+            return execute(result);
+        }
+        return OutputJson.serializeValue(result.database());
     }
 
-    private RenderableShellTable mkTable() {
+    @Override
+    protected final OutputAll execute(DbGetResult result) {
+        val dbInfo = result.database();
+
+        return key
+            .map((k) -> dbInfo4Key(dbInfo, k))
+            .map(OutputAll::serializeValue)
+            .orElseGet(() -> this.mkTable(dbInfo));
+    }
+
+    private RenderableShellTable mkTable(Database dbInfo) {
         return new ShellTable(List.of(
-            ShellTable.attr("Name", dbInfo4Key(name)),
-            ShellTable.attr("id", dbInfo4Key(id)),
-            ShellTable.attr("Cloud", dbInfo4Key(cloud)),
-            ShellTable.attr("Region", dbInfo4Key(region)),
-            ShellTable.attr("Status", dbInfo4Key(status)),
-            ShellTable.attr("Vector", dbInfo4Key(vector).equals(true) ? "Enabled" : "Disabled"),
-            ShellTable.attr("Default Keyspace", dbInfo4Key(keyspace)),
-            ShellTable.attr("Creation Time", dbInfo4Key(creation_time)),
-            ShellTable.attr("Keyspaces", dbInfo4Key(keyspaces)),
-            ShellTable.attr("Regions", dbInfo4Key(regions))
+            ShellTable.attr("Name", dbInfo4Key(dbInfo, name)),
+            ShellTable.attr("id", dbInfo4Key(dbInfo, id)),
+            ShellTable.attr("Cloud", dbInfo4Key(dbInfo, cloud)),
+            ShellTable.attr("Region", dbInfo4Key(dbInfo, region)),
+            ShellTable.attr("Status", dbInfo4Key(dbInfo, status)),
+            ShellTable.attr("Vector", dbInfo4Key(dbInfo, vector).equals(true) ? "Enabled" : "Disabled"),
+            ShellTable.attr("Default Keyspace", dbInfo4Key(dbInfo, keyspace)),
+            ShellTable.attr("Creation Time", dbInfo4Key(dbInfo, creation_time)),
+            ShellTable.attr("Keyspaces", dbInfo4Key(dbInfo, keyspaces)),
+            ShellTable.attr("Regions", dbInfo4Key(dbInfo, regions))
         )).withAttributeColumns();
     }
 
-    private @Nullable Database cachedDbInfo;
-
-    private Database dbInfo() {
-        if (cachedDbInfo == null) {
-            val result = new DbGetOperation(dbGateway).execute(dbRef);
-            cachedDbInfo = result.database();
-        }
-        return cachedDbInfo;
-    }
-
-    private Object dbInfo4Key(DbGetKeys key) {
-        val dbInfo = dbInfo();
-
+    private Object dbInfo4Key(Database dbInfo, DbGetKeys key) {
         return switch (key) {
             case name -> dbInfo.getInfo().getName();
             case id -> dbInfo.getId();

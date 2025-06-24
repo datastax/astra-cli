@@ -2,9 +2,6 @@ package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation;
-import com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.RegionDeleted;
-import com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.RegionNotFound;
-import com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.RegionDeletedAndDbActive;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -12,11 +9,12 @@ import picocli.CommandLine.Option;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.*;
 
 @Command(
     name = "delete-region"
 )
-public final class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd {
+public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<RegionDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if region does not exist", DEFAULT_VALUE },
@@ -30,9 +28,12 @@ public final class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd 
     }
 
     @Override
-    public OutputAll execute() {
-        val result = new RegionDeleteOperation(regionGateway, dbGateway).execute(dbRef, region, ifExists, lrMixin.options());
+    protected RegionDeleteOperation mkOperation() {
+        return new RegionDeleteOperation(regionGateway, dbGateway, new RegionDeleteRequest(dbRef, region, ifExists, lrMixin.options()));
+    }
 
+    @Override
+    protected final OutputAll execute(RegionDeleteResult result) {
         return switch (result) {
             case RegionNotFound() -> {
                 yield OutputAll.message("Region " + highlight(region) + " does not exist in database " + highlight(dbRef.toString()) + "; nothing to delete");
@@ -42,6 +43,9 @@ public final class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd 
             }
             case RegionDeletedAndDbActive(var waitTime) -> {
                 yield OutputAll.message("Region " + highlight(region) + " has been deleted from database " + highlight(dbRef.toString()) + " (waited " + waitTime.toSeconds() + "s for database to become active)");
+            }
+            case RegionIllegallyNotFound() -> {
+                throw new RegionDeleteOperation.RegionNotFoundException(region, dbRef);
             }
         };
     }
