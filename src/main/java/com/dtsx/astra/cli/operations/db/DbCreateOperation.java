@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.db;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
@@ -24,7 +25,7 @@ public class DbCreateOperation {
 
     public record CreateDbRequest(
         String dbName,
-        String region,
+        RegionName region,
         Optional<CloudProviderType> cloud,
         String db,
         String tier,

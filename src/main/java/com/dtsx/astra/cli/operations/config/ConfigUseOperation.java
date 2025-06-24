@@ -41,7 +41,7 @@ public class ConfigUseOperation {
         val defaultProfile = config.lookupProfile(ProfileName.DEFAULT);
 
         return defaultProfile.isPresent() && config.getValidatedProfiles().stream()
-            .filter(p -> !p.name().equals(ProfileName.DEFAULT))
+            .filter(p -> !p.isDefault())
             .noneMatch(p -> p.token().equals(defaultProfile.get().token()) && p.env().equals(defaultProfile.get().env()));
     }
 

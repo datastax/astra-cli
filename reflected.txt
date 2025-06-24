@@ -28,3 +28,4 @@ com.datastax.astra.client.core.rerank.RerankServiceOptions$Parameters
 com.datastax.astra.internal.api.DataAPIResponse
 com.datastax.astra.internal.api.DataAPIStatus
 com.datastax.astra.client.collections.definition.documents.Document
+com.dtsx.astra.cli.core.output.JsonResponse

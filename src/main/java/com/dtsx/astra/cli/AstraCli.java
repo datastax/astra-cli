@@ -3,6 +3,8 @@ package com.dtsx.astra.cli;
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
+import com.dtsx.astra.cli.commands.org.OrgCmd;
+import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
@@ -23,6 +25,8 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
     subcommands = {
         DbCmd.class,
         ConfigCmd.class,
+        OrgCmd.class,
+        TokenCmd.class,
         AutoComplete.GenerateCompletion.class,
         CommandLine.HelpCommand.class,
     }

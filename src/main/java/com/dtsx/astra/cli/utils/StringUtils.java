@@ -57,4 +57,18 @@ public class StringUtils {
 
         return String.join("\n", trimmedLines);
     }
+
+    public static String obfuscateToken(String token) {
+        if (token.startsWith("AstraCS:")) {
+            if (token.length() <= 14) {
+                return token;
+            }
+            return token.substring(0, 14) + "***";
+        } else {
+            if (token.length() <= 6) {
+                return token;
+            }
+            return token.substring(0, 6) + "***";
+        }
+    }
 }

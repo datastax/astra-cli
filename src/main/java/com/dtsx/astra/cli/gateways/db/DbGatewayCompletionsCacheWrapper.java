@@ -1,9 +1,11 @@
 package com.dtsx.astra.cli.gateways.db;
 
+import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -85,12 +87,12 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
+    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly) {
         return delegate.findCloudForRegion(cloud, region, vectorOnly);
     }
 
     @Override
-    public CreationStatus<Database> createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
+    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
         val status = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector);
         addToCache(name);
         return status;
@@ -114,14 +116,19 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     private void addToCache(DbRef ref) {
         ref.fold(
             _ -> null,
-            name -> toVoid(() -> cache.update((s) -> setAdd(s, name)))
+            toFn((name) -> cache.update((s) -> setAdd(s, name)))
         );
     }
 
     private void removeFromCache(DbRef ref) {
         ref.fold(
             _ -> null,
-            name -> toVoid(() -> cache.update((s) -> setDel(s, name)))
+            toFn((name) -> cache.update((s) -> setDel(s, name)))
         );
+    }
+
+    @Override
+    public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
+        return delegate.findEmbeddingProviders(dbRef);
     }
 }

@@ -1,8 +1,0 @@
-2025-06-17 15:49:25 INFO  Username and password provided but auth provider not specified, inferring PlainTextAuthProvider
-2025-06-17 15:49:25 INFO  A cloud secure connect bundle was provided: ignoring all explicit contact points.
-2025-06-17 15:49:25 INFO  Operation directory: /home/me/work/astra-cli-pico/logs/COUNT_20250617-154925-468089
-2025-06-17 15:49:30 ERROR Operation COUNT_20250617-154925-468089 failed: When schema.query is not defined, then either schema.keyspace or schema.graph must be defined, and either schema.table, schema.vertex or schema.edge must be defined.
-java.lang.IllegalArgumentException: When schema.query is not defined, then either schema.keyspace or schema.graph must be defined, and either schema.table, schema.vertex or schema.edge must be defined
-	at com.datastax.oss.dsbulk.workflow.commons.settings.SchemaSettings.init(SchemaSettings.java:329)
-	at com.datastax.oss.dsbulk.workflow.count.CountWorkflow.init(CountWorkflow.java:120)
-	at com.datastax.oss.dsbulk.runner.WorkflowThread.run(WorkflowThread.java:52)

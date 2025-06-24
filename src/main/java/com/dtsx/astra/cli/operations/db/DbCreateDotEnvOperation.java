@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.exceptions.db.KeyspaceNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.db.RegionNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
@@ -44,7 +45,7 @@ public class DbCreateDotEnvOperation {
         Profile profile,
         DbRef dbRef,
         Optional<KeyspaceRef> ksRef,
-        Optional<String> region,
+        Optional<RegionName> region,
         Optional<File> file,
         boolean print,
         Set<EnvKey> keys,
@@ -168,7 +169,7 @@ public class DbCreateDotEnvOperation {
 
         {
             wasSet |= envSetter.set(ASTRA_DB_ID, () -> db(request).getId());
-            wasSet |= envSetter.set(ASTRA_DB_REGION, () -> resolveRegion(request));
+            wasSet |= envSetter.set(ASTRA_DB_REGION, () -> resolveRegion(request).unwrap());
             wasSet |= envSetter.set(ASTRA_DB_KEYSPACE, () -> resolveKeyspace(request));
             wasSet |= envSetter.set(ASTRA_DB_APPLICATION_TOKEN, request.profile::token);
             wasSet |= envSetter.set(ASTRA_DB_ENVIRONMENT, () -> request.profile.env().name().toLowerCase());
@@ -201,7 +202,7 @@ public class DbCreateDotEnvOperation {
 
     private @Nullable Organization cachedOrg;
     private @Nullable Database cachedDb;
-    private @Nullable String cachedRegion;
+    private @Nullable RegionName cachedRegion;
     private @Nullable String cachedKeyspace;
 
     private Organization org() {
@@ -218,16 +219,17 @@ public class DbCreateDotEnvOperation {
         return cachedDb;
     }
 
-    private String resolveRegion(CreateDotEnvRequest request) {
+    private RegionName resolveRegion(CreateDotEnvRequest request) {
         if (cachedRegion == null) {
             cachedRegion = request.region
                 .map(r -> db(request).getInfo().getDatacenters().stream()
                     .map(Datacenter::getRegion)
-                    .filter(r::equalsIgnoreCase)
+                    .filter(region -> region.equalsIgnoreCase(r.unwrap()))
                     .findFirst()
+                    .map(RegionName::mkUnsafe)
                     .orElseThrow(() -> new RegionNotFoundException(request.dbRef, r))
                 )
-                .orElseGet(() -> db(request).getInfo().getRegion());
+                .orElseGet(() -> RegionName.mkUnsafe(db(request).getInfo().getRegion()));
         }
         return cachedRegion;
     }
@@ -263,24 +265,24 @@ public class DbCreateDotEnvOperation {
     }
 
     private String resolveGqlEndpoint(CreateDotEnvRequest request) {
-        return ApiLocator.getApiGraphQLEndPoint(request.profile.env(), db(request).getId(), resolveRegion(request));
+        return ApiLocator.getApiGraphQLEndPoint(request.profile.env(), db(request).getId(), resolveRegion(request).unwrap());
     }
 
     private String resolveDataApiEndpoint(CreateDotEnvRequest request, String suffix) {
         return (db(request).getInfo().getDbType() != null)
-            ? ApiLocator.getApiEndpoint(request.profile.env(), db(request).getId(), resolveRegion(request)) + suffix
+            ? ApiLocator.getApiEndpoint(request.profile.env(), db(request).getId(), resolveRegion(request).unwrap()) + suffix
             : "";
     }
 
     private String resolveRestApiEndpoint(CreateDotEnvRequest request, String suffix) {
         return (db(request).getInfo().getDbType() == null)
-            ? ApiLocator.getApiRestEndpoint(request.profile.env(), db(request).getId(), resolveRegion(request)) + suffix
+            ? ApiLocator.getApiRestEndpoint(request.profile.env(), db(request).getId(), resolveRegion(request).unwrap()) + suffix
             : "";
     }
 
     private Datacenter resolveDatacenter(CreateDotEnvRequest request) {
         return db(request).getInfo().getDatacenters().stream()
-            .filter(dc -> dc.getRegion().equalsIgnoreCase(resolveRegion(request)))
+            .filter(dc -> dc.getRegion().equalsIgnoreCase(resolveRegion(request).unwrap()))
             .findFirst()
             .orElseThrow(() -> new RegionNotFoundException(request.dbRef, resolveRegion(request)));
     }

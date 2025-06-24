@@ -30,9 +30,9 @@ public final class ConfigCreateCmd extends AbstractCmd {
     public String token;
 
     @Option(names = { "-t", "--token" }, required = true, description = "Astra authentication token (must start with 'AstraCS:')", paramLabel = "<token>")
-    protected void setToken(String token) {
+    private void setToken(String token) {
         if (!token.startsWith("AstraCS:")) {
-            throw new OptionValidationException("token", "Astra token should start with 'AstraCS:'");
+            throw new ParameterException(spec.commandLine(), "Astra token should start with 'AstraCS:'");
         }
         this.token = StringUtils.removeQuotesIfAny(token);
     }
@@ -67,6 +67,8 @@ public final class ConfigCreateCmd extends AbstractCmd {
 
         return OutputAll.message(
             "Configuration %s successfully %s.".formatted(highlight(result.profileName()), (result.profileWasOverwritten()) ? "overwritten" : "created")
+            +
+            (result.profileName().isDefault() ? "\n\nIt is now the default profile." : "\n\nRun %s to set it as the default profile.".formatted(highlight("astra config use " + result.profileName())))
         );
     }
 

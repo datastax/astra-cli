@@ -8,11 +8,13 @@ import com.dtsx.astra.cli.core.exceptions.db.CouldNotResumeDbException;
 import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.utils.EnumFolder;
+import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.dtsx.astra.sdk.utils.Utils;
@@ -201,7 +203,7 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly) {
+    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly) {
         val cloudRegions = regionGateway.findServerlessRegions(false);
 
         if (cloud.isPresent()) {
@@ -211,32 +213,32 @@ public class DbGatewayImpl implements DbGateway {
                 throw new OptionValidationException("cloud", "Cloud provider '%s' does not have any available%s regions".formatted(cloudName, (vectorOnly) ? " vector" : ""));
             }
 
-            if (!cloudRegions.get(cloud.get()).containsKey(region.toLowerCase())) {
-                throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(cloudName, cloud.get()));
+            if (!cloudRegions.get(cloud.get()).containsKey(region.unwrap().toLowerCase())) {
+                throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(region.unwrap(), cloud.get()));
             }
 
             return cloud.get();
         }
 
         val matchingClouds = cloudRegions.entrySet().stream()
-            .filter(entry -> entry.getValue().containsKey(region.toLowerCase()))
+            .filter(entry -> entry.getValue().containsKey(region.unwrap().toLowerCase()))
             .map(Entry::getKey)
             .toList();
 
         return switch (matchingClouds.size()) {
             case 0 ->
-                throw new OptionValidationException("region", "Region '%s' is not available for any cloud provider".formatted(region));
+                throw new OptionValidationException("region", "Region '%s' is not available for any cloud provider".formatted(region.unwrap()));
             case 1 ->
                 matchingClouds.getFirst();
             default ->
                 throw new OptionValidationException("region", "Region '%s' is available for multiple cloud providers: %s".formatted(
-                    region, matchingClouds.stream().map(CloudProviderType::name).toList()
+                    region.unwrap(), matchingClouds.stream().map(CloudProviderType::name).toList()
                 ));
         };
     }
 
     @Override
-    public CreationStatus<Database> createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
+    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
         val existingDb = AstraLogger.loading("Checking if database " + highlight(name) + " already exists", (_) -> (
             tryFindOneDb(DbRef.fromNameUnsafe(name))
         ));
@@ -251,7 +253,7 @@ public class DbGatewayImpl implements DbGateway {
                 .tier(tier)
                 .capacityUnit(capacityUnits)
                 .cloudProvider(cloud)
-                .cloudRegion(region)
+                .cloudRegion(region.unwrap())
                 .keyspace(keyspace);
 
             if (vector) {
@@ -283,5 +285,13 @@ public class DbGatewayImpl implements DbGateway {
         });
 
         return DeletionStatus.deleted(ref);
+    }
+
+    @Override
+    public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
+        return AstraLogger.loading("Fetching embedding providers for database " + highlight(dbRef), (_) -> {
+            val admin = api.dataApiDatabaseAdmin(dbRef);
+            return admin.findEmbeddingProviders();
+        });
     }
 }

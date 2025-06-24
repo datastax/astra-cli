@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.db.region;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -24,7 +25,7 @@ public class RegionDeleteOperation {
     public record RegionDeleted() implements RegionDeleteResult {}
     public record RegionDeletedAndDbActive(Duration waitTime) implements RegionDeleteResult {}
 
-    public RegionDeleteResult execute(DbRef dbRef, String region, boolean ifExists, LongRunningOptions lrOptions) {
+    public RegionDeleteResult execute(DbRef dbRef, RegionName region, boolean ifExists, LongRunningOptions lrOptions) {
         val status = regionGateway.deleteRegion(dbRef, region);
 
         return switch (status) {
@@ -42,7 +43,7 @@ public class RegionDeleteOperation {
         return new RegionDeletedAndDbActive(awaitedDuration);
     }
 
-    private RegionDeleteResult handleRegionNotFound(DbRef dbRef, String region, boolean ifExists) {
+    private RegionDeleteResult handleRegionNotFound(DbRef dbRef, RegionName region, boolean ifExists) {
         if (ifExists) {
             return new RegionNotFound();
         } else {
@@ -51,7 +52,7 @@ public class RegionDeleteOperation {
     }
 
     public static class RegionNotFoundException extends AstraCliException {
-        public RegionNotFoundException(String region, DbRef dbRef) {
+        public RegionNotFoundException(RegionName region, DbRef dbRef) {
             super("""
               @|bold,red Error: Region '%s' does not exist in database '%s'.|@
             
@@ -59,7 +60,7 @@ public class RegionDeleteOperation {
               - Run %s to see the existing regions.
               - Pass the %s flag to skip this error if the region doesn't exist.
             """.formatted(
-                region,
+                region.unwrap(),
                 dbRef,
                 AstraColors.highlight("astra db list-regions " + dbRef),
                 AstraColors.highlight("--if-exists")

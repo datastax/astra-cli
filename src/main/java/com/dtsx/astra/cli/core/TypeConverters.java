@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.output.output.OutputType;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -15,7 +16,8 @@ public abstract class TypeConverters {
         new ToAstraEnvironment(),
         new ToOutputType(),
         new ToProfileName(),
-        new ToDbRef()
+        new ToDbRef(),
+        new ToRegionRef()
     );
 
     public abstract static class TypeConverterWithClass implements ITypeConverter<Object> {
@@ -72,6 +74,19 @@ public abstract class TypeConverters {
         public Object convert(String value) {
             return DbRef.parse(value).getRight((msg) -> {
                 throw new OptionValidationException("database name/id", msg);
+            });
+        }
+    }
+
+    private static class ToRegionRef extends TypeConverterWithClass {
+        public ToRegionRef() {
+            super(RegionName.class);
+        }
+
+        @Override
+        public Object convert(String value) {
+            return RegionName.parse(value).getRight((msg) -> {
+                throw new OptionValidationException("region", msg);
             });
         }
     }

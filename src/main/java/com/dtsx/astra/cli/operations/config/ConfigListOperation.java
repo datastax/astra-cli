@@ -31,7 +31,7 @@ public class ConfigListOperation {
             .orElse(null);
 
         val profiles = config.getValidatedProfiles().stream()
-            .filter(p -> !p.name().equals(ProfileName.DEFAULT))
+            .filter(p -> !p.isDefault())
             .map(p -> new ProfileInfo(
                 p.name().unwrap(),
                 p.token(),

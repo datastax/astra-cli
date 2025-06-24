@@ -2,11 +2,13 @@ package com.dtsx.astra.cli.gateways;
 
 import com.datastax.astra.client.DataAPIClient;
 import com.datastax.astra.client.DataAPIDestination;
+import com.datastax.astra.client.admin.DatabaseAdmin;
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.client.databases.DatabaseOptions;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.exceptions.db.DbNameNotUniqueException;
 import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
@@ -47,6 +49,11 @@ public class APIProviderImpl implements APIProvider {
     }
 
     @Override
+    public DatabaseAdmin dataApiDatabaseAdmin(DbRef dbRef) {
+        return dataApiClient().getAdmin().getDatabaseAdmin(resolveId(dbRef));
+    }
+
+    @Override
     public String restApiEndpoint(DbRef dbRef, AstraEnvironment env) {
         return ApiLocator.getApiRestEndpoint(env, resolveId(dbRef).toString(), resolveRegion(dbRef));
     }
@@ -74,12 +81,14 @@ public class APIProviderImpl implements APIProvider {
     private String resolveRegion(DbRef ref) {
         val cachedRegion = dbCache.lookupDbRegion(ref);
 
-        return cachedRegion.orElseGet(() -> AstraLogger.loading("Resolving region for database " + highlight(ref), (_) ->
-            tryResolveDb(ref)
-                .map(com.dtsx.astra.sdk.db.domain.Database::getInfo)
-                .map(DatabaseInfo::getRegion)
-                .orElseThrow(() -> new DbNotFoundException(ref))
-        ));
+        return cachedRegion
+            .map(RegionName::unwrap)
+            .orElseGet(() -> AstraLogger.loading("Resolving region for database " + highlight(ref), (_) ->
+                tryResolveDb(ref)
+                    .map(com.dtsx.astra.sdk.db.domain.Database::getInfo)
+                    .map(DatabaseInfo::getRegion)
+                    .orElseThrow(() -> new DbNotFoundException(ref))
+            ));
     }
 
     public Optional<com.dtsx.astra.sdk.db.domain.Database> tryResolveDb(@NotNull DbRef ref) {
@@ -103,7 +112,7 @@ public class APIProviderImpl implements APIProvider {
         dbInfo.ifPresent((info) -> {
             val id = UUID.fromString(info.getId());
             dbCache.cacheDbId(info.getInfo().getName(), id);
-            dbCache.cacheDbRegion(id, info.getInfo().getRegion());
+            dbCache.cacheDbRegion(id, RegionName.mkUnsafe(info.getInfo().getRegion()));
         });
 
         return dbInfo;

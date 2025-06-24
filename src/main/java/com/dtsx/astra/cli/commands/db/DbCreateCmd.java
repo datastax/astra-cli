@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.db.DbCreateOperation;
@@ -41,7 +42,7 @@ public final class DbCreateCmd extends AbstractLongRunningDbSpecificCmd {
             description = "Cloud provider region to provision",
             required = true
         )
-        public String region;
+        public RegionName region;
 
         @Option(
             names = { "-c", "--cloud" },

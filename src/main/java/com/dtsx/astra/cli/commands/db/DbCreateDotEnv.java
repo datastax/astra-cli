@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraConsole.ConfirmResponse;
@@ -64,7 +65,7 @@ public final class DbCreateDotEnv extends AbstractDbSpecificCmd {
         description = "The region to use",
         paramLabel = "REGION"
     )
-    private Optional<String> region;
+    private Optional<RegionName> region;
 
     @ArgGroup
     private @Nullable Keys keysGroup;

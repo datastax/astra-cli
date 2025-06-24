@@ -61,7 +61,7 @@ public class ConfigCreateOperation {
     private ProfileName mkProfileName(Organization org, CreateConfigRequest request) {
         val profileName = request.profileName.orElse(ProfileName.mkUnsafe(org.getName()));
 
-        if (profileName.equals(ProfileName.DEFAULT)) {
+        if (profileName.isDefault()) {
             assertShouldSetDefaultProfile(request);
         }
 

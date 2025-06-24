@@ -1,9 +1,11 @@
 package com.dtsx.astra.cli.gateways.db;
 
+import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.GlobalInfoCache;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -42,9 +44,11 @@ public interface DbGateway {
 
     Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout);
 
-    CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, String region, boolean vectorOnly);
+    CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly);
 
-    CreationStatus<Database> createDb(String name, String keyspace, String region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector);
+    CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector);
 
     DeletionStatus<DbRef> deleteDb(DbRef ref);
+
+    FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef);
 }

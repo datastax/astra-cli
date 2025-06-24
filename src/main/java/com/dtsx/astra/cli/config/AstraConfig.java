@@ -12,6 +12,7 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,13 +26,18 @@ import java.util.function.Predicate;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
     public static final String ASTRARC_FILE_NAME = ".astrarc-pico";
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
-    public record Profile(ProfileName name, String token, AstraEnvironment env) {}
+    public record Profile(ProfileName name, String token, AstraEnvironment env) {
+        public boolean isDefault() {
+            return name.isDefault();
+        }
+    }
     private record InvalidProfile(IniSection section, String issue) {}
 
     @Getter

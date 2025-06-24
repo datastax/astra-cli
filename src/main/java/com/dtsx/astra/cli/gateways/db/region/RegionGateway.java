@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.db.region;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
@@ -25,11 +26,11 @@ public interface RegionGateway {
 
     List<Datacenter> findRegionsForDb(DbRef dbRef);
 
-    boolean regionExistsInDb(DbRef dbRef, String region);
+    boolean regionExistsInDb(DbRef dbRef, RegionName region);
 
     Set<String> findRegionClouds();
 
-    CreationStatus<String> createRegion(DbRef ref, String region, String tier, CloudProviderType cp);
+    CreationStatus<RegionName> createRegion(DbRef ref, RegionName region, String tier, CloudProviderType cp);
 
-    DeletionStatus<String> deleteRegion(DbRef ref, String region);
+    DeletionStatus<RegionName> deleteRegion(DbRef ref, RegionName region);
 }

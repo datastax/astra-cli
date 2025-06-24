@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.db.region;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -24,7 +25,7 @@ public class RegionCreateOperation {
     public record RegionCreated() implements RegionCreateResult {}
     public record RegionCreatedAndDbActive(Duration waitTime) implements RegionCreateResult {}
 
-    public RegionCreateResult execute(DbRef dbRef, String region, boolean ifNotExists, LongRunningOptions lrOptions) {
+    public RegionCreateResult execute(DbRef dbRef, RegionName region, boolean ifNotExists, LongRunningOptions lrOptions) {
         val dbInfo = dbGateway.findOneDb(dbRef);
 
         val status = regionGateway.createRegion(dbRef, region, dbInfo.getInfo().getTier(), dbInfo.getInfo().getCloudProvider());
@@ -44,7 +45,7 @@ public class RegionCreateOperation {
         return new RegionCreatedAndDbActive(awaitedDuration);
     }
 
-    private RegionCreateResult handleRegionAlreadyExists(DbRef dbRef, String region, boolean ifNotExists) {
+    private RegionCreateResult handleRegionAlreadyExists(DbRef dbRef, RegionName region, boolean ifNotExists) {
         if (ifNotExists) {
             return new RegionAlreadyExists();
         } else {
@@ -53,7 +54,7 @@ public class RegionCreateOperation {
     }
 
     public static class RegionAlreadyExistsException extends AstraCliException {
-        public RegionAlreadyExistsException(String region, DbRef dbRef) {
+        public RegionAlreadyExistsException(RegionName region, DbRef dbRef) {
             super("""
               @|bold,red Error: Region '%s' already exists in database '%s'.|@
             
@@ -61,7 +62,7 @@ public class RegionCreateOperation {
               - Run %s to see the existing regions.
               - Pass the %s flag to skip this error if the region already exists.
             """.formatted(
-                region,
+                region.unwrap(),
                 dbRef,
                 AstraColors.highlight("astra db list-regions " + dbRef),
                 AstraColors.highlight("--if-not-exists")

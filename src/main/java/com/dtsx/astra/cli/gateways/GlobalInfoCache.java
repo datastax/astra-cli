@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.gateways;
 
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -13,7 +14,7 @@ public enum GlobalInfoCache implements DbCache {
     INSTANCE;
 
     private final Map<String, @NotNull UUID> dbIdCache = new HashMap<>();
-    private final Map<UUID, @NotNull String> dbRegionCache = new HashMap<>();
+    private final Map<UUID, @NotNull RegionName> dbRegionCache = new HashMap<>();
 
     @Override
     public void cacheDbId(String dbName, UUID id) {
@@ -21,7 +22,7 @@ public enum GlobalInfoCache implements DbCache {
     }
 
     @Override
-    public void cacheDbRegion(UUID id, String region) {
+    public void cacheDbRegion(UUID id, RegionName region) {
         dbRegionCache.put(id, region);
     }
 
@@ -31,7 +32,7 @@ public enum GlobalInfoCache implements DbCache {
     }
 
     @Override
-    public Optional<String> lookupDbRegion(DbRef ref) {
+    public Optional<RegionName> lookupDbRegion(DbRef ref) {
         return ref.fold(
             id -> Optional.ofNullable(dbRegionCache.get(id)),
             name -> Optional.ofNullable(dbIdCache.get(name)).map(dbRegionCache::get)

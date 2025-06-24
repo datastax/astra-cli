@@ -3,13 +3,13 @@ package com.dtsx.astra.cli.config;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.utils.StringUtils;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
 public class ProfileName implements AstraColors.Highlightable {
     public static final ProfileName DEFAULT = ProfileName.mkUnsafe("default");
-
-    public static final String PARAM_LABEL = "PROFILE_NAME";
 
     String name;
 
@@ -35,6 +35,10 @@ public class ProfileName implements AstraColors.Highlightable {
 
     public String unwrap() {
         return name;
+    }
+
+    public boolean isDefault() {
+        return this.equals(DEFAULT);
     }
 
     @Override

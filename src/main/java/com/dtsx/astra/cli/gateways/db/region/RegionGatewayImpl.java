@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.db.region;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.*;
@@ -85,14 +86,14 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public boolean regionExistsInDb(DbRef dbRef, String region) {
+    public boolean regionExistsInDb(DbRef dbRef, RegionName region) {
         return AstraLogger.loading("Checking if region " + highlight(region) + " exists in db " + highlight(dbRef), (_) -> (
-            findRegionsForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region))
+            findRegionsForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
         ));
     }
 
     @Override
-    public CreationStatus<String> createRegion(DbRef ref, String region, String tier, CloudProviderType cp) {
+    public CreationStatus<RegionName> createRegion(DbRef ref, RegionName region, String tier, CloudProviderType cp) {
         val exists = regionExistsInDb(ref, region);
 
         if (exists) {
@@ -100,7 +101,7 @@ public class RegionGatewayImpl implements RegionGateway {
         }
 
         AstraLogger.loading("Creating region " + highlight(region) + " for db " + highlight(ref), (_) -> {
-            api.dbOpsClient(ref).datacenters().create(tier, cp, region);
+            api.dbOpsClient(ref).datacenters().create(tier, cp, region.unwrap());
             return null;
         });
 
@@ -108,7 +109,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public DeletionStatus<String> deleteRegion(DbRef ref, String region) {
+    public DeletionStatus<RegionName> deleteRegion(DbRef ref, RegionName region) {
         val exists = regionExistsInDb(ref, region);
 
         if (!exists) {
@@ -116,7 +117,7 @@ public class RegionGatewayImpl implements RegionGateway {
         }
 
         AstraLogger.loading("Deleting region " + highlight(region) + " from db " + highlight(ref), (_) -> {
-            api.dbOpsClient(ref).datacenters().delete(region);
+            api.dbOpsClient(ref).datacenters().delete(region.unwrap());
             return null;
         });
 

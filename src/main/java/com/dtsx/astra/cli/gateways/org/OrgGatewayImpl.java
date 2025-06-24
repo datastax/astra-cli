@@ -16,7 +16,7 @@ public class OrgGatewayImpl implements OrgGateway {
 
     @Override
     public Organization getCurrentOrg() {
-        return AstraLogger.loading("Fetching current organization", (_) -> {
+        return AstraLogger.loading("Fetching details about the current organization", (_) -> {
             return apiProvider.astraOpsClient().getOrganization();
         });
     }

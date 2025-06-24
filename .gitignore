@@ -41,5 +41,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-token
+/token
 comp.bash
