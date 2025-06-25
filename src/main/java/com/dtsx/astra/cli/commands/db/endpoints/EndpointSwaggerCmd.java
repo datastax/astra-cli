@@ -1,17 +1,20 @@
 package com.dtsx.astra.cli.commands.db.endpoints;
 
-import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.cli.operations.db.endpoints.EndpointSwaggerOperation;
+import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
+import com.dtsx.astra.sdk.utils.ApiLocator;
+import lombok.val;
 import picocli.CommandLine.Command;
-
-import static com.dtsx.astra.cli.operations.db.endpoints.EndpointSwaggerOperation.EndpointSwaggerRequest;
 
 @Command(
     name = "get-endpoint-swagger"
 )
 public class EndpointSwaggerCmd extends AbstractEndpointGetCmd {
     @Override
-    protected Operation<String> mkOperation() {
-        return new EndpointSwaggerOperation(dbGateway, new EndpointSwaggerRequest(dbRef, region, profile().env()));
+    protected String mkEndpoint(EndpointGetResponse result) {
+        val db = result.database();
+
+        return (db.getInfo().getDbType() == null)
+            ? ApiLocator.getApiRestEndpoint(profile().env(), db.getId(), result.region()) + "/swagger-ui/"
+            : ApiLocator.getApiEndpoint(profile().env(), db.getId(), result.region()) + "/api/json/swagger-ui/";
     }
 }

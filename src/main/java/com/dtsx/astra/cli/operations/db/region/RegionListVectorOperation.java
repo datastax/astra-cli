@@ -13,9 +13,6 @@ import static com.dtsx.astra.cli.operations.db.region.RegionListVectorOperation.
 @RequiredArgsConstructor
 public class RegionListVectorOperation implements Operation<SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>>> {
     private final RegionGateway regionGateway;
-    private final RegionListVectorRequest request;
-
-    public record RegionListVectorRequest() {}
 
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> execute() {

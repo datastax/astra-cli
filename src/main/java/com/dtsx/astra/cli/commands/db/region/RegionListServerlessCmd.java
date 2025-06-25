@@ -8,14 +8,12 @@ import picocli.CommandLine.Command;
 
 import java.util.SortedMap;
 
-import static com.dtsx.astra.cli.operations.db.region.RegionListServerlessOperation.RegionListServerlessRequest;
-
 @Command(
     name = "list-regions-serverless"
 )
 public class RegionListServerlessCmd extends AbstractRegionListCmd {
     @Override
     protected Operation<SortedMap<CloudProviderType,? extends SortedMap<String, RegionInfo>>> mkOperation() {
-        return new RegionListServerlessOperation(regionGateway, new RegionListServerlessRequest());
+        return new RegionListServerlessOperation(regionGateway);
     }
 }

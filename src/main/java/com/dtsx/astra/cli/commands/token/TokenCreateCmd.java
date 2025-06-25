@@ -12,7 +12,9 @@ import java.util.List;
 
 import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.*;
 
-@Command(name = "create", description = "Create a new token")
+@Command(
+    name = "create"
+)
 public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     @Option(
         names = { "-r", "--role" },

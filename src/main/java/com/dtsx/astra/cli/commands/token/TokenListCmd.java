@@ -12,7 +12,9 @@ import java.util.Map;
 
 import static com.dtsx.astra.cli.operations.token.TokenListOperation.*;
 
-@Command(name = "list", description = "Display the list of tokens in an organization")
+@Command(
+    name = "list"
+)
 public class TokenListCmd extends AbstractTokenCmd<List<TokenInfo>> {
     @Override
     public final OutputAll execute(List<TokenInfo> tokens) {

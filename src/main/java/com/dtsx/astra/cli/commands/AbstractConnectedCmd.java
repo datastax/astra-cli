@@ -15,10 +15,10 @@ import java.util.Optional;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @Option(names = { "-e", "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
-    public Optional<AstraEnvironment> env;
+    private Optional<AstraEnvironment> env;
 
     @ArgGroup
-    public @Nullable TokenProvider tokenProvider;
+    private @Nullable TokenProvider tokenProvider;
 
     public static class TokenProvider {
         @Option(names = { "--profile", "-p" }, completionCandidates = AvailableProfilesCompletion.class, description = "Specify the astrarc profile to use", paramLabel = "NAME")

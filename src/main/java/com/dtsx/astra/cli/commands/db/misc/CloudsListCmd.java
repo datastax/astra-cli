@@ -19,7 +19,7 @@ import static com.dtsx.astra.cli.operations.db.misc.CloudsListOperation.*;
 public class CloudsListCmd extends AbstractRegionCmd<Set<String>> {
     @Override
     protected CloudsListOperation mkOperation() {
-        return new CloudsListOperation(regionGateway, new CloudsListRequest());
+        return new CloudsListOperation(regionGateway);
     }
 
     @Override

@@ -13,9 +13,6 @@ import static com.dtsx.astra.cli.operations.db.region.RegionListServerlessOperat
 @RequiredArgsConstructor
 public class RegionListServerlessOperation implements Operation<SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>>> {
     private final RegionGateway regionGateway;
-    private final RegionListServerlessRequest request;
-
-    public record RegionListServerlessRequest() {}
 
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> execute() {

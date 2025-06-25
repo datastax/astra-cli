@@ -8,14 +8,12 @@ import picocli.CommandLine.Command;
 
 import java.util.SortedMap;
 
-import static com.dtsx.astra.cli.operations.db.region.RegionListVectorOperation.RegionListVectorRequest;
-
 @Command(
     name = "list-regions-vector"
 )
 public class RegionListVectorCmd extends AbstractRegionListCmd {
     @Override
     protected Operation<SortedMap<CloudProviderType,? extends SortedMap<String, RegionInfo>>> mkOperation() {
-        return new RegionListVectorOperation(regionGateway, new RegionListVectorRequest());
+        return new RegionListVectorOperation(regionGateway);
     }
 }

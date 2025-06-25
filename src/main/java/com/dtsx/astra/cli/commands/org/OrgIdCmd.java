@@ -5,7 +5,9 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.org.OrgIdOperation;
 import picocli.CommandLine.Command;
 
-@Command(name = "id")
+@Command(
+    name = "id"
+)
 public class OrgIdCmd extends AbstractOrgCmd<String> {
     @Override
     public final OutputAll execute(String id) {
