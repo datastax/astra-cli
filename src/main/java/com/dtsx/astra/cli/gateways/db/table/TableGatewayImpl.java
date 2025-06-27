@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.APIProviderImpl;
@@ -23,7 +24,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 public class TableGatewayImpl implements TableGateway {
     private final APIProviderImpl api;
 
-    public TableGatewayImpl(String token, AstraEnvironment env) {
+    public TableGatewayImpl(Token token, AstraEnvironment env) {
         this.api = (APIProviderImpl) APIProvider.mkDefault(token, env);
     }
 

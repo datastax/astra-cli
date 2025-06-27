@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.db.misc;
 
 import com.dtsx.astra.cli.commands.db.region.AbstractRegionCmd;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
@@ -11,10 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.dtsx.astra.cli.operations.db.misc.CloudsListOperation.*;
-
 @Command(
-    name = "list-clouds"
+    name = "list-clouds",
+    description = "List all cloud providers with regions available for Astra DB"
+)
+@Example(
+    comment = "List all available cloud providers",
+    command = "astra db list-clouds"
 )
 public class CloudsListCmd extends AbstractRegionCmd<Set<String>> {
     @Override

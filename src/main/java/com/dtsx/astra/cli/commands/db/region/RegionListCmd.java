@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.region;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.region.RegionListOperation;
@@ -11,12 +12,17 @@ import java.util.Map;
 import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
 
 @Command(
-    name = "list-regions"
+    name = "list-regions",
+    description = "List the regions for the given database"
+)
+@Example(
+    comment = "List all regions for the database",
+    command = "astra db list-regions my_db"
 )
 public class RegionListCmd extends AbstractDbSpecificRegionCmd<FoundRegions> {
     @Override
     protected RegionListOperation mkOperation() {
-        return new RegionListOperation(regionGateway, dbGateway, new RegionListRequest(dbRef));
+        return new RegionListOperation(regionGateway, dbGateway, new RegionListRequest($dbRef));
     }
 
     @Override

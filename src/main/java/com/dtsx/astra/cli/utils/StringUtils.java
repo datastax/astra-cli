@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.utils;
 
+import com.dtsx.astra.cli.core.output.AstraColors;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
@@ -9,14 +10,14 @@ import java.util.UUID;
 public class StringUtils {
     public static final String NL = System.lineSeparator();
 
-    public String removeQuotesIfAny(String str) {
+    public static String removeQuotesIfAny(String str) {
         if (str != null && str.length() >= 2 && ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'")))) {
             return str.substring(1, str.length() - 1);
         }
         return str;
     }
 
-    public boolean isUUID(String str) {
+    public static boolean isUUID(String str) {
         try {
             UUID.fromString(str);
             return true;
@@ -26,6 +27,10 @@ public class StringUtils {
     }
 
     public static String trimIndent(String input) {
+        return withIndent(input, 0);
+    }
+
+    public static String withIndent(String input, int targetIndent) {
         val lines = input.split("\n", -1);
 
         var start = 0;
@@ -52,12 +57,27 @@ public class StringUtils {
             }
         }
 
+        val indentStr = " ".repeat(targetIndent);
+
         for (int i = 0; i < trimmedLines.length; i++) {
             if (trimmedLines[i].length() >= minIndent) {
                 trimmedLines[i] = trimmedLines[i].substring(minIndent);
             }
+            trimmedLines[i] = indentStr + trimmedLines[i];
         }
 
         return String.join(NL, trimmedLines);
+    }
+
+    public static String renderComment(CharSequence comment) {
+        return AstraColors.NEUTRAL_400.use("# " + comment);
+    }
+
+    public static String renderCommand(Iterable<? extends CharSequence> command, CharSequence extra) {
+        return renderCommand(String.join(" ", command) + " " + extra);
+    }
+
+    public static String renderCommand(CharSequence command) {
+        return AstraColors.BLUE_300.use("$ ") + command;
     }
 }

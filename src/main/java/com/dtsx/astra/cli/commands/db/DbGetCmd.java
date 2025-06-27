@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
@@ -20,7 +21,16 @@ import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
 
 @Command(
     name = "get",
-    aliases = { "describe" }
+    aliases = { "describe" },
+    description = "Get information about a specific database."
+)
+@Example(
+    comment = "Get information about a specific database",
+    command = "astra db get my_db"
+)
+@Example(
+    comment = "Get a specific attribute of a database",
+    command = "astra db get my_db -k id"
 )
 public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     public enum DbGetKeys {
@@ -36,17 +46,21 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
         vector
     }
 
-    @Option(names = { "-k", "--key" }, description = "Specific database attribute to retrieve", paramLabel = "<key>")
-    public Optional<DbGetKeys> key;
+    @Option(
+        names = { "-k", "--key" },
+        description = "Specific database attribute to retrieve",
+        paramLabel = "<key>"
+    )
+    public Optional<DbGetKeys> $key;
 
     @Override
     protected DbGetOperation mkOperation() {
-        return new DbGetOperation(dbGateway, new DbGetRequest(dbRef));
+        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef));
     }
 
     @Override
     public OutputJson executeJson(DbGetResult result) {
-        if (key.isPresent()) {
+        if ($key.isPresent()) {
             return execute(result);
         }
         return OutputJson.serializeValue(result.database());
@@ -56,7 +70,7 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     protected final OutputAll execute(DbGetResult result) {
         val dbInfo = result.database();
 
-        return key
+        return $key
             .map((k) -> dbInfo4Key(dbInfo, k))
             .map(OutputAll::serializeValue)
             .orElseGet(() -> this.mkTable(dbInfo));

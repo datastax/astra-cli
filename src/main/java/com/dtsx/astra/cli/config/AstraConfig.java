@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.config;
 
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
@@ -26,14 +27,13 @@ import java.util.function.Predicate;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
-@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
     public static final String ASTRARC_FILE_NAME = ".astrarc-pico";
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
-    public record Profile(ProfileName name, String token, AstraEnvironment env) {
+    public record Profile(ProfileName name, Token token, AstraEnvironment env) {
         public boolean isDefault() {
             return name.isDefault();
         }
@@ -97,7 +97,10 @@ public class AstraConfig {
                             .map(AstraEnvironment::valueOf)
                             .orElse(AstraEnvironment.PROD);
 
-                        return Either.right(new Profile(profileName, token.get(), env));
+                        return Token.parse(token.get()).bimap(
+                            (msg) -> new InvalidProfile(section, "Error parsing token for profile " + highlight(profileName.unwrap()) + ": " + msg),
+                            (tokenValue) -> new Profile(profileName, tokenValue, env)
+                        );
                     });
                 })
                 .toList();
@@ -147,11 +150,11 @@ public class AstraConfig {
     }
 
     public class ProfileModificationCtx {
-        public void createProfile(ProfileName name, String token, AstraEnvironment env) {
+        public void createProfile(ProfileName name, Token token, AstraEnvironment env) {
             profiles.add(Either.right(new Profile(name, token, env)));
 
             backingIni.addSection(name.unwrap(), new HashMap<>() {{
-                put(TOKEN_KEY, token);
+                put(TOKEN_KEY, token.unwrap());
 
                 if (env != AstraEnvironment.PROD) {
                     put(ENV_KEY, env.name());

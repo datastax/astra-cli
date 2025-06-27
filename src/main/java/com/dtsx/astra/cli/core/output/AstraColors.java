@@ -36,6 +36,7 @@ public enum AstraColors implements Ansi.IStyle {
     ORANGE_600(173, 84, 31),
 
     NEUTRAL_300(167, 170, 173),
+    NEUTRAL_400(138, 141, 144),
     NEUTRAL_500(108, 111, 115),
 
     TEAL_400(85, 186, 185),

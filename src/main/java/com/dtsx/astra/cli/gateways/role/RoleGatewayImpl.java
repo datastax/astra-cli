@@ -10,11 +10,18 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 public class RoleGatewayImpl implements RoleGateway {
     private final APIProvider apiProvider;
+
+    @Override
+    public List<Role> findAll() {
+        return AstraLogger.loading("Loading roles", (_) -> 
+            apiProvider.astraOpsClient().roles().findAll().toList());
+    }
 
     @Override
     public Optional<Role> tryFindOne(String role) {

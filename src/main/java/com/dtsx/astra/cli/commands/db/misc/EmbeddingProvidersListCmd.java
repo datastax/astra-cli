@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.db.misc;
 
 import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation;
@@ -13,12 +14,17 @@ import java.util.Map;
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.*;
 
 @Command(
-    name = "list-embedding-providers"
+    name = "list-embedding-providers",
+    description = "Find all available embedding providers for a given database"
+)
+@Example(
+    comment = "Find all available embedding providers for a database",
+    command = "astra db list-embedding-providers my_db"
 )
 public class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd<List<EmbeddingProviderResult>> {
     @Override
     protected EmbeddingProvidersListOperation mkOperation() {
-        return new EmbeddingProvidersListOperation(dbGateway, new EmbeddingProvidersListRequest(dbRef));
+        return new EmbeddingProvidersListOperation(dbGateway, new EmbeddingProvidersListRequest($dbRef));
     }
 
     @Override

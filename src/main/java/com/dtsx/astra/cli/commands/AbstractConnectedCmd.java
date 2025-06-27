@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         public Optional<ProfileName> profileName;
 
         @Option(names = { "--token" }, description = "Override the default astra token", paramLabel = "TOKEN")
-        public Optional<String> token;
+        public Optional<Token> token;
     }
 
     private @Nullable Profile cachedProfile;
@@ -36,7 +37,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         }
 
         if (tokenProvider != null && tokenProvider.token.isPresent()) {
-            return cachedProfile = new Profile(ProfileName.mkUnsafe("<faux_profile>"), tokenProvider.token.get(), env.orElse(AstraEnvironment.PROD));
+            return cachedProfile = new Profile(ProfileName.mkUnsafe("<arg_provided_token>"), tokenProvider.token.get(), env.orElse(AstraEnvironment.PROD));
         }
 
         val profileName = (tokenProvider != null) && tokenProvider.profileName.isPresent()

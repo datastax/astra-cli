@@ -60,21 +60,4 @@ public class KeyspaceCreateOperation implements Operation<KeyspaceCreateResult> 
             return new KeyspaceIllegallyAlreadyExists();
         }
     }
-
-    public static class KeyspaceAlreadyExistsException extends AstraCliException {
-        public KeyspaceAlreadyExistsException(KeyspaceRef keyspaceRef) {
-            super("""
-              @|bold,red Error: Keyspace '%s' already exists in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see the existing keyspaces.
-              - Pass the %s flag to skip this error if the keyspace already exists.
-            """.formatted(
-                keyspaceRef,
-                keyspaceRef.db(),
-                AstraColors.highlight("astra db list-keyspaces " + keyspaceRef.db()),
-                AstraColors.highlight("--if-not-exists")
-            ));
-        }
-    }
 }

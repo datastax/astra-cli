@@ -100,7 +100,7 @@ public record EnvFile(@Getter ArrayList<EnvNode> nodes) {
             val sj = new StringJoiner(NL);
 
             for (String comment : comments) {
-                sj.add((colored) ? AstraColors.NEUTRAL_300.use(comment) : comment);
+                sj.add((colored) ? AstraColors.NEUTRAL_400.use(comment) : comment);
             }
 
             return sj.toString();
@@ -121,12 +121,12 @@ public record EnvFile(@Getter ArrayList<EnvNode> nodes) {
             val sb = new StringBuilder();
 
             for (String comment : comments) {
-                sb.append((colored) ? AstraColors.NEUTRAL_300.use(comment) : comment);
+                sb.append((colored) ? AstraColors.NEUTRAL_400.use(comment) : comment);
                 sb.append(NL);
             }
 
             if (colored) {
-                sb.append(AstraColors.BLUE_300.use(key)).append(AstraColors.NEUTRAL_300.use("=")).append(value);
+                sb.append(AstraColors.BLUE_300.use(key)).append(AstraColors.NEUTRAL_400.use("=")).append(value);
             } else {
                 sb.append(key).append("=").append(value);
             }

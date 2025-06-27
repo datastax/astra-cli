@@ -6,13 +6,14 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface TableGateway {
-    static TableGateway mkDefault(String token, AstraEnvironment env) {
+    static TableGateway mkDefault(Token token, AstraEnvironment env) {
         return new TableGatewayImpl(token, env);
     }
 

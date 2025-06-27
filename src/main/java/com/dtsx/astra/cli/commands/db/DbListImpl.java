@@ -16,11 +16,11 @@ import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
 
 public abstract class DbListImpl extends AbstractDbCmd<List<Database>> {
     @Option(names = "--vector", description = "Only show vector-enabled databases")
-    protected boolean vectorOnly;
+    protected boolean $vectorOnly;
 
     @Override
     protected DbListOperation mkOperation() {
-        return new DbListOperation(dbGateway, new DbListRequest(vectorOnly));
+        return new DbListOperation(dbGateway, new DbListRequest($vectorOnly));
     }
 
     @Override

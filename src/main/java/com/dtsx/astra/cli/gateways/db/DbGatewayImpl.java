@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
@@ -22,6 +23,7 @@ import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.graalvm.collections.Pair;
 
 import java.io.File;
 import java.net.URI;
@@ -41,7 +43,7 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 @RequiredArgsConstructor
 public class DbGatewayImpl implements DbGateway {
     private final APIProvider api;
-    private final String token;
+    private final Token token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
     private final RegionGateway regionGateway;
@@ -77,26 +79,23 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public ResumeDbResult resumeDb(DbRef ref, int timeout) {
+    public Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout) {
         val currentStatus = AstraLogger.loading("Fetching current currStatus of db " + highlight(ref), (_) -> findOneDb(ref))
             .getStatus();
 
-        return new EnumFolder<DatabaseStatusType, ResumeDbResult>(DatabaseStatusType.class)
+        return new EnumFolder<DatabaseStatusType, Pair<DatabaseStatusType, Duration>>(DatabaseStatusType.class)
             .on(ACTIVE, () -> {
-                AstraLogger.debug("Database '%s' is already active".formatted(ref));
-                return new ResumeDbResult(false, Duration.ZERO);
+                return Pair.create(currentStatus, Duration.ZERO);
             })
             .on(HIBERNATED, () -> {
                 AstraLogger.loading("Resuming database '%s'".formatted(ref), (_) -> {
                     resumeDbInternal(ref);
                     return null;
                 });
-
-                return new ResumeDbResult(true, waitUntilDbStatus(ref, ACTIVE, timeout));
+                return Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
             })
             .on(MAINTENANCE, INITIALIZING, PENDING, () -> {
-                AstraLogger.debug("Database '%s' is of currStatus '%s', and will be available soon".formatted(ref, currentStatus));
-                return new ResumeDbResult(false, Duration.ZERO);
+                return Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
             })
             .exhaustive((expected, _) -> {
                 throw new UnexpectedDbStatusException(ref, currentStatus, expected);
@@ -138,7 +137,7 @@ public class DbGatewayImpl implements DbGateway {
                 .uri(URI.create(endpoint))
                 .timeout(Duration.ofSeconds(20))
                 .header("Content-Type", "application/json")
-                .header("X-Cassandra-Token", token)
+                .header("X-Cassandra-Token", token.unwrap())
                 .GET()
                 .build();
 

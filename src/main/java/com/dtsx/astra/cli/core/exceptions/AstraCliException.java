@@ -6,24 +6,32 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-public abstract class AstraCliException extends RuntimeException {
+public class AstraCliException extends RuntimeException {
     @Getter
     private final @Nullable Map<String, Object> metadata;
 
+    @Getter
+    private final CliExceptionCode code;
+
     public AstraCliException(String formatted) {
-        this(formatted, null, null);
+        this(null, formatted, null);
     }
 
-    public AstraCliException(String formatted, Throwable cause) {
-        this(formatted, null, cause);
+    public AstraCliException(CliExceptionCode code, String formatted) {
+        this(code, formatted, null);
     }
 
-    public AstraCliException(String formatted, @Nullable Map<String, Object> metadata, @Nullable Throwable cause) {
-        super(StringUtils.trimIndent(formatted), cause);
+    public AstraCliException(CliExceptionCode code, String formatted, @Nullable Map<String, Object> metadata) {
+        super(StringUtils.trimIndent(formatted));
         this.metadata = metadata;
+        this.code = code;
     }
 
     public boolean shouldDumpLogs() {
+        return false;
+    }
+
+    public boolean shouldPrintHelpMessage() {
         return false;
     }
 }

@@ -5,19 +5,27 @@ import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+
+import java.time.Duration;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
-import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
+import static com.dtsx.astra.cli.operations.db.DbResumeOperation.DbResumeResult;
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.HIBERNATED;
 
 @RequiredArgsConstructor
 public class DbResumeOperation implements Operation<DbResumeResult> {
     private final DbGateway dbGateway;
     private final DbResumeRequest request;
 
-    public record DbResumeResult(
-        Database finalDatabase,
-        DbGateway.ResumeDbResult resumeResult
-    ) {}
+    public sealed interface DbResumeResult {}
+    public record DatabaseAwaited(Duration waited) implements DbResumeResult {}
+    public record DatabaseResumedAwaited(Duration waited) implements DbResumeResult {}
+    public record DatabaseNeedsAwaiting(Database database) implements DbResumeResult {}
+    public record DatabaseResumedNeedsAwaiting(Database database) implements DbResumeResult {}
+    public record DatabaseAlreadyActiveNoWait() implements DbResumeResult {}
 
     public record DbResumeRequest(
         DbRef dbRef,
@@ -26,8 +34,25 @@ public class DbResumeOperation implements Operation<DbResumeResult> {
 
     @Override
     public DbResumeResult execute() {
-        var resumeResult = dbGateway.resumeDb(request.dbRef, request.lrOptions.dontWait() ? 0 : request.lrOptions.timeout());
-        var finalDatabase = dbGateway.findOneDb(request.dbRef);
-        return new DbResumeResult(finalDatabase, resumeResult);
+        val pair = dbGateway.resumeDb(request.dbRef, Optional.of(request.lrOptions.timeout()).filter((_) -> !request.lrOptions.dontWait()));
+
+        val initialStatus = pair.getLeft();
+        val awaitedDuration = pair.getRight();
+
+        if (initialStatus == ACTIVE) {
+            return new DatabaseAlreadyActiveNoWait();
+        }
+
+        if (request.lrOptions.dontWait()) {
+            val database = dbGateway.findOneDb(request.dbRef);
+
+            return (initialStatus == HIBERNATED)
+                ? new DatabaseResumedNeedsAwaiting(database)
+                : new DatabaseNeedsAwaiting(database);
+        }
+
+        return (initialStatus == HIBERNATED)
+            ? new DatabaseResumedAwaited(awaitedDuration)
+            : new DatabaseAwaited(awaitedDuration);
     }
 }

@@ -2,12 +2,12 @@ package com.dtsx.astra.cli.commands.db.cdc;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CdcId;
 import com.dtsx.astra.cli.core.models.CdcRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation;
@@ -16,15 +16,30 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CDC_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
+import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
-    name = "delete-cdc"
+    name = "delete-cdc",
+    description = "Delete a CDC (Change Data Capture) from the database"
+)
+@Example(
+    comment = "Delete a CDC by ID",
+    command = "astra db delete-cdc my_db --cdc-id abc123"
+)
+@Example(
+    comment = "Delete a CDC by table and tenant",
+    command = "astra db delete-cdc my_db -k my_keyspace -t my_table --tenant my_tenant"
+)
+@Example(
+    comment = "Delete a CDC without failing if it doesn't exist",
+    command = "astra db delete-cdc my_db --cdc-id abc123 --if-exists"
 )
 public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
-    @ArgGroup(exclusive = true, multiplicity = "1")
-    CdcIdentifier cdcIdentifier;
+    @ArgGroup(multiplicity = "1")
+    CdcIdentifier $cdcIdentifier;
 
     static class CdcIdentifier {
         @Option(
@@ -70,61 +85,90 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         description = { "Do not fail if CDC does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    public boolean ifExists;
+    public boolean $ifExists;
 
     @Override
     public final OutputAll execute(CdcDeleteResult result) {
-        val cdcRef = getCdcRef();
-        
         val message = switch (result) {
-            case CdcNotFound() -> "CDC " + highlight(cdcRef.toString()) + " does not exist; nothing to delete";
-            case CdcIllegallyNotFound() -> throw new CdcNotFoundException(cdcRef);
-            case CdcDeleted() -> "CDC " + highlight(cdcRef.toString()) + " has been deleted";
+            case CdcNotFound() -> handleCdcNotFound();
+            case CdcIllegallyNotFound() -> throwCdcNotFound();
+            case CdcDeleted() -> handleCdcDeleted();
         };
         
-        return OutputAll.message(message);
+        return OutputAll.message(trimIndent(message));
+    }
+
+    private String handleCdcNotFound() {
+        val cdcRef = getCdcRef();
+        return """
+          CDC %s does not exist in database %s; nothing to delete.
+
+          %s
+          %s
+        """.formatted(
+            highlight(cdcRef.toString()),
+            highlight($dbRef),
+            renderComment("List existing CDCs:"),
+            renderCommand("astra db list-cdcs %s".formatted($dbRef))
+        );
+    }
+
+    private String handleCdcDeleted() {
+        val cdcRef = getCdcRef();
+        return """
+          CDC %s has been deleted from database %s.
+        """.formatted(
+            highlight(cdcRef.toString()),
+            highlight($dbRef)
+        );
+    }
+
+    private String throwCdcNotFound() {
+        val cdcRef = getCdcRef();
+        
+        throw new AstraCliException(CDC_NOT_FOUND, """
+          @|bold,red Error: CDC '%s' does not exist in database '%s'.|@
+
+          To ignore this error, provide the %s flag to skip this error if the CDC doesn't exist.
+
+          %s
+          %s
+
+          %s
+          %s
+        """.formatted(
+            cdcRef.toString(),
+            $dbRef,
+            highlight("--if-exists"),
+            renderComment("Example fix:"),
+            renderCommand(originalArgs(), "--if-exists"),
+            renderComment("List existing CDCs:"),
+            renderCommand("astra db list-cdcs %s".formatted($dbRef))
+        ));
     }
 
     @Override
     protected Operation<CdcDeleteResult> mkOperation() {
-        return new CdcDeleteOperation(cdcGateway, new CdcDeleteRequest(getCdcRef(), ifExists));
+        return new CdcDeleteOperation(cdcGateway, new CdcDeleteRequest(getCdcRef(), $ifExists));
     }
 
     private CdcRef getCdcRef() {
-        if (cdcIdentifier.cdcId != null) {
-            val cdcId = CdcId.parse(cdcIdentifier.cdcId).getRight((msg) -> {
+        if ($cdcIdentifier.cdcId != null) {
+            val cdcId = CdcId.parse($cdcIdentifier.cdcId).getRight((msg) -> {
                 throw new OptionValidationException("cdc id", msg);
             });
-            return CdcRef.fromId(dbRef, cdcId);
+            return CdcRef.fromId($dbRef, cdcId);
         } else {
-            val tableTenant = cdcIdentifier.tableTenant;
-            val keyspaceRef = KeyspaceRef.parse(dbRef, tableTenant.keyspace).getRight((msg) -> {
+            val keyspaceRef = KeyspaceRef.parse($dbRef, $cdcIdentifier.tableTenant.keyspace).getRight((msg) -> {
                 throw new OptionValidationException("keyspace", msg);
             });
-            val tableRef = TableRef.parse(keyspaceRef, tableTenant.table).getRight((msg) -> {
+            val tableRef = TableRef.parse(keyspaceRef, $cdcIdentifier.tableTenant.table).getRight((msg) -> {
                 throw new OptionValidationException("table", msg);
             });
-            val tenantName = TenantName.parse(tableTenant.tenant).getRight((msg) -> {
+            val tenantName = TenantName.parse($cdcIdentifier.tableTenant.tenant).getRight((msg) -> {
                 throw new OptionValidationException("tenant", msg);
             });
             return CdcRef.fromDefinition(tableRef, tenantName);
-        }
-    }
-
-    public static class CdcNotFoundException extends AstraCliException {
-        public CdcNotFoundException(CdcRef cdcRef) {
-            super("""
-              @|bold,red Error: Cdc '%s' does not exist in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see the existing cdcs.
-              - Pass the %s flag to skip this error if the cdc doesn't exist.
-            """.formatted(
-                cdcRef,
-                cdcRef.db(),
-                AstraColors.highlight("astra db list-cdcs " + cdcRef.db()),
-                AstraColors.highlight("--if-exists")
-            ));
         }
     }
 }

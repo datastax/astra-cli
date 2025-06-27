@@ -2,17 +2,25 @@ package com.dtsx.astra.cli.core.exceptions.config;
 
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.exceptions.CliExceptionCode;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.ExitCode;
 
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.PROFILE_NOT_FOUND;
+import static com.dtsx.astra.cli.utils.StringUtils.renderCommand;
+import static com.dtsx.astra.cli.utils.StringUtils.renderComment;
+
 public class ProfileNotFoundException extends AstraCliException {
     public ProfileNotFoundException(ProfileName profileName) {
-        this(profileName, "");
-    }
+        super(PROFILE_NOT_FOUND, """
+          @|bold,red Error: A profile with the name '%s' could not be found.|@
 
-    public ProfileNotFoundException(ProfileName profileName, String extra) {
-        super(
-            AstraColors.RED_500.use("@|bold Profile not found:|@ Profile '%s' does not exist%s".formatted(profileName.unwrap(), extra))
-        );
+          %s
+          %s
+        """.formatted(
+            profileName.unwrap(),
+            renderComment("See your existing profiles:"),
+            renderCommand("astra config list")
+        ));
     }
 }

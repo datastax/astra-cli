@@ -10,8 +10,7 @@ import java.io.File;
 public class CannotCreateFileException extends AstraCliException {
     public CannotCreateFileException(File file, @Nullable String message, Throwable cause) {
         super(
-            AstraColors.RED_500.use("@|bold An error occurred while trying to create file '%s':%n%n%s|@").formatted(file.getAbsolutePath(), cause.getMessage()) + (message == null ? "" : "%n%n%s".formatted(message)),
-            cause
+            AstraColors.RED_500.use("@|bold An error occurred while trying to create file '%s':%n%n%s|@").formatted(file.getAbsolutePath(), cause.getMessage()) + (message == null ? "" : "%n%n%s".formatted(message))
         );
     }
 }

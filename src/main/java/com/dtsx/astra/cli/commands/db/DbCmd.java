@@ -3,12 +3,10 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.commands.db.cdc.CdcCreateCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcDeleteCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcListCmd;
-import com.dtsx.astra.cli.commands.db.collections.CollectionCreateCmd;
-import com.dtsx.astra.cli.commands.db.collections.CollectionDeleteCmd;
-import com.dtsx.astra.cli.commands.db.collections.CollectionListCmd;
-import com.dtsx.astra.cli.commands.db.collections.CollectionTruncateCmd;
+import com.dtsx.astra.cli.commands.db.collections.*;
 import com.dtsx.astra.cli.commands.db.misc.EmbeddingProvidersListCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDeleteCmd;
+import com.dtsx.astra.cli.commands.db.table.TableDescribeCmd;
 import com.dtsx.astra.cli.commands.db.table.TableListCmd;
 import com.dtsx.astra.cli.commands.db.table.TableTruncateCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.EndpointApiCmd;
@@ -19,15 +17,18 @@ import com.dtsx.astra.cli.commands.db.keyspace.KeyspaceDeleteCmd;
 import com.dtsx.astra.cli.commands.db.keyspace.KeyspaceListCmd;
 import com.dtsx.astra.cli.commands.db.misc.CloudsListCmd;
 import com.dtsx.astra.cli.commands.db.region.*;
+import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
 @Command(
     name = "db",
+    description = "List your non-terminated Astra databases.",
     subcommands = {
         DbListCmd.class,
         DbGetCmd.class,
         DbCreateCmd.class,
         DbDeleteCmd.class,
+        DbStatusCmd.class,
         DbCreateDotEnv.class,
         DbDownloadScbCmd.class,
         EmbeddingProvidersListCmd.class,
@@ -37,9 +38,11 @@ import picocli.CommandLine.Command;
         KeyspaceDeleteCmd.class,
         CollectionListCmd.class,
         CollectionCreateCmd.class,
+        CollectionDescribeCmd.class,
         CollectionDeleteCmd.class,
         CollectionTruncateCmd.class,
         TableListCmd.class,
+        TableDescribeCmd.class,
         TableDeleteCmd.class,
         TableTruncateCmd.class,
         CdcListCmd.class,
@@ -56,5 +59,13 @@ import picocli.CommandLine.Command;
         EndpointApiCmd.class,
         EndpointPlaygroundCmd.class,
     }
+)
+@Example(
+    comment = "List all your Astra databases",
+    command = "astra db"
+)
+@Example(
+    comment = "List only vector-enabled Astra databases",
+    command = "astra db --vector"
 )
 public final class DbCmd extends DbListImpl {}

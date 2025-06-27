@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.APIProviderImpl;
@@ -23,7 +24,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 public class CollectionGatewayImpl implements CollectionGateway {
     private final APIProviderImpl api;
 
-    public CollectionGatewayImpl(String token, AstraEnvironment env) {
+    public CollectionGatewayImpl(Token token, AstraEnvironment env) {
         this.api = (APIProviderImpl) APIProvider.mkDefault(token, env);
     }
 
@@ -48,6 +49,13 @@ public class CollectionGatewayImpl implements CollectionGateway {
             }
             throw e;
         }
+    }
+
+    @Override
+    public long estimatedDocumentCount(CollectionRef collRef) {
+        return AstraLogger.loading("Estimating document count for collection " + highlight(collRef), (_) -> {
+            return api.dataApiDatabase(collRef.keyspace()).getCollection(collRef.name()).estimatedDocumentCount();
+        });
     }
 
     @Override

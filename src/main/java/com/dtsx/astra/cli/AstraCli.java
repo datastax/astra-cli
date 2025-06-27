@@ -4,8 +4,12 @@ import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.commands.org.OrgCmd;
+import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
+import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
+import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
+import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.TypeConverters;
@@ -14,12 +18,12 @@ import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Help;
 
 import java.util.StringJoiner;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.*;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
-import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "ast",
@@ -27,7 +31,9 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
         DbCmd.class,
         ConfigCmd.class,
         OrgCmd.class,
+        RoleCmd.class,
         TokenCmd.class,
+        UserCmd.class,
         AutoComplete.GenerateCompletion.class,
         CommandLine.HelpCommand.class,
     }
@@ -70,17 +76,23 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     public static void main(String... args) {
-        val cli = new AstraCli();
+        val cmd = new CommandLine(new AstraCli());
 
-        val cmd = new CommandLine(cli)
+        cmd
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
             .setExecutionExceptionHandler(new ExecutionExceptionHandler())
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
         for (val converter : TypeConverters.INSTANCES) {
-            cmd.registerConverter(converter.getClazz(), converter);
+            cmd.registerConverter(converter.clazz(), converter);
         }
+
+        cmd.setHelpFactory((spec, cs) -> {
+            ExamplesRenderer.installRenderer(spec.commandLine());
+            DescriptionNewlineRenderer.installRenderer(spec.commandLine());
+            return new Help(spec, cs);
+        });
 
         cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
         cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);

@@ -2,12 +2,11 @@ package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.exceptions.misc.InvalidTokenException;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.ConfigCreateResult;
-import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
@@ -19,78 +18,80 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     private final AstraConfig config;
+    private final OrgGateway orgGateway;
     private final CreateConfigRequest request;
 
     public record CreateConfigRequest(
         Optional<ProfileName> profileName,
-        String token,
+        Token token,
         AstraEnvironment env,
         boolean force,
         boolean failIfExists,
-        Runnable assertShouldSetDefaultProfile,
+        boolean setDefault,
         Consumer<ProfileName> assertCanOverwriteProfile
     ) {}
 
-    public sealed interface ConfigCreateResult { ProfileName profileName(); }
-    public record ProfileWasCreated(ProfileName profileName) implements ConfigCreateResult {}
-    public record ProfileWasOverwritten(ProfileName profileName) implements ConfigCreateResult {}
+    public sealed interface ConfigCreateResult {}
+    public record ProfileCreated(ProfileName profileName, boolean overwritten, boolean isDefault) implements ConfigCreateResult {}
+    public record ProfileIllegallyExists(ProfileName profileName) implements ConfigCreateResult {}
+    public record ViolatedFailIfExists() implements ConfigCreateResult {}
 
     @Override
     public ConfigCreateResult execute() {
-        val org = validateTokenAndFetchOrg(request.token, request.env);
-        val profileName = mkProfileName(org, request);
+        val org = validateTokenAndFetchOrg(orgGateway);
+        val profileName = resolveProfileName(org, request);
+
+        if (profileName.isDefault()) {
+            return new ViolatedFailIfExists();
+        }
 
         val profileExists = config.profileExists(profileName);
 
         if (profileExists) {
-            assertCanOverwriteProfile(profileName, request);
+            val res = assertCanOverwriteProfile(profileName, request);
+
+            if (res.isPresent()) {
+                return res.get();
+            }
         }
 
         config.modify((ctx) -> {
             ctx.deleteProfile(profileName);
             ctx.createProfile(profileName, request.token, request.env);
+
+            if (request.setDefault) {
+                ctx.deleteProfile(ProfileName.DEFAULT);
+                ctx.createProfile(ProfileName.DEFAULT, request.token, request.env);
+            }
         });
 
-        return (profileExists)
-            ? new ProfileWasOverwritten(profileName)
-            : new ProfileWasCreated(profileName);
+        return new ProfileCreated(
+            profileName,
+            profileExists,
+            request.setDefault
+        );
     }
 
-    private Organization validateTokenAndFetchOrg(String token, AstraEnvironment env) {
-        try {
-            return AstraLogger.loading("Validating your Astra token", (_) -> (
-                new AstraOpsClient(token, env).getOrganization()
-            ));
-        } catch (Exception e) {
-            throw new InvalidTokenException("Error validating your astra token" + ((env != AstraEnvironment.PROD) ? "; make sure token targets the proper environment (%s)" : ""));
-        }
+    private Organization validateTokenAndFetchOrg(OrgGateway orgGateway) {
+        return AstraLogger.loading("Validating your Astra token", (_) -> (
+            orgGateway.getCurrentOrg()
+        ));
     }
 
-    private ProfileName mkProfileName(Organization org, CreateConfigRequest request) {
-        val profileName = request.profileName.orElse(ProfileName.mkUnsafe(org.getName()));
-
-        if (profileName.isDefault()) {
-            assertShouldSetDefaultProfile(request);
-        }
-
-        return profileName;
+    private ProfileName resolveProfileName(Organization org, CreateConfigRequest request) {
+        return request.profileName.orElse(ProfileName.mkUnsafe(org.getName()));
     }
 
-    private void assertShouldSetDefaultProfile(CreateConfigRequest request) {
-        if (!request.force) {
-            request.assertShouldSetDefaultProfile.run();
-        }
-    }
-
-    private void assertCanOverwriteProfile(ProfileName profileName, CreateConfigRequest request) {
+    private Optional<ConfigCreateResult> assertCanOverwriteProfile(ProfileName profileName, CreateConfigRequest request) {
         if (request.force) {
-            return;
+            return Optional.empty();
         }
 
         if (request.failIfExists) {
-            throw new ExecutionCancelledException("Operation canceled because profile %s already exists, and --fail-if-exists was set.".formatted(profileName));
+            return Optional.of(new ProfileIllegallyExists(profileName));
         }
 
         request.assertCanOverwriteProfile.accept(profileName);
+        return Optional.empty();
     }
 }

@@ -8,4 +8,9 @@ public class OptionValidationException extends AstraCliException {
     public OptionValidationException(String parameter, String message) {
         super("@|bold,red Error validating %s: \"%s\"|@".formatted(parameter, message));
     }
+
+    @Override
+    public boolean shouldPrintHelpMessage() {
+        return true;
+    }
 }

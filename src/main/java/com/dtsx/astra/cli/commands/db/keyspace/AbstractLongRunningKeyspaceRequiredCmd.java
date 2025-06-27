@@ -9,7 +9,7 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 public abstract class AbstractLongRunningKeyspaceRequiredCmd<OpRes> extends AbstractKeyspaceCmd<OpRes> implements WithSetTimeout {
-    protected KeyspaceRef keyspaceRef;
+    protected KeyspaceRef $keyspaceRef;
 
     @Mixin
     protected LongRunningOptionsMixin lrMixin;
@@ -27,7 +27,7 @@ public abstract class AbstractLongRunningKeyspaceRequiredCmd<OpRes> extends Abst
     protected void prelude() {
         super.prelude();
 
-        this.keyspaceRef = KeyspaceRef.parse(dbRef, actualKeyspaceRefOption).getRight((msg) -> {
+        this.$keyspaceRef = KeyspaceRef.parse($dbRef, actualKeyspaceRefOption).getRight((msg) -> {
             throw new OptionValidationException("keyspace name", msg);
         });
     }

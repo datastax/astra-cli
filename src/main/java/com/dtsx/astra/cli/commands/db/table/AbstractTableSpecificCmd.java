@@ -6,7 +6,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
 public abstract class AbstractTableSpecificCmd<OpRes> extends AbstractTableCmd<OpRes> {
-    protected TableRef tableRef;
+    protected TableRef $tableRef;
 
     @Option(
         names = { "--table", "-t" },
@@ -21,7 +21,7 @@ public abstract class AbstractTableSpecificCmd<OpRes> extends AbstractTableCmd<O
     protected void prelude() {
         super.prelude();
 
-        this.tableRef = TableRef.parse(keyspaceRef, actualTableRefOption).getRight((msg) -> {
+        this.$tableRef = TableRef.parse($keyspaceRef, actualTableRefOption).getRight((msg) -> {
             throw new OptionValidationException("table name", msg);
         });
     }

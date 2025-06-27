@@ -12,6 +12,7 @@ import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.graalvm.collections.Pair;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -66,7 +67,7 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public ResumeDbResult resumeDb(DbRef ref, int timeout) {
+    public Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout) {
         val res = delegate.resumeDb(ref, timeout);
         addToCache(ref);
         return res;

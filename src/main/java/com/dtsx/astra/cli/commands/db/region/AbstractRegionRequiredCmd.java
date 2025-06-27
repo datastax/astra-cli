@@ -10,5 +10,5 @@ public abstract class AbstractRegionRequiredCmd<OpRes> extends AbstractDbSpecifi
         paramLabel = "REGION",
         required = true
     )
-    protected RegionName region;
+    protected RegionName $region;
 }

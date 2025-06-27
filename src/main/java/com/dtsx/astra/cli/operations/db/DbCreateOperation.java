@@ -1,10 +1,8 @@
 package com.dtsx.astra.cli.operations.db;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
@@ -18,7 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
-import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
+import static com.dtsx.astra.cli.operations.db.DbCreateOperation.DbCreateResult;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -40,7 +38,8 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
 
     public sealed interface DbCreateResult {}
     public record DatabaseAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) implements DbCreateResult {}
-    public record DatabaseAlreadyExistsAndIsNowActive(UUID dbId, DatabaseStatusType prevStatus, DbGateway.ResumeDbResult resumeResult) implements DbCreateResult {}
+    public record DatabaseAlreadyExistsIllegallyWithStatus(UUID dbId, DatabaseStatusType currStatus) implements DbCreateResult {}
+    public record DatabaseAlreadyExistsAndIsActive(UUID dbId, DatabaseStatusType prevStatus, Duration awaited) implements DbCreateResult {}
     public record DatabaseCreated(UUID dbId, Duration waitTime) implements DbCreateResult {}
     public record DatabaseCreationStarted(UUID dbId, DatabaseStatusType currStatus) implements DbCreateResult {}
 
@@ -63,23 +62,23 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
         );
 
         return switch (status) {
-            case CreationStatus.AlreadyExists<Database>(var db) -> connectToExistingDb(request.dbName, UUID.fromString(db.getId()), db.getStatus(), request);
+            case CreationStatus.AlreadyExists<Database>(var db) -> connectToExistingDb(UUID.fromString(db.getId()), db.getStatus(), request);
             case CreationStatus.Created<Database>(var db) -> connectToNewDb(UUID.fromString(db.getId()), db.getStatus(), request);
         };
     }
 
-    private DbCreateResult connectToExistingDb(String dbName, UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
+    private DbCreateResult connectToExistingDb(UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
         if (!request.ifNotExists) {
-            throw new DbAlreadyExistsException(dbName, dbId);
+            return new DatabaseAlreadyExistsIllegallyWithStatus(dbId, dbStatus);
         }
 
         if (request.lrOptions.dontWait()) {
             return new DatabaseAlreadyExistsWithStatus(dbId, dbStatus);
         }
 
-        val resumeResult = dbGateway.resumeDb(DbRef.fromId(dbId), request.lrOptions.timeout());
+        val awaited = dbGateway.resumeDb(DbRef.fromId(dbId), Optional.of(request.lrOptions.timeout()));
 
-        return new DatabaseAlreadyExistsAndIsNowActive(dbId, dbStatus, resumeResult);
+        return new DatabaseAlreadyExistsAndIsActive(dbId, dbStatus, awaited.getRight());
     }
 
     private DbCreateResult connectToNewDb(UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
@@ -90,22 +89,5 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
         val awaitedDuration = dbGateway.waitUntilDbStatus(DbRef.fromId(dbId), ACTIVE, request.lrOptions.timeout());
 
         return new DatabaseCreated(dbId, awaitedDuration);
-    }
-
-    public static class DbAlreadyExistsException extends AstraCliException {
-        public DbAlreadyExistsException(String dbName, UUID dbId) {
-            super("""
-              @|bold,red Error: Database '%s' already exists with ID '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see the existing dbs in your current org.
-              - Pass the %s flag to skip this error if the db already exists.
-            """.formatted(
-                dbName,
-                dbId,
-                AstraColors.highlight("astra db list"),
-                AstraColors.highlight("--if-not-exists")
-            ));
-        }
     }
 }

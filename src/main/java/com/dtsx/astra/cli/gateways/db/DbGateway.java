@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.GlobalInfoCache;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -14,13 +15,14 @@ import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import org.graalvm.collections.Pair;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
 public interface DbGateway {
-    static DbGateway mkDefault(String token, AstraEnvironment env, DbCompletionsCache dbCompletionsCache) {
+    static DbGateway mkDefault(Token token, AstraEnvironment env, DbCompletionsCache dbCompletionsCache) {
         return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(APIProvider.mkDefault(token, env), token, env, GlobalInfoCache.INSTANCE, RegionGateway.mkDefault(token, env)), dbCompletionsCache);
     }
 
@@ -34,13 +36,7 @@ public interface DbGateway {
 
     List<String> downloadCloudSecureBundles(DbRef ref, String dbName, List<Datacenter> datacenters);
 
-    record ResumeDbResult(boolean hadToBeResumed, Duration timeWaited) {
-        public boolean wasAwaited() {
-            return hadToBeResumed && !timeWaited.isZero();
-        }
-    }
-
-    ResumeDbResult resumeDb(DbRef ref, int timeout);
+    Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout);
 
     Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout);
 

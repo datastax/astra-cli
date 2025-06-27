@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -13,12 +14,17 @@ import java.util.Map;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.*;
 
 @Command(
-    name = "list-keyspaces"
+    name = "list-keyspaces",
+    description = "List all keyspaces in the specified database"
+)
+@Example(
+    comment = "List all keyspaces in a database",
+    command = "astra db list-keyspaces my_db"
 )
 public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     @Override
     protected KeyspaceListOperation mkOperation() {
-        return new KeyspaceListOperation(keyspaceGateway, new KeyspaceListRequest(dbRef));
+        return new KeyspaceListOperation(keyspaceGateway, new KeyspaceListRequest($dbRef));
     }
 
     @Override

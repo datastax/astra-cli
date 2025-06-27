@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
@@ -13,7 +14,12 @@ import java.util.Map;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
 
 @Command(
-    name = "list-cdcs"
+    name = "list-cdcs",
+    description = "List all CDC (Change Data Capture) connections for the specified database"
+)
+@Example(
+    comment = "List all CDCs in a database",
+    command = "astra db list-cdcs my_db"
 )
 public class CdcListCmd extends AbstractCdcCmd<List<CdcInfo>> {
     @Override
@@ -35,6 +41,6 @@ public class CdcListCmd extends AbstractCdcCmd<List<CdcInfo>> {
 
     @Override
     protected Operation<List<CdcInfo>> mkOperation() {
-        return new CdcListOperation(cdcGateway, new CdcListRequest(dbRef));
+        return new CdcListOperation(cdcGateway, new CdcListRequest($dbRef));
     }
 }

@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
@@ -22,20 +22,44 @@ import picocli.CommandLine.Parameters;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.KEY_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "get",
-    aliases = { "describe" }
+    aliases = { "describe" },
+    description = "Get the configuration of a profile or a specific key. Warning: this command may expose your sensitive Astra token."
+)
+@Example(
+    comment = "Get the configuration of the default profile",
+    command = "astra config get"
+)
+@Example(
+    comment = "Get the configuration of a specific profile",
+    command = "astra config get my_profile"
+)
+@Example(
+    comment = "Get the value of a specific key",
+    command = "astra config get my_profile -k ASTRA_DB_APPLICATION_TOKEN"
 )
 public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
-    @Parameters(completionCandidates = AvailableProfilesCompletion.class, description = "Name of the profile to display", paramLabel = "PROFILE", defaultValue = "default")
-    public ProfileName profileName;
+    @Parameters(
+        description = { "Name of the profile to display", DEFAULT_VALUE },
+        completionCandidates = AvailableProfilesCompletion.class,
+        paramLabel = "PROFILE",
+        defaultValue = "default"
+    )
+    public ProfileName $profileName;
 
-    @Option(names = { "-k", "--key" }, completionCandidates = ProfileKeysCompletion.class, description = "Specific configuration key to retrieve", paramLabel = "KEY")
-    public Optional<String> key = Optional.empty();
+    @Option(
+        names = { "-k", "--key" },
+        description = "Specific configuration key to retrieve",
+        completionCandidates = ProfileKeysCompletion.class,
+        paramLabel = "KEY"
+    )
+    public Optional<String> $key = Optional.empty();
 
     @Override
     public final OutputAll execute(GetConfigResult result) {
@@ -46,14 +70,14 @@ public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
                 () -> mkTable(section),
                 () -> mkTable(section)
             );
-            case ProfileNotFound() -> throw new ProfileNotFoundException(profileName);
-            case KeyNotFound(var keyName, var section) -> throw new KeyNotFoundException(keyName, section);
+            case ProfileNotFound() -> throw new ProfileNotFoundException($profileName);
+            case KeyNotFound(var keyName, var section) -> throwKeyNotFound(keyName, section);
         };
     }
 
     @Override
     protected Operation<GetConfigResult> mkOperation() {
-        return new ConfigGetOperation(config(), new GetConfigRequest(profileName, key));
+        return new ConfigGetOperation(config(), new GetConfigRequest($profileName, $key));
     }
 
     private RenderableShellTable mkTable(Ini.IniSection section) {
@@ -64,40 +88,37 @@ public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
         return new ShellTable(attrs).withAttributeColumns();
     }
 
-    public static class KeyNotFoundException extends AstraCliException {
-        public KeyNotFoundException(String key, Ini.IniSection section) {
-            super(section.pairs().isEmpty() ? mkNoKeysMsg(key, section) : mkKeysMsg(key, section));
-        }
+    private <T> T throwKeyNotFound(String key, Ini.IniSection section) {
+        throw new AstraCliException(KEY_NOT_FOUND, section.pairs().isEmpty() ? mkNoKeysMsg(key, section) : mkKeysMsg(key, section));
+    }
 
-        private static String mkNoKeysMsg(String key, Ini.IniSection section) {
-            return """
-              @|bold,red Error: Key '%s' does not exist in profile '%s'.|@
-            
-              Profile %s does not contain any keys.
-            """.formatted(
-                key,
-                section.name(),
-                highlight(section.name())
-            );
-        }
+    private String mkNoKeysMsg(String key, Ini.IniSection section) {
+        return """
+          @|bold,red Error: Key '%s' does not exist in profile '%s'.|@
+        
+          Profile %s does not contain any keys.
+        """.formatted(
+            key,
+            section.name(),
+            highlight(section.name())
+        );
+    }
 
-        private static String mkKeysMsg(String key, Ini.IniSection section) {
-            return """
-              @|bold,red Error: Key '%s' does not exist in profile '%s'.|@
-            
-              Available keys in profile %s:
-              %s
-            
-              Use %s to get the values of all keys in the profile.
-            """.formatted(
-                key,
-                section.name(),
-                highlight(section.name()),
-                section.pairs().stream()
-                    .map(p -> "- " + AstraColors.PURPLE_300.use(p.key()))
-                    .collect(Collectors.joining(NL)),
-                highlight("astra config get " + section.name())
-            );
-        }
+    private String mkKeysMsg(String key, Ini.IniSection section) {
+        return """
+          @|bold,red Error: Key '%s' does not exist in profile '%s'.|@
+        
+          Available keys in this profile are:
+          %s
+        
+          %s
+          %s
+        """.formatted(
+            key,
+            section.name(),
+            section.pairs().stream().map(p -> "- " + highlight(p.key())).collect(Collectors.joining(NL)),
+            renderComment("Get the values of the keys in this profile with:"),
+            renderCommand("astra config get " + section.name())
+        );
     }
 }

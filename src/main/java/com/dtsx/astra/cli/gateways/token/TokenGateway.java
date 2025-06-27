@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.token;
 
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TokenGateway {
-    static TokenGateway mkDefault(String token, AstraEnvironment env) {
+    static TokenGateway mkDefault(Token token, AstraEnvironment env) {
         return new TokenGatewayImpl(APIProvider.mkDefault(token, env));
     }
 

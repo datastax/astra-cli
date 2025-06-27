@@ -6,7 +6,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
 public abstract class AbstractCollectionSpecificCmd<OpRes> extends AbstractCollectionCmd<OpRes> {
-    protected CollectionRef collRef;
+    protected CollectionRef $collRef;
 
     @Option(
         names = { "--collection", "-c" },
@@ -21,7 +21,7 @@ public abstract class AbstractCollectionSpecificCmd<OpRes> extends AbstractColle
     protected void prelude() {
         super.prelude();
 
-        this.collRef = CollectionRef.parse(keyspaceRef, actualCollectionRefOption).getRight((msg) -> {
+        this.$collRef = CollectionRef.parse($keyspaceRef, actualCollectionRefOption).getRight((msg) -> {
             throw new OptionValidationException("collection name", msg);
         });
     }

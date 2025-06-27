@@ -15,13 +15,17 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static picocli.CommandLine.Help.Ansi.OFF;
 
 @Command(
     version = AstraCli.VERSION,
     mixinStandardHelpOptions = true,
     commandListHeading = "%nCommands:%n",
-    footer = "%nSee 'astra <command> --help' for more information on a specific command."
+    descriptionHeading = "%n",
+    footer = "%nSee 'astra <command> <subcommand> --help' for help on a specific subcommand."
 )
 public abstract class AbstractCmd<OpRes> implements Runnable {
     public static final String DEFAULT_VALUE = "  @|faint (default: |@@|faint,italic ${DEFAULT-VALUE}|@@|faint )|@";
@@ -104,5 +108,9 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     protected final AstraConfig config() {
         return cfgMixin.getAstraConfig();
+    }
+
+    protected final List<String> originalArgs() {
+        return new ArrayList<>() {{ add("astra"); addAll(spec.commandLine().getParseResult().originalArgs()); }};
     }
 }

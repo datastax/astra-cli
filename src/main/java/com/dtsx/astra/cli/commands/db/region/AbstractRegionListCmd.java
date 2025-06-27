@@ -17,9 +17,10 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<SortedMap<
     @Option(
         names = { "-f", "--filter" },
         description = "Comma-separated case-insensitive partial-match filters on the region name",
+        split = ",",
         paramLabel = "FILTER"
     )
-    public @Nullable List<String> nameFilter;
+    public @Nullable List<String> $nameFilter;
 
     @Option(
         names = { "-c", "--cloud" },
@@ -27,7 +28,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<SortedMap<
         split = ",",
         paramLabel = "FILTER"
     )
-    public @Nullable List<CloudProviderType> cloudFilter;
+    public @Nullable List<CloudProviderType> $cloudFilter;
 
     @Option(
         names = { "-z", "--zone" },
@@ -35,7 +36,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<SortedMap<
         split = ",",
         paramLabel = "FILTER"
     )
-    public @Nullable List<String> zoneFilter;
+    public @Nullable List<String> $zoneFilter;
 
     @Override
     protected OutputAll execute(SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> regions) {
@@ -63,17 +64,17 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<SortedMap<
     }
 
     private boolean passesCloudFilter(Entry<CloudProviderType, ? extends SortedMap<String, RegionInfo>> entry) {
-        return cloudFilter == null || !cloudFilter.contains(entry.getKey());
+        return $cloudFilter == null || !$cloudFilter.contains(entry.getKey());
     }
 
     private boolean passesNameFilter(Entry<String, RegionInfo> entry) {
-        return nameFilter == null || nameFilter.stream().anyMatch((f) ->
+        return $nameFilter == null || $nameFilter.stream().anyMatch((f) ->
             entry.getKey().toLowerCase().contains(f.toLowerCase()) || entry.getValue().displayName().toLowerCase().contains(f.toLowerCase())
         );
     }
 
     private boolean passesZoneFilter(Entry<String, RegionInfo> entry) {
-        return zoneFilter == null || zoneFilter.stream().anyMatch((z) -> entry.getValue().zone().equalsIgnoreCase(z));
+        return $zoneFilter == null || $zoneFilter.stream().anyMatch((z) -> entry.getValue().zone().equalsIgnoreCase(z));
     }
 
     private String formatCloudProviderName(CloudProviderType cloudProvider, Map.Entry<String, RegionInfo> entry) {

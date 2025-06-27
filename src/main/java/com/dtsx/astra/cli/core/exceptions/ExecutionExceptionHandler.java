@@ -23,30 +23,16 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
         );
 
     @Override
-    public int handleExecutionException(Exception unmappedE, CommandLine commandLine, ParseResult parseResult) {
+    public int handleExecutionException(Exception unmappedE, CommandLine cmd, ParseResult parseResult) {
         val e = (EXTERNAL_ERROR_MAPPERS.containsKey(unmappedE.getClass()))
-            ? EXTERNAL_ERROR_MAPPERS.get(unmappedE.getClass()).mapException(unmappedE, commandLine, parseResult)
+            ? EXTERNAL_ERROR_MAPPERS.get(unmappedE.getClass()).mapException(unmappedE, cmd, parseResult)
             : unmappedE;
 
         if (e instanceof AstraCliException cliErr) {
-            val formatted = AstraConsole.format(cliErr.getMessage());
-
-            if (formatted.stripTrailing().endsWith("\n")) {
-                AstraConsole.getErr().print(formatted);
-            } else {
-                AstraConsole.getErr().println(formatted);
-            }
-
-            AstraLogger.exception(cliErr);
-
-            if (cliErr.shouldDumpLogs()) {
-                AstraLogger.dumpLogs();
-            }
-
-            return 2;
+            return ExceptionHandlerUtils.handleAstraCliException(cliErr, cmd);
         }
-        e.printStackTrace(AstraConsole.getErr());
 
+        e.printStackTrace(AstraConsole.getErr());
         return ExitCode.INTERNAL_ERROR.getCode();
     }
 

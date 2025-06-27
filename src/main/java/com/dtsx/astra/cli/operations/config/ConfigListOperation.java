@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.config;
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -21,7 +22,7 @@ public class ConfigListOperation implements Operation<ListConfigResult> {
 
     public record ProfileInfo(
         String name,
-        String token,
+        Token token,
         AstraEnvironment env,
         boolean isInUse
     ) {}

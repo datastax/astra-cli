@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
@@ -14,7 +15,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 public interface RegionGateway {
-    static RegionGateway mkDefault(String token, AstraEnvironment env) {
+    static RegionGateway mkDefault(Token token, AstraEnvironment env) {
         return new RegionGatewayImpl(APIProvider.mkDefault(token, env));
     }
 

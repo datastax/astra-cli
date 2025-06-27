@@ -6,6 +6,7 @@ import com.datastax.astra.client.admin.DatabaseAdmin;
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.client.databases.DatabaseOptions;
+import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -29,13 +30,13 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @RequiredArgsConstructor
 public class APIProviderImpl implements APIProvider {
-    private final String token;
+    private final Token token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
 
     @Override
     public AstraOpsClient astraOpsClient() {
-        return new AstraOpsClient(token, env);
+        return new AstraOpsClient(token.unwrap(), env);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class APIProviderImpl implements APIProvider {
 
     @Override
     public Database dataApiDatabase(KeyspaceRef ksRef) {
-        return dataApiClient().getDatabase(resolveId(ksRef.db()), resolveRegion(ksRef.db()), new DatabaseOptions().keyspace(ksRef.name()).token(token));
+        return dataApiClient().getDatabase(resolveId(ksRef.db()), resolveRegion(ksRef.db()), new DatabaseOptions().keyspace(ksRef.name()).token(token.unwrap()));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class APIProviderImpl implements APIProvider {
             case DEV -> DataAPIDestination.ASTRA_DEV;
             case TEST -> DataAPIDestination.ASTRA_TEST;
         };
-        return new DataAPIClient(token, new DataAPIClientOptions().destination(destination));
+        return new DataAPIClient(token.unwrap(), new DataAPIClientOptions().destination(destination));
     }
 
     private UUID resolveId(DbRef ref) {
@@ -94,7 +95,7 @@ public class APIProviderImpl implements APIProvider {
     public Optional<com.dtsx.astra.sdk.db.domain.Database> tryResolveDb(@NotNull DbRef ref) {
         val cachedRef = dbCache.convertDbNameToIdIfCached(ref);
 
-        val dbOpsClient = new AstraOpsClient(token, env).db();
+        val dbOpsClient = new AstraOpsClient(token.unwrap(), env).db();
 
         val dbInfo = cachedRef.<Optional<com.dtsx.astra.sdk.db.domain.Database>>fold(
             (id) -> dbOpsClient.findById(id.toString()),

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
 public abstract class AbstractKeyspaceSpecificCmd<OpRes> extends AbstractKeyspaceCmd<OpRes> {
-    protected KeyspaceRef keyspaceRef;
+    protected KeyspaceRef $keyspaceRef;
 
     @Option(
         names = { "--keyspace", "-k" },
@@ -21,7 +21,7 @@ public abstract class AbstractKeyspaceSpecificCmd<OpRes> extends AbstractKeyspac
     protected void prelude() {
         super.prelude();
 
-        this.keyspaceRef = KeyspaceRef.parse(dbRef, actualKeyspaceRefOption).getRight((msg) -> {
+        this.$keyspaceRef = KeyspaceRef.parse($dbRef, actualKeyspaceRefOption).getRight((msg) -> {
             throw new OptionValidationException("keyspace name", msg);
         });
     }

@@ -28,6 +28,6 @@ public abstract class AbstractEndpointGetCmd extends AbstractDbSpecificCmd<Endpo
 
     @Override
     protected Operation<EndpointGetResponse> mkOperation() {
-        return new EndpointGetOperation(dbGateway, new EndpointGetRequest(dbRef, region, profile().env()));
+        return new EndpointGetOperation(dbGateway, new EndpointGetRequest($dbRef, region, profile().env()));
     }
 }

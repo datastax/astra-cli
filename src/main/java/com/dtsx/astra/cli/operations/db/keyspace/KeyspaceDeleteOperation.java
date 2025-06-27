@@ -1,10 +1,8 @@
 package com.dtsx.astra.cli.operations.db.keyspace;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -62,20 +60,4 @@ public class KeyspaceDeleteOperation implements Operation<KeyspaceDeleteResult> 
         }
     }
 
-    public static class KeyspaceNotFoundException extends AstraCliException {
-        public KeyspaceNotFoundException(KeyspaceRef keyspaceRef) {
-            super("""
-              @|bold,red Error: Keyspace '%s' does not exist in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see the existing keyspaces.
-              - Pass the %s flag to skip this error if the keyspace doesn't exist.
-            """.formatted(
-                keyspaceRef,
-                keyspaceRef.db(),
-                AstraColors.highlight("astra db list-keyspaces " + keyspaceRef.db()),
-                AstraColors.highlight("--if-exists")
-            ));
-        }
-    }
 }
