@@ -2,7 +2,9 @@ package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
@@ -11,12 +13,11 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.renderCommand;
-import static com.dtsx.astra.cli.utils.StringUtils.renderComment;
 
 @Command(
     name = "describe-collection",
@@ -31,6 +32,14 @@ import static com.dtsx.astra.cli.utils.StringUtils.renderComment;
     command = "astra db describe-collection my_db -k my_keyspace -c my_collection"
 )
 public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<CollectionDescribeResult> {
+    @Override
+    protected OutputJson executeJson(CollectionDescribeResult result) {
+        return switch (result) {
+            case CollectionNotFound() -> throwCollectionNotFound();
+            case CollectionFound(var info) -> OutputJson.serializeValue(info.raw());
+        };
+    }
+
     @Override
     public final OutputAll execute(CollectionDescribeResult result) {
         return switch (result) {
@@ -91,23 +100,18 @@ public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<Collect
         return new ShellTable(attrs).withAttributeColumns();
     }
 
-    private OutputAll throwCollectionNotFound() {
+    private <T> T throwCollectionNotFound() {
         throw new AstraCliException(COLLECTION_NOT_FOUND, """
           @|bold,red Error: Collection '%s' does not exist in keyspace '%s' of database '%s'.|@
-
-          %s
-          %s
-
-          %s
-          %s
         """.formatted(
             $collRef.name(),
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            renderComment("List existing collections:"),
-            renderCommand("astra db list-collections %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name())),
-            renderComment("Create the collection:"),
-            renderCommand("astra db create-collection %s -k %s -c %s [...options]".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("List existing collections:",
+                "astra db list-collections %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name())),
+            new Hint("Create the collection:",
+                "astra db create-collection %s -k %s -c %s [...options]".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
         ));
     }
 

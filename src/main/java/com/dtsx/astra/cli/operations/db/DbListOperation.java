@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
-
 @RequiredArgsConstructor
 public class DbListOperation implements Operation<List<Database>> {
     private final DbGateway dbGateway;

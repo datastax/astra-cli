@@ -27,11 +27,6 @@ public class UserGetCmd extends AbstractUserCmd<User> {
     public UserRef user;
 
     @Override
-    protected Operation<User> mkOperation() {
-        return new UserGetOperation(userGateway, new UserGetRequest(user));
-    }
-
-    @Override
     public OutputJson executeJson(User result) {
         return OutputJson.serializeValue(result);
     }
@@ -52,5 +47,10 @@ public class UserGetCmd extends AbstractUserCmd<User> {
             ShellTable.attr("Status", user.getStatus().name()),
             ShellTable.attr("Roles", roleNames)
         )).withAttributeColumns();
+    }
+
+    @Override
+    protected Operation<User> mkOperation() {
+        return new UserGetOperation(userGateway, new UserGetRequest(user));
     }
 }

@@ -2,10 +2,13 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -43,6 +46,14 @@ public class DbRef implements AstraColors.Highlightable {
 
     public <T> T fold(Function<UUID, T> idMapper, Function<String, T> nameMapper) {
         return ref.fold(idMapper, nameMapper);
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        return ref.fold(
+            id -> Map.of("type", "id", "unwrap", id.toString()),
+            name -> Map.of("type", "name", "unwrap", name)
+        );
     }
 
     @Override

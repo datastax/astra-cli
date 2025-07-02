@@ -7,7 +7,6 @@ import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.role.RoleGetOperation;
 import com.dtsx.astra.sdk.org.domain.Role;
-import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 

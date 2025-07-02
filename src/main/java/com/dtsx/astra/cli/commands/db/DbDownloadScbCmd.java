@@ -87,9 +87,9 @@ public class DbDownloadScbCmd extends AbstractDbSpecificCmd<DownloadScbResult> {
                 );
 
         val potentialFix =
-            (fail.ex() instanceof FileAlreadyExistsException ex)
+            (fail.ex() instanceof FileAlreadyExistsException)
                 ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("rm " + fail.dest().getPath()) :
-            (fail.ex() instanceof NoSuchFileException ex)
+            (fail.ex() instanceof NoSuchFileException)
                 ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("mkdir -p " + fail.dest().getParentFile().getPath())
                 : "";
 

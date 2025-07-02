@@ -8,13 +8,13 @@ import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
@@ -22,12 +22,15 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CONFIG_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "create",
@@ -109,11 +112,15 @@ public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
             ? "Configuration profile %s successfully overwritten.".formatted(highlight(result.profileName()))
             : "Configuration profile %s successfully created.".formatted(highlight(result.profileName()));
 
-        val defaultMessage = (result.isDefault())
-            ? "It is now the default profile."
-            : "Run %s to set it as the default profile.".formatted(highlight("astra config use " + result.profileName()));
+        val data = mkData(result.profileName(), result.isDefault(), result.overwritten());
 
-        return OutputAll.message(creationMessage + NL + NL + defaultMessage);
+        if (result.isDefault()) {
+            return OutputAll.response(creationMessage + NL + NL + "It is now the default profile.", data);
+        }
+
+        return OutputAll.response(creationMessage, data, List.of(
+            new Hint("Set it as the default profile:", "astra config use " + result.profileName())
+        ));
     }
 
     private <T> T throwProfileAlreadyExists(ProfileName profileName) {
@@ -124,26 +131,19 @@ public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
             .toList();
 
         val mainMsg = (wasFailIfExists)
-            ? "The %s flag was set, so the operation failed without confirmation or warning.".formatted(highlight("--fail-if-exists"))
-            : "To overwrite it, either interactively respond to the prompt, or use the %s option to proceed without confirmation.".formatted(highlight("--yes"));
+            ? "The @!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
+            : "To overwrite it, either interactively respond to the prompt, or use the @!--yes!@ option to proceed without confirmation.";
 
         throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists in the configuration file.|@
 
           %s
-        
-          %s
-          %s
-        
-          %s
-          %s
         """.formatted(
             profileName,
-            mainMsg,
-            renderComment("Example fix:"),
-            renderCommand(originalArgsWithoutFailIfExists, "--yes"),
-            renderComment("See the values of the existing profile:"),
-            renderCommand("astra config get " + profileName)
+            mainMsg
+        ), List.of(
+            new Hint("Example fix:", originalArgsWithoutFailIfExists, "--yes"),
+            new Hint("See the values of the existing profile:", "astra config get " + profileName)
         ));
     }
 
@@ -160,16 +160,10 @@ public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
           @|bold,red Error: Cannot set the default profile directly.|@
 
           Please create the profile using a different name, then:
-          - Pass the %s flag while creating the profile, or
-          - Create the profile, then run %s to set it as default.
-        
-          %s
-          %s
-        """.formatted(
-            highlight("--set-default"),
-            highlight("astra config use <profile>"),
-            renderComment("Example fix (replacing <new_name>):"),
-            renderCommand(originalArgsWithoutDefault, defaultFlag)
+          - Pass the @!--set-default!@ flag while creating the profile, or
+          - Create the profile, then run @!astra config use <profile>!@ to set it as default.
+        """, List.of(
+            new Hint("Example fix (replacing <new_name>):", originalArgsWithoutDefault, defaultFlag)
         ));
     }
 
@@ -187,17 +181,25 @@ public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
     }
 
     private void assertCanOverwriteProfile(ProfileName profileName) {
-        val confirmationMsg = trimIndent("""
+        val confirmationMsg = """
           A profile under the name %s already exists in the given configuration file.
 
           Do you wish to overwrite it? [y/N]
-        """).formatted(
+        """.formatted(
             highlight(profileName)
         );
 
-        switch (AstraConsole.confirm(confirmationMsg)) {
+        switch (AstraConsole.confirm(trimIndent(confirmationMsg))) {
             case ANSWER_NO -> throw new ExecutionCancelledException("Operation cancelled by user. Use --yes to override without confirmation.");
             case NO_ANSWER -> throwProfileAlreadyExists(profileName);
         }
+    }
+
+    private Map<String, Object> mkData(ProfileName profileName, Boolean isDefault, Boolean wasOverwritten) {
+        return Map.of(
+            "profileName", profileName,
+            "isDefault", isDefault,
+            "wasOverwritten", wasOverwritten
+        );
     }
 }

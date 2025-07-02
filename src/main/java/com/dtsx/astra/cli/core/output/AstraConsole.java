@@ -12,8 +12,11 @@ import java.io.Console;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class AstraConsole {
+    private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
+    
     @Getter @Setter
     private static PrintStream out = System.out;
 
@@ -26,7 +29,6 @@ public class AstraConsole {
     private static boolean noInput = false;
 
     public static boolean isTty() {
-        // Check current console state, not just the cached one
         return System.console() != null;
     }
 
@@ -104,7 +106,10 @@ public class AstraConsole {
             if (item instanceof AstraColors color) {
                 sb.append(color.on());
             } else if (item instanceof String str) {
-                sb.append(AstraColors.ansi().string(str));
+                val processedStr = HIGHLIGHT_PATTERN.matcher(str).replaceAll(match ->
+                    AstraColors.highlight(match.group(1)));
+
+                sb.append(AstraColors.ansi().new Text(processedStr, AstraColors.colorScheme()));
             } else {
                 sb.append(item);
             }

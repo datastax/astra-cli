@@ -1,29 +1,49 @@
 package com.dtsx.astra.cli.core.output.output;
 
-import com.dtsx.astra.cli.core.output.JsonResponse;
-import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.SneakyThrows;
-import lombok.val;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.OK;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @FunctionalInterface
 public interface OutputJson {
     String renderAsJson();
 
-    static OutputJson message(CharSequence s) {
-        return serializeValue(s.toString());
+    static OutputJson response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps) {
+        return () -> serializeValue(Map.of(
+            "code", OK,
+            "message", trimIndent(message.toString()),
+            "data", Optional.ofNullable(data),
+            "nextSteps", Optional.ofNullable(nextSteps)
+        ));
     }
 
-    @SuppressWarnings("Convert2Lambda")
-    static OutputJson serializeValue(Object o) {
-        return new OutputJson() {
-            @SneakyThrows
-            public String renderAsJson() {
-                val resp = JsonResponse.ok(o);
+    static OutputJson message(CharSequence message) {
+        return () -> serializeValue(Map.of(
+            "code", OK,
+            "message", message
+        ));
+    }
 
-                return JSON.std
-                    .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
-                    .asString(resp);
-            }
-        };
+    static OutputJson serializeValue(Object o) {
+        return () -> serializeValue(Map.of(
+            "code", OK,
+            "data", o
+        ));
+    }
+
+    @SneakyThrows
+    private static String serializeValue(Map<String, ?> data) {
+        return new ObjectMapper()
+            .registerModule(new Jdk8Module())
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(data);
     }
 }

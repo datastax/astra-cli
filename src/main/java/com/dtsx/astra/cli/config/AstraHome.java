@@ -11,6 +11,7 @@ public class AstraHome {
         private static final File SCB = new File(DIR, "scb");
         private static final File COMPLETIONS_CACHE = new File(DIR, "completions-cache");
         private static final File LOGS = new File(DIR, "logs");
+        private static final File CQLSH = new File(DIR, "cqlsh-astra");
 
         public static File useScb() {
             FileUtils.createDirIfNotExists(SCB, "");
@@ -25,6 +26,15 @@ public class AstraHome {
         public static File useLogs() {
             FileUtils.createDirIfNotExists(LOGS, "");
             return LOGS;
+        }
+
+        public static File useCqlsh() {
+            FileUtils.createDirIfNotExists(CQLSH, "");
+            return CQLSH;
+        }
+
+        public static boolean cqlshExists() {
+            return CQLSH.exists();
         }
     }
 

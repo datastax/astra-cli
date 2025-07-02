@@ -79,7 +79,7 @@ public class AstraCli extends AbstractCmd<Void> {
         val cmd = new CommandLine(new AstraCli());
 
         cmd
-            .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
+            .setColorScheme(AstraColors.colorScheme())
             .setExecutionExceptionHandler(new ExecutionExceptionHandler())
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
@@ -98,5 +98,10 @@ public class AstraCli extends AbstractCmd<Void> {
         cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
 
         cmd.execute(args);
+    }
+
+    public static <T> T exit(int exitCode) {
+        System.exit(exitCode);
+        return null;
     }
 }

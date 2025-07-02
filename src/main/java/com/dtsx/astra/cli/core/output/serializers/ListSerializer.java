@@ -36,6 +36,23 @@ enum ListSerializer implements OutputSerializer<List<String>> {
 
     @Override
     public String serializeAsCsvInternal(List<String> strings) {
-        return String.join("|", strings);
+        if (strings.isEmpty()) {
+            return "";
+        }
+
+        if (strings.size() == 1) {
+            return OutputSerializer.trySerializeAsCsv(strings.getFirst());
+        }
+
+        val content = strings.stream()
+            .map(OutputSerializer::trySerializeAsCsv)
+            .map((s) -> (
+                (s.startsWith("\""))
+                    ? s.substring(1, s.length() - 1)
+                    : s
+            ))
+            .collect(Collectors.joining(","));
+
+        return '"' + content + '"';
     }
 }

@@ -29,6 +29,7 @@ import picocli.CommandLine.Command;
         DbCreateCmd.class,
         DbDeleteCmd.class,
         DbStatusCmd.class,
+        DbCqlshCmd.class,
         DbCreateDotEnv.class,
         DbDownloadScbCmd.class,
         EmbeddingProvidersListCmd.class,

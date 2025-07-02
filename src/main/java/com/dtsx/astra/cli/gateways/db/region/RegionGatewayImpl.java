@@ -32,7 +32,7 @@ public class RegionGatewayImpl implements RegionGateway {
                 .collect(Collectors.toMap(
                     r -> CloudProviderType.valueOf(r.getCloudProvider()),
                     r -> new TreeMap<>() {{
-                        put(r.getName(), new RegionInfo(r.getDisplayName(), !r.isReservedForQualifiedUsers(), r.getZone()));
+                        put(r.getName(), new RegionInfo(r.getDisplayName(), !r.isReservedForQualifiedUsers(), r.getZone(), r));
                     }},
                     (a, b) -> new TreeMap<>() {{
                         putAll(a);
@@ -53,13 +53,13 @@ public class RegionGatewayImpl implements RegionGateway {
                     (r) -> new TreeMap<>() {{
                         put(
                             r.getRegion(),
-                            new RegionInfo(r.getRegionDisplay(), r.getTier().equalsIgnoreCase("developer"), r.getRegionContinent())
+                            new RegionInfo(r.getRegionDisplay(), r.getTier().equalsIgnoreCase("developer"), r.getRegionContinent(), r)
                         );
                     }},
                     (m1, m2) -> new TreeMap<>(m1) {{ // devops api duplicates regions because of course it does
                         m2.forEach((name, info) ->
                             merge(name, info, (i1, i2) ->
-                                new RegionInfo(i2.displayName(), i1.hasFreeTier() || i2.hasFreeTier(), i2.zone())
+                                new RegionInfo(i2.displayName(), i1.hasFreeTier() || i2.hasFreeTier(), i2.zone(), i2)
                             )
                         );
                     }},

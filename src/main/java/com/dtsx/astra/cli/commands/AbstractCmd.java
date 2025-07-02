@@ -74,7 +74,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @Override
     public final void run() {
         if (OutputType.isNotHuman()) {
-            AstraColors.setAnsi(OFF);
+            AstraColors.ansi(OFF);
         }
 
         this.prelude();

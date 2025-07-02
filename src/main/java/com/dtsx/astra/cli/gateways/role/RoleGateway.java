@@ -7,13 +7,14 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface RoleGateway {
     static RoleGateway mkDefault(Token token, AstraEnvironment env) {
         return new RoleGatewayImpl(APIProvider.mkDefault(token, env));
     }
 
-    List<Role> findAll();
+    Stream<Role> findAll();
     Optional<Role> tryFindOne(String role);
     Role findOne(String role);
 }

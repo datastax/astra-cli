@@ -30,7 +30,8 @@ public class CollectionDescribeOperation implements Operation<CollectionDescribe
         long estimatedCount,
         Optional<String> defaultIdType,
         Optional<IndexingInfo> indexing,
-        Optional<VectorInfo> vector
+        Optional<VectorInfo> vector,
+        CollectionDefinition raw
     ) {}
 
     public record IndexingInfo(
@@ -67,7 +68,8 @@ public class CollectionDescribeOperation implements Operation<CollectionDescribe
             estimatedCount,
             extractDefaultIdType(definition),
             extractIndexingInfo(definition),
-            extractVectorInfo(definition)
+            extractVectorInfo(definition),
+            definition
         ));
     }
 

@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateOperation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
@@ -16,6 +17,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -138,126 +141,100 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd<DbCreateResult
 
     @Override
     protected final OutputAll execute(DbCreateResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case DatabaseAlreadyExistsWithStatus(var dbId, var currStatus) -> handleDbAlreadyExistsWithStatus(dbId, currStatus);
             case DatabaseAlreadyExistsIllegallyWithStatus(var dbId, var currStatus) -> throwDbAlreadyExistsWithStatus(dbId, currStatus);
             case DatabaseAlreadyExistsAndIsActive(var dbId, var prevStatus, var awaited) -> handleDbAlreadyExistsAndIsActive(dbId, prevStatus, awaited);
             case DatabaseCreationStarted(var dbId, var currStatus) -> handleDbCreationStarted(dbId, currStatus);
             case DatabaseCreated(var dbId, var waitTime) -> handleDbCreated(dbId, waitTime);
         };
-
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleDbAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) {
-        return """
-          Database %s already exists with id %s, and has status %s.
-        
-          %s
-          %s
-        
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleDbAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) {
+        val message = "Database %s already exists with id %s, and has status %s.".formatted(
             highlight($dbRef),
             highlight(dbId),
-            highlight(currStatus),
-            renderComment("Resume the database:"),
-            renderCommand("astra db resume %s".formatted($dbRef)),
-            renderComment("Get information about the existing database:"),
-            renderCommand("astra db get %s".formatted($dbRef))
+            highlight(currStatus)
         );
-    }
 
-    private String throwDbAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) {
-        throw new AstraCliException(DATABASE_ALREADY_EXISTS, """
-          @|bold,red Error: Database %s already exists with id %s, and has status %s.|@
-        
-          To ignore this error, provide the %s flag to skip this error if the database already exists.
-        
-          %s
-          %s
-        
-          %s
-          %s
-        """.formatted(
-            $dbRef,
-            dbId,
-            currStatus,
-            highlight("--if-not-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-not-exists"),
-            renderComment("Get information about the existing database:"),
-            renderCommand("astra db get %s".formatted($dbRef))
+        val data = mkData(dbId, false, currStatus, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Resume the database:", "astra db resume %s".formatted($dbRef)),
+            new Hint("Get information about the existing database:", "astra db get %s".formatted($dbRef))
         ));
     }
 
-    private String handleDbAlreadyExistsAndIsActive(UUID dbId, DatabaseStatusType prevStatus, Duration awaited) {
-        if (awaited.isZero()) {
-            return """
-              Database %s already exists with id %s, and was already active; no action was required.
-           
-              %s
-              %s
-            """.formatted(
+    private <T> T throwDbAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) {
+        throw new AstraCliException(DATABASE_ALREADY_EXISTS, """
+          @|bold,red Error: Database %s already exists with id %s, and has status %s.|@
+        
+          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the database already exists.
+        """.formatted(
+            $dbRef,
+            dbId,
+            currStatus
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-not-exists"),
+            new Hint("Get information about the existing database:", "astra db get %s".formatted($dbRef))
+        ));
+    }
+
+    private OutputAll handleDbAlreadyExistsAndIsActive(UUID dbId, DatabaseStatusType prevStatus, Duration awaited) {
+        val message = awaited.isZero() 
+            ? "Database %s already exists with id %s, and was already active; no action was required.".formatted(
+                highlight($dbRef),
+                highlight(dbId)
+            )
+            : "Database %s already exists with id %s, and had status %s. It is now active after waiting %s seconds.".formatted(
                 highlight($dbRef),
                 highlight(dbId),
-                renderComment("Get more information about the existing database:"),
-                renderCommand("astra db get %s".formatted($dbRef))
+                highlight(prevStatus),
+                highlight(awaited.toSeconds())
             );
-        }
 
-        return """
-          Database %s already exists with id %s, and had status %s.
-        
-          It is now active after waiting %s seconds.
-        
-          %s
-          %s
-        """.formatted(
-            highlight($dbRef),
-            highlight(dbId),
-            highlight(prevStatus),
-            highlight(awaited.toSeconds()),
-            renderComment("Get more information about the existing database:"),
-            renderCommand("astra db get %s".formatted($dbRef))
-        );
+        val data = mkData(dbId, false, DatabaseStatusType.ACTIVE, awaited);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Get more information about the existing database:", "astra db get %s".formatted($dbRef))
+        ));
     }
 
-    private String handleDbCreationStarted(UUID dbId, DatabaseStatusType currStatus) {
-        return """
-          Database %s has been created with id %s, and currently has status %s.
-        
-          %s
-          %s
-        
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleDbCreationStarted(UUID dbId, DatabaseStatusType currStatus) {
+        val message = "Database %s has been created with id %s, and currently has status %s.".formatted(
             highlight($dbRef),
             highlight(dbId),
-            highlight(currStatus),
-            renderComment("Poll the database's status:"),
-            renderCommand("astra db status %s".formatted($dbRef)),
-            renderComment("Get more information about the new database:"),
-            renderCommand("astra db get %s".formatted($dbRef))
+            highlight(currStatus)
         );
+
+        val data = mkData(dbId, true, currStatus, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef)),
+            new Hint("Get more information about the new database:", "astra db get %s".formatted($dbRef))
+        ));
     }
 
-    private String handleDbCreated(UUID dbId, Duration waitTime) {
-        return """
-          Database %s has been created with id %s.
-        
-          It is now active after waiting %s seconds.
-        
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleDbCreated(UUID dbId, Duration waitTime) {
+        val message = "Database %s has been created with id %s. It is now active after waiting %s seconds.".formatted(
             highlight($dbRef),
             highlight(dbId),
-            highlight(waitTime.toSeconds()),
-            renderComment("Get more information about the new database:"),
-            renderCommand("astra db get %s".formatted($dbRef))
+            highlight(waitTime.toSeconds())
+        );
+
+        val data = mkData(dbId, true, DatabaseStatusType.ACTIVE, waitTime);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Get more information about the new database:", "astra db get %s".formatted($dbRef))
+        ));
+    }
+
+    private Map<String, Object> mkData(UUID dbId, Boolean wasCreated, DatabaseStatusType currentStatus, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "dbId", dbId,
+            "wasCreated", wasCreated,
+            "currentStatus", currentStatus,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );
     }
 }

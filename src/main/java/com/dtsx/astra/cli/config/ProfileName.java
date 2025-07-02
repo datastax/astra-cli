@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.config;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -42,6 +43,7 @@ public class ProfileName implements AstraColors.Highlightable {
     }
 
     @Override
+    @JsonValue
     public String toString() {
         return unwrap();
     }

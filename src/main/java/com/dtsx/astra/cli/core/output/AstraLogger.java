@@ -32,7 +32,7 @@ public class AstraLogger {
         return new File(AstraHome.Dirs.useLogs(), Instant.now().toString().replace(":", "-") + ".log");
     }
 
-    enum Level {
+    public enum Level {
         QUIET,
         REGULAR,
         VERBOSE,

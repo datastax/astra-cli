@@ -2,13 +2,18 @@ package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.REGION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -52,90 +57,74 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     @Override
     protected final OutputAll execute(RegionDeleteResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case RegionNotFound() -> handleRegionNotFound();
             case RegionDeleted() -> handleRegionDeleted();
             case RegionDeletedAndDbActive(var waitTime) -> handleRegionDeletedAndDbActive(waitTime);
             case RegionIllegallyNotFound() -> throwRegionNotFound();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleRegionNotFound() {
-        return """
-          Region %s does not exist in database %s; nothing to delete.
-          
-          %s
-          %s
-          
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleRegionNotFound() {
+        val message = "Region %s does not exist in database %s; nothing to delete.".formatted(
+            highlight($region),
+            highlight($dbRef)
+        );
+
+        val data = mkData(false, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("List all regions in the database:", "astra db list-regions %s".formatted($dbRef)),
+            new Hint("Get database information:", "astra db get %s".formatted($dbRef))
+        ));
+    }
+
+    private OutputAll handleRegionDeleted() {
+        val message = "Region %s has been deleted from database %s (database may not be active yet).".formatted(
+            highlight($region),
+            highlight($dbRef)
+        );
+
+        val data = mkData(true, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef)),
+            new Hint("List remaining regions in the database:", "astra db list-regions %s".formatted($dbRef))
+        ));
+    }
+
+    private OutputAll handleRegionDeletedAndDbActive(Duration waitTime) {
+        val message = "Region %s has been deleted from database %s. Database is now active after waiting %s seconds.".formatted(
             highlight($region),
             highlight($dbRef),
-            renderComment("List all regions in the database:"),
-            renderCommand("astra db list-regions %s".formatted($dbRef)),
-            renderComment("Get database information:"),
-            renderCommand("astra db get %s".formatted($dbRef))
+            highlight(waitTime.toSeconds())
         );
+
+        val data = mkData(true, waitTime);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("List remaining regions in the database:", "astra db list-regions %s".formatted($dbRef))
+        ));
     }
 
-    private String handleRegionDeleted() {
-        return """
-          Region %s has been deleted from database %s (database may not be active yet).
-          
-          %s
-          %s
-          
-          %s
-          %s
-        """.formatted(
-            highlight($region),
-            highlight($dbRef),
-            renderComment("Poll the database's status:"),
-            renderCommand("astra db status %s".formatted($dbRef)),
-            renderComment("List remaining regions in the database:"),
-            renderCommand("astra db list-regions %s".formatted($dbRef))
-        );
-    }
-
-    private String handleRegionDeletedAndDbActive(Duration waitTime) {
-        return """
-          Region %s has been deleted from database %s.
-          
-          Database is now active after waiting %s seconds.
-          
-          %s
-          %s
-        """.formatted(
-            highlight($region),
-            highlight($dbRef),
-            highlight(waitTime.toSeconds()),
-            renderComment("List remaining regions in the database:"),
-            renderCommand("astra db list-regions %s".formatted($dbRef))
-        );
-    }
-
-    private String throwRegionNotFound() {
+    private <T> T throwRegionNotFound() {
         throw new AstraCliException(REGION_NOT_FOUND, """
           @|bold,red Error: Region %s does not exist in database %s.|@
-          
-          To ignore this error, provide the %s flag to skip this error if the region doesn't exist.
-          
-          %s
-          %s
-          
-          %s
-          %s
+    
+          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the region doesn't exist.
         """.formatted(
             $region,
-            $dbRef,
-            highlight("--if-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-exists"),
-            renderComment("List existing regions:"),
-            renderCommand("astra db list-regions %s".formatted($dbRef))
+            $dbRef
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-exists"),
+            new Hint("List existing regions:", "astra db list-regions %s".formatted($dbRef))
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "wasDeleted", wasDeleted,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
+        );
     }
 }

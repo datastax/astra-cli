@@ -32,7 +32,7 @@ public class CdcCreateOperation implements Operation<CdcCreateResult> {
 
         return switch (status) {
             case CreationStatus.Created<?> _ -> handleCdcCreated();
-            case CreationStatus.AlreadyExists<?> _ -> handleCdcAlreadyExists(request.tableRef, request.tenantName, request.ifNotExists);
+            case CreationStatus.AlreadyExists<?> _ -> handleCdcAlreadyExists(request.ifNotExists);
         };
     }
 
@@ -40,12 +40,11 @@ public class CdcCreateOperation implements Operation<CdcCreateResult> {
         return new CdcCreated();
     }
 
-    private CdcCreateResult handleCdcAlreadyExists(TableRef tableRef, TenantName tenantName, boolean ifNotExists) {
+    private CdcCreateResult handleCdcAlreadyExists(boolean ifNotExists) {
         if (ifNotExists) {
             return new CdcAlreadyExists();
         } else {
             return new CdcIllegallyAlreadyExists();
         }
     }
-
 }

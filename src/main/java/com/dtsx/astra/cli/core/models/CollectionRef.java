@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class CollectionRef implements AstraColors.Highlightable {
         return Either.right(new CollectionRef(name, keyspace));
     }
 
+    @JsonValue
     public String name() {
         return name;
     }

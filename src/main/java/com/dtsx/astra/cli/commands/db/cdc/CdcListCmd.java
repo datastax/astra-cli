@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db.cdc;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcListOperation;
@@ -10,6 +11,7 @@ import picocli.CommandLine.Command;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
 
@@ -21,10 +23,15 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
     comment = "List all CDCs in a database",
     command = "astra db list-cdcs my_db"
 )
-public class CdcListCmd extends AbstractCdcCmd<List<CdcInfo>> {
+public class CdcListCmd extends AbstractCdcCmd<Stream<CdcInfo>> {
     @Override
-    public final OutputAll execute(List<CdcInfo> result) {
-        val data = result.stream()
+    protected OutputJson executeJson(Stream<CdcInfo> result) {
+        return OutputJson.serializeValue(result.map(CdcInfo::raw).toList());
+    }
+
+    @Override
+    public final OutputAll execute(Stream<CdcInfo> result) {
+        val data = result
             .map((cdc) -> Map.of(
                 "ID", cdc.id(),
                 "Keyspace", cdc.keyspace(),
@@ -40,7 +47,7 @@ public class CdcListCmd extends AbstractCdcCmd<List<CdcInfo>> {
     }
 
     @Override
-    protected Operation<List<CdcInfo>> mkOperation() {
+    protected Operation<Stream<CdcInfo>> mkOperation() {
         return new CdcListOperation(cdcGateway, new CdcListRequest($dbRef));
     }
 }

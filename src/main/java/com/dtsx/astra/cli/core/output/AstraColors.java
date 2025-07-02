@@ -1,7 +1,9 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.val;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
@@ -10,6 +12,7 @@ import picocli.CommandLine.Option;
 
 import java.util.UUID;
 
+@Accessors(fluent = true)
 public enum AstraColors implements Ansi.IStyle {
     PURPLE_300(175, 110, 195),
     PURPLE_500(110, 46, 164),
@@ -44,17 +47,15 @@ public enum AstraColors implements Ansi.IStyle {
 
     private static final String DISABLE_STRING = CSI + "39m";
 
-    public static final Help.ColorScheme DEFAULT_COLOR_SCHEME = new Help.ColorScheme.Builder(Help.defaultColorScheme(Ansi.AUTO))
-        .options(AstraColors.BLUE_300)
-        .parameters(AstraColors.BLUE_300)
-        .build();
-
+    @Getter
     @Setter
     private static Ansi ansi = Ansi.AUTO;
 
-    public static Ansi ansi() {
-        return ansi;
-    }
+    @Getter
+    private static ColorScheme colorScheme = new ColorScheme.Builder(Help.defaultColorScheme(Ansi.AUTO))
+        .options(AstraColors.BLUE_300)
+        .parameters(AstraColors.BLUE_300)
+        .build();
 
     public static boolean enabled() {
         return ansi.enabled();
@@ -77,7 +78,7 @@ public enum AstraColors implements Ansi.IStyle {
         public ColorScheme getColorScheme() {
             val ansi = (AstraColors.ansi == null) ? Ansi.AUTO : AstraColors.ansi;
 
-            return new Help.ColorScheme.Builder(DEFAULT_COLOR_SCHEME)
+            return colorScheme = new Help.ColorScheme.Builder(colorScheme)
                 .ansi(ansi)
                 .build();
         }

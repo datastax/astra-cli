@@ -2,12 +2,16 @@ package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -40,61 +44,59 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
 
     @Override
     public final OutputAll execute(CollectionDeleteResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case CollectionNotFound() -> handleCollectionNotFound();
             case CollectionIllegallyNotFound() -> throwCollectionNotFound();
             case CollectionDeleted() -> handleCollectionDeleted();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleCollectionNotFound() {
-        return """
-          Collection %s does not exist in keyspace %s of database %s; nothing to delete.
-
-          %s
-          %s
-        """.formatted(
-            highlight($collRef.name()),
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db()),
-            renderComment("See all existing collections in the database:"),
-            renderCommand("astra db list-collections %s --all".formatted($keyspaceRef.db()))
-        );
-    }
-
-    private String handleCollectionDeleted() {
-        return """
-          Collection %s has been deleted from keyspace %s in database %s.
-        """.formatted(
+    private OutputAll handleCollectionNotFound() {
+        val message = "Collection %s does not exist in keyspace %s of database %s; nothing to delete.".formatted(
             highlight($collRef.name()),
             highlight($keyspaceRef.name()),
             highlight($keyspaceRef.db())
         );
+
+        val data = mkData(false);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("See all existing collections in the database:",
+                "astra db list-collections %s --all".formatted($keyspaceRef.db()))
+        ));
     }
 
-    private String throwCollectionNotFound() {
+    private OutputAll handleCollectionDeleted() {
+        val message = "Collection %s has been deleted from keyspace %s in database %s.".formatted(
+            highlight($collRef.name()),
+            highlight($keyspaceRef.name()),
+            highlight($keyspaceRef.db())
+        );
+
+        val data = mkData(true);
+
+        return OutputAll.response(message, data);
+    }
+
+    private <T> T throwCollectionNotFound() {
         throw new AstraCliException(COLLECTION_NOT_FOUND, """
           @|bold,red Error: Collection '%s' does not exist in keyspace '%s' of database '%s'.|@
         
-          To ignore this error, provide the %s flag to skip this error if the collection doesn't exist.
-        
-          %s
-          %s
-        
-          %s
-          %s
+          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the collection doesn't exist.
         """.formatted(
             $collRef.name(),
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            highlight("--if-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-exists"),
-            renderComment("See all existing collections in the database:"),
-            renderCommand("astra db list-collections %s --all".formatted($keyspaceRef.db()))
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-exists"),
+            new Hint("See all existing collections in the database:", "astra db list-collections %s --all".formatted($keyspaceRef.db()))
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasDeleted) {
+        return Map.of(
+            "wasDeleted", wasDeleted
+        );
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation;
@@ -11,11 +12,11 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "create-collection",
@@ -116,71 +117,60 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
 
     @Override
     public final OutputAll execute(CollectionCreateResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case CollectionAlreadyExists() -> handleCollectionAlreadyExists();
             case CollectionIllegallyAlreadyExists() -> throwCollectionAlreadyExists();
             case CollectionCreated() -> handleCollectionCreated();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleCollectionAlreadyExists() {
-        return """
-          Collection %s already exists in keyspace %s of database %s.
-
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleCollectionAlreadyExists() {
+        val message = "Collection %s already exists in keyspace %s of database %s.".formatted(
             highlight($collRef.name()),
             highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db()),
-            renderComment("Get information about the existing collection:"),
-            renderCommand("astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            highlight($keyspaceRef.db())
         );
+
+        val data = mkData(false);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Get information about the existing collection:", "astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+        ));
     }
 
-    private String handleCollectionCreated() {
-        return """
-          Collection %s has been created in keyspace %s of database %s.
-
-          %s
-          %s
-
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleCollectionCreated() {
+        val message = "Collection %s has been created in keyspace %s of database %s.".formatted(
             highlight($collRef.name()),
             highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db()),
-            renderComment("List all collections in the keyspace:"),
-            renderCommand("astra db list-collections %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name())),
-            renderComment("Get more information about the new collection:"),
-            renderCommand("astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            highlight($keyspaceRef.db())
         );
+
+        val data = mkData(true);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Get more information about the new collection:", "astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+        ));
     }
 
-    private String throwCollectionAlreadyExists() {
+    private <T> T throwCollectionAlreadyExists() {
         throw new AstraCliException(COLLECTION_ALREADY_EXISTS, """
           @|bold,red Error: Collection '%s' already exists in keyspace '%s' of database '%s'.|@
 
-          To ignore this error, provide the %s flag to skip this error if the collection already exists.
-
-          %s
-          %s
-
-          %s
-          %s
+          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the collection already exists.
         """.formatted(
             $collRef.name(),
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            highlight("--if-not-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-not-exists"),
-            renderComment("Get information about the existing collection:"),
-            renderCommand("astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-not-exists"),
+            new Hint("Get information about the existing collection:", "astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasCreated) {
+        return Map.of(
+            "wasCreated", wasCreated
+        );
     }
 
     @Override

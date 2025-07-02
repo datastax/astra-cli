@@ -8,7 +8,6 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public interface OutputSerializer<T> {
     List<OutputSerializer<?>> SERIALIZERS = List.of(
-        StringSerializer.INSTANCE,
         ListSerializer.INSTANCE,
         EnumSerializer.INSTANCE,
         CatchAllSerializer.INSTANCE

@@ -1,5 +1,14 @@
 import java.net.URLClassLoader
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("io.github.classgraph:classgraph:4.8.177")
+    }
+}
+
 plugins {
     java
     application
@@ -19,6 +28,8 @@ dependencies {
     implementation("com.datastax.astra:astra-db-java:2.0.0")
     implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
 
+    implementation("org.apache.commons:commons-compress:1.27.1")
+
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
@@ -29,8 +40,6 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
-
-    implementation("com.fasterxml.jackson.jr:jackson-jr-objects:2.19.0")
 }
 
 tasks.compileJava {
@@ -44,6 +53,8 @@ application {
 graalvmNative {
     binaries.all {
         buildArgs.add("-Os")
+        buildArgs.add("--enable-http")
+        buildArgs.add("--enable-https")
     }
 }
 
@@ -66,17 +77,52 @@ tasks.register("generateGraalReflectionConfig") {
         val classpath = sourceSets.main.get().runtimeClasspath
         val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray())
 
-        val classes = inputFile.readLines().map(String::trim).filter { it.isNotBlank() && !it.startsWith("#") }
+        val inputLines = inputFile.readLines().map(String::trim).filter { it.isNotBlank() && !it.startsWith("#") }
+        val allClasses = mutableSetOf<String>()
 
-        classes.forEach {
-            try {
-                Class.forName(it, false, classLoader)
-            } catch (_: ClassNotFoundException) {
-                throw GradleException("Invalid class '$it' found in reflected.txt")
+        val scanResult = io.github.classgraph.ClassGraph()
+            .overrideClassLoaders(classLoader)
+            .enableAllInfo()
+            .scan()
+
+        inputLines.forEach { line ->
+            if (line.endsWith(".*") || line.endsWith("]")) {
+                val packageName = line.substringBeforeLast(".^[", "").ifBlank { line.substringBeforeLast(".[", "").ifBlank { line.substringBeforeLast(".") } }
+                val classesInPackage = scanResult.getPackageInfo(packageName)?.classInfo ?: emptyList()
+
+                val filter: (String) -> Boolean = if (line.contains("[")) {
+                    val regexes = line.substringAfter("[").substringBefore("]").split(",").map(String::trim).map(String::toRegex)
+
+                    if (line.contains("^[")) {
+                        { className -> regexes.none { className.matches(it) } }
+                    } else {
+                        { className -> regexes.any { className.matches(it) } }
+                    }
+                } else {
+                    { true }
+                }
+
+                for (classInfo in classesInPackage) {
+                    if (!classInfo.isInterface && !classInfo.isAbstract && filter(classInfo.name.substringAfterLast('.'))) {
+                        allClasses.add(classInfo.name)
+                    }
+                }
+            } else {
+                allClasses.add(line)
             }
         }
 
-        val reflectionConfig = classes.map {
+        scanResult.close()
+
+        allClasses.forEach { className ->
+            try {
+                Class.forName(className, false, classLoader)
+            } catch (_: ClassNotFoundException) {
+                throw GradleException("Invalid class '$className' found in reflected.txt")
+            }
+        }
+
+        val reflectionConfig = allClasses.map {
             mapOf(
                 "name" to it,
                 "allDeclaredConstructors" to true,

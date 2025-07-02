@@ -10,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class TableListOperation implements Operation<List<TableListResult>> {
+public class TableListOperation implements Operation<Stream<TableListResult>> {
     private final TableGateway tableGateway;
     private final KeyspaceGateway ksGateway;
     private final TableListRequest request;
@@ -25,19 +26,18 @@ public class TableListOperation implements Operation<List<TableListResult>> {
     public record TableListRequest(KeyspaceRef keyspaceRef, boolean all) {}
 
     @Override
-    public List<TableListResult> execute() {
+    public Stream<TableListResult> execute() {
         val dbRef = request.keyspaceRef.db();
 
         val keyspaces = (request.all)
-            ? ksGateway.findAllKeyspaces(dbRef).keyspaces()
-            : List.of(request.keyspaceRef.name());
+            ? ksGateway.findAllKeyspaces(dbRef).keyspaces().stream()
+            : Stream.of(request.keyspaceRef.name());
 
-        return keyspaces.stream()
+        return keyspaces
             .map(ks -> KeyspaceRef.mkUnsafe(dbRef, ks))
             .map(ref -> new TableListResult(
                 ref.name(),
                 tableGateway.findAllTables(ref)
-            ))
-            .toList();
+            ));
     }
 }

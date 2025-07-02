@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.token;
 
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
@@ -12,15 +13,16 @@ import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class TokenGatewayImpl implements TokenGateway {
     private final APIProvider apiProvider;
 
     @Override
-    public List<IamToken> findAll() {
+    public Stream<IamToken> findAll() {
         return AstraLogger.loading("Fetching tokens for the current org", (_) -> 
-            apiProvider.astraOpsClient().tokens().findAll().toList());
+            apiProvider.astraOpsClient().tokens().findAll());
     }
 
     @Override
@@ -42,10 +44,16 @@ public class TokenGatewayImpl implements TokenGateway {
     }
 
     @Override
-    public void delete(String clientId) {
+    public DeletionStatus<Void> delete(String clientId) {
+        if (!exists(clientId)) {
+            return DeletionStatus.notFound(null);
+        }
+        
         AstraLogger.loading("Deleting token " + highlight(clientId), (_) -> {
             apiProvider.astraOpsClient().tokens().delete(clientId);
             return null;
         });
+        
+        return DeletionStatus.deleted(null);
     }
 }

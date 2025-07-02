@@ -3,20 +3,24 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "delete",
@@ -54,69 +58,66 @@ public class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd<DbDeleteResult
 
     @Override
     protected final OutputAll execute(DbDeleteResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case DatabaseNotFound() -> handleDbNotFound($dbRef);
             case DatabaseDeleted() -> handleDbDeleted($dbRef);
             case DatabaseDeletedAndTerminated(var waitTime) -> handleDbDeletedAndTerminated($dbRef, waitTime);
             case DatabaseIllegallyNotFound() -> throwDbNotFound($dbRef);
         };
-
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleDbNotFound(DbRef dbRef) {
-        return """
-          Database %s does not exist; nothing to delete.
-
-          %s
-          %s
-        """.formatted(
-            highlight(dbRef),
-            renderComment("See your existing databases:"),
-            renderCommand("astra db list")
+    private OutputAll handleDbNotFound(DbRef dbRef) {
+        val message = "Database %s does not exist; nothing to delete.".formatted(
+            highlight(dbRef)
         );
+
+        val data = mkData(false, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("See your existing databases:", "astra db list")
+        ));
     }
 
-    private String handleDbDeleted(DbRef dbRef) {
-        return """
-          Database %s has been deleted (though it may still be terminating, and not yet fully terminated).
-        
-          %s
-          %s
-        """.formatted(
-            highlight(dbRef),
-            renderComment("Poll its status with:"),
-            renderCommand("astra db status " + dbRef)
+    private OutputAll handleDbDeleted(DbRef dbRef) {
+        val message = "Database %s has been deleted (though it may still be terminating, and not yet fully terminated).".formatted(
+            highlight(dbRef)
         );
+
+        val data = mkData(true, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll its status with:", "astra db status " + dbRef)
+        ));
     }
 
-    private String handleDbDeletedAndTerminated(DbRef dbRef, Duration waitTime) {
-        return """
-          Database %s has been deleted and fully terminated (waited %ds for termination).
-        """.formatted(
+    private OutputAll handleDbDeletedAndTerminated(DbRef dbRef, Duration waitTime) {
+        val message = "Database %s has been deleted and fully terminated (waited %ds for termination).".formatted(
             highlight(dbRef),
             waitTime.toSeconds()
         );
+
+        val data = mkData(true, waitTime);
+
+        return OutputAll.response(message, data);
     }
 
-    private String throwDbNotFound(DbRef dbRef) {
-        throw new AstraCliException("""
+    private <T> T throwDbNotFound(DbRef dbRef) {
+        throw new AstraCliException(DATABASE_NOT_FOUND, """
           @|bold,red Error: Database '%s' could not be found.|@
         
-          To ignore this error, you can use the %s option to avoid failing if the profile does not exist.
-        
-          %s
-          %s
-        
-          %s
-          %s
+          To ignore this error, you can use the @!--if-exists!@ option to avoid failing if the database does not exist.
         """.formatted(
-            dbRef,
-            AstraColors.highlight("--if-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-exists"),
-            renderComment("See your existing databases:"),
-            renderCommand("astra db list")
+            dbRef
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-exists"),
+            new Hint("See your existing databases:", "astra db list")
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "wasDeleted", wasDeleted,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
+        );
     }
 }

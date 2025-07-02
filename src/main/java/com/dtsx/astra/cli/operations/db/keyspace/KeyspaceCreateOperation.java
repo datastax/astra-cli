@@ -1,9 +1,7 @@
 package com.dtsx.astra.cli.operations.db.keyspace;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.operations.Operation;

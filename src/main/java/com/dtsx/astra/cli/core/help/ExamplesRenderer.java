@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.help;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraConsole;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import picocli.CommandLine;
@@ -28,7 +28,7 @@ public class ExamplesRenderer {
         });
 
         cmd.getHelpSectionMap().put(SECTION_DETAILS_KEY, (help) -> {
-            return help.ansi().text(renderExamples(examples)).toString();
+            return AstraConsole.format(renderExamples(examples));
         });
 
         cmd.setHelpSectionKeys(insertSectionKeys(cmd.getHelpSectionKeys()));

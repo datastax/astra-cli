@@ -4,13 +4,15 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.CdcInfo;
+import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class CdcListOperation implements Operation<List<CdcInfo>> {
+public class CdcListOperation implements Operation<Stream<CdcInfo>> {
     private final CdcGateway cdcGateway;
     private final CdcListRequest request;
 
@@ -21,17 +23,18 @@ public class CdcListOperation implements Operation<List<CdcInfo>> {
         String cluster,
         String namespace,
         String tenant,
-        String status
+        String status,
+        CdcDefinition raw
     ) {}
 
     public record CdcListRequest(DbRef dbRef) {}
 
     @Override
-    public List<CdcInfo> execute() {
+    public Stream<CdcInfo> execute() {
         val dbRef = request.dbRef;
         val result = cdcGateway.findAll(dbRef);
 
-        return result.stream()
+        return result
             .map((cdc) -> new CdcInfo(
                 cdc.getConnectorName(),
                 cdc.getKeyspace(),
@@ -39,8 +42,8 @@ public class CdcListOperation implements Operation<List<CdcInfo>> {
                 cdc.getClusterName(),
                 cdc.getNamespace(),
                 cdc.getTenant(),
-                cdc.getCodStatus()
-            ))
-            .toList();
+                cdc.getCodStatus(),
+                cdc
+            ));
     }
 }

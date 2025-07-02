@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db.table;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.table.TableListOperation;
@@ -12,9 +13,9 @@ import picocli.CommandLine.ParameterException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.table.TableListOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "list-tables",
@@ -32,7 +33,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     comment = "List all tables in all keyspaces",
     command = "astra db list-tables my_db --all"
 )
-public class TableListCmd extends AbstractTableCmd<List<TableListResult>> {
+public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
     @Option(
         names = { "--all", "-a" },
         description = "List tables in all keyspaces",
@@ -41,16 +42,26 @@ public class TableListCmd extends AbstractTableCmd<List<TableListResult>> {
     public boolean $all;
 
     @Override
-    public final OutputAll execute(List<TableListResult> result) {
-        return handleTableList(result);
-    }
+    protected OutputJson executeJson(Stream<TableListResult> result) {
+        validateParams();
 
-    private OutputAll handleTableList(List<TableListResult> result) {
-        if ($all && !$keyspaceRef.isDefaultKeyspace()) {
-            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
+        if ($all) {
+            return OutputJson.serializeValue(result
+                .map(res -> Map.of(
+                    "keyspace", res.keyspace(),
+                    "tables", res.tables()
+                ))
+                .toList());
         }
 
-        val data = result.stream()
+        return OutputJson.serializeValue(result.toList().getFirst().tables());
+    }
+
+    @Override
+    public final OutputAll execute(Stream<TableListResult> result) {
+        validateParams();
+
+        val data = result
             .flatMap((res) -> (
                 res.tables().stream()
                     .map(desc -> Map.of(
@@ -60,13 +71,21 @@ public class TableListCmd extends AbstractTableCmd<List<TableListResult>> {
             ))
             .toList();
 
-        return $all
-            ? new ShellTable(data).withColumns("Keyspace", "Name")
-            : new ShellTable(data).withColumns("Name");
+        if ($all) {
+            return new ShellTable(data).withColumns("Keyspace", "Name");
+        } else {
+            return new ShellTable(data).withColumns("Name");
+        }
+    }
+
+    private void validateParams() {
+        if ($all && !$keyspaceRef.isDefaultKeyspace()) {
+            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
+        }
     }
 
     @Override
-    protected Operation<List<TableListResult>> mkOperation() {
+    protected Operation<Stream<TableListResult>> mkOperation() {
         return new TableListOperation(tableGateway, keyspaceGateway, new TableListRequest($keyspaceRef, $all));
     }
 }

@@ -8,8 +8,9 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputCsv;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
-import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.Operation;
@@ -19,6 +20,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     command = "astra config get my_profile"
 )
 @Example(
-    comment = "Get the value of a specific key",
+    comment = "Get the unwrap of a specific key",
     command = "astra config get my_profile -k ASTRA_DB_APPLICATION_TOKEN"
 )
 public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
@@ -66,21 +68,31 @@ public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
         return switch (result) {
             case SpecificKeyValue(var value) -> OutputAll.serializeValue(value);
             case ProfileSection(var section) -> OutputAll.instance(
-                () -> OutputHuman.message(section.render(true)),
-                () -> mkTable(section),
-                () -> mkTable(section)
+                () -> renderHuman(section),
+                () -> renderJson(section),
+                () -> renderCsv(section)
             );
             case ProfileNotFound() -> throw new ProfileNotFoundException($profileName);
             case KeyNotFound(var keyName, var section) -> throwKeyNotFound(keyName, section);
         };
     }
 
-    @Override
-    protected Operation<GetConfigResult> mkOperation() {
-        return new ConfigGetOperation(config(), new GetConfigRequest($profileName, $key));
+    private OutputHuman renderHuman(Ini.IniSection section) {
+        return OutputHuman.message(section.render(true));
     }
 
-    private RenderableShellTable mkTable(Ini.IniSection section) {
+    private OutputJson renderJson(Ini.IniSection section) {
+        return OutputJson.serializeValue(Map.of(
+            "name", section.name(),
+            "attributes", section.pairs().stream().map((p) -> Map.of(
+                "key", p.key(),
+                "unwrap", p.value(),
+                "comments", p.comments()
+            )).toList()
+        ));
+    }
+
+    private OutputCsv renderCsv(Ini.IniSection section) {
         val attrs = section.pairs().stream()
             .map(p -> ShellTable.attr(p.key(), p.value()))
             .toList();
@@ -120,5 +132,10 @@ public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
             renderComment("Get the values of the keys in this profile with:"),
             renderCommand("astra config get " + section.name())
         );
+    }
+
+    @Override
+    protected Operation<GetConfigResult> mkOperation() {
+        return new ConfigGetOperation(config(), new GetConfigRequest($profileName, $key));
     }
 }

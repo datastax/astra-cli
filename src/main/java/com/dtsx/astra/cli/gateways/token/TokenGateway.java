@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.token;
 
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
@@ -9,15 +10,16 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface TokenGateway {
     static TokenGateway mkDefault(Token token, AstraEnvironment env) {
         return new TokenGatewayImpl(APIProvider.mkDefault(token, env));
     }
 
-    List<IamToken> findAll();
+    Stream<IamToken> findAll();
     Optional<IamToken> tryFindOne(String clientId);
     boolean exists(String clientId);
     CreateTokenResponse create(Role role);
-    void delete(String clientId);
+    DeletionStatus<Void> delete(String clientId);
 }

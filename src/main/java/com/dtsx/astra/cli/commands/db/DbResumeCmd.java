@@ -1,20 +1,26 @@
 package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbResumeOperation;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @Command(
     name = "resume",
@@ -41,70 +47,79 @@ public class DbResumeCmd extends AbstractLongRunningDbSpecificCmd<DbResumeResult
 
     @Override
     protected final OutputAll execute(DbResumeResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case DatabaseAwaited(var duration) -> handleDatabaseAwaited(duration);
             case DatabaseResumedAwaited(var duration) -> handleDatabaseResumedAwaited(duration);
             case DatabaseNeedsAwaiting(var database) -> handleDatabaseNeedsAwaiting(database);
             case DatabaseResumedNeedsAwaiting(var database) -> handleDatabaseResumedNeedsAwaiting(database);
             case DatabaseAlreadyActiveNoWait() -> handleDatabaseAlreadyActiveNoWait();
         };
-
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleDatabaseAwaited(Duration duration) {
-        return """
-          Database %s was not in a state that required resuming, but is now active after waiting %d seconds.
-        """.formatted(
+    private OutputAll handleDatabaseAwaited(Duration duration) {
+        val message = "Database %s was not in a state that required resuming, but is now active after waiting %d seconds.".formatted(
             highlight($dbRef),
             duration.getSeconds()
         );
+
+        val data = mkData(false, ACTIVE, duration);
+
+        return OutputAll.response(message, data);
     }
 
-    private String handleDatabaseResumedAwaited(Duration duration) {
-        return """
-          Database %s was resumed, and is now active after waiting %d seconds.
-        """.formatted(
+    private OutputAll handleDatabaseResumedAwaited(Duration duration) {
+        val message = "Database %s was resumed, and is now active after waiting %d seconds.".formatted(
             highlight($dbRef),
             duration.getSeconds()
         );
+
+        val data = mkData(true, ACTIVE, duration);
+
+        return OutputAll.response(message, data);
     }
 
-    private String handleDatabaseNeedsAwaiting(Database database) {
+    private OutputAll handleDatabaseNeedsAwaiting(Database database) {
+        val currentStatus = database.getStatus();
+        val message = "Database %s was not in a state that required resuming, but is not yet active (current status: %s).".formatted(
+            highlight($dbRef),
+            highlight(currentStatus)
+        );
+
+        val data = mkData(false, currentStatus, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef))
+        ));
+    }
+
+    private OutputAll handleDatabaseResumedNeedsAwaiting(Database database) {
         val currentStatus = database.getStatus();
 
-        return """
-          Database %s was not in a state that required resuming, but is not yet active (current status: %s).
-        
-          %s
-          %s
-        """.formatted(
+        val message = "Database %s was resumed, but is not yet active (current status: %s).".formatted(
             highlight($dbRef),
-            highlight(currentStatus),
-            renderComment("Poll the database's status:"),
-            renderCommand("astra db status %s".formatted($dbRef))
+            highlight(currentStatus)
         );
+
+        val data = mkData(true, currentStatus, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef))
+        ));
     }
 
-    private String handleDatabaseResumedNeedsAwaiting(Database database) {
-        val currentStatus = database.getStatus();
+    private OutputAll handleDatabaseAlreadyActiveNoWait() {
+        val message = "Database %s is already active; no action was required.".formatted(highlight($dbRef));
 
-        return """
-          Database %s was resumed, but is not yet active (current status: %s).
-        
-          %s
-          %s
-        """.formatted(
-            highlight($dbRef),
-            highlight(currentStatus),
-            renderComment("Poll the database's status:"),
-            renderCommand("astra db status %s".formatted($dbRef))
-        );
+        val data = mkData(false, ACTIVE, Duration.ZERO);
+
+        return OutputAll.response(message, data);
     }
 
-    private String handleDatabaseAlreadyActiveNoWait() {
-        return """
-          Database %s is already active; no action was required.
-        """.formatted(highlight($dbRef));
+    private Map<String, Object> mkData(Boolean wasResumed, DatabaseStatusType currentStatus, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "wasHibernated", wasResumed,
+            "currentStatus", currentStatus,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
+        );
     }
 }

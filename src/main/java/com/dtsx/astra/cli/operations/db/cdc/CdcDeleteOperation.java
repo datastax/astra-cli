@@ -1,9 +1,7 @@
 package com.dtsx.astra.cli.operations.db.cdc;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.CdcRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.CdcDeleteResult;

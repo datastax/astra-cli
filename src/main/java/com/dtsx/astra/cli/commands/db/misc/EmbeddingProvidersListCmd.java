@@ -3,15 +3,16 @@ package com.dtsx.astra.cli.commands.db.misc;
 import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.List;
 import java.util.Map;
 
-import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.*;
+import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProviderResult;
+import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProvidersListRequest;
 
 @Command(
     name = "list-embedding-providers",
@@ -21,15 +22,15 @@ import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperat
     comment = "Find all available embedding providers for a database",
     command = "astra db list-embedding-providers my_db"
 )
-public class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd<List<EmbeddingProviderResult>> {
+public class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd<EmbeddingProviderResult> {
     @Override
-    protected EmbeddingProvidersListOperation mkOperation() {
-        return new EmbeddingProvidersListOperation(dbGateway, new EmbeddingProvidersListRequest($dbRef));
+    protected final OutputJson executeJson(EmbeddingProviderResult result) {
+        return OutputJson.serializeValue(result.raw());
     }
 
     @Override
-    protected final OutputAll execute(List<EmbeddingProviderResult> result) {
-        val data = result.stream()
+    protected final OutputAll execute(EmbeddingProviderResult result) {
+        val data = result.embeddingProviders()
             .map(r -> Map.of(
                 "Key", r.key(),
                 "Display Name", r.displayName().orElse("N/A"),
@@ -43,5 +44,10 @@ public class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd<List<Embedd
         return new ShellTable(data).withColumns(
             "Key", "Display Name", "Models", "Parameters", "Auth Header", "Auth Secret"
         );
+    }
+
+    @Override
+    protected EmbeddingProvidersListOperation mkOperation() {
+        return new EmbeddingProvidersListOperation(dbGateway, new EmbeddingProvidersListRequest($dbRef));
     }
 }

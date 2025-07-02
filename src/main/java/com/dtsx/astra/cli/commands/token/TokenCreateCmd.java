@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.token;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.token.TokenCreateOperation;
@@ -23,6 +24,11 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
         required = true
     )
     private String role;
+
+    @Override
+    public final OutputJson executeJson(CreateTokenResponse tokenResponse) {
+        return OutputJson.serializeValue(tokenResponse);
+    }
 
     @Override
     public final OutputAll execute(CreateTokenResponse tokenResponse) {

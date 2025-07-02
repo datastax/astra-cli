@@ -3,12 +3,17 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -53,75 +58,70 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     @Override
     protected final OutputAll execute(KeyspaceDeleteResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case KeyspaceNotFound() -> handleKeyspaceNotFound();
             case KeyspaceDeleted() -> handleKeyspaceDeleted();
             case KeyspaceDeletedAndDbActive(var waitTime) -> handleKeyspaceDeletedAndDbActive(waitTime);
             case KeyspaceIllegallyNotFound() -> throwKeyspaceNotFound();
         };
-
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleKeyspaceNotFound() {
-        return """
-          Keyspace %s does not exist in database %s; nothing to delete.
-
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleKeyspaceNotFound() {
+        val message = "Keyspace %s does not exist in database %s; nothing to delete.".formatted(
             highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db()),
-            renderComment("List existing keyspaces:"),
-            renderCommand("astra db list-keyspaces %s".formatted($keyspaceRef.db()))
+            highlight($keyspaceRef.db())
         );
+
+        val data = mkData(false, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("List existing keyspaces:", "astra db list-keyspaces %s".formatted($keyspaceRef.db()))
+        ));
     }
 
-    private String handleKeyspaceDeleted() {
-        return """
-          Keyspace %s has been deleted from database %s (database may not be active yet).
-
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleKeyspaceDeleted() {
+        val message = "Keyspace %s has been deleted from database %s (database may not be active yet).".formatted(
             highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db()),
-            renderComment("Check the database status:"),
-            renderCommand("astra db status %s".formatted($keyspaceRef.db()))
+            highlight($keyspaceRef.db())
         );
+
+        val data = mkData(true, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Check the database status:", "astra db status %s".formatted($keyspaceRef.db()))
+        ));
     }
 
-    private String handleKeyspaceDeletedAndDbActive(Duration waitTime) {
-        return """
-          Keyspace %s has been deleted from database %s.
-
-          The database is now active after waiting %d seconds.
-        """.formatted(
+    private OutputAll handleKeyspaceDeletedAndDbActive(Duration waitTime) {
+        val message = "Keyspace %s has been deleted from database %s. The database is now active after waiting %d seconds.".formatted(
             highlight($keyspaceRef.name()),
             highlight($keyspaceRef.db()),
             waitTime.toSeconds()
         );
+
+        val data = mkData(true, waitTime);
+
+        return OutputAll.response(message, data);
     }
 
-    private String throwKeyspaceNotFound() {
+    private <T> T throwKeyspaceNotFound() {
         throw new AstraCliException(KEYSPACE_NOT_FOUND, """
           @|bold,red Error: Keyspace '%s' does not exist in database '%s'.|@
 
-          To ignore this error, provide the %s flag to skip this error if the keyspace doesn't exist.
-
-          %s
-          %s
-
-          %s
-          %s
+          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the keyspace doesn't exist.
         """.formatted(
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            highlight("--if-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-exists"),
-            renderComment("List existing keyspaces:"),
-            renderCommand("astra db list-keyspaces %s".formatted($keyspaceRef.db()))
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-exists"),
+            new Hint("List existing keyspaces:", "astra db list-keyspaces %s".formatted($keyspaceRef.db()))
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "wasDeleted", wasDeleted,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
+        );
     }
 }

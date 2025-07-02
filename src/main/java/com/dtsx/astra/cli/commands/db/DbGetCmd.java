@@ -54,11 +54,6 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     public Optional<DbGetKeys> $key;
 
     @Override
-    protected DbGetOperation mkOperation() {
-        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef));
-    }
-
-    @Override
     public OutputJson executeJson(DbGetResult result) {
         if ($key.isPresent()) {
             return execute(result);
@@ -104,5 +99,10 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
             case creation_time -> dbInfo.getCreationTime();
             case vector -> dbInfo.getInfo().getDbType().equals("vector");
         };
+    }
+
+    @Override
+    protected DbGetOperation mkOperation() {
+        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef));
     }
 }

@@ -8,27 +8,25 @@ import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.utils.MiscUtils;
 import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.utils.MiscUtils.*;
+import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
 
 @RequiredArgsConstructor
 public class CdcGatewayImpl implements CdcGateway {
     private final APIProvider api;
 
     @Override
-    public List<CdcDefinition> findAll(DbRef dbRef) {
+    public Stream<CdcDefinition> findAll(DbRef dbRef) {
         return AstraLogger.loading("Finding all CDC definitions for db " + highlight(dbRef), (_) -> (
             api.dbOpsClient(dbRef)
                 .cdc()
                 .findAll()
-                .toList()
         ));
     }
 

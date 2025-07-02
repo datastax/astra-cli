@@ -2,11 +2,15 @@ package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.collection.CollectionTruncateOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -28,36 +32,27 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<CollectionTruncateResult> {
     @Override
     public final OutputAll execute(CollectionTruncateResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case CollectionTruncated() -> handleCollectionTruncated();
             case CollectionNotFound() -> throwCollectionNotFound();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleCollectionTruncated() {
-        return """
-          Collection %s has been truncated.
-
-          All documents have been deleted from the collection.
-        """.formatted(
+    private OutputAll handleCollectionTruncated() {
+        return OutputAll.response("Collection %s has been truncated. All documents have been deleted from the collection.".formatted(
             highlight($collRef)
-        );
+        ));
     }
 
-    private String throwCollectionNotFound() {
+    private <T> T throwCollectionNotFound() {
         throw new AstraCliException(COLLECTION_NOT_FOUND, """
           @|bold,red Error: Collection '%s' does not exist in keyspace '%s' of database '%s'.|@
-
-          %s
-          %s
         """.formatted(
             $collRef.name(),
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            renderComment("List existing collections:"),
-            renderCommand("astra db list-collections %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name()))
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("See all existing collections in the database:", "astra db list-collections %s --all".formatted($keyspaceRef.db()))
         ));
     }
 

@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway.RegionInfo;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
@@ -37,6 +38,29 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<SortedMap<
         paramLabel = "FILTER"
     )
     public @Nullable List<String> $zoneFilter;
+
+    @Override
+    protected OutputJson executeJson(SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> regions) {
+        val data = regions.sequencedEntrySet()
+            .reversed()
+            .stream()
+            .filter((e1) -> (
+                passesCloudFilter(e1) && e1.getValue() != null &&
+                    e1.getValue().sequencedEntrySet().stream().anyMatch(this::passesNameFilter) &&
+                    e1.getValue().sequencedEntrySet().stream().anyMatch(this::passesZoneFilter)
+            ))
+            .flatMap((e1) -> e1.getValue()
+                .sequencedEntrySet()
+                .stream()
+                .map((e2) -> Map.of(
+                    "cloudProvider", formatCloudProviderName(e1.getKey(), e2),
+                    "datacenter", e2.getValue().raw()
+                ))
+            )
+            .toList();
+
+        return OutputJson.serializeValue(data);
+    }
 
     @Override
     protected OutputAll execute(SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> regions) {

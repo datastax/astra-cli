@@ -12,15 +12,16 @@ import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class RoleGatewayImpl implements RoleGateway {
     private final APIProvider apiProvider;
 
     @Override
-    public List<Role> findAll() {
+    public Stream<Role> findAll() {
         return AstraLogger.loading("Loading roles", (_) -> 
-            apiProvider.astraOpsClient().roles().findAll().toList());
+            apiProvider.astraOpsClient().roles().findAll());
     }
 
     @Override

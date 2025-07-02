@@ -2,7 +2,9 @@ package com.dtsx.astra.cli.commands.db.table;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
@@ -11,6 +13,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
@@ -32,6 +35,14 @@ import static com.dtsx.astra.cli.utils.StringUtils.renderComment;
     command = "astra db describe-table my_db -k my_keyspace -c my_table"
 )
 public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResult> {
+    @Override
+    protected OutputJson executeJson(TableDescribeResult result) {
+        return switch (result) {
+            case TableNotFound() -> throwTableNotFound();
+            case TableFound(var info) -> OutputJson.serializeValue(info.raw());
+        };
+    }
+
     @Override
     public final OutputAll execute(TableDescribeResult result) {
         return switch (result) {
@@ -71,18 +82,15 @@ public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResu
         return new ShellTable(attrs).withAttributeColumns();
     }
 
-    private OutputAll throwTableNotFound() {
+    private <T> T throwTableNotFound() {
         throw new AstraCliException(COLLECTION_NOT_FOUND, """
           @|bold,red Error: Table '%s' does not exist in keyspace '%s' of database '%s'.|@
-
-          %s
-          %s
         """.formatted(
             $tableRef.name(),
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            renderComment("List existing tables:"),
-            renderCommand("astra db list-tables %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name()))
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("List existing tables:", "astra db list-tables %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name()))
         ));
     }
 

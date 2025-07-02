@@ -8,8 +8,10 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
-import com.dtsx.astra.cli.operations.config.ConfigUseOperation.*;
-import lombok.val;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ProfileNotFound;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ProfileSetAsDefault;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.UseConfigRequest;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -37,12 +39,10 @@ public class ConfigUseCmd extends AbstractCmd<ConfigUseResult> {
 
     @Override
     public final OutputAll execute(ConfigUseResult result) {
-        val message = switch (result) {
-            case ProfileSetAsDefault() -> "Default profile set to " + highlight($profileName);
+        return switch (result) {
+            case ProfileSetAsDefault() -> OutputAll.message("Default profile set to " + highlight($profileName));
             case ProfileNotFound() -> throw new ProfileNotFoundException($profileName);
         };
-
-        return OutputAll.message(message);
     }
 
     @Override

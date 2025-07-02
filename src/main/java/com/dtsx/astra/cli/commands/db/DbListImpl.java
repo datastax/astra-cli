@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.operations.db.DbListOperation;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -19,8 +20,8 @@ public abstract class DbListImpl extends AbstractDbCmd<List<Database>> {
     protected boolean $vectorOnly;
 
     @Override
-    protected DbListOperation mkOperation() {
-        return new DbListOperation(dbGateway, new DbListRequest($vectorOnly));
+    protected OutputJson executeJson(List<Database> result) {
+        return OutputJson.serializeValue(result);
     }
 
     @Override
@@ -61,5 +62,10 @@ public abstract class DbListImpl extends AbstractDbCmd<List<Database>> {
 
     private String status(Database db) {
         return AstraColors.highlight(db.getStatus());
+    }
+
+    @Override
+    protected DbListOperation mkOperation() {
+        return new DbListOperation(dbGateway, new DbListRequest($vectorOnly));
     }
 }

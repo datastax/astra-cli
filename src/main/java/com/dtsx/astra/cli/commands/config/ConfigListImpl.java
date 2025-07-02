@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation;
@@ -13,14 +13,14 @@ import picocli.CommandLine.Command;
 
 import java.util.Map;
 
-import static com.dtsx.astra.cli.operations.config.ConfigListOperation.*;
+import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
 
 @Command(
     description = "Lists your Astra CLI profiles (configurations), highlighting the one currently in use. Multiple profiles may be highlighted if they share the same credentials."
 )
 public abstract class ConfigListImpl extends AbstractCmd<ListConfigResult> {
     @Override
-    public final OutputAll execute(ListConfigResult result) {
+    public final OutputHuman executeHuman(ListConfigResult result) {
         val cells = result.profiles().stream()
             .map((p) -> Map.of(
                 "configuration", mkConfigDisplayName(p.name(), p.isInUse()),
@@ -38,6 +38,20 @@ public abstract class ConfigListImpl extends AbstractCmd<ListConfigResult> {
         } else {
             return table.withColumns("configuration");
         }
+    }
+
+    @Override
+    public final OutputAll executeJson(ListConfigResult result) {
+        val cells = result.profiles().stream()
+            .map((p) -> Map.of(
+                "name", p.name(),
+                "env", p.env().name(),
+                "token", p.token().unwrap(),
+                "isUsedAsDefault", p.isInUse()
+            ))
+            .toList();
+
+        return new ShellTable(cells).withColumns("name", "env", "token", "isUsedAsDefault");
     }
 
     @Override

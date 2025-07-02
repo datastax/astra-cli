@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.operations.db.DbStatusOperation.*;
 
 @RequiredArgsConstructor
 public class DbStatusOperation implements Operation<DatabaseStatusType> {

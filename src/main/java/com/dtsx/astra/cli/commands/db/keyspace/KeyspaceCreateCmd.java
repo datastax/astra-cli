@@ -2,15 +2,18 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.KEYSPACE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -55,60 +58,67 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     @Override
     protected final OutputAll execute(KeyspaceCreateResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case KeyspaceAlreadyExists() -> handleKeyspaceAlreadyExists();
             case KeyspaceCreated() -> handleKeyspaceCreated();
             case KeyspaceCreatedAndDbActive(var waitTime) -> handleKeyspaceCreatedAndDbActive(waitTime);
             case KeyspaceIllegallyAlreadyExists() -> throwKeyspaceAlreadyExists();
         };
-
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleKeyspaceAlreadyExists() {
-        return "Keyspace " + highlight($keyspaceRef) + " already exists in database " + highlight($keyspaceRef.db()) + ".";
-    }
-
-    private String handleKeyspaceCreated() {
-        return """
-          Keyspace %s has been created in database %s (database may not be active yet).
-        
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleKeyspaceAlreadyExists() {
+        val message = "Keyspace %s already exists in database %s.".formatted(
             highlight($keyspaceRef),
-            highlight($keyspaceRef.db()),
-            renderComment("Poll the database status:"),
-            renderCommand("astra db status %s".formatted($keyspaceRef.db()))
+            highlight($keyspaceRef.db())
         );
+
+        val data = mkData(false, null);
+
+        return OutputAll.response(message, data);
     }
 
-    private String handleKeyspaceCreatedAndDbActive(Duration waitTime) {
-        return """
-          Keyspace %s has been created in database %s.
-        
-          The database is now active after waiting %d seconds.
-        """.formatted(
+    private OutputAll handleKeyspaceCreated() {
+        val message = "Keyspace %s has been created in database %s (database may not be active yet).".formatted(
+            highlight($keyspaceRef),
+            highlight($keyspaceRef.db())
+        );
+
+        val data = mkData(true, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll the database status:", "astra db status %s".formatted($keyspaceRef.db()))
+        ));
+    }
+
+    private OutputAll handleKeyspaceCreatedAndDbActive(Duration waitTime) {
+        val message = "Keyspace %s has been created in database %s. The database is now active after waiting %d seconds.".formatted(
             highlight($keyspaceRef),
             highlight($keyspaceRef.db()),
             waitTime.toSeconds()
         );
+
+        val data = mkData(true, waitTime);
+
+        return OutputAll.response(message, data);
     }
 
-    private String throwKeyspaceAlreadyExists() {
+    private <T> T throwKeyspaceAlreadyExists() {
         throw new AstraCliException(KEYSPACE_ALREADY_EXISTS, """
           @|bold,red Error: Keyspace '%s' already exists in database '%s'.|@
         
-          To ignore this error, provide the %s flag to skip this error if the keyspace already exists.
-        
-          %s
-          %s
+          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the keyspace already exists.
         """.formatted(
             $keyspaceRef.name(),
-            $keyspaceRef.db(),
-            highlight("--if-not-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-not-exists")
+            $keyspaceRef.db()
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-not-exists")
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasCreated, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "wasCreated", wasCreated,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
+        );
     }
 }

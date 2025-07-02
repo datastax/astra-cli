@@ -1,12 +1,14 @@
 package com.dtsx.astra.cli.commands;
 
-import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -15,7 +17,7 @@ import picocli.CommandLine.ParameterException;
 import java.util.Optional;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
-    @Option(names = { "-e", "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
+    @Option(names = { "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
     private Optional<AstraEnvironment> env;
 
     @ArgGroup
@@ -30,6 +32,8 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     }
 
     private @Nullable Profile cachedProfile;
+
+    protected DownloadsGateway downloadsGateway;
 
     protected final Profile profile() {
         if (cachedProfile != null) {
@@ -46,5 +50,12 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
         return cachedProfile = config().lookupProfile(profileName)
             .orElseThrow(() -> new ParameterException(spec.commandLine(), "Profile '" + profileName + "' does not exist"));
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        super.prelude();
+        downloadsGateway = DownloadsGateway.mkDefault(profile().token(), profile().env());
     }
 }

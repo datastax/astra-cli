@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.region.RegionListOperation;
 import lombok.val;
@@ -23,6 +24,11 @@ public class RegionListCmd extends AbstractDbSpecificRegionCmd<FoundRegions> {
     @Override
     protected RegionListOperation mkOperation() {
         return new RegionListOperation(regionGateway, dbGateway, new RegionListRequest($dbRef));
+    }
+
+    @Override
+    protected OutputJson executeJson(FoundRegions result) {
+        return OutputJson.serializeValue(result.regions());
     }
 
     @Override

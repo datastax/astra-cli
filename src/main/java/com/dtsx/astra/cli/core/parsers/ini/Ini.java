@@ -178,7 +178,7 @@ public record Ini(@Getter ArrayList<TopLevelIniNode> nodes) {
                 val key = line.substring(0, equalIndex).trim();
 
                 if (key.isEmpty()) {
-                    throw new IniParseException("Invalid key-value pair: key cannot be empty", lineNumber, line);
+                    throw new IniParseException("Invalid key-unwrap pair: key cannot be empty", lineNumber, line);
                 }
 
                 val value = StringUtils.removeQuotesIfAny(line.substring(equalIndex + 1).trim());
@@ -186,7 +186,7 @@ public record Ini(@Getter ArrayList<TopLevelIniNode> nodes) {
                 lastSection.pairs().add(new IniKVPair(new ArrayList<>(currentComments), key, value));
                 currentComments.clear();
             } else {
-                throw new IniParseException("Key-value pair found outside of section", lineNumber, line);
+                throw new IniParseException("Key-unwrap pair found outside of section", lineNumber, line);
             }
         }
     }

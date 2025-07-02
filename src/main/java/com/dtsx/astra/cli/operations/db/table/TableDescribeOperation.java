@@ -29,7 +29,8 @@ public class TableDescribeOperation implements Operation<TableDescribeResult> {
     public record TableInfo(
         String name,
         Map<String, ColumnInfo> columns,
-        PrimaryKeyInfo primaryKey
+        PrimaryKeyInfo primaryKey,
+        TableDefinition raw
     ) {}
 
     public record ColumnInfo(
@@ -56,7 +57,8 @@ public class TableDescribeOperation implements Operation<TableDescribeResult> {
         return new TableFound(new TableInfo(
             request.tableRef.name(),
             extractColumnInfo(definition),
-            extractPrimaryKeyInfo(definition)
+            extractPrimaryKeyInfo(definition),
+            definition
         ));
     }
 

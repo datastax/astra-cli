@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.user;
 
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
@@ -7,8 +8,8 @@ import com.dtsx.astra.sdk.org.domain.User;
 import com.dtsx.astra.sdk.org.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
@@ -17,9 +18,9 @@ public class UserGatewayImpl implements UserGateway {
     private final APIProvider apiProvider;
 
     @Override
-    public List<User> findAll() {
+    public Stream<User> findAll() {
         return AstraLogger.loading("Loading users", (_) -> 
-            apiProvider.astraOpsClient().users().findAll().toList());
+            apiProvider.astraOpsClient().users().findAll());
     }
 
     @Override
@@ -50,11 +51,18 @@ public class UserGatewayImpl implements UserGateway {
     }
 
     @Override
-    public void delete(UserRef user) {
-        User userObj = findOne(user);
+    public DeletionStatus<Void> delete(UserRef user) {
+        Optional<User> userOpt = tryFindOne(user);
+        if (userOpt.isEmpty()) {
+            return DeletionStatus.notFound(null);
+        }
+        
+        User userObj = userOpt.get();
         AstraLogger.loading("Deleting user " + highlight(user), (_) -> {
             apiProvider.astraOpsClient().users().delete(userObj.getUserId());
             return null;
         });
+        
+        return DeletionStatus.deleted(null);
     }
 }

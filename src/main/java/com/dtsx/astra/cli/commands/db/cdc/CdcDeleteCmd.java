@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.models.CdcRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.TenantName;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation;
@@ -15,6 +16,9 @@ import lombok.val;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CDC_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -89,70 +93,65 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
 
     @Override
     public final OutputAll execute(CdcDeleteResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case CdcNotFound() -> handleCdcNotFound();
             case CdcIllegallyNotFound() -> throwCdcNotFound();
             case CdcDeleted() -> handleCdcDeleted();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleCdcNotFound() {
-        val cdcRef = getCdcRef();
-        return """
+    private OutputAll handleCdcNotFound() {
+        val msg = """
           CDC %s does not exist in database %s; nothing to delete.
-
-          %s
-          %s
         """.formatted(
-            highlight(cdcRef.toString()),
-            highlight($dbRef),
-            renderComment("List existing CDCs:"),
-            renderCommand("astra db list-cdcs %s".formatted($dbRef))
-        );
-    }
-
-    private String handleCdcDeleted() {
-        val cdcRef = getCdcRef();
-        return """
-          CDC %s has been deleted from database %s.
-        """.formatted(
-            highlight(cdcRef.toString()),
+            highlight(cdcRef()),
             highlight($dbRef)
         );
+
+        return OutputAll.response(msg, mkData(false), List.of(
+            new Hint("List existing CDCs", "astra db list-cdcs " + $dbRef)
+        ));
     }
 
-    private String throwCdcNotFound() {
-        val cdcRef = getCdcRef();
-        
+    private OutputAll handleCdcDeleted() {
+        val msg = """
+          CDC %s has been deleted from database %s.
+        """.formatted(
+            highlight(cdcRef()),
+            highlight($dbRef)
+        );
+
+        return OutputAll.response(msg, mkData(true), List.of(
+            new Hint("List existing CDCs", "astra db list-cdcs " + $dbRef)
+        ));
+    }
+
+    private <T> T throwCdcNotFound() {
         throw new AstraCliException(CDC_NOT_FOUND, """
           @|bold,red Error: CDC '%s' does not exist in database '%s'.|@
 
-          To ignore this error, provide the %s flag to skip this error if the CDC doesn't exist.
-
-          %s
-          %s
-
-          %s
-          %s
+          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the CDC doesn't exist.
         """.formatted(
-            cdcRef.toString(),
-            $dbRef,
-            highlight("--if-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-exists"),
-            renderComment("List existing CDCs:"),
-            renderCommand("astra db list-cdcs %s".formatted($dbRef))
+            cdcRef(),
+            $dbRef
+        ), List.of(
+            new Hint("Example fix", originalArgs(), "--if-exists"),
+            new Hint("List existing CDCs", "astra db list-cdcs " + $dbRef)
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasDeleted) {
+        return Map.of(
+            "wasDeleted", wasDeleted
+        );
     }
 
     @Override
     protected Operation<CdcDeleteResult> mkOperation() {
-        return new CdcDeleteOperation(cdcGateway, new CdcDeleteRequest(getCdcRef(), $ifExists));
+        return new CdcDeleteOperation(cdcGateway, new CdcDeleteRequest(cdcRef(), $ifExists));
     }
 
-    private CdcRef getCdcRef() {
+    private CdcRef cdcRef() {
         if ($cdcIdentifier.cdcId != null) {
             val cdcId = CdcId.parse($cdcIdentifier.cdcId).getRight((msg) -> {
                 throw new OptionValidationException("cdc id", msg);

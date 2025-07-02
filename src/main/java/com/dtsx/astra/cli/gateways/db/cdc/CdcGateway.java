@@ -8,13 +8,14 @@ import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface CdcGateway {
     static CdcGateway mkDefault(Token token, AstraEnvironment env) {
         return new CdcGatewayImpl(APIProvider.mkDefault(token, env));
     }
 
-    List<CdcDefinition> findAll(DbRef dbRef);
+    Stream<CdcDefinition> findAll(DbRef dbRef);
 
     CreationStatus<Void> create(TableRef tableRef, TenantName tenantName, int topicPartition);
 

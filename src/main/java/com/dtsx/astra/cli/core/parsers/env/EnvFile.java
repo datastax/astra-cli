@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
@@ -81,6 +82,13 @@ public record EnvFile(@Getter ArrayList<EnvNode> nodes) {
             sj.add(node.render(colored));
         }
         return sj.toString();
+    }
+
+    public Map<String, String> toMap() {
+        return nodes.stream()
+            .filter(EnvKVPair.class::isInstance)
+            .map(EnvKVPair.class::cast)
+            .collect(Collectors.toMap(EnvKVPair::key, EnvKVPair::value));
     }
 
     @SneakyThrows
@@ -178,7 +186,7 @@ public record EnvFile(@Getter ArrayList<EnvNode> nodes) {
             val key = line.substring(0, equalIndex).trim();
 
             if (key.isEmpty()) {
-                throw new EnvParseException("Invalid key-value pair: key cannot be empty", lineNumber, line);
+                throw new EnvParseException("Invalid key-unwrap pair: key cannot be empty", lineNumber, line);
             }
 
             val value = StringUtils.removeQuotesIfAny(line.substring(equalIndex + 1).trim());

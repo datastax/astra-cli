@@ -2,13 +2,18 @@ package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.region.RegionCreateOperation;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.REGION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -52,75 +57,70 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     @Override
     protected final OutputAll execute(RegionCreateResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case RegionAlreadyExists() -> handleRegionAlreadyExists();
             case RegionCreated() -> handleRegionCreated();
             case RegionCreatedAndDbActive(var waitTime) -> handleRegionCreatedAndDbActive(waitTime);
             case RegionIllegallyAlreadyExists() -> throwRegionAlreadyExists();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleRegionAlreadyExists() {
-        return """
-          Region %s already exists in database %s.
-        
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleRegionAlreadyExists() {
+        val message = "Region %s already exists in database %s.".formatted(
             highlight($region),
-            highlight($dbRef),
-            renderComment("List existing regions:"),
-            renderCommand("astra db list-regions %s".formatted($dbRef))
+            highlight($dbRef)
         );
+
+        val data = mkData(false, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("List existing regions:", "astra db list-regions %s".formatted($dbRef))
+        ));
     }
 
-    private String handleRegionCreated() {
-        return """
-          Region %s has been created in database %s (database may not be active yet).
-        
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleRegionCreated() {
+        val message = "Region %s has been created in database %s (database may not be active yet).".formatted(
             highlight($region),
-            highlight($dbRef),
-            renderComment("Poll the database's status:"),
-            renderCommand("astra db status %s".formatted($dbRef))
+            highlight($dbRef)
         );
+
+        val data = mkData(true, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef))
+        ));
     }
 
-    private String handleRegionCreatedAndDbActive(Duration waitTime) {
-        return """
-          Region %s has been created in database %s.
-        
-          The database is now active after waiting %s seconds.
-        """.formatted(
+    private OutputAll handleRegionCreatedAndDbActive(Duration waitTime) {
+        val message = "Region %s has been created in database %s. The database is now active after waiting %s seconds.".formatted(
             highlight($region),
             highlight($dbRef),
             highlight(waitTime.toSeconds())
         );
+
+        val data = mkData(true, waitTime);
+
+        return OutputAll.response(message, data);
     }
 
-    private String throwRegionAlreadyExists() {
+    private <T> T throwRegionAlreadyExists() {
         throw new AstraCliException(REGION_ALREADY_EXISTS, """
           @|bold,red Error: Region %s already exists in database %s.|@
       
-          To ignore this error, provide the %s flag to skip this error if the region already exists.
-
-          %s
-          %s
-    
-          %s
-          %s
+          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the region already exists.
         """.formatted(
             $region,
-            $dbRef,
-            highlight("--if-not-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-not-exists"),
-            renderComment("List existing regions:"),
-            renderCommand("astra db list-regions %s".formatted($dbRef))
+            $dbRef
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-not-exists"),
+            new Hint("List existing regions:", "astra db list-regions %s".formatted($dbRef))
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasCreated, @Nullable Duration waitedDuration) {
+        return Map.of(
+            "wasCreated", wasCreated,
+            "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
+        );
     }
 }

@@ -3,10 +3,12 @@ package com.dtsx.astra.cli.core.models;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraColors.Highlightable;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.graalvm.collections.Pair;
 
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -39,6 +41,14 @@ public class CdcRef implements Highlightable {
         return ref.fold(
             idMapper,
             pair -> defMapper.apply(pair.getLeft(), pair.getRight())
+        );
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        return ref.fold(
+            id -> Map.of("type", "id", "unwrap", id.toString()),
+            ref -> Map.of("type", "ref", "unwrap", Map.of("table", ref.getLeft(), "tenant", ref.getRight()))
         );
     }
 

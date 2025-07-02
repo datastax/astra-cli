@@ -19,7 +19,7 @@ public interface RegionGateway {
         return new RegionGatewayImpl(APIProvider.mkDefault(token, env));
     }
 
-    record RegionInfo(String displayName, boolean hasFreeTier, String zone) {}
+    record RegionInfo(String displayName, boolean hasFreeTier, String zone, Object raw) {}
 
     SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findServerlessRegions(boolean vector);
 

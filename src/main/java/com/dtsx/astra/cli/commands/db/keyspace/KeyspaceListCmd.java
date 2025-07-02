@@ -2,16 +2,18 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation;
 import lombok.val;
-import picocli.CommandLine.*;
+import picocli.CommandLine.Command;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.*;
+import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceInfo;
+import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceListRequest;
 
 @Command(
     name = "list-keyspaces",
@@ -28,12 +30,26 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     }
 
     @Override
-    protected final OutputAll execute(List<KeyspaceInfo> result) {
+    protected final OutputHuman executeHuman(List<KeyspaceInfo> result) {
         val data = result.stream()
-            .map((ks) -> Map.of("Name", mkKeyspaceDisplayName(ks.name(), ks.isDefault())))
+            .map((ks) -> Map.of(
+                "Name", mkKeyspaceDisplayName(ks.name(), ks.isDefault())
+            ))
             .toList();
 
         return new ShellTable(data).withColumns("Name");
+    }
+
+    @Override
+    protected final OutputAll execute(List<KeyspaceInfo> result) {
+        val data = result.stream()
+            .map((ks) -> Map.of(
+                "name", ks.name(),
+                "isDefault", ks.isDefault()
+            ))
+            .toList();
+
+        return new ShellTable(data).withColumns("name", "isDefault");
     }
 
     private String mkKeyspaceDisplayName(String name, boolean isDefault) {

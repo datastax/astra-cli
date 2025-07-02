@@ -1,31 +1,31 @@
-com.dtsx.astra.sdk.org.domain.ResponseAllUsers
-com.dtsx.astra.sdk.org.domain.Role
-com.dtsx.astra.sdk.org.domain.User
-com.dtsx.astra.sdk.db.domain.Database
-com.dtsx.astra.sdk.db.domain.DatabaseInfo
-com.dtsx.astra.sdk.db.domain.DatabaseStatusType
-com.dtsx.astra.sdk.db.domain.DatabaseStatusType
-com.dtsx.astra.sdk.db.domain.DatabaseStorage
-com.dtsx.astra.sdk.db.domain.DatabaseCost
-com.dtsx.astra.sdk.db.domain.DatabaseMetrics
-com.dtsx.astra.sdk.db.domain.CloudProviderType
-com.dtsx.astra.sdk.db.domain.Datacenter
-com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless
-com.dtsx.astra.sdk.db.domain.DatabaseRegion
-com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest
-com.dtsx.astra.sdk.db.domain.DatabaseCreationType
-com.datastax.astra.client.core.commands.Command$CommandSerializer
-com.datastax.astra.client.collections.definition.CollectionDescriptor
-com.datastax.astra.client.collections.definition.CollectionDefinition
-com.datastax.astra.client.collections.definition.CollectionDefinition$DefaultIdOptions
-com.datastax.astra.client.collections.definition.CollectionDefinition$IndexingOptions
+# CLI basics
+com.dtsx.astra.cli.core.output.output.Hint
+com.dtsx.astra.cli.core.models.*
+
+# Org+User gateway
+com.dtsx.astra.sdk.org.domain.[User,ResponseAllUsers,InviteUserRequest]
+
+# Role gateway
+com.dtsx.astra.sdk.org.domain.[Role,RolePolicy]
+
+# Db gateway
+com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
+
+# Token gateway
+com.dtsx.astra.sdk.org.domain.[CreateTokenResponse,ResponseAllIamTokens,IamToken]
+
+# CDC gateway
+com.dtsx.astra.sdk.streaming.domain.[CdcDefinition,CreateCdc,DeleteCdc]
+
+# Data API stuff
+com.datastax.astra.internal.api.[DataAPI.+]
 com.datastax.astra.client.core.vectorize.VectorServiceOptions
 com.datastax.astra.client.core.vector.VectorOptions
-com.datastax.astra.client.core.lexical.LexicalOptions
-com.datastax.astra.client.core.rerank.CollectionRerankOptions
-com.datastax.astra.client.core.rerank.RerankServiceOptions
 com.datastax.astra.client.core.rerank.RerankServiceOptions$Parameters
-com.datastax.astra.internal.api.DataAPIResponse
-com.datastax.astra.internal.api.DataAPIStatus
+com.datastax.astra.client.core.rerank.RerankServiceOptions
+com.datastax.astra.client.core.rerank.CollectionRerankOptions
+com.datastax.astra.client.core.lexical.LexicalOptions
+com.datastax.astra.client.core.commands.Command$CommandSerializer
 com.datastax.astra.client.collections.definition.documents.Document
-com.dtsx.astra.cli.core.output.JsonResponse
+com.datastax.astra.client.collections.definition.*
+com.datastax.astra.client.tables.definition.*

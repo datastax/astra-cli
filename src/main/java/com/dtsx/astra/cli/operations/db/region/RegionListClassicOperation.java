@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.SortedMap;
 
-import static com.dtsx.astra.cli.operations.db.region.RegionListClassicOperation.*;
-
 @RequiredArgsConstructor
 public class RegionListClassicOperation implements Operation<SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>>> {
     private final RegionGateway regionGateway;

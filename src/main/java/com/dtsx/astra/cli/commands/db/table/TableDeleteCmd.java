@@ -2,13 +2,16 @@ package com.dtsx.astra.cli.commands.db.table;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.TableRef;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.table.TableDeleteOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -41,73 +44,62 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
 
     @Override
     public final OutputAll execute(TableDeleteResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case TableNotFound() -> handleTableNotFound();
             case TableIllegallyNotFound() -> throwTableNotFound();
             case TableDeleted() -> handleTableDeleted();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleTableNotFound() {
-        return """
-          Table %s does not exist in keyspace %s; nothing to delete.
-          
-          %s
-          %s
-          
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleTableNotFound() {
+        val message = "Table %s does not exist in keyspace %s; nothing to delete.".formatted(
             highlight($tableRef.name()),
-            highlight($keyspaceRef),
-            renderComment("List all tables in this keyspace:"),
-            renderCommand("astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name())),
-            renderComment("List all tables in all keyspaces:"),
-            renderCommand("astra db list-tables %s --all".formatted($dbRef))
+            highlight($keyspaceRef)
         );
+
+        val data = mkData(false);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("List all tables in this keyspace:", "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name())),
+            new Hint("List all tables in all keyspaces:", "astra db list-tables %s --all".formatted($dbRef))
+        ));
     }
 
-    private String handleTableDeleted() {
-        return """
-          Table %s has been deleted from keyspace %s.
-          
-          %s
-          %s
-        """.formatted(
+    private OutputAll handleTableDeleted() {
+        val message = "Table %s has been deleted from keyspace %s.".formatted(
             highlight($tableRef.name()),
-            highlight($keyspaceRef),
-            renderComment("List remaining tables in this keyspace:"),
-            renderCommand("astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
+            highlight($keyspaceRef)
         );
+
+        val data = mkData(true);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("List remaining tables in this keyspace:", "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
+        ));
     }
 
-    private String throwTableNotFound() {
+    private <T> T throwTableNotFound() {
         throw new AstraCliException(COLLECTION_NOT_FOUND, """
           @|bold,red Error: Table %s does not exist in keyspace %s.|@
-          
-          To ignore this error, provide the %s flag to skip this error if the table doesn't exist.
-          
-          %s
-          %s
-          
-          %s
-          %s
+  
+          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the table doesn't exist.
         """.formatted(
             $tableRef.name(),
-            $keyspaceRef,
-            highlight("--if-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-exists"),
-            renderComment("List existing tables:"),
-            renderCommand("astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
+            $keyspaceRef
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-exists"),
+            new Hint("List existing tables:", "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasDeleted) {
+        return Map.of(
+            "wasDeleted", wasDeleted
+        );
     }
 
     @Override
     protected Operation<TableDeleteResult> mkOperation() {
         return new TableDeleteOperation(tableGateway, new TableDeleteRequest($tableRef, $ifExists));
     }
-
 }

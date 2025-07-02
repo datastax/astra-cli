@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.core.models;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class Token implements AstraColors.Highlightable {
         return new Token(token);
     }
 
+    @JsonValue
     public String unwrap() {
         return token;
     }

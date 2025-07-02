@@ -7,12 +7,16 @@ import com.dtsx.astra.cli.core.models.CdcRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.TenantName;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CDC_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -77,84 +81,73 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
 
     @Override
     public final OutputAll execute(CdcCreateResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case CdcAlreadyExists() -> handleCdcAlreadyExists();
             case CdcIllegallyAlreadyExists() -> throwCdcAlreadyExists();
             case CdcCreated() -> handleCdcCreated();
         };
-        
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleCdcAlreadyExists() {
-        val tableRef = getTableRef();
-        return """
+    private OutputAll handleCdcAlreadyExists() {
+        val msg = """
           CDC already exists for table %s with tenant %s in database %s.
-
-          %s
-          %s
         """.formatted(
-            highlight(tableRef.toString()),
+            highlight(tableRef().toString()),
             highlight($tenant),
-            highlight($dbRef),
-            renderComment("List existing CDCs:"),
-            renderCommand("astra db list-cdcs %s".formatted($dbRef))
+            highlight($dbRef)
         );
+
+        return OutputAll.response(msg, mkData(false), List.of(
+            new Hint("List existing CDCs:", "astra db list-cdcs " + $dbRef)
+        ));
     }
 
-    private String handleCdcCreated() {
-        val tableRef = getTableRef();
-        return """
+    private OutputAll handleCdcCreated() {
+        val msg = """
           CDC has been created for table %s with tenant %s in database %s.
-
-          %s
-          %s
         """.formatted(
-            highlight(tableRef.toString()),
+            highlight(tableRef().toString()),
             highlight($tenant),
-            highlight($dbRef),
-            renderComment("List all CDCs in the database:"),
-            renderCommand("astra db list-cdcs %s".formatted($dbRef))
+            highlight($dbRef)
         );
+
+        return OutputAll.response(msg, mkData(true));
     }
 
-    private String throwCdcAlreadyExists() {
-        val tableRef = getTableRef();
-        val cdcRef = CdcRef.fromDefinition(tableRef, $tenant);
+    private <T> T throwCdcAlreadyExists() {
+        val tableRef = tableRef();
         
         throw new AstraCliException(CDC_ALREADY_EXISTS, """
           @|bold,red Error: CDC already exists for table '%s' with tenant '%s' in database '%s'.|@
 
-          To ignore this error, provide the %s flag to skip this error if the CDC already exists.
-
-          %s
-          %s
-
-          %s
-          %s
+          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the CDC already exists.
         """.formatted(
             tableRef.toString(),
             $tenant,
-            $dbRef,
-            highlight("--if-not-exists"),
-            renderComment("Example fix:"),
-            renderCommand(originalArgs(), "--if-not-exists"),
-            renderComment("List existing CDCs:"),
-            renderCommand("astra db list-cdcs %s".formatted($dbRef))
+            $dbRef
+        ), List.of(
+            new Hint("Example fix:", originalArgs(), "--if-not-exists"),
+            new Hint("List existing CDCs:", "astra db list-cdcs " + $dbRef)
         ));
+    }
+
+    private Map<String, Object> mkData(Boolean wasCreated) {
+        return Map.of(
+            "wasCreated", wasCreated
+        );
     }
 
     @Override
     protected Operation<CdcCreateResult> mkOperation() {
         return new CdcCreateOperation(cdcGateway, new CdcCreateRequest(
-            getTableRef(),
+            tableRef(),
             $tenant,
             $topicPartitions,
             $ifNotExists
         ));
     }
 
-    private TableRef getTableRef() {
+    private TableRef tableRef() {
         val keyspaceRef = KeyspaceRef.parse($dbRef, $keyspace).getRight((msg) -> {
             throw new OptionValidationException("keyspace", msg);
         });
@@ -163,5 +156,4 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
             throw new OptionValidationException("table", msg);
         });
     }
-
 }

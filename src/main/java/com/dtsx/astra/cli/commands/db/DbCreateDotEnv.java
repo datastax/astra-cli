@@ -147,9 +147,10 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
     @Override
     protected final OutputAll execute(CreateDotEnvResult result) {
         return switch (result) {
-            case CreatedDotEnvContent(var content) -> OutputAll.message(
+            case CreatedDotEnvContent(var content) -> OutputAll.response(
                 content.render(true)
             );
+
             case CreatedDotEnvFile(var outputFile) -> OutputAll.message(trimIndent("""
               A new env file has been created at %s.
             
@@ -162,6 +163,7 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
                 renderComment("View the env file"),
                 renderCommand("bat " + outputFile.getAbsolutePath())
             )));
+
             case UpdatedDotEnvFile(var outputFile, var overwritten) -> OutputAll.message(trimIndent("""
               The .env file has been updated at %s.
 
@@ -177,6 +179,7 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
                 renderComment("View the env file"),
                 renderCommand("bat " + outputFile.getAbsolutePath())
             )));
+
             case NothingToUpdate(var outputFile) -> OutputAll.message(trimIndent("""
               No changes needed to be made to the .env file at %s.
             

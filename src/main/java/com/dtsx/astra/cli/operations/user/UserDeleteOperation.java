@@ -1,10 +1,12 @@
 package com.dtsx.astra.cli.operations.user;
 
+import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.user.UserDeleteOperation.UserDeleteResult;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 @RequiredArgsConstructor
 public class UserDeleteOperation implements Operation<UserDeleteResult> {
@@ -20,12 +22,12 @@ public class UserDeleteOperation implements Operation<UserDeleteResult> {
 
     @Override
     public UserDeleteResult execute() {
-        if (userGateway.tryFindOne(request.user()).isEmpty()) {
-            return handleUserNotFound(request.ifExists());
-        }
-        
-        userGateway.delete(request.user());
-        return new UserDeleted();
+        val status = userGateway.delete(request.user());
+
+        return switch (status) {
+            case DeletionStatus.Deleted<?> _ -> new UserDeleted();
+            case DeletionStatus.NotFound<?> _ -> handleUserNotFound(request.ifExists());
+        };
     }
 
     private UserDeleteResult handleUserNotFound(boolean ifExists) {
