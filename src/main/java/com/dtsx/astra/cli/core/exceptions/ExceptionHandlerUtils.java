@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.core.exceptions;
 
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.output.OutputType;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import picocli.CommandLine;
@@ -11,10 +13,18 @@ public class ExceptionHandlerUtils {
     public int handleAstraCliException(AstraCliException err, CommandLine cmd) {
         val formatted = AstraConsole.format(err.getMessage());
 
-        if (formatted.stripTrailing().endsWith("\n")) {
-            AstraConsole.getErr().print(formatted);
+        val response = OutputAll.response(formatted, err.getMetadata(), err.getNextSteps());
+
+        val message = switch (OutputType.requested()) {
+            case HUMAN -> response.renderAsHuman();
+            case JSON -> response.renderAsJson();
+            case CSV -> response.renderAsCsv();
+        };
+
+        if (message.stripTrailing().endsWith("\n")) {
+            AstraConsole.getErr().print(message);
         } else {
-            AstraConsole.getErr().println(formatted);
+            AstraConsole.getErr().println(message);
         }
 
         AstraLogger.exception(err);
