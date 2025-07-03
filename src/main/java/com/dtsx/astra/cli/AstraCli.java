@@ -95,7 +95,7 @@ public class AstraCli extends AbstractCmd<Void> {
         });
 
         cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
-        cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
+//        cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
 
         cmd.execute(args);
     }
