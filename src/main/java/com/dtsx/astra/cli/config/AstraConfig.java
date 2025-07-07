@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
-import com.dtsx.astra.cli.core.exceptions.config.AstraConfigFileException;
+import com.dtsx.astra.cli.core.exceptions.internal.config.AstraConfigFileException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.utils.FileUtils;
@@ -13,7 +13,6 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,9 +32,17 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
-    public record Profile(ProfileName name, Token token, AstraEnvironment env) {
+    public record Profile(Optional<ProfileName> name, Token token, AstraEnvironment env) {
         public boolean isDefault() {
-            return name.isDefault();
+            return name.map(ProfileName::isDefault).orElse(false);
+        }
+
+        public boolean isArgsProvided() {
+            return name.isEmpty();
+        }
+
+        public ProfileName nameOrDefault() {
+            return name.orElse(ProfileName.mkUnsafe("<args_provided>"));
         }
     }
     private record InvalidProfile(IniSection section, String issue) {}
@@ -99,7 +106,7 @@ public class AstraConfig {
 
                         return Token.parse(token.get()).bimap(
                             (msg) -> new InvalidProfile(section, "Error parsing token for profile " + highlight(profileName.unwrap()) + ": " + msg),
-                            (tokenValue) -> new Profile(profileName, tokenValue, env)
+                            (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env)
                         );
                     });
                 })
@@ -151,7 +158,7 @@ public class AstraConfig {
 
     public class ProfileModificationCtx {
         public void createProfile(ProfileName name, Token token, AstraEnvironment env) {
-            profiles.add(Either.right(new Profile(name, token, env)));
+            profiles.add(Either.right(new Profile(Optional.of(name), token, env)));
 
             backingIni.addSection(name.unwrap(), new HashMap<>() {{
                 put(TOKEN_KEY, token.unwrap());
@@ -183,7 +190,7 @@ public class AstraConfig {
     private Predicate<Either<InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
         return (p) -> p.fold(
             (invalid) -> invalid.section.name().equals(profileName.unwrap()),
-            (profile) -> profile.name().equals(profileName)
+            (profile) -> profile.nameOrDefault().equals(profileName)
         );
     }
 }

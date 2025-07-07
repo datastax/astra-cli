@@ -30,14 +30,14 @@ public class TableListOperation implements Operation<Stream<TableListResult>> {
         val dbRef = request.keyspaceRef.db();
 
         val keyspaces = (request.all)
-            ? ksGateway.findAllKeyspaces(dbRef).keyspaces().stream()
+            ? ksGateway.findAll(dbRef).keyspaces().stream()
             : Stream.of(request.keyspaceRef.name());
 
         return keyspaces
             .map(ks -> KeyspaceRef.mkUnsafe(dbRef, ks))
             .map(ref -> new TableListResult(
                 ref.name(),
-                tableGateway.findAllTables(ref)
+                tableGateway.findAll(ref)
             ));
     }
 }

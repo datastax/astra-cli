@@ -2,7 +2,7 @@
 com.dtsx.astra.cli.core.output.output.Hint
 com.dtsx.astra.cli.core.models.*
 
-# Org+User gateway
+# Org+User gateways
 com.dtsx.astra.sdk.org.domain.[User,ResponseAllUsers,InviteUserRequest]
 
 # Role gateway
@@ -14,8 +14,9 @@ com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
 # Token gateway
 com.dtsx.astra.sdk.org.domain.[CreateTokenResponse,ResponseAllIamTokens,IamToken]
 
-# CDC gateway
-com.dtsx.astra.sdk.streaming.domain.[CdcDefinition,CreateCdc,DeleteCdc]
+# CDC+Streaming gateways
+com.dtsx.astra.sdk.streaming.domain.[CdcDefinition,CreateCdc,DeleteCdc,Tenant,CreateTenant,StreamingRegion]
+com.dtsx.astra.sdk.utils.ApiResponse
 
 # Data API stuff
 com.datastax.astra.internal.api.[DataAPI.+]

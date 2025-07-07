@@ -12,8 +12,10 @@ import picocli.CommandLine.Option;
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
+import java.util.Map;
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
@@ -52,30 +54,29 @@ public class DbDownloadScbCmd extends AbstractDbSpecificCmd<DownloadScbResult> {
 
     @Override
     protected DbDownloadScbOperation mkOperation() {
-        return new DbDownloadScbOperation(dbGateway, new DbDownloadScbRequest($dbRef, $region, $destination));
+        return new DbDownloadScbOperation(dbGateway, downloadsGateway, new DbDownloadScbRequest($dbRef, $region, $destination));
     }
 
     @Override
     protected final OutputAll execute(DownloadScbResult result) {
-        val message = switch (result) {
+        return switch (result) {
             case ScbDownloaded(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoved(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoveFailed fail -> throwScbDownloadedAndMoveFailed(fail);
+            case ScbDownloadFailed (var error) -> throwScbDownloadFailed(error);
         };
-
-        return OutputAll.message(trimIndent(message));
     }
 
-    private String handleScbDownloaded(File file) {
-        return """
+    private OutputAll handleScbDownloaded(File file) {
+        return OutputAll.response("""
           The secure connect bundle was download to the following path:
           %s
         """.formatted(
             highlight(file.getAbsolutePath())
-        );
+        ), mkData(file));
     }
 
-    private String throwScbDownloadedAndMoveFailed(ScbDownloadedAndMoveFailed fail) {
+    private <T> T throwScbDownloadedAndMoveFailed(ScbDownloadedAndMoveFailed fail) {
         val errorMessage =
             (fail.ex() instanceof FileAlreadyExistsException)
                 ? "The destination file already exists; please delete it or specify a different destination." :
@@ -110,5 +111,20 @@ public class DbDownloadScbCmd extends AbstractDbSpecificCmd<DownloadScbResult> {
                 ? "@|green The downloaded file has been successfully deleted; it no longer exists in the 'Downloaded to' location.|@"
                 : "@|bold,yellow Warning: Failed to delete the downloaded file; it still exists in the 'Downloaded to' location.|@"
         ));
+    }
+
+    private <T> T throwScbDownloadFailed(String error) {
+        throw new AstraCliException(DOWNLOAD_ISSUE, trimIndent("""
+          @|bold,red Error: Failed to download secure connect bundle.|@
+        
+          Cause:
+          %s
+        """).formatted(error));
+    }
+
+    private Map<String, Object> mkData(File dest) {
+        return Map.of(
+            "file", dest.getAbsolutePath()
+        );
     }
 }

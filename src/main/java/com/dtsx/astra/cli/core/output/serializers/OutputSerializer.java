@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output.serializers;
 
-import com.dtsx.astra.cli.core.exceptions.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import lombok.val;
 
 import java.util.List;

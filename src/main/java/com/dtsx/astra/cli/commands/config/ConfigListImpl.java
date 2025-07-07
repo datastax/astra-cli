@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
@@ -18,7 +17,7 @@ import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfi
 @Command(
     description = "Lists your Astra CLI profiles (configurations), highlighting the one currently in use. Multiple profiles may be highlighted if they share the same credentials."
 )
-public abstract class ConfigListImpl extends AbstractCmd<ListConfigResult> {
+public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult> {
     @Override
     public final OutputHuman executeHuman(ListConfigResult result) {
         val cells = result.profiles().stream()

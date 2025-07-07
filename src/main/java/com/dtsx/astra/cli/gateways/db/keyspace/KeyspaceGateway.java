@@ -21,11 +21,9 @@ public interface KeyspaceGateway {
         List<String> keyspaces
     ) {}
 
-    FoundKeyspaces findAllKeyspaces(DbRef dbRef);
+    FoundKeyspaces findAll(DbRef dbRef);
 
-    boolean keyspaceExists(KeyspaceRef keyspaceRef);
+    CreationStatus<KeyspaceRef> create(KeyspaceRef keyspaceRef);
 
-    CreationStatus<KeyspaceRef> createKeyspace(KeyspaceRef keyspaceRef);
-
-    DeletionStatus<KeyspaceRef> deleteKeyspace(KeyspaceRef keyspaceRef);
+    DeletionStatus<KeyspaceRef> delete(KeyspaceRef keyspaceRef);
 }

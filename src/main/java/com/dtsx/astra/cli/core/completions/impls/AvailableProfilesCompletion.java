@@ -4,7 +4,15 @@ import com.dtsx.astra.cli.core.completions.DynamicCompletion;
 import com.dtsx.astra.cli.config.AstraConfig;
 
 public class AvailableProfilesCompletion extends DynamicCompletion {
+    static {
+        register(new AvailableProfilesCompletion());
+    }
+
     public AvailableProfilesCompletion() {
-        super("grep '^\\[.*\\]$' '" + AstraConfig.resolveDefaultAstraConfigFile() + "' | tr -d '[]' | tr '\\n' ' '");
+        super("""
+          OUT=( $(grep '^\\[.*\\]$' '%s' | tr -d '[]') )
+        """.formatted(
+            AstraConfig.resolveDefaultAstraConfigFile()
+        ));
     }
 }

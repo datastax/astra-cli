@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
+import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
 import com.dtsx.astra.sdk.db.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -23,7 +24,7 @@ public class RegionGatewayImpl implements RegionGateway {
     private final APIProvider api;
 
     @Override
-    public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findServerlessRegions(boolean vector) {
+    public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector) {
         val regionType = vector ? RegionType.VECTOR : RegionType.ALL;
 
         return AstraLogger.loading("Fetching all available " + ((vector) ? "vector" : "serverless") + " regions", (_) -> (
@@ -44,7 +45,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findClassicRegions() {
+    public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllClassic() {
         return AstraLogger.loading("Fetching all available classic regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAll()
@@ -69,32 +70,26 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public List<Datacenter> findRegionsForDb(DbRef dbRef) {
+    public List<Datacenter> findForDb(DbRef dbRef) {
         return AstraLogger.loading("Fetching regions for db " + highlight(dbRef), (_) -> (
             api.dbOpsClient(dbRef).datacenters().findAll().toList()
         ));
     }
 
     @Override
-    public Set<String> findRegionClouds() {
+    public Set<CloudProviderType> findAvailableClouds() {
         return AstraLogger.loading("Finding cloud providers for all available regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(RegionType.ALL)
                 .map(DatabaseRegionServerless::getCloudProvider)
+                .map(CloudProviderType::valueOf)
                 .collect(Collectors.toSet())
         ));
     }
 
     @Override
-    public boolean regionExistsInDb(DbRef dbRef, RegionName region) {
-        return AstraLogger.loading("Checking if region " + highlight(region) + " exists in db " + highlight(dbRef), (_) -> (
-            findRegionsForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
-        ));
-    }
-
-    @Override
-    public CreationStatus<RegionName> createRegion(DbRef ref, RegionName region, String tier, CloudProviderType cp) {
-        val exists = regionExistsInDb(ref, region);
+    public CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProviderType cp) {
+        val exists = existsInDb(ref, region);
 
         if (exists) {
             return CreationStatus.alreadyExists(region);
@@ -109,8 +104,8 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public DeletionStatus<RegionName> deleteRegion(DbRef ref, RegionName region) {
-        val exists = regionExistsInDb(ref, region);
+    public DeletionStatus<RegionName> delete(DbRef ref, RegionName region) {
+        val exists = existsInDb(ref, region);
 
         if (!exists) {
             return DeletionStatus.notFound(region);
@@ -122,5 +117,11 @@ public class RegionGatewayImpl implements RegionGateway {
         });
 
         return DeletionStatus.deleted(region);
+    }
+
+    private boolean existsInDb(DbRef dbRef, RegionName region) {
+        return AstraLogger.loading("Checking if region " + highlight(region) + " exists in db " + highlight(dbRef), (_) -> (
+            findForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
+        ));
     }
 }

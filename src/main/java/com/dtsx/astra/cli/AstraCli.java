@@ -1,14 +1,18 @@
 package com.dtsx.astra.cli;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
+import com.dtsx.astra.cli.commands.CompletionsCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.commands.org.OrgCmd;
 import com.dtsx.astra.cli.commands.role.RoleCmd;
+import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
+import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
 import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
@@ -32,11 +36,24 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         ConfigCmd.class,
         OrgCmd.class,
         RoleCmd.class,
+        StreamingCmd.class,
         TokenCmd.class,
         UserCmd.class,
-        AutoComplete.GenerateCompletion.class,
+        CompletionsCmd.class,
         CommandLine.HelpCommand.class,
     }
+)
+@Example(
+    comment = "Setup the Astra CLI",
+    command = "astra setup"
+)
+@Example(
+    comment = "List databases",
+    command = "astra db list"
+)
+@Example(
+    comment = "Create a vector database",
+    command = "astra db create demo --vector"
 )
 public class AstraCli extends AbstractCmd<Void> {
     public static final String VERSION = "1.0.0-alpha.0";
@@ -62,25 +79,22 @@ public class AstraCli extends AbstractCmd<Void> {
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
 
-        sj.add("Sample commands:");
-        sj.add(" → List databases           " + highlight("astra db list"));
-        sj.add(" → Create vector database   " + highlight("astra db create demo --vector"));
-        sj.add(" → List collections         " + highlight("astra db list-collections demo"));
-
         return OutputHuman.message(sj);
     }
 
     @Override
     protected Operation<Void> mkOperation() {
-        return null;
+        return () -> null;
     }
 
     public static void main(String... args) {
-        val cmd = new CommandLine(new AstraCli());
+        AstraCli command = new AstraCli();
+        val cmd = new CommandLine(command);
 
         cmd
             .setColorScheme(AstraColors.colorScheme())
             .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler()))
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
@@ -95,7 +109,6 @@ public class AstraCli extends AbstractCmd<Void> {
         });
 
         cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
-//        cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
 
         cmd.execute(args);
     }

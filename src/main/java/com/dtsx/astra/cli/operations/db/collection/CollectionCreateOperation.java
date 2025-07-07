@@ -35,7 +35,7 @@ public class CollectionCreateOperation implements Operation<CollectionCreateResu
 
     @Override
     public CollectionCreateResult execute() {
-        val status = collectionGateway.createCollection(
+        val status = collectionGateway.create(
             request.collectionRef,
             request.dimension,
             request.metric != null ? request.metric : "cosine",

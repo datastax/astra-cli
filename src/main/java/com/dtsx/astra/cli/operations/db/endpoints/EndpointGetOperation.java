@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.endpoints;
 
-import com.dtsx.astra.cli.core.exceptions.db.RegionNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.RegionNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -31,7 +31,7 @@ public class EndpointGetOperation implements Operation<EndpointGetResponse> {
 
     @Override
     public EndpointGetResponse execute() {
-        val db = dbGateway.findOneDb(request.dbRef);
+        val db = dbGateway.findOne(request.dbRef);
 
         if (request.region.isPresent()) {
             val regionIsValid = db.getInfo()

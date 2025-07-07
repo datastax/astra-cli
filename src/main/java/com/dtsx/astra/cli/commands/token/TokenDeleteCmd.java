@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.token;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -21,6 +22,14 @@ import static com.dtsx.astra.cli.operations.token.TokenDeleteOperation.*;
     name = "delete", 
     aliases = { "revoke" },
     description = "Delete a token"
+)
+@Example(
+    comment = "Delete a specific token",
+    command = "astra token delete <client_id>"
+)
+@Example(
+    comment = "Delete a token without failing if it doesn't exist",
+    command = "astra token delete <client_id> --if-exists"
 )
 public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
     @Parameters(

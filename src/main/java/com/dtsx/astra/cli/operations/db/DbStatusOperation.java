@@ -20,7 +20,7 @@ public class DbStatusOperation implements Operation<DatabaseStatusType> {
     @Override
     public DatabaseStatusType execute() {
         return AstraLogger.loading("Fetching status for database " + highlight(request.dbRef), (_) -> {
-            val db = dbGateway.findOneDb(request.dbRef);
+            val db = dbGateway.findOne(request.dbRef);
             return db.getStatus();
         });
     }

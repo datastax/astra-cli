@@ -54,7 +54,7 @@ public class CollectionDescribeOperation implements Operation<CollectionDescribe
 
     @Override
     public CollectionDescribeResult execute() {
-        val collectionResult = collectionGateway.findOneCollection(request.collectionRef);
+        val collectionResult = collectionGateway.findOne(request.collectionRef);
         
         if (collectionResult.isEmpty()) {
             return new CollectionNotFound();

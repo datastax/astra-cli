@@ -29,10 +29,10 @@ public class RegionListOperation implements Operation<FoundRegions> {
 
     @Override
     public FoundRegions execute() {
-        val dcs = regionGateway.findRegionsForDb(request.dbRef);
+        val dcs = regionGateway.findForDb(request.dbRef);
 
         val defaultRegion = AstraLogger.loading("Fetching default region for db " + highlight(request.dbRef), (_) -> (
-            dbGateway.findOneDb(request.dbRef).getInfo().getRegion()
+            dbGateway.findOne(request.dbRef).getInfo().getRegion()
         ));
 
         return new FoundRegions(

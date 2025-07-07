@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
+import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import picocli.CommandLine.Command;
 
@@ -20,19 +21,19 @@ import java.util.TreeSet;
     comment = "List all available cloud providers",
     command = "astra db list-clouds"
 )
-public class CloudsListCmd extends AbstractRegionCmd<Set<String>> {
+public class CloudsListCmd extends AbstractRegionCmd<Set<CloudProviderType>> {
     @Override
     protected CloudsListOperation mkOperation() {
         return new CloudsListOperation(regionGateway);
     }
 
     @Override
-    protected final OutputAll execute(Set<String> result) {
+    protected final OutputAll execute(Set<CloudProviderType> result) {
         val set = new TreeSet<>(result);
 
         return new ShellTable(
             set.stream()
-                .map(c -> Map.of("Cloud Provider", c.toLowerCase()))
+                .map(c -> Map.of("Cloud Provider", c.name().toLowerCase()))
                 .toList()
         ).withColumns("Cloud Provider");
     }

@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;

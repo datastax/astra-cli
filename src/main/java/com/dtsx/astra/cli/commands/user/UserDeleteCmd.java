@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.core.completions.impls.UserEmailsCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -22,8 +24,20 @@ import static com.dtsx.astra.cli.operations.user.UserDeleteOperation.*;
     name = "delete",
     description = "Delete an existing user"
 )
+@Example(
+    comment = "Delete a specific user",
+    command = "astra user delete john@example.com"
+)
+@Example(
+    comment = "Delete a user without failing if they doesn't exist",
+    command = "astra user delete john@example.com --if-exists"
+)
 public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
-    @Parameters(description = "User email or identifier")
+    @Parameters(
+        description = "User email/id to delete",
+        paramLabel = "USER",
+        completionCandidates = UserEmailsCompletion.class
+    )
     public UserRef user;
 
     @Option(

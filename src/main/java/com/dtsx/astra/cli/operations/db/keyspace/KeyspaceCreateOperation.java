@@ -34,7 +34,7 @@ public class KeyspaceCreateOperation implements Operation<KeyspaceCreateResult> 
 
     @Override
     public KeyspaceCreateResult execute() {
-        val status = keyspaceGateway.createKeyspace(request.keyspaceRef);
+        val status = keyspaceGateway.create(request.keyspaceRef);
 
         return switch (status) {
             case CreationStatus.Created<?> _ -> handleKsCreated(request.keyspaceRef, request.lrOptions);

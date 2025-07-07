@@ -3,7 +3,6 @@ package com.dtsx.astra.cli.gateways.db.table;
 import com.datastax.astra.client.tables.definition.TableDefinition;
 import com.datastax.astra.client.tables.definition.TableDescriptor;
 import com.datastax.astra.client.exceptions.DataAPIException;
-import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
@@ -13,7 +12,6 @@ import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.APIProviderImpl;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,14 +27,14 @@ public class TableGatewayImpl implements TableGateway {
     }
 
     @Override
-    public List<TableDescriptor> findAllTables(KeyspaceRef ksRef) {
+    public List<TableDescriptor> findAll(KeyspaceRef ksRef) {
         return AstraLogger.loading("Listing tables for keyspace " + highlight(ksRef), (_) ->
             api.dataApiDatabase(ksRef).listTables()
         );
     }
 
     @Override
-    public Optional<TableDefinition> findOneTable(TableRef collRef) {
+    public Optional<TableDefinition> findOne(TableRef collRef) {
         try {
             return AstraLogger.loading("Getting table " + highlight(collRef), (_) -> {
                 return Optional.of(
@@ -52,15 +50,8 @@ public class TableGatewayImpl implements TableGateway {
     }
 
     @Override
-    public boolean tableExists(TableRef collRef) {
-        return AstraLogger.loading("Checking if table " + highlight(collRef) + " exists", (_) -> {
-            return findOneTable(collRef).isPresent();
-        });
-    }
-
-    @Override
-    public DeletionStatus<TableRef> deleteTable(TableRef collRef) {
-        if (!tableExists(collRef)) {
+    public DeletionStatus<TableRef> delete(TableRef collRef) {
+        if (!exists(collRef)) {
             return DeletionStatus.notFound(collRef);
         }
 
@@ -73,8 +64,8 @@ public class TableGatewayImpl implements TableGateway {
     }
 
     @Override
-    public DeletionStatus<TableRef> truncateTable(TableRef collRef) {
-        if (!tableExists(collRef)) {
+    public DeletionStatus<TableRef> truncate(TableRef collRef) {
+        if (!exists(collRef)) {
             return DeletionStatus.notFound(collRef);
         }
 
@@ -84,5 +75,11 @@ public class TableGatewayImpl implements TableGateway {
         });
 
         return DeletionStatus.deleted(collRef);
+    }
+
+    private boolean exists(TableRef collRef) {
+        return AstraLogger.loading("Checking if table " + highlight(collRef) + " exists", (_) -> {
+            return findOne(collRef).isPresent();
+        });
     }
 }

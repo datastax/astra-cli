@@ -35,7 +35,7 @@ public class KeyspaceDeleteOperation implements Operation<KeyspaceDeleteResult> 
 
     @Override
     public KeyspaceDeleteResult execute() {
-        val status = keyspaceGateway.deleteKeyspace(request.keyspaceRef);
+        val status = keyspaceGateway.delete(request.keyspaceRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleKsDeleted(request.keyspaceRef.db(), request.lrOptions);

@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.user;
 
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd;
+import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -11,6 +12,6 @@ public abstract class AbstractUserCmd<OpRes> extends AbstractConnectedCmd<OpRes>
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        userGateway = UserGateway.mkDefault(profile().token(), profile().env());
+        userGateway = UserGateway.mkDefault(profile().token(), profile().env(), new UserCompletionsCache(profile().name()));
     }
 }

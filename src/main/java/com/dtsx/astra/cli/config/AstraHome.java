@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.config;
 
 import com.dtsx.astra.cli.utils.FileUtils;
+import lombok.val;
 
 import java.io.File;
 
@@ -33,8 +34,16 @@ public class AstraHome {
             return CQLSH;
         }
 
-        public static boolean cqlshExists() {
-            return CQLSH.exists();
+        public static File useDsbulk(String version) {
+            val file = new File(DIR, "dsbulk-" + version);
+            FileUtils.createDirIfNotExists(file, "");
+            return file;
+        }
+
+        public static File usePulsar(String version) {
+            val file = new File(DIR, "lunastreaming-shell-" + version);
+            FileUtils.createDirIfNotExists(file, "");
+            return file;
         }
     }
 

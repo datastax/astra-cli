@@ -1,13 +1,14 @@
 package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraConsole.ConfirmResponse;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation;
 import lombok.Getter;
@@ -19,11 +20,14 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
@@ -125,13 +129,69 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
     }
 
     @Override
+    protected final OutputAll execute(CreateDotEnvResult result) {
+        return switch (result) {
+            case CreatedDotEnvContent(var content) -> OutputAll.response(
+                content.render(true),
+                mkData("printed", false, null)
+            );
+
+            case CreatedDotEnvFile(var outputFile) -> OutputAll.response("""
+              A new env file has been created at %s.
+            
+              Please double check the content of the file before using it, and manually add it to your .gitignore file.
+            """.formatted(
+                highlight(outputFile.getAbsolutePath())
+            ), mkData("created", false, outputFile), List.of(
+                new Hint("View the env file", "cat " + outputFile.getAbsolutePath())
+            ));
+
+            case UpdatedDotEnvFile(var outputFile, var overwritten) -> OutputAll.response("""
+              The .env file has been updated at %s.
+
+              If there were any duplicate keys, they %s.
+
+              Please double check the content of the file before using it, and ensure it is added to your .gitignore file.
+            """.formatted(
+                highlight(outputFile.getAbsolutePath()),
+                (overwritten) ? "were overwritten" : "were left in the env file, with the new keys added to the end"
+            ), mkData("updated", overwritten, outputFile), List.of(
+                new Hint("View the env file", "cat " + outputFile.getAbsolutePath())
+            ));
+
+            case NothingToUpdate(var outputFile) -> OutputAll.response("""
+              No changes needed to be made to the .env file at %s.
+            """.formatted(
+                highlight(outputFile.getAbsolutePath())
+            ), mkData("no_change", false, outputFile), List.of(
+                new Hint("View the env file", "cat " + outputFile.getAbsolutePath())
+            ));
+
+            case FailedToDownloadSCB(var reason) -> throw new AstraCliException(DOWNLOAD_ISSUE, """
+              @|bold, red Error: Failed to download the secure connect bundle.|@
+            
+              Cause:
+              %s
+            """.formatted(reason));
+        };
+    }
+
+    private Map<String, Object> mkData(String status, boolean overwriteOccurred, @Nullable File file) {
+        return Map.of(
+            "status", status,
+            "overwriteOccurred", overwriteOccurred,
+            "file", Optional.ofNullable(file).map(File::getAbsolutePath)
+        );
+    }
+
+    @Override
     protected DbCreateDotEnvOperation mkOperation() {
         val ksRef = $keyspace.map(ks -> KeyspaceRef.parse($dbRef, ks).fold(
             err -> { throw new OptionValidationException("keyspace", err); },
             Function.identity()
         ));
 
-        return new DbCreateDotEnvOperation(dbGateway, orgGateway, new CreateDotEnvRequest(
+        return new DbCreateDotEnvOperation(dbGateway, orgGateway, downloadsGateway, new CreateDotEnvRequest(
             profile(),
             $dbRef,
             ksRef,
@@ -142,55 +202,6 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
             $overwrite,
             this::askIfShouldOverwrite
         ));
-    }
-
-    @Override
-    protected final OutputAll execute(CreateDotEnvResult result) {
-        return switch (result) {
-            case CreatedDotEnvContent(var content) -> OutputAll.response(
-                content.render(true)
-            );
-
-            case CreatedDotEnvFile(var outputFile) -> OutputAll.message(trimIndent("""
-              A new env file has been created at %s.
-            
-              Please double check the content of the file before using it, and manually add it to your .gitignore file.
-            
-              %s
-              %s
-            """.formatted(
-                highlight(outputFile.getAbsolutePath()),
-                renderComment("View the env file"),
-                renderCommand("bat " + outputFile.getAbsolutePath())
-            )));
-
-            case UpdatedDotEnvFile(var outputFile, var overwritten) -> OutputAll.message(trimIndent("""
-              The .env file has been updated at %s.
-
-              If there were any duplicate keys, they %s.
-
-              Please double check the content of the file before using it, and ensure it is added to your .gitignore file.
-            
-              %s
-              %s
-            """.formatted(
-                highlight(outputFile.getAbsolutePath()),
-                (overwritten) ? "were overwritten" : "were left in the env file, with the new keys added to the end",
-                renderComment("View the env file"),
-                renderCommand("bat " + outputFile.getAbsolutePath())
-            )));
-
-            case NothingToUpdate(var outputFile) -> OutputAll.message(trimIndent("""
-              No changes needed to be made to the .env file at %s.
-            
-              %s
-              %s
-            """.formatted(
-                highlight(outputFile.getAbsolutePath()),
-                renderComment("View the env file"),
-                renderCommand("bat " + outputFile.getAbsolutePath())
-            )));
-        };
     }
 
     private Set<EnvKey> resolveKeys() {
@@ -236,12 +247,9 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
             
               To avoid this error, you can:
               - Interactively answer 'y' to overwrite the duplicate keys,
-              - Use the %s option to automatically overwrite the duplicate keys, or
-              - Use the %s option to leave the duplicate keys in the env file.
-            """.formatted(
-                highlight("--overwrite"),
-                highlight("--no-overwrite")
-            ));
+              - Use the @!--overwrite!@ option to automatically overwrite the duplicate keys, or
+              - Use the @!--no-overwrite!@ option to leave the duplicate keys in the env file.
+            """);
         }
 
         return response.equals(ConfirmResponse.ANSWER_OK);

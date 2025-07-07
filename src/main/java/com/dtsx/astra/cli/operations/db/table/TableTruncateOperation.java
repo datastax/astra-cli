@@ -21,7 +21,7 @@ public class TableTruncateOperation implements Operation<TableTruncateResult> {
 
     @Override
     public TableTruncateResult execute() {
-        val status = tableGateway.truncateTable(request.tableRef);
+        val status = tableGateway.truncate(request.tableRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> new TableTruncated();

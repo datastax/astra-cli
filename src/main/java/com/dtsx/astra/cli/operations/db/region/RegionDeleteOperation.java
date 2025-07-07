@@ -38,7 +38,7 @@ public class RegionDeleteOperation implements Operation<RegionDeleteResult> {
 
     @Override
     public RegionDeleteResult execute() {
-        val status = regionGateway.deleteRegion(request.dbRef, request.region);
+        val status = regionGateway.delete(request.dbRef, request.region);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleRegionDeleted(request.dbRef, request.lrOptions);

@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.ConfigCreateResult;
+import com.dtsx.astra.sdk.exception.AuthenticationException;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +36,17 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     public record ProfileCreated(ProfileName profileName, boolean overwritten, boolean isDefault) implements ConfigCreateResult {}
     public record ProfileIllegallyExists(ProfileName profileName) implements ConfigCreateResult {}
     public record ViolatedFailIfExists() implements ConfigCreateResult {}
+    public record InvalidToken() implements ConfigCreateResult {}
 
     @Override
     public ConfigCreateResult execute() {
         val org = validateTokenAndFetchOrg(orgGateway);
-        val profileName = resolveProfileName(org, request);
+
+        if (org.isEmpty()) {
+            return new InvalidToken();
+        }
+
+        val profileName = resolveProfileName(org.get(), request);
 
         if (profileName.isDefault()) {
             return new ViolatedFailIfExists();
@@ -72,10 +79,14 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
         );
     }
 
-    private Organization validateTokenAndFetchOrg(OrgGateway orgGateway) {
-        return AstraLogger.loading("Validating your Astra token", (_) -> (
-            orgGateway.getCurrentOrg()
-        ));
+    private Optional<Organization> validateTokenAndFetchOrg(OrgGateway orgGateway) {
+        return AstraLogger.loading("Validating your Astra token", (_) -> {
+            try {
+                return Optional.of(orgGateway.current());
+            } catch (AuthenticationException e) {
+                return Optional.empty();
+            }
+        });
     }
 
     private ProfileName resolveProfileName(Organization org, CreateConfigRequest request) {

@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CdcId;
 import com.dtsx.astra.cli.core.models.CdcRef;
@@ -23,7 +23,6 @@ import java.util.Map;
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CDC_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "delete-cdc",

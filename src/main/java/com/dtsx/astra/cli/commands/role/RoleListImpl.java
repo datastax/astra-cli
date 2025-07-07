@@ -23,12 +23,11 @@ public abstract class RoleListImpl extends AbstractRoleCmd<Stream<RoleInfo>> {
         val data = result
             .map((role) -> Map.of(
                 "Role Id", role.id(),
-                "Role Name", role.name(),
-                "Description", role.description()
+                "Role Name", role.name()
             ))
             .toList();
 
-        return new ShellTable(data).withColumns("Role Id", "Role Name", "Description");
+        return new ShellTable(data).withColumns("Role Id", "Role Name");
     }
 
     @Override

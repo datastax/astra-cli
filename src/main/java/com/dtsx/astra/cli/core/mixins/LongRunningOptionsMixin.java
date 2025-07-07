@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.mixins;
 
-import com.dtsx.astra.cli.core.exceptions.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;

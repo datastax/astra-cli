@@ -1,17 +1,18 @@
 package com.dtsx.astra.cli.core.completions.caches;
 
-import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 
 import java.io.File;
+import java.util.Optional;
 
 public class DbCompletionsCache extends ProfileLinkedCompletionsCache {
-    public DbCompletionsCache(ProfileName profileName) {
+    public DbCompletionsCache(Optional<ProfileName> profileName) {
         super(profileName);
     }
 
     @Override
-    protected File useCacheFile() {
-        return new File(useCacheDir(), "db_names");
+    protected Optional<File> useCacheFile() {
+        return super.useCacheDir().map((dir) -> new File(dir, "db_names"));
     }
 }

@@ -26,13 +26,6 @@ public class TokenGatewayImpl implements TokenGateway {
     }
 
     @Override
-    public Optional<IamToken> tryFindOne(String clientId) {
-        return apiProvider.astraOpsClient().tokens().findAll()
-                .filter(t -> t.getClientId().equals(clientId))
-                .findFirst();
-    }
-
-    @Override
     public boolean exists(String clientId) {
         return apiProvider.astraOpsClient().tokens().exist(clientId);
     }

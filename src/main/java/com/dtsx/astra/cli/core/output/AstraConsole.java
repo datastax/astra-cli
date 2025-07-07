@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.core.exceptions.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.output.OutputType;
 import lombok.Getter;
 import lombok.Setter;

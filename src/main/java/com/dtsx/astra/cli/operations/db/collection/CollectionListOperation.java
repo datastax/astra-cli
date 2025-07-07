@@ -30,14 +30,14 @@ public class CollectionListOperation implements Operation<Stream<CollectionListR
         val dbRef = request.keyspaceRef.db();
 
         val keyspaces = (request.all)
-            ? ksGateway.findAllKeyspaces(dbRef).keyspaces().stream()
+            ? ksGateway.findAll(dbRef).keyspaces().stream()
             : Stream.of(request.keyspaceRef.name());
 
         return keyspaces
             .map(ks -> KeyspaceRef.mkUnsafe(dbRef, ks))
             .map(ref -> new CollectionListResult(
                 ref.name(),
-                collectionGateway.findAllCollections(ref)
+                collectionGateway.findAll(ref)
             ));
     }
 }

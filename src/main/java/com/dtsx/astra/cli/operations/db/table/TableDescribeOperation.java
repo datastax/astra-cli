@@ -46,7 +46,7 @@ public class TableDescribeOperation implements Operation<TableDescribeResult> {
 
     @Override
     public TableDescribeResult execute() {
-        val tableResult = tableGateway.findOneTable(request.tableRef);
+        val tableResult = tableGateway.findOne(request.tableRef);
         
         if (tableResult.isEmpty()) {
             return new TableNotFound();

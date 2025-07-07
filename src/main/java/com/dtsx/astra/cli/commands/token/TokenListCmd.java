@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.token;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
@@ -14,7 +15,12 @@ import java.util.stream.Stream;
 import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
 
 @Command(
-    name = "list"
+    name = "list",
+    description = "List your tokens' information"
+)
+@Example(
+    comment = "List your tokens' information",
+    command = "astra token list"
 )
 public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override

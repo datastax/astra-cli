@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.core.output.AstraConsole;
@@ -26,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CONFIG_ALREADY_EXISTS;
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.ILLEGAL_OPERATION;
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.*;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
@@ -56,7 +54,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
     comment = "Create a new profile without any prompting if the profile already exists",
     command = "astra config create -t AstraCS:... -y"
 )
-public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
+public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(
         arity = "0..1",
         description = "Profile name (defaults to organization name if not specified)",
@@ -104,6 +102,7 @@ public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
             case ProfileCreated pc -> handleConfigCreated(pc);
             case ProfileIllegallyExists(var profileName) -> throwProfileAlreadyExists(profileName);
             case ViolatedFailIfExists() -> throwAttemptedToSetDefault();
+            case InvalidToken() -> throwInvalidToken();
         };
     }
 
@@ -164,6 +163,18 @@ public class ConfigCreateCmd extends AbstractCmd<ConfigCreateResult> {
           - Create the profile, then run @!astra config use <profile>!@ to set it as default.
         """, List.of(
             new Hint("Example fix (replacing <new_name>):", originalArgsWithoutDefault, defaultFlag)
+        ));
+    }
+
+    private <T> T throwInvalidToken() {
+        throw new AstraCliException(INVALID_TOKEN, """
+          @|bold,red Error: The token you provided is invalid.|@
+        
+          The token %s matches the expect format, but is not a valid Astra token.
+        
+          If you are targeting a non-production environment, ensure that the right environment is set with the @!--env!@ option.
+        """.formatted(
+            highlight($token)
         ));
     }
 

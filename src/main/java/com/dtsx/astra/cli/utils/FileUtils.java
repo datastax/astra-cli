@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.utils;
 
-import com.dtsx.astra.cli.core.exceptions.misc.CannotCreateFileException;
+import com.dtsx.astra.cli.core.exceptions.internal.misc.CannotCreateFileException;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import lombok.Cleanup;
 import lombok.SneakyThrows;

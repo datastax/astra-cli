@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.gateways.db.table;
 
 import com.datastax.astra.client.tables.definition.TableDefinition;
 import com.datastax.astra.client.tables.definition.TableDescriptor;
-import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
@@ -17,13 +16,11 @@ public interface TableGateway {
         return new TableGatewayImpl(token, env);
     }
 
-    List<TableDescriptor> findAllTables(KeyspaceRef ksRef);
+    Optional<TableDefinition> findOne(TableRef collRef);
 
-    Optional<TableDefinition> findOneTable(TableRef collRef);
+    List<TableDescriptor> findAll(KeyspaceRef ksRef);
 
-    boolean tableExists(TableRef collRef);
+    DeletionStatus<TableRef> delete(TableRef collRef);
 
-    DeletionStatus<TableRef> deleteTable(TableRef collRef);
-
-    DeletionStatus<TableRef> truncateTable(TableRef collRef);
+    DeletionStatus<TableRef> truncate(TableRef collRef);
 }

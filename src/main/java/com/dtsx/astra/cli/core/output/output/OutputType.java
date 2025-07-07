@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.output.output;
 
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
-import com.dtsx.astra.cli.core.exceptions.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 

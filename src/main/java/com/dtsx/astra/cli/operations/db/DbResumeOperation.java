@@ -44,7 +44,7 @@ public class DbResumeOperation implements Operation<DbResumeResult> {
         }
 
         if (request.lrOptions.dontWait()) {
-            val database = dbGateway.findOneDb(request.dbRef);
+            val database = dbGateway.findOne(request.dbRef);
 
             return (initialStatus == HIBERNATED)
                 ? new DatabaseResumedNeedsAwaiting(database)

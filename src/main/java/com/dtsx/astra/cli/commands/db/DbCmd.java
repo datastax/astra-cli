@@ -4,6 +4,10 @@ import com.dtsx.astra.cli.commands.db.cdc.CdcCreateCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcDeleteCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcListCmd;
 import com.dtsx.astra.cli.commands.db.collections.*;
+import com.dtsx.astra.cli.commands.db.cqlsh.DbCqlshCmd;
+import com.dtsx.astra.cli.commands.db.dsbulk.DbCountCmd;
+import com.dtsx.astra.cli.commands.db.dsbulk.DbLoadCmd;
+import com.dtsx.astra.cli.commands.db.dsbulk.DbUnloadCmd;
 import com.dtsx.astra.cli.commands.db.misc.EmbeddingProvidersListCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDeleteCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDescribeCmd;
@@ -22,7 +26,7 @@ import picocli.CommandLine.Command;
 
 @Command(
     name = "db",
-    description = "List your non-terminated Astra databases.",
+    description = "Manage your Astra databases",
     subcommands = {
         DbListCmd.class,
         DbGetCmd.class,
@@ -30,9 +34,11 @@ import picocli.CommandLine.Command;
         DbDeleteCmd.class,
         DbStatusCmd.class,
         DbCqlshCmd.class,
+        DbCountCmd.class,
+        DbLoadCmd.class,
+        DbUnloadCmd.class,
         DbCreateDotEnv.class,
         DbDownloadScbCmd.class,
-        EmbeddingProvidersListCmd.class,
         DbResumeCmd.class,
         KeyspaceListCmd.class,
         KeyspaceCreateCmd.class,
@@ -46,6 +52,7 @@ import picocli.CommandLine.Command;
         TableDescribeCmd.class,
         TableDeleteCmd.class,
         TableTruncateCmd.class,
+        EmbeddingProvidersListCmd.class,
         CdcListCmd.class,
         CdcCreateCmd.class,
         CdcDeleteCmd.class,

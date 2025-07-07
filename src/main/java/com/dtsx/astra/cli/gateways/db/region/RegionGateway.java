@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.Token;
 import com.dtsx.astra.cli.gateways.APIProvider;
+import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -21,17 +22,15 @@ public interface RegionGateway {
 
     record RegionInfo(String displayName, boolean hasFreeTier, String zone, Object raw) {}
 
-    SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findServerlessRegions(boolean vector);
+    SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector);
 
-    SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findClassicRegions();
+    SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllClassic();
 
-    List<Datacenter> findRegionsForDb(DbRef dbRef);
+    List<Datacenter> findForDb(DbRef dbRef);
 
-    boolean regionExistsInDb(DbRef dbRef, RegionName region);
+    Set<CloudProviderType> findAvailableClouds();
 
-    Set<String> findRegionClouds();
+    CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProviderType cp);
 
-    CreationStatus<RegionName> createRegion(DbRef ref, RegionName region, String tier, CloudProviderType cp);
-
-    DeletionStatus<RegionName> deleteRegion(DbRef ref, RegionName region);
+    DeletionStatus<RegionName> delete(DbRef ref, RegionName region);
 }

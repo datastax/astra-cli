@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
@@ -14,41 +15,59 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
+import java.io.File;
 import java.util.Optional;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
-    @Option(names = { "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
-    private Optional<AstraEnvironment> env;
-
     @ArgGroup
-    private @Nullable TokenProvider tokenProvider;
+    private @Nullable CredsProvider credsProvider;
 
-    public static class TokenProvider {
+    public static class CredsProvider {
+        @ArgGroup(exclusive = false)
+        public @Nullable ConfigSpec config;
+
+        @ArgGroup(exclusive = false)
+        public @Nullable CredsSpec creds;
+    }
+
+    public static class CredsSpec {
+        @Option(names = { "--token" }, description = "Override the default astra token", paramLabel = "TOKEN", required = true)
+        public Token token;
+
+        @Option(names = { "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
+        private Optional<AstraEnvironment> env;
+    }
+
+    public static class ConfigSpec {
+        @Option(names = { "--config-file", "-cf" }, description = "The astrarc file to use", paramLabel = "PATH")
+        private Optional<File> configFile;
+
         @Option(names = { "--profile", "-p" }, completionCandidates = AvailableProfilesCompletion.class, description = "Specify the astrarc profile to use", paramLabel = "NAME")
         public Optional<ProfileName> profileName;
-
-        @Option(names = { "--token" }, description = "Override the default astra token", paramLabel = "TOKEN")
-        public Optional<Token> token;
     }
 
     private @Nullable Profile cachedProfile;
 
     protected DownloadsGateway downloadsGateway;
 
-    protected final Profile profile() {
+    public final Profile profile() {
         if (cachedProfile != null) {
             return cachedProfile;
         }
 
-        if (tokenProvider != null && tokenProvider.token.isPresent()) {
-            return cachedProfile = new Profile(ProfileName.mkUnsafe("<arg_provided_token>"), tokenProvider.token.get(), env.orElse(AstraEnvironment.PROD));
+        if (credsProvider != null && credsProvider.creds != null) {
+            return cachedProfile = new Profile(Optional.empty(), credsProvider.creds.token, credsProvider.creds.env.orElse(AstraEnvironment.PROD));
         }
 
-        val profileName = (tokenProvider != null) && tokenProvider.profileName.isPresent()
-            ? tokenProvider.profileName.get()
+        val profileName = (credsProvider != null && credsProvider.config != null && credsProvider.config.profileName.isPresent())
+            ? credsProvider.config.profileName.get()
             : ProfileName.DEFAULT;
 
-        return cachedProfile = config().lookupProfile(profileName)
+        val configFile = (credsProvider != null && credsProvider.config != null)
+            ? AstraConfig.readAstraConfigFile(credsProvider.config.configFile.orElse(null))
+            : AstraConfig.readAstraConfigFile(null);
+
+        return cachedProfile = configFile.lookupProfile(profileName)
             .orElseThrow(() -> new ParameterException(spec.commandLine(), "Profile '" + profileName + "' does not exist"));
     }
 

@@ -1,5 +1,8 @@
 package com.dtsx.astra.cli.commands.role;
 
+import com.dtsx.astra.cli.core.completions.impls.RoleNamesCompletion;
+import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
@@ -16,11 +19,24 @@ import static com.dtsx.astra.cli.operations.role.RoleGetOperation.RoleGetRequest
 
 @Command(
     name = "get",
-    aliases = { "describe" }
+    aliases = { "describe" },
+    description = "Show details for a specific role"
+)
+@Example(
+    comment = "Get details for a specific role by name",
+    command = "astra role get \"Database Administrator\""
+)
+@Example(
+    comment = "Get details for a specific role by ID",
+    command = "astra role get 12345678-abcd-1234-abcd-123456789012"
 )
 public class RoleGetCmd extends AbstractRoleCmd<Role> {
-    @Parameters(index = "0", paramLabel = "ROLE")
-    public String role;
+    @Parameters(
+        description = "Role name/id to get",
+        paramLabel = "ROLE",
+        completionCandidates = RoleNamesCompletion.class
+    )
+    public RoleRef role;
 
     @Override
     protected Operation<Role> mkOperation() {

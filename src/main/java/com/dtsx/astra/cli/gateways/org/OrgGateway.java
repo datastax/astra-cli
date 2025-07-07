@@ -10,5 +10,5 @@ public interface OrgGateway {
         return new OrgGatewayImpl(APIProvider.mkDefault(token, env));
     }
 
-    Organization getCurrentOrg();
+    Organization current();
 }

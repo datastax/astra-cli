@@ -12,21 +12,22 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
 
-public abstract class DbListImpl extends AbstractDbCmd<List<Database>> {
+public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     @Option(names = "--vector", description = "Only show vector-enabled databases")
     protected boolean $vectorOnly;
 
     @Override
-    protected OutputJson executeJson(List<Database> result) {
-        return OutputJson.serializeValue(result);
+    protected OutputJson executeJson(Stream<Database> result) {
+        return OutputJson.serializeValue(result.toList());
     }
 
     @Override
-    protected final OutputAll execute(List<Database> result) {
-        val data = result.stream()
+    protected final OutputAll execute(Stream<Database> result) {
+        val data = result
             .map((db) -> Map.of(
                 "Name", name(db),
                 "id", id(db),

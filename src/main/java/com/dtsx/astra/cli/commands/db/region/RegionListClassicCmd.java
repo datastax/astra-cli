@@ -3,11 +3,14 @@ package com.dtsx.astra.cli.commands.db.region;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway.RegionInfo;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.FoundRegion;
 import com.dtsx.astra.cli.operations.db.region.RegionListClassicOperation;
+import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.RegionListRequest;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import picocli.CommandLine.Command;
 
 import java.util.SortedMap;
+import java.util.stream.Stream;
 
 @Command(
     name = "list-regions-classic",
@@ -31,7 +34,11 @@ import java.util.SortedMap;
 )
 public class RegionListClassicCmd extends AbstractRegionListCmd {
     @Override
-    protected Operation<SortedMap<CloudProviderType,? extends SortedMap<String, RegionInfo>>> mkOperation() {
-        return new RegionListClassicOperation(regionGateway);
+    protected Operation<Stream<FoundRegion>> mkOperation() {
+        return new RegionListClassicOperation(regionGateway, new RegionListRequest(
+            $nameFilter,
+            $cloudFilter,
+            $zoneFilter
+        ));
     }
 }

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
 @Command(
@@ -11,5 +12,9 @@ import picocli.CommandLine.Command;
         UserInviteCmd.class,
         UserDeleteCmd.class
     }
+)
+@Example(
+    comment = "List all your Astra users",
+    command = "astra user"
 )
 public final class UserCmd extends UserListImpl {}

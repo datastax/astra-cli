@@ -1,8 +1,6 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.AstraCli;
-import com.dtsx.astra.cli.config.AstraConfig;
-import com.dtsx.astra.cli.config.AstraConfigFileMixin;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -35,9 +33,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     @Mixin
     private AstraColors.Mixin csMixin;
-
-    @Mixin
-    private AstraConfigFileMixin cfgMixin;
 
     @Mixin
     private OutputType.Mixin outputTypeMixin;
@@ -104,10 +99,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         } catch (UnsupportedOperationException e) {
             return execute(result).render(OutputType.requested());
         }
-    }
-
-    protected final AstraConfig config() {
-        return cfgMixin.getAstraConfig();
     }
 
     protected final List<String> originalArgs() {

@@ -19,6 +19,6 @@ public class DbGetOperation implements Operation<DbGetResult> {
 
     @Override
     public DbGetResult execute() {
-        return new DbGetResult(dbGateway.findOneDb(request.dbRef));
+        return new DbGetResult(dbGateway.findOne(request.dbRef));
     }
 }

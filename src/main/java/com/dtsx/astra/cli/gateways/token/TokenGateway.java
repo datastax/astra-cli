@@ -18,8 +18,10 @@ public interface TokenGateway {
     }
 
     Stream<IamToken> findAll();
-    Optional<IamToken> tryFindOne(String clientId);
+
     boolean exists(String clientId);
+
     CreateTokenResponse create(Role role);
+
     DeletionStatus<Void> delete(String clientId);
 }

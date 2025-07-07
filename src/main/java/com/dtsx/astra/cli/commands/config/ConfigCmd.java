@@ -5,7 +5,7 @@ import picocli.CommandLine.Command;
 
 @Command(
     name = "config",
-    description = "List your Astra CLI configurations.",
+    description = "Manage your Astra CLI configuration profiles.",
     subcommands = {
         ConfigListCmd.class,
         ConfigCreateCmd.class,
@@ -16,6 +16,6 @@ import picocli.CommandLine.Command;
 )
 @Example(
     command = "astra config",
-    comment = "List your Astra CLI configurations."
+    comment = "List your Astra CLI profiles."
 )
 public final class ConfigCmd extends ConfigListImpl {}

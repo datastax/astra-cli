@@ -29,14 +29,14 @@ public class CollectionGatewayImpl implements CollectionGateway {
     }
 
     @Override
-    public List<CollectionDescriptor> findAllCollections(KeyspaceRef ksRef) {
+    public List<CollectionDescriptor> findAll(KeyspaceRef ksRef) {
         return AstraLogger.loading("Listing collections for keyspace " + highlight(ksRef), (_) ->
             api.dataApiDatabase(ksRef).listCollections()
         );
     }
 
     @Override
-    public Optional<CollectionDefinition> findOneCollection(CollectionRef collRef) {
+    public Optional<CollectionDefinition> findOne(CollectionRef collRef) {
         try {
             return AstraLogger.loading("Getting collection " + highlight(collRef), (_) -> {
                 return Optional.of(
@@ -59,14 +59,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
     }
 
     @Override
-    public boolean collectionExists(CollectionRef collRef) {
-        return AstraLogger.loading("Checking if collection " + highlight(collRef) + " exists", (_) -> {
-            return findOneCollection(collRef).isPresent();
-        });
-    }
-
-    @Override
-    public CreationStatus<CollectionRef> createCollection(
+    public CreationStatus<CollectionRef> create(
         CollectionRef collRef,
         Integer dimension,
         String metric,
@@ -77,7 +70,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
         List<String> indexingAllow,
         List<String> indexingDeny
     ) {
-        val exists = collectionExists(collRef);
+        val exists = exists(collRef);
 
         if (exists) {
             return CreationStatus.alreadyExists(collRef);
@@ -135,8 +128,8 @@ public class CollectionGatewayImpl implements CollectionGateway {
     }
 
     @Override
-    public DeletionStatus<CollectionRef> deleteCollection(CollectionRef collRef) {
-        if (!collectionExists(collRef)) {
+    public DeletionStatus<CollectionRef> delete(CollectionRef collRef) {
+        if (!exists(collRef)) {
             return DeletionStatus.notFound(collRef);
         }
 
@@ -149,8 +142,8 @@ public class CollectionGatewayImpl implements CollectionGateway {
     }
 
     @Override
-    public DeletionStatus<CollectionRef> truncateCollection(CollectionRef collRef) {
-        if (!collectionExists(collRef)) {
+    public DeletionStatus<CollectionRef> truncate(CollectionRef collRef) {
+        if (!exists(collRef)) {
             return DeletionStatus.notFound(collRef);
         }
 
@@ -160,5 +153,11 @@ public class CollectionGatewayImpl implements CollectionGateway {
         });
 
         return DeletionStatus.deleted(collRef);
+    }
+
+    private boolean exists(CollectionRef collRef) {
+        return AstraLogger.loading("Checking if collection " + highlight(collRef) + " exists", (_) -> {
+            return findOne(collRef).isPresent();
+        });
     }
 }

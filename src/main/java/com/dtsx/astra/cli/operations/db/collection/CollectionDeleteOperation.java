@@ -22,7 +22,7 @@ public class CollectionDeleteOperation implements Operation<CollectionDeleteResu
 
     @Override
     public CollectionDeleteResult execute() {
-        val status = collectionGateway.deleteCollection(request.collRef);
+        val status = collectionGateway.delete(request.collRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleCollDeleted();

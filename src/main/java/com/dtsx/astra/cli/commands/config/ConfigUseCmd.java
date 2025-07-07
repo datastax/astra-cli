@@ -1,9 +1,8 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
-import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.internal.config.ProfileNotFoundException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -29,7 +28,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
     comment = "Set a profile as the default when creating it",
     command = "config create my_profile -t @token.txt --set-default"
 )
-public class ConfigUseCmd extends AbstractCmd<ConfigUseResult> {
+public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     @Parameters(
         description = "Profile to set as default",
         completionCandidates = AvailableProfilesCompletion.class,

@@ -38,9 +38,9 @@ public class RegionCreateOperation implements Operation<RegionCreateResult> {
 
     @Override
     public RegionCreateResult execute() {
-        val dbInfo = dbGateway.findOneDb(request.dbRef);
+        val dbInfo = dbGateway.findOne(request.dbRef);
 
-        val status = regionGateway.createRegion(request.dbRef, request.region, dbInfo.getInfo().getTier(), dbInfo.getInfo().getCloudProvider());
+        val status = regionGateway.create(request.dbRef, request.region, dbInfo.getInfo().getTier(), dbInfo.getInfo().getCloudProvider());
 
         return switch (status) {
             case CreationStatus.Created<?> _ -> handleRegionCreated(request.dbRef, request.lrOptions);

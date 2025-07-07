@@ -1,30 +1,37 @@
 package com.dtsx.astra.cli.core.completions;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Set;
 
 public abstract class DynamicCompletion implements Iterable<String> {
-    public enum UtilityFunctions {
-        INSTANCE;
-        public final String GET_PROFILE = "function get_profile(){ for ((i=0;i<${#COMP_WORDS[@]};i++));do [[ ${COMP_WORDS[i]} == --profile ]]&&((i+1<${#COMP_WORDS[@]}))&&echo ${COMP_WORDS[i+1]}&&return;done; echo default;};";
-        public final String GET_ASTRA_DIR = "function get_astra_dir(){ echo ~/.astra;};";
+    protected DynamicCompletion(String bash) {
+        this.bash = bash;
     }
 
+    private static final Set<DynamicCompletion> INSTANCES = new HashSet<>();
+
+    protected static void register(DynamicCompletion instance) {
+        INSTANCES.add(instance);
+    }
+
+    public static Set<DynamicCompletion> mkInstances() {
+        return INSTANCES;
+    }
+
+    @Getter
     private final String bash;
 
-    public DynamicCompletion(String bash) {
-        this(bash, (_) -> "");
-    }
-
-    public DynamicCompletion(String bash, Function<UtilityFunctions, String> funcs) {
-        this.bash = "\"`" + funcs.apply(UtilityFunctions.INSTANCE) + bash + "`\"";
+    public static String marker(DynamicCompletion instance) {
+        return "!$!this-is-a-dynamic-completion!$!:" + instance.getClass().getName();
     }
 
     @Override
     public @NotNull Iterator<String> iterator() {
-        return List.of(bash).iterator();
+        return List.of(marker(this)).iterator();
     }
 }

@@ -22,7 +22,7 @@ public class TableDeleteOperation implements Operation<TableDeleteResult> {
 
     @Override
     public TableDeleteResult execute() {
-        val status = tableGateway.deleteTable(request.tableRef);
+        val status = tableGateway.delete(request.tableRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleTableDeleted();

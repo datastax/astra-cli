@@ -10,6 +10,6 @@ public class OrgNameOperation implements Operation<String> {
 
     @Override
     public String execute() {
-        return orgGateway.getCurrentOrg().getName();
+        return orgGateway.current().getName();
     }
 }

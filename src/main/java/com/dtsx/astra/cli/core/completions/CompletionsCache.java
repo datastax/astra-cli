@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.completions;
 
 import com.dtsx.astra.cli.config.AstraHome;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -9,11 +10,20 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.dtsx.astra.cli.utils.MiscUtils.setAdd;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public abstract class CompletionsCache {
     private @Nullable Set<String> cachedCandidates;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @SneakyThrows
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -24,10 +34,14 @@ public abstract class CompletionsCache {
 
         val cacheFile = useCacheFile();
 
+        if (cacheFile.isEmpty()) {
+            return;
+        }
+
         var currentCandidates = Set.<String>of();
 
         try {
-            currentCandidates = Set.of(Files.readString(cacheFile.toPath()).split(" "));
+            currentCandidates = Files.readAllLines(cacheFile.get().toPath()).stream().map(this::readJsonString).collect(Collectors.toSet());
         } catch (Exception _) {}
 
         val candidates = mkCandidates.apply(currentCandidates);
@@ -40,24 +54,46 @@ public abstract class CompletionsCache {
             cachedCandidates = Set.copyOf(candidates);
 
             if (candidates.isEmpty()) {
-                cacheFile.delete();
+                cacheFile.get().delete();
                 return;
             }
 
-            cacheFile.getParentFile().mkdirs();
+            cacheFile.get().getParentFile().mkdirs();
 
-            @Cleanup val writer = new FileWriter(cacheFile);
-            writer.write(String.join(" ", candidates));
+            @Cleanup val writer = new FileWriter(cacheFile.get());
+            writer.write(String.join(NL, candidates.stream().map(this::writeJsonString).toList()));
         } catch (Exception _) {
             try {
-                cacheFile.delete();
+                cacheFile.get().delete();
             } catch (Exception _) {}
         }
     }
 
-    protected abstract File useCacheFile();
+    public void setCache(List<String> completions) {
+        update((_) -> new HashSet<>(completions));
+    }
 
-    protected File useCacheDir() {
-        return AstraHome.Dirs.useCompletionsCache();
+    public void addToCache(String completion) {
+        update((s) -> setAdd(s, completion));
+    }
+
+    public void removeFromCache(String completion) {
+        update((s) -> setAdd(s, completion));
+    }
+
+    protected abstract Optional<File> useCacheFile();
+
+    protected Optional<File> useCacheDir() {
+        return Optional.of(AstraHome.Dirs.useCompletionsCache());
+    }
+
+    @SneakyThrows
+    private String readJsonString(String value) {
+        return MAPPER.readValue(value, String.class);
+    }
+
+    @SneakyThrows
+    protected String writeJsonString(String value) {
+        return MAPPER.writeValueAsString(value);
     }
 }

@@ -17,15 +17,13 @@ public interface CollectionGateway {
         return new CollectionGatewayImpl(token, env);
     }
 
-    List<CollectionDescriptor> findAllCollections(KeyspaceRef ksRef);
+    Optional<CollectionDefinition> findOne(CollectionRef collRef);
 
-    Optional<CollectionDefinition> findOneCollection(CollectionRef collRef);
+    List<CollectionDescriptor> findAll(KeyspaceRef ksRef);
 
     long estimatedDocumentCount(CollectionRef collRef);
 
-    boolean collectionExists(CollectionRef collRef);
-
-    CreationStatus<CollectionRef> createCollection(
+    CreationStatus<CollectionRef> create(
         CollectionRef collRef,
         Integer dimension,
         String metric,
@@ -37,7 +35,7 @@ public interface CollectionGateway {
         List<String> indexingDeny
     );
 
-    DeletionStatus<CollectionRef> deleteCollection(CollectionRef collRef);
+    DeletionStatus<CollectionRef> delete(CollectionRef collRef);
 
-    DeletionStatus<CollectionRef> truncateCollection(CollectionRef collRef);
+    DeletionStatus<CollectionRef> truncate(CollectionRef collRef);
 }

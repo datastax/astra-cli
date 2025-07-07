@@ -24,7 +24,7 @@ public class KeyspaceListOperation implements Operation<List<KeyspaceInfo>> {
 
     @Override
     public List<KeyspaceInfo> execute() {
-        val result = keyspaceGateway.findAllKeyspaces(request.dbRef);
+        val result = keyspaceGateway.findAll(request.dbRef);
 
         return result.keyspaces().stream()
             .map(ks -> new KeyspaceInfo(ks, ks.equals(result.defaultKeyspace())))

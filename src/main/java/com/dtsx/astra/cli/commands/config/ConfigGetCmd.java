@@ -1,11 +1,10 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.config.ProfileNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.internal.config.ProfileNotFoundException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputCsv;
@@ -46,7 +45,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     comment = "Get the unwrap of a specific key",
     command = "astra config get my_profile -k ASTRA_DB_APPLICATION_TOKEN"
 )
-public class ConfigGetCmd extends AbstractCmd<GetConfigResult> {
+public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     @Parameters(
         description = { "Name of the profile to display", DEFAULT_VALUE },
         completionCandidates = AvailableProfilesCompletion.class,

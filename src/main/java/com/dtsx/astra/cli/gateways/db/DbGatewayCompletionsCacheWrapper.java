@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
-import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
+import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -9,34 +9,32 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
-import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.graalvm.collections.Pair;
 
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.utils.MiscUtils.*;
 
 @RequiredArgsConstructor
 public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     private final DbGateway delegate;
-    private final DbCompletionsCache cache;
+    private final CompletionsCache cache;
 
     @Override
-    public List<Database> findAllDbs() {
-        val databases = delegate.findAllDbs();
-        setCache(databases.stream().map(i -> i.getInfo().getName()).toList());
-        return databases;
+    public Stream<Database> findAll() {
+        val databases = delegate.findAll().toList();
+        cache.setCache(databases.stream().map(i -> i.getInfo().getName()).toList());
+        return databases.stream();
     }
 
     @Override
-    public Database findOneDb(DbRef ref) {
-        val db = delegate.findOneDb(ref);
-        addToCache(db.getInfo().getName());
+    public Database findOne(DbRef ref) {
+        val db = delegate.findOne(ref);
+        cache.addToCache(db.getInfo().getName());
         return db;
     }
 
@@ -45,9 +43,9 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
         val res = delegate.tryFindOneDb(ref);
 
         if (res.isPresent()) {
-            addToCache(res.get().getInfo().getName());
+            cache.addToCache(res.get().getInfo().getName());
         } else {
-            removeFromCache(ref);
+            removeRefFromCache(ref);
         }
 
         return res;
@@ -58,9 +56,9 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
         val exists = delegate.dbExists(ref);
 
         if (exists) {
-            addToCache(ref);
+            addRefToCache(ref);
         } else {
-            removeFromCache(ref);
+            removeRefFromCache(ref);
         }
 
         return exists;
@@ -69,22 +67,15 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     @Override
     public Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout) {
         val res = delegate.resumeDb(ref, timeout);
-        addToCache(ref);
+        addRefToCache(ref);
         return res;
     }
 
     @Override
     public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout) {
         val duration = delegate.waitUntilDbStatus(ref, target, timeout);
-        addToCache(ref);
+        addRefToCache(ref);
         return duration;
-    }
-
-    @Override
-    public List<String> downloadCloudSecureBundles(DbRef ref, String dbName, List<Datacenter> datacenters) {
-        val downloadPaths = delegate.downloadCloudSecureBundles(ref, dbName, datacenters);
-        addToCache(ref);
-        return downloadPaths;
     }
 
     @Override
@@ -95,33 +86,25 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     @Override
     public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
         val status = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector);
-        addToCache(name);
+        cache.addToCache(name);
         return status;
     }
 
     @Override
     public DeletionStatus<DbRef> deleteDb(DbRef ref) {
         val status = delegate.deleteDb(ref);
-        removeFromCache(ref);
+        removeRefFromCache(ref);
         return status;
     }
 
-    private void setCache(List<String> dbNames) {
-        cache.update((_) -> new HashSet<>(dbNames));
-    }
-
-    private void addToCache(String dbName) {
-        cache.update((s) -> setAdd(s, dbName));
-    }
-
-    private void addToCache(DbRef ref) {
+    private void addRefToCache(DbRef ref) {
         ref.fold(
             _ -> null,
             toFn((name) -> cache.update((s) -> setAdd(s, name)))
         );
     }
 
-    private void removeFromCache(DbRef ref) {
+    private void removeRefFromCache(DbRef ref) {
         ref.fold(
             _ -> null,
             toFn((name) -> cache.update((s) -> setDel(s, name)))

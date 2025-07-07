@@ -10,6 +10,6 @@ public class OrgIdOperation implements Operation<String> {
 
     @Override
     public String execute() {
-        return orgGateway.getCurrentOrg().getId();
+        return orgGateway.current().getId();
     }
 }

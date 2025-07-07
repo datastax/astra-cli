@@ -37,7 +37,7 @@ public class ConfigListOperation implements Operation<ListConfigResult> {
         val profiles = config.getValidatedProfiles().stream()
             .filter(p -> !p.isDefault())
             .map(p -> new ProfileInfo(
-                p.name().unwrap(),
+                p.nameOrDefault().unwrap(),
                 p.token(),
                 p.env(),
                 p.token().equals(defaultToken)

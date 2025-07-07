@@ -18,7 +18,11 @@ public class TenantName implements AstraColors.Highlightable {
             return Either.left("Tenant name cannot be blank or empty");
         }
 
-        return Either.right(new TenantName(name));
+        return Either.right(TenantName.mkUnsafe(name));
+    }
+
+    public static TenantName mkUnsafe(@NonNull String name) {
+        return new TenantName(name);
     }
 
     @JsonValue

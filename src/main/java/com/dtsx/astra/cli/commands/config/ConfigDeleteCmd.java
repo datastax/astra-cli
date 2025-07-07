@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -20,7 +19,6 @@ import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "delete",
@@ -34,7 +32,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
     comment = "Delete a profile named 'my_profile' without failing if it does not exist",
     command = "astra config delete my_profile --if-exists"
 )
-public class ConfigDeleteCmd extends AbstractCmd<ConfigDeleteResult> {
+public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
     @Parameters(
         description = "Name of the profile to delete",
         completionCandidates = AvailableProfilesCompletion.class,

@@ -11,6 +11,6 @@ public class OrgGetOperation implements Operation<Organization> {
 
     @Override
     public Organization execute() {
-        return orgGateway.getCurrentOrg();
+        return orgGateway.current();
     }
 }

@@ -1,12 +1,12 @@
 package com.dtsx.astra.cli.gateways.db;
 
-import com.dtsx.astra.cli.config.AstraHome;
+import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.cli.OptionValidationException;
-import com.dtsx.astra.cli.core.exceptions.db.CouldNotResumeDbException;
-import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
-import com.dtsx.astra.cli.core.exceptions.db.UnexpectedDbStatusException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.CouldNotResumeDbException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.Token;
@@ -15,27 +15,24 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.utils.EnumFolder;
-import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import com.dtsx.astra.sdk.utils.Utils;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.graalvm.collections.Pair;
 
-import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
@@ -49,16 +46,16 @@ public class DbGatewayImpl implements DbGateway {
     private final RegionGateway regionGateway;
 
     @Override
-    public List<Database> findAllDbs() {
+    public Stream<Database> findAll() {
         return AstraLogger.loading("Fetching all databases", (_) -> 
             api.astraOpsClient().db().search(DatabaseFilter.builder()
                 .limit(1000)
-                .build()).toList()
+                .build())
         );
     }
 
     @Override
-    public Database findOneDb(DbRef ref) {
+    public Database findOne(DbRef ref) {
         return AstraLogger.loading("Fetching info for database " + highlight(ref), (_) ->
             api.dbOpsClient(ref).find().orElseThrow(() -> new DbNotFoundException(ref))
         );
@@ -67,7 +64,7 @@ public class DbGatewayImpl implements DbGateway {
     @Override
     public Optional<Database> tryFindOneDb(DbRef ref) {
         try {
-            return Optional.of(findOneDb(ref));
+            return Optional.of(findOne(ref));
         } catch (DbNotFoundException e) {
             return Optional.empty();
         }
@@ -80,7 +77,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout) {
-        val currentStatus = AstraLogger.loading("Fetching current currStatus of db " + highlight(ref), (_) -> findOneDb(ref))
+        val currentStatus = AstraLogger.loading("Fetching current currStatus of db " + highlight(ref), (_) -> findOne(ref))
             .getStatus();
 
         return new EnumFolder<DatabaseStatusType, Pair<DatabaseStatusType, Duration>>(DatabaseStatusType.class)
@@ -101,26 +98,6 @@ public class DbGatewayImpl implements DbGateway {
                 throw new UnexpectedDbStatusException(ref, currentStatus, expected);
             })
             .run(currentStatus);
-    }
-
-    @Override
-    public List<String> downloadCloudSecureBundles(DbRef ref, String dbName, List<Datacenter> datacenters) {
-        val dbOpsClient = api.dbOpsClient(ref);
-
-        return datacenters.stream()
-            .map((datacenter) -> (
-                AstraLogger.loading("Downloading secure connect bundle for database %s in region %s".formatted(highlight(ref), highlight(datacenter.getRegion())), (_) -> {
-                    val scbName = dbOpsClient.buildScbFileName(dbName, datacenter.getRegion());
-                    val scbPath = new File(AstraHome.Dirs.useScb(), scbName);
-
-                    if (!scbPath.exists()) {
-                        Utils.downloadFile(datacenter.getSecureBundleUrl(), scbPath.getAbsolutePath());
-                    }
-
-                    return scbPath.getAbsolutePath();
-                })
-            ))
-            .toList();
     }
 
     @SneakyThrows
@@ -157,7 +134,7 @@ public class DbGatewayImpl implements DbGateway {
         val startTime = System.currentTimeMillis();
 
         var status = new AtomicReference<>(
-            AstraLogger.loading("Fetching initial sttaus of database %s".formatted(highlight(ref)), (_) -> findOneDb(ref).getStatus())
+            AstraLogger.loading("Fetching initial status of database %s".formatted(highlight(ref)), (_) -> findOne(ref).getStatus())
         );
 
         if (status.get().equals(target)) {
@@ -168,6 +145,8 @@ public class DbGatewayImpl implements DbGateway {
             .formatted(highlight(ref), highlight(target), highlight(status.get()));
 
         return AstraLogger.loading(initialMessage, (updateMsg) -> {
+            var cycles = 0;
+
             while (!status.get().equals(target)) {
                 val elapsed = Duration.ofMillis(System.currentTimeMillis() - startTime);
                 
@@ -181,13 +160,13 @@ public class DbGatewayImpl implements DbGateway {
                             .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
                     );
 
-                    if (elapsed.toSeconds() % 5 == 0) {
+                    if (cycles % 5 == 0) {
                         updateMsg.accept(
                             "Checking if database %s is status %s (currently %s, elapsed: %ds)"
                                 .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
                         );
 
-                        status.set(findOneDb(ref).getStatus());
+                        status.set(findOne(ref).getStatus());
                     }
 
                     Thread.sleep(1000);
@@ -195,6 +174,8 @@ public class DbGatewayImpl implements DbGateway {
                     Thread.currentThread().interrupt();
                     break;
                 }
+
+                cycles++;
             }
 
             return Duration.ofMillis(System.currentTimeMillis() - startTime);
@@ -203,7 +184,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly) {
-        val cloudRegions = regionGateway.findServerlessRegions(false);
+        val cloudRegions = regionGateway.findAllServerless(vectorOnly);
 
         if (cloud.isPresent()) {
             val cloudName = cloud.get().name().toLowerCase();
@@ -267,7 +248,7 @@ public class DbGatewayImpl implements DbGateway {
         dbCache.cacheDbId(name, id);
         dbCache.cacheDbRegion(id, region);
 
-        val newDb = AstraLogger.loading("Fetching info for newly created database " + highlight(name), (_) -> findOneDb(DbRef.fromId(id)));
+        val newDb = AstraLogger.loading("Fetching info for newly created database " + highlight(name), (_) -> findOne(DbRef.fromId(id)));
 
         return CreationStatus.created(newDb);
     }

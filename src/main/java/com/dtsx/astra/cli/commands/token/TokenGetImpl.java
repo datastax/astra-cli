@@ -8,7 +8,7 @@ import com.dtsx.astra.cli.operations.token.TokenGetOperation;
 public abstract class TokenGetImpl extends AbstractTokenCmd<Token> {
     @Override
     public final OutputAll execute(Token token) {
-        return OutputAll.serializeValue(token);
+        return OutputAll.serializeValue(token.unwrap());
     }
 
     @Override

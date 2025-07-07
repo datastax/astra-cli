@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.role;
 
-import com.dtsx.astra.cli.core.exceptions.role.RoleNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.internal.role.RoleNotFoundException;
+import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.StringUtils;
@@ -8,9 +9,7 @@ import com.dtsx.astra.sdk.org.domain.Role;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -20,22 +19,19 @@ public class RoleGatewayImpl implements RoleGateway {
 
     @Override
     public Stream<Role> findAll() {
-        return AstraLogger.loading("Loading roles", (_) -> 
-            apiProvider.astraOpsClient().roles().findAll());
+        return AstraLogger.loading("Finding all roles", (_) -> apiProvider.astraOpsClient().roles().findAll());
     }
 
     @Override
-    public Optional<Role> tryFindOne(String role) {
-        if (StringUtils.isUUID(role)) {
-            return AstraLogger.loading("Looking up role by ID " + highlight(role), (_) -> 
-                apiProvider.astraOpsClient().roles().find(role));
-        }
-        return AstraLogger.loading("Looking up role by name " + highlight(role), (_) -> 
-            apiProvider.astraOpsClient().roles().findByName(role));
+    public Optional<Role> tryFindOne(RoleRef role) {
+        return AstraLogger.loading("Looking up role " + highlight(role), (_) -> role.fold(
+            id -> apiProvider.astraOpsClient().roles().find(id.toString()),
+            name -> apiProvider.astraOpsClient().roles().findByName(StringUtils.removeQuotesIfAny(name))
+        ));
     }
 
     @Override
-    public Role findOne(String role) {
+    public Role findOne(RoleRef role) {
         return tryFindOne(role).orElseThrow(() -> new RoleNotFoundException(role));
     }
 }

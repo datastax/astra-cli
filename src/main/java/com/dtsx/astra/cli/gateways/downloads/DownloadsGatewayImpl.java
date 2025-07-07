@@ -49,44 +49,59 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @Override
-    public Either<String, File> downloadCqlshArchive(String url, String tarFileName) {
-        val cqlshDir = AstraHome.Dirs.useCqlsh();
+    public Either<String, File> downloadCqlsh(String url) {
+        return installGenericArchive(AstraHome.Dirs.useCqlsh(), url, "cqlsh");
+    }
 
-        if (cqlshDir.isFile()) {
-            return Either.left("%s is a file; expected it to be a directory".formatted(cqlshDir.getAbsolutePath()));
+    @Override
+    public Either<String, File> downloadDsbulk(String url, String version) {
+        return installGenericArchive(AstraHome.Dirs.useDsbulk(version), url, "dsbulk");
+    }
+
+    @Override
+    public Either<String, File> downloadPulsarShell(String url, String version) {
+        return installGenericArchive(AstraHome.Dirs.useDsbulk(version), url, "pulsar-shell");
+    }
+
+    private Either<String, File> installGenericArchive(File installDir, String url, String exe) {
+        if (installDir.isFile()) {
+            return Either.left("%s is a file; expected it to be a directory".formatted(installDir.getAbsolutePath()));
         }
 
-        val tarFile = new File(cqlshDir, tarFileName);
-        val exeFile = new File(cqlshDir, "bin/cqlsh");
+        val tarFile = new File(installDir, exe + "-download.tar.gz");
+        val exeFile = new File(installDir, "bin/" + exe);
 
-        if (Objects.requireNonNull(cqlshDir.list()).length > 0) {
+        if (Objects.requireNonNull(installDir.list()).length > 0) {
             return Either.right(exeFile);
         }
 
+        //noinspection ResultOfMethodCallIgnored
+        tarFile.delete();
+
         try {
-            AstraLogger.loading("Downloading cqlsh, please wait", (_) -> {
+            AstraLogger.loading("Downloading " + exe + ", please wait", (_) -> {
                 FileUtils.downloadFile(url, tarFile.getAbsolutePath());
                 return null;
             });
         } catch (Exception e) {
-            return Either.left("Failed to download cqlsh archive from %s: %s".formatted(url, e.getMessage()));
+            return Either.left("Failed to download " + exe + " archive from %s: %s".formatted(url, e.getMessage()));
         }
 
         try {
-            AstraLogger.loading("Extracting cqlsh archive, please wait", (_) -> {
+            AstraLogger.loading("Extracting " + exe + " archive, please wait", (_) -> {
                 FileUtils.extractTarArchiveInPlace(tarFile);
                 return null;
             });
         } catch (Exception e) {
-            return Either.left("Failed to extract cqlsh archive %s: %s".formatted(tarFile.getAbsolutePath(), e.getMessage()));
+            return Either.left("Failed to extract " + exe + " archive %s: %s".formatted(tarFile.getAbsolutePath(), e.getMessage()));
         }
 
         if (!tarFile.delete()) {
-            return Either.left("Failed to delete temporary cqlsh archive %s".formatted(tarFile.getAbsolutePath()));
+            return Either.left("Failed to delete temporary " + exe + " archive %s".formatted(tarFile.getAbsolutePath()));
         }
 
         if (!exeFile.setExecutable(true, false)) {
-            return Either.left("Failed to make cqlsh executable at %s".formatted(exeFile.getAbsolutePath()));
+            return Either.left("Failed to make " + exe + " executable at %s".formatted(exeFile.getAbsolutePath()));
         }
 
         return Either.right(exeFile);

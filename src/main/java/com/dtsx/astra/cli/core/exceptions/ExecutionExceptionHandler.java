@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.core.exceptions;
 
+import com.dtsx.astra.cli.core.exceptions.external.AuthenticationExceptionMapper;
 import com.dtsx.astra.cli.core.exceptions.external.DatabaseNotFoundExceptionMapper;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import lombok.val;
 import picocli.CommandLine;
@@ -17,7 +17,8 @@ import java.util.stream.Stream;
 public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
     private static final Map<Class<? extends Exception>, ExternalExceptionMapper<?>> EXTERNAL_ERROR_MAPPERS =
         Stream.of(
-            new DatabaseNotFoundExceptionMapper()
+            new DatabaseNotFoundExceptionMapper(),
+            new AuthenticationExceptionMapper()
         ).collect(
             Collectors.toMap(ExternalExceptionMapper::getExceptionClass, Function.identity())
         );

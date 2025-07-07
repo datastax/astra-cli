@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.completions.impls.UserEmailsCompletion;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
@@ -20,10 +22,22 @@ import static com.dtsx.astra.cli.operations.user.UserGetOperation.UserGetRequest
 @Command(
     name = "get",
     aliases = { "describe" },
-    description = "Show user details"
+    description = "Show details for a specific user"
+)
+@Example(
+    comment = "Get details for a specific user by email",
+    command = "astra user get john@example.com"
+)
+@Example(
+    comment = "Get details for a specific user by ID",
+    command = "astra user get 12345678-abcd-1234-abcd-123456789012"
 )
 public class UserGetCmd extends AbstractUserCmd<User> {
-    @Parameters(description = "User email or identifier")
+    @Parameters(
+        description = "User email/id to get",
+        paramLabel = "USER",
+        completionCandidates = UserEmailsCompletion.class
+    )
     public UserRef user;
 
     @Override

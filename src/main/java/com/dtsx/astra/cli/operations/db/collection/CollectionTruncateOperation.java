@@ -21,7 +21,7 @@ public class CollectionTruncateOperation implements Operation<CollectionTruncate
 
     @Override
     public CollectionTruncateResult execute() {
-        val status = collectionGateway.truncateCollection(request.collRef);
+        val status = collectionGateway.truncate(request.collRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> new CollectionTruncated();

@@ -18,5 +18,9 @@ public interface DownloadsGateway {
 
     Either<String, List<File>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters);
 
-    Either<String, File> downloadCqlshArchive(String url, String tarball);
+    Either<String, File> downloadCqlsh(String url);
+
+    Either<String, File> downloadDsbulk(String url, String version);
+
+    Either<String, File> downloadPulsarShell(String url, String version);
 }

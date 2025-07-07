@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.gateways.db.keyspace;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.exceptions.db.DbNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
@@ -19,7 +19,7 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
     private final APIProvider api;
 
     @Override
-    public FoundKeyspaces findAllKeyspaces(DbRef dbRef) {
+    public FoundKeyspaces findAll(DbRef dbRef) {
         return AstraLogger.loading("Fetching keyspaces for db " + highlight(dbRef), (_) -> {
             val db = api.dbOpsClient(dbRef).find().orElseThrow(() -> new DbNotFoundException(dbRef));
 
@@ -34,16 +34,8 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
     }
 
     @Override
-    public boolean keyspaceExists(KeyspaceRef keyspaceRef) {
-        return AstraLogger.loading("Checking if keyspace " + highlight(keyspaceRef) + " exists", (_) -> (
-            findAllKeyspaces(keyspaceRef.db()).keyspaces().stream()
-                .anyMatch(ks -> ks.equals(keyspaceRef.name()))
-        ));
-    }
-
-    @Override
-    public CreationStatus<KeyspaceRef> createKeyspace(KeyspaceRef keyspaceRef) {
-        if (keyspaceExists(keyspaceRef)) {
+    public CreationStatus<KeyspaceRef> create(KeyspaceRef keyspaceRef) {
+        if (exists(keyspaceRef)) {
             return CreationStatus.alreadyExists(keyspaceRef);
         }
 
@@ -56,8 +48,8 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
     }
 
     @Override
-    public DeletionStatus<KeyspaceRef> deleteKeyspace(KeyspaceRef keyspaceRef) {
-        if (!keyspaceExists(keyspaceRef)) {
+    public DeletionStatus<KeyspaceRef> delete(KeyspaceRef keyspaceRef) {
+        if (!exists(keyspaceRef)) {
             return DeletionStatus.notFound(keyspaceRef);
         }
 
@@ -67,5 +59,12 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
         });
 
         return DeletionStatus.deleted(keyspaceRef);
+    }
+
+    private boolean exists(KeyspaceRef keyspaceRef) {
+        return AstraLogger.loading("Checking if keyspace " + highlight(keyspaceRef) + " exists", (_) -> (
+            findAll(keyspaceRef.db()).keyspaces().stream()
+                .anyMatch(ks -> ks.equals(keyspaceRef.name()))
+        ));
     }
 }
