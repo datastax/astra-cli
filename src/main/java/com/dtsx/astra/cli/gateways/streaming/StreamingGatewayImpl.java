@@ -69,13 +69,17 @@ public class StreamingGatewayImpl implements StreamingGateway {
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions() {
         return AstraLogger.loading("Fetching streaming regions", (_) -> (
-            apiProvider.astraOpsClient().streaming().regions().findAllServerless()
+            apiProvider.astraOpsClient().streaming().regions()
+                .findAllServerless()
                 .collect(Collectors.toMap(
-                    r -> CloudProviderType.valueOf(r.getCloudProvider()),
-                    r -> new TreeMap<String, StreamingRegionInfo>() {{
-                        put(r.getName(), new StreamingRegionInfo(r.getDisplayName(), !r.getClassification().equalsIgnoreCase("premium"), r));
+                    r -> CloudProviderType.valueOf(r.getCloudProvider().toUpperCase()),
+                    r -> new TreeMap<>() {{
+                        put(r.getName(), new StreamingRegionInfo(r.getDisplayName(), r.getClassification().equalsIgnoreCase("premium"), r));
                     }},
-                    (_, b) -> b,
+                    (a, b) -> new TreeMap<>() {{
+                        putAll(a);
+                        putAll(b);
+                    }},
                     TreeMap::new
                 ))
         ));
