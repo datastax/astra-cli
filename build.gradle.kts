@@ -58,6 +58,7 @@ graalvmNative {
         buildArgs.add("-Os")
         buildArgs.add("--enable-http")
         buildArgs.add("--enable-https")
+        buildArgs.add("--enable-native-access=ALL-UNNAMED")
     }
 }
 

@@ -1,0 +1,16 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\Qorg/fusesource/jansi/internal/native/Mac/x86_64/libjansi.jnilib\\E"
+      },
+      {
+        "pattern": "\\Qorg/fusesource/jansi/jansi.properties\\E"
+      },
+      {
+        "pattern": "\\Qapplication.properties\\E"
+      }
+    ]
+  },
+  "bundles": []
+}

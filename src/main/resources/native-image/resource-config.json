@@ -1,9 +1,0 @@
-{
-  "resources":{
-  "includes":[
-    {
-      "pattern":"\\Qapplication.properties\\E"
-    }
-  ]},
-  "bundles":[]
-}

@@ -1,0 +1,30 @@
+[
+  {
+    "name":"java.lang.ClassLoader",
+    "methods":[
+      {"name":"getPlatformClassLoader","parameterTypes":[] },
+      {"name":"loadClass","parameterTypes":["java.lang.String"] }
+    ]
+  },
+  {
+    "name":"jdk.internal.loader.ClassLoaders$PlatformClassLoader"
+  },
+  {
+    "name":"org.fusesource.jansi.internal.CLibrary",
+    "fields":[
+      {"name":"HAVE_ISATTY"},
+      {"name":"HAVE_TTYNAME"},
+      {"name":"TCSADRAIN"},
+      {"name":"TCSAFLUSH"},
+      {"name":"TCSANOW"},
+      {"name":"TIOCGETD"},
+      {"name":"TIOCGWINSZ"},
+      {"name":"TIOCSETD"},
+      {"name":"TIOCSWINSZ"}
+    ]
+  },
+  {
+    "name":"org.graalvm.nativebridge.jni.JNIExceptionWrapperEntryPoints",
+    "methods":[{"name":"getClassName","parameterTypes":["java.lang.Class"] }]
+  }
+]

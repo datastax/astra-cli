@@ -16,12 +16,14 @@ import java.util.regex.Pattern;
 
 public class AstraConsole {
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
-    
-    @Getter @Setter
-    private static PrintStream out = System.out;
 
-    @Getter @Setter
-    private static PrintStream err = System.err;
+    public static PrintStream getOut() {
+        return System.out;
+    }
+
+    public static PrintStream getErr() {
+        return System.err;
+    }
 
     @Getter @Setter
     private static @Nullable Console console = System.console();
@@ -43,22 +45,22 @@ public class AstraConsole {
         if (OutputType.isNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
-        write(out, items);
+        write(getOut(), items);
     }
 
     public static void println(Object... items) {
         if (OutputType.isNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.println() when the output format is not 'human'");
         }
-        writeln(out, items);
+        writeln(getOut(), items);
     }
 
     public static void error(Object... items) {
-        write(err, items);
+        write(getErr(), items);
     }
 
     public static void errorln(Object... items) {
-        writeln(err, items);
+        writeln(getErr(), items);
     }
 
     public static Optional<String> readLine(String prompt) {
