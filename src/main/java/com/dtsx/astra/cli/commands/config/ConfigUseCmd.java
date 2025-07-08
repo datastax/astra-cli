@@ -18,7 +18,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "use",
-    description = "Sets an existing profile to be used as the default for all commands. Use the `--set-default` option when creating a new profile to set it as the default automatically."
+    description = "Sets an existing profile to be used as the default for all commands. Use the `--default` option when creating a new profile to set it as the default automatically."
 )
 @Example(
     comment = "Set an existing profile as the default",
@@ -26,7 +26,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 )
 @Example(
     comment = "Set a profile as the default when creating it",
-    command = "config create my_profile -t @token.txt --set-default"
+    command = "config create my_profile -t @token.txt --default"
 )
 public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     @Parameters(

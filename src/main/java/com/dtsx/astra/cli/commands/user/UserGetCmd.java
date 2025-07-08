@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.user;
 
-import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.completions.impls.UserEmailsCompletion;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
@@ -15,7 +15,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 import static com.dtsx.astra.cli.operations.user.UserGetOperation.UserGetRequest;
 
@@ -55,13 +55,14 @@ public class UserGetCmd extends AbstractUserCmd<User> {
             .map(Role::getName)
             .toList();
 
-        return new ShellTable(List.of(
-            ShellTable.attr("User Id", user.getUserId()),
-            ShellTable.attr("User Email", user.getEmail()),
-            ShellTable.attr("Status", user.getStatus().name()),
-            ShellTable.attr("Roles", roleNames)
-        )).withAttributeColumns();
+        return ShellTable.forAttributes(new LinkedHashMap<>() {{
+            put("User Id", user.getUserId());
+            put("User Email", user.getEmail());
+            put("Status", user.getStatus().name());
+            put("Roles", roleNames);
+        }});
     }
+
 
     @Override
     protected Operation<User> mkOperation() {

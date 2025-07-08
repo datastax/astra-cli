@@ -12,15 +12,12 @@ import com.dtsx.astra.cli.operations.db.table.TableDescribeOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.renderCommand;
-import static com.dtsx.astra.cli.utils.StringUtils.renderComment;
 
 @Command(
     name = "describe-table",
@@ -56,30 +53,30 @@ public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResu
     }
 
     private RenderableShellTable mkTable(TableInfo info) {
-        val attrs = new ArrayList<Map<String, Object>>();
+        val attrs = new LinkedHashMap<String, Object>();
 
-        attrs.add(ShellTable.attr("Name", info.name()));
-        attrs.add(ShellTable.attr("", ""));
-        attrs.add(ShellTable.attr(highlight("COLUMNS"), ""));
+        attrs.put("Name", info.name());
+        attrs.put("", "");
+        attrs.put(highlight("COLUMNS"), "");
 
         info.columns().forEach((columnName, columnInfo) -> {
-            attrs.add(ShellTable.attr(columnName, columnInfo.cqlDefinition()));
+            attrs.put(columnName, columnInfo.cqlDefinition());
         });
 
-        attrs.add(ShellTable.attr("", ""));
-        attrs.add(ShellTable.attr(highlight("PRIMARY KEY"), ""));
+        attrs.put("", "");
+        attrs.put(highlight("PRIMARY KEY"), "");
         
         if (!info.primaryKey().partitionBy().isEmpty()) {
             val partitionKey = String.join(", ", info.primaryKey().partitionBy());
-            attrs.add(ShellTable.attr("Partition Key", partitionKey));
+            attrs.put("Partition Key", partitionKey);
         }
         
         if (!info.primaryKey().clusteringColumns().isEmpty()) {
             val clusteringColumns = String.join(", ", info.primaryKey().clusteringColumns());
-            attrs.add(ShellTable.attr("Clustering Columns", clusteringColumns));
+            attrs.put("Clustering Columns", clusteringColumns);
         }
         
-        return new ShellTable(attrs).withAttributeColumns();
+        return ShellTable.forAttributes(attrs);
     }
 
     private <T> T throwTableNotFound() {

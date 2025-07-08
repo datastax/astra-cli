@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
@@ -19,7 +19,7 @@ import java.util.SortedMap;
 import java.util.stream.Stream;
 
 public interface StreamingGateway {
-    static StreamingGateway mkDefault(Token token, AstraEnvironment env, CompletionsCache tenantCompletionsCache) {
+    static StreamingGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache) {
         return new StreamingGatewayCompletionsCacheWrapper(new StreamingGatewayImpl(APIProvider.mkDefault(token, env)), tenantCompletionsCache);
     }
 

@@ -6,14 +6,14 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CollectionGateway {
-    static CollectionGateway mkDefault(Token token, AstraEnvironment env) {
+    static CollectionGateway mkDefault(AstraToken token, AstraEnvironment env) {
         return new CollectionGatewayImpl(token, env);
     }
 

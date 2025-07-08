@@ -33,16 +33,16 @@ import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
     description = "Create a new Astra database"
 )
 @Example(
-    comment = "Create a basic Astra vector database in the 'us-east-1' region",
-    command = "astra db create my_db --region us-east-1"
+    comment = "Create a basic Astra vector database in the 'us-east1' region",
+    command = "astra db create my_db --region us-east1"
 )
 @Example(
     comment = "Specify a specific default keyspace for the database",
-    command = "astra db create my_db --region us-east-1 -k my_keyspace"
+    command = "astra db create my_db --region us-east1 -k my_keyspace"
 )
 @Example(
     comment = "Create a classic non-vector database",
-    command = "astra db create my_db --region us-east-1 --non-vector"
+    command = "astra db create my_db --region us-east1 --non-vector"
 )
 @Example(
     comment = "Create a database without waiting for it to become active",
@@ -50,7 +50,7 @@ import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
 )
 @Example(
     comment = "Create a database if it doesn't already exist",
-    command = "astra db create my_db --region us-east-1 --if-not-exists"
+    command = "astra db create my_db --region us-east1 --if-not-exists"
 )
 public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd<DbCreateResult> {
     @Option(

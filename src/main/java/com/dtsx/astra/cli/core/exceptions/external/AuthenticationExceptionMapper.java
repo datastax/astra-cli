@@ -38,7 +38,7 @@ public class AuthenticationExceptionMapper implements ExternalExceptionMapper<Au
         
           Cause: %s
         
-          If you are using a non-production environment, make ensure that the correct environment is set in the profile or via the @!--env|@ command-line option.
+          If you are using a non-production environment, make ensure that the correct environment is set in the profile or via the @!--env!@ command-line option.
         """.formatted(
             tokenMsg,
             ex.getMessage()

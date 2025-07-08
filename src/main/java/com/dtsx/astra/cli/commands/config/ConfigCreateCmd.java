@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -48,7 +48,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 )
 @Example(
     comment = "Create a new profile and set it as the default profile",
-    command = "astra config create -t AstraCS:... --set-default"
+    command = "astra config create -t AstraCS:... --default"
 )
 @Example(
     comment = "Create a new profile without any prompting if the profile already exists",
@@ -68,7 +68,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         paramLabel = "TOKEN",
         required = true
     )
-    public Token $token;
+    public AstraToken $token;
 
     @Option(
         names = { "-e", "--env" },
@@ -80,7 +80,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     public AstraEnvironment $env;
 
     @Option(
-        names = { "-d", "--set-default" },
+        names = { "-d", "--default" },
         description = { "Set the created profile as the default profile", DEFAULT_VALUE }
     )
     public boolean $setDefault;
@@ -147,8 +147,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     }
 
     private <T> T throwAttemptedToSetDefault() {
-        val defaultFlag = (!originalArgs().contains("--set-default") && !originalArgs().contains("-d"))
-            ? "--set-default"
+        val defaultFlag = (!originalArgs().contains("--default") && !originalArgs().contains("-d"))
+            ? "--default"
             : "";
 
         val originalArgsWithoutDefault = originalArgs().stream()
@@ -159,7 +159,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
           @|bold,red Error: Cannot set the default profile directly.|@
 
           Please create the profile using a different name, then:
-          - Pass the @!--set-default!@ flag while creating the profile, or
+          - Pass the @!--default!@ flag while creating the profile, or
           - Create the profile, then run @!astra config use <profile>!@ to set it as default.
         """, List.of(
             new Hint("Example fix (replacing <new_name>):", originalArgsWithoutDefault, defaultFlag)

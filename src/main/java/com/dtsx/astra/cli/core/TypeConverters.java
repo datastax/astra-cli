@@ -15,7 +15,7 @@ public abstract class TypeConverters {
         new TypeConverter(DbRef.class, DbRef::parse),
         new TypeConverter(RegionName.class, RegionName::parse),
         new TypeConverter(UserRef.class, UserRef::parse),
-        new TypeConverter(Token.class, Token::parse),
+        new TypeConverter(AstraToken.class, AstraToken::parse),
         new TypeConverter(TenantName.class, TenantName::parse),
         new TypeConverter(RoleRef.class, RoleRef::parse)
     );

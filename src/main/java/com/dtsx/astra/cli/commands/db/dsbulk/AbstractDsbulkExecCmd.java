@@ -5,13 +5,13 @@ import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkInstallFailed;
-import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkResult;
+import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.Executed;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.ScbDownloadFailed;
 
-public abstract class AbstractDbDsbulkExecCmd extends AbstractDbSpecificCmd<DsbulkResult> {
+public abstract class AbstractDsbulkExecCmd extends AbstractDbSpecificCmd<DsbulkExecResult> {
     @Override
-    protected final OutputHuman executeHuman(DsbulkResult result) {
+    protected final OutputHuman executeHuman(DsbulkExecResult result) {
         return switch (result) {
             case DsbulkInstallFailed(var msg) -> OutputAll.message(msg);
             case ScbDownloadFailed(var msg) -> OutputAll.message(msg);

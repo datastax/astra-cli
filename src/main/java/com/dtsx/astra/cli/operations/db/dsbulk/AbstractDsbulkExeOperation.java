@@ -16,19 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkResult;
+import static com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 
 @RequiredArgsConstructor
-public abstract class AbstractDsbulkExeOperation<Req> implements Operation<DsbulkResult> {
+public abstract class AbstractDsbulkExeOperation<Req> implements Operation<DsbulkExecResult> {
     protected final DbGateway dbGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
 
-    public sealed interface DsbulkResult {}
+    public sealed interface DsbulkExecResult {}
 
-    public record DsbulkInstallFailed(String error) implements DsbulkResult {}
-    public record ScbDownloadFailed(String error) implements DsbulkResult {}
-    public record Executed(int exitCode) implements DsbulkResult {}
+    public record DsbulkInstallFailed(String error) implements DsbulkExecResult {}
+    public record ScbDownloadFailed(String error) implements DsbulkExecResult {}
+    public record Executed(int exitCode) implements DsbulkExecResult {}
 
     public record CoreDsbulkOptions(
         String keyspace,
@@ -39,10 +39,10 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         File dsBulkConfig
     ) {}
 
-    abstract Either<DsbulkResult, List<String>> buildCommandLine();
+    abstract Either<DsbulkExecResult, List<String>> buildCommandLine();
 
     @Override
-    public DsbulkResult execute() {
+    public DsbulkExecResult execute() {
         return downloadDsbulk().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
                 add(exe.getAbsolutePath());
@@ -70,7 +70,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         })).fold(l -> l, r -> r);
     }
 
-    private Either<DsbulkResult, File> downloadDsbulk() {
+    private Either<DsbulkExecResult, File> downloadDsbulk() {
         val downloadResult = downloadsGateway.downloadDsbulk(CLIProperties.read("dsbulk.url"), CLIProperties.read("dsbulk.version"));
 
         return downloadResult.bimap(
@@ -79,7 +79,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         );
     }
 
-    protected Either<DsbulkResult, File> downloadSCB(DbRef dbRef) {
+    protected Either<DsbulkExecResult, File> downloadSCB(DbRef dbRef) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(

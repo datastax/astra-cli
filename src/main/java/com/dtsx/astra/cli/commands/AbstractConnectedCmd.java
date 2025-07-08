@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
@@ -32,9 +32,9 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
     public static class CredsSpec {
         @Option(names = { "--token" }, description = "Override the default astra token", paramLabel = "TOKEN", required = true)
-        public Token token;
+        public AstraToken token;
 
-        @Option(names = { "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "<environment>")
+        @Option(names = { "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "ENV")
         private Optional<AstraEnvironment> env;
     }
 

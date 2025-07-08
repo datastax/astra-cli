@@ -9,7 +9,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
@@ -40,7 +40,7 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 @RequiredArgsConstructor
 public class DbGatewayImpl implements DbGateway {
     private final APIProvider api;
-    private final Token token;
+    private final AstraToken token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
     private final RegionGateway regionGateway;

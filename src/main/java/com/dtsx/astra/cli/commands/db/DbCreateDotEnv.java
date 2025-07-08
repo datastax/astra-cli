@@ -51,7 +51,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 @Example(
     comment = "Create a .env file specifying the keyspace and/or region to target",
-    command = "astra db create-dotenv -k my_keyspace -r us-east-1"
+    command = "astra db create-dotenv -k my_keyspace -r us-east1"
 )
 @Example(
     comment = "Print the .env file to stdout instead of saving it to a file",

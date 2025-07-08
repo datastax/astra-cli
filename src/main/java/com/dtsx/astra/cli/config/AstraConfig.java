@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.config;
 
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
@@ -32,7 +32,7 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
-    public record Profile(Optional<ProfileName> name, Token token, AstraEnvironment env) {
+    public record Profile(Optional<ProfileName> name, AstraToken token, AstraEnvironment env) {
         public boolean isDefault() {
             return name.map(ProfileName::isDefault).orElse(false);
         }
@@ -65,7 +65,7 @@ public class AstraConfig {
     public static AstraConfig readAstraConfigFile(@Nullable File file) {
         if (file == null) {
             file = resolveDefaultAstraConfigFile();
-            FileUtils.createFileIfNotExists(file, "");
+            FileUtils.createFileIfNotExists(file, null);
         }
 
         try {
@@ -104,7 +104,7 @@ public class AstraConfig {
                             .map(AstraEnvironment::valueOf)
                             .orElse(AstraEnvironment.PROD);
 
-                        return Token.parse(token.get()).bimap(
+                        return AstraToken.parse(token.get()).bimap(
                             (msg) -> new InvalidProfile(section, "Error parsing token for profile " + highlight(profileName.unwrap()) + ": " + msg),
                             (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env)
                         );
@@ -157,7 +157,7 @@ public class AstraConfig {
     }
 
     public class ProfileModificationCtx {
-        public void createProfile(ProfileName name, Token token, AstraEnvironment env) {
+        public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
             profiles.add(Either.right(new Profile(Optional.of(name), token, env)));
 
             backingIni.addSection(name.unwrap(), new HashMap<>() {{

@@ -5,14 +5,14 @@ import com.datastax.astra.client.tables.definition.TableDescriptor;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface TableGateway {
-    static TableGateway mkDefault(Token token, AstraEnvironment env) {
+    static TableGateway mkDefault(AstraToken token, AstraEnvironment env) {
         return new TableGatewayImpl(token, env);
     }
 

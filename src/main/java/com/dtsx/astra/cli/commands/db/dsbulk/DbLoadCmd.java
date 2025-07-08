@@ -1,15 +1,15 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
 import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkResult;
+import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import picocli.CommandLine.Command;
 
 @Command(
     name = "load"
 )
-public class DbLoadCmd extends AbstractDbDsbulkExecCmd {
+public class DbLoadCmd extends AbstractDsbulkExecCmd {
     @Override
-    protected Operation<DsbulkResult> mkOperation() {
+    protected Operation<DsbulkExecResult> mkOperation() {
         return null;
     }
 }

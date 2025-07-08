@@ -10,6 +10,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -22,7 +23,7 @@ import java.nio.file.Files;
 @UtilityClass
 public class FileUtils {
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void createFileIfNotExists(File file, String extra) {
+    public void createFileIfNotExists(File file, @Nullable String extra) {
         try {
             file.createNewFile();
         } catch (Exception e) {
@@ -30,7 +31,7 @@ public class FileUtils {
         }
     }
 
-    public void createDirIfNotExists(File file, String extra) {
+    public void createDirIfNotExists(File file, @Nullable String extra) {
         try {
             Files.createDirectories(file.toPath());
         } catch (Exception e) {

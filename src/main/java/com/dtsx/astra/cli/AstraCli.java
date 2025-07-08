@@ -18,11 +18,13 @@ import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.operations.Operation;
+import lombok.Cleanup;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
+import picocli.jansi.graalvm.AnsiConsole;
 
 import java.util.StringJoiner;
 
@@ -53,7 +55,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Create a vector database",
-    command = "astra db create demo --vector"
+    command = "astra db create demo -r us-east1 --vector"
 )
 public class AstraCli extends AbstractCmd<Void> {
     public static final String VERSION = "1.0.0-alpha.0";
@@ -88,29 +90,33 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     public static void main(String... args) {
-        AstraCli command = new AstraCli();
-        val cmd = new CommandLine(command);
+        try {
+            AnsiConsole.systemInstall();
+            val cmd = new CommandLine(new AstraCli());
 
-        cmd
-            .setColorScheme(AstraColors.colorScheme())
-            .setExecutionExceptionHandler(new ExecutionExceptionHandler())
-            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler()))
-            .setCaseInsensitiveEnumValuesAllowed(true)
-            .setOverwrittenOptionsAllowed(true);
+            cmd
+                .setColorScheme(AstraColors.colorScheme())
+                .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+                .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler()))
+                .setCaseInsensitiveEnumValuesAllowed(true)
+                .setOverwrittenOptionsAllowed(true);
 
-        for (val converter : TypeConverters.INSTANCES) {
-            cmd.registerConverter(converter.clazz(), converter);
+            for (val converter : TypeConverters.INSTANCES) {
+                cmd.registerConverter(converter.clazz(), converter);
+            }
+
+            cmd.setHelpFactory((spec, cs) -> {
+                ExamplesRenderer.installRenderer(spec.commandLine());
+                DescriptionNewlineRenderer.installRenderer(spec.commandLine());
+                return new Help(spec, cs);
+            });
+
+            cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
+
+            cmd.execute(args);
+        } finally {
+            AnsiConsole.systemUninstall();
         }
-
-        cmd.setHelpFactory((spec, cs) -> {
-            ExamplesRenderer.installRenderer(spec.commandLine());
-            DescriptionNewlineRenderer.installRenderer(spec.commandLine());
-            return new Help(spec, cs);
-        });
-
-        cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
-
-        cmd.execute(args);
     }
 
     public static <T> T exit(int exitCode) {

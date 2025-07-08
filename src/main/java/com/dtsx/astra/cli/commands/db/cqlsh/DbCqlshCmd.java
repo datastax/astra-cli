@@ -32,7 +32,7 @@ import java.util.Optional;
     comment = "Execute a CQL statement",
     command = "astra db cqlsh my_db -e \"SELECT * FROM my_keyspace.my_table\""
 )
-public class DbCqlshCmd extends AbstractDbCqlshExecCmd {
+public class DbCqlshCmd extends AbstractCqlshExecCmd {
     @Parameters(
         index = "0",
         completionCandidates = DbNamesCompletion.class,

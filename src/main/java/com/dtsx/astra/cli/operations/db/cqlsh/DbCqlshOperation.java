@@ -32,13 +32,13 @@ public class DbCqlshOperation extends AbstractCqlshExeOperation<CqlshRequest> {
     ) {}
 
     @Override
-    protected Either<CqlshResult, List<String>> buildCommandLine() {
+    protected Either<CqlshExecResult, List<String>> buildCommandLine() {
         val commands = new ArrayList<String>();
 
-        var scbPath = downloadSCB(request.dbRef);
+        val scbFile = downloadSCB(request.dbRef);
 
-        if (scbPath.isLeft()) {
-            return Either.left(scbPath.getLeft());
+        if (scbFile.isLeft()) {
+            return Either.left(scbFile.getLeft());
         }
 
         commands.add("-u");
@@ -46,7 +46,7 @@ public class DbCqlshOperation extends AbstractCqlshExeOperation<CqlshRequest> {
         commands.add("-p");
         commands.add(request.profile().token().unwrap());
         commands.add("-b");
-        commands.add(scbPath.getRight().getAbsolutePath());
+        commands.add(scbFile.getRight().getAbsolutePath());
 
         if (request.debug()) {
             commands.add("--debug");

@@ -11,10 +11,10 @@ import lombok.Value;
 
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Token implements AstraColors.Highlightable {
+public class AstraToken implements AstraColors.Highlightable {
     String token;
 
-    public static Either<String, Token> parse(@NonNull String token) {
+    public static Either<String, AstraToken> parse(@NonNull String token) {
         if (token.isBlank()) {
             return Either.left("Astra token cannot be blank or empty");
         }
@@ -32,8 +32,8 @@ public class Token implements AstraColors.Highlightable {
         return Either.right(mkUnsafe(token));
     }
 
-    public static Token mkUnsafe(@NonNull String token) {
-        return new Token(token);
+    public static AstraToken mkUnsafe(@NonNull String token) {
+        return new AstraToken(token);
     }
 
     @JsonValue

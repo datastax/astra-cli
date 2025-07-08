@@ -6,7 +6,7 @@ import com.datastax.astra.client.admin.DatabaseAdmin;
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.client.databases.DatabaseOptions;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -30,7 +30,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @RequiredArgsConstructor
 public class APIProviderImpl implements APIProvider {
-    private final Token token;
+    private final AstraToken token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
 

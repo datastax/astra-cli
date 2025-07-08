@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -24,7 +24,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
 
     public record CreateConfigRequest(
         Optional<ProfileName> profileName,
-        Token token,
+        AstraToken token,
         AstraEnvironment env,
         boolean force,
         boolean failIfExists,

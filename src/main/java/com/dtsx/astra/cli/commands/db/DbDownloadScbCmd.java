@@ -31,7 +31,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 @Example(
     comment = "Download the SCB for a database, targeting a specific region",
-    command = "astra db download-scb my_db -r us-east-1"
+    command = "astra db download-scb my_db -r us-east1"
 )
 @Example(
     comment = "Download the SCB for a database, saving it to a specific file",

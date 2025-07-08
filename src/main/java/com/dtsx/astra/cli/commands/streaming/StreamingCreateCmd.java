@@ -31,12 +31,12 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation.*
     description = "Create a new streaming tenant"
 )
 @Example(
-    comment = "Create a basic streaming tenant in the 'us-east-1' region",
-    command = "astra streaming create my_tenant --region us-east-1"
+    comment = "Create a basic streaming tenant in the 'us-east1' region",
+    command = "astra streaming create my_tenant --region us-east1"
 )
 @Example(
     comment = "Create a tenant with a specific cloud provider",
-    command = "astra streaming create my_tenant --region us-east-1 --cloud AWS"
+    command = "astra streaming create my_tenant --region us-east1 --cloud AWS"
 )
 @Example(
     comment = "Create a tenant with a dedicated cluster",
@@ -44,7 +44,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation.*
 )
 @Example(
     comment = "Create a tenant if it doesn't already exist",
-    command = "astra streaming create my_tenant --region us-east-1 --if-not-exists"
+    command = "astra streaming create my_tenant --region us-east1 --if-not-exists"
 )
 public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<StreamingCreateResult> {
     @Option(

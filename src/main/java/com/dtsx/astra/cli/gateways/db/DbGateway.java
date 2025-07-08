@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.GlobalInfoCache;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -17,12 +17,11 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import org.graalvm.collections.Pair;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface DbGateway {
-    static DbGateway mkDefault(Token token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
+    static DbGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
         return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(APIProvider.mkDefault(token, env), token, env, GlobalInfoCache.INSTANCE, RegionGateway.mkDefault(token, env)), dbCompletionsCache);
     }
 

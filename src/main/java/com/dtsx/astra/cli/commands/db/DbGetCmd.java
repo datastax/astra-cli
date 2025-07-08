@@ -12,7 +12,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
@@ -30,7 +30,7 @@ import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
 )
 @Example(
     comment = "Get a specific attribute of a database",
-    command = "astra db get my_db -k id"
+    command = "astra db get my_db --key id"
 )
 public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     public enum DbGetKeys {
@@ -49,12 +49,12 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     @Option(
         names = { "-k", "--key" },
         description = "Specific database attribute to retrieve",
-        paramLabel = "<key>"
+        paramLabel = "KEY"
     )
     public Optional<DbGetKeys> $key;
 
     @Override
-    public OutputJson executeJson(DbGetResult result) {
+    public final OutputJson executeJson(DbGetResult result) {
         if ($key.isPresent()) {
             return execute(result);
         }
@@ -72,18 +72,18 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
     }
 
     private RenderableShellTable mkTable(Database dbInfo) {
-        return new ShellTable(List.of(
-            ShellTable.attr("Name", dbInfo4Key(dbInfo, name)),
-            ShellTable.attr("id", dbInfo4Key(dbInfo, id)),
-            ShellTable.attr("Cloud", dbInfo4Key(dbInfo, cloud)),
-            ShellTable.attr("Region", dbInfo4Key(dbInfo, region)),
-            ShellTable.attr("Status", dbInfo4Key(dbInfo, status)),
-            ShellTable.attr("Vector", dbInfo4Key(dbInfo, vector).equals(true) ? "Enabled" : "Disabled"),
-            ShellTable.attr("Default Keyspace", dbInfo4Key(dbInfo, keyspace)),
-            ShellTable.attr("Creation Time", dbInfo4Key(dbInfo, creation_time)),
-            ShellTable.attr("Keyspaces", dbInfo4Key(dbInfo, keyspaces)),
-            ShellTable.attr("Regions", dbInfo4Key(dbInfo, regions))
-        )).withAttributeColumns();
+        return ShellTable.forAttributes(new LinkedHashMap<>() {{
+            put("Name", dbInfo4Key(dbInfo, name));
+            put("ID", dbInfo4Key(dbInfo, id));
+            put("Cloud Provider", dbInfo4Key(dbInfo, cloud));
+            put("Region", dbInfo4Key(dbInfo, region));
+            put("Status", dbInfo4Key(dbInfo, status));
+            put("Vector", dbInfo4Key(dbInfo, vector).equals(true) ? "Enabled" : "Disabled");
+            put("Default Keyspace", dbInfo4Key(dbInfo, keyspace));
+            put("Creation Time", dbInfo4Key(dbInfo, creation_time));
+            put("Keyspaces", dbInfo4Key(dbInfo, keyspaces).toString());
+            put("Regions", dbInfo4Key(dbInfo, regions).toString());
+        }});
     }
 
     private Object dbInfo4Key(Database dbInfo, DbGetKeys key) {

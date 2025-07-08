@@ -16,24 +16,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshResult;
+import static com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
 
 @RequiredArgsConstructor
-public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshResult> {
+public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshExecResult> {
     protected final DbGateway dbGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
 
-    public sealed interface CqlshResult {}
+    public sealed interface CqlshExecResult {}
 
-    public record CqlshInstallFailed(String error) implements CqlshResult {}
-    public record ScbDownloadFailed(String error) implements CqlshResult {}
-    public record Executed(int exitCode) implements CqlshResult {}
+    public record CqlshInstallFailed(String error) implements CqlshExecResult {}
+    public record ScbDownloadFailed(String error) implements CqlshExecResult {}
+    public record Executed(int exitCode) implements CqlshExecResult {}
 
-    abstract Either<CqlshResult, List<String>> buildCommandLine();
+    abstract Either<CqlshExecResult, List<String>> buildCommandLine();
 
     @Override
-    public CqlshResult execute() {
+    public CqlshExecResult execute() {
         return downloadCqlsh().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
                 add(exe.getAbsolutePath());
@@ -61,7 +61,7 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshR
         })).fold(l -> l, r -> r);
     }
 
-    private Either<CqlshResult, File> downloadCqlsh() {
+    private Either<CqlshExecResult, File> downloadCqlsh() {
         val downloadResult = downloadsGateway.downloadCqlsh(CLIProperties.read("cqlsh.url"));
 
         return downloadResult.bimap(
@@ -70,7 +70,7 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshR
         );
     }
 
-    protected Either<CqlshResult, File> downloadSCB(DbRef dbRef) {
+    protected Either<CqlshExecResult, File> downloadSCB(DbRef dbRef) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(

@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.exceptions.internal.config.ProfileNotFoundException;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation.GetConfigResult;
@@ -18,7 +19,6 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
     public sealed interface GetConfigResult {}
     public record ProfileSection(Ini.IniSection section) implements GetConfigResult {}
     public record SpecificKeyValue(String value) implements GetConfigResult {}
-    public record ProfileNotFound() implements GetConfigResult {}
     public record KeyNotFound(String key, Ini.IniSection section) implements GetConfigResult {}
 
     public record GetConfigRequest(
@@ -28,22 +28,18 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
 
     @Override
     public GetConfigResult execute() {
-        val section = config.getProfileSection(request.profileName);
-
-        if (section.isEmpty()) {
-            return new ProfileNotFound();
-        }
+        val section = config.getProfileSection(request.profileName).orElseThrow(() -> new ProfileNotFoundException(request.profileName));
 
         if (request.key.isPresent()) {
-            val keyValue = section.get().lookupKey(request.key.get());
+            val keyValue = section.lookupKey(request.key.get());
 
             if (keyValue.isPresent()) {
                 return new SpecificKeyValue(keyValue.get());
             } else {
-                return new KeyNotFound(request.key.get(), section.get());
+                return new KeyNotFound(request.key.get(), section);
             }
         }
 
-        return new ProfileSection(section.get());
+        return new ProfileSection(section);
     }
 }

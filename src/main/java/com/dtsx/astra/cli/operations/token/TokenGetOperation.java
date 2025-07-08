@@ -1,16 +1,16 @@
 package com.dtsx.astra.cli.operations.token;
 
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
-import com.dtsx.astra.cli.core.models.Token;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TokenGetOperation implements Operation<Token> {
+public class TokenGetOperation implements Operation<AstraToken> {
     private final Profile profile;
 
     @Override
-    public Token execute() {
+    public AstraToken execute() {
         return profile.token();
     }
 }

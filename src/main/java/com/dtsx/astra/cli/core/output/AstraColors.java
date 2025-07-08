@@ -87,7 +87,7 @@ public enum AstraColors implements Ansi.IStyle {
     private final String enableString;
 
     AstraColors(int red, int green, int blue) {
-        this.enableString = CSI + "38;2;" + red + ";" + green + ";" + blue + "m";
+        this.enableString = CSI + "38;2;" + (red & 255) + ";" + (green & 255) + ";" + (blue & 255) + "m";
     }
 
     @Override

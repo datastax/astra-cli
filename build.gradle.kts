@@ -36,6 +36,9 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
+    implementation("info.picocli:picocli-jansi-graalvm:1.2.0")
+    implementation("org.fusesource.jansi:jansi:2.4.2")
+
     compileOnly("org.jetbrains:annotations:26.0.2")
 
     compileOnly("org.projectlombok:lombok:1.18.38")

@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.token;
 
-import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.completions.impls.RoleNamesCompletion;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
@@ -12,9 +12,9 @@ import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
-import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.*;
+import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCreateRequest;
 
 @Command(
     name = "create",
@@ -41,11 +41,11 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
 
     @Override
     public final OutputAll execute(CreateTokenResponse tokenResponse) {
-        return new ShellTable(List.of(
-            ShellTable.attr("Client Id", tokenResponse.getClientId()),
-            ShellTable.attr("Client Secret", tokenResponse.getSecret()),
-            ShellTable.attr("Token", tokenResponse.getToken())
-        )).withAttributeColumns();
+        return ShellTable.forAttributes(new LinkedHashMap<>() {{
+            put("Client Id", tokenResponse.getClientId());
+            put("Client Secret", tokenResponse.getSecret());
+            put("Token", tokenResponse.getToken());
+        }});
     }
 
     @Override

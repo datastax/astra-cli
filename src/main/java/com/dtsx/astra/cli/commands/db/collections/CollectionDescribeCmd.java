@@ -12,9 +12,8 @@ import com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOperation.*;
@@ -34,7 +33,7 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOper
 public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<CollectionDescribeResult> {
     @Override
     protected OutputJson executeJson(CollectionDescribeResult result) {
-        return switch (result) {
+            return switch (result) {
             case CollectionNotFound() -> throwCollectionNotFound();
             case CollectionFound(var info) -> OutputJson.serializeValue(info.raw());
         };
@@ -53,36 +52,36 @@ public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<Collect
     }
 
     private RenderableShellTable mkTable(CollectionInfo info) {
-        val attrs = new ArrayList<Map<String, Object>>();
+        val attrs = new LinkedHashMap<String, Object>();
 
-        attrs.add(ShellTable.attr("Name", info.name()));
-        attrs.add(ShellTable.attr("Estimated Count", String.valueOf(info.estimatedCount())));
+        attrs.put("Name", info.name());
+        attrs.put("Estimated Count", String.valueOf(info.estimatedCount()));
 
         info.defaultIdType().ifPresent(idType -> 
-            attrs.add(ShellTable.attr("DefaultId", idType))
+            attrs.put("DefaultId", idType)
         );
 
         info.indexing().ifPresent(indexing -> {
-            attrs.add(ShellTable.attr("Indexing Allowed", indexing.allow().size() + " allowed"));
-            attrs.add(ShellTable.attr("Indexing Denied", indexing.deny().size() + " denied"));
+            attrs.put("Indexing Allowed", indexing.allow().size() + " allowed");
+            attrs.put("Indexing Denied", indexing.deny().size() + " denied");
         });
 
         info.vector().ifPresent(vector -> {
-            attrs.add(ShellTable.attr("Vector Dimension", String.valueOf(vector.dimension())));
-            attrs.add(ShellTable.attr("Similarity Metric", vector.metric()));
+            attrs.put("Vector Dimension", String.valueOf(vector.dimension()));
+            attrs.put("Similarity Metric", vector.metric());
 
             vector.vectorize().ifPresent(vectorize -> {
-                attrs.add(ShellTable.attr("AI Provider", vectorize.provider()));
-                attrs.add(ShellTable.attr("AI Model", vectorize.modelName()));
+                attrs.put("AI Provider", vectorize.provider());
+                attrs.put("AI Model", vectorize.modelName());
                 
                 if (!vectorize.authentication().isEmpty()) {
                     val authStr = vectorize.authentication().entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue())
                         .reduce((a, b) -> a + ", " + b)
                         .orElse("--");
-                    attrs.add(ShellTable.attr("Authentication", authStr));
+                    attrs.put("Authentication", authStr);
                 } else {
-                    attrs.add(ShellTable.attr("Authentication", "--"));
+                    attrs.put("Authentication", "--");
                 }
                 
                 if (!vectorize.parameters().isEmpty()) {
@@ -90,14 +89,14 @@ public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<Collect
                         .map(entry -> entry.getKey() + ": " + entry.getValue())
                         .reduce((a, b) -> a + ", " + b)
                         .orElse("--");
-                    attrs.add(ShellTable.attr("Parameters", paramsStr));
+                    attrs.put("Parameters", paramsStr);
                 } else {
-                    attrs.add(ShellTable.attr("Parameters", "--"));
+                    attrs.put("Parameters", "--");
                 }
             });
         });
         
-        return new ShellTable(attrs).withAttributeColumns();
+        return ShellTable.forAttributes(attrs);
     }
 
     private <T> T throwCollectionNotFound() {

@@ -4,7 +4,6 @@ import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.internal.config.ProfileNotFoundException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputCsv;
@@ -19,6 +18,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,7 +71,6 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
                 () -> renderJson(section),
                 () -> renderCsv(section)
             );
-            case ProfileNotFound() -> throw new ProfileNotFoundException($profileName);
             case KeyNotFound(var keyName, var section) -> throwKeyNotFound(keyName, section);
         };
     }
@@ -92,11 +91,13 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     }
 
     private OutputCsv renderCsv(Ini.IniSection section) {
-        val attrs = section.pairs().stream()
-            .map(p -> ShellTable.attr(p.key(), p.value()))
-            .toList();
+        val data = new LinkedHashMap<String, Object>();
 
-        return new ShellTable(attrs).withAttributeColumns();
+        for (var pair : section.pairs()) {
+            data.put(pair.key(), pair.value());
+        }
+
+        return ShellTable.forAttributes(data);
     }
 
     private <T> T throwKeyNotFound(String key, Ini.IniSection section) {

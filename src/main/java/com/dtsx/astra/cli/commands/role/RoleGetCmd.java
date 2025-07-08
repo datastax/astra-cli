@@ -13,7 +13,7 @@ import com.dtsx.astra.sdk.org.domain.Role;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 import static com.dtsx.astra.cli.operations.role.RoleGetOperation.RoleGetRequest;
 
@@ -54,13 +54,13 @@ public class RoleGetCmd extends AbstractRoleCmd<Role> {
     }
 
     private RenderableShellTable mkTable(Role role) {
-        return new ShellTable(List.of(
-            ShellTable.attr("Identifier", role.getId()),
-            ShellTable.attr("Name", role.getName()),
-            ShellTable.attr("Description", role.getPolicy().getDescription()),
-            ShellTable.attr("Effect", role.getPolicy().getEffect()),
-            ShellTable.attr("Resources", role.getPolicy().getResources()),
-            ShellTable.attr("Actions", role.getPolicy().getActions())
-        )).withAttributeColumns();
+        return ShellTable.forAttributes(new LinkedHashMap<>() {{
+            put("Identifier", role.getId());
+            put("Name", role.getName());
+            put("Description", role.getPolicy().getDescription());
+            put("Effect", role.getPolicy().getEffect());
+            put("Resources", role.getPolicy().getResources());
+            put("Actions", role.getPolicy().getActions());
+        }});
     }
 }

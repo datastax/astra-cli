@@ -8,11 +8,13 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Accessors;
 
 @Value
+@Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TenantStatus implements Highlightable {
-    String status;
+    String unwrap;
 
     public static Either<String, TenantStatus> parse(@NonNull String name) {
         if (name.isBlank()) {
@@ -28,16 +30,16 @@ public class TenantStatus implements Highlightable {
 
     @Override
     public String highlight() {
-        return switch (status) {
-            case "active" -> AstraColors.GREEN_500.useOrQuote(status);
-            case "error" -> AstraColors.RED_500.useOrQuote(status);
-            default -> AstraColors.NEUTRAL_300.useOrQuote(status);
+        return switch (unwrap) {
+            case "active" -> AstraColors.GREEN_500.useOrQuote(unwrap);
+            case "error" -> AstraColors.RED_500.useOrQuote(unwrap);
+            default -> AstraColors.NEUTRAL_300.useOrQuote(unwrap);
         };
     }
 
     @Override
     @JsonValue
     public String toString() {
-        return status;
+        return unwrap;
     }
 }
