@@ -29,7 +29,6 @@ public class LoadingSpinner {
                 spinnerThread = new Thread(this::runSpinner);
                 spinnerThread.start();
             }
-            // In non-TTY environment or non-human output, don't print anything - just run silently
         }
     }
     
@@ -43,7 +42,6 @@ public class LoadingSpinner {
             }
             clearLine();
         }
-        // In non-TTY environment or non-human output, don't print anything - just complete silently
     }
     
     public void updateMessage(String newMessage) {
@@ -53,7 +51,6 @@ public class LoadingSpinner {
                 messageStack.push(newMessage);
             }
         }
-        // In non-TTY environment or non-human output, don't print updates - just update silently
     }
     
     public void pushMessage(String message) {
@@ -81,14 +78,12 @@ public class LoadingSpinner {
             pauseLatch = new CountDownLatch(1);
             isPaused.set(true);
             
-            // Wait for the spinner thread to acknowledge the pause and clear the line
             try {
                 pauseLatch.await();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
-        // In non-TTY mode or non-human output, no action needed
     }
     
     public void resume() {
@@ -100,7 +95,6 @@ public class LoadingSpinner {
             }
             isPaused.set(false);
         }
-        // In non-TTY mode or non-human output, no action needed
     }
     
     private void runSpinner() {
@@ -108,14 +102,12 @@ public class LoadingSpinner {
         
         while (isRunning.get()) {
             if (isPaused.get()) {
-                // Clear the line when paused and signal that we've done so
                 clearLine();
                 CountDownLatch latch = pauseLatch;
                 if (latch != null) {
                     latch.countDown();
                 }
                 
-                // Wait while paused
                 while (isPaused.get() && isRunning.get()) {
                     try {
                         Thread.sleep(10);

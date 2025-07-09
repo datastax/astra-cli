@@ -46,6 +46,14 @@ public sealed interface Either<L, R> {
         return bimap(left -> left, rightMapper);
     }
 
+
+    default L foldMap(Function<R, L> rightMapper) {
+        return switch (this) {
+            case Left<L, R> left -> left.unwrap;
+            case Right<L, R> right -> rightMapper.apply(right.unwrap);
+        };
+    }
+
     default boolean isLeft() {
         return this instanceof Left<?, ?>;
     }

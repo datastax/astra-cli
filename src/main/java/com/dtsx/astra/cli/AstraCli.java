@@ -2,6 +2,7 @@ package com.dtsx.astra.cli;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.commands.CompletionsCmd;
+import com.dtsx.astra.cli.commands.SetupCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.commands.org.OrgCmd;
@@ -9,18 +10,17 @@ import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
+import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
 import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
-import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.operations.Operation;
-import lombok.Cleanup;
 import lombok.val;
-import picocli.AutoComplete;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
@@ -28,21 +28,22 @@ import picocli.jansi.graalvm.AnsiConsole;
 
 import java.util.StringJoiner;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.*;
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "ast",
     subcommands = {
-        DbCmd.class,
+        CommandLine.HelpCommand.class,
+        SetupCmd.class,
         ConfigCmd.class,
+        DbCmd.class,
         OrgCmd.class,
         RoleCmd.class,
         StreamingCmd.class,
         TokenCmd.class,
         UserCmd.class,
         CompletionsCmd.class,
-        CommandLine.HelpCommand.class,
     }
 )
 @Example(
@@ -60,22 +61,11 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class AstraCli extends AbstractCmd<Void> {
     public static final String VERSION = "1.0.0-alpha.0";
 
-    public static final String BANNER = PURPLE_300.use("""
-          _____            __
-         /  _  \\   _______/  |_____________
-        /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\
-       /    |    \\\\___ \\  |  |  |  | \\ //__ \\_
-       \\____|__  /____  > |__|  |__|  (____  /
-               \\/     \\/                   \\/
-    
-                            Version: %s
-    """.stripIndent().formatted(VERSION));
-
     @Override
     public OutputHuman executeHuman(Void v) {
-        val sj = new StringJoiner(NL);
+        AstraLogger.banner();
 
-        sj.add(BANNER);
+        val sj = new StringJoiner(NL);
 
         sj.add("Documentation: " + highlight("https://awesome-astra.github.io/docs/pages/astra/astra-cli/"));
         sj.add("");

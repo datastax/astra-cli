@@ -25,4 +25,5 @@ public enum CliExceptionCode {
     TENANT_NOT_FOUND,
     TENANT_ALREADY_EXISTS,
     INVALID_TOKEN,
+    NO_ANSWER,
 }

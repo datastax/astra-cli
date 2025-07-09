@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
+import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.config.AstraHome;
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,6 +18,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.dtsx.astra.cli.core.output.AstraColors.PURPLE_300;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+
 public class AstraLogger {
     @Getter
     private static Level level = Level.REGULAR;
@@ -30,6 +35,21 @@ public class AstraLogger {
 
     private static File useSessionLogFile() {
         return new File(AstraHome.Dirs.useLogs(), Instant.now().toString().replace(":", "-") + ".log");
+    }
+
+    public static void banner() {
+        val banner = PURPLE_300.use("""
+              _____            __
+             /  _  \\   _______/  |_____________
+            /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\
+           /    |    \\\\___ \\  |  |  |  | \\ //__ \\_
+           \\____|__  /____  > |__|  |__|  (____  /
+                   \\/     \\/                   \\/
+        
+                                Version: %s
+        """.stripIndent().formatted(AstraCli.VERSION));
+
+        log(banner + NL, Level.REGULAR, false);
     }
 
     public enum Level {
@@ -59,28 +79,26 @@ public class AstraLogger {
     }
 
     public static void debug(String... msg) {
-        append(AstraColors.NEUTRAL_300.use("[DEBUG] ") + String.join("", msg), Level.VERBOSE);
+        log(AstraColors.NEUTRAL_300.use("[DEBUG] ") + String.join("", msg), Level.VERBOSE, true);
     }
 
     public static void info(String... msg) {
-        append(AstraColors.CYAN_600.use("[INFO] ") + String.join("", msg), Level.REGULAR);
+        log(AstraColors.CYAN_600.use("[INFO] ") + String.join("", msg), Level.REGULAR, true);
     }
 
     public static void warn(String... msg) {
-        append(AstraColors.ORANGE_400.use("[WARN] ") + String.join("", msg), Level.REGULAR);
+        log(AstraColors.ORANGE_400.use("[WARN] ") + String.join("", msg), Level.REGULAR, true);
     }
 
     public static void started(String... msg) {
-        append("@|green [STARTED]|@ " + String.join("", msg), Level.VERBOSE);
+        log("@|green [STARTED]|@ " + String.join("", msg), Level.VERBOSE, true);
     }
 
     public static void done(String... msg) {
-        append("@|green [DONE]|@ " + String.join("", msg), Level.VERBOSE);
+        log("@|green [DONE]|@ " + String.join("", msg), Level.VERBOSE, true);
     }
 
     public static <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
-//        accumulated.add("[LOADING:STARTED] " + initialMsg);
-
         started(initialMsg);
 
         boolean isFirstLoading = globalSpinner == null;
@@ -109,7 +127,7 @@ public class AstraLogger {
     }
 
     public static void exception(String... msg) {
-        append(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE);
+        log(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE, true);
     }
 
     public static <E extends Exception> E exception(E e) {
@@ -128,8 +146,10 @@ public class AstraLogger {
         } catch (Exception _) {}
     }
 
-    private static void append(String msg, Level minLevel) {
-        accumulated.add(msg);
+    private static void log(String msg, Level minLevel, boolean appendToAccumulated) {
+        if (appendToAccumulated) {
+            accumulated.add(msg);
+        }
 
         if (level.ordinal() < minLevel.ordinal()) {
             return;

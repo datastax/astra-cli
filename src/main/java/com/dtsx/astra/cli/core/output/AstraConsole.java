@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+
 public class AstraConsole {
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
 
@@ -63,19 +65,22 @@ public class AstraConsole {
         writeln(getErr(), items);
     }
 
-    public static Optional<String> readLine(String prompt) {
+    public static Optional<String> readLine(String prompt, boolean isSecret) {
         if (console == null || OutputType.isNotHuman() || noInput) {
             return Optional.empty();
         }
 
         console.printf("%s ", format(prompt));
-        val ret = console.readLine();
 
-        if (ret == null) {
+        val ret = (isSecret)
+            ? Optional.ofNullable(console.readPassword("")).map(String::valueOf)
+            : Optional.ofNullable(console.readLine(""));
+
+        if (ret.isEmpty()) {
             println();
         }
 
-        return Optional.ofNullable(ret);
+        return ret;
     }
 
     public enum ConfirmResponse {
@@ -84,15 +89,12 @@ public class AstraConsole {
 
     private static final List<String> YES_ANSWERS = List.of("y", "yes", "true", "1", "ok");
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static ConfirmResponse confirm(String prompt) {
-        val read = readLine(format(prompt));
+        val read = readLine(prompt, false);
 
-        if (read.isEmpty()) {
+        if (read.isEmpty() || read.get().isBlank()) {
             return ConfirmResponse.NO_ANSWER;
         }
-
-        println("--");
 
         if (YES_ANSWERS.contains(read.get().trim().toLowerCase())) {
             return ConfirmResponse.ANSWER_OK;

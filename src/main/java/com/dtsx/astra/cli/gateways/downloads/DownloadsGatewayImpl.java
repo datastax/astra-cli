@@ -60,7 +60,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Either<String, File> downloadPulsarShell(String url, String version) {
-        return installGenericArchive(AstraHome.Dirs.useDsbulk(version), url, "pulsar-shell");
+        return installGenericArchive(AstraHome.Dirs.usePulsar(version), url + "lunastreaming-shell-" + version + "-bin.tar.gz", "pulsar-shell");
     }
 
     private Either<String, File> installGenericArchive(File installDir, String url, String exe) {
