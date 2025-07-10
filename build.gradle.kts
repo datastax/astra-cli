@@ -104,6 +104,8 @@ tasks.test {
 val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
 
 tasks.register<JavaExec>("generateJniConfig") {
+    enabled = false
+
     val outputFile = file("${nativeImageGeneratedDir}/jni-config.json")
 
     doFirst {
@@ -265,7 +267,7 @@ tasks.register("writeResourceConfig") {
 tasks.jar {
     dependsOn("generateGraalReflectionConfig")
     dependsOn("writeResourceConfig")
-    dependsOn("generateJniConfig")
+//    dependsOn("generateJniConfig")
 }
 
 tasks.named<JavaExec>("run") {
