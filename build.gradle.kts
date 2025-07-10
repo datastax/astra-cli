@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-alpha.0"
 
 repositories {
     mavenCentral()
@@ -50,15 +50,61 @@ tasks.compileJava {
 }
 
 application {
-    mainClass.set("$group.AstraCli")
+    mainClass.set("com.dtsx.astra.cli.AstraCli")
 }
 
 graalvmNative {
     binaries.all {
+        imageName.set("astra")
+
         buildArgs.add("-Os")
         buildArgs.add("--enable-http")
         buildArgs.add("--enable-https")
         buildArgs.add("--enable-native-access=ALL-UNNAMED")
+    }
+}
+
+initNativeArchiveTask<Tar>("nativeTar") {
+    compression = Compression.GZIP
+
+    from(tasks.nativeCompile.get().outputs.files.singleFile) {
+        rename { "astra" }
+        filePermissions {
+            unix("rwxr-xr-x")
+        }
+    }
+}
+
+initNativeArchiveTask<Zip>("nativeZip") {
+    from(tasks.nativeCompile.get().outputs.files.singleFile) {
+        rename { "astra.exe" }
+    }
+}
+
+inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, crossinline otherConfiguration: T.() -> Unit) {
+    tasks.register<T>(name) {
+        dependsOn("nativeCompile")
+        archiveBaseName.set("astra")
+        archiveVersion.set("")
+        archiveClassifier.set(getOsArch())
+        destinationDirectory.set(file("${layout.buildDirectory}/distributions"))
+        otherConfiguration()
+    }
+}
+
+fun getOsArch(): String {
+    val os = System.getProperty("os.name").lowercase()
+    val arch = System.getProperty("os.arch").lowercase()
+    
+    return when {
+        os.contains("windows") -> "windows-amd64"
+        os.contains("mac") || os.contains("darwin") -> {
+            if (arch.contains("aarch64") || arch.contains("arm")) "macos-arm64" else "macos-amd64"
+        }
+        os.contains("linux") -> {
+            if (arch.contains("aarch64") || arch.contains("arm")) "linux-arm64" else "linux-amd64"
+        }
+        else -> "unknown"
     }
 }
 
@@ -69,7 +115,7 @@ tasks.test {
 tasks.register("generateGraalReflectionConfig") {
     val inputFile = file("reflected.txt")
 
-    val outputDir = file("${layout.buildDirectory.get()}/classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}")
+    val outputDir = file("${layout.buildDirectory}/classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}")
     val outputFile = file("${outputDir}/reflect-config.json")
 
     inputs.file(inputFile)
@@ -140,7 +186,19 @@ tasks.register("generateGraalReflectionConfig") {
     }
 }
 
+tasks.register("generateVersionFile") {
+    val outputFile = file("${layout.buildDirectory}/resources/main/version.txt")
+
+    outputs.file(outputFile)
+
+    doLast {
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText("${project.version}")
+    }
+}
+
 tasks.jar {
+    dependsOn("generateGraalReflectionConfig")
     dependsOn("generateGraalReflectionConfig")
 }
 

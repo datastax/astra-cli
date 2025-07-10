@@ -1,8 +1,9 @@
 package com.dtsx.astra.cli.core.exceptions.internal.cli;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+
+import static com.dtsx.astra.cli.core.output.table.ShellTable.highlight;
 
 public class CongratsYouFoundABugException extends AstraCliException {
     public CongratsYouFoundABugException(String error) {
@@ -23,10 +24,10 @@ public class CongratsYouFoundABugException extends AstraCliException {
        
           Thank you for your help in making Astra CLI better!
         """.formatted(
-            AstraColors.BLUE_300.use("Congratulations, you have found a bug in the Astra CLI."),
+            highlight("Congratulations, you have found a bug in the Astra CLI."),
             error,
-            AstraColors.BLUE_300.use("https://github.com/datastax/astra-cli/issues/new?template=bug_report.md"),
-            AstraColors.BLUE_300.use(AstraLogger.useSessionLogFilePath())
+            highlight("https://github.com/datastax/astra-cli/issues/new?template=bug_report.md"),
+            highlight(AstraLogger.useSessionLogFilePath())
         ));
     }
 

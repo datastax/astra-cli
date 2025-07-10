@@ -59,8 +59,6 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "astra db create demo -r us-east1 --vector"
 )
 public class AstraCli extends AbstractCmd<Void> {
-    public static final String VERSION = "1.0.0-alpha.0";
-
     @Override
     public OutputHuman executeHuman(Void v) {
         AstraLogger.banner();

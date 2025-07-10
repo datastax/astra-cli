@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.AstraCli;
+import com.dtsx.astra.cli.CLIProperties;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -19,7 +20,7 @@ import java.util.List;
 import static picocli.CommandLine.Help.Ansi.OFF;
 
 @Command(
-    version = AstraCli.VERSION,
+    versionProvider = CLIProperties.class,
     mixinStandardHelpOptions = true,
     commandListHeading = "%nCommands:%n",
     descriptionHeading = "%n",

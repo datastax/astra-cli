@@ -1,20 +1,47 @@
 package com.dtsx.astra.cli;
 
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.output.AstraLogger;
+import lombok.Cleanup;
+import lombok.val;
+import picocli.CommandLine.IVersionProvider;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Properties;
 
-@UtilityClass
-public class CLIProperties {
+public class CLIProperties implements IVersionProvider {
     private static Properties properties;
+    private static String version;
 
-    @SneakyThrows
     public static String read(String key) {
-        if (properties == null) {
-            properties = new Properties();
-            properties.load(AstraCli.class.getClassLoader().getResourceAsStream("application.properties"));
+        try {
+            if (properties == null) {
+                properties = new Properties();
+                properties.load(AstraCli.class.getClassLoader().getResourceAsStream("application.properties"));
+            }
+            return properties.getProperty(key);
+        } catch (Exception e) {
+            AstraLogger.exception(e);
+            throw new CongratsYouFoundABugException("Could not read property '" + key + "' from application.properties - '" + e.getMessage() + "'");
         }
-        return properties.getProperty(key);
+    }
+
+    public static String version() {
+        try {
+            if (version == null) {
+                @Cleanup val stream = Objects.requireNonNull(AstraCli.class.getResourceAsStream("version.txt"));
+                version = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            return version;
+        } catch (Exception e) {
+            AstraLogger.exception(e);
+            throw new CongratsYouFoundABugException("Could not read version from version.txt - '" + e.getMessage() + "'");
+        }
+    }
+
+    @Override
+    public String[] getVersion() {
+        return new String[]{ version() };
     }
 }

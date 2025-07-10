@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.AstraCli;
+import com.dtsx.astra.cli.CLIProperties;
 import com.dtsx.astra.cli.config.AstraHome;
 import lombok.Getter;
 import lombok.NonNull;
@@ -20,7 +20,6 @@ import java.util.function.Function;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.PURPLE_300;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
-import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 public class AstraLogger {
     @Getter
@@ -47,7 +46,7 @@ public class AstraLogger {
                    \\/     \\/                   \\/
         
                                 Version: %s
-        """.stripIndent().formatted(AstraCli.VERSION));
+        """.stripIndent().formatted(CLIProperties.version()));
 
         log(banner + NL, Level.REGULAR, false);
     }

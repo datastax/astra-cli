@@ -8,6 +8,9 @@
         "pattern": "\\Qorg/fusesource/jansi/jansi.properties\\E"
       },
       {
+        "pattern": "\\Qversion.txt\\E"
+      },
+      {
         "pattern": "\\Qapplication.properties\\E"
       }
     ]

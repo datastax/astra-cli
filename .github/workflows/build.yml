@@ -1,0 +1,60 @@
+name: build.yml
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-13, macos-14 ]
+        include:
+          - os: ubuntu-24.04
+            artifact-name: astra-cli-linux-amd64
+            artifact-type: tar
+          - os: windows-2022
+            artifact-name: astra-cli-windows-amd64
+            artifact-type: zip
+          - os: ubuntu-24.04-arm
+            artifact-name: astra-cli-linux-arm64
+            artifact-type: tar
+          - os: macos-13
+            artifact-name: astra-cli-macos-amd64
+            artifact-type: tar
+          - os: macos-14
+            artifact-name: astra-cli-macos-arm64
+            artifact-type: tar
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '24'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+
+      - name: Build and package native image (tar)
+        if: matrix.artifact-type == 'tar'
+        run: ./gradlew nativeTar
+
+      - name: Build and package native image (zip)
+        if: matrix.artifact-type == 'zip'
+        run: ./gradlew nativeZip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: build/distributions/*.${{ matrix.artifact-type }}*
+          if-no-files-found: error
