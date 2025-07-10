@@ -69,12 +69,6 @@ graalvmNative {
     }
 }
 
-tasks.register("printClasspath") {
-    doLast {
-        println(sourceSets["main"].runtimeClasspath.asPath)
-    }
-}
-
 initNativeArchiveTask<Tar>("nativeTar") {
     compression = Compression.GZIP
     archiveExtension = "tar.gz"
@@ -107,17 +101,44 @@ tasks.test {
     useJUnitPlatform()
 }
 
+val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
+
+tasks.register<JavaExec>("generateJniConfig") {
+    val outputFile = file("${nativeImageGeneratedDir}/jni-config.json")
+
+    doFirst {
+        outputFile.parentFile.mkdirs()
+    }
+
+    mainClass.set("picocli.codegen.aot.graalvm.JniConfigGenerator")
+
+    classpath = files((configurations.runtimeClasspath.get() + configurations.annotationProcessor.get()).filter {
+        it.name.startsWith("picocli") || it.name.startsWith("jansi")
+    })
+
+    args = listOf(
+        "org.fusesource.jansi.internal.CLibrary",
+        "org.fusesource.jansi.internal.Kernel32",
+        "-o=${outputFile.absolutePath}"
+    )
+
+    jvmArgs = listOf(
+        "--enable-native-access=ALL-UNNAMED"
+    )
+
+    outputs.file(outputFile)
+}
+
 tasks.register("generateGraalReflectionConfig") {
     val inputFile = file("reflected.txt")
 
-    val outputDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
-    val outputFile = file("${outputDir}/reflect-config.json")
+    val outputFile = file("${nativeImageGeneratedDir}/reflect-config.json")
 
     inputs.file(inputFile)
     outputs.file(outputFile)
 
     doLast {
-        outputDir.mkdirs()
+        outputFile.parentFile.mkdirs()
 
         val classpath = sourceSets.main.get().runtimeClasspath
         val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray())
@@ -220,13 +241,12 @@ tasks.register("writeResourceConfig") {
     dependsOn("generateVersionFile")
     dependsOn("includeJansiNativeLibResource")
 
-    val outputDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
-    val outputFile = file("${outputDir}/resource-config.json")
+    val outputFile = file("${nativeImageGeneratedDir}/resource-config.json")
 
     outputs.file(outputFile)
 
     doLast {
-        outputDir.mkdirs()
+        outputFile.parentFile.mkdirs()
 
         println(includeResourcePatterns)
 
@@ -245,6 +265,7 @@ tasks.register("writeResourceConfig") {
 tasks.jar {
     dependsOn("generateGraalReflectionConfig")
     dependsOn("writeResourceConfig")
+    dependsOn("generateJniConfig")
 }
 
 tasks.named<JavaExec>("run") {
