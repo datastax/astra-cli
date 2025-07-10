@@ -109,7 +109,7 @@ public enum AstraColors implements Ansi.IStyle {
     }
 
     public static String highlight(String s) {
-        return AstraColors.BLUE_300.useOrQuote(s);
+        return AstraColors.PURPLE_300.useOrQuote(s);
     }
 
     public static String highlight(UUID u) {
@@ -117,7 +117,7 @@ public enum AstraColors implements Ansi.IStyle {
     }
 
     public static String highlight(long l) {
-        return enabled() ? AstraColors.BLUE_300.use(String.valueOf(l)) : String.valueOf(l);
+        return enabled() ? AstraColors.PURPLE_300.use(String.valueOf(l)) : String.valueOf(l);
     }
 
     public static String highlight(Highlightable h) {
