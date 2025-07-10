@@ -1,19 +1,5 @@
 [
   {
-    "name":"java.lang.ClassLoader",
-    "methods":[
-      {"name":"getPlatformClassLoader","parameterTypes":[] },
-      {"name":"loadClass","parameterTypes":["java.lang.String"] }
-    ]
-  },
-  {
-    "name":"jdk.internal.loader.ClassLoaders$PlatformClassLoader"
-  }
-  {
-    "name":"org.graalvm.nativebridge.jni.JNIExceptionWrapperEntryPoints",
-    "methods":[{"name":"getClassName","parameterTypes":["java.lang.Class"] }]
-  },
-  {
     "name" : "org.fusesource.jansi.internal.CLibrary",
     "allDeclaredConstructors" : true,
     "allPublicConstructors" : true,
