@@ -69,7 +69,6 @@ initNativeArchiveTask<Tar>("nativeTar") {
     archiveExtension = "tar.gz"
 
     from(tasks.nativeCompile.get().outputs.files.singleFile) {
-        rename { "astra" }
         filePermissions {
             unix("rwxr-xr-x")
         }
@@ -77,9 +76,7 @@ initNativeArchiveTask<Tar>("nativeTar") {
 }
 
 initNativeArchiveTask<Zip>("nativeZip") {
-    from(tasks.nativeCompile.get().outputs.files.singleFile) {
-        rename { "astra.exe" }
-    }
+    from(tasks.nativeCompile.get().outputs.files.find { it.endsWith(".exe") }!!) {}
 }
 
 inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, crossinline otherConfiguration: T.() -> Unit) {
