@@ -222,6 +222,8 @@ tasks.register("writeResourceConfig") {
     doLast {
         outputDir.mkdirs()
 
+        println(includeResourcePatterns)
+
         val resourceConfig = mapOf(
             "resources" to mapOf(
                 "includes" to includeResourcePatterns.map { mapOf("pattern" to it) }
