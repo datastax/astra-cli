@@ -26,14 +26,11 @@ public class AstraLogger {
     private static Level level = Level.REGULAR;
     private static LoadingSpinner globalSpinner;
 
+    private static final File sessionLogFile = new File(AstraHome.Dirs.useLogs(), Instant.now().toString().replace(":", "-") + ".log");
     private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
     public static String useSessionLogFilePath() {
-        return useSessionLogFile().getAbsolutePath();
-    }
-
-    private static File useSessionLogFile() {
-        return new File(AstraHome.Dirs.useLogs(), Instant.now().toString().replace(":", "-") + ".log");
+        return sessionLogFile.getAbsolutePath();
     }
 
     public static void banner() {
@@ -129,7 +126,7 @@ public class AstraLogger {
         log(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE, true);
     }
 
-    public static <E extends Exception> E exception(E e) {
+    public static <E extends Throwable> E exception(E e) {
         val sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
         exception(sw.toString());
@@ -137,7 +134,7 @@ public class AstraLogger {
     }
 
     public static void dumpLogs() {
-        try (var writer = new FileWriter(useSessionLogFile())) {
+        try (var writer = new FileWriter(sessionLogFile)) {
             for (String line : accumulated) {
                 writer.write(AstraColors.stripAnsi(line));
                 writer.write(System.lineSeparator());

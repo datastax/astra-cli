@@ -78,13 +78,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         this.postlude();
 
         if (!result.isEmpty()) {
-            val formatted = AstraConsole.format(result);
-
-            if (formatted.stripTrailing().endsWith("\n")) {
-                AstraConsole.getOut().print(formatted);
-            } else {
-                AstraConsole.getOut().println(formatted);
-            }
+            val formatted = AstraConsole.format(result.stripTrailing());
+            AstraConsole.getOut().println(formatted);
         }
     }
 

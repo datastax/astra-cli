@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli;
 
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import lombok.Cleanup;
 import lombok.val;
 import picocli.CommandLine.IVersionProvider;
@@ -22,21 +21,19 @@ public class CLIProperties implements IVersionProvider {
             }
             return properties.getProperty(key);
         } catch (Exception e) {
-            AstraLogger.exception(e);
-            throw new CongratsYouFoundABugException("Could not read property '" + key + "' from application.properties - '" + e.getMessage() + "'");
+            throw new CongratsYouFoundABugException("Could not read property '" + key + "' from application.properties - '" + e.getMessage() + "'", e);
         }
     }
 
     public static String version() {
         try {
             if (version == null) {
-                @Cleanup val stream = Objects.requireNonNull(AstraCli.class.getResourceAsStream("version.txt"));
+                @Cleanup val stream = Objects.requireNonNull(AstraCli.class.getClassLoader().getResourceAsStream("version.txt"));
                 version = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
             }
             return version;
         } catch (Exception e) {
-            AstraLogger.exception(e);
-            throw new CongratsYouFoundABugException("Could not read version from version.txt - '" + e.getMessage() + "'");
+            throw new CongratsYouFoundABugException("Could not read version from version.txt - '" + e.getMessage() + "'", e);
         }
     }
 

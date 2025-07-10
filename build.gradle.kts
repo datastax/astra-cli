@@ -57,10 +57,15 @@ graalvmNative {
     binaries.all {
         imageName.set("astra")
 
-        buildArgs.add("-Os")
         buildArgs.add("--enable-http")
         buildArgs.add("--enable-https")
         buildArgs.add("--enable-native-access=ALL-UNNAMED")
+        
+        if (project.hasProperty("prod")) {
+            buildArgs.add("-Os")
+        } else {
+            buildArgs.add("-Ob")
+        }
     }
 }
 
@@ -92,22 +97,6 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
     }
 }
 
-fun getOsArch(): String {
-    val os = System.getProperty("os.name").lowercase()
-    val arch = System.getProperty("os.arch").lowercase()
-
-    return when {
-        os.contains("windows") -> "windows-amd64"
-        os.contains("mac") || os.contains("darwin") -> {
-            if (arch.contains("aarch64") || arch.contains("arm")) "macos-arm64" else "macos-amd64"
-        }
-        os.contains("linux") -> {
-            if (arch.contains("aarch64") || arch.contains("arm")) "linux-arm64" else "linux-amd64"
-        }
-        else -> "unknown"
-    }
-}
-
 tasks.test {
     useJUnitPlatform()
 }
@@ -115,7 +104,7 @@ tasks.test {
 tasks.register("generateGraalReflectionConfig") {
     val inputFile = file("reflected.txt")
 
-    val outputDir = file("${layout.buildDirectory.get()}/classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}")
+    val outputDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
     val outputFile = file("${outputDir}/reflect-config.json")
 
     inputs.file(inputFile)
@@ -186,6 +175,8 @@ tasks.register("generateGraalReflectionConfig") {
     }
 }
 
+val includeResourcePatterns = mutableListOf<String>()
+
 tasks.register("generateVersionFile") {
     val outputFile = file("${layout.buildDirectory.get()}/resources/main/version.txt")
     val projectVersion = version.toString()
@@ -195,14 +186,77 @@ tasks.register("generateVersionFile") {
     doLast {
         outputFile.parentFile.mkdirs()
         outputFile.writeText(projectVersion)
+        includeResourcePatterns.add("\\Qversion.txt\\E")
+    }
+}
+
+tasks.register("includeJansiNativeLibResource") {
+    val addPathForArch = { os: String, arch: String ->
+        val addPath = { archPattern: String -> includeResourcePatterns.add("\\QMETA-INF/native-image/org/fusesource/jansi/$os/$archPattern/.*\\E") }
+
+        when (arch) {
+            "x86_64" -> addPath("x86_64")
+            "arm64" -> addPath("arm64")
+            else -> addPath(".*")
+        }
+    }
+
+    val (os, arch) = getOsArch().split("-")
+
+    when (os) {
+        "windows" -> addPathForArch("Windows", arch)
+        "macos" -> addPathForArch("MacOS", arch)
+        "linux" -> addPathForArch("Linux", arch)
+    }
+}
+
+tasks.register("writeResourceConfig") {
+    dependsOn("generateVersionFile")
+    dependsOn("includeJansiNativeLibResource")
+
+    val outputDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
+    val outputFile = file("${outputDir}/resource-config.json")
+
+    outputs.file(outputFile)
+
+    doLast {
+        outputDir.mkdirs()
+
+        val resourceConfig = mapOf(
+            "resources" to mapOf(
+                "includes" to includeResourcePatterns.map { mapOf("pattern" to it) }
+            ),
+            "bundles" to emptyList<Any>()
+        )
+
+        val json = groovy.json.JsonBuilder(resourceConfig).toString()
+        outputFile.writeText(json)
     }
 }
 
 tasks.jar {
     dependsOn("generateGraalReflectionConfig")
-    dependsOn("generateVersionFile")
+    dependsOn("writeResourceConfig")
 }
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
+}
+
+fun getOsArch(): String {
+    val os = System.getProperty("os.name").lowercase()
+    val arch = System.getProperty("os.arch").lowercase()
+
+    return when {
+        os.contains("windows") -> {
+            if (arch.contains("aarch64") || arch.contains("arm")) "windows-arm64" else "windows-x86_64"
+        }
+        os.contains("mac") || os.contains("darwin") -> {
+            if (arch.contains("aarch64") || arch.contains("arm")) "macos-arm64" else "macos-x86_64"
+        }
+        os.contains("linux") -> {
+            if (arch.contains("aarch64") || arch.contains("arm")) "linux-arm64" else "linux-x86_64"
+        }
+        else -> throw GradleException("Unsupported OS: $os with architecture $arch")
+    }
 }

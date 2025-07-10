@@ -50,10 +50,7 @@ jobs:
 
       - name: Build and package native image (zip)
         if: matrix.artifact-type == 'zip'
-        run: |
-          ./gradlew nativeCompile
-          dir build/native/nativeCompile/
-          ./gradlew nativeZip
+        run: ./gradlew nativeZip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
