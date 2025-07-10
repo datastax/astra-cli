@@ -45,7 +45,7 @@ public enum AstraColors implements Ansi.IStyle {
     TEAL_400(85, 186, 185),
     TEAL_600(53, 123, 120);
 
-    private static final String DISABLE_STRING = CSI + "39m";
+    private static final String DISABLE_STRING = CSI + "0m";
 
     @Getter
     @Setter
@@ -92,6 +92,7 @@ public enum AstraColors implements Ansi.IStyle {
 
     @Override
     public String on() {
+        System.out.println("Using color: " + this.name() + " " + enabled());
         return enabled() ? enableString : "";
     }
 
@@ -109,7 +110,7 @@ public enum AstraColors implements Ansi.IStyle {
     }
 
     public static String highlight(String s) {
-        return AstraColors.PURPLE_300.useOrQuote(s);
+        return AstraColors.BLUE_300.useOrQuote(s);
     }
 
     public static String highlight(UUID u) {
@@ -117,7 +118,7 @@ public enum AstraColors implements Ansi.IStyle {
     }
 
     public static String highlight(long l) {
-        return enabled() ? AstraColors.PURPLE_300.use(String.valueOf(l)) : String.valueOf(l);
+        return enabled() ? AstraColors.BLUE_300.use(String.valueOf(l)) : String.valueOf(l);
     }
 
     public static String highlight(Highlightable h) {
