@@ -69,6 +69,12 @@ graalvmNative {
     }
 }
 
+tasks.register("printClasspath") {
+    doLast {
+        println(sourceSets["main"].runtimeClasspath.asPath)
+    }
+}
+
 initNativeArchiveTask<Tar>("nativeTar") {
     compression = Compression.GZIP
     archiveExtension = "tar.gz"
