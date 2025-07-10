@@ -76,7 +76,9 @@ initNativeArchiveTask<Tar>("nativeTar") {
 }
 
 initNativeArchiveTask<Zip>("nativeZip") {
-    from(tasks.nativeCompile.get().outputs.files.find { it.endsWith(".exe") }!!) {}
+    duplicatesStrategy = DuplicatesStrategy.WARN
+
+    from(tasks.nativeCompile.get().outputs.files.singleFile) {}
 }
 
 inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, crossinline otherConfiguration: T.() -> Unit) {
