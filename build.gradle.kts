@@ -87,7 +87,7 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
         archiveBaseName.set("astra")
         archiveVersion.set("")
         archiveClassifier.set(getOsArch())
-        destinationDirectory.set(file("${layout.buildDirectory}/distributions"))
+        destinationDirectory.set(file("${layout.buildDirectory.get()}/distributions"))
         otherConfiguration()
     }
 }
@@ -115,7 +115,7 @@ tasks.test {
 tasks.register("generateGraalReflectionConfig") {
     val inputFile = file("reflected.txt")
 
-    val outputDir = file("${layout.buildDirectory}/classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}")
+    val outputDir = file("${layout.buildDirectory.get()}/classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}")
     val outputFile = file("${outputDir}/reflect-config.json")
 
     inputs.file(inputFile)
@@ -187,7 +187,7 @@ tasks.register("generateGraalReflectionConfig") {
 }
 
 tasks.register("generateVersionFile") {
-    val outputFile = file("${layout.buildDirectory}/resources/main/version.txt")
+    val outputFile = file("${layout.buildDirectory.get()}/resources/main/version.txt")
 
     outputs.file(outputFile)
 
