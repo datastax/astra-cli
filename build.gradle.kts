@@ -104,12 +104,6 @@ tasks.test {
 
 val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
 
-tasks.register("printClasspath") {
-    doLast {
-        println(sourceSets["main"].runtimeClasspath.asPath)
-    }
-}
-
 tasks.register<JavaExec>("generateJniConfig") {
     val outputFile = file("${nativeImageGeneratedDir}/jni-config.json")
 
@@ -254,8 +248,6 @@ tasks.register("writeResourceConfig") {
 
     doLast {
         outputFile.parentFile.mkdirs()
-
-        println(includeResourcePatterns)
 
         val resourceConfig = mapOf(
             "resources" to mapOf(

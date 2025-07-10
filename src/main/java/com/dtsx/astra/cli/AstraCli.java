@@ -22,11 +22,11 @@ import com.dtsx.astra.cli.core.output.Jansi;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
-import picocli.jansi.graalvm.AnsiConsole;
 
 import java.util.StringJoiner;
 
@@ -79,6 +79,7 @@ public class AstraCli extends AbstractCmd<Void> {
         return () -> null;
     }
 
+    @SneakyThrows
     public static void main(String... args) {
         @Cleanup val jansi = Jansi.installIfNecessary();
         val cmd = new CommandLine(new AstraCli());
