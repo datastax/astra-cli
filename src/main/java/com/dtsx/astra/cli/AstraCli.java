@@ -78,6 +78,17 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     public static void main(String... args) {
+        final String CSI = "\u001b[";
+        String blue300 = CSI + "38;2;129;163;231m";
+        String reset = CSI + "0m";
+
+        System.out.println(blue300 + "I am so bloody confused" + reset);
+        System.out.println(highlight("I am so bloody confused"));
+
+        for (val color : AstraColors.values()) {
+            System.out.println(color.use(color.name()));
+        }
+        
         try {
             AnsiConsole.systemInstall();
             val cmd = new CommandLine(new AstraCli());

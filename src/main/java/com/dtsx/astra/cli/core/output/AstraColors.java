@@ -49,7 +49,7 @@ public enum AstraColors implements Ansi.IStyle {
 
     @Getter
     @Setter
-    private static Ansi ansi = Ansi.AUTO;
+    private static Ansi ansi = Ansi.ON;
 
     @Getter
     private static ColorScheme colorScheme = new ColorScheme.Builder(Help.defaultColorScheme(Ansi.AUTO))
@@ -72,11 +72,11 @@ public enum AstraColors implements Ansi.IStyle {
     public static class Mixin {
         @Option(names = "--color", negatable = true, description = "Force colored output")
         public void setAnsi(boolean ansi) {
-            AstraColors.ansi = (ansi) ? Ansi.ON : Ansi.OFF;
+            AstraColors.ansi = (ansi) ? Ansi.ON : Ansi.ON;
         }
 
         public ColorScheme getColorScheme() {
-            val ansi = (AstraColors.ansi == null) ? Ansi.AUTO : AstraColors.ansi;
+            val ansi = (AstraColors.ansi == null) ? Ansi.ON : AstraColors.ansi;
 
             return colorScheme = new Help.ColorScheme.Builder(colorScheme)
                 .ansi(ansi)
@@ -92,7 +92,6 @@ public enum AstraColors implements Ansi.IStyle {
 
     @Override
     public String on() {
-        System.out.println("Using color: " + this.name() + " " + enabled());
         return enabled() ? enableString : "";
     }
 
