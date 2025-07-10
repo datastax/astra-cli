@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CountDownLatch;
 
 public class LoadingSpinner {
-    private static final String[] SPINNER_FRAMES = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
+    private static final String[] SPINNER_FRAMES = PlatformChars.SPINNER_FRAMES;
     private static final int FRAME_DELAY_MS = 80;
 
     private final ArrayDeque<String> messageStack = new ArrayDeque<>();

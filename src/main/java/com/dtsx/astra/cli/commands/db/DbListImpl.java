@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.operations.db.DbListOperation;
 import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.sdk.db.domain.Database;
@@ -58,7 +59,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     }
 
     private String vector(Database db) {
-        return db.getInfo().getDbType() != null ? "■" : "";
+        return db.getInfo().getDbType() != null ? PlatformChars.PRESENCE_INDICATOR : "";
     }
 
     private String status(Database db) {

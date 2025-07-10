@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
@@ -36,8 +37,8 @@ public class EmbeddingProvidersListCmd extends AbstractDbSpecificCmd<EmbeddingPr
                 "Display Name", r.displayName().orElse("N/A"),
                 "Models", String.valueOf(r.modelsCount()),
                 "Parameters", String.valueOf(r.parametersCount()),
-                "Auth Header", r.hasAuthHeader() ? "■" : "",
-                "Auth Secret", r.hasAuthSecret() ? "■" : ""
+                "Auth Header", r.hasAuthHeader() ? PlatformChars.PRESENCE_INDICATOR : "",
+                "Auth Secret", r.hasAuthSecret() ? PlatformChars.PRESENCE_INDICATOR : ""
             ))
             .toList();
 
