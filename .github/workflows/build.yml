@@ -53,7 +53,7 @@ jobs:
         if: matrix.artifact-type == 'zip'
         run: |
           ./gradlew nativeCompile
-          ls -la build/native/nativeCompile/
+          dir build/native/nativeCompile/
           ./gradlew nativeZip
 
       - name: Upload artifacts
