@@ -8,24 +8,23 @@ jobs:
   build:
     strategy:
       matrix:
-#        os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-13, macos-14 ]
-        os: [ windows-2022 ]
+        os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-13, macos-14 ]
         include:
-#          - os: ubuntu-24.04
-#            artifact-name: astra-cli-linux-amd64
-#            artifact-type: tar
+          - os: ubuntu-24.04
+            artifact-name: astra-cli-linux-amd64
+            artifact-type: tar
           - os: windows-2022
             artifact-name: astra-cli-windows-amd64
             artifact-type: zip
-#          - os: ubuntu-24.04-arm
-#            artifact-name: astra-cli-linux-arm64
-#            artifact-type: tar
-#          - os: macos-13
-#            artifact-name: astra-cli-macos-amd64
-#            artifact-type: tar
-#          - os: macos-14
-#            artifact-name: astra-cli-macos-arm64
-#            artifact-type: tar
+          - os: ubuntu-24.04-arm
+            artifact-name: astra-cli-linux-arm64
+            artifact-type: tar
+          - os: macos-13
+            artifact-name: astra-cli-macos-amd64
+            artifact-type: tar
+          - os: macos-14
+            artifact-name: astra-cli-macos-arm64
+            artifact-type: tar
 
     runs-on: ${{ matrix.os }}
     

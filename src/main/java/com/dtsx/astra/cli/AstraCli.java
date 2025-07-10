@@ -18,8 +18,10 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.Jansi;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
+import lombok.Cleanup;
 import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -78,59 +80,29 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     public static void main(String... args) {
-        {
-            final String CSI = "\u001b[";
-            String blue300 = CSI + "38;2;129;163;231m";
-            String reset = CSI + "0m";
+        @Cleanup val jansi = Jansi.installIfNecessary();
+        val cmd = new CommandLine(new AstraCli());
 
-            System.out.println(blue300 + "I am so bloody confused" + reset);
-            System.out.println(highlight("I am so bloody confused"));
+        cmd
+            .setColorScheme(AstraColors.colorScheme())
+            .setExecutionExceptionHandler(new ExecutionExceptionHandler())
+            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler()))
+            .setCaseInsensitiveEnumValuesAllowed(true)
+            .setOverwrittenOptionsAllowed(true);
 
-            for (val color : AstraColors.values()) {
-                System.out.println(color.use(color.name()));
-            }
+        for (val converter : TypeConverters.INSTANCES) {
+            cmd.registerConverter(converter.clazz(), converter);
         }
 
-        try {
-            AnsiConsole.systemInstall();
-            val cmd = new CommandLine(new AstraCli());
+        cmd.setHelpFactory((spec, cs) -> {
+            ExamplesRenderer.installRenderer(spec.commandLine());
+            DescriptionNewlineRenderer.installRenderer(spec.commandLine());
+            return new Help(spec, cs);
+        });
 
+        cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
 
-            final String CSI = "\u001b[";
-            String blue300 = CSI + "38;2;129;163;231m";
-            String reset = CSI + "0m";
-
-            System.out.println(blue300 + "I am so bloody confused" + reset);
-            System.out.println(highlight("I am so bloody confused"));
-
-            for (val color : AstraColors.values()) {
-                System.out.println(color.use(color.name()));
-            }
-
-
-            cmd
-                .setColorScheme(AstraColors.colorScheme())
-                .setExecutionExceptionHandler(new ExecutionExceptionHandler())
-                .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler()))
-                .setCaseInsensitiveEnumValuesAllowed(true)
-                .setOverwrittenOptionsAllowed(true);
-
-            for (val converter : TypeConverters.INSTANCES) {
-                cmd.registerConverter(converter.clazz(), converter);
-            }
-
-            cmd.setHelpFactory((spec, cs) -> {
-                ExamplesRenderer.installRenderer(spec.commandLine());
-                DescriptionNewlineRenderer.installRenderer(spec.commandLine());
-                return new Help(spec, cs);
-            });
-
-            cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
-
-            cmd.execute(args);
-        } finally {
-            AnsiConsole.systemUninstall();
-        }
+        cmd.execute(args);
     }
 
     public static <T> T exit(int exitCode) {
