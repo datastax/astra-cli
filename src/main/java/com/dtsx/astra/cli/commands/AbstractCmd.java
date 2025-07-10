@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.commands;
 
-import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.CLIProperties;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;

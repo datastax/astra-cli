@@ -3,12 +3,14 @@ package com.dtsx.astra.cli.commands.db.dsbulk;
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.misc.WindowsUnsupportedException;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkInstallFailed;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.Executed;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.ScbDownloadFailed;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -83,6 +85,13 @@ public abstract class AbstractDsbulkExecCmd extends AbstractDbSpecificCmd<Dsbulk
                 .<Either<File, Map<String, String>>>map(Either::left)
                 .orElseGet(() -> Either.right($dsBulkConfigProvider.flags)))
             : Either.right(emptyMap());
+    }
+
+    @Override
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        WindowsUnsupportedException.throwIfWindows();
+        super.prelude();
     }
 
     @Override
