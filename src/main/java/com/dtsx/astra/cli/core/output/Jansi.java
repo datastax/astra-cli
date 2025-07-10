@@ -4,11 +4,10 @@ import picocli.jansi.graalvm.AnsiConsole;
 
 public class Jansi {
     public static AutoCloseable installIfNecessary() {
-        if (System.getenv("WT_SESSION") != null) {
+        if (System.getenv("WT_SESSION") == null) {
             AnsiConsole.systemInstall();
             return AnsiConsole::systemUninstall;
         }
-
         return () -> {};
     }
 }
