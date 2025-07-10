@@ -66,6 +66,7 @@ graalvmNative {
 
 initNativeArchiveTask<Tar>("nativeTar") {
     compression = Compression.GZIP
+    archiveExtension = "tar.gz"
 
     from(tasks.nativeCompile.get().outputs.files.singleFile) {
         rename { "astra" }
@@ -95,7 +96,7 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
 fun getOsArch(): String {
     val os = System.getProperty("os.name").lowercase()
     val arch = System.getProperty("os.arch").lowercase()
-    
+
     return when {
         os.contains("windows") -> "windows-amd64"
         os.contains("mac") || os.contains("darwin") -> {
@@ -188,18 +189,19 @@ tasks.register("generateGraalReflectionConfig") {
 
 tasks.register("generateVersionFile") {
     val outputFile = file("${layout.buildDirectory.get()}/resources/main/version.txt")
+    val projectVersion = version.toString()
 
     outputs.file(outputFile)
 
     doLast {
         outputFile.parentFile.mkdirs()
-        outputFile.writeText("${project.version}")
+        outputFile.writeText(projectVersion)
     }
 }
 
 tasks.jar {
     dependsOn("generateGraalReflectionConfig")
-    dependsOn("generateGraalReflectionConfig")
+    dependsOn("generateVersionFile")
 }
 
 tasks.named<JavaExec>("run") {
