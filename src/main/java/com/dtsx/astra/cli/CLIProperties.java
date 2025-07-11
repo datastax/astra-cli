@@ -5,40 +5,59 @@ import lombok.Cleanup;
 import lombok.val;
 import picocli.CommandLine.IVersionProvider;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.List;
 
 public class CLIProperties implements IVersionProvider {
-    private static Properties properties;
-    private static String version;
+    static {
+        for (val file : List.of("static.properties", "dynamic.properties")) {
+            try {
+                @Cleanup val stream = CLIProperties.class.getClassLoader().getResourceAsStream(file);
 
-    public static String read(String key) {
-        try {
-            if (properties == null) {
-                properties = new Properties();
-                properties.load(AstraCli.class.getClassLoader().getResourceAsStream("application.properties"));
+                if (stream == null) {
+                    throw new CongratsYouFoundABugException("Could not find resource '" + file + "'' in classpath.");
+                }
+
+                System.getProperties().load(stream);
+            } catch (Exception e) {
+                throw new CongratsYouFoundABugException("Could not read '" + file + "' - '" + e.getMessage() + "'", e);
             }
-            return properties.getProperty(key);
-        } catch (Exception e) {
-            throw new CongratsYouFoundABugException("Could not read property '" + key + "' from application.properties - '" + e.getMessage() + "'", e);
         }
     }
 
+    public record ExternalSoftware(String url, String version) {}
+
+    public static ExternalSoftware cqlsh() {
+        return new ExternalSoftware(prop("cqlsh.url"), prop("cqlsh.version"));
+    }
+
+    public static ExternalSoftware dsbulk() {
+        return new ExternalSoftware(prop("dsbulk.url"), prop("dsbulk.version"));
+    }
+
+    public static ExternalSoftware pulsar() {
+        return new ExternalSoftware(prop("pulsar-shell.url"), prop("pulsar-shell.version"));
+    }
+
     public static String version() {
-        try {
-            if (version == null) {
-                @Cleanup val stream = Objects.requireNonNull(AstraCli.class.getClassLoader().getResourceAsStream("version.txt"));
-                version = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-            }
-            return version;
-        } catch (Exception e) {
-            throw new CongratsYouFoundABugException("Could not read version from version.txt - '" + e.getMessage() + "'", e);
-        }
+        return prop("cli.version");
+    }
+
+    public static String rcFileName() {
+        return prop("cli.rc-file-name");
     }
 
     @Override
     public String[] getVersion() {
         return new String[]{ version() };
+    }
+
+    private static String prop(String string) {
+        val value = System.getProperty(string);
+
+        if (value == null) {
+            throw new CongratsYouFoundABugException("Could not find property '%s' in System properties".formatted(string));
+        }
+
+        return value;
     }
 }

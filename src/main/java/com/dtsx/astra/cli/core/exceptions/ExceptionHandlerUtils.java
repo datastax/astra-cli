@@ -11,9 +11,7 @@ import picocli.CommandLine;
 @UtilityClass
 public class ExceptionHandlerUtils {
     public int handleAstraCliException(AstraCliException err, CommandLine cmd) {
-        val formatted = AstraConsole.format(err.getMessage());
-
-        val response = OutputAll.response(formatted, err.getMetadata(), err.getNextSteps());
+        val response = OutputAll.response(err.getMessage(), err.getMetadata(), err.getNextSteps());
 
         val message = switch (OutputType.requested()) {
             case HUMAN -> response.renderAsHuman();

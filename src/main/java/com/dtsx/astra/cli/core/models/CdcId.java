@@ -13,12 +13,8 @@ import lombok.Value;
 public class CdcId implements AstraColors.Highlightable {
     String id;
 
-    public static Either<String, CdcId> parse(@NonNull String name) {
-        if (name.isBlank()) {
-            return Either.left("Cdc ID cannot be blank or empty");
-        }
-
-        return Either.right(new CdcId(name));
+    public static Either<String, CdcId> parse(@NonNull String id) {
+        return Utils.trimAndValidateBasics("Cdc ID", id).map(CdcId::new);
     }
 
     @JsonValue

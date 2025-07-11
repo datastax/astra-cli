@@ -63,7 +63,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
     }
 
     private Either<PulsarExecResult, File> downloadPulsar() {
-        val downloadResult = downloadsGateway.downloadPulsarShell(CLIProperties.read("pulsar.shell.url"), CLIProperties.read("pulsar.shell.version"));
+        val downloadResult = downloadsGateway.downloadPulsarShell(CLIProperties.pulsar());
 
         return downloadResult.bimap(
             PulsarInstallFailed::new,
@@ -75,7 +75,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
         val tenant = streamingGateway.findOne(tenantName);
 
         val confFile = new File(
-            AstraHome.Dirs.usePulsar(CLIProperties.read("pulsar.shell.version")),
+            AstraHome.Dirs.usePulsar(CLIProperties.pulsar().version()),
             "client-" + tenant.getCloudProvider() + "-" + tenant.getCloudRegion() + "-" + tenant.getTenantName() + ".conf"
         );
 

@@ -142,7 +142,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         AstraLogger.banner();
 
         val confirmationMsg = """
-          Looks like you're already set up—your config file exists at %s.
+          Looks like you're already set up! Your config file exists at %s.
         
           Hint: You can use the @!astra config!@ commands to manage your profiles.
        
@@ -183,16 +183,18 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     private AstraToken promptForToken() {
         val message = """
         
-        %s Enter your Astra token, or the path to the file containing it
+        %s Enter your Astra token (it should start with @!AstraCS!@)
         @!>!@"""
             .stripIndent()
             .formatted(AstraColors.PURPLE_300.use("(Required)"));
 
-        val tokenInput = AstraConsole.readLine(message, true);
+        val input = AstraConsole.readLine(message, true);
 
-        return tokenInput.map(AstraToken::parse)
-            .map(r -> r.getRight(InvalidTokenException::new))
-            .orElseThrow(() -> new AstraCliException(NO_ANSWER, "An Astra token is required. Please provide it interactively or pass the --token option."));
+        if (input.isEmpty()) {
+            throw new AstraCliException(NO_ANSWER, "An Astra token is required. Please provide it interactively or pass the --token option.");
+        }
+
+        return AstraToken.parse(input.get()).getRight(InvalidTokenException::new);
     }
 
     private Optional<AstraEnvironment> promptForEnv() {

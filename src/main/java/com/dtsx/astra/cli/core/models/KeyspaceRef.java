@@ -13,11 +13,8 @@ public class KeyspaceRef implements AstraColors.Highlightable {
     private final DbRef dbRef;
 
     public static Either<String, KeyspaceRef> parse(@NonNull DbRef dbRef, @NonNull String name) {
-        if (name.isBlank()) {
-            return Either.left("Keyspace name cannot be blank or empty");
-        }
-
-        return Either.right(mkUnsafe(dbRef, name));
+        return Utils.trimAndValidateBasics("Keyspace name", name)
+            .map((trimmed) -> mkUnsafe(dbRef, trimmed));
     }
 
     public static KeyspaceRef mkUnsafe(@NonNull DbRef dbRef, @NonNull String name) {

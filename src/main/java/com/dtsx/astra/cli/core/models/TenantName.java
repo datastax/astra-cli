@@ -14,11 +14,7 @@ public class TenantName implements AstraColors.Highlightable {
     String name;
 
     public static Either<String, TenantName> parse(@NonNull String name) {
-        if (name.isBlank()) {
-            return Either.left("Tenant name cannot be blank or empty");
-        }
-
-        return Either.right(TenantName.mkUnsafe(name));
+        return Utils.trimAndValidateBasics("Tenant name", name).map(TenantName::mkUnsafe);
     }
 
     public static TenantName mkUnsafe(@NonNull String name) {

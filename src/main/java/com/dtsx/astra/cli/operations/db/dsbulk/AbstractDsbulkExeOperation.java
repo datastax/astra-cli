@@ -77,7 +77,7 @@ public abstract class AbstractDsbulkExeOperation<Req extends CoreDsbulkOptions> 
     }
 
     private Either<DsbulkExecResult, File> downloadDsbulk() {
-        val downloadResult = downloadsGateway.downloadDsbulk(CLIProperties.read("dsbulk.url"), CLIProperties.read("dsbulk.version"));
+        val downloadResult = downloadsGateway.downloadDsbulk(CLIProperties.dsbulk());
 
         return downloadResult.bimap(
             DsbulkInstallFailed::new,

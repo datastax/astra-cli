@@ -1,11 +1,9 @@
 package com.dtsx.astra.cli.config;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.utils.StringUtils;
+import com.dtsx.astra.cli.core.models.Utils;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
@@ -15,23 +13,16 @@ public class ProfileName implements AstraColors.Highlightable {
     String name;
 
     public static Either<String, ProfileName> parse(String name) {
-        if (name.contains("\n")) {
-            return Either.left("Profile name cannot contain newlines.");
-        }
-
-        if (name.isBlank()) {
-            return Either.left("Profile name cannot be blank or empty.");
-        }
-
-        return Either.right(ProfileName.mkUnsafe(name));
+        return Utils.trimAndValidateBasics("Profile name", name).flatMap(trimmed -> {
+            if (trimmed.contains("\n")) {
+                return Either.left("Profile name cannot contain newlines");
+            }
+            return Either.right(ProfileName.mkUnsafe(trimmed));
+        });
     }
 
     public static ProfileName mkUnsafe(String name) {
         return new ProfileName(name);
-    }
-
-    private ProfileName(String name) {
-        this.name = StringUtils.removeQuotesIfAny(name);
     }
 
     public String unwrap() {

@@ -48,11 +48,11 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 )
 @Example(
     comment = "Create a new profile and set it as the default profile",
-    command = "astra config create -t AstraCS:... --default"
+    command = "astra config create my_profile -t AstraCS:... --default"
 )
 @Example(
     comment = "Create a new profile without any prompting if the profile already exists",
-    command = "astra config create -t AstraCS:... -y"
+    command = "astra config create my_profile -t AstraCS:... -y"
 )
 public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(

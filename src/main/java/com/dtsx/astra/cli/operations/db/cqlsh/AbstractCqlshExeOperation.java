@@ -62,7 +62,7 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshE
     }
 
     private Either<CqlshExecResult, File> downloadCqlsh() {
-        val downloadResult = downloadsGateway.downloadCqlsh(CLIProperties.read("cqlsh.url"));
+        val downloadResult = downloadsGateway.downloadCqlsh(CLIProperties.cqlsh());
 
         return downloadResult.bimap(
             CqlshInstallFailed::new,

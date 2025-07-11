@@ -1,14 +1,13 @@
 package com.dtsx.astra.cli.core.models;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -17,15 +16,13 @@ public class DbRef implements AstraColors.Highlightable {
     private final Either<UUID, String> ref;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
-        if (ref.isBlank()) {
-            return Either.left("Database name/id cannot be blank or empty");
-        }
-
-        try {
-            return Either.right(new DbRef(Either.left(UUID.fromString(ref))));
-        } catch (IllegalArgumentException e) {
-            return Either.right(new DbRef(Either.right(ref)));
-        }
+        return Utils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
+            try {
+                return Either.right(new DbRef(Either.left(UUID.fromString(trimmed))));
+            } catch (IllegalArgumentException e) {
+                return Either.right(new DbRef(Either.right(trimmed)));
+            }
+        });
     }
 
     public static DbRef fromNameUnsafe(@NonNull String name) {

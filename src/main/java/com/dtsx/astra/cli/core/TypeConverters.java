@@ -11,13 +11,13 @@ import java.util.List;
 
 public abstract class TypeConverters {
     public static List<TypeConverter> INSTANCES = List.of(
-        new TypeConverter(ProfileName.class, ProfileName::parse),
+        new TypeConverter(AstraToken.class, AstraToken::parse),
         new TypeConverter(DbRef.class, DbRef::parse),
         new TypeConverter(RegionName.class, RegionName::parse),
-        new TypeConverter(UserRef.class, UserRef::parse),
-        new TypeConverter(AstraToken.class, AstraToken::parse),
+        new TypeConverter(RoleRef.class, RoleRef::parse),
         new TypeConverter(TenantName.class, TenantName::parse),
-        new TypeConverter(RoleRef.class, RoleRef::parse)
+        new TypeConverter(UserRef.class, UserRef::parse),
+        new TypeConverter(ProfileName.class, ProfileName::parse)
     );
 
     private interface Parseable {

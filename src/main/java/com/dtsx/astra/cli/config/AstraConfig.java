@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.config;
 
+import com.dtsx.astra.cli.CLIProperties;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
@@ -28,7 +29,6 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
-    public static final String ASTRARC_FILE_NAME = ".astrarc-pico";
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
@@ -121,7 +121,7 @@ public class AstraConfig {
     }
 
     public static File resolveDefaultAstraConfigFile() {
-        return new File(System.getProperty("user.home") + File.separator + ASTRARC_FILE_NAME);
+        return new File(System.getProperty("user.home") + File.separator + CLIProperties.rcFileName());
     }
 
     public boolean profileExists(ProfileName profileName) {

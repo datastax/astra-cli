@@ -14,11 +14,7 @@ public class RegionName implements AstraColors.Highlightable {
     String name;
 
     public static Either<String, RegionName> parse(@NonNull String name) {
-        if (name.isBlank()) {
-            return Either.left("Region cannot be blank or empty");
-        }
-
-        return Either.right(mkUnsafe(name));
+        return Utils.trimAndValidateBasics("Region", name).map(RegionName::mkUnsafe);
     }
 
     public static RegionName mkUnsafe(@NonNull String name) {

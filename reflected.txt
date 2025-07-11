@@ -18,7 +18,16 @@ com.dtsx.astra.sdk.org.domain.[CreateTokenResponse,ResponseAllIamTokens,IamToken
 com.dtsx.astra.sdk.streaming.domain.[CdcDefinition,CreateCdc,DeleteCdc,Tenant,CreateTenant,StreamingRegion]
 com.dtsx.astra.sdk.utils.ApiResponse
 
-# Data API stuff
+# Collections
+com.datastax.astra.client.collections.definition.documents.Document
+com.datastax.astra.client.collections.definition.*
+
+# Tables
+com.datastax.astra.client.tables.definition.rows.Row
+com.datastax.astra.client.tables.definition.columns.*
+com.datastax.astra.client.tables.definition.*
+
+# Other misc Data API stuff
 com.datastax.astra.internal.api.[DataAPI.+]
 com.datastax.astra.client.core.vectorize.VectorServiceOptions
 com.datastax.astra.client.core.vector.VectorOptions
@@ -27,6 +36,3 @@ com.datastax.astra.client.core.rerank.RerankServiceOptions
 com.datastax.astra.client.core.rerank.CollectionRerankOptions
 com.datastax.astra.client.core.lexical.LexicalOptions
 com.datastax.astra.client.core.commands.Command$CommandSerializer
-com.datastax.astra.client.collections.definition.documents.Document
-com.datastax.astra.client.collections.definition.*
-com.datastax.astra.client.tables.definition.*

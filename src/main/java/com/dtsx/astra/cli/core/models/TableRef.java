@@ -13,11 +13,8 @@ public class TableRef implements AstraColors.Highlightable {
     private final KeyspaceRef ksRef;
 
     public static Either<String, TableRef> parse(@NonNull KeyspaceRef keyspace, @NonNull String name) {
-        if (name.isBlank()) {
-            return Either.left("Table name cannot be blank or empty");
-        }
-
-        return Either.right(new TableRef(name, keyspace));
+        return Utils.trimAndValidateBasics("Table name", name)
+            .map((trimmed) -> new TableRef(trimmed, keyspace));
     }
 
     @JsonValue

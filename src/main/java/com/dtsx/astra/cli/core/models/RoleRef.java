@@ -16,15 +16,13 @@ public class RoleRef implements AstraColors.Highlightable {
     private final Either<UUID, String> ref;
 
     public static Either<String, RoleRef> parse(@NonNull String ref) {
-        if (ref.isBlank()) {
-            return Either.left("Role name/id cannot be blank or empty");
-        }
-
-        try {
-            return Either.right(new RoleRef(Either.left(UUID.fromString(ref))));
-        } catch (IllegalArgumentException e) {
-            return Either.right(new RoleRef(Either.right(ref)));
-        }
+        return Utils.trimAndValidateBasics("Role name/id", ref).flatMap(trimmed -> {
+            try {
+                return Either.right(new RoleRef(Either.left(UUID.fromString(trimmed))));
+            } catch (IllegalArgumentException e) {
+                return Either.right(new RoleRef(Either.right(trimmed)));
+            }
+        });
     }
 
     public static RoleRef fromId(@NonNull UUID id) {

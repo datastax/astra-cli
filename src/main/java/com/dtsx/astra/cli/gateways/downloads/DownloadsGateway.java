@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
+import com.dtsx.astra.cli.CLIProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.AstraToken;
@@ -18,9 +19,9 @@ public interface DownloadsGateway {
 
     Either<String, List<File>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters);
 
-    Either<String, File> downloadCqlsh(String url);
+    Either<String, File> downloadCqlsh(ExternalSoftware cqlsh);
 
-    Either<String, File> downloadDsbulk(String url, String version);
+    Either<String, File> downloadDsbulk(ExternalSoftware dsbulk);
 
-    Either<String, File> downloadPulsarShell(String url, String version);
+    Either<String, File> downloadPulsarShell(ExternalSoftware pulsar);
 }

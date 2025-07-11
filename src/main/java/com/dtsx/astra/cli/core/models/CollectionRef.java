@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.models;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -13,11 +13,8 @@ public class CollectionRef implements AstraColors.Highlightable {
     private final KeyspaceRef ksRef;
 
     public static Either<String, CollectionRef> parse(@NonNull KeyspaceRef keyspace, @NonNull String name) {
-        if (name.isBlank()) {
-            return Either.left("Collection name cannot be blank or empty");
-        }
-
-        return Either.right(new CollectionRef(name, keyspace));
+        return Utils.trimAndValidateBasics("Collection name", name)
+            .map((trimmed) -> new CollectionRef(trimmed, keyspace));
     }
 
     @JsonValue

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CDC_NOT_FOUND;
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
 
@@ -89,6 +90,12 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         defaultValue = "false"
     )
     public boolean $ifExists;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        throw new AstraCliException(ILLEGAL_OPERATION, "Deleting CDCs via the Astra CLI is not currently not supported due to a dependency bug.");
+    }
 
     @Override
     public final OutputAll execute(CdcDeleteResult result) {

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
+import com.dtsx.astra.cli.core.completions.impls.TenantNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.CDC_ALREADY_EXISTS;
+import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
 
@@ -27,15 +29,15 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
 )
 @Example(
     comment = "Create a CDC",
-    command = "astra db create-cdc -t my_table --tenant my_tenant"
+    command = "astra db create-cdc my_db -t my_table --tenant my_tenant"
 )
 @Example(
     comment = "Create a CDC with a specific keyspace and topic partitions",
-    command = "astra db create-cdc -k my_keyspace -t my_table --tenant my_tenant --topic-partitions 5"
+    command = "astra db create-cdc my_db -k my_keyspace -t my_table --tenant my_tenant --topic-partitions 5"
 )
 @Example(
     comment = "Create a CDC without failing if it already exists",
-    command = "astra db create-cdc -t my_table --tenant my_tenant --if-not-exists"
+    command = "astra db create-cdc my_db -t my_table --tenant my_tenant --if-not-exists"
 )
 public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     @Option(
@@ -48,7 +50,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
 
     @Option(
         names = { "--table", "-t" },
-        description = { "The table to create CDC for", DEFAULT_VALUE },
+        description = { "The table or collection to create CDC for", DEFAULT_VALUE },
         paramLabel = "TABLE",
         required = true
     )
@@ -58,6 +60,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         names = { "--tenant" },
         description = { "The tenant name", DEFAULT_VALUE },
         paramLabel = "TENANT",
+        completionCandidates = TenantNamesCompletion.class,
         required = true
     )
     public TenantName $tenant;
@@ -76,6 +79,12 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         defaultValue = "false"
     )
     public boolean $ifNotExists;
+
+    @Override
+    protected void prelude() {
+        super.prelude();
+        throw new AstraCliException(ILLEGAL_OPERATION, "Creating CDCs via the Astra CLI is not currently not supported due to a dependency bug.");
+    }
 
     @Override
     public final OutputAll execute(CdcCreateResult result) {

@@ -12,11 +12,13 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.PURPLE_300;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -26,11 +28,36 @@ public class AstraLogger {
     private static Level level = Level.REGULAR;
     private static LoadingSpinner globalSpinner;
 
-    private static final File sessionLogFile = new File(AstraHome.Dirs.useLogs(), Instant.now().toString().replace(":", "-") + ".log");
+    private static File sessionLogFile;
     private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
+    
+    private static File getLogFile() {
+        if (sessionLogFile == null) {
+            val logsDir = AstraHome.Dirs.useLogs();
+            val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(java.time.ZoneId.systemDefault()));
+
+            sessionLogFile = new File(logsDir, "astra-" + timestamp + ".log");
+
+            try {
+                val logFiles = logsDir.listFiles();
+
+                if (logFiles != null) {
+                    Stream.of(logFiles)
+                        .sorted((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()))
+                        .skip(10)
+                        .forEach((f) -> {
+                            try {
+                                f.delete();
+                            } catch (Exception _) {}
+                        });
+                }
+            } catch (Exception _) {}
+        }
+        return sessionLogFile;
+    }
 
     public static String useSessionLogFilePath() {
-        return sessionLogFile.getAbsolutePath();
+        return getLogFile().getAbsolutePath();
     }
 
     public static void banner() {
@@ -134,7 +161,7 @@ public class AstraLogger {
     }
 
     public static void dumpLogs() {
-        try (var writer = new FileWriter(sessionLogFile)) {
+        try (var writer = new FileWriter(getLogFile())) {
             for (String line : accumulated) {
                 writer.write(AstraColors.stripAnsi(line));
                 writer.write(System.lineSeparator());

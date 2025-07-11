@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
+import com.dtsx.astra.cli.CLIProperties.ExternalSoftware;
 import com.dtsx.astra.cli.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -49,18 +50,18 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @Override
-    public Either<String, File> downloadCqlsh(String url) {
-        return installGenericArchive(AstraHome.Dirs.useCqlsh(), url, "cqlsh");
+    public Either<String, File> downloadCqlsh(ExternalSoftware cqlsh) {
+        return installGenericArchive(AstraHome.Dirs.useCqlsh(), cqlsh.url(), "cqlsh");
     }
 
     @Override
-    public Either<String, File> downloadDsbulk(String url, String version) {
-        return installGenericArchive(AstraHome.Dirs.useDsbulk(version), url, "dsbulk");
+    public Either<String, File> downloadDsbulk(ExternalSoftware dsbulk) {
+        return installGenericArchive(AstraHome.Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), "dsbulk");
     }
 
     @Override
-    public Either<String, File> downloadPulsarShell(String url, String version) {
-        return installGenericArchive(AstraHome.Dirs.usePulsar(version), url + "lunastreaming-shell-" + version + "-bin.tar.gz", "pulsar-shell");
+    public Either<String, File> downloadPulsarShell(ExternalSoftware pulsar) {
+        return installGenericArchive(AstraHome.Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell");
     }
 
     private Either<String, File> installGenericArchive(File installDir, String url, String exe) {

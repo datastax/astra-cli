@@ -31,7 +31,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
         val data = result
             .map((db) -> Map.of(
                 "Name", name(db),
-                "id", id(db),
+                "Id", id(db),
                 "Regions", regions(db),
                 "Cloud", cloud(db),
                 "V", vector(db),
@@ -39,7 +39,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
             ))
             .toList();
 
-        return new ShellTable(data).withColumns("Name", "id", "Regions", "Cloud", "V", "Status");
+        return new ShellTable(data).withColumns("Name", "Id", "Regions", "Cloud", "V", "Status");
     }
 
     private String name(Database db) {

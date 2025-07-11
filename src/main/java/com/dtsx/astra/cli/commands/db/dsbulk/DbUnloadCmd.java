@@ -1,14 +1,11 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
-import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
-import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbUnloadOperation;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbUnloadOperation.UnloadRequest;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 @Command(
     name = "unload",

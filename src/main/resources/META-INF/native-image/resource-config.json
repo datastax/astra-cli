@@ -11,7 +11,7 @@
         "pattern": "\\Qversion.txt\\E"
       },
       {
-        "pattern": "\\Qapplication.properties\\E"
+        "pattern": "\\Qstatic.properties\\E"
       }
     ]
   },

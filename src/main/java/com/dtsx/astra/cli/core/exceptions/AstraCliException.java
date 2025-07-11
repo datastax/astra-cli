@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.exceptions;
 
+import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.Getter;
@@ -14,24 +15,24 @@ public class AstraCliException extends RuntimeException {
     private final @Nullable List<Hint> nextSteps;
     private final CliExceptionCode code;
 
-    public AstraCliException(String formatted) {
-        this(null, formatted, null, null);
+    public AstraCliException(String message) {
+        this(null, message, null, null);
     }
 
-    public AstraCliException(CliExceptionCode code, String formatted) {
-        this(code, formatted, null, null);
+    public AstraCliException(CliExceptionCode code, String message) {
+        this(code, message, null, null);
     }
 
-    public AstraCliException(CliExceptionCode code, String formatted, @Nullable Map<String, Object> metadata) {
-        this(code, formatted, metadata, null);
+    public AstraCliException(CliExceptionCode code, String message, @Nullable Map<String, Object> metadata) {
+        this(code, message, metadata, null);
     }
 
-    public AstraCliException(CliExceptionCode code, String formatted, @Nullable List<Hint> nextSteps) {
-        this(code, formatted, null, nextSteps);
+    public AstraCliException(CliExceptionCode code, String message, @Nullable List<Hint> nextSteps) {
+        this(code, message, null, nextSteps);
     }
 
-    public AstraCliException(CliExceptionCode code, String formatted, @Nullable Map<String, Object> metadata, @Nullable List<Hint> nextSteps) {
-        super(StringUtils.trimIndent(formatted));
+    public AstraCliException(CliExceptionCode code, String message, @Nullable Map<String, Object> metadata, @Nullable List<Hint> nextSteps) {
+        super(AstraConsole.format(StringUtils.trimIndent(message)));
         this.nextSteps = nextSteps;
         this.metadata = metadata;
         this.code = code;

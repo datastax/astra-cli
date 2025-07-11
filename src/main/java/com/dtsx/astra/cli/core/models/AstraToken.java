@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -15,21 +14,17 @@ public class AstraToken implements AstraColors.Highlightable {
     String token;
 
     public static Either<String, AstraToken> parse(@NonNull String token) {
-        if (token.isBlank()) {
-            return Either.left("Astra token cannot be blank or empty");
-        }
+        return Utils.trimAndValidateBasics("Astra token", token).flatMap((t) -> {
+            if (!t.startsWith("AstraCS:")) {
+                return Either.left("Astra token should start with 'AstraCS:'");
+            }
 
-        token = StringUtils.removeQuotesIfAny(token.trim());
+            if (t.length() != 97) {
+                return Either.left("Astra token should be exactly 97 characters long; yours is " + t.length());
+            }
 
-        if (!token.startsWith("AstraCS:")) {
-            return Either.left("Astra token should start with 'AstraCS:'");
-        }
-
-        if (token.length() != 97) {
-            return Either.left("Astra token should be exactly 98 characters long");
-        }
-
-        return Either.right(mkUnsafe(token));
+            return Either.right(mkUnsafe(t));
+        });
     }
 
     public static AstraToken mkUnsafe(@NonNull String token) {

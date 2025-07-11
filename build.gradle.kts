@@ -54,6 +54,13 @@ application {
     mainClass.set("com.dtsx.astra.cli.AstraCli")
 }
 
+val isProd = project.hasProperty("prod") && project.property("prod") == "true"
+
+val cliSystemProperties = mapOf(
+    "cli.version" to project.version.toString(),
+    "cli.rc-file-name" to if (isProd) ".astrarc" else ".astrarc-dev",
+)
+
 graalvmNative {
     binaries.all {
         imageName.set("astra")
@@ -203,44 +210,48 @@ tasks.register("generateGraalReflectionConfig") {
     }
 }
 
-val includeResourcePatterns = mutableListOf<String>()
+val resourcePatterns = mutableListOf<String>()
 
-tasks.register("generateVersionFile") {
-    val outputFile = file("${layout.buildDirectory.get()}/resources/main/version.txt")
-    val projectVersion = version.toString()
+tasks.register("includeJansiNativeLibResources") {
+    val (os, arch) = getOsArch().split("-")
+
+    val osPattern = when (os) {
+        "windows" -> "Windows"
+        "macos" -> "MacOS"
+        "linux" -> "Linux"
+        else -> ".*"
+    }
+
+    val archPattern = when (arch) {
+        "x86_64", "arm64" -> arch
+        else -> ".*"
+    }
+
+    resourcePatterns.add(
+        "\\QMETA-INF/native-image/org/fusesource/jansi/$osPattern/$archPattern/.*\\E"
+    )
+}
+
+tasks.register("createDynamicProperties") {
+    val outputFile = layout.buildDirectory.file("resources/main/dynamic.properties").get().asFile
 
     outputs.file(outputFile)
 
     doLast {
+        val output = cliSystemProperties.map { (key, value) -> "$key=$value" }.joinToString("\n")
+
         outputFile.parentFile.mkdirs()
-        outputFile.writeText(projectVersion)
-        includeResourcePatterns.add("\\Qversion.txt\\E")
+        outputFile.writeText(output);
+
+        resourcePatterns.add(
+            "\\Qdynamic.properties\\E"
+        )
     }
 }
 
-tasks.register("includeJansiNativeLibResource") {
-    val addPathForArch = { os: String, arch: String ->
-        val addPath = { archPattern: String -> includeResourcePatterns.add("\\QMETA-INF/native-image/org/fusesource/jansi/$os/$archPattern/.*\\E") }
-
-        when (arch) {
-            "x86_64" -> addPath("x86_64")
-            "arm64" -> addPath("arm64")
-            else -> addPath(".*")
-        }
-    }
-
-    val (os, arch) = getOsArch().split("-")
-
-    when (os) {
-        "windows" -> addPathForArch("Windows", arch)
-        "macos" -> addPathForArch("MacOS", arch)
-        "linux" -> addPathForArch("Linux", arch)
-    }
-}
-
-tasks.register("writeResourceConfig") {
-    dependsOn("generateVersionFile")
-    dependsOn("includeJansiNativeLibResource")
+tasks.register("generateGraalResourceConfig") {
+    dependsOn("includeJansiNativeLibResources")
+    dependsOn("createDynamicProperties")
 
     val outputFile = file("${nativeImageGeneratedDir}/resource-config.json")
 
@@ -251,7 +262,7 @@ tasks.register("writeResourceConfig") {
 
         val resourceConfig = mapOf(
             "resources" to mapOf(
-                "includes" to includeResourcePatterns.map { mapOf("pattern" to it) }
+                "includes" to resourcePatterns.map { mapOf("pattern" to it) }
             ),
             "bundles" to emptyList<Any>()
         )
@@ -263,11 +274,12 @@ tasks.register("writeResourceConfig") {
 
 tasks.jar {
     dependsOn("generateGraalReflectionConfig")
-    dependsOn("writeResourceConfig")
+    dependsOn("generateGraalResourceConfig")
     dependsOn("generateJniConfig")
 }
 
 tasks.named<JavaExec>("run") {
+    dependsOn("createDynamicProperties")
     standardInput = System.`in`
 }
 

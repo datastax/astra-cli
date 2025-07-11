@@ -34,14 +34,12 @@ public class StringUtils {
         val lines = input.split("\n", -1);
 
         var start = 0;
-//        while (start < lines.length && lines[start].trim().isEmpty()) {
-        if (start < lines.length && lines[start].trim().isEmpty()) {
+        while (start < lines.length && lines[start].trim().isEmpty()) {
             start++;
         }
 
         var end = lines.length;
-//        while (end > start && lines[end - 1].trim().isEmpty()) {
-        if (end > start && lines[end - 1].trim().isEmpty()) {
+        while (end > start && lines[end - 1].trim().isEmpty()) {
             end--;
         }
 
