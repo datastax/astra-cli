@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
@@ -11,6 +12,7 @@ import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraConsole.ConfirmResponse;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
@@ -200,19 +202,21 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     private Optional<AstraEnvironment> promptForEnv() {
         val message = """
         
-        %s Enter the target Astra environment (defaults to @!prod!@)
-        @!>!@"""
+        %s Enter the target Astra environment (defaults to @!prod!@)"""
             .stripIndent()
             .formatted(AstraColors.PURPLE_300.use("(Optional)"));
 
-        val envInput = AstraConsole.readLine(message, false);
+        val envInput = AstraConsole.select(message, NEList.of("prod", "dev", "test"), "prod", s -> AstraEnvironment.valueOf(s.toUpperCase()), "--env", false);
 
-        return envInput.map((input) -> {
-            if (input.isBlank()) {
-                return AstraEnvironment.PROD;
+        return switch (envInput) {
+            case SelectStatus.Selected<AstraEnvironment>(var value) -> {
+                yield Optional.of(value);
             }
-            return AstraEnvironment.valueOf(input.trim().toUpperCase());
-        });
+            case SelectStatus.Default<AstraEnvironment>(var value) -> {
+                yield Optional.of(value);
+            }
+            case SelectStatus.NoAnswer<AstraEnvironment> ignored -> Optional.empty();
+        };
     }
 
     private Optional<ProfileName> promptForName() {

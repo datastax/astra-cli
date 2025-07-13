@@ -160,6 +160,7 @@ public class AstraLogger {
         return e;
     }
 
+
     public static void dumpLogs() {
         try (var writer = new FileWriter(getLogFile())) {
             for (String line : accumulated) {

@@ -1,8 +1,13 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
+import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.DbGetOperation;
@@ -11,6 +16,7 @@ import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -32,7 +38,7 @@ import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
     comment = "Get a specific attribute of a database",
     command = "astra db get my_db --key id"
 )
-public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
+public class DbGetCmd extends AbstractDbCmd<DbGetResult> {
     public enum DbGetKeys {
         name,
         id,
@@ -45,6 +51,15 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
         creation_time,
         vector
     }
+
+    @Parameters(
+        index = "0",
+        arity = "0..1",
+        completionCandidates = DbNamesCompletion.class,
+        paramLabel = "DB",
+        description = "The name or ID of the Astra database to operate on"
+    )
+    protected Optional<DbRef> $dbRef;
 
     @Option(
         names = { "-k", "--key" },
@@ -103,6 +118,16 @@ public class DbGetCmd extends AbstractDbSpecificCmd<DbGetResult> {
 
     @Override
     protected DbGetOperation mkOperation() {
-        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef));
+        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef, this::promptForDbRef));
+    }
+
+    private DbRef promptForDbRef() {
+        val res = AstraConsole.select("Select the database to get information about:", NEList.of("car", "bar", "tar"), DbRef::fromNameUnsafe, "<db>", true);
+
+        return switch (res) {
+            case SelectStatus.Selected<DbRef>(var dbRef) -> dbRef;
+            case SelectStatus.Default<DbRef>(var dbRef) -> dbRef;
+            case SelectStatus.NoAnswer<DbRef> ignored -> throw new IllegalArgumentException("No database selected.");
+        };
     }
 }

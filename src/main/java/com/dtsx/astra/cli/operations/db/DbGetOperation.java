@@ -6,6 +6,9 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import static com.dtsx.astra.cli.operations.db.DbGetOperation.*;
 
 @RequiredArgsConstructor
@@ -15,10 +18,10 @@ public class DbGetOperation implements Operation<DbGetResult> {
 
     public record DbGetResult(Database database) {}
 
-    public record DbGetRequest(DbRef dbRef) {}
+    public record DbGetRequest(Optional<DbRef> dbRef, Supplier<DbRef> promptForDbRef) {}
 
     @Override
     public DbGetResult execute() {
-        return new DbGetResult(dbGateway.findOne(request.dbRef));
+        return new DbGetResult(dbGateway.findOne(request.dbRef.orElseGet(request.promptForDbRef)));
     }
 }

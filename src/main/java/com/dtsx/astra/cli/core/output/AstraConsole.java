@@ -1,20 +1,23 @@
 package com.dtsx.astra.cli.core.output;
 
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.output.OutputType;
+import com.dtsx.astra.cli.core.output.select.AstraSelector;
+import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.*;
+import picocli.CommandLine.Option;
 
 import java.io.Console;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Pattern;
-
-import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 public class AstraConsole {
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
@@ -48,6 +51,13 @@ public class AstraConsole {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
         write(getOut(), items);
+    }
+
+    public static void printf(@PrintFormat String format, Object... items) {
+        if (OutputType.isNotHuman()) {
+            throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
+        }
+        write(getOut(), format.formatted(items));
     }
 
     public static void println(Object... items) {
@@ -103,6 +113,22 @@ public class AstraConsole {
         }
     }
 
+    public static SelectStatus<String> select(String prompt, NEList<String> options, String fallbackFlag, boolean clearAfterSelection) {
+        return select(prompt, options, null, Function.identity(), fallbackFlag, clearAfterSelection);
+    }
+    
+    public static SelectStatus<String> select(String prompt, NEList<String> options, @Nullable String defaultOption, String fallbackFlag, boolean clearAfterSelection) {
+        return select(prompt, options, defaultOption, Function.identity(), fallbackFlag, clearAfterSelection);
+    }
+    
+    public static <T> SelectStatus<T> select(String prompt, NEList<String> options, Function<String, T> mapper, String fallbackFlag, boolean clearAfterSelection) {
+        return new AstraSelector().select(prompt, options, Optional.empty(), mapper, fallbackFlag, clearAfterSelection);
+    }
+
+    public static <T> SelectStatus<T> select(String prompt, NEList<String> options, @Nullable String defaultOption, Function<String, T> mapper, String fallbackFlag, boolean clearAfterSelection) {
+        return new AstraSelector().select(prompt, options, Optional.ofNullable(defaultOption), mapper, fallbackFlag, clearAfterSelection);
+    }
+
     public static String format(Object... args) {
         val sb = new StringBuilder();
 
@@ -129,7 +155,7 @@ public class AstraConsole {
     }
 
     private static void writeln(PrintStream ps, Object... items) {
-        print(items);
+        write(ps, items);
         ps.println();
     }
 }
