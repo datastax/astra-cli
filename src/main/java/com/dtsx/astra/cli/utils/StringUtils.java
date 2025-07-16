@@ -34,12 +34,12 @@ public class StringUtils {
         val lines = input.split("\n", -1);
 
         var start = 0;
-        while (start < lines.length && lines[start].trim().isEmpty()) {
+        while (start < lines.length && stripAnsiCodes(lines[start]).trim().isEmpty()) {
             start++;
         }
 
         var end = lines.length;
-        while (end > start && lines[end - 1].trim().isEmpty()) {
+        while (end > start && stripAnsiCodes(lines[end - 1]).trim().isEmpty()) {
             end--;
         }
 
@@ -49,8 +49,9 @@ public class StringUtils {
         var minIndent = Integer.MAX_VALUE;
 
         for (val line : trimmedLines) {
-            if (!line.trim().isEmpty()) {
-                int indent = line.indexOf(line.trim());
+            val strippedLine = stripAnsiCodes(line);
+            if (!strippedLine.trim().isEmpty()) {
+                int indent = findVisibleTextStart(line);
                 if (indent < minIndent) {
                     minIndent = indent;
                 }
@@ -67,6 +68,19 @@ public class StringUtils {
         }
 
         return String.join(NL, trimmedLines);
+    }
+
+    private static String stripAnsiCodes(String input) {
+        return input.replaceAll("\u001B\\[[0-9;]*m", "");
+    }
+
+    private static int findVisibleTextStart(String line) {
+        val stripped = stripAnsiCodes(line);
+        val trimmed = stripped.trim();
+        if (trimmed.isEmpty()) {
+            return 0;
+        }
+        return stripped.indexOf(trimmed);
     }
 
     public static String renderComment(CharSequence comment) {

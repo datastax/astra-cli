@@ -24,6 +24,7 @@ import com.dtsx.astra.cli.operations.SetupOperation.SetupRequest;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -121,21 +122,20 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           Welcome to the Astra CLI setup! A configuration file with your profile will be created at %s.
         
           If you'd prefer to provide credentials on a per-command basis rather than storing them in a file, you can either:
-          - Use the @!--token!@ option to pass your token directly.
-          - Use the @!--config-file!@ option to specify a different configuration file.
+          - Use the per-command @!--token!@ flag to pass your token directly.
+          - Use the per-command @!--config-file!@ flag to specify an existing configuration file.
         
           %s
           %s
         
-          Enter anything to continue, or press %s to cancel.
+          Enter anything to continue, or use @!Ctrl+C!@ to cancel.
         """.formatted(
             highlight(existing.getAbsolutePath()),
             renderComment("Example:"),
-            renderCommand("astra db list --token <your_token>"),
-            AstraColors.PURPLE_300.use("Ctrl+C")
+            renderCommand("astra db list --token <your_token>")
         );
 
-        if (AstraConsole.confirm(trimIndent(confirmationMsg)) == ConfirmResponse.ANSWER_NO) {
+        if (AstraConsole.confirm(confirmationMsg) == ConfirmResponse.ANSWER_NO) {
             throw new ExecutionCancelledException("Operation cancelled by user.");
         }
     }
@@ -158,7 +158,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             renderCommand("astra config list")
         );
 
-        if (AstraConsole.confirm(trimIndent(confirmationMsg)) == ConfirmResponse.ANSWER_NO) {
+        if (AstraConsole.confirm(confirmationMsg) == ConfirmResponse.ANSWER_NO) {
             throw new ExecutionCancelledException("Operation cancelled by user.");
         }
     }
@@ -176,7 +176,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             existing.name().orElseThrow()
         );
 
-        switch (AstraConsole.confirm(NL + trimIndent(confirmationMsg))) {
+        switch (AstraConsole.confirm(confirmationMsg)) {
             case ANSWER_NO -> throw new ExecutionCancelledException("Operation cancelled by user.");
             case NO_ANSWER -> throw new AstraCliException(NO_ANSWER, "Please answer interactively or pass the --name option with a different profile name.");
         }
@@ -184,11 +184,11 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
     private AstraToken promptForToken() {
         val message = """
-        
-        %s Enter your Astra token (it should start with @!AstraCS!@)
-        @!>!@"""
-            .stripIndent()
-            .formatted(AstraColors.PURPLE_300.use("(Required)"));
+           %s Enter your Astra token (it should start with @!AstraCS!@)
+           @!>!@
+        """.formatted(
+            AstraColors.PURPLE_300.use("(Required)")
+        );
 
         val input = AstraConsole.readLine(message, true);
 
@@ -200,32 +200,24 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private Optional<AstraEnvironment> promptForEnv() {
-        val message = """
-        
-        %s Enter the target Astra environment (defaults to @!prod!@)"""
-            .stripIndent()
-            .formatted(AstraColors.PURPLE_300.use("(Optional)"));
-
-        val envInput = AstraConsole.select(message, NEList.of("prod", "dev", "test"), "prod", s -> AstraEnvironment.valueOf(s.toUpperCase()), "--env", false);
-
-        return switch (envInput) {
-            case SelectStatus.Selected<AstraEnvironment>(var value) -> {
-                yield Optional.of(value);
-            }
-            case SelectStatus.Default<AstraEnvironment>(var value) -> {
-                yield Optional.of(value);
-            }
-            case SelectStatus.NoAnswer<AstraEnvironment> ignored -> Optional.empty();
-        };
+        return AstraConsole.select(
+            AstraColors.PURPLE_300.use("(Optional)") + "Enter the target Astra environment (defaults to @!prod!@)",
+            NEList.of("prod", "dev", "test"),
+            "prod",
+            s -> AstraEnvironment.valueOf(s.toUpperCase()),
+            "@!--env!@ flag",
+            Pair.create(originalArgs(), "--env <prod|test|dev>"),
+            false
+        );
     }
 
     private Optional<ProfileName> promptForName() {
         val message = """
-        
-        %s Enter a name for your profile (defaults to your org's name)
-        @!>!@"""
-            .stripIndent()
-            .formatted(AstraColors.PURPLE_300.use("(Optional)"));
+          %s Enter a name for your profile (defaults to your org name)
+          @!>!@
+        """.formatted(
+            AstraColors.PURPLE_300.use("(Optional)")
+        );
 
         val nameInput = AstraConsole.readLine(message, false);
 
@@ -240,7 +232,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           Do you want to set this profile as the default instead? [y/N]
         """;
 
-        return switch (AstraConsole.confirm(NL + trimIndent(confirmationMsg))) {
+        return switch (AstraConsole.confirm(confirmationMsg)) {
             case ANSWER_OK -> true;
             case ANSWER_NO, NO_ANSWER -> false;
         };

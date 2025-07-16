@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
@@ -14,12 +15,15 @@ import com.dtsx.astra.cli.operations.db.DbGetOperation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
 import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetRequest;
@@ -121,13 +125,34 @@ public class DbGetCmd extends AbstractDbCmd<DbGetResult> {
         return new DbGetOperation(dbGateway, new DbGetRequest($dbRef, this::promptForDbRef));
     }
 
-    private DbRef promptForDbRef() {
-        val res = AstraConsole.select("Select the database to get information about:", NEList.of("car", "bar", "tar"), DbRef::fromNameUnsafe, "<db>", true);
+    private Database promptForDbRef(NEList<Database> dbs) {
+        val namesAreUnique = dbs.stream()
+            .map(db -> db.getInfo().getName())
+            .distinct()
+            .count() == dbs.size();
 
-        return switch (res) {
-            case SelectStatus.Selected<DbRef>(var dbRef) -> dbRef;
-            case SelectStatus.Default<DbRef>(var dbRef) -> dbRef;
-            case SelectStatus.NoAnswer<DbRef> ignored -> throw new IllegalArgumentException("No database selected.");
-        };
+        val maxNameLength = dbs.stream()
+            .map(db -> db.getInfo().getName().length())
+            .max(Integer::compareTo)
+            .orElse(0);
+
+        val displayToDbMap = dbs.stream().collect(Collectors.toMap(
+            db -> db.getInfo().getName() + " ".repeat(maxNameLength - db.getInfo().getName().length()) +
+                (namesAreUnique
+                    ? " " + AstraColors.NEUTRAL_500.use("(" + db.getInfo().getCloudProvider().name() + " " + db.getInfo().getRegion() + ")")
+                    : " " + AstraColors.NEUTRAL_500.use("(" + db.getId() + ")")),
+            Function.identity()
+        ));
+
+        val dbInput = AstraConsole.select(
+            "Select the database to get information about:",
+            NEList.of(displayToDbMap.keySet().stream().toList()),
+            displayToDbMap::get,
+            "@!--db!@ flag",
+            Pair.create(originalArgs(), "<db>"),
+            true
+        );
+
+        return dbInput.orElseThrow();
     }
 }

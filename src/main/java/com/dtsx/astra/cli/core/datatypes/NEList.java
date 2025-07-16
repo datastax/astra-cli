@@ -5,6 +5,7 @@ import lombok.experimental.Delegate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class NEList<E> implements List<E> {
     @Delegate
@@ -19,6 +20,13 @@ public class NEList<E> implements List<E> {
             throw new IllegalArgumentException("Attempted to create an NEList from an empty list");
         }
         return new NEList<>(list);
+    }
+
+    public static <E> Optional<NEList<E>> parse(@NonNull List<E> list) {
+        if (list.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new NEList<>(list));
     }
 
     @SafeVarargs

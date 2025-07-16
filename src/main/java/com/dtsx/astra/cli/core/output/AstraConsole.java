@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 public class AstraConsole {
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
@@ -80,15 +83,16 @@ public class AstraConsole {
             return Optional.empty();
         }
 
-        console.printf("%s ", format(prompt));
+        print(trimIndent(prompt), " ");
 
         val ret = (isSecret)
-            ? Optional.ofNullable(console.readPassword("")).map(String::valueOf)
-            : Optional.ofNullable(console.readLine(""));
+            ? Optional.ofNullable(console.readPassword()).map(String::valueOf)
+            : Optional.ofNullable(console.readLine());
 
         if (ret.isEmpty()) {
             println();
         }
+        println();
 
         return ret;
     }
@@ -113,20 +117,20 @@ public class AstraConsole {
         }
     }
 
-    public static SelectStatus<String> select(String prompt, NEList<String> options, String fallbackFlag, boolean clearAfterSelection) {
-        return select(prompt, options, null, Function.identity(), fallbackFlag, clearAfterSelection);
+    public static Optional<String> select(String prompt, NEList<String> options, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
+        return select(prompt, options, null, Function.identity(), fallback, fix, clearAfterSelection);
     }
     
-    public static SelectStatus<String> select(String prompt, NEList<String> options, @Nullable String defaultOption, String fallbackFlag, boolean clearAfterSelection) {
-        return select(prompt, options, defaultOption, Function.identity(), fallbackFlag, clearAfterSelection);
+    public static Optional<String> select(String prompt, NEList<String> options, @Nullable String defaultOption, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
+        return select(prompt, options, defaultOption, Function.identity(), fallback, fix, clearAfterSelection);
     }
     
-    public static <T> SelectStatus<T> select(String prompt, NEList<String> options, Function<String, T> mapper, String fallbackFlag, boolean clearAfterSelection) {
-        return new AstraSelector().select(prompt, options, Optional.empty(), mapper, fallbackFlag, clearAfterSelection);
+    public static <T> Optional<T> select(String prompt, NEList<String> options, Function<String, T> mapper, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
+        return select(prompt, options, null, mapper, fallback, fix, clearAfterSelection);
     }
 
-    public static <T> SelectStatus<T> select(String prompt, NEList<String> options, @Nullable String defaultOption, Function<String, T> mapper, String fallbackFlag, boolean clearAfterSelection) {
-        return new AstraSelector().select(prompt, options, Optional.ofNullable(defaultOption), mapper, fallbackFlag, clearAfterSelection);
+    public static <T> Optional<T> select(String prompt, NEList<String> options, @Nullable String defaultOption, Function<String, T> mapper, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
+        return new AstraSelector().select(trimIndent(prompt), options, Optional.ofNullable(defaultOption), mapper, fallback, fix, clearAfterSelection);
     }
 
     public static String format(Object... args) {
@@ -136,7 +140,7 @@ public class AstraConsole {
             if (item instanceof AstraColors color) {
                 sb.append(color.on());
             } else if (item instanceof String str) {
-                val processedStr = HIGHLIGHT_PATTERN.matcher(str).replaceAll(match ->
+                val processedStr = HIGHLIGHT_PATTERN.matcher(str).replaceAll((match) ->
                     AstraColors.highlight(match.group(1)));
 
                 sb.append(AstraColors.ansi().new Text(processedStr, AstraColors.colorScheme()));

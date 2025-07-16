@@ -6,11 +6,18 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface SelectionStrategy<T> {
-    SelectStatus<T> select();
-    SelectStatus<T> select(boolean clearAfterSelection);
+    Optional<T> select();
+
+    record SelectionRequest<T>(
+        String prompt,
+        NEList<String> options,
+        Optional<String> defaultOption,
+        Function<String, T> mapper,
+        boolean clearAfterSelection
+    ) {}
 
     interface Meta {
         boolean isSupported();
-        <T> SelectionStrategy<T> mkInstance(String prompt, NEList<String> options, Optional<String> defaultOption, Function<String, T> mapper);
+        <T> SelectionStrategy<T> mkInstance(SelectionRequest<T> request);
     }
 }

@@ -5,19 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/datatypes/NEList.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/ArrowKeySelectionStrategy.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/AstraSelector.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/SelectionStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/ArrowKeySelectionStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/datatypes/NEList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/datatypes/NEList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraConsole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraSelector.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/NumberedSelectionStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/NumberedSelectionStrategy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/SelectionStrategy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/ArrowKeySelectionStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/ArrowKeySelectionStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/AstraSelector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/AstraSelector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/NumberedSelectionStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/NumberedSelectionStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/SelectStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/SelectStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/SelectionStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/select/SelectionStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/SetupOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/SetupOperation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbGetOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbGetOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/StringUtils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,18 +71,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "toptobes"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;toptobes&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/toptobes/astra-cli-pico.git",
-    "accountId": "700a40a4-03f4-4a34-a40f-ba9cc01c83ef"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/toptobes/astra-cli-pico.git&quot;,
+    &quot;accountId&quot;: &quot;700a40a4-03f4-4a34-a40f-ba9cc01c83ef&quot;
   }
-}]]></component>
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -93,41 +95,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;NIXITCH_NIXPKGS_CONFIG&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_CONF_DIR&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_OTHER_STORES&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_PATH&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_PROFILES&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_REMOTE&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_USER_PROFILE_DIR&quot;: &quot;&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;C:\\Users\\wanna\\AppData\\Roaming\\JetBrains\\IntelliJIdea2025.1\\plugins\\Shell Script\\linux\\amd64\\shellcheck&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/main/resources&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Download Sources.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "NIXITCH_NIXPKGS_CONFIG": "",
+    "NIXITCH_NIX_CONF_DIR": "",
+    "NIXITCH_NIX_OTHER_STORES": "",
+    "NIXITCH_NIX_PATH": "",
+    "NIXITCH_NIX_PROFILES": "",
+    "NIXITCH_NIX_REMOTE": "",
+    "NIXITCH_NIX_USER_PROFILE_DIR": "",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "C:\\Users\\wanna\\AppData\\Roaming\\JetBrains\\IntelliJIdea2025.1\\plugins\\Shell Script\\linux\\amd64\\shellcheck",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/main/resources",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.sourceCode.Java",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;HTTP Request&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "HTTP Request"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.dtsx.astra.cli.commands.streaming.pulsar" />
@@ -189,5 +191,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

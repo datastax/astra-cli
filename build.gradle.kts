@@ -300,3 +300,21 @@ fun getOsArch(): String {
         else -> throw GradleException("Unsupported OS: $os with architecture $arch")
     }
 }
+
+tasks.register<Jar>("fatJar") {
+    dependsOn(configurations.runtimeClasspath)
+    archiveBaseName.set("fat")
+    archiveVersion.set(project.version.toString())
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes["Main-Class"] = "com.dtsx.astra.cli.AstraCli"
+    }
+
+    from(sourceSets.main.get().output)
+
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+}

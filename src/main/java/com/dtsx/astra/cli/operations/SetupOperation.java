@@ -45,12 +45,13 @@ public class SetupOperation implements Operation<SetupResult> {
     @Override
     public SetupResult execute() {
         val configFile = AstraConfig.resolveDefaultAstraConfigFile();
-
-        if (configFile.exists()) {
-            request.assertShouldContinueIfAlreadySetup.accept(configFile);
-        }
-
         val config = AstraConfig.readAstraConfigFile(null);
+
+        if (configFile.exists() && !config.getProfiles().isEmpty()) {
+            request.assertShouldContinueIfAlreadySetup.accept(configFile);
+        } else {
+            request.assertShouldSetup.accept(configFile);
+        }
 
         return resolveProfileDetails(request).foldMap((details) -> {
             config.lookupProfile(details.profileName).ifPresent(request.assertShouldOverwriteExistingProfile);
