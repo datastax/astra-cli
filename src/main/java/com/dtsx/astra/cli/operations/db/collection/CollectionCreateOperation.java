@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CollectionCreateOperation implements Operation<CollectionCreateResult> {
@@ -17,12 +18,12 @@ public class CollectionCreateOperation implements Operation<CollectionCreateResu
 
     public record CollectionCreateRequest(
         CollectionRef collectionRef,
-        Integer dimension,
-        String metric,
-        String defaultId,
-        String embeddingProvider,
-        String embeddingModel,
-        String embeddingKey,
+        Optional<Integer> dimension,
+        Optional<String> metric,
+        Optional<String> defaultId,
+        Optional<String> embeddingProvider,
+        Optional<String> embeddingModel,
+        Optional<String> embeddingKey,
         List<String> indexingAllow,
         List<String> indexingDeny,
         boolean ifNotExists
@@ -38,7 +39,7 @@ public class CollectionCreateOperation implements Operation<CollectionCreateResu
         val status = collectionGateway.create(
             request.collectionRef,
             request.dimension,
-            request.metric != null ? request.metric : "cosine",
+            request.metric,
             request.defaultId,
             request.embeddingProvider,
             request.embeddingModel,
@@ -49,7 +50,7 @@ public class CollectionCreateOperation implements Operation<CollectionCreateResu
 
         return switch (status) {
             case CreationStatus.Created<?> _ -> handleCollCreated();
-            case CreationStatus.AlreadyExists<?> _ -> handleCollAlreadyExists(request.collectionRef, request.ifNotExists);
+            case CreationStatus.AlreadyExists<?> _ -> handleCollAlreadyExists(request.ifNotExists);
         };
     }
 
@@ -57,12 +58,11 @@ public class CollectionCreateOperation implements Operation<CollectionCreateResu
         return new CollectionCreated();
     }
 
-    private CollectionCreateResult handleCollAlreadyExists(CollectionRef collRef, boolean ifNotExists) {
+    private CollectionCreateResult handleCollAlreadyExists(boolean ifNotExists) {
         if (ifNotExists) {
             return new CollectionAlreadyExists();
         } else {
             return new CollectionIllegallyAlreadyExists();
         }
     }
-
 }

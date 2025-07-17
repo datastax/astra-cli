@@ -1,13 +1,16 @@
 package com.dtsx.astra.cli.gateways.db.collection;
 
+import com.datastax.astra.client.collections.definition.CollectionDefaultIdTypes;
 import com.datastax.astra.client.collections.definition.CollectionDefinition;
+import com.datastax.astra.client.collections.definition.CollectionDefinition.IndexingOptions;
 import com.datastax.astra.client.collections.definition.CollectionDescriptor;
+import com.datastax.astra.client.core.vector.SimilarityMetric;
 import com.datastax.astra.client.exceptions.DataAPIException;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.APIProviderImpl;
@@ -61,12 +64,12 @@ public class CollectionGatewayImpl implements CollectionGateway {
     @Override
     public CreationStatus<CollectionRef> create(
         CollectionRef collRef,
-        Integer dimension,
-        String metric,
-        String defaultId,
-        String embeddingProvider,
-        String embeddingModel,
-        String embeddingKey,
+        Optional<Integer> dimension,
+        Optional<String> metric,
+        Optional<String> defaultId,
+        Optional<String> embeddingProvider,
+        Optional<String> embeddingModel,
+        Optional<String> embeddingKey,
         List<String> indexingAllow,
         List<String> indexingDeny
     ) {
@@ -76,51 +79,22 @@ public class CollectionGatewayImpl implements CollectionGateway {
             return CreationStatus.alreadyExists(collRef);
         }
 
+        var collDef = new CollectionDefinition();
+
+        defaultId.ifPresent(s -> collDef.defaultId(CollectionDefaultIdTypes.fromValue(s)));
+        dimension.ifPresent(collDef::vectorDimension);
+        metric.ifPresent(m -> collDef.vectorSimilarity(SimilarityMetric.fromValue(m)));
+
+        if (embeddingProvider.isPresent() && embeddingModel.isPresent() && embeddingKey.isPresent()) {
+            collDef.vectorize(embeddingProvider.get(), embeddingModel.get(), embeddingKey.get());
+        }
+
+        collDef.indexing(new IndexingOptions()
+            .allow(indexingAllow)
+            .deny(indexingDeny));
+
         AstraLogger.loading("Creating collection " + highlight(collRef), (_) -> {
-//            var collectionDefBuilder = new CollectionDefinition();
-//
-//            if (defaultId != null) {
-//                collectionDefBuilder.defaultId(CollectionDefaultIdTypes);
-//            }
-//
-//            // Set up vector configuration
-//            var vectorDefBuilder = VectorDefinition.builder()
-//                .dimension(dimension)
-//                .metric(SimilarityMetric.valueOf(metric.toUpperCase()));
-//
-//            // Add vectorize configuration if provided
-//            if (embeddingProvider != null || embeddingModel != null || embeddingKey != null) {
-//                var vectorizeBuilder = VectorizeDefinition.builder();
-//                if (embeddingProvider != null) {
-//                    vectorizeBuilder.provider(embeddingProvider);
-//                }
-//                if (embeddingModel != null) {
-//                    vectorizeBuilder.model(embeddingModel);
-//                }
-//                if (embeddingKey != null) {
-//                    vectorizeBuilder.authentication(Map.of("providerKey", embeddingKey));
-//                }
-//                vectorDefBuilder.vectorize(vectorizeBuilder.build());
-//            }
-//
-//            collectionDefBuilder.vector(vectorDefBuilder.build());
-//
-//            // Set up indexing configuration
-//            if (indexingAllow != null || indexingDeny != null) {
-//                var indexDefBuilder = CollectionIndexDefinition.builder()
-//                    .type(CollectionIndexTypes.DEFAULT);
-//
-//                if (indexingAllow != null) {
-//                    indexDefBuilder.allow(indexingAllow);
-//                }
-//                if (indexingDeny != null) {
-//                    indexDefBuilder.deny(indexingDeny);
-//                }
-//
-//                collectionDefBuilder.indexing(indexDefBuilder.build());
-//            }
-//
-//            api.dataApiDatabase(collRef).createCollection(collectionDefBuilder.build());
+            api.dataApiDatabase(collRef.keyspace()).createCollection(collRef.name(), collDef);
             return null;
         });
 

@@ -13,6 +13,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -53,24 +54,23 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
         @Option(
             names = { "-d", "--dimension" },
             paramLabel = "DIMENSION",
-            description = "Dimension of the vector space for this collection",
-            required = true
+            description = "Dimension of the vector space for this collection"
         )
-        public Integer dimension;
+        public Optional<Integer> dimension;
 
         @Option(
             names = { "--default-id" },
             paramLabel = "DEFAULT_ID",
             description = "Default identifier to use for the collection"
         )
-        public String defaultId;
+        public Optional<String> defaultId;
 
         @Option(
             names = { "-m", "--metric" },
             paramLabel = "METRIC",
             description = "Distance metric to use for vector similarity searches"
         )
-        public String metric;
+        public Optional<String> metric;
 
         @Option(
             names = { "--indexing-allow" },
@@ -98,21 +98,21 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
             paramLabel = "EMBEDDING_PROVIDER",
             description = "Using Vectorize, embedding provider to use"
         )
-        public String embeddingProvider;
+        public Optional<String> embeddingProvider;
 
         @Option(
             names = { "--embedding-model" },
             paramLabel = "EMBEDDING_MODEL",
             description = "Using Vectorize, embedding model to use"
         )
-        public String embeddingModel;
+        public Optional<String> embeddingModel;
 
         @Option(
             names = { "--embedding-key" },
             paramLabel = "EMBEDDING_KEY",
             description = "Using Vectorize, embedding key used for shared secret"
         )
-        public String embeddingKey;
+        public Optional<String> embeddingKey;
     }
 
     @Override
@@ -177,14 +177,14 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
     protected Operation<CollectionCreateResult> mkOperation() {
         return new CollectionCreateOperation(collectionGateway, new CollectionCreateRequest(
             $collRef,
-            $collectionCreationOptions.dimension,
-            $collectionCreationOptions.metric,
-            $collectionCreationOptions.defaultId,
-            $vectorizeOptions != null ? $vectorizeOptions.embeddingProvider : null,
-            $vectorizeOptions != null ? $vectorizeOptions.embeddingModel : null,
-            $vectorizeOptions != null ? $vectorizeOptions.embeddingKey : null,
-            $collectionCreationOptions.indexingAllow,
-            $collectionCreationOptions.indexingDeny,
+            Optional.ofNullable($collectionCreationOptions).flatMap(o -> o.dimension),
+            Optional.ofNullable($collectionCreationOptions).flatMap(o -> o.metric),
+            Optional.ofNullable($collectionCreationOptions).flatMap(o -> o.defaultId),
+            Optional.ofNullable($vectorizeOptions).flatMap(o -> o.embeddingProvider),
+            Optional.ofNullable($vectorizeOptions).flatMap(o -> o.embeddingModel),
+            Optional.ofNullable($vectorizeOptions).flatMap(o -> o.embeddingKey),
+            Optional.ofNullable($collectionCreationOptions).map(o -> o.indexingAllow).orElseGet(List::of),
+            Optional.ofNullable($collectionCreationOptions).map(o -> o.indexingDeny).orElseGet(List::of),
             $ifNotExists
         ));
     }

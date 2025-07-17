@@ -25,12 +25,12 @@ public interface CollectionGateway {
 
     CreationStatus<CollectionRef> create(
         CollectionRef collRef,
-        Integer dimension,
-        String metric,
-        String defaultId,
-        String embeddingProvider,
-        String embeddingModel,
-        String embeddingKey,
+        Optional<Integer> dimension,
+        Optional<String> metric,
+        Optional<String> defaultId,
+        Optional<String> embeddingProvider,
+        Optional<String> embeddingModel,
+        Optional<String> embeddingKey,
         List<String> indexingAllow,
         List<String> indexingDeny
     );
