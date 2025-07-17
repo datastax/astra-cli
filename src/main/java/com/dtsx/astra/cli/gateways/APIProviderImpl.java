@@ -13,6 +13,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -107,8 +109,14 @@ public class APIProviderImpl implements APIProvider {
                     throw new AstraCliException(UNIQUENESS_ISSUE, """
                       @|bold,red Multiple databases with same name '%s' were found.|@
                     
-                      Please use the target database's ID to resolve the conflict.
-                    """);
+                      Please use the target database's ID to resolve the conflict. Use @!astra db list!@ to see each database's ID.
+                    
+                      Alternatively, if the command supports it, you can interactively select the target database by not passing a database identifier at all.
+                    """.formatted(name), List.of(
+                        new Hint("Example of using a database ID", "astra db get " + all.getFirst().getId()),
+                        new Hint("Example of using interactive selection", "astra db get"),
+                        new Hint("See all databases with their IDs", "astra db list")
+                    ));
                 }
 
                 return (all.size() == 1) ? Optional.of(all.getFirst()) : Optional.empty();

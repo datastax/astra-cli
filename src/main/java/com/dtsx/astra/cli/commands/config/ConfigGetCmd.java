@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
+import com.dtsx.astra.cli.config.AstraConfig.InvalidProfile;
+import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
@@ -19,12 +21,15 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEY_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
@@ -150,7 +155,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         return new ConfigGetOperation(config(false), new GetConfigRequest($profileName, $key, this::promptForProfileName));
     }
 
-    private String promptForProfileName(NEList<Either<AstraConfig.InvalidProfile, AstraConfig.Profile>> candidates) {
+    private String promptForProfileName(NEList<Either<InvalidProfile, Profile>> candidates) {
         val maxNameLength = candidates.stream()
             .map(p -> profileName(p).length())
             .max(Integer::compareTo)

@@ -22,6 +22,10 @@ public record Ini(@Getter ArrayList<TopLevelIniNode> nodes) {
         nodes.add(new IniSection(name, pairs.entrySet().stream().map(e -> new IniKVPair(List.of(), e.getKey(), e.getValue())).toList()));
     }
 
+    public void addSection(String name, IniSection base) {
+        nodes.add(new IniSection(name, new ArrayList<>(base.pairs())));
+    }
+
     public void deleteSection(String name) {
         nodes.removeIf((n) -> (n instanceof IniSection s) && s.name.equals(name));
     }

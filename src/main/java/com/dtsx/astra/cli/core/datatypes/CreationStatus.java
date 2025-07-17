@@ -11,4 +11,6 @@ public sealed interface CreationStatus<T> {
     static <T> CreationStatus<T> alreadyExists(T value) {
         return new AlreadyExists<>(value);
     }
+
+    T value();
 }

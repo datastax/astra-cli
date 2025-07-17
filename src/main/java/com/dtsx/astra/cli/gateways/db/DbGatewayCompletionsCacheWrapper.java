@@ -84,8 +84,8 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
-        val status = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector);
+    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+        val status = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector, allowDuplicate);
         cache.addToCache(name);
         return status;
     }

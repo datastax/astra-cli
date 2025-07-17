@@ -205,6 +205,19 @@ public class AstraConfig {
             }});
         }
 
+        public void copyProfile(Profile src, ProfileName target) {
+            deleteProfile(target);
+
+            profiles.add(Either.right(new Profile(Optional.of(target), src.token(), src.env())));
+
+            val srcSection = backingIni.getSections().stream()
+                .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
+                .findFirst()
+                .orElseThrow();
+
+            backingIni.addSection(target.unwrap(), srcSection);
+        }
+
         public void deleteProfile(ProfileName profileName) {
             profiles.removeIf(isProfileName(profileName));
             backingIni.deleteSection(profileName.unwrap());

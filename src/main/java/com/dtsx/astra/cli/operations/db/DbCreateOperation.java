@@ -6,7 +6,6 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
-import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -24,6 +23,12 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
     private final DbGateway dbGateway;
     private final CreateDbRequest request;
 
+    public enum ExistingBehavior {
+        FAIL,
+        CREATE_IF_NOT_EXISTS,
+        ALLOW_DUPLICATES
+    }
+
     public record CreateDbRequest(
         String dbName,
         RegionName region,
@@ -32,7 +37,7 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
         String tier,
         Integer capacityUnits,
         boolean nonVector,
-        boolean ifNotExists,
+        ExistingBehavior existingBehavior,
         LongRunningOptions lrOptions
     ) {}
 
@@ -58,36 +63,41 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
             cloudProvider,
             request.tier,
             request.capacityUnits,
-            !request.nonVector
+            !request.nonVector,
+            request.existingBehavior == ExistingBehavior.ALLOW_DUPLICATES
         );
 
-        return switch (status) {
-            case CreationStatus.AlreadyExists<Database>(var db) -> connectToExistingDb(UUID.fromString(db.getId()), db.getStatus(), request);
-            case CreationStatus.Created<Database>(var db) -> connectToNewDb(UUID.fromString(db.getId()), db.getStatus(), request);
-        };
-    }
+        val db = status.value();
+        val dbId = UUID.fromString(db.getId());
 
-    private DbCreateResult connectToExistingDb(UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
-        if (!request.ifNotExists) {
-            return new DatabaseAlreadyExistsIllegallyWithStatus(dbId, dbStatus);
+        if (status instanceof CreationStatus.Created<?>) {
+            return connectToNewDb(dbId, db.getStatus(), request);
         }
 
+        if (request.existingBehavior == ExistingBehavior.FAIL) {
+            return new DatabaseAlreadyExistsIllegallyWithStatus(dbId, db.getStatus());
+        }
+
+        return connectToExistingDb(dbId, db.getStatus(), request);
+    }
+
+    private DbCreateResult connectToExistingDb(UUID dbId, DatabaseStatusType dbStatus, DbCreateOperation.CreateDbRequest request) {
         if (request.lrOptions.dontWait()) {
-            return new DatabaseAlreadyExistsWithStatus(dbId, dbStatus);
+            return new DbCreateOperation.DatabaseAlreadyExistsWithStatus(dbId, dbStatus);
         }
 
         val awaited = dbGateway.resumeDb(DbRef.fromId(dbId), Optional.of(request.lrOptions.timeout()));
 
-        return new DatabaseAlreadyExistsAndIsActive(dbId, dbStatus, awaited.getRight());
+        return new DbCreateOperation.DatabaseAlreadyExistsAndIsActive(dbId, dbStatus, awaited.getRight());
     }
 
     private DbCreateResult connectToNewDb(UUID dbId, DatabaseStatusType dbStatus, CreateDbRequest request) {
         if (request.lrOptions.dontWait()) {
-            return new DatabaseCreationStarted(dbId, dbStatus);
+            return new DbCreateOperation.DatabaseCreationStarted(dbId, dbStatus);
         }
 
         val awaitedDuration = dbGateway.waitUntilDbStatus(DbRef.fromId(dbId), ACTIVE, request.lrOptions.timeout());
 
-        return new DatabaseCreated(dbId, awaitedDuration);
+        return new DbCreateOperation.DatabaseCreated(dbId, awaitedDuration);
     }
 }

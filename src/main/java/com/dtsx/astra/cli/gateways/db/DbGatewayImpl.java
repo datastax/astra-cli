@@ -223,13 +223,15 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector) {
-        val existingDb = AstraLogger.loading("Checking if database " + highlight(name) + " already exists", (_) -> (
-            tryFindOneDb(DbRef.fromNameUnsafe(name))
-        ));
+    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+        if (!allowDuplicate) {
+            val existingDb = AstraLogger.loading("Checking if database " + highlight(name) + " already exists", (_) -> (
+                tryFindOneDb(DbRef.fromNameUnsafe(name))
+            ));
 
-        if (existingDb.isPresent()) {
-            return CreationStatus.alreadyExists(existingDb.get());
+            if (existingDb.isPresent()) {
+                return CreationStatus.alreadyExists(existingDb.get());
+            }
         }
 
         val id = AstraLogger.loading("Creating database %s".formatted(highlight(name)), (_) -> {

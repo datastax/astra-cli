@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
+import com.dtsx.astra.cli.config.AstraConfig.InvalidProfile;
+import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
@@ -26,7 +28,7 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
     public record GetConfigRequest(
         Optional<String> profileName,
         Optional<String> key,
-        Function<NEList<Either<AstraConfig.InvalidProfile, AstraConfig.Profile>>, String> promptProfileName
+        Function<NEList<Either<InvalidProfile, Profile>>, String> promptProfileName
     ) {}
 
     @Override

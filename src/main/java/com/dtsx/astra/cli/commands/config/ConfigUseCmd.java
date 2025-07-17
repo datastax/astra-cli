@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
+import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
@@ -59,7 +60,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
         return new ConfigUseOperation(config(false), new UseConfigRequest($profileName, this::promptForProfile));
     }
 
-    private AstraConfig.Profile promptForProfile(NEList<AstraConfig.Profile> candidates) {
+    private AstraConfig.Profile promptForProfile(Optional<Profile> defaultProfile, NEList<Profile> candidates) {
         val maxNameLength = candidates.stream()
             .map(p -> p.nameOrDefault().unwrap().length())
             .max(Integer::compareTo)
@@ -74,7 +75,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
                     val tags = new ArrayList<String>() {{
                         add(p.env().name().toLowerCase());
 
-                        if (p.isDefault()) {
+                        if (defaultProfile.isPresent() && defaultProfile.get().token().equals(p.token()) && defaultProfile.get().env().equals(p.env())) {
                             add("already default");
                         }
                     }};

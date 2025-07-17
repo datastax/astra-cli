@@ -66,6 +66,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
             ctx.deleteProfile(profileName);
             ctx.createProfile(profileName, request.token, request.env);
 
+
             if (request.setDefault) {
                 ctx.deleteProfile(ProfileName.DEFAULT);
                 ctx.createProfile(ProfileName.DEFAULT, request.token, request.env);

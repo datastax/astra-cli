@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
+import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.operations.Operation;
@@ -9,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 public class ConfigUseOperation implements Operation<ConfigUseResult> {
@@ -22,7 +23,7 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
 
     public record UseConfigRequest(
         Optional<ProfileName> profileName,
-        Function<NEList<AstraConfig.Profile>, AstraConfig.Profile> promptForProfile
+        BiFunction<Optional<Profile>, NEList<Profile>, Profile> promptForProfile
     ) {}
 
     @Override
@@ -34,7 +35,9 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
                 throw new IllegalStateException("No profiles available to select from.");
             }
 
-            return request.promptForProfile.apply(profiles.get()).nameOrDefault();
+            val defaultProfile = config.lookupProfile(ProfileName.DEFAULT);
+
+            return request.promptForProfile.apply(defaultProfile, profiles.get()).nameOrDefault();
         });
 
         val retrievedProfile = config.lookupProfile(targetProfileName);
@@ -46,8 +49,7 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
         val profile = retrievedProfile.get();
 
         config.modify((ctx) -> {
-            ctx.deleteProfile(ProfileName.DEFAULT);
-            ctx.createProfile(ProfileName.DEFAULT, profile.token(), profile.env());
+            ctx.copyProfile(profile, ProfileName.DEFAULT);
         });
 
         return new ProfileSetAsDefault(targetProfileName);

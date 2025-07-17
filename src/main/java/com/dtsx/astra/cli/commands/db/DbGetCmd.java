@@ -81,8 +81,8 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbGetResult> {
             put("Vector", dbInfo4Key(dbInfo, vector).equals(true) ? "Enabled" : "Disabled");
             put("Default Keyspace", dbInfo4Key(dbInfo, keyspace));
             put("Creation Time", dbInfo4Key(dbInfo, creation_time));
-            put("Keyspaces", dbInfo4Key(dbInfo, keyspaces).toString());
-            put("Regions", dbInfo4Key(dbInfo, regions).toString());
+            put("Keyspaces", dbInfo4Key(dbInfo, keyspaces));
+            put("Regions", dbInfo4Key(dbInfo, regions));
         }});
     }
 

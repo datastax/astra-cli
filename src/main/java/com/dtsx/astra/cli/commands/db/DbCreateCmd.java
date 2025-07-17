@@ -56,11 +56,22 @@ import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
     command = "astra db list-regions-vector"
 )
 public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implements WithSetTimeout {
-    @Option(
-        names = { "--if-not-exists" },
-        description = { "Don't error if the database already exists", DEFAULT_VALUE }
-    )
-    public boolean $ifNotExists;
+    @ArgGroup(heading = "%nWhat to do if the database already exists:%n")
+    public @Nullable ExistingBehavior $existingBehavior;
+
+    public static class ExistingBehavior {
+        @Option(
+            names = { "--if-not-exists" },
+            description = { "Don't error if the database already exists", DEFAULT_VALUE }
+        )
+        public boolean $ifNotExists;
+
+        @Option(
+            names = { "--allow-duplicate-names" },
+            description = { "Allow multiple databases with the same name", DEFAULT_VALUE }
+        )
+        public boolean $allowDuplicateNames;
+    }
 
     @ArgGroup(validate = false, heading = "%nDatabase configuration options:%n")
     public @Nullable DatabaseCreationOptions $databaseCreationOptions;
@@ -130,6 +141,13 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             throw new ParameterException(spec.commandLine(), "Must provide a region (via --region) when creating a new database");
         }
 
+        val existingBehavior =
+            ($existingBehavior != null && $existingBehavior.$ifNotExists)
+                ? DbCreateOperation.ExistingBehavior.CREATE_IF_NOT_EXISTS :
+            ($existingBehavior != null && $existingBehavior.$allowDuplicateNames)
+                ? DbCreateOperation.ExistingBehavior.ALLOW_DUPLICATES
+                : DbCreateOperation.ExistingBehavior.FAIL;
+
         return new DbCreateOperation(dbGateway, new CreateDbRequest(
             dbName,
             $databaseCreationOptions.region,
@@ -138,7 +156,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             $databaseCreationOptions.tier,
             $databaseCreationOptions.capacityUnits,
             $databaseCreationOptions.nonVector,
-            $ifNotExists,
+            existingBehavior,
             lrMixin.options()
         ));
     }
@@ -173,13 +191,16 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         throw new AstraCliException(DATABASE_ALREADY_EXISTS, """
           @|bold,red Error: Database %s already exists with id %s, and has status %s.|@
         
-          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the database already exists.
+          To ignore this error, either:
+          - Provide the @!--if-not-exists!@ flag to skip this error if the database already exists.
+          - Provide the @!--allow-duplicate-names!@ flag to create the database even if another with the same name already exists.
         """.formatted(
             $dbRef,
             dbId,
             currStatus
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-not-exists"),
+            new Hint("Example fix:", originalArgs(), "--allow-duplicate-names"),
             new Hint("Get information about the existing database:", "astra db get %s".formatted($dbRef))
         ));
     }
