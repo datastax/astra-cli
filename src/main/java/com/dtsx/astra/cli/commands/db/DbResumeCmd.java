@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbResumeOperation;
@@ -9,6 +11,7 @@ import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
@@ -34,10 +37,18 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
     comment = "Resume a database, without waiting for it to become active",
     command = "astra db resume my_db --async"
 )
-public class DbResumeCmd extends AbstractLongRunningDbSpecificCmd<DbResumeResult> {
+public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implements WithSetTimeout {
     @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
+    }
+
+    @Mixin
+    protected LongRunningOptionsMixin lrMixin;
+
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to resume";
     }
 
     @Override

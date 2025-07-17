@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
-import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
+import com.dtsx.astra.cli.commands.db.AbstractDbRequiredCmd;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGateway;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public abstract class AbstractCdcCmd<OpRes> extends AbstractDbSpecificCmd<OpRes> {
+public abstract class AbstractCdcCmd<OpRes> extends AbstractDbRequiredCmd<OpRes> {
     protected CdcGateway cdcGateway;
 
     @Override

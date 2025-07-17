@@ -3,6 +3,8 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -11,10 +13,7 @@ import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.ArgGroup;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DATABASE_ALREADY_EXISTS;
+import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -52,7 +51,11 @@ import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
     comment = "Create a database if it doesn't already exist",
     command = "astra db create my_db --region us-east1 --if-not-exists"
 )
-public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd<DbCreateResult> {
+@Example(
+    comment = "List available vector database regions for creating a database",
+    command = "astra db list-regions-vector"
+)
+public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implements WithSetTimeout {
     @Option(
         names = { "--if-not-exists" },
         description = { "Don't error if the database already exists", DEFAULT_VALUE }
@@ -62,12 +65,14 @@ public class DbCreateCmd extends AbstractLongRunningDbSpecificCmd<DbCreateResult
     @ArgGroup(validate = false, heading = "%nDatabase configuration options:%n")
     public @Nullable DatabaseCreationOptions $databaseCreationOptions;
 
+    @Mixin
+    protected LongRunningOptionsMixin lrMixin;
+
     public static class DatabaseCreationOptions {
         @Option(
             names = { "-r", "--region" },
             paramLabel = "DB_REGION",
-            description = "Cloud provider region to provision",
-            required = true
+            description = "Cloud provider region to provision. @|bold Use one of the `astra db list-regions-*` commands to see available regions.|@"
         )
         public RegionName region;
 

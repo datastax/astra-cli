@@ -1,29 +1,19 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
-import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.core.output.output.OutputJson;
-import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.DbGetOperation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
-import org.graalvm.collections.Pair;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
 import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetRequest;
@@ -42,7 +32,7 @@ import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
     comment = "Get a specific attribute of a database",
     command = "astra db get my_db --key id"
 )
-public class DbGetCmd extends AbstractDbCmd<DbGetResult> {
+public class DbGetCmd extends AbstractPromptForDbCmd<DbGetResult> {
     public enum DbGetKeys {
         name,
         id,
@@ -55,15 +45,6 @@ public class DbGetCmd extends AbstractDbCmd<DbGetResult> {
         creation_time,
         vector
     }
-
-    @Parameters(
-        index = "0",
-        arity = "0..1",
-        completionCandidates = DbNamesCompletion.class,
-        paramLabel = "DB",
-        description = "The name or ID of the Astra database to operate on"
-    )
-    protected Optional<DbRef> $dbRef;
 
     @Option(
         names = { "-k", "--key" },
@@ -122,37 +103,11 @@ public class DbGetCmd extends AbstractDbCmd<DbGetResult> {
 
     @Override
     protected DbGetOperation mkOperation() {
-        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef, this::promptForDbRef));
+        return new DbGetOperation(dbGateway, new DbGetRequest($dbRef));
     }
 
-    private Database promptForDbRef(NEList<Database> dbs) {
-        val namesAreUnique = dbs.stream()
-            .map(db -> db.getInfo().getName())
-            .distinct()
-            .count() == dbs.size();
-
-        val maxNameLength = dbs.stream()
-            .map(db -> db.getInfo().getName().length())
-            .max(Integer::compareTo)
-            .orElse(0);
-
-        val displayToDbMap = dbs.stream().collect(Collectors.toMap(
-            db -> db.getInfo().getName() + " ".repeat(maxNameLength - db.getInfo().getName().length()) +
-                (namesAreUnique
-                    ? " " + AstraColors.NEUTRAL_500.use("(" + db.getInfo().getCloudProvider().name() + " " + db.getInfo().getRegion() + ")")
-                    : " " + AstraColors.NEUTRAL_500.use("(" + db.getId() + ")")),
-            Function.identity()
-        ));
-
-        val dbInput = AstraConsole.select(
-            "Select the database to get information about:",
-            NEList.of(displayToDbMap.keySet().stream().toList()),
-            displayToDbMap::get,
-            "@!--db!@ flag",
-            Pair.create(originalArgs(), "<db>"),
-            true
-        );
-
-        return dbInput.orElseThrow();
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to get information about";
     }
 }

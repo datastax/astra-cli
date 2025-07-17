@@ -2,10 +2,14 @@ package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class ConfigUseOperation implements Operation<ConfigUseResult> {
@@ -13,28 +17,39 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
     private final UseConfigRequest request;
 
     public sealed interface ConfigUseResult {}
-    public record ProfileSetAsDefault() implements ConfigUseResult {}
-    public record ProfileNotFound() implements ConfigUseResult {}
+    public record ProfileSetAsDefault(ProfileName profileName) implements ConfigUseResult {}
+    public record ProfileNotFound(ProfileName profileName) implements ConfigUseResult {}
 
     public record UseConfigRequest(
-        ProfileName profileName
+        Optional<ProfileName> profileName,
+        Function<NEList<AstraConfig.Profile>, AstraConfig.Profile> promptForProfile
     ) {}
 
     @Override
     public ConfigUseResult execute() {
-        val targetProfile = config.lookupProfile(request.profileName);
+        val targetProfileName = request.profileName.orElseGet(() -> {
+            val profiles = NEList.parse(config.getValidatedProfiles().stream().filter(p -> !p.isDefault()).toList());
 
-        if (targetProfile.isEmpty()) {
-            return new ProfileNotFound();
+            if (profiles.isEmpty()) {
+                throw new IllegalStateException("No profiles available to select from.");
+            }
+
+            return request.promptForProfile.apply(profiles.get()).nameOrDefault();
+        });
+
+        val retrievedProfile = config.lookupProfile(targetProfileName);
+
+        if (retrievedProfile.isEmpty()) {
+            return new ProfileNotFound(targetProfileName);
         }
 
-        val profile = targetProfile.get();
+        val profile = retrievedProfile.get();
 
         config.modify((ctx) -> {
             ctx.deleteProfile(ProfileName.DEFAULT);
             ctx.createProfile(ProfileName.DEFAULT, profile.token(), profile.env());
         });
 
-        return new ProfileSetAsDefault();
+        return new ProfileSetAsDefault(targetProfileName);
     }
 }

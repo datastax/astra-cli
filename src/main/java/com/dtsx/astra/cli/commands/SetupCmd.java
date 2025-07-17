@@ -3,7 +3,6 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
-import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
@@ -12,7 +11,6 @@ import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraConsole.ConfirmResponse;
 import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputHuman;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
@@ -24,7 +22,6 @@ import com.dtsx.astra.cli.operations.SetupOperation.SetupRequest;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
-import org.graalvm.collections.Pair;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -32,8 +29,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.INVALID_TOKEN;
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.NO_ANSWER;
+import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
+import static com.dtsx.astra.cli.core.output.ExitCode.NO_ANSWER;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
@@ -78,11 +75,16 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             : "@|bold Profile|@ %s @|bold successfully created.|@".formatted(highlight(result.profileName())));
 
         if (result.isDefault()) {
-            return OutputHuman.response(creationMessage + "\n\nIt is now the default profile.", null);
+            return OutputHuman.response(creationMessage + "\n\nIt has been set as the default profile.", List.of(
+                new Hint("Try it out!", "astra db list"),
+                new Hint("Manage your profiles", "astra config list")
+            ));
         }
 
         return OutputHuman.response(creationMessage, List.of(
-            new Hint("Set it as the default profile with:", "astra config use " + result.profileName())
+            new Hint("Set it as the default profile with:", "astra config use " + result.profileName()),
+            new Hint("Explicitly use this profile in commands like:", "astra db list --profile " + result.profileName()),
+            new Hint("Manage your profiles", "astra config list")
         ));
     }
 
@@ -119,7 +121,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         AstraLogger.banner();
 
         val confirmationMsg = """
-          Welcome to the Astra CLI setup! A configuration file with your profile will be created at %s.
+          @|bold Welcome to the Astra CLI setup!|@
+        
+          @|faint A configuration file with your profile will be created at|@ @|faint,italic %s|@
         
           If you'd prefer to provide credentials on a per-command basis rather than storing them in a file, you can either:
           - Use the per-command @!--token!@ flag to pass your token directly.
@@ -130,13 +134,13 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           Enter anything to continue, or use @!Ctrl+C!@ to cancel.
         """.formatted(
-            highlight(existing.getAbsolutePath()),
+            existing.getAbsolutePath(),
             renderComment("Example:"),
             renderCommand("astra db list --token <your_token>")
         );
 
-        if (AstraConsole.confirm(confirmationMsg) == ConfirmResponse.ANSWER_NO) {
-            throw new ExecutionCancelledException("Operation cancelled by user.");
+        if (AstraConsole.confirm(confirmationMsg, true) == ConfirmResponse.ANSWER_NO) {
+            throw new ExecutionCancelledException();
         }
     }
 
@@ -144,7 +148,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         AstraLogger.banner();
 
         val confirmationMsg = """
-          Looks like you're already set up! Your config file exists at %s.
+          @|bold Looks like you're already set up!|@
+        
+          @|faint Your config file already exists at|@ @|faint,italic %s|@
         
           Hint: You can use the @!astra config!@ commands to manage your profiles.
        
@@ -153,13 +159,13 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           Do you want to continue and create a new profile? [Y/n]
         """.formatted(
-            highlight(existing.getAbsolutePath()),
+            existing.getAbsolutePath(),
             renderComment("Example:"),
             renderCommand("astra config list")
         );
 
-        if (AstraConsole.confirm(confirmationMsg) == ConfirmResponse.ANSWER_NO) {
-            throw new ExecutionCancelledException("Operation cancelled by user.");
+        if (AstraConsole.confirm(confirmationMsg, true) == ConfirmResponse.ANSWER_NO) {
+            throw new ExecutionCancelledException();
         }
     }
 
@@ -176,8 +182,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             existing.name().orElseThrow()
         );
 
-        switch (AstraConsole.confirm(confirmationMsg)) {
-            case ANSWER_NO -> throw new ExecutionCancelledException("Operation cancelled by user.");
+        switch (AstraConsole.confirm(confirmationMsg, false)) {
+            case ANSWER_NO -> throw new ExecutionCancelledException();
             case NO_ANSWER -> throw new AstraCliException(NO_ANSWER, "Please answer interactively or pass the --name option with a different profile name.");
         }
     }
@@ -200,15 +206,15 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private Optional<AstraEnvironment> promptForEnv() {
-        return AstraConsole.select(
-            AstraColors.PURPLE_300.use("(Optional)") + "Enter the target Astra environment (defaults to @!prod!@)",
-            NEList.of("prod", "dev", "test"),
-            "prod",
-            s -> AstraEnvironment.valueOf(s.toUpperCase()),
-            "@!--env!@ flag",
-            Pair.create(originalArgs(), "--env <prod|test|dev>"),
-            false
-        );
+        val prompt = AstraColors.PURPLE_300.use("(Optional)") + " Enter the target Astra environment (defaults to @!prod!@)";
+
+        return AstraConsole.select(prompt)
+            .options(AstraEnvironment.values())
+            .defaultOption(AstraEnvironment.PROD)
+            .mapper(e -> e.name().toLowerCase())
+            .fallbackFlag("--env")
+            .fix(originalArgs(), "--env <prod|test|dev>")
+            .dontClearAfterSelection();
     }
 
     private Optional<ProfileName> promptForName() {
@@ -232,7 +238,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           Do you want to set this profile as the default instead? [y/N]
         """;
 
-        return switch (AstraConsole.confirm(confirmationMsg)) {
+        return switch (AstraConsole.confirm(confirmationMsg, false)) {
             case ANSWER_OK -> true;
             case ANSWER_NO, NO_ANSWER -> false;
         };

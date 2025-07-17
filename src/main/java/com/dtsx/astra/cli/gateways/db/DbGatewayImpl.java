@@ -3,8 +3,8 @@ package com.dtsx.astra.cli.gateways.db;
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
-import com.dtsx.astra.cli.core.exceptions.internal.db.CouldNotResumeDbException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -121,7 +121,12 @@ public class DbGatewayImpl implements DbGateway {
             val response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 500) {
-                throw new CouldNotResumeDbException(ref, response.body());
+                throw new AstraCliException("""
+                  @|bold,red An error occurred while attempting to resume database %s|@
+                
+                  The server returned the following response:
+                  %s
+                """.formatted(ref, response.body()));
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -15,7 +15,7 @@ import picocli.CommandLine.Command;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
 

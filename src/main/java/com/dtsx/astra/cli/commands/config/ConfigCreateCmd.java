@@ -25,10 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.*;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
-import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "create",
@@ -180,7 +179,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
-        return new ConfigCreateOperation(config(), OrgGateway.mkDefault($token, $env), new CreateConfigRequest(
+        return new ConfigCreateOperation(config(true), OrgGateway.mkDefault($token, $env), new CreateConfigRequest(
             $profileName,
             $token,
             $env,
@@ -200,8 +199,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             highlight(profileName)
         );
 
-        switch (AstraConsole.confirm(trimIndent(confirmationMsg))) {
-            case ANSWER_NO -> throw new ExecutionCancelledException("Operation cancelled by user. Use --yes to override without confirmation.");
+        switch (AstraConsole.confirm(confirmationMsg, false)) {
+            case ANSWER_NO -> throw new ExecutionCancelledException();
             case NO_ANSWER -> throwProfileAlreadyExists(profileName);
         }
     }

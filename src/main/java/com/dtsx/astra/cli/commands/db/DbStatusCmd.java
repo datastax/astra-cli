@@ -18,7 +18,7 @@ import static com.dtsx.astra.cli.operations.db.DbStatusOperation.*;
     comment = "Get the status of a database",
     command = "astra db status my_db"
 )
-public class DbStatusCmd extends AbstractDbSpecificCmd<DatabaseStatusType> {
+public class DbStatusCmd extends AbstractPromptForDbCmd<DatabaseStatusType> {
     @Override
     protected DbStatusOperation mkOperation() {
         return new DbStatusOperation(dbGateway, new DbStatusRequest($dbRef));
@@ -32,5 +32,10 @@ public class DbStatusCmd extends AbstractDbSpecificCmd<DatabaseStatusType> {
     @Override
     protected final OutputAll execute(DatabaseStatusType result) {
         return OutputAll.serializeValue(result);
+    }
+
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to get the status for";
     }
 }

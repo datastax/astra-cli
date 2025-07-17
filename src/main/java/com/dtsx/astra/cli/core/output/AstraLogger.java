@@ -62,17 +62,17 @@ public class AstraLogger {
 
     public static void banner() {
         val banner = PURPLE_300.use("""
-              _____            __
-             /  _  \\   _______/  |_____________
-            /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\
-           /    |    \\\\___ \\  |  |  |  | \\ //__ \\_
-           \\____|__  /____  > |__|  |__|  (____  /
-                   \\/     \\/                   \\/
+             _____            __
+            /  _  \\   _______/  |_____________
+           /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\
+          /    |    \\\\___ \\  |  |  |  | \\ //__ \\_
+          \\____|__  /____  > |__|  |__|  (____  /
+                  \\/     \\/                   \\/
         
-                                Version: %s
+                               Version: %s
         """.stripIndent().formatted(CLIProperties.version()));
 
-        log(banner + NL, Level.REGULAR, false);
+        log(NL + banner, Level.REGULAR, false);
     }
 
     public enum Level {

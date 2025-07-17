@@ -20,7 +20,7 @@ import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
     comment = "List all regions for the database",
     command = "astra db list-regions my_db"
 )
-public class RegionListCmd extends AbstractDbSpecificRegionCmd<FoundRegions> {
+public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
     @Override
     protected RegionListOperation mkOperation() {
         return new RegionListOperation(regionGateway, dbGateway, new RegionListRequest($dbRef));
@@ -43,5 +43,10 @@ public class RegionListCmd extends AbstractDbSpecificRegionCmd<FoundRegions> {
             .toList();
 
         return new ShellTable(data).withColumns("Cloud Provider", "Region", "Tier", "Status");
+    }
+
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to list regions for";
     }
 }

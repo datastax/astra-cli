@@ -55,7 +55,7 @@ public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult>
 
     @Override
     protected Operation<ListConfigResult> mkOperation() {
-        return new ConfigListOperation(config());
+        return new ConfigListOperation(config(false));
     }
 
     private String mkConfigDisplayName(String name, boolean isInUse) {

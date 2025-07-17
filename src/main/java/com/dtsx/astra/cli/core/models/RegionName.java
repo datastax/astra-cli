@@ -14,6 +14,9 @@ public class RegionName implements AstraColors.Highlightable {
     String name;
 
     public static Either<String, RegionName> parse(@NonNull String name) {
+        if (Utils.trim(name).isBlank()) {
+            return Either.left("Region should not be blank or empty. Use one of the `astra db list-regions-*` commands to see available regions.");
+        }
         return Utils.trimAndValidateBasics("Region", name).map(RegionName::mkUnsafe);
     }
 

@@ -9,8 +9,8 @@ import picocli.CommandLine;
 
 public class DatabaseNotFoundExceptionMapper implements ExternalExceptionMapper<DatabaseNotFoundException> {
     @Override
-    public Class<DatabaseNotFoundException> getExceptionClass() {
-        return DatabaseNotFoundException.class;
+    public boolean canMap(Exception ex) {
+        return ex instanceof DatabaseNotFoundException;
     }
 
     @Override

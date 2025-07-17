@@ -15,12 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.KEYSPACE_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "delete-keyspace",

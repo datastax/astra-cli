@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.USER_ALREADY_INVITED;
+import static com.dtsx.astra.cli.core.output.ExitCode.USER_ALREADY_INVITED;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.user.UserInviteOperation.*;
 

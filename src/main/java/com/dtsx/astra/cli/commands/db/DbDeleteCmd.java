@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -9,6 +11,7 @@ import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
@@ -16,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DATABASE_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -38,13 +41,16 @@ import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
     comment = "Delete an existing Astra database without waiting for complete termination",
     command = "astra db delete my_db --async"
 )
-public class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd<DbDeleteResult> {
+public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implements WithSetTimeout {
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if database does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
     public boolean $ifExists;
+
+    @Mixin
+    protected LongRunningOptionsMixin lrMixin;
 
     @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
@@ -119,5 +125,10 @@ public class DbDeleteCmd extends AbstractLongRunningDbSpecificCmd<DbDeleteResult
             "wasDeleted", wasDeleted,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );
+    }
+
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to delete";
     }
 }

@@ -17,7 +17,7 @@ import picocli.CommandLine.Parameters;
 import java.util.List;
 import java.util.Map;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.PROFILE_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
@@ -90,6 +90,6 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
 
     @Override
     protected Operation<ConfigDeleteResult> mkOperation() {
-        return new ConfigDeleteOperation(config(), new CreateDeleteRequest($profileName, $ifExists));
+        return new ConfigDeleteOperation(config(false), new CreateDeleteRequest($profileName, $ifExists));
     }
 }

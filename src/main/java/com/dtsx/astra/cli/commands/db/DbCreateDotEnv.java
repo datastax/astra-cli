@@ -27,8 +27,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DOWNLOAD_ISSUE;
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.EXECUTION_CANCELLED;
+import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
+import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
@@ -61,7 +61,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     comment = "Specify the file to create/update",
     command = "astra db create-dotenv -f .env.local"
 )
-public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
+public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     @Option(
         names = { "--print" },
         description = { "Output the .env file to stdout instead of saving it to the .env file.", DEFAULT_VALUE },
@@ -204,6 +204,11 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
         ));
     }
 
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to create the .env file for";
+    }
+
     private Set<EnvKey> resolveKeys() {
         if ($keysGroup != null && $keysGroup.keys != null) {
             return $keysGroup.keys;
@@ -239,7 +244,7 @@ public class DbCreateDotEnv extends AbstractDbSpecificCmd<CreateDotEnvResult> {
             duplicatesStr
         ));
 
-        val response = AstraConsole.confirm(msg);
+        val response = AstraConsole.confirm(msg, false);
 
         if (response.equals(ConfirmResponse.NO_ANSWER)) {
             throw new AstraCliException(EXECUTION_CANCELLED, """

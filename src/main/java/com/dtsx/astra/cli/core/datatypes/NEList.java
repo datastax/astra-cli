@@ -6,6 +6,7 @@ import lombok.experimental.Delegate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class NEList<E> implements List<E> {
     @Delegate
@@ -35,5 +36,9 @@ public class NEList<E> implements List<E> {
             throw new IllegalArgumentException("Attempted to create an NEList from an empty array");
         }
         return new NEList<>(List.of(elements));
+    }
+
+    public <R> NEList<R> map(Function<E, R> mapper) {
+        return new NEList<>(stream().map(mapper).toList());
     }
 }

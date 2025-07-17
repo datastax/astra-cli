@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.core.exceptions.internal.role;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.RoleRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 
 public class RoleNotFoundException extends AstraCliException {
     public RoleNotFoundException(RoleRef role) {
@@ -11,10 +10,7 @@ public class RoleNotFoundException extends AstraCliException {
         
           The specified role does not exist.
         
-          Use %s to see all available roles.
-        """.formatted(
-            role,
-            AstraColors.highlight("astra role list")
-        ));
+          Use @!astra role list!@ to see all available roles.
+        """.formatted(role));
     }
 }

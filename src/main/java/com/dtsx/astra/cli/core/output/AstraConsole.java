@@ -1,14 +1,11 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.output.OutputType;
 import com.dtsx.astra.cli.core.output.select.AstraSelector;
-import com.dtsx.astra.cli.core.output.select.SelectStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
-import org.graalvm.collections.Pair;
 import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
@@ -17,7 +14,6 @@ import java.io.Console;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
@@ -83,11 +79,9 @@ public class AstraConsole {
             return Optional.empty();
         }
 
-        print(trimIndent(prompt), " ");
-
         val ret = (isSecret)
-            ? Optional.ofNullable(console.readPassword()).map(String::valueOf)
-            : Optional.ofNullable(console.readLine());
+            ? Optional.ofNullable(console.readPassword(format(trimIndent(prompt)) + " ")).map(String::valueOf)
+            : Optional.ofNullable(console.readLine(format(trimIndent(prompt)) + " "));
 
         if (ret.isEmpty()) {
             println();
@@ -103,11 +97,15 @@ public class AstraConsole {
 
     private static final List<String> YES_ANSWERS = List.of("y", "yes", "true", "1", "ok");
 
-    public static ConfirmResponse confirm(String prompt) {
+    public static ConfirmResponse confirm(String prompt, boolean defaultAnswer) {
         val read = readLine(prompt, false);
 
-        if (read.isEmpty() || read.get().isBlank()) {
+        if (read.isEmpty()) {
             return ConfirmResponse.NO_ANSWER;
+        }
+
+        if (read.get().trim().isEmpty()) {
+            return defaultAnswer ? ConfirmResponse.ANSWER_OK : ConfirmResponse.ANSWER_NO;
         }
 
         if (YES_ANSWERS.contains(read.get().trim().toLowerCase())) {
@@ -117,20 +115,8 @@ public class AstraConsole {
         }
     }
 
-    public static Optional<String> select(String prompt, NEList<String> options, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
-        return select(prompt, options, null, Function.identity(), fallback, fix, clearAfterSelection);
-    }
-    
-    public static Optional<String> select(String prompt, NEList<String> options, @Nullable String defaultOption, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
-        return select(prompt, options, defaultOption, Function.identity(), fallback, fix, clearAfterSelection);
-    }
-    
-    public static <T> Optional<T> select(String prompt, NEList<String> options, Function<String, T> mapper, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
-        return select(prompt, options, null, mapper, fallback, fix, clearAfterSelection);
-    }
-
-    public static <T> Optional<T> select(String prompt, NEList<String> options, @Nullable String defaultOption, Function<String, T> mapper, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
-        return new AstraSelector().select(trimIndent(prompt), options, Optional.ofNullable(defaultOption), mapper, fallback, fix, clearAfterSelection);
+    public static AstraSelector.Builder select(String prompt) {
+        return new AstraSelector.Builder(prompt);
     }
 
     public static String format(Object... args) {
@@ -142,6 +128,7 @@ public class AstraConsole {
             } else if (item instanceof String str) {
                 val processedStr = HIGHLIGHT_PATTERN.matcher(str).replaceAll((match) ->
                     AstraColors.highlight(match.group(1)));
+
 
                 sb.append(AstraColors.ansi().new Text(processedStr, AstraColors.colorScheme()));
             } else {

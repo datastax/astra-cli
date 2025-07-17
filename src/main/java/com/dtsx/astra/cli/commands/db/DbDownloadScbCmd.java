@@ -15,8 +15,8 @@ import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DOWNLOAD_ISSUE;
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.FILE_ISSUE;
+import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
+import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
@@ -37,7 +37,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     comment = "Download the SCB for a database, saving it to a specific file",
     command = "astra db download-scb my_db -f /path/to/scb.zip"
 )
-public class DbDownloadScbCmd extends AbstractDbSpecificCmd<DownloadScbResult> {
+public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> {
     @Option(
         names = { "-r", "--region" },
         description = "The cloud provider region to target. Defaults to the default region of the database.",
@@ -126,5 +126,10 @@ public class DbDownloadScbCmd extends AbstractDbSpecificCmd<DownloadScbResult> {
         return Map.of(
             "file", dest.getAbsolutePath()
         );
+    }
+
+    @Override
+    protected String dbRefPrompt() {
+        return "Select the database to download the secure connect bundle(s) for";
     }
 }

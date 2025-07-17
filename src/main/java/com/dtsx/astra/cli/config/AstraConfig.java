@@ -1,19 +1,22 @@
 package com.dtsx.astra.cli.config;
 
 import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
+import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.exceptions.internal.config.AstraConfigFileException;
 import com.dtsx.astra.cli.core.models.AstraToken;
+import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
-import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
-import com.dtsx.astra.cli.core.exceptions.internal.config.AstraConfigFileException;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +28,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
+@Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
@@ -45,12 +50,14 @@ public class AstraConfig {
             return name.orElse(ProfileName.mkUnsafe("<args_provided>"));
         }
     }
-    private record InvalidProfile(IniSection section, String issue) {}
+    public record InvalidProfile(IniSection section, String issue) {}
 
     @Getter
     private final ArrayList<Either<InvalidProfile, Profile>> profiles;
 
     private final Ini backingIni;
+
+    @Getter
     private final File backingFile;
 
     public List<Profile> getValidatedProfiles() {
@@ -62,10 +69,39 @@ public class AstraConfig {
         )).toList();
     }
 
-    public static AstraConfig readAstraConfigFile(@Nullable File file) {
-        if (file == null) {
+    public static AstraConfig readAstraConfigFile(@Nullable File file, boolean createIfNotExists) {
+        val usingDefault = file == null;
+
+        if (usingDefault) {
             file = resolveDefaultAstraConfigFile();
+        }
+
+        if (createIfNotExists) {
             FileUtils.createFileIfNotExists(file, null);
+        }
+
+        if (!file.exists()) {
+            if (usingDefault) {
+                throw new AstraCliException(FILE_ISSUE, """
+                  @|bold,red Error: The default configuration file (%s) does not exist.|@
+                
+                  Please run @!astra setup!@ to create the default configuration file, and set up your Astra credentials.
+                
+                  Alternatively, you can specify a custom configuration file using the @!--config-file!@ option.
+                """.formatted(
+                    file.getAbsolutePath()
+                ), List.of(
+                    new Hint("Interactively set up your configuration file", "astra setup"),
+                    new Hint("Programmatically set up your configuration file", "astra config create <name> --token <token> [--env <env>]"),
+                    new Hint("Example custom config file usage", "astra db list --config-file ~/.custom_astrarc")
+                ));
+            } else {
+                throw new AstraCliException(FILE_ISSUE, """
+                  @|bold,red Error: A configuration file at %s could not be found.|@
+                
+                  Please ensure that the file exists, or create it if it does not.
+                """);
+            }
         }
 
         try {
@@ -128,7 +164,7 @@ public class AstraConfig {
         return profiles.stream().anyMatch(isProfileName(profileName));
     }
 
-    public Optional<Profile> lookupProfile(ProfileName profileName) {
+    public Optional<AstraConfig.Profile> lookupProfile(ProfileName profileName) {
         val matching = profiles.stream().filter(isProfileName(profileName)).toList();
 
         if (matching.isEmpty()) {
@@ -181,13 +217,13 @@ public class AstraConfig {
         backingIni.writeToFile(backingFile);
     }
 
-    public Optional<Ini.IniSection> getProfileSection(ProfileName profileName) {
+    public Optional<Ini.IniSection> getProfileSection(String sectionName) {
         return backingIni.getSections().stream()
-            .filter(s -> s.name().equals(profileName.unwrap()))
+            .filter(s -> s.name().equals(sectionName))
             .findFirst();
     }
 
-    private Predicate<Either<InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
+    private Predicate<Either<AstraConfig.InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
         return (p) -> p.fold(
             (invalid) -> invalid.section.name().equals(profileName.unwrap()),
             (profile) -> profile.nameOrDefault().equals(profileName)

@@ -6,14 +6,14 @@ import com.datastax.astra.client.admin.DatabaseAdmin;
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.client.databases.DatabaseOptions;
-import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.gateways.db.DbCache;
-import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.exceptions.internal.db.DbNameNotUniqueException;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
+import com.dtsx.astra.cli.core.models.AstraToken;
+import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.DatabaseInfo;
@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.UNIQUENESS_ISSUE;
 
 @RequiredArgsConstructor
 public class APIProviderImpl implements APIProvider {
@@ -103,7 +104,11 @@ public class APIProviderImpl implements APIProvider {
                 val all = dbOpsClient.findByName(name).toList();
 
                 if (all.size() > 1) {
-                    throw new DbNameNotUniqueException(name);
+                    throw new AstraCliException(UNIQUENESS_ISSUE, """
+                      @|bold,red Multiple databases with same name '%s' were found.|@
+                    
+                      Please use the target database's ID to resolve the conflict.
+                    """);
                 }
 
                 return (all.size() == 1) ? Optional.of(all.getFirst()) : Optional.empty();

@@ -7,13 +7,13 @@ import com.dtsx.astra.sdk.exception.AuthenticationException;
 import lombok.val;
 import picocli.CommandLine;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.INVALID_TOKEN;
+import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 public class AuthenticationExceptionMapper implements ExternalExceptionMapper<AuthenticationException> {
     @Override
-    public Class<AuthenticationException> getExceptionClass() {
-        return AuthenticationException.class;
+    public boolean canMap(Exception ex) {
+        return ex instanceof AuthenticationException;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class AuthenticationExceptionMapper implements ExternalExceptionMapper<Au
         
           Cause: %s
         
-          If you are using a non-production environment, make ensure that the correct environment is set in the profile or via the @!--env!@ command-line option.
+          If you are using a non-production environment, ensure that the correct environment is set in the profile or via the @!--env!@ command-line option.
         """.formatted(
             tokenMsg,
             ex.getMessage()

@@ -6,16 +6,13 @@ import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.table.TableTruncateOperation;
-import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.List;
-import java.util.Map;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "truncate-table",

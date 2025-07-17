@@ -14,9 +14,9 @@ public abstract class AbstractConfigCmd<OpRes> extends AbstractCmd<OpRes> {
     @Nullable
     private AstraConfig astraConfig;
 
-    public AstraConfig config() {
+    public AstraConfig config(boolean createIfNotExists) {
         if (astraConfig == null) {
-            this.astraConfig = AstraConfig.readAstraConfigFile(configFile);
+            this.astraConfig = AstraConfig.readAstraConfigFile(configFile, createIfNotExists);
         }
         return astraConfig;
     }

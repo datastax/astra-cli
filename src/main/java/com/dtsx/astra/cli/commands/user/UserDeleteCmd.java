@@ -16,7 +16,7 @@ import picocli.CommandLine.Parameters;
 import java.util.List;
 import java.util.Map;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.USER_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.USER_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.user.UserDeleteOperation.*;
 

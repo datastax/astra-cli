@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.OK;
+import static com.dtsx.astra.cli.core.output.ExitCode.OK;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @FunctionalInterface

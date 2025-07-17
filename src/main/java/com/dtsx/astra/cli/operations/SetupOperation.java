@@ -13,11 +13,13 @@ import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
@@ -45,22 +47,23 @@ public class SetupOperation implements Operation<SetupResult> {
     @Override
     public SetupResult execute() {
         val configFile = AstraConfig.resolveDefaultAstraConfigFile();
-        val config = AstraConfig.readAstraConfigFile(null);
 
-        if (configFile.exists() && !config.getProfiles().isEmpty()) {
+        if (ifConfigExistsAnd(c -> !c.profiles().isEmpty())) {
             request.assertShouldContinueIfAlreadySetup.accept(configFile);
         } else {
             request.assertShouldSetup.accept(configFile);
         }
 
         return resolveProfileDetails(request).foldMap((details) -> {
-            config.lookupProfile(details.profileName).ifPresent(request.assertShouldOverwriteExistingProfile);
+            if (configFile.exists()) {
+                config().lookupProfile(details.profileName).ifPresent(request.assertShouldOverwriteExistingProfile);
+            }
 
-            val shouldSetDefault = (config.lookupProfile(ProfileName.DEFAULT).isPresent())
+            val shouldSetDefault = (ifConfigExistsAnd(c -> c.profileExists(ProfileName.DEFAULT)))
                 ? request.promptShouldSetDefault.get()
                 : true;
 
-            config.modify((ctx) -> {
+            config().modify((ctx) -> {
                 ctx.deleteProfile(details.profileName);
                 ctx.createProfile(details.profileName, details.token, details.env);
 
@@ -80,7 +83,7 @@ public class SetupOperation implements Operation<SetupResult> {
         AstraEnvironment env
     ) {}
 
-    private Either<SetupResult, ProfileDetails> resolveProfileDetails(SetupRequest request) {
+    private Either<SetupResult, ProfileDetails> resolveProfileDetails(SetupOperation.SetupRequest request) {
         val token = request.token.orElseGet(request.promptForToken);
         val env = request.env.or(request.promptForEnv).orElse(AstraEnvironment.PROD);
 
@@ -110,5 +113,24 @@ public class SetupOperation implements Operation<SetupResult> {
 
     private ProfileName resolveProfileName(Organization org, SetupRequest request) {
         return request.name.or(request.promptForName).orElse(ProfileName.mkUnsafe(org.getName()));
+    }
+
+    private @Nullable AstraConfig cachedConfig;
+
+    private AstraConfig config() {
+        if (cachedConfig == null) {
+            cachedConfig = AstraConfig.readAstraConfigFile(null, true);
+        }
+        return cachedConfig;
+    }
+
+    private boolean ifConfigExistsAnd(Function<AstraConfig, Boolean> fn) {
+        val configFile = AstraConfig.resolveDefaultAstraConfigFile();
+
+        if (configFile.exists()) {
+            return fn.apply(config());
+        }
+
+        return false;
     }
 }

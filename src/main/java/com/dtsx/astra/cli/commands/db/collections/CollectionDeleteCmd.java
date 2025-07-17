@@ -13,10 +13,9 @@ import picocli.CommandLine.Option;
 import java.util.List;
 import java.util.Map;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.COLLECTION_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "delete-collection",

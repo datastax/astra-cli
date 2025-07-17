@@ -5,7 +5,9 @@ import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.AstraToken;
+import com.dtsx.astra.cli.core.output.output.Hint;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
@@ -13,10 +15,13 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
+
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @ArgGroup
@@ -63,12 +68,62 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             ? credsProvider.config.profileName.get()
             : ProfileName.DEFAULT;
 
-        val configFile = (credsProvider != null && credsProvider.config != null)
-            ? AstraConfig.readAstraConfigFile(credsProvider.config.configFile.orElse(null))
-            : AstraConfig.readAstraConfigFile(null);
+        val config = (credsProvider != null && credsProvider.config != null)
+            ? AstraConfig.readAstraConfigFile(credsProvider.config.configFile.orElse(null), false)
+            : AstraConfig.readAstraConfigFile(null, false);
 
-        return cachedProfile = configFile.lookupProfile(profileName)
-            .orElseThrow(() -> new ParameterException(spec.commandLine(), "Profile '" + profileName + "' does not exist"));
+        val profile = config.lookupProfile(profileName);
+
+        if (profile.isEmpty()) {
+            val filePath = config.backingFile().getAbsolutePath();
+            val isDefaultConfigFile = filePath.equals(AstraConfig.resolveDefaultAstraConfigFile().getAbsolutePath());
+
+            if (config.getValidatedProfiles().isEmpty()) {
+                val hints = (isDefaultConfigFile)
+                    ? List.of(
+                        new Hint("Interactively create a new profile", "astra setup"),
+                        new Hint("Programmatically create a new profile", "astra config create <name> --token <token> [--env <env>]")
+                    )
+                    : List.of(
+                        new Hint("Interactively create a new profile (default config file only)", "astra setup"),
+                        new Hint("Programmatically create a new profile", "astra config create <name> --token <token> [--env <env>] -cf " + config.backingFile().getPath())
+                    );
+
+                throw new AstraCliException(PROFILE_NOT_FOUND, """
+                  @|bold,red Error: No profiles exist in your .astrarc file.|@
+                
+                  > Using configuration file at %s
+                """.formatted(
+                    highlight(filePath)
+                ), hints);
+            }
+
+            if (profileName.isDefault()) {
+                throw new AstraCliException(PROFILE_NOT_FOUND, """
+                  @|bold,red Error: No default profile exists in your .astrarc file.|@
+          
+                  > Using configuration file at %s
+                """.formatted(
+                    highlight(filePath)
+                ), List.of(
+                    new Hint("Set a profile as default:", "astra config use [name]" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile().getPath())),
+                    new Hint("Specify a profile to use:", originalArgs(), "--profile <name>")
+                ));
+            } else {
+                throw new AstraCliException(PROFILE_NOT_FOUND, """
+                  @|bold,red Error: Profile '%s' does not exist in your .astrarc file.|@
+               
+                  > Using configuration file at %s
+                """.formatted(
+                    profileName.unwrap(),
+                    highlight(filePath)
+                ), List.of(
+                    new Hint("List available profiles:", "astra config list" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile().getPath()))
+                ));
+            }
+        }
+
+        return cachedProfile = profile.get();
     }
 
     @Override

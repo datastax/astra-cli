@@ -1,15 +1,10 @@
 package com.dtsx.astra.cli.operations.db;
 
-import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
 
@@ -20,20 +15,10 @@ public class DbGetOperation implements Operation<DbGetResult> {
 
     public record DbGetResult(Database database) {}
 
-    public record DbGetRequest(Optional<DbRef> dbRef, Function<NEList<Database>, Database> promptForDbRef) {}
+    public record DbGetRequest(DbRef dbRef) {}
 
     @Override
     public DbGetResult execute() {
-        val dbRef = request.dbRef.orElseGet(() -> {
-            val dbs = dbGateway.findAll().toList();
-
-            val chosenDb = NEList.parse(dbs)
-               .map(request.promptForDbRef)
-               .orElseThrow(() -> new IllegalArgumentException("No databases found in the organization"));
-
-            return DbRef.fromNameUnsafe(chosenDb.getInfo().getName());
-        });
-
-        return new DbGetResult(dbGateway.findOne(dbRef));
+        return new DbGetResult(dbGateway.findOne(request.dbRef));
     }
 }

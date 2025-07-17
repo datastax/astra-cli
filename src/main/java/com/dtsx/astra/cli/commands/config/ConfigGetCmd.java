@@ -1,14 +1,15 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
+import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
-import com.dtsx.astra.cli.core.output.output.OutputCsv;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
-import com.dtsx.astra.cli.core.output.output.OutputJson;
+import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.output.*;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.Operation;
@@ -18,12 +19,11 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.KEY_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.KEY_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
@@ -47,12 +47,12 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     @Parameters(
+        arity = "0..1",
         description = { "Name of the profile to display", DEFAULT_VALUE },
         completionCandidates = AvailableProfilesCompletion.class,
-        paramLabel = "PROFILE",
-        defaultValue = "default"
+        paramLabel = "PROFILE"
     )
-    public ProfileName $profileName;
+    public Optional<String> $profileName;
 
     @Option(
         names = { "-k", "--key" },
@@ -72,6 +72,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
                 () -> renderCsv(section)
             );
             case KeyNotFound(var keyName, var section) -> throwKeyNotFound(keyName, section);
+            case ProfileNotFound(var name) -> throwProfileNotFound(name);
         };
     }
 
@@ -98,6 +99,16 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         }
 
         return ShellTable.forAttributes(data);
+    }
+
+    private <T> T throwProfileNotFound(String name) {
+        throw new AstraCliException(PROFILE_NOT_FOUND, """
+          @|bold,red Error: Profile '%s' could not be found.|@
+        
+          Ensure that the correct configuration file is being used and that the profile name is correct.
+        """.formatted(name), List.of(
+            new Hint("List your profiles:", "astra config list")
+        ));
     }
 
     private <T> T throwKeyNotFound(String key, Ini.IniSection section) {
@@ -136,6 +147,50 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
 
     @Override
     protected Operation<GetConfigResult> mkOperation() {
-        return new ConfigGetOperation(config(), new GetConfigRequest($profileName, $key));
+        return new ConfigGetOperation(config(false), new GetConfigRequest($profileName, $key, this::promptForProfileName));
+    }
+
+    private String promptForProfileName(NEList<Either<AstraConfig.InvalidProfile, AstraConfig.Profile>> candidates) {
+        val maxNameLength = candidates.stream()
+            .map(p -> profileName(p).length())
+            .max(Integer::compareTo)
+            .orElse(0);
+
+        val profileToDisplayMap = candidates.stream()
+            .collect(Collectors.toMap(
+                (p) -> p,
+                (p) -> {
+                    val paddedName = profileName(p) + " ".repeat(maxNameLength - profileName(p).length());
+
+                    return p.fold(
+                        (_) -> paddedName + " @|bold,red (invalid)|@",
+                        (profile) -> paddedName + " " + AstraColors.NEUTRAL_500.use("(" + profile.env().name().toLowerCase() + ")")
+                    );
+                }
+            ));
+
+        val defaultProfile = candidates.stream()
+            .filter(p -> p.isRight() && p.getRight().isDefault())
+            .findFirst()
+            .orElse(null);
+
+        val selected = AstraConsole.select("Select a profile to look at")
+            .options(candidates)
+            .defaultOption(defaultProfile)
+            .mapper(profileToDisplayMap::get)
+            .fallbackIndex(0)
+            .fix(originalArgs(), "<profile>")
+            .clearAfterSelection();
+
+        return selected
+            .map(this::profileName)
+            .orElseThrow();
+    }
+
+    private String profileName(Either<AstraConfig.InvalidProfile, AstraConfig.Profile> profile) {
+        return profile.fold(
+            (invalid) -> invalid.section().name(),
+            (valid) -> valid.nameOrDefault().unwrap()
+        );
     }
 }

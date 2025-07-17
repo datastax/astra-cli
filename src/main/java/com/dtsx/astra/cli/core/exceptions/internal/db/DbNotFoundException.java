@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.output.output.Hint;
 import java.util.List;
 import java.util.UUID;
 
-import static com.dtsx.astra.cli.core.exceptions.CliExceptionCode.DATABASE_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 
 public class DbNotFoundException extends AstraCliException {
     public DbNotFoundException(DbRef dbRef) {

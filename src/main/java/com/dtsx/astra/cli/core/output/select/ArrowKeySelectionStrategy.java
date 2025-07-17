@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.output.select;
 
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.output.OutputType;
@@ -213,7 +214,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     
     private Optional<T> handleQuit() {
         clearSelector();
-        return Optional.empty();
+        throw new ExecutionCancelledException();
     }
     
     private void handleBackspace() {

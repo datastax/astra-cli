@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
 import com.dtsx.astra.cli.AstraCli;
-import com.dtsx.astra.cli.commands.db.AbstractDbSpecificCmd;
+import com.dtsx.astra.cli.commands.db.AbstractDbRequiredCmd;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.WindowsUnsupportedException;
 import com.dtsx.astra.cli.core.output.output.OutputAll;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyMap;
 
-public abstract class AbstractDsbulkExecCmd extends AbstractDbSpecificCmd<DsbulkExecResult> {
+public abstract class AbstractDsbulkExecCmd extends AbstractDbRequiredCmd<DsbulkExecResult> {
     @Option(
         names = { "-k", "--keyspace" },
         description = "Keyspace used for loading or unloading data",
