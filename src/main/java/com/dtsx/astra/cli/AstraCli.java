@@ -34,7 +34,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
-    name = "ast",
+    name = "astra",
     subcommands = {
         CommandLine.HelpCommand.class,
         SetupCmd.class,
@@ -100,8 +100,6 @@ public class AstraCli extends AbstractCmd<Void> {
             DescriptionNewlineRenderer.installRenderer(spec.commandLine());
             return new Help(spec, cs);
         });
-
-        cmd.getSubcommands().get("generate-completion").getCommandSpec().usageMessage().hidden(true);
 
         cmd.execute(args);
     }

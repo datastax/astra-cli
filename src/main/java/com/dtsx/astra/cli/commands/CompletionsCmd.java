@@ -5,6 +5,7 @@ import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 import java.util.Set;
@@ -14,15 +15,24 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 
 @Command(
-    name = "generate-completion"
+    name = "completions",
+    aliases = { "compgen" },
+    hidden = true
 )
 public class CompletionsCmd implements Runnable {
     @Spec
     CommandSpec spec;
 
+    @Option(
+        names = { "-n", "--cli-name" },
+        description = "CLI name to use in the completion script",
+        defaultValue = "astra"
+    )
+    String cliName;
+
     public void run() {
         val script = AutoComplete.bash(
-            spec.root().name(),
+            cliName,
             spec.root().commandLine()
         );
 
