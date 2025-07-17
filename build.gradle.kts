@@ -54,7 +54,7 @@ application {
     mainClass.set("com.dtsx.astra.cli.AstraCli")
 }
 
-val isProd = project.hasProperty("prod") && project.property("prod") == "true"
+val isProd = project.hasProperty("prod")
 
 val cliSystemProperties = mapOf(
     "cli.version" to project.version.toString(),

@@ -1,5 +1,6 @@
 name: build.yml
 on:
+  workflow_call:
   workflow_dispatch:
   push:
     branches: [ master ]
@@ -11,16 +12,16 @@ jobs:
         os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-13, macos-14 ]
         include:
           - os: ubuntu-24.04
-            artifact-name: astra-cli-linux-amd64
+            artifact-name: astra-cli-linux-x86_64
             artifact-type: tar
           - os: windows-2022
-            artifact-name: astra-cli-windows-amd64
+            artifact-name: astra-cli-windows-x86_64
             artifact-type: zip
           - os: ubuntu-24.04-arm
             artifact-name: astra-cli-linux-arm64
             artifact-type: tar
           - os: macos-13
-            artifact-name: astra-cli-macos-amd64
+            artifact-name: astra-cli-macos-x86_64
             artifact-type: tar
           - os: macos-14
             artifact-name: astra-cli-macos-arm64
@@ -46,11 +47,11 @@ jobs:
 
       - name: Build and package native image (tar)
         if: matrix.artifact-type == 'tar'
-        run: ./gradlew nativeTar
+        run: ./gradlew nativeTar -Pprod
 
       - name: Build and package native image (zip)
         if: matrix.artifact-type == 'zip'
-        run: ./gradlew nativeZip
+        run: ./gradlew nativeZip -Pprod
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -58,3 +59,4 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: build/distributions/*.${{ matrix.artifact-type }}*
           if-no-files-found: error
+          retention-days: 1
