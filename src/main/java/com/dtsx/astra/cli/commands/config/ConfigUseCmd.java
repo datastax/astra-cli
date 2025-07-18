@@ -22,6 +22,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -48,8 +49,8 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     public Optional<ProfileName> $profileName;
 
     @Override
-    public final OutputAll execute(ConfigUseResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<ConfigUseResult> result) {
+        return switch (result.get()) {
             case ProfileSetAsDefault(var profileName) -> OutputAll.message("Default profile set to " + highlight(profileName));
             case ProfileNotFound(var profileName) -> throw new ProfileNotFoundException(profileName);
         };

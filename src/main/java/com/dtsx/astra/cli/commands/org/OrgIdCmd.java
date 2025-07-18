@@ -6,6 +6,8 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.org.OrgIdOperation;
 import picocli.CommandLine.Command;
 
+import java.util.function.Supplier;
+
 @Command(
     name = "id",
     description = "Show organization ID"
@@ -16,8 +18,8 @@ import picocli.CommandLine.Command;
 )
 public class OrgIdCmd extends AbstractOrgCmd<String> {
     @Override
-    public final OutputAll execute(String id) {
-        return OutputAll.serializeValue(id);
+    public final OutputAll execute(Supplier<String> id) {
+        return OutputAll.serializeValue(id.get());
     }
 
     @Override

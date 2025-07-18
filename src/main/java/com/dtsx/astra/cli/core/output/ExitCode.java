@@ -28,4 +28,5 @@ public enum ExitCode {
     TENANT_ALREADY_EXISTS,
     INVALID_TOKEN,
     NO_ANSWER,
+    UNSUPPORTED_EXECUTION,
 }

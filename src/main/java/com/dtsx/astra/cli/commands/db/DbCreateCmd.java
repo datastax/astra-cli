@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -162,8 +163,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
     }
 
     @Override
-    protected final OutputAll execute(DbCreateResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<DbCreateResult> result) {
+        return switch (result.get()) {
             case DatabaseAlreadyExistsWithStatus(var dbId, var currStatus) -> handleDbAlreadyExistsWithStatus(dbId, currStatus);
             case DatabaseAlreadyExistsIllegallyWithStatus(var dbId, var currStatus) -> throwDbAlreadyExistsWithStatus(dbId, currStatus);
             case DatabaseAlreadyExistsAndIsActive(var dbId, var prevStatus, var awaited) -> handleDbAlreadyExistsAndIsActive(dbId, prevStatus, awaited);

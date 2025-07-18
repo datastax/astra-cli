@@ -11,8 +11,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.table.TableListOperation.*;
@@ -42,11 +42,11 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
     public boolean $all;
 
     @Override
-    protected OutputJson executeJson(Stream<TableListResult> result) {
+    protected OutputJson executeJson(Supplier<Stream<TableListResult>> result) {
         validateParams();
 
         if ($all) {
-            return OutputJson.serializeValue(result
+            return OutputJson.serializeValue(result.get()
                 .map(res -> Map.of(
                     "keyspace", res.keyspace(),
                     "tables", res.tables()
@@ -54,14 +54,14 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
                 .toList());
         }
 
-        return OutputJson.serializeValue(result.toList().getFirst().tables());
+        return OutputJson.serializeValue(result.get().toList().getFirst().tables());
     }
 
     @Override
-    public final OutputAll execute(Stream<TableListResult> result) {
+    public final OutputAll execute(Supplier<Stream<TableListResult>> result) {
         validateParams();
 
-        val data = result
+        val data = result.get()
             .flatMap((res) -> (
                 res.tables().stream()
                     .map(desc -> Map.of(

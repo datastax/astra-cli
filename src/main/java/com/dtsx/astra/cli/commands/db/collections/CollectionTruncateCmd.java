@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.operations.db.collection.CollectionTruncateOperation;
 import picocli.CommandLine.Command;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -28,8 +29,8 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionTruncateOper
 )
 public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<CollectionTruncateResult> {
     @Override
-    public final OutputAll execute(CollectionTruncateResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<CollectionTruncateResult> result) {
+        return switch (result.get()) {
             case CollectionTruncated() -> handleCollectionTruncated();
             case CollectionNotFound() -> throwCollectionNotFound();
         };

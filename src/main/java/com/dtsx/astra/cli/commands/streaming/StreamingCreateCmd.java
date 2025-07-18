@@ -21,6 +21,7 @@ import picocli.CommandLine.Option;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -119,8 +120,8 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
     }
 
     @Override
-    protected final OutputAll execute(StreamingCreateResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<StreamingCreateResult> result) {
+        return switch (result.get()) {
             case TenantAlreadyExistsWithStatus(var tenantName, var currStatus) -> handleTenantAlreadyExistsWithStatus(tenantName, currStatus);
             case TenantAlreadyExistsIllegallyWithStatus(var tenantName, var currStatus) -> throwTenantAlreadyExistsWithStatus(tenantName, currStatus);
             case TenantCreated(var tenantName, var currStatus) -> handleTenantCreated(tenantName, currStatus);

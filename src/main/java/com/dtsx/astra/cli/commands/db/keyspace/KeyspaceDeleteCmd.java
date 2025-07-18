@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -56,8 +57,8 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
     }
 
     @Override
-    protected final OutputAll execute(KeyspaceDeleteResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<KeyspaceDeleteResult> result) {
+        return switch (result.get()) {
             case KeyspaceNotFound() -> handleKeyspaceNotFound();
             case KeyspaceDeleted() -> handleKeyspaceDeleted();
             case KeyspaceDeletedAndDbActive(var waitTime) -> handleKeyspaceDeletedAndDbActive(waitTime);

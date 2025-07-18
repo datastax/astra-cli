@@ -12,6 +12,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -42,8 +43,8 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
     public boolean $ifExists;
 
     @Override
-    public final OutputAll execute(CollectionDeleteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<CollectionDeleteResult> result) {
+        return switch (result.get()) {
             case CollectionNotFound() -> handleCollectionNotFound();
             case CollectionIllegallyNotFound() -> throwCollectionNotFound();
             case CollectionDeleted() -> handleCollectionDeleted();

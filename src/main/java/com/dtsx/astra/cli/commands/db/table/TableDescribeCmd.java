@@ -14,6 +14,7 @@ import picocli.CommandLine.Command;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -33,16 +34,16 @@ import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
 )
 public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResult> {
     @Override
-    protected OutputJson executeJson(TableDescribeResult result) {
-        return switch (result) {
+    protected OutputJson executeJson(Supplier<TableDescribeResult> result) {
+        return switch (result.get()) {
             case TableNotFound() -> throwTableNotFound();
             case TableFound(var info) -> OutputJson.serializeValue(info.raw());
         };
     }
 
     @Override
-    public final OutputAll execute(TableDescribeResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<TableDescribeResult> result) {
+        return switch (result.get()) {
             case TableNotFound() -> throwTableNotFound();
             case TableFound(var info) -> handleTableFound(info);
         };

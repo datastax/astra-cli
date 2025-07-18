@@ -11,6 +11,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProviderResult;
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProvidersListRequest;
@@ -25,13 +26,13 @@ import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperat
 )
 public class EmbeddingProvidersListCmd extends AbstractPromptForDbCmd<EmbeddingProviderResult> {
     @Override
-    protected final OutputJson executeJson(EmbeddingProviderResult result) {
-        return OutputJson.serializeValue(result.raw());
+    protected final OutputJson executeJson(Supplier<EmbeddingProviderResult> result) {
+        return OutputJson.serializeValue(result.get().raw());
     }
 
     @Override
-    protected final OutputAll execute(EmbeddingProviderResult result) {
-        val data = result.embeddingProviders()
+    protected final OutputAll execute(Supplier<EmbeddingProviderResult> result) {
+        val data = result.get().embeddingProviders()
             .map(r -> Map.of(
                 "Key", r.key(),
                 "Display Name", r.displayName().orElse("N/A"),

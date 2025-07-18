@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.REGION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -55,8 +56,8 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
     }
 
     @Override
-    protected final OutputAll execute(RegionCreateResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<RegionCreateResult> result) {
+        return switch (result.get()) {
             case RegionAlreadyExists() -> handleRegionAlreadyExists();
             case RegionCreated() -> handleRegionCreated();
             case RegionCreatedAndDbActive(var waitTime) -> handleRegionCreatedAndDbActive(waitTime);

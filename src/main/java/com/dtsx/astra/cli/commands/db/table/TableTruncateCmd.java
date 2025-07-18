@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.operations.db.table.TableTruncateOperation;
 import picocli.CommandLine.Command;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -28,8 +29,8 @@ import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
 )
 public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResult> {
     @Override
-    public final OutputAll execute(TableTruncateResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<TableTruncateResult> result) {
+        return switch (result.get()) {
             case TableTruncated() -> handleTableTruncated();
             case TableNotFound() -> throwTableNotFound();
         };

@@ -11,6 +11,8 @@ import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.Executed
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.ScbDownloadFailed;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.function.Supplier;
+
 public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult> {
     @Override
     @MustBeInvokedByOverriders
@@ -20,8 +22,8 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     }
 
     @Override
-    protected final OutputHuman executeHuman(CqlshExecResult result) {
-        return switch (result) {
+    protected final OutputHuman executeHuman(Supplier<CqlshExecResult> result) {
+        return switch (result.get()) {
             case CqlshInstallFailed(var msg) -> OutputAll.message(msg);
             case ScbDownloadFailed(var msg) -> OutputAll.message(msg);
             case Executed(var exitCode) -> AstraCli.exit(exitCode);

@@ -5,10 +5,12 @@ import com.dtsx.astra.cli.core.output.output.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.token.TokenGetOperation;
 
+import java.util.function.Supplier;
+
 public abstract class TokenGetImpl extends AbstractTokenCmd<AstraToken> {
     @Override
-    public final OutputAll execute(AstraToken token) {
-        return OutputAll.serializeValue(token.unwrap());
+    public final OutputAll execute(Supplier<AstraToken> token) {
+        return OutputAll.serializeValue(token.get().unwrap());
     }
 
     @Override

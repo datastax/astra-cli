@@ -14,6 +14,7 @@ import picocli.CommandLine.Option;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.commands.db.DbGetCmd.DbGetKeys.*;
 import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetRequest;
@@ -54,16 +55,16 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbGetResult> {
     public Optional<DbGetKeys> $key;
 
     @Override
-    public final OutputJson executeJson(DbGetResult result) {
+    public final OutputJson executeJson(Supplier<DbGetResult> result) {
         if ($key.isPresent()) {
             return execute(result);
         }
-        return OutputJson.serializeValue(result.database());
+        return OutputJson.serializeValue(result.get().database());
     }
 
     @Override
-    protected final OutputAll execute(DbGetResult result) {
-        val dbInfo = result.database();
+    protected final OutputAll execute(Supplier<DbGetResult> result) {
+        val dbInfo = result.get().database();
 
         return $key
             .map((k) -> dbInfo4Key(dbInfo, k))

@@ -18,6 +18,7 @@ import picocli.CommandLine.Option;
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.util.Collections.emptyMap;
 
@@ -95,8 +96,8 @@ public abstract class AbstractDsbulkExecCmd extends AbstractDbRequiredCmd<Dsbulk
     }
 
     @Override
-    protected final OutputHuman executeHuman(DsbulkExecResult result) {
-        return switch (result) {
+    protected final OutputHuman executeHuman(Supplier<DsbulkExecResult> result) {
+        return switch (result.get()) {
             case DsbulkInstallFailed(var msg) -> OutputAll.message(msg);
             case ScbDownloadFailed(var msg) -> OutputAll.message(msg);
             case Executed(var exitCode) -> AstraCli.exit(exitCode);

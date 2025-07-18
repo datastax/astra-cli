@@ -14,6 +14,7 @@ import picocli.CommandLine.Option;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -116,8 +117,8 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
     }
 
     @Override
-    public final OutputAll execute(CollectionCreateResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<CollectionCreateResult> result) {
+        return switch (result.get()) {
             case CollectionAlreadyExists() -> handleCollectionAlreadyExists();
             case CollectionIllegallyAlreadyExists() -> throwCollectionAlreadyExists();
             case CollectionCreated() -> handleCollectionCreated();

@@ -7,6 +7,8 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingExistOperation;
 import picocli.CommandLine.Command;
 
+import java.util.function.Supplier;
+
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.streaming.StreamingExistOperation.StreamingExistRequest;
 
@@ -21,8 +23,8 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingExistOperation.St
 )
 public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolean> {
     @Override
-    protected final OutputHuman executeHuman(Boolean exists) {
-        if (exists) {
+    protected final OutputHuman executeHuman(Supplier<Boolean> exists) {
+        if (exists.get()) {
             return OutputHuman.message("Tenant %s exists.".formatted(highlight($tenantName)));
         } else {
             return OutputHuman.message("Tenant %s does not exist.".formatted(highlight($tenantName)));
@@ -30,7 +32,7 @@ public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolea
     }
 
     @Override
-    protected final OutputAll execute(Boolean exists) {
+    protected final OutputAll execute(Supplier<Boolean> exists) {
         return OutputAll.serializeValue(exists);
     }
 

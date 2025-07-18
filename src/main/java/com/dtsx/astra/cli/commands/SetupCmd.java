@@ -28,6 +28,7 @@ import picocli.CommandLine.Option;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.core.output.ExitCode.NO_ANSWER;
@@ -62,8 +63,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     public Optional<ProfileName> $name;
 
     @Override
-    protected OutputHuman executeHuman(SetupResult result) {
-        return switch (result) {
+    protected OutputHuman executeHuman(Supplier<SetupResult> result) {
+        return switch (result.get()) {
             case ProfileCreated pc -> handleProfileCreated(pc);
             case InvalidToken() -> throwInvalidToken();
         };

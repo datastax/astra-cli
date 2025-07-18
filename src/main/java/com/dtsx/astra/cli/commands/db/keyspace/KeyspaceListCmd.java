@@ -11,6 +11,7 @@ import picocli.CommandLine.Command;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceInfo;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceListRequest;
@@ -30,8 +31,8 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     }
 
     @Override
-    protected final OutputHuman executeHuman(List<KeyspaceInfo> result) {
-        val data = result.stream()
+    protected final OutputHuman executeHuman(Supplier<List<KeyspaceInfo>> result) {
+        val data = result.get().stream()
             .map((ks) -> Map.of(
                 "Name", mkKeyspaceDisplayName(ks.name(), ks.isDefault())
             ))
@@ -41,8 +42,8 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     }
 
     @Override
-    protected final OutputAll execute(List<KeyspaceInfo> result) {
-        val data = result.stream()
+    protected final OutputAll execute(Supplier<List<KeyspaceInfo>> result) {
+        val data = result.get().stream()
             .map((ks) -> Map.of(
                 "name", ks.name(),
                 "isDefault", ks.isDefault()

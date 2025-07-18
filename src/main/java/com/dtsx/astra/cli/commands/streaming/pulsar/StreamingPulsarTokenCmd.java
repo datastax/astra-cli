@@ -8,6 +8,8 @@ import com.dtsx.astra.cli.operations.streaming.pulsar.StreamingPulsarTokenOperat
 import com.dtsx.astra.cli.operations.streaming.pulsar.StreamingPulsarTokenOperation.PulsarTokenRequest;
 import picocli.CommandLine.Command;
 
+import java.util.function.Supplier;
+
 @Command(
     name = "pulsar-token",
     description = "Get the Pulsar token for a streaming tenant"
@@ -18,7 +20,7 @@ import picocli.CommandLine.Command;
 )
 public class StreamingPulsarTokenCmd extends AbstractStreamingTenantSpecificCmd<String> {
     @Override
-    protected final OutputAll execute(String token) {
+    protected final OutputAll execute(Supplier<String> token) {
         return OutputAll.serializeValue(token);
     }
 

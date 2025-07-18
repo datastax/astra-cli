@@ -17,10 +17,10 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.CDC_ALREADY_EXISTS;
-import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
 
 @Command(
@@ -83,12 +83,12 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     @Override
     protected void prelude() {
         super.prelude();
-        throw new AstraCliException(ILLEGAL_OPERATION, "Creating CDCs via the Astra CLI is not currently not supported due to a dependency bug.");
+        throw new AstraCliException(UNSUPPORTED_EXECUTION, "Creating CDCs via the Astra CLI is not currently not supported due to a dependency bug.");
     }
 
     @Override
-    public final OutputAll execute(CdcCreateResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<CdcCreateResult> result) {
+        return switch (result.get()) {
             case CdcAlreadyExists() -> handleCdcAlreadyExists();
             case CdcIllegallyAlreadyExists() -> throwCdcAlreadyExists();
             case CdcCreated() -> handleCdcCreated();

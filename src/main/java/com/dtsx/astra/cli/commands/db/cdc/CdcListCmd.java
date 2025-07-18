@@ -9,8 +9,8 @@ import com.dtsx.astra.cli.operations.db.cdc.CdcListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
@@ -25,13 +25,13 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
 )
 public class CdcListCmd extends AbstractCdcCmd<Stream<CdcInfo>> {
     @Override
-    protected OutputJson executeJson(Stream<CdcInfo> result) {
-        return OutputJson.serializeValue(result.map(CdcInfo::raw).toList());
+    protected OutputJson executeJson(Supplier<Stream<CdcInfo>> result) {
+        return OutputJson.serializeValue(result.get().map(CdcInfo::raw).toList());
     }
 
     @Override
-    public final OutputAll execute(Stream<CdcInfo> result) {
-        val data = result
+    public final OutputAll execute(Supplier<Stream<CdcInfo>> result) {
+        val data = result.get()
             .map((cdc) -> Map.of(
                 "ID", cdc.id(),
                 "Keyspace", cdc.keyspace(),

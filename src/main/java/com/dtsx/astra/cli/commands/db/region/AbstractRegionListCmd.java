@@ -11,6 +11,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<FoundRegion>> {
@@ -39,8 +40,8 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
     public @Nullable List<String> $zoneFilter;
 
     @Override
-    protected OutputJson executeJson(Stream<FoundRegion> regions) {
-        val data = regions
+    protected OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
+        val data = regions.get()
             .map((r) -> Map.of(
                 "cloudProvider", r.cloudProvider().name(),
                 "region", r.raw(),
@@ -52,8 +53,8 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
     }
 
     @Override
-    protected OutputAll execute(Stream<FoundRegion> regions) {
-        val data = regions
+    protected OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
+        val data = regions.get()
             .map((r) -> Map.of(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.hasFreeTier()),
                 "Region", r.regionName(),

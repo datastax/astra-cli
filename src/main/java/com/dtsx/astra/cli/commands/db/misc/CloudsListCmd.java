@@ -12,6 +12,7 @@ import picocli.CommandLine.Command;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 @Command(
     name = "list-clouds",
@@ -28,8 +29,8 @@ public class CloudsListCmd extends AbstractRegionCmd<Set<CloudProviderType>> {
     }
 
     @Override
-    protected final OutputAll execute(Set<CloudProviderType> result) {
-        val set = new TreeSet<>(result);
+    protected final OutputAll execute(Supplier<Set<CloudProviderType>> result) {
+        val set = new TreeSet<>(result.get());
 
         return new ShellTable(
             set.stream()

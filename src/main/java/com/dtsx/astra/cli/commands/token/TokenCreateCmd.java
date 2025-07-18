@@ -13,6 +13,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.LinkedHashMap;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCreateRequest;
 
@@ -35,16 +36,16 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     private RoleRef role;
 
     @Override
-    public final OutputJson executeJson(CreateTokenResponse tokenResponse) {
+    public final OutputJson executeJson(Supplier<CreateTokenResponse> tokenResponse) {
         return OutputJson.serializeValue(tokenResponse);
     }
 
     @Override
-    public final OutputAll execute(CreateTokenResponse tokenResponse) {
+    public final OutputAll execute(Supplier<CreateTokenResponse> tokenResponse) {
         return ShellTable.forAttributes(new LinkedHashMap<>() {{
-            put("Client Id", tokenResponse.getClientId());
-            put("Client Secret", tokenResponse.getSecret());
-            put("Token", tokenResponse.getToken());
+            put("Client Id", tokenResponse.get().getClientId());
+            put("Client Secret", tokenResponse.get().getSecret());
+            put("Token", tokenResponse.get().getToken());
         }});
     }
 

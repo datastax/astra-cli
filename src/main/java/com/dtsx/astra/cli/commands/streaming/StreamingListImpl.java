@@ -9,17 +9,18 @@ import com.dtsx.astra.cli.operations.streaming.StreamingListOperation.TenantInfo
 import lombok.val;
 
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> {
     @Override
-    protected OutputJson executeJson(Stream<TenantInfo> result) {
-        return OutputJson.serializeValue(result.map(TenantInfo::raw).toList());
+    protected OutputJson executeJson(Supplier<Stream<TenantInfo>> result) {
+        return OutputJson.serializeValue(result.get().map(TenantInfo::raw).toList());
     }
 
     @Override
-    protected final OutputAll execute(Stream<TenantInfo> result) {
-        val data = result
+    protected final OutputAll execute(Supplier<Stream<TenantInfo>> result) {
+        val data = result.get()
             .map((tenant) -> Map.of(
                 "name", tenant.name(),
                 "cloud", tenant.cloud().name(),

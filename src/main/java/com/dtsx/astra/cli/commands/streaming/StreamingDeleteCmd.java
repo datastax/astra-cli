@@ -12,6 +12,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -38,8 +39,8 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
     public boolean $ifExists;
 
     @Override
-    protected final OutputAll execute(StreamingDeleteResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<StreamingDeleteResult> result) {
+        return switch (result.get()) {
             case TenantNotFound() -> handleTenantNotFound();
             case TenantDeleted() -> handleTenantDeleted();
             case TenantIllegallyNotFound() -> throwTenantNotFound();

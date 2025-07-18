@@ -14,6 +14,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.role.RoleGetOperation.RoleGetRequest;
 
@@ -44,13 +45,13 @@ public class RoleGetCmd extends AbstractRoleCmd<Role> {
     }
 
     @Override
-    public OutputJson executeJson(Role result) {
+    public OutputJson executeJson(Supplier<Role> result) {
         return OutputJson.serializeValue(result);
     }
 
     @Override
-    protected final OutputAll execute(Role result) {
-        return mkTable(result);
+    protected final OutputAll execute(Supplier<Role> result) {
+        return mkTable(result.get());
     }
 
     private RenderableShellTable mkTable(Role role) {

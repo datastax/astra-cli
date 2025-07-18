@@ -24,6 +24,7 @@ import picocli.CommandLine.Parameters;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.*;
@@ -96,8 +97,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     }
 
     @Override
-    public final OutputAll execute(ConfigCreateResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<ConfigCreateResult> result) {
+        return switch (result.get()) {
             case ProfileCreated pc -> handleConfigCreated(pc);
             case ProfileIllegallyExists(var profileName) -> throwProfileAlreadyExists(profileName);
             case ViolatedFailIfExists() -> throwAttemptedToSetDefault();

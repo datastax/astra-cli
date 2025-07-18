@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -56,8 +57,8 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
     }
 
     @Override
-    protected final OutputAll execute(KeyspaceCreateResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<KeyspaceCreateResult> result) {
+        return switch (result.get()) {
             case KeyspaceAlreadyExists() -> handleKeyspaceAlreadyExists();
             case KeyspaceCreated() -> handleKeyspaceCreated();
             case KeyspaceCreatedAndDbActive(var waitTime) -> handleKeyspaceCreatedAndDbActive(waitTime);

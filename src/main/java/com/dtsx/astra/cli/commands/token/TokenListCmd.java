@@ -10,6 +10,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
@@ -24,8 +25,8 @@ import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
 )
 public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override
-    protected OutputJson executeJson(Stream<TokenInfo> tokens) {
-        return OutputJson.serializeValue(tokens.map((t) -> Map.of(
+    protected OutputJson executeJson(Supplier<Stream<TokenInfo>> tokens) {
+        return OutputJson.serializeValue(tokens.get().map((t) -> Map.of(
             "generatedOn", t.generatedOn(),
             "clientId", t.clientId(),
             "roleNames", t.roleNames(),
@@ -34,8 +35,8 @@ public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     }
 
     @Override
-    public final OutputAll execute(Stream<TokenInfo> tokens) {
-        val rows = tokens
+    public final OutputAll execute(Supplier<Stream<TokenInfo>> tokens) {
+        val rows = tokens.get()
             .map(token -> Map.of(
                 "Generated On", token.generatedOn(),
                 "Client Id", token.clientId(),

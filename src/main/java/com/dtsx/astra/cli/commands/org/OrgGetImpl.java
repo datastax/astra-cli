@@ -8,18 +8,19 @@ import com.dtsx.astra.cli.operations.org.OrgGetOperation;
 import com.dtsx.astra.sdk.org.domain.Organization;
 
 import java.util.LinkedHashMap;
+import java.util.function.Supplier;
 
 public abstract class OrgGetImpl extends AbstractOrgCmd<Organization> {
     @Override
-    protected OutputJson executeJson(Organization org) {
+    protected OutputJson executeJson(Supplier<Organization> org) {
         return OutputJson.serializeValue(org);
     }
 
     @Override
-    public final OutputAll execute(Organization organization) {
+    public final OutputAll execute(Supplier<Organization> organization) {
         return ShellTable.forAttributes(new LinkedHashMap<>() {{
-            put("Name", organization.getName());
-            put("Id", organization.getId());
+            put("Name", organization.get().getName());
+            put("Id", organization.get().getId());
         }});
     }
 

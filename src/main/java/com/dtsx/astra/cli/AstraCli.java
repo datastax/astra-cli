@@ -29,6 +29,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
 
 import java.util.StringJoiner;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -62,7 +63,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 public class AstraCli extends AbstractCmd<Void> {
     @Override
-    public OutputHuman executeHuman(Void v) {
+    public OutputHuman executeHuman(Supplier<Void> v) {
         AstraLogger.banner();
 
         val sj = new StringJoiner(NL);

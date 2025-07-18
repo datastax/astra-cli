@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.config.AstraConfig;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.NEList;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,9 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
             val profiles = NEList.parse(config.getValidatedProfiles().stream().filter(p -> !p.isDefault()).toList());
 
             if (profiles.isEmpty()) {
-                throw new IllegalStateException("No profiles available to select from.");
+                throw new AstraCliException("""
+                  @|bold,red No profiles found to select from|@
+                """);
             }
 
             val defaultProfile = config.lookupProfile(ProfileName.DEFAULT);

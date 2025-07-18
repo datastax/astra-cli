@@ -13,6 +13,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
@@ -22,13 +23,13 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     protected boolean $vectorOnly;
 
     @Override
-    protected OutputJson executeJson(Stream<Database> result) {
-        return OutputJson.serializeValue(result.toList());
+    protected OutputJson executeJson(Supplier<Stream<Database>> result) {
+        return OutputJson.serializeValue(result.get().toList());
     }
 
     @Override
-    protected final OutputAll execute(Stream<Database> result) {
-        val data = result
+    protected final OutputAll execute(Supplier<Stream<Database>> result) {
+        val data = result.get()
             .map((db) -> Map.of(
                 "Name", name(db),
                 "Id", id(db),

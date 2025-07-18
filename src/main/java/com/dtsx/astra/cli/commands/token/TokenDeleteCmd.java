@@ -13,6 +13,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -47,8 +48,8 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
     public boolean ifExists;
 
     @Override
-    public final OutputAll execute(TokenDeleteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<TokenDeleteResult> result) {
+        return switch (result.get()) {
             case TokenDeleted() -> handleTokenDeleted();
             case TokenNotFound() -> handleTokenNotFound();
             case TokenIllegallyNotFound() -> throwTokenNotFound();

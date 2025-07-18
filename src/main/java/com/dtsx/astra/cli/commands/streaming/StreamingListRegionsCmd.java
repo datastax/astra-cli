@@ -16,6 +16,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Command(
@@ -52,8 +53,8 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
     public @Nullable List<CloudProviderType> $cloudFilter;
 
     @Override
-    protected OutputJson executeJson(Stream<FoundRegion> regions) {
-        val data = regions
+    protected OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
+        val data = regions.get()
             .map((r) -> Map.of(
                 "cloudProvider", r.cloudProvider(),
                 "region", r.regionName(),
@@ -66,8 +67,8 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
     }
 
     @Override
-    protected OutputAll execute(Stream<FoundRegion> regions) {
-        val data = regions
+    protected OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
+        val data = regions.get()
             .map((r) -> Map.of(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.isPremium()),
                 "Region", r.regionName(),

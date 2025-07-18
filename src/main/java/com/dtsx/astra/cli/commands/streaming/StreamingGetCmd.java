@@ -15,6 +15,7 @@ import picocli.CommandLine.Option;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Command(
     name = "get",
@@ -45,16 +46,16 @@ public class StreamingGetCmd extends AbstractStreamingTenantSpecificCmd<Streamin
     public Optional<StreamingGetKeys> $key;
 
     @Override
-    protected final OutputAll executeJson(StreamingInfo result) {
-        return switch (result) {
+    protected final OutputAll executeJson(Supplier<StreamingInfo> result) {
+        return switch (result.get()) {
             case StreamingInfoFull info -> OutputAll.serializeValue(info.raw());
             case StreamingInfoValue(var value) -> OutputAll.serializeValue(value);
         };
     }
 
     @Override
-    protected final OutputAll execute(StreamingInfo result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<StreamingInfo> result) {
+        return switch (result.get()) {
             case StreamingInfoFull info -> mkShellTable(info);
             case StreamingInfoValue(var value) -> OutputAll.serializeValue(value);
         };

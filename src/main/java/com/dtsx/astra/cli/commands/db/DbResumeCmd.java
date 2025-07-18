@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
@@ -57,8 +58,8 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
     }
 
     @Override
-    protected final OutputAll execute(DbResumeResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<DbResumeResult> result) {
+        return switch (result.get()) {
             case DatabaseAwaited(var duration) -> handleDatabaseAwaited(duration);
             case DatabaseResumedAwaited(var duration) -> handleDatabaseResumedAwaited(duration);
             case DatabaseNeedsAwaiting(var database) -> handleDatabaseNeedsAwaiting(database);

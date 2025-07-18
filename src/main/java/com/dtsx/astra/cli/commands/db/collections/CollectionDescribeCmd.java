@@ -14,6 +14,7 @@ import picocli.CommandLine.Command;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOperation.*;
@@ -32,16 +33,16 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOper
 )
 public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<CollectionDescribeResult> {
     @Override
-    protected OutputJson executeJson(CollectionDescribeResult result) {
-            return switch (result) {
+    protected OutputJson executeJson(Supplier<CollectionDescribeResult> result) {
+            return switch (result.get()) {
             case CollectionNotFound() -> throwCollectionNotFound();
             case CollectionFound(var info) -> OutputJson.serializeValue(info.raw());
         };
     }
 
     @Override
-    public final OutputAll execute(CollectionDescribeResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<CollectionDescribeResult> result) {
+        return switch (result.get()) {
             case CollectionNotFound() -> throwCollectionNotFound();
             case CollectionFound(var info) -> handleCollectionFound(info);
         };

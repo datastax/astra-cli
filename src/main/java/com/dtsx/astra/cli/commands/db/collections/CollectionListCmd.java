@@ -11,8 +11,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperation.CollectionListRequest;
@@ -43,14 +43,14 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
     public boolean $all;
 
     @Override
-    protected OutputJson executeJson(Stream<CollectionListResult> result) {
+    protected OutputJson executeJson(Supplier<Stream<CollectionListResult>> result) {
         validateParams();
 
         if ($all) {
-            return OutputJson.serializeValue(result.toList().getFirst().collections());
+            return OutputJson.serializeValue(result.get().toList().getFirst().collections());
         }
 
-        return OutputJson.serializeValue(result
+        return OutputJson.serializeValue(result.get()
             .map(res -> Map.of(
                 "keyspace", res.keyspace(),
                 "collections", res.collections()
@@ -59,10 +59,10 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
     }
 
     @Override
-    public final OutputAll execute(Stream<CollectionListResult> result) {
+    public final OutputAll execute(Supplier<Stream<CollectionListResult>> result) {
         validateParams();
 
-        val data = result
+        val data = result.get()
             .flatMap((res) -> (
                 res.collections().stream()
                     .map(desc -> Map.of(

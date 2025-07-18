@@ -8,19 +8,19 @@ import com.dtsx.astra.cli.operations.user.UserListOperation;
 import com.dtsx.astra.cli.operations.user.UserListOperation.UserInfo;
 import lombok.val;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public abstract class UserListImpl extends AbstractUserCmd<Stream<UserInfo>> {
     @Override
-    protected OutputJson executeJson(Stream<UserInfo> result) {
-        return OutputJson.serializeValue(result.map(UserInfo::raw).toList());
+    protected OutputJson executeJson(Supplier<Stream<UserInfo>> result) {
+        return OutputJson.serializeValue(result.get().map(UserInfo::raw).toList());
     }
 
     @Override
-    protected final OutputAll execute(Stream<UserInfo> result) {
-        val data = result
+    protected final OutputAll execute(Supplier<Stream<UserInfo>> result) {
+        val data = result.get()
             .map((user) -> Map.of(
                 "User Id", user.userId(),
                 "User Email", user.email(),

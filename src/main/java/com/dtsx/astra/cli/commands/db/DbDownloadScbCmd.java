@@ -14,6 +14,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
@@ -58,8 +59,8 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
     }
 
     @Override
-    protected final OutputAll execute(DownloadScbResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<DownloadScbResult> result) {
+        return switch (result.get()) {
             case ScbDownloaded(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoved(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoveFailed fail -> throwScbDownloadedAndMoveFailed(fail);

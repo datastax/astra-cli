@@ -8,19 +8,19 @@ import com.dtsx.astra.cli.operations.role.RoleListOperation;
 import com.dtsx.astra.cli.operations.role.RoleListOperation.RoleInfo;
 import lombok.val;
 
-import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public abstract class RoleListImpl extends AbstractRoleCmd<Stream<RoleInfo>> {
     @Override
-    protected OutputJson executeJson(Stream<RoleInfo> result) {
-        return OutputJson.serializeValue(result.map(RoleInfo::raw).toList());
+    protected OutputJson executeJson(Supplier<Stream<RoleInfo>> result) {
+        return OutputJson.serializeValue(result.get().map(RoleInfo::raw).toList());
     }
 
     @Override
-    protected final OutputAll execute(Stream<RoleInfo> result) {
-        val data = result
+    protected final OutputAll execute(Supplier<Stream<RoleInfo>> result) {
+        val data = result.get()
             .map((role) -> Map.of(
                 "Role Id", role.id(),
                 "Role Name", role.name()

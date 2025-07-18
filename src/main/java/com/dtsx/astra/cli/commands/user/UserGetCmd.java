@@ -16,6 +16,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.user.UserGetOperation.UserGetRequest;
 
@@ -41,13 +42,13 @@ public class UserGetCmd extends AbstractUserCmd<User> {
     public UserRef user;
 
     @Override
-    public OutputJson executeJson(User result) {
+    public OutputJson executeJson(Supplier<User> result) {
         return OutputJson.serializeValue(result);
     }
 
     @Override
-    protected final OutputAll execute(User result) {
-        return mkTable(result);
+    protected final OutputAll execute(Supplier<User> result) {
+        return mkTable(result.get());
     }
 
     private RenderableShellTable mkTable(User user) {

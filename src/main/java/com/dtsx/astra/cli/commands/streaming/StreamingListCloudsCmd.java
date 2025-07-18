@@ -12,6 +12,7 @@ import picocli.CommandLine.Command;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Command(
     name = "list-clouds",
@@ -23,8 +24,8 @@ import java.util.Set;
 )
 public class StreamingListCloudsCmd extends AbstractStreamingCmd<Set<CloudProviderType>> {
     @Override
-    protected OutputJson executeJson(Set<CloudProviderType> clouds) {
-        val data = clouds
+    protected OutputJson executeJson(Supplier<Set<CloudProviderType>> clouds) {
+        val data = clouds.get()
             .stream()
             .map((cloud) -> Map.of("cloudProvider", cloud.name()))
             .toList();
@@ -33,8 +34,8 @@ public class StreamingListCloudsCmd extends AbstractStreamingCmd<Set<CloudProvid
     }
 
     @Override
-    protected OutputAll execute(Set<CloudProviderType> clouds) {
-        val data = clouds
+    protected OutputAll execute(Supplier<Set<CloudProviderType>> clouds) {
+        val data = clouds.get()
             .stream()
             .map((cloud) -> Map.of("Cloud Provider", cloud.name().toLowerCase()))
             .toList();

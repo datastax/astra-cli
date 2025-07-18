@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -63,8 +64,8 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     }
 
     @Override
-    protected final OutputAll execute(DbDeleteResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<DbDeleteResult> result) {
+        return switch (result.get()) {
             case DatabaseNotFound() -> handleDbNotFound($dbRef);
             case DatabaseDeleted() -> handleDbDeleted($dbRef);
             case DatabaseDeletedAndTerminated(var waitTime) -> handleDbDeletedAndTerminated($dbRef, waitTime);

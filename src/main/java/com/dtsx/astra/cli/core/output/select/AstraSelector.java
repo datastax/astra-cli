@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 
 public class AstraSelector {
     private static final List<SelectionStrategy.Meta> STRATEGIES = List.of(
@@ -24,7 +24,7 @@ public class AstraSelector {
     
     public <T> Optional<T> select(String prompt, NEList<T> options, Optional<T> defaultOption, Function<T, String> mapper, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
         if (!AstraConsole.isTty()) {
-            throw new AstraCliException(ILLEGAL_OPERATION, """
+            throw new AstraCliException(UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Can not interactively select an option when the program is not running interactively|@
             
               Please programmatically pass an option using the %s.
@@ -34,7 +34,7 @@ public class AstraSelector {
         }
 
         if (OutputType.isNotHuman()) {
-            throw new AstraCliException(ILLEGAL_OPERATION, """
+            throw new AstraCliException(UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Can not interactively select an option when the output type is not 'human'|@
             
               Please programmatically pass an option using the %s, or use the 'human' output format instead.
@@ -58,7 +58,13 @@ public class AstraSelector {
             }
         }
 
-        throw new AstraCliException("");
+        throw new AstraCliException(UNSUPPORTED_EXECUTION, """
+            @|bold,red Error: No interactive selection strategy is supported on this terminal|@
+            
+            Please programmatically pass an option using the %s.
+            """.formatted(fallback), List.of(
+                new Hint("Potential fix", fix.getLeft(), fix.getRight())
+            ));
     }
 
     @RequiredArgsConstructor

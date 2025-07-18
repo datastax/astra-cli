@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.config.AstraConfig.InvalidProfile;
 import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation.GetConfigResult;
@@ -37,7 +38,9 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
             val candidates = NEList.parse(config.profiles());
 
             if (candidates.isEmpty()) {
-                throw new IllegalStateException("No profile available in configuration");
+                throw new AstraCliException("""
+                  @|bold,red No profiles found to select from|@
+                """);
             }
 
             return request.promptProfileName.apply(candidates.get());

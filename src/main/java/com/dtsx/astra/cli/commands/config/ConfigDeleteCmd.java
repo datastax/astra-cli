@@ -16,6 +16,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -47,8 +48,8 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
     public boolean $ifExists;
 
     @Override
-    public final OutputAll execute(ConfigDeleteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<ConfigDeleteResult> result) {
+        return switch (result.get()) {
             case ProfileDeleted() -> handleProfileDeleted();
             case ProfileDoesNotExist() -> handleProfileDoesNotExist();
             case ProfileIllegallyDoesNotExist() -> throwProfileNotFound();

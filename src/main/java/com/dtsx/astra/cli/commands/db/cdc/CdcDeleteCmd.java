@@ -19,10 +19,10 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.CDC_NOT_FOUND;
-import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
 
 @Command(
@@ -94,12 +94,12 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
     @Override
     protected void prelude() {
         super.prelude();
-        throw new AstraCliException(ILLEGAL_OPERATION, "Deleting CDCs via the Astra CLI is not currently not supported due to a dependency bug.");
+        throw new AstraCliException(UNSUPPORTED_EXECUTION, "Deleting CDCs via the Astra CLI is not currently not supported due to a dependency bug.");
     }
 
     @Override
-    public final OutputAll execute(CdcDeleteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<CdcDeleteResult> result) {
+        return switch (result.get()) {
             case CdcNotFound() -> handleCdcNotFound();
             case CdcIllegallyNotFound() -> throwCdcNotFound();
             case CdcDeleted() -> handleCdcDeleted();

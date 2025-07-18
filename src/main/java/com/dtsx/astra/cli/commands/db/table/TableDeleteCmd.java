@@ -12,6 +12,7 @@ import picocli.CommandLine.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -42,8 +43,8 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
     public boolean $ifExists;
 
     @Override
-    public final OutputAll execute(TableDeleteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<TableDeleteResult> result) {
+        return switch (result.get()) {
             case TableNotFound() -> handleTableNotFound();
             case TableIllegallyNotFound() -> throwTableNotFound();
             case TableDeleted() -> handleTableDeleted();

@@ -10,7 +10,8 @@ public interface OutputSerializer<T> {
     List<OutputSerializer<?>> SERIALIZERS = List.of(
         ListSerializer.INSTANCE,
         EnumSerializer.INSTANCE,
-        CatchAllSerializer.INSTANCE
+        CatchAllSerializer.INSTANCE,
+        SupplierSerializer.INSTANCE
     );
 
     boolean canSerialize(Object o);

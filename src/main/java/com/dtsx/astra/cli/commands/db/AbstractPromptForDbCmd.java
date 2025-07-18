@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
@@ -37,7 +38,9 @@ public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes>
         val dbs = dbGateway.findAll().toList();
 
         if (dbs.isEmpty()) {
-            throw new IllegalStateException("No databases found for the current profile");
+            throw new AstraCliException("""
+              @|bold,red No databases found to select from|@
+            """);
         }
 
         val namesAreUnique = dbs.stream()

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
@@ -129,8 +130,8 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     }
 
     @Override
-    protected final OutputAll execute(CreateDotEnvResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<CreateDotEnvResult> result) {
+        return switch (result.get()) {
             case CreatedDotEnvContent(var content) -> OutputAll.response(
                 content.render(true),
                 mkData("printed", false, null)

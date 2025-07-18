@@ -11,6 +11,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
 
@@ -19,15 +20,15 @@ import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfi
 )
 public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult> {
     @Override
-    public final OutputHuman executeHuman(ListConfigResult result) {
-        val cells = result.profiles().stream()
+    public final OutputHuman executeHuman(Supplier<ListConfigResult> result) {
+        val cells = result.get().profiles().stream()
             .map((p) -> Map.of(
                 "configuration", mkConfigDisplayName(p.name(), p.isInUse()),
                 "env", p.env().name()
             ))
             .toList();
 
-        val allProdEnv = result.profiles().stream()
+        val allProdEnv = result.get().profiles().stream()
             .allMatch(p -> p.env() == AstraEnvironment.PROD);
 
         val table = new ShellTable(cells);
@@ -40,8 +41,8 @@ public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult>
     }
 
     @Override
-    public final OutputAll executeJson(ListConfigResult result) {
-        val cells = result.profiles().stream()
+    public final OutputAll executeJson(Supplier<ListConfigResult> result) {
+        val cells = result.get().profiles().stream()
             .map((p) -> Map.of(
                 "name", p.name(),
                 "env", p.env().name(),

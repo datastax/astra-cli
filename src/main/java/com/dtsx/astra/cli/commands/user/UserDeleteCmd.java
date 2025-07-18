@@ -15,6 +15,7 @@ import picocli.CommandLine.Parameters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.USER_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -53,8 +54,8 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
     }
 
     @Override
-    public final OutputAll execute(UserDeleteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<UserDeleteResult> result) {
+        return switch (result.get()) {
             case UserDeleted() -> handleUserDeleted();
             case UserNotFound() -> handleUserNotFound();
             case UserIllegallyNotFound() -> throwUserNotFound();

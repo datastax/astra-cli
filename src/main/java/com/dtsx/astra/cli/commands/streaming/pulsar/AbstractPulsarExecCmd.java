@@ -11,6 +11,8 @@ import com.dtsx.astra.cli.operations.streaming.pulsar.AbstractPulsarExeOperation
 import com.dtsx.astra.cli.operations.streaming.pulsar.AbstractPulsarExeOperation.PulsarInstallFailed;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
+import java.util.function.Supplier;
+
 public abstract class AbstractPulsarExecCmd extends AbstractStreamingCmd<PulsarExecResult> {
     @Override
     @MustBeInvokedByOverriders
@@ -20,8 +22,8 @@ public abstract class AbstractPulsarExecCmd extends AbstractStreamingCmd<PulsarE
     }
 
     @Override
-    protected final OutputHuman executeHuman(PulsarExecResult result) {
-        return switch (result) {
+    protected final OutputHuman executeHuman(Supplier<PulsarExecResult> result) {
+        return switch (result.get()) {
             case PulsarInstallFailed(var msg) -> OutputAll.message(msg);
             case ConfFileCreationFailed(var msg) -> OutputAll.message(msg);
             case Executed(var exitCode) -> AstraCli.exit(exitCode);

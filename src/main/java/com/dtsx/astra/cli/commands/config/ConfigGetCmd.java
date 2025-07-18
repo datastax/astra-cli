@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -68,8 +69,8 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     public Optional<String> $key = Optional.empty();
 
     @Override
-    public final OutputAll execute(GetConfigResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<GetConfigResult> result) {
+        return switch (result.get()) {
             case SpecificKeyValue(var value) -> OutputAll.serializeValue(value);
             case ProfileSection(var section) -> OutputAll.instance(
                 () -> renderHuman(section),

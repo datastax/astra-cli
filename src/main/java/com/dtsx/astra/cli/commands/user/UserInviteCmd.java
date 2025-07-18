@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.USER_ALREADY_INVITED;
@@ -81,8 +82,8 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
     }
 
     @Override
-    public final OutputAll execute(UserInviteResult result) {
-        return switch (result) {
+    public final OutputAll execute(Supplier<UserInviteResult> result) {
+        return switch (result.get()) {
             case UserInvited(var roleIds) -> handleUserInvited(roleIds);
             case UserAlreadyExists() -> handleUserAlreadyExists();
             case UserIllegallyAlreadyExists() -> throwUserAlreadyExists();

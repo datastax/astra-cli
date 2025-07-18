@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.REGION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
@@ -55,8 +56,8 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
     }
 
     @Override
-    protected final OutputAll execute(RegionDeleteResult result) {
-        return switch (result) {
+    protected final OutputAll execute(Supplier<RegionDeleteResult> result) {
+        return switch (result.get()) {
             case RegionNotFound() -> handleRegionNotFound();
             case RegionDeleted() -> handleRegionDeleted();
             case RegionDeletedAndDbActive(var waitTime) -> handleRegionDeletedAndDbActive(waitTime);

@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointG
 import picocli.CommandLine.Option;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public abstract class AbstractEndpointGetCmd extends AbstractPromptForDbCmd<EndpointGetResponse> {
     @Option(
@@ -22,8 +23,8 @@ public abstract class AbstractEndpointGetCmd extends AbstractPromptForDbCmd<Endp
     protected abstract String mkEndpoint(EndpointGetResponse result);
 
     @Override
-    protected final OutputAll execute(EndpointGetResponse result) {
-        return OutputAll.serializeValue(mkEndpoint(result));
+    protected final OutputAll execute(Supplier<EndpointGetResponse> result) {
+        return OutputAll.serializeValue(mkEndpoint(result.get()));
     }
 
     @Override
