@@ -106,7 +106,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 """.formatted(
                     highlight(filePath)
                 ), List.of(
-                    new Hint("Set a profile as default:", "astra config use [name]" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile().getPath())),
+                    new Hint("Set a profile as default:", "astra config use" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile().getPath())),
                     new Hint("Specify a profile to use:", originalArgs(), "--profile <name>")
                 ));
             } else {

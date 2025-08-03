@@ -83,7 +83,7 @@ public class FileUtils {
         TarArchiveEntry tarEntry;
 
         while ((tarEntry = tis.getNextEntry()) != null) {
-            File outputFile = new File(outputDir, tarEntry.getName()).getCanonicalFile();
+            val outputFile = new File(outputDir, tarEntry.getName()).getCanonicalFile();
 
             if (tarEntry.isDirectory()) {
                 if (!outputFile.exists() && outputFile.mkdirs()) {

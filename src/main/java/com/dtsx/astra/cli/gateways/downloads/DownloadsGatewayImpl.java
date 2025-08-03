@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.val;
 
 import java.io.File;
@@ -64,12 +65,13 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         return installGenericArchive(AstraHome.Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell");
     }
 
+    @SneakyThrows
     private Either<String, File> installGenericArchive(File installDir, String url, String exe) {
         if (installDir.isFile()) {
             return Either.left("%s is a file; expected it to be a directory".formatted(installDir.getAbsolutePath()));
         }
 
-        val tarFile = new File(installDir, exe + "-download.tar.gz");
+        val tarFile = new File(installDir.getParentFile(), exe + "-download.tar.gz");
         val exeFile = new File(installDir, "bin/" + exe);
 
         if (Objects.requireNonNull(installDir.list()).length > 0) {
@@ -94,15 +96,16 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
                 return null;
             });
         } catch (Exception e) {
+            e.printStackTrace();
             return Either.left("Failed to extract " + exe + " archive %s: %s".formatted(tarFile.getAbsolutePath(), e.getMessage()));
-        }
-
-        if (!tarFile.delete()) {
-            return Either.left("Failed to delete temporary " + exe + " archive %s".formatted(tarFile.getAbsolutePath()));
         }
 
         if (!exeFile.setExecutable(true, false)) {
             return Either.left("Failed to make " + exe + " executable at %s".formatted(exeFile.getAbsolutePath()));
+        }
+
+        if (!tarFile.delete()) {
+            return Either.left("Failed to delete temporary " + exe + " archive %s".formatted(tarFile.getAbsolutePath()));
         }
 
         return Either.right(exeFile);
