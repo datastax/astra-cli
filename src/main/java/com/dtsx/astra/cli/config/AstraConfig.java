@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.config.AstraConfigFileException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.output.Hint;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
@@ -87,12 +87,12 @@ public class AstraConfig {
                 
                   Please run @!astra setup!@ to create the default configuration file, and set up your Astra credentials.
                 
-                  Alternatively, you can specify a custom configuration file using the @!--config-file!@ option.
+                  Alternatively, you can specify credentials via the @!--config-file!@ or @!--token!@ options.
                 """.formatted(
                     file.getAbsolutePath()
                 ), List.of(
                     new Hint("Interactively set up your configuration file", "astra setup"),
-                    new Hint("Programmatically set up your configuration file", "astra config create <name> --token <token> [--env <env>]"),
+                    new Hint("Programmatically set up your configuration file", "astra config create [name] --token <token> [--env <env>]"),
                     new Hint("Example custom config file usage", "astra db list --config-file ~/.custom_astrarc")
                 ));
             } else {

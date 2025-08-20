@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db.region;
 
-import com.dtsx.astra.cli.core.output.output.OutputAll;
-import com.dtsx.astra.cli.core.output.output.OutputJson;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.FoundRegion;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;

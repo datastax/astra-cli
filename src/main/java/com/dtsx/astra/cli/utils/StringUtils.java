@@ -1,11 +1,14 @@
 package com.dtsx.astra.cli.utils;
 
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.UUID;
 
+@Slf4j
 @UtilityClass
 public class StringUtils {
     public static final String NL = System.lineSeparator();
@@ -33,15 +36,13 @@ public class StringUtils {
     public static String withIndent(String input, int targetIndent) {
         val lines = input.split("\n", -1);
 
-        var start = 0;
-        while (start < lines.length && stripAnsiCodes(lines[start]).trim().isEmpty()) {
-            start++;
-        }
+        val start = lines.length > 0 && stripAnsiCodes(lines[0]).trim().isEmpty()
+            ? 1
+            : 0;
 
-        var end = lines.length;
-        while (end > start && stripAnsiCodes(lines[end - 1]).trim().isEmpty()) {
-            end--;
-        }
+        val end = lines.length > 1 && stripAnsiCodes(lines[lines.length - 1]).trim().isEmpty()
+            ? lines.length - 1
+            : lines.length;
 
         val trimmedLines = new String[end - start];
         System.arraycopy(lines, start, trimmedLines, 0, end - start);
@@ -50,21 +51,16 @@ public class StringUtils {
 
         for (val line : trimmedLines) {
             val strippedLine = stripAnsiCodes(line);
+
             if (!strippedLine.trim().isEmpty()) {
-                int indent = findVisibleTextStart(line);
-                if (indent < minIndent) {
-                    minIndent = indent;
-                }
+                minIndent = Math.min(minIndent, findVisibleTextStart(strippedLine));
             }
         }
 
         val indentStr = " ".repeat(targetIndent);
 
         for (int i = 0; i < trimmedLines.length; i++) {
-            if (trimmedLines[i].length() >= minIndent) {
-                trimmedLines[i] = trimmedLines[i].substring(minIndent);
-            }
-            trimmedLines[i] = indentStr + trimmedLines[i];
+            trimmedLines[i] = indentStr + trimLeadingSpacesAndTabs(trimmedLines[i]);
         }
 
         return String.join(NL, trimmedLines);
@@ -74,13 +70,26 @@ public class StringUtils {
         return input.replaceAll("\u001B\\[[0-9;]*m", "");
     }
 
-    private static int findVisibleTextStart(String line) {
-        val stripped = stripAnsiCodes(line);
-        val trimmed = stripped.trim();
-        if (trimmed.isEmpty()) {
-            return 0;
+    private static String trimLeadingSpacesAndTabs(String line) {
+        int start = 0;
+        while (start < line.length()) {
+            char c = line.charAt(start);
+            if (c != ' ' && c != '\t') {
+                break;
+            }
+            start++;
         }
-        return stripped.indexOf(trimmed);
+        return line.substring(start);
+    }
+
+    private static int findVisibleTextStart(String strippedLine) {
+        val trimmed = strippedLine.trim();
+
+        if (trimmed.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+
+        return strippedLine.indexOf(trimmed);
     }
 
     public static String renderComment(CharSequence comment) {
@@ -93,5 +102,47 @@ public class StringUtils {
 
     public static String renderCommand(CharSequence command) {
         return AstraColors.BLUE_300.use("$ ") + command;
+    }
+
+    public static String maskToken(String token) {
+        return AstraToken.parse(token).fold(
+            _ -> AstraColors.RED_500.use("<invalid_token('" + truncate(token, 4) + "')>"),
+            AstraToken::toString
+        );
+    }
+
+    public static boolean isWhitespaceOnly(String str) {
+        if (str == null || str.isEmpty()) {
+            return true;
+        }
+
+        for (char c : str.toCharArray()) {
+            if (c != ' ' && c != '\t') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean isInteger(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+
+        for (char c : str.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static String truncate(String str, int maxLength) {
+        if (str == null || str.length() <= maxLength) {
+            return str;
+        }
+        return str.substring(0, maxLength - 1) + "…";
     }
 }

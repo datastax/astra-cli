@@ -6,6 +6,7 @@ import lombok.experimental.Delegate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 public class NEList<E> implements List<E> {
@@ -21,6 +22,13 @@ public class NEList<E> implements List<E> {
             throw new IllegalArgumentException("Attempted to create an NEList from an empty list");
         }
         return new NEList<>(list);
+    }
+
+    public static <E> NEList<E> of(@NonNull Set<E> set) {
+        if (set.isEmpty()) {
+            throw new IllegalArgumentException("Attempted to create an NEList from an empty set");
+        }
+        return new NEList<>(List.copyOf(set));
     }
 
     public static <E> Optional<NEList<E>> parse(@NonNull List<E> list) {

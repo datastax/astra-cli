@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation;
 import lombok.val;

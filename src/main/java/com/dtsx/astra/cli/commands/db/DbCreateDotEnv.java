@@ -7,9 +7,8 @@ import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraConsole.ConfirmResponse;
-import com.dtsx.astra.cli.core.output.output.Hint;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +27,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
-import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "create-dotenv",
@@ -72,7 +70,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     private boolean $print;
 
     @Option(
-        names = { "--overwrite", "-y" },
+        names = { "--overwrite" },
         description = { "Whether to existing duplicate keys in the .env file. If false, the command will attempt to prompt the user before overwriting any existing keys, or fail if it can't.", DEFAULT_VALUE },
         paramLabel = "PRINT",
         negatable = true
@@ -234,30 +232,30 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
             duplicatesStr += "\n- and %s more...".formatted(AstraColors.PURPLE_300.use(String.valueOf(duplicates.size() - 5)));
         }
 
-        val msg = trimIndent("""
-            Pre-existing keys found in the .env file:
-            %s
+        val msg = """
+          Pre-existing keys found in the .env file:
+          %s
+  
+          Note that these keys may not necessary have different values than what would be written.
+  
+          Do you want to overwrite them?
+        """.formatted(duplicatesStr);
 
-            Note that these keys may not necessary have different values than what would be written.
+        return AstraConsole.confirm(msg)
+            .defaultNo()
+            .fallbackFlag("--overwrite")
+            .fix(originalArgs(), "--overwrite")
+            .dontClearAfterSelection();
 
-            Do you want to overwrite them? [y/N]
-            """.formatted(
-            duplicatesStr
-        ));
-
-        val response = AstraConsole.confirm(msg, false);
-
-        if (response.equals(ConfirmResponse.NO_ANSWER)) {
-            throw new AstraCliException(EXECUTION_CANCELLED, """
-              @|bold, red Error: Operation was cancelled because clashing keys were found in the .env file.|@
-            
-              To avoid this error, you can:
-              - Interactively answer 'y' to overwrite the duplicate keys,
-              - Use the @!--overwrite!@ option to automatically overwrite the duplicate keys, or
-              - Use the @!--no-overwrite!@ option to leave the duplicate keys in the env file.
-            """);
-        }
-
-        return response.equals(ConfirmResponse.ANSWER_OK);
+//        if (response.equals(ConfirmResponse.NO_ANSWER)) {
+//            throw new AstraCliException(EXECUTION_CANCELLED, """
+//              @|bold, red Error: Operation was canceled because clashing keys were found in the .env file.|@
+//
+//              To avoid this error, you can:
+//              - Interactively answer 'y' to overwrite the duplicate keys,
+//              - Use the @!--overwrite!@ option to automatically overwrite the duplicate keys, or
+//              - Use the @!--no-overwrite!@ option to leave the duplicate keys in the env file.
+//            """);
+//        }
     }
 }

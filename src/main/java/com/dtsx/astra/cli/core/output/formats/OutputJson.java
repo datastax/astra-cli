@@ -1,5 +1,6 @@
-package com.dtsx.astra.cli.core.output.output;
+package com.dtsx.astra.cli.core.output.formats;
 
+import com.dtsx.astra.cli.core.output.Hint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.SneakyThrows;

@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.commands.db.endpoints;
 
 import com.dtsx.astra.cli.commands.db.AbstractPromptForDbCmd;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetRequest;

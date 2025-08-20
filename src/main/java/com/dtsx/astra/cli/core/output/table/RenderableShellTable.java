@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output.table;
 
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 
 import java.util.List;
 import java.util.Map;

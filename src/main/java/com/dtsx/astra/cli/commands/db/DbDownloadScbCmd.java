@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDownloadScbOperation;
 import lombok.val;
 import picocli.CommandLine.Command;

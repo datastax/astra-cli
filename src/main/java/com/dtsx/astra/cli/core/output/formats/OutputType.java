@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.core.output.output;
+package com.dtsx.astra.cli.core.output.formats;
 
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;

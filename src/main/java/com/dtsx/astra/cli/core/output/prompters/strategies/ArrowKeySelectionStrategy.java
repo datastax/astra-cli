@@ -1,10 +1,12 @@
-package com.dtsx.astra.cli.core.output.select;
+package com.dtsx.astra.cli.core.output.prompters.strategies;
 
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.output.OutputType;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
+import com.dtsx.astra.cli.core.output.prompters.PromptRequest;
+import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy;
 import lombok.SneakyThrows;
 import lombok.val;
 
@@ -33,28 +35,30 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     private static final String UNDERLINE_START = "\033[4m";
     private static final String UNDERLINE_END = "\033[24m";
 
-    private final SelectionRequest<T> req;
+    private final PromptRequest.Closed<T> req;
     
     private String filterText = "";
     private volatile boolean rawModeEnabled;
 
+    private final String fixedPrompt;
     private List<String> filteredOptions;
     private int selectedIndex;
 
-    public ArrowKeySelectionStrategy(SelectionRequest<T> req) {
+    public ArrowKeySelectionStrategy(PromptRequest.Closed<T> req) {
         this.req = req;
+        this.fixedPrompt = req.prompt().replace("\n", "\r\n");
         this.filteredOptions = List.copyOf(req.options());
         this.selectedIndex = Math.max(req.defaultOption().map(filteredOptions::indexOf).orElse(0), 0);
     }
     
-    public static class Meta implements SelectionStrategy.Meta {
+    public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
         public boolean isSupported() {
-            return System.console() != null && OutputType.isHuman() && AstraConsole.isTty() && !isWindows();
+            return OutputType.isHuman() && AstraConsole.isTty() && !isWindows() && AstraColors.enabled();
         }
         
         @Override
-        public <T> SelectionStrategy<T> mkInstance(SelectionRequest<T> request) {
+        public <T> SelectionStrategy<T> mkInstance(PromptRequest.Closed<T> request) {
             return new ArrowKeySelectionStrategy<>(request);
         }
     }
@@ -81,34 +85,39 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private void showPromptAndStartSelector() {
-        AstraConsole.println(req.prompt());
+        AstraConsole.println(fixedPrompt);
         AstraConsole.print(HIDE_CURSOR);
         redraw();
     }
     
     private void redraw() {
         if (filteredOptions.isEmpty()) {
-            AstraConsole.printf("\r%s%s%n", AstraColors.NEUTRAL_400.use("Oops! No matches found for "), formatFilter(filterText));
+            AstraConsole.printf("\r%s%s%n", AstraColors.NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
             AstraConsole.printf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
         } else {
+            val defaultIndex = req.defaultOption().map(filteredOptions::indexOf);
+
             for (int i = 0; i < filteredOptions.size(); i++) {
-                drawOption(i);
+                drawOption(i, defaultIndex.isPresent() && defaultIndex.get() == i);
             }
             AstraConsole.printf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
         }
     }
     
-    private void drawOption(int index) {
+    private void drawOption(int index, boolean isDefault) {
         val isSelected = index == selectedIndex;
         val prefix = isSelected ? AstraColors.BLUE_300.use(">") : " ";
         val option = filteredOptions.get(index);
-        val displayOption = highlightMatch(option);
-        
-        if (isSelected) {
-            AstraConsole.printf("\r%s %s%n", prefix, highlight(displayOption));
-        } else {
-            AstraConsole.printf("\r%s %s%n", prefix, displayOption);
-        }
+
+        val optionStr = (isSelected)
+            ? highlight(highlightMatch(option))
+            : highlightMatch(option);
+
+        val isDefaultStr = (isDefault && req.labelDefault())
+            ? AstraColors.PURPLE_300.use(" (default)")
+            : "";
+
+        AstraConsole.printf("\r%s %s%s%n", prefix, optionStr, isDefaultStr);
     }
     
     private String highlightMatch(String option) {
@@ -161,7 +170,11 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
                 }
             }
             else if (isSelectionKey(input)) {
-                return handleSelection();
+                val res = handleSelection();
+
+                if (res.isPresent()) {
+                    return res;
+                }
             }
             else if (isQuitKey(input)) {
                 return handleQuit();
@@ -204,7 +217,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
             clearSelector();
 
             if (!req.clearAfterSelection()) {
-                AstraConsole.printf("@!>!@ %s%n%n", highlight(selected));
+                AstraConsole.printf("@!> %s!@\r\n\r\n", selected);
             }
             
             return Optional.of(req.mapper().apply(selected));
@@ -254,7 +267,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
     
     private void clearPrompt() {
-        for (int i = 0; i < req.prompt().split("\n").length; i++) {
+        for (int i = 0; i < fixedPrompt.split("\n").length; i++) {
             AstraConsole.print(MOVE_UP_CLEAR);
         }
     }
@@ -288,10 +301,10 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
             if (exitCode == 0) {
                 rawModeEnabled = true;
             } else {
-                throw new CongratsYouFoundABugException("");
+                throw new CongratsYouFoundABugException("TODO1");
             }
         } catch (Exception ignored) {
-            throw new CongratsYouFoundABugException("");
+            throw new CongratsYouFoundABugException("TODO2");
         }
     }
 

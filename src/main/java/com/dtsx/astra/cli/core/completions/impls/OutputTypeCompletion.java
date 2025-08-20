@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.completions.impls;
 
 import com.dtsx.astra.cli.core.completions.StaticCompletion;
-import com.dtsx.astra.cli.core.output.output.OutputType;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 
 import java.util.Arrays;
 

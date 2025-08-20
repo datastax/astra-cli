@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.commands.streaming;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.TenantStatus;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingStatusOperation;
 import picocli.CommandLine.Command;

@@ -1,12 +1,12 @@
-package com.dtsx.astra.cli.core.output.output;
+package com.dtsx.astra.cli.core.output.formats;
 
 import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 
 import static com.dtsx.astra.cli.core.output.AstraLogger.Level.QUIET;

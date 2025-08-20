@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output.table;
 
-import com.dtsx.astra.cli.core.output.output.OutputCsv;
+import com.dtsx.astra.cli.core.output.formats.OutputCsv;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 import lombok.val;
 

@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.core.exceptions.internal.db;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.output.Hint;
+import com.dtsx.astra.cli.core.output.Hint;
 
 import java.util.List;
 import java.util.UUID;

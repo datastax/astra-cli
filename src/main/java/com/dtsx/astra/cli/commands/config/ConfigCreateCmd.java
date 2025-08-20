@@ -3,20 +3,17 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.output.Hint;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
-import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -29,17 +26,22 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "create",
     description = "Create a new configuration profile, to store your Astra credentials. Use the `--token @<file>` syntax to securely read the token from a file, without leaking the token to your shell history."
 )
 @Example(
-    comment = "Create a new profile with an explicit name",
+    comment = "(Recommended) Interactively create a new profile",
+    command = "astra setup"
+)
+@Example(
+    comment = "Programmatically create a new profile",
     command = "astra config create my_profile -t AstraCS:..."
 )
 @Example(
-    comment = { "(Recommended)", "Securely create a new profile with the token provided from a plaintext file" },
+    comment = { "(Recommended)", "Securely create a new profile with the token provided from any file containing the token" },
     command = "astra config create my_profile -t @token.txt"
 )
 @Example(
@@ -49,10 +51,6 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 @Example(
     comment = "Create a new profile and set it as the default profile",
     command = "astra config create my_profile -t AstraCS:... --default"
-)
-@Example(
-    comment = "Create a new profile without any prompting if the profile already exists",
-    command = "astra config create my_profile -t AstraCS:... -y"
 )
 public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(
@@ -85,16 +83,13 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     )
     public boolean $setDefault;
 
-    @ArgGroup
-    public @Nullable ExistingProfileBehavior $existingProfileBehavior;
-
-    public static class ExistingProfileBehavior {
-        @Option(names = { "-y", "--yes" }, description = "Force creation without any confirmation prompts")
-        public boolean force;
-
-        @Option(names = { "-F", "--fail-if-exists" }, description = "Fail if profile already exists instead of prompting")
-        public boolean failIfExists;
-    }
+    @Option(
+        names = { "--overwrite" },
+        description = { "Whether to overwrite any existing profile(s) with the same name", DEFAULT_VALUE },
+        paramLabel = "PRINT",
+        negatable = true
+    )
+    private Optional<Boolean> $overwrite;
 
     @Override
     public final OutputAll execute(Supplier<ConfigCreateResult> result) {
@@ -131,7 +126,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
         val mainMsg = (wasFailIfExists)
             ? "The @!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
-            : "To overwrite it, either interactively respond to the prompt, or use the @!--yes!@ option to proceed without confirmation.";
+            : "To overwrite it, either interactively respond @!yes@! to the prompt, or use the @!--yes!@ option to proceed without confirmation.";
 
         throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists in the configuration file.|@
@@ -184,25 +179,27 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             $profileName,
             $token,
             $env,
-            Optional.ofNullable($existingProfileBehavior).map(eb -> eb.force).orElse(false),
-            Optional.ofNullable($existingProfileBehavior).map(eb -> eb.failIfExists).orElse(false),
+            $overwrite,
             $setDefault,
             this::assertCanOverwriteProfile
         ));
     }
 
     private void assertCanOverwriteProfile(ProfileName profileName) {
-        val confirmationMsg = """
-          A profile under the name %s already exists in the given configuration file.
+        val msg = trimIndent("""
+          A profile under the name @!%s!@ already exists in the given configuration file.
 
-          Do you wish to overwrite it? [y/N]
-        """.formatted(
-            highlight(profileName)
-        );
+          Do you wish to overwrite it?
+        """).formatted(profileName);
 
-        switch (AstraConsole.confirm(confirmationMsg, false)) {
-            case ANSWER_NO -> throw new ExecutionCancelledException();
-            case NO_ANSWER -> throwProfileAlreadyExists(profileName);
+        val allowOverwrite = AstraConsole.confirm(msg)
+            .defaultNo()
+            .fallbackFlag("--yes")
+            .fix(originalArgs(), "--yes")
+            .clearAfterSelection();
+
+        if (!allowOverwrite) {
+            throwProfileAlreadyExists(profileName);
         }
     }
 

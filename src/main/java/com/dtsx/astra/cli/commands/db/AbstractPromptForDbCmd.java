@@ -63,19 +63,18 @@ public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes>
 
         val neDbs = NEList.of(dbs);
 
-        val dbInput = AstraConsole.select(prompt)
+        val db = AstraConsole.select(prompt)
             .options(neDbs)
+            .requireAnswer()
             .mapper(dbToDisplayMap::get)
             .fallbackIndex(0)
             .fix(originalArgs(), "<db>")
             .clearAfterSelection();
 
-        return dbInput
-            .map(db ->
-                (dbs.stream().filter(d -> d.getInfo().getName().equals(db.getInfo().getName())).count() > 1)
-                    ? DbRef.fromId(UUID.fromString(db.getId()))
-                    : DbRef.fromNameUnsafe(db.getInfo().getName())
-            )
-            .orElseThrow();
+        val multipleDbsMatch = dbs.stream().filter(d -> d.getInfo().getName().equals(db.getInfo().getName())).count() > 1;
+
+        return (multipleDbsMatch)
+            ? DbRef.fromId(UUID.fromString(db.getId()))
+            : DbRef.fromNameUnsafe(db.getInfo().getName());
     }
 }

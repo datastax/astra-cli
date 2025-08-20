@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.commands.streaming.pulsar;
 
 import com.dtsx.astra.cli.commands.streaming.AbstractStreamingTenantSpecificCmd;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.pulsar.StreamingPulsarTokenOperation;
 import com.dtsx.astra.cli.operations.streaming.pulsar.StreamingPulsarTokenOperation.PulsarTokenRequest;

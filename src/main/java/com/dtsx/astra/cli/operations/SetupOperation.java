@@ -35,8 +35,8 @@ public class SetupOperation implements Operation<SetupResult> {
         Consumer<File> assertShouldContinueIfAlreadySetup,
         Consumer<Profile> assertShouldOverwriteExistingProfile,
         Supplier<AstraToken> promptForToken,
-        Supplier<Optional<AstraEnvironment>> promptForEnv,
-        Supplier<Optional<ProfileName>> promptForName,
+        Function<AstraEnvironment, AstraEnvironment> promptForEnv,
+        Function<String, ProfileName> promptForName,
         Supplier<Boolean> promptShouldSetDefault
     ) {}
 
@@ -85,7 +85,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
     private Either<SetupResult, ProfileDetails> resolveProfileDetails(SetupOperation.SetupRequest request) {
         val token = request.token.orElseGet(request.promptForToken);
-        val env = request.env.or(request.promptForEnv).orElse(AstraEnvironment.PROD);
+        val env = request.env.orElseGet(() -> request.promptForEnv.apply(AstraEnvironment.PROD));
 
         val orgGateway = createOrgGateway.apply(token, env);
         val org = validateTokenAndFetchOrg(orgGateway);
@@ -112,7 +112,7 @@ public class SetupOperation implements Operation<SetupResult> {
     }
 
     private ProfileName resolveProfileName(Organization org, SetupRequest request) {
-        return request.name.or(request.promptForName).orElse(ProfileName.mkUnsafe(org.getName()));
+        return request.name.orElseGet(() -> request.promptForName.apply(org.getName()));
     }
 
     private @Nullable AstraConfig cachedConfig;

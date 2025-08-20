@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output.table;
 
-import com.dtsx.astra.cli.core.output.output.OutputJson;
+import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 
 import java.util.List;

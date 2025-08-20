@@ -26,8 +26,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
         Optional<ProfileName> profileName,
         AstraToken token,
         AstraEnvironment env,
-        boolean force,
-        boolean failIfExists,
+        Optional<Boolean> overwrite,
         boolean setDefault,
         Consumer<ProfileName> assertCanOverwriteProfile
     ) {}
@@ -95,15 +94,15 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     }
 
     private Optional<ConfigCreateResult> assertCanOverwriteProfile(ProfileName profileName, CreateConfigRequest request) {
-        if (request.force) {
+        if (request.overwrite.isEmpty()) {
+            request.assertCanOverwriteProfile.accept(profileName);
             return Optional.empty();
         }
 
-        if (request.failIfExists) {
-            return Optional.of(new ProfileIllegallyExists(profileName));
-        }
+        val shouldOverwrite = request.overwrite.get();
 
-        request.assertCanOverwriteProfile.accept(profileName);
-        return Optional.empty();
+        return (!shouldOverwrite)
+            ? Optional.of(new ProfileIllegallyExists(profileName))
+            : Optional.empty();
     }
 }

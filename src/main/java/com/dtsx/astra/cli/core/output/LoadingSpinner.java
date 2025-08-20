@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.core.output.output.OutputType;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.val;
 
 import java.util.ArrayDeque;

@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbStatusOperation;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import picocli.CommandLine.Command;

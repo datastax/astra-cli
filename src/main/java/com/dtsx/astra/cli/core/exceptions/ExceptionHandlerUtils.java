@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.core.exceptions;
 
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
-import com.dtsx.astra.cli.core.output.output.OutputType;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import picocli.CommandLine;

@@ -9,7 +9,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.config.ProfileNotFoundExcepti
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
@@ -91,10 +91,10 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
 
         return AstraConsole.select("Select a profile to set as default")
             .options(candidates)
+            .requireAnswer()
             .mapper(profileToDisplayMap::get)
             .fallbackIndex(0)
             .fix(originalArgs(), "<profile>")
-            .clearAfterSelection()
-            .orElseThrow();
+            .clearAfterSelection();
     }
 }

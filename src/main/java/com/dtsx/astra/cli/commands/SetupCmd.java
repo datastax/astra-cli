@@ -9,10 +9,9 @@ import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraConsole.ConfirmResponse;
 import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.cli.core.output.output.Hint;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.SetupOperation;
@@ -20,6 +19,7 @@ import com.dtsx.astra.cli.operations.SetupOperation.InvalidToken;
 import com.dtsx.astra.cli.operations.SetupOperation.ProfileCreated;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupRequest;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
+import com.dtsx.astra.cli.utils.StringUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import picocli.CommandLine.Command;
@@ -30,14 +30,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
-import static com.dtsx.astra.cli.core.output.ExitCode.NO_ANSWER;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "setup",
-    description = "Initialize the Astra CLI configuration file"
+    description = "Interactively set up the Astra CLI & create new configuration profiles"
 )
 public class SetupCmd extends AbstractCmd<SetupResult> {
     @Option(
@@ -121,34 +120,43 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     private void assertShouldSetup(File existing) {
         AstraLogger.banner();
 
-        val confirmationMsg = """
+        if (AstraConsole.getConsole() == null) {
+            throw new AstraCliException("""
+              @|bold,red Error: Cannot run setup in non-interactive mode.|@
+            
+              The setup process requires user interaction, but no console is available.
+            
+              Please use @!astra config create!@ to programmatically create profiles instead.
+            """);
+        }
+
+        val prompt = """
           @|bold Welcome to the Astra CLI setup!|@
         
           @|faint A configuration file with your profile will be created at|@ @|faint,italic %s|@
         
           If you'd prefer to provide credentials on a per-command basis rather than storing them in a file, you can either:
-          - Use the per-command @!--token!@ flag to pass your token directly.
-          - Use the per-command @!--config-file!@ flag to specify an existing configuration file.
+          - Use the per-command @!--token!@ flag to pass your existing @!AstraCS!@ token directly.
+          - Use the per-command @!--config-file!@ flag to specify an existing @!.astrarc!@ file.
         
           %s
           %s
-        
-          Enter anything to continue, or use @!Ctrl+C!@ to cancel.
         """.formatted(
             existing.getAbsolutePath(),
             renderComment("Example:"),
             renderCommand("astra db list --token <your_token>")
         );
 
-        if (AstraConsole.confirm(confirmationMsg, true) == ConfirmResponse.ANSWER_NO) {
-            throw new ExecutionCancelledException();
-        }
+        AstraConsole.println(trimIndent(prompt));
+        AstraConsole.println();
+        AstraConsole.getConsole().readPassword(AstraConsole.format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "));
+        AstraConsole.println();
     }
 
     private void assertShouldContinueIfAlreadySetup(File existing) {
         AstraLogger.banner();
 
-        val confirmationMsg = """
+        val prompt = """
           @|bold Looks like you're already set up!|@
         
           @|faint Your config file already exists at|@ @|faint,italic %s|@
@@ -158,90 +166,94 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           %s
           %s
         
-          Do you want to continue and create a new profile? [Y/n]
+          Do you want to continue and create a new profile?
         """.formatted(
             existing.getAbsolutePath(),
             renderComment("Example:"),
             renderCommand("astra config list")
         );
 
-        if (AstraConsole.confirm(confirmationMsg, true) == ConfirmResponse.ANSWER_NO) {
+        val shouldContinue = AstraConsole.confirm(prompt)
+            .defaultYes()
+            .fallbackFlag("")
+            .fix(List.of(), "")
+            .clearAfterSelection();
+
+        if (!shouldContinue) {
             throw new ExecutionCancelledException();
         }
     }
 
     private void assertShouldOverwriteExistingProfile(Profile existing) {
-        val confirmationMsg = """
+        val prompt = """
           @|bold A profile with this name already exists with token|@ %s @|bold for environment|@ %s@|bold .|@
         
           You can use @!astra config get %s!@ to get more information about the existing profile.
         
-          Do you wish to overwrite it? [y/N]
+          Do you wish to overwrite it?
         """.formatted(
             highlight(existing.token().toString()),
             highlight(existing.env().name().toLowerCase()),
             existing.name().orElseThrow()
         );
 
-        switch (AstraConsole.confirm(confirmationMsg, false)) {
-            case ANSWER_NO -> throw new ExecutionCancelledException();
-            case NO_ANSWER -> throw new AstraCliException(NO_ANSWER, "Please answer interactively or pass the --name option with a different profile name.");
+        val shouldOverwrite = AstraConsole.confirm(prompt)
+            .defaultNo()
+            .fallbackFlag("")
+            .fix(List.of(), "")
+            .clearAfterSelection();
+
+        if (!shouldOverwrite) {
+            throw new ExecutionCancelledException();
         }
     }
 
     private AstraToken promptForToken() {
-        val message = """
-           %s Enter your Astra token (it should start with @!AstraCS!@)
-           @!>!@
-        """.formatted(
-            AstraColors.PURPLE_300.use("(Required)")
-        );
+        val prompt = AstraColors.PURPLE_300.use("(Required)") + " Enter your Astra token (it should start with @!AstraCS!@)";
 
-        val input = AstraConsole.readLine(message, true);
-
-        if (input.isEmpty()) {
-            throw new AstraCliException(NO_ANSWER, "An Astra token is required. Please provide it interactively or pass the --token option.");
-        }
-
-        return AstraToken.parse(input.get()).getRight(InvalidTokenException::new);
+        return AstraConsole.prompt(prompt)
+            .mapper(input -> AstraToken.parse(input).getRight(InvalidTokenException::new))
+            .echoOff(StringUtils::maskToken)
+            .requireAnswer()
+            .fallbackFlag("--token")
+            .fix(originalArgs(), "--token <your_token>")
+            .dontClearAfterSelection();
     }
 
-    private Optional<AstraEnvironment> promptForEnv() {
+    private AstraEnvironment promptForEnv(AstraEnvironment defaultEnv) {
         val prompt = AstraColors.PURPLE_300.use("(Optional)") + " Enter the target Astra environment (defaults to @!prod!@)";
 
         return AstraConsole.select(prompt)
             .options(AstraEnvironment.values())
-            .defaultOption(AstraEnvironment.PROD)
+            .defaultOption(defaultEnv)
             .mapper(e -> e.name().toLowerCase())
             .fallbackFlag("--env")
             .fix(originalArgs(), "--env <prod|test|dev>")
             .dontClearAfterSelection();
     }
 
-    private Optional<ProfileName> promptForName() {
-        val message = """
-          %s Enter a name for your profile (defaults to your org name)
-          @!>!@
-        """.formatted(
-            AstraColors.PURPLE_300.use("(Optional)")
-        );
+    private ProfileName promptForName(String defaultName) {
+        val prompt = AstraColors.PURPLE_300.use("(Optional)") + " Enter a name for your profile (defaults to your org name)";
 
-        val nameInput = AstraConsole.readLine(message, false);
-
-        return nameInput.filter(name -> !name.trim().isEmpty())
-            .map(ProfileName::mkUnsafe);
+        return AstraConsole.prompt(prompt)
+            .mapper(ProfileName::mkUnsafe)
+            .defaultOption(defaultName)
+            .fallbackFlag("--name")
+            .fix(originalArgs(), "--name <profile_name>")
+            .dontClearAfterSelection();
     }
 
     private Boolean promptShouldSetDefault() {
-        val confirmationMsg = """
+        val prompt = """
           @|bold A default profile already exists.|@
         
-          Do you want to set this profile as the default instead? [y/N]
+          Do you want to set this profile as the default instead?
         """;
 
-        return switch (AstraConsole.confirm(confirmationMsg, false)) {
-            case ANSWER_OK -> true;
-            case ANSWER_NO, NO_ANSWER -> false;
-        };
+        return AstraConsole.confirm(prompt)
+            .defaultNo()
+            .fallbackFlag("")
+            .fix(List.of(), "")
+            .clearAfterSelection();
     }
 }

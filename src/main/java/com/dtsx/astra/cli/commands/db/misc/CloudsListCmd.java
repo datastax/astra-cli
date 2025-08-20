@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.commands.db.misc;
 
 import com.dtsx.astra.cli.commands.db.region.AbstractRegionCmd;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;

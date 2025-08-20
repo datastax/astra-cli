@@ -1,5 +1,5 @@
 # CLI basics
-com.dtsx.astra.cli.core.output.output.Hint
+com.dtsx.astra.cli.core.output.Hint
 com.dtsx.astra.cli.core.models.*
 
 # Org+User gateways

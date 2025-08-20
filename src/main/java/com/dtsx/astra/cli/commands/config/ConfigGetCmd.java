@@ -11,7 +11,8 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.output.*;
+import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.output.formats.*;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.Operation;
@@ -158,7 +159,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
 
     private String promptForProfileName(NEList<Either<InvalidProfile, Profile>> candidates) {
         val maxNameLength = candidates.stream()
-            .map(p -> profileName(p).length())
+            .map(p -> extractProfileName(p).length())
             .max(Integer::compareTo)
             .orElse(0);
 
@@ -166,7 +167,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
             .collect(Collectors.toMap(
                 (p) -> p,
                 (p) -> {
-                    val paddedName = profileName(p) + " ".repeat(maxNameLength - profileName(p).length());
+                    val paddedName = extractProfileName(p) + " ".repeat(maxNameLength - extractProfileName(p).length());
 
                     return p.fold(
                         (_) -> paddedName + " @|bold,red (invalid)|@",
@@ -188,12 +189,10 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
             .fix(originalArgs(), "<profile>")
             .clearAfterSelection();
 
-        return selected
-            .map(this::profileName)
-            .orElseThrow();
+        return extractProfileName(selected);
     }
 
-    private String profileName(Either<AstraConfig.InvalidProfile, AstraConfig.Profile> profile) {
+    private String extractProfileName(Either<AstraConfig.InvalidProfile, AstraConfig.Profile> profile) {
         return profile.fold(
             (invalid) -> invalid.section().name(),
             (valid) -> valid.nameOrDefault().unwrap()

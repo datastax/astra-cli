@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.core.output.output;
+package com.dtsx.astra.cli.core.output;
 
 public record Hint(String comment, String command) {
     public Hint(String comment, Iterable<? extends CharSequence> command, CharSequence extra) {

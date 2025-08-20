@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.core.output.output;
+package com.dtsx.astra.cli.core.output.formats;
 
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 import lombok.SneakyThrows;

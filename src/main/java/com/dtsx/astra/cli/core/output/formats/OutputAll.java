@@ -1,5 +1,6 @@
-package com.dtsx.astra.cli.core.output.output;
+package com.dtsx.astra.cli.core.output.formats;
 
+import com.dtsx.astra.cli.core.output.Hint;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

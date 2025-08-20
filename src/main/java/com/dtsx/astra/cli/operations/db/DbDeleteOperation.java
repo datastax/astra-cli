@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.time.Duration;
+import java.util.UUID;
+import java.util.function.BiConsumer;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.DbDeleteResult;
@@ -27,11 +29,23 @@ public class DbDeleteOperation implements Operation<DbDeleteResult> {
     public record DbDeleteRequest(
         DbRef dbRef,
         boolean ifExists,
-        LongRunningOptions lrOptions
+        boolean forceDelete,
+        LongRunningOptions lrOptions,
+        BiConsumer<String, UUID> assertShouldDelete
     ) {}
 
     @Override
     public DbDeleteResult execute() {
+        if (!request.forceDelete) {
+            val dbInfo = dbGateway.tryFindOneDb(request.dbRef);
+
+            if (dbInfo.isEmpty()) {
+                return handleDbNotFound(request.ifExists);
+            }
+
+            request.assertShouldDelete.accept(dbInfo.get().getInfo().getName(), UUID.fromString(dbInfo.get().getId()));
+        }
+
         val status = dbGateway.deleteDb(request.dbRef);
 
         return switch (status) {

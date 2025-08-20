@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.output.table;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 import lombok.val;
 

@@ -13,7 +13,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.cli.core.output.output.Hint;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;

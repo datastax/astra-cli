@@ -18,8 +18,8 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.cli.core.output.Jansi;
-import com.dtsx.astra.cli.core.output.output.OutputHuman;
+import com.dtsx.astra.cli.core.output.JansiUtils;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -82,7 +82,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     public static void main(String... args) {
-        @Cleanup val jansi = Jansi.installIfNecessary();
+        @Cleanup val jansi = JansiUtils.installIfNecessary();
         val cmd = new CommandLine(new AstraCli());
 
         cmd

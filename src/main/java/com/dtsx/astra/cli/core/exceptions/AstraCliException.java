@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.core.exceptions;
 
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.ExitCode;
-import com.dtsx.astra.cli.core.output.output.Hint;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;

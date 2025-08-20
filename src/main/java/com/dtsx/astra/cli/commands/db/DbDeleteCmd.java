@@ -5,8 +5,9 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.output.Hint;
-import com.dtsx.astra.cli.core.output.output.OutputAll;
+import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -18,12 +19,15 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
 
 @Command(
@@ -33,6 +37,10 @@ import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
 @Example(
     comment = "Delete an existing Astra database",
     command = "astra db delete my_db"
+)
+@Example(
+    comment = "Delete an existing Astra database without confirmation (required for non-interactive shells)",
+    command = "astra db delete my_db --yes"
 )
 @Example(
     comment = "Delete an existing Astra database without failing if it does not exist",
@@ -50,17 +58,19 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     )
     public boolean $ifExists;
 
+    @Option(
+        names = { "--yes" },
+        description = { "Force deletion of database without prompting", DEFAULT_VALUE },
+        defaultValue = "false"
+    )
+    public boolean $forceDelete;
+
     @Mixin
     protected LongRunningOptionsMixin lrMixin;
 
     @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
-    }
-
-    @Override
-    protected DbDeleteOperation mkOperation() {
-        return new DbDeleteOperation(dbGateway, new DbDeleteRequest($dbRef, $ifExists, lrMixin.options()));
     }
 
     @Override
@@ -119,6 +129,43 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             new Hint("Example fix:", originalArgs(), "--if-exists"),
             new Hint("See your existing databases:", "astra db list")
         ));
+    }
+
+    @Override
+    protected DbDeleteOperation mkOperation() {
+        return new DbDeleteOperation(dbGateway, new DbDeleteRequest(
+            $dbRef,
+            $ifExists,
+            $forceDelete,
+            lrMixin.options(),
+            this::assertShouldDelete
+        ));
+    }
+
+    private void assertShouldDelete(String dbName, UUID id) {
+        val prompt = """
+          You are about to permanently delete database @!%s!@ @|faint (%s)|@.
+        
+          To confirm, type the name below or press @!Ctrl+C!@ to cancel.
+        """.formatted(dbName, id);
+
+        val shouldDelete = AstraConsole.prompt(prompt)
+            .mapper(Function.identity())
+            .requireAnswer()
+            .fallbackFlag("--yes")
+            .fix(originalArgs(), "--yes")
+            .clearAfterSelection()
+            .equals(dbName);
+
+        if (!shouldDelete) {
+            throw new AstraCliException(EXECUTION_CANCELLED, """
+              @|bold,red Error: User input did not match database name.|@
+            
+              Database @!%s!@ was not deleted.
+            """.formatted(dbName), List.of(
+                new Hint("Skip confirmation prompt:", originalArgs(), "--yes")
+            ));
+        }
     }
 
     private Map<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
