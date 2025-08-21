@@ -36,7 +36,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "setup",
-    description = "Interactively set up the Astra CLI & create new configuration profiles"
+    description = "Interactively set up the Astra CLI and create profiles"
 )
 public class SetupCmd extends AbstractCmd<SetupResult> {
     @Option(

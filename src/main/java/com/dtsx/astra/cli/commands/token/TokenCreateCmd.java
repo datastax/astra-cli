@@ -13,6 +13,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCreateRequest;
@@ -33,7 +34,14 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
         paramLabel = "ROLE",
         required = true
     )
-    private RoleRef role;
+    private RoleRef $role;
+
+    @Option(
+        names = { "-d", "--description" },
+        description = "An optional description for this token",
+        paramLabel = "DESCRIPTION"
+    )
+    private Optional<String> $description;
 
     @Override
     public final OutputJson executeJson(Supplier<CreateTokenResponse> tokenResponse) {
@@ -51,6 +59,6 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
 
     @Override
     protected Operation<CreateTokenResponse> mkOperation() {
-        return new TokenCreateOperation(tokenGateway, roleGateway, new TokenCreateRequest(role));
+        return new TokenCreateOperation(tokenGateway, new TokenCreateRequest($role, $description));
     }
 }

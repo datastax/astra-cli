@@ -1,23 +1,25 @@
 package com.dtsx.astra.cli.gateways.token;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
+import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
-import com.dtsx.astra.sdk.org.domain.Role;
-
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import com.dtsx.astra.sdk.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @RequiredArgsConstructor
 public class TokenGatewayImpl implements TokenGateway {
     private final APIProvider apiProvider;
+    private final RoleGateway roleGateway;
 
     @Override
     public Stream<IamToken> findAll() {
@@ -31,9 +33,26 @@ public class TokenGatewayImpl implements TokenGateway {
     }
 
     @Override
-    public CreateTokenResponse create(Role role) {
-        return AstraLogger.loading("Creating token with role " + highlight(role.getName()), (_) -> 
-            apiProvider.astraOpsClient().tokens().create(role.getId()));
+    public CreateTokenResponse create(RoleRef roleRef, Optional<String> description) {
+        val role = roleGateway.findOne(roleRef);
+
+        return AstraLogger.loading("Creating token with role " + highlight(role.getName()), (_) -> {
+            val client = apiProvider.astraOpsClient().tokens();
+
+            val body = """
+              {
+                "roles": ["%s"],
+                "description": %s
+              }
+            """.formatted(
+                JsonUtils.escapeJson(role.getId()),
+                description.map(d -> '"' + JsonUtils.escapeJson(d) + '"').orElse("null")
+            );
+
+            val res = client.POST(client.getEndpointTokens(), body, "tokens.create");
+
+            return JsonUtils.unmarshallBean(res.getBody(), CreateTokenResponse.class);
+        });
     }
 
     @Override

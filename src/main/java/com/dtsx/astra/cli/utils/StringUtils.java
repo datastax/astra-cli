@@ -60,7 +60,7 @@ public class StringUtils {
         val indentStr = " ".repeat(targetIndent);
 
         for (int i = 0; i < trimmedLines.length; i++) {
-            trimmedLines[i] = indentStr + trimLeadingSpacesAndTabs(trimmedLines[i]);
+            trimmedLines[i] = indentStr + trimLeadingSpaces(trimmedLines[i], minIndent);
         }
 
         return String.join(NL, trimmedLines);
@@ -70,11 +70,11 @@ public class StringUtils {
         return input.replaceAll("\u001B\\[[0-9;]*m", "");
     }
 
-    private static String trimLeadingSpacesAndTabs(String line) {
+    private static String trimLeadingSpaces(String line, int max) {
         int start = 0;
-        while (start < line.length()) {
+        while (start < line.length() && start < max) {
             char c = line.charAt(start);
-            if (c != ' ' && c != '\t') {
+            if (c != ' ') {
                 break;
             }
             start++;
@@ -144,5 +144,12 @@ public class StringUtils {
             return str;
         }
         return str.substring(0, maxLength - 1) + "…";
+    }
+
+    public static String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 }

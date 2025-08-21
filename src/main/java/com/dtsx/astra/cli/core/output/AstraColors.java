@@ -45,7 +45,7 @@ public enum AstraColors implements Ansi.IStyle {
     TEAL_400(85, 186, 185),
     TEAL_600(53, 123, 120);
 
-    private static final String DISABLE_STRING = CSI + "0m";
+    private static final String DISABLE_STRING = CSI + "39m";
 
     @Getter
     @Setter

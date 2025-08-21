@@ -2,6 +2,7 @@ package com.dtsx.astra.cli;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
 import com.dtsx.astra.cli.commands.CompletionsCmd;
+import com.dtsx.astra.cli.commands.NukeCmd;
 import com.dtsx.astra.cli.commands.SetupCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
@@ -47,6 +48,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         TokenCmd.class,
         UserCmd.class,
         CompletionsCmd.class,
+        NukeCmd.class,
     }
 )
 @Example(

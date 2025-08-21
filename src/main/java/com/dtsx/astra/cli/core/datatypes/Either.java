@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.datatypes;
 
+import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 public sealed interface Either<L, R> {
@@ -68,6 +69,14 @@ public sealed interface Either<L, R> {
 
     static <L, R> Either<L, R> right(R value) {
         return new Right<>(value);
+    }
+
+    static <L, R> Either<L, R> tryCatch(Callable<R> supplier, Function<Exception, L> exceptionHandler) {
+        try {
+            return right(supplier.call());
+        } catch (Exception e) {
+            return left(exceptionHandler.apply(e));
+        }
     }
 
     default <R2> Either<L, R2> flatMap(Function<R, Either<L, R2>> mapper) {

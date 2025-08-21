@@ -110,7 +110,7 @@ public class AstraLogger {
     }
 
     public static void warn(String... msg) {
-        log(AstraColors.ORANGE_400.use("[WARN] ") + String.join("", msg), Level.REGULAR, true);
+        log(AstraColors.ORANGE_400.use("[WARNING] ") + String.join("", msg), Level.REGULAR, true);
     }
 
     public static void started(String... msg) {
