@@ -12,11 +12,15 @@ import lombok.val;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @RequiredArgsConstructor
 public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshExecResult> {
@@ -66,8 +70,51 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshE
 
         return downloadResult.bimap(
             CqlshInstallFailed::new,
-            Function.identity()
+            this::tryPatchCqlsh
         );
+    }
+
+    private File tryPatchCqlsh(File cqlshExe) {
+        try {
+            val content = Files.readAllLines(cqlshExe.toPath());
+
+            val matcher = Pattern.compile("^for interpreter in (python.*\\s*)+; do\\s*$");
+
+            val updatedLine = new Object() {
+                int index = -1;
+                String content = null;
+            };
+
+            val replaced = content.stream()
+                .map(l -> matcher.matcher(l).replaceFirst((r) -> {
+                    val existingInterpreters = r.group(1).split("\\s+");
+
+                    val allInterpreters = new LinkedHashSet<String>() {{
+                        addAll(List.of("python3.11", "python3.10", "python3.9"));
+                        addAll(List.of(existingInterpreters));
+                    }};
+
+                    updatedLine.index = content.indexOf(l);
+                    updatedLine.content = l;
+
+                    return "for interpreter in " + String.join(" ", allInterpreters) + "; do";
+                }))
+                .collect(Collectors.toList());
+
+            if (!content.equals(replaced)) {
+                AstraLogger.info("Patched cqlsh script to try known supported Python versions first");
+
+                replaced.add(updatedLine.index, "# Patched by `astra-cli` to try known supported Python versions first");
+                replaced.add(updatedLine.index + 1, "# Previous line: `" + updatedLine.content + "`");
+
+                Files.writeString(cqlshExe.toPath(), String.join(NL, replaced));
+            }
+        } catch (Exception e) {
+            AstraLogger.exception("Error occurred attempting to patch '" + cqlshExe.getAbsolutePath() + "'");
+            AstraLogger.exception(e);
+        }
+
+        return cqlshExe;
     }
 
     protected Either<CqlshExecResult, File> downloadSCB(DbRef dbRef) {
