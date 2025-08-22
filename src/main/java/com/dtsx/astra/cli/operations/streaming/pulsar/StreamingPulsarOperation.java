@@ -21,7 +21,6 @@ public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarR
 
     public record PulsarRequest(
         TenantName tenantName,
-        boolean version,
         boolean failOnError,
         Optional<Either<String, File>> execute,
         boolean noProgress
@@ -46,10 +45,6 @@ public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarR
 
         if (request.failOnError) {
             commands.add("--fail-on-error");
-        }
-
-        if (request.version) {
-            commands.add("--version");
         }
 
         request.execute.ifPresent(either -> either.fold(
