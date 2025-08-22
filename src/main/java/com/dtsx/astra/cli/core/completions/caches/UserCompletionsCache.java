@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.completions.caches;
 
-import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 
 import java.io.File;

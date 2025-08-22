@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.config.AstraConfig;
+import com.dtsx.astra.cli.core.config.AstraConfig;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 

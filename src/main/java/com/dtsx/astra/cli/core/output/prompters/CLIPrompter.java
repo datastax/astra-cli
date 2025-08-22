@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.prompters;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.output.AstraConsole;
@@ -115,7 +116,7 @@ public class CLIPrompter {
             """.formatted(fallback), List.of(hint));
         }
 
-        if (!AstraConsole.isTty()) {
+        if (!CliEnvironment.isTty()) {
             throw new AstraCliException(UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Can not interactively select an option when the program is not running interactively|@
             

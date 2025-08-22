@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.completions;
 
-import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.TenantCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;

@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.completions;
 
-import com.dtsx.astra.cli.config.AstraHome;
+import com.dtsx.astra.cli.core.config.AstraHome;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
 import lombok.SneakyThrows;

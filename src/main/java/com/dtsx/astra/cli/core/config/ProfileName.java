@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.config;
+package com.dtsx.astra.cli.core.config;
 
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.Utils;

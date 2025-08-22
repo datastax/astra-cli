@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
+import com.dtsx.astra.cli.core.CliEnvironment;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -55,7 +55,7 @@ public class DbCqlshExecOperation extends DbCqlshStartOperation {
                     flags.add(source.get().getRight().getAbsolutePath());
                 }
             } else {
-                if (AstraConsole.isTty()) {
+                if (CliEnvironment.isTty()) {
                     AstraLogger.info("Reading CQL statements from stdin...");
                     AstraLogger.info("Use backslashes for multi-line statements");
                 }

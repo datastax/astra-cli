@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core;
 
-import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.*;
 import lombok.RequiredArgsConstructor;

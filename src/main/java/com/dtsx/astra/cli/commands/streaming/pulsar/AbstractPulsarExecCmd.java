@@ -2,11 +2,9 @@ package com.dtsx.astra.cli.commands.streaming.pulsar;
 
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.commands.streaming.AbstractStreamingCmd;
-import com.dtsx.astra.cli.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.WindowsUnsupportedException;
 import com.dtsx.astra.cli.core.output.Hint;
-import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.streaming.pulsar.AbstractPulsarExeOperation.ConfFileCreationFailed;
 import com.dtsx.astra.cli.operations.streaming.pulsar.AbstractPulsarExeOperation.Executed;

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.prompters.strategies;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
@@ -32,7 +33,7 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
     public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
         public boolean isSupported() {
-            return OutputType.isHuman() && AstraConsole.isTty();
+            return OutputType.isHuman() && CliEnvironment.isTty();
         }
 
         @Override

@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.operations.config;
 
-import com.dtsx.astra.cli.config.AstraConfig;
-import com.dtsx.astra.cli.config.AstraConfig.InvalidProfile;
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
+import com.dtsx.astra.cli.core.config.AstraConfig;
+import com.dtsx.astra.cli.core.config.InvalidProfile;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;

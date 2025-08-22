@@ -59,6 +59,7 @@ val isProd = project.hasProperty("prod")
 val cliSystemProperties = mapOf(
     "cli.version" to project.version.toString(),
     "cli.rc-file-name" to if (isProd) ".astrarc" else ".astrarc-dev",
+    "cli.home-folder-name" to if (isProd) "astra" else "astra-dev",
 )
 
 graalvmNative {

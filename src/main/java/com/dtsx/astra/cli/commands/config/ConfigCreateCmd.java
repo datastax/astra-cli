@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;

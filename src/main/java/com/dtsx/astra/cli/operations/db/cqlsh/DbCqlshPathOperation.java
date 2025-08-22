@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
-import com.dtsx.astra.cli.CliProperties;
+import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshPathOperation.CqlPathResponse;

@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli;
+package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import lombok.Cleanup;
@@ -50,6 +50,10 @@ public class CliProperties implements IVersionProvider {
         return prop("cli.rc-file-name");
     }
 
+    public static String homeFolderName(boolean useDotPrefix) {
+        return ((useDotPrefix) ? "." : "") + prop("cli.home-folder-name");
+    }
+
     private static @Nullable String cachedCliName = null;
 
     public static String cliName() {
@@ -68,6 +72,14 @@ public class CliProperties implements IVersionProvider {
 
         System.setProperty("cli.name", cachedCliName);
         return cachedCliName;
+    }
+
+    public static String rcEnvVar() {
+        return prop("cli.env-vars.rc-file");
+    }
+
+    public static String homeEnvVar() {
+        return prop("cli.env-vars.home-folder");
     }
 
     @Override

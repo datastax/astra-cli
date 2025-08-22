@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.core.exceptions.internal.misc;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.isWindows;
+import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 public class WindowsUnsupportedException extends AstraCliException {
     public WindowsUnsupportedException() {

@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
 import com.dtsx.astra.cli.commands.db.AbstractDbCmd;
-import com.dtsx.astra.cli.config.AstraHome;
+import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;

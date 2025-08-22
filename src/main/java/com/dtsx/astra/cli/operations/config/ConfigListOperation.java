@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.operations.config;
 
-import com.dtsx.astra.cli.config.AstraConfig;
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
-import com.dtsx.astra.cli.config.ProfileName;
+import com.dtsx.astra.cli.core.config.AstraConfig;
+import com.dtsx.astra.cli.core.config.Profile;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;

@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;

@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.token;
 
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;

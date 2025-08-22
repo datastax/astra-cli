@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
-import com.dtsx.astra.cli.CliProperties;
+import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;

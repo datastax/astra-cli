@@ -1,12 +1,15 @@
-package com.dtsx.astra.cli.config;
+package com.dtsx.astra.cli.core.config;
 
+import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.val;
 
 import java.io.File;
 
+import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
+
 public class AstraHome {
-    public static final File DIR = new File(System.getProperty("user.home") + File.separator + ".astra");
+    public static final File DIR = resolveDefaultAstraHomeFolder();
 
     public static class Dirs {
         private static final File SCB = new File(DIR, "scb");
@@ -63,5 +66,21 @@ public class AstraHome {
 
     public static boolean exists() {
         return DIR.exists();
+    }
+
+    private static File resolveDefaultAstraHomeFolder() {
+        if (System.getenv(CliProperties.rcEnvVar()) != null) {
+            return new File(System.getenv(CliProperties.homeEnvVar()));
+        }
+
+        if (System.getenv("XDG_DATA_HOME") != null) { // TODO - should we do this?
+            return new File(System.getenv("XDG_DATA_HOME") + File.separator + CliProperties.homeFolderName(false));
+        }
+
+        if (isWindows()) {
+            return new File(System.getProperty("LOCALAPPDATA") + File.separator + CliProperties.homeFolderName(true));
+        } else {
+            return new File(System.getProperty("user.home") + File.separator + CliProperties.homeFolderName(true));
+        }
     }
 }

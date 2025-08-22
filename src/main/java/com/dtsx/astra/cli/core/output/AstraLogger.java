@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.CliProperties;
-import com.dtsx.astra.cli.config.AstraHome;
+import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.config.AstraHome;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;

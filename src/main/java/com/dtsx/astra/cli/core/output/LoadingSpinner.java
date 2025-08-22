@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.val;
 
@@ -25,7 +26,7 @@ public class LoadingSpinner {
     
     public void start() {
         if (isRunning.compareAndSet(false, true)) {
-            if (AstraConsole.isTty() && OutputType.isHuman()) {
+            if (CliEnvironment.isTty() && OutputType.isHuman()) {
                 spinnerThread = new Thread(this::runSpinner);
                 spinnerThread.start();
             }
@@ -74,7 +75,7 @@ public class LoadingSpinner {
     }
     
     public void pause() {
-        if (AstraConsole.isTty() && OutputType.isHuman() && spinnerThread != null) {
+        if (CliEnvironment.isTty() && OutputType.isHuman() && spinnerThread != null) {
             pauseLatch = new CountDownLatch(1);
             isPaused.set(true);
             
@@ -87,7 +88,7 @@ public class LoadingSpinner {
     }
     
     public void resume() {
-        if (AstraConsole.isTty() && OutputType.isHuman() && spinnerThread != null) {
+        if (CliEnvironment.isTty() && OutputType.isHuman() && spinnerThread != null) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
@@ -119,7 +120,7 @@ public class LoadingSpinner {
                 continue;
             }
             
-            if (AstraLogger.getLevel() != AstraLogger.Level.QUIET && AstraConsole.isTty()) {
+            if (AstraLogger.getLevel() != AstraLogger.Level.QUIET && CliEnvironment.isTty()) {
                 val currentLine = AstraColors.BLUE_300.use(SPINNER_FRAMES[frameIndex] + " ") + getCurrentMessage() + "...";
                 val clearLine = "\r" + " ".repeat(lastLineLength.get()) + "\r";
                 AstraConsole.error(clearLine + currentLine);
@@ -138,7 +139,7 @@ public class LoadingSpinner {
     }
     
     private void clearLine() {
-        if (AstraLogger.getLevel() != AstraLogger.Level.QUIET && AstraConsole.isTty()) {
+        if (AstraLogger.getLevel() != AstraLogger.Level.QUIET && CliEnvironment.isTty()) {
             val clearSpaces = Math.max(50, lastLineLength.get());
             AstraConsole.error("\r" + " ".repeat(clearSpaces) + "\r");
         }

@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.operations;
 
-import com.dtsx.astra.cli.config.AstraConfig;
-import com.dtsx.astra.cli.config.AstraHome;
+import com.dtsx.astra.cli.core.config.AstraConfig;
+import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.isWindows;
+import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 @RequiredArgsConstructor
 public class NukeOperation implements Operation<NukeResult> {

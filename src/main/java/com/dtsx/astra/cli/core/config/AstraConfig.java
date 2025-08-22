@@ -1,6 +1,6 @@
-package com.dtsx.astra.cli.config;
+package com.dtsx.astra.cli.core.config;
 
-import com.dtsx.astra.cli.CliProperties;
+import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -9,7 +9,6 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
-import com.dtsx.astra.cli.core.parsers.ini.Ini.IniSection;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -37,21 +36,6 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
-    public record Profile(Optional<ProfileName> name, AstraToken token, AstraEnvironment env) {
-        public boolean isDefault() {
-            return name.map(ProfileName::isDefault).orElse(false);
-        }
-
-        public boolean isArgsProvided() {
-            return name.isEmpty();
-        }
-
-        public ProfileName nameOrDefault() {
-            return name.orElse(ProfileName.mkUnsafe("<args_provided>"));
-        }
-    }
-    public record InvalidProfile(IniSection section, String issue) {}
-
     @Getter
     private final ArrayList<Either<InvalidProfile, Profile>> profiles;
 
@@ -63,7 +47,7 @@ public class AstraConfig {
     public List<Profile> getValidatedProfiles() {
         return profiles.stream().map((e) -> e.fold(
             (invalid) -> {
-                throw new AstraConfigFileException(invalid.issue, backingFile);
+                throw new AstraConfigFileException(invalid.issue(), backingFile);
             },
             Function.identity()
         )).toList();
@@ -157,6 +141,14 @@ public class AstraConfig {
     }
 
     public static File resolveDefaultAstraConfigFile() {
+        if (System.getenv(CliProperties.rcEnvVar()) != null) {
+            return new File(System.getenv(CliProperties.rcEnvVar()));
+        }
+
+        if (System.getenv("XDG_CONFIG_HOME") != null) { // TODO - should we do this?
+            return new File(System.getenv("XDG_CONFIG_HOME") + File.separator + CliProperties.homeFolderName(false) + File.separator + CliProperties.rcFileName());
+        }
+
         return new File(System.getProperty("user.home") + File.separator + CliProperties.rcFileName());
     }
 
@@ -164,7 +156,7 @@ public class AstraConfig {
         return profiles.stream().anyMatch(isProfileName(profileName));
     }
 
-    public Optional<AstraConfig.Profile> lookupProfile(ProfileName profileName) {
+    public Optional<Profile> lookupProfile(ProfileName profileName) {
         val matching = profiles.stream().filter(isProfileName(profileName)).toList();
 
         if (matching.isEmpty()) {
@@ -186,7 +178,7 @@ public class AstraConfig {
 
         return matching.getFirst().fold(
             (invalid) -> {
-                throw new AstraConfigFileException(invalid.issue, backingFile);
+                throw new AstraConfigFileException(invalid.issue(), backingFile);
             },
             Optional::of
         );
@@ -236,9 +228,9 @@ public class AstraConfig {
             .findFirst();
     }
 
-    private Predicate<Either<AstraConfig.InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
+    private Predicate<Either<InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
         return (p) -> p.fold(
-            (invalid) -> invalid.section.name().equals(profileName.unwrap()),
+            (invalid) -> invalid.section().name().equals(profileName.unwrap()),
             (profile) -> profile.nameOrDefault().equals(profileName)
         );
     }

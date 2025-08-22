@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.prompters.strategies;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.output.AstraColors;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.utils.MiscUtils.isWindows;
+import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     private static final int ESC = 27;
@@ -54,7 +55,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
         public boolean isSupported() {
-            return OutputType.isHuman() && AstraConsole.isTty() && !isWindows() && AstraColors.enabled();
+            return OutputType.isHuman() && CliEnvironment.isTty() && !isWindows() && AstraColors.enabled();
         }
         
         @Override

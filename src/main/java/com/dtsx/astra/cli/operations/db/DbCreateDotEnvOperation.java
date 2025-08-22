@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db;
 
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.KeyspaceNotFoundException;

@@ -1,8 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.config.AstraConfig;
-import com.dtsx.astra.cli.config.AstraConfig.InvalidProfile;
-import com.dtsx.astra.cli.config.AstraConfig.Profile;
+import com.dtsx.astra.cli.core.config.InvalidProfile;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
@@ -192,7 +191,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         return extractProfileName(selected);
     }
 
-    private String extractProfileName(Either<AstraConfig.InvalidProfile, AstraConfig.Profile> profile) {
+    private String extractProfileName(Either<InvalidProfile, Profile> profile) {
         return profile.fold(
             (invalid) -> invalid.section().name(),
             (valid) -> valid.nameOrDefault().unwrap()

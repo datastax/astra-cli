@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.CliProperties;
+import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.core.output.prompters.builders.ConfirmerBuilder;
@@ -37,10 +37,6 @@ public class AstraConsole {
     private static @Nullable Console console = System.console();
 
     private static boolean noInput = false;
-
-    public static boolean isTty() {
-        return System.console() != null;
-    }
 
     public static class Mixin {
         @Option(names = "--no-input", description = "Never ask for user input (e.g. confirmation prompts)")
