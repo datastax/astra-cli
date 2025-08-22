@@ -94,6 +94,8 @@ public class AstraCli extends AbstractCmd<Void> {
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
+        cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
+
         for (val converter : TypeConverters.INSTANCES) {
             cmd.registerConverter(converter.clazz(), converter);
         }
