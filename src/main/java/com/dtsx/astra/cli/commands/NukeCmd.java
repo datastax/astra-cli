@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.NukeOperation;
@@ -49,6 +50,8 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     @Override
     protected OutputAll execute(Supplier<NukeResult> result) {
+        AstraLogger.banner();
+
         return switch (result.get()) {
             case CouldNotResolveCommandName _ -> throwCouldNotResolveCommandName();
             case Nuked res -> handleNuked(res);
@@ -86,14 +89,14 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         val summary = new StringBuilder();
         val nothingToReport = new ArrayList<String>();
 
-        appendToSummary(summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "updated", res.updatedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
+        appendToSummary(summary, nothingToReport, "were deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "had their content updated", res.updatedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "were skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
 
         switch (nothingToReport.size()) {
             case 3 -> summary.append("@|faint No files were deleted, updated, or skipped.|@").append(NL);
-            case 2 -> summary.append("@|faint No files were ").append(nothingToReport.get(0)).append(" or ").append(nothingToReport.get(1)).append(".|@").append(NL);
-            case 1 -> summary.append("@|faint No files were ").append(nothingToReport.get(0)).append(".|@").append(NL);
+            case 2 -> summary.append("@|faint No files ").append(nothingToReport.get(0)).append(" or ").append(nothingToReport.get(1)).append(".|@").append(NL);
+            case 1 -> summary.append("@|faint No files ").append(nothingToReport.get(0)).append(".|@").append(NL);
         }
 
         if (res.skipped().values().stream().anyMatch(s -> s instanceof SkipReason.NeedsSudo)) {
@@ -158,8 +161,8 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     private boolean promptShouldDeleteAstrarc(File file, boolean isDryRun) {
         val secondLine = (isDryRun)
-            ? "(Note: This is a dry-run, so the file will not actually be deleted.)"
-            : "Your credentials may be lost if you proceed. A backup is recommended.";
+            ? "This is a dry-run, so the file @|underline @!will not actually be deleted!@|@."
+            : "Your credentials @!may be lost!@ if you proceed. A backup is recommended.";
 
         val prompt = """
           Do you want to delete the @!.astrarc!@ file located at @|underline @!%s!@|@?
