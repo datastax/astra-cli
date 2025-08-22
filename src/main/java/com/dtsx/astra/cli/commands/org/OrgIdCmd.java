@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 )
 @Example(
     comment = "Get your organization ID",
-    command = "astra org id"
+    command = "${cli.name} org id"
 )
 public class OrgIdCmd extends AbstractOrgCmd<String> {
     @Override

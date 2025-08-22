@@ -27,11 +27,11 @@ import static com.dtsx.astra.cli.operations.user.UserDeleteOperation.*;
 )
 @Example(
     comment = "Delete a specific user",
-    command = "astra user delete john@example.com"
+    command = "${cli.name} user delete john@example.com"
 )
 @Example(
     comment = "Delete a user without failing if they doesn't exist",
-    command = "astra user delete john@example.com --if-exists"
+    command = "${cli.name} user delete john@example.com --if-exists"
 )
 public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
     @Parameters(
@@ -72,7 +72,7 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
         val message = "User %s does not exist; nothing to delete.".formatted(highlight(user));
         
         return OutputAll.response(message, mkData(false), List.of(
-            new Hint("See all existing users:", "astra user list")
+            new Hint("See all existing users:", "${cli.name} user list")
         ));
     }
 
@@ -85,7 +85,7 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
             user
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("See all existing users:", "astra user list")
+            new Hint("See all existing users:", "${cli.name} user list")
         ));
     }
 

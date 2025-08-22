@@ -23,15 +23,15 @@ import static com.dtsx.astra.cli.operations.db.table.TableListOperation.*;
 )
 @Example(
     comment = "List all tables in the default keyspace",
-    command = "astra db list-tables my_db"
+    command = "${cli.name} db list-tables my_db"
 )
 @Example(
     comment = "List all tables in a specific keyspace",
-    command = "astra db list-tables my_db -k my_keyspace"
+    command = "${cli.name} db list-tables my_db -k my_keyspace"
 )
 @Example(
     comment = "List all tables in all keyspaces",
-    command = "astra db list-tables my_db --all"
+    command = "${cli.name} db list-tables my_db --all"
 )
 public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
     @Option(

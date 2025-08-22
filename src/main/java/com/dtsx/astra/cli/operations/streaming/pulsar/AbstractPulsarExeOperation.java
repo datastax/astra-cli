@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.streaming.pulsar;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.TenantName;
@@ -63,7 +63,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
     }
 
     private Either<PulsarExecResult, File> downloadPulsar() {
-        val downloadResult = downloadsGateway.downloadPulsarShell(CLIProperties.pulsar());
+        val downloadResult = downloadsGateway.downloadPulsarShell(CliProperties.pulsar());
 
         return downloadResult.bimap(
             PulsarInstallFailed::new,
@@ -75,7 +75,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
         val tenant = streamingGateway.findOne(tenantName);
 
         val confFile = new File(
-            AstraHome.Dirs.usePulsar(CLIProperties.pulsar().version()),
+            AstraHome.Dirs.usePulsar(CliProperties.pulsar().version()),
             "client-" + tenant.getCloudProvider() + "-" + tenant.getCloudRegion() + "-" + tenant.getTenantName() + ".conf"
         );
 

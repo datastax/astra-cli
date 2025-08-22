@@ -18,19 +18,19 @@ import java.util.stream.Stream;
 )
 @Example(
     comment = "List all available regions for classic Astra DB databases",
-    command = "astra db region list-regions-classic"
+    command = "${cli.name} db region list-regions-classic"
 )
 @Example(
     comment = "Filter by cloud provider",
-    command = "astra db region list-regions-classic --cloud AWS,GCP"
+    command = "${cli.name} db region list-regions-classic --cloud AWS,GCP"
 )
 @Example(
     comment = "Filter by partial region name",
-    command = "astra db region list-regions-classic --filter us-,ca-"
+    command = "${cli.name} db region list-regions-classic --filter us-,ca-"
 )
 @Example(
     comment = "Filter by zone",
-    command = "astra db region list-regions-classic --zone Europe"
+    command = "${cli.name} db region list-regions-classic --zone Europe"
 )
 public class RegionListClassicCmd extends AbstractRegionListCmd {
     @Override

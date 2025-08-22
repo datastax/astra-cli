@@ -9,6 +9,6 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "List all users in your organization",
-    command = "astra user list"
+    command = "${cli.name} user list"
 )
 public final class UserListCmd extends UserListImpl {}

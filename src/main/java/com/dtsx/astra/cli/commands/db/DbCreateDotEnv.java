@@ -38,27 +38,27 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Create a fully-populated .env file, updating the existing one if it exists",
-    command = "astra db create-dotenv"
+    command = "${cli.name} db create-dotenv"
 )
 @Example(
     comment = "Create a .env file specifying the keys to include",
-    command = "astra db create-dotenv --keys ASTRA_DB_APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT"
+    command = "${cli.name} db create-dotenv --keys ASTRA_DB_APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT"
 )
 @Example(
     comment = "Create a .env file with a preset specifying the keys to include",
-    command = "astra db create-dotenv --preset data_api_client"
+    command = "${cli.name} db create-dotenv --preset data_api_client"
 )
 @Example(
     comment = "Create a .env file specifying the keyspace and/or region to target",
-    command = "astra db create-dotenv -k my_keyspace -r us-east1"
+    command = "${cli.name} db create-dotenv -k my_keyspace -r us-east1"
 )
 @Example(
     comment = "Print the .env file to stdout instead of saving it to a file",
-    command = "astra db create-dotenv --print"
+    command = "${cli.name} db create-dotenv --print"
 )
 @Example(
     comment = "Specify the file to create/update",
-    command = "astra db create-dotenv -f .env.local"
+    command = "${cli.name} db create-dotenv -f .env.local"
 )
 public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     @Option(

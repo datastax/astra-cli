@@ -9,10 +9,10 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "List all your Astra databases",
-    command = "astra db list"
+    command = "${cli.name} db list"
 )
 @Example(
     comment = "List only vector-enabled Astra databases",
-    command = "astra db list --vector"
+    command = "${cli.name} db list --vector"
 )
 public final class DbListCmd extends DbListImpl {}

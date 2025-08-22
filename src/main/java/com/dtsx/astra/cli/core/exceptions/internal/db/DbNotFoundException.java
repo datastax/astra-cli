@@ -40,16 +40,16 @@ public class DbNotFoundException extends AstraCliException {
 
     private static List<Hint> mkIdHints(UUID id) {
         return List.of(
-            new Hint("List all dbs in your current org", "astra db list"),
-            new Hint("Check your credentials", "astra config get <profile>")
+            new Hint("List all dbs in your current org", "${cli.name} db list"),
+            new Hint("Check your credentials", "${cli.name} config get <profile>")
         );
     }
 
     private static List<Hint> mkNameHints(String name) {
         return List.of(
-            new Hint("List all dbs in your current org", "astra db list"),
-            new Hint("Check your credentials", "astra config get <profile>"),
-            new Hint("Create a new database with the given name", "astra db create '" + name + "' <options>")
+            new Hint("List all dbs in your current org", "${cli.name} db list"),
+            new Hint("Check your credentials", "${cli.name} config get <profile>"),
+            new Hint("Create a new database with the given name", "${cli.name} db create '" + name + "' <options>")
         );
     }
 }

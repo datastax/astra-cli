@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.streaming.pulsar;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ public class StreamingPulsarPathOperation implements Operation<StreamingPulsarPa
 
     @Override
     public PulsarPathResponse execute() {
-        val existingPath = downloadsGateway.pulsarShellPath(CLIProperties.pulsar());
+        val existingPath = downloadsGateway.pulsarShellPath(CliProperties.pulsar());
         
         if (existingPath.isPresent()) {
             return new ExePathFound(existingPath.get());
         }
         
         if (shouldInstall) {
-            val installResult = downloadsGateway.downloadPulsarShell(CLIProperties.pulsar());
+            val installResult = downloadsGateway.downloadPulsarShell(CliProperties.pulsar());
 
             if (installResult.isRight()) {
                 return new ExePathFound(installResult.getRight());

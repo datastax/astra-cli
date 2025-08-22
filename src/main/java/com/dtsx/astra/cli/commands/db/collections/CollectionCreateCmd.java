@@ -26,19 +26,19 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperat
 )
 @Example(
     comment = "Create a basic collection",
-    command = "astra db create-collection my_db -c my_collection"
+    command = "${cli.name} db create-collection my_db -c my_collection"
 )
 @Example(
     comment = "Create a vector collection",
-    command = "astra db create-collection my_db -c my_collection --dimension 2048"
+    command = "${cli.name} db create-collection my_db -c my_collection --dimension 2048"
 )
 @Example(
     comment = "Create a collection in a non-default keyspace",
-    command = "astra db create-collection my_db -k my_keyspace -c my_collection"
+    command = "${cli.name} db create-collection my_db -k my_keyspace -c my_collection"
 )
 @Example(
     comment = "Create a collection without failing if it already exists",
-    command = "astra db create-collection my_db -c my_collection --if-not-exists"
+    command = "${cli.name} db create-collection my_db -c my_collection --if-not-exists"
 )
 public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<CollectionCreateResult> {
     @Option(
@@ -135,7 +135,7 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
         val data = mkData(false);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Get information about the existing collection:", "astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            new Hint("Get information about the existing collection:", "${cli.name} db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
         ));
     }
 
@@ -149,7 +149,7 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
         val data = mkData(true);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Get more information about the new collection:", "astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            new Hint("Get more information about the new collection:", "${cli.name} db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
         ));
     }
 
@@ -164,7 +164,7 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
             $keyspaceRef.db()
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-not-exists"),
-            new Hint("Get information about the existing collection:", "astra db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+            new Hint("Get information about the existing collection:", "${cli.name} db describe-collection %s -k %s -c %s".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
         ));
     }
 

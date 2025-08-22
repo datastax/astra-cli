@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.config.AstraHome;
 import lombok.Getter;
 import lombok.NonNull;
@@ -70,7 +70,7 @@ public class AstraLogger {
                   \\/     \\/                   \\/
         
                                Version: %s
-        """.stripIndent().formatted(CLIProperties.version()));
+        """.stripIndent().formatted(CliProperties.version()));
 
         log(NL + banner, Level.REGULAR, false);
     }

@@ -11,12 +11,14 @@ import picocli.CommandLine.Spec;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_VALUE;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 
 @Command(
     name = "completions",
     aliases = { "compgen" },
+    mixinStandardHelpOptions = true,
     hidden = true
 )
 public class CompletionsCmd implements Runnable {
@@ -25,8 +27,8 @@ public class CompletionsCmd implements Runnable {
 
     @Option(
         names = { "-n", "--cli-name" },
-        description = "CLI name to use in the completion script",
-        defaultValue = "astra"
+        description = { "CLI name to use in the completion script", DEFAULT_VALUE },
+        defaultValue = "${cli.name}"
     )
     String cliName;
 

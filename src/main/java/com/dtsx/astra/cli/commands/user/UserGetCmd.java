@@ -27,11 +27,11 @@ import static com.dtsx.astra.cli.operations.user.UserGetOperation.UserGetRequest
 )
 @Example(
     comment = "Get details for a specific user by email",
-    command = "astra user get john@example.com"
+    command = "${cli.name} user get john@example.com"
 )
 @Example(
     comment = "Get details for a specific user by ID",
-    command = "astra user get 12345678-abcd-1234-abcd-123456789012"
+    command = "${cli.name} user get 12345678-abcd-1234-abcd-123456789012"
 )
 public class UserGetCmd extends AbstractUserCmd<User> {
     @Parameters(

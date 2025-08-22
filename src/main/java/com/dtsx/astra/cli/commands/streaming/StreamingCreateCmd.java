@@ -33,19 +33,19 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation.*
 )
 @Example(
     comment = "Create a basic streaming tenant in the 'us-east1' region",
-    command = "astra streaming create my_tenant --region us-east1"
+    command = "${cli.name} streaming create my_tenant --region us-east1"
 )
 @Example(
     comment = "Create a tenant with a specific cloud provider",
-    command = "astra streaming create my_tenant --region us-east1 --cloud AWS"
+    command = "${cli.name} streaming create my_tenant --region us-east1 --cloud AWS"
 )
 @Example(
     comment = "Create a tenant with a dedicated cluster",
-    command = "astra streaming create my_tenant --cluster my_cluster"
+    command = "${cli.name} streaming create my_tenant --cluster my_cluster"
 )
 @Example(
     comment = "Create a tenant if it doesn't already exist",
-    command = "astra streaming create my_tenant --region us-east1 --if-not-exists"
+    command = "${cli.name} streaming create my_tenant --region us-east1 --if-not-exists"
 )
 public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<StreamingCreateResult> {
     @Option(
@@ -137,7 +137,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
         val data = mkData(tenantName, false, currStatus);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Get information about the existing tenant:", "astra streaming get %s".formatted(tenantName))
+            new Hint("Get information about the existing tenant:", "${cli.name} streaming get %s".formatted(tenantName))
         ));
     }
 
@@ -151,7 +151,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
             currStatus
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-not-exists"),
-            new Hint("Get information about the existing tenant:", "astra streaming get %s".formatted(tenantName))
+            new Hint("Get information about the existing tenant:", "${cli.name} streaming get %s".formatted(tenantName))
         ));
     }
 
@@ -163,7 +163,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
         val data = mkData(tenantName, true, currStatus);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Get more information about the new tenant:", "astra streaming get %s".formatted(tenantName))
+            new Hint("Get more information about the new tenant:", "${cli.name} streaming get %s".formatted(tenantName))
         ));
     }
 

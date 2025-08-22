@@ -32,11 +32,11 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 )
 @Example(
     comment = "Resume a database",
-    command = "astra db resume my_db"
+    command = "${cli.name} db resume my_db"
 )
 @Example(
     comment = "Resume a database, without waiting for it to become active",
-    command = "astra db resume my_db --async"
+    command = "${cli.name} db resume my_db --async"
 )
 public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implements WithSetTimeout {
     @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
@@ -100,7 +100,7 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
         val data = mkData(false, currentStatus, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef))
+            new Hint("Poll the database's status:", "${cli.name} db status %s".formatted($dbRef))
         ));
     }
 
@@ -115,7 +115,7 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
         val data = mkData(true, currentStatus, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef))
+            new Hint("Poll the database's status:", "${cli.name} db status %s".formatted($dbRef))
         ));
     }
 

@@ -21,11 +21,11 @@ import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
 )
 @Example(
     comment = "Truncate a table in the default keyspace",
-    command = "astra db truncate-table my_db -c my_table"
+    command = "${cli.name} db truncate-table my_db -c my_table"
 )
 @Example(
     comment = "Truncate a table in a specific keyspace",
-    command = "astra db truncate-table my_db -k my_keyspace -c my_table"
+    command = "${cli.name} db truncate-table my_db -k my_keyspace -c my_table"
 )
 public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResult> {
     @Override
@@ -50,7 +50,7 @@ public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResu
             $keyspaceRef
         ), List.of(
             new Hint("List existing tables:",
-                "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
+                "${cli.name} db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
         ));
     }
 

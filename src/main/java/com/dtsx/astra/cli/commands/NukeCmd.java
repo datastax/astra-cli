@@ -42,18 +42,18 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
     public Optional<Boolean> $preserveAstrarc;
 
     @Option(
-        names = { "--command-name", "-n" },
-        description = "The CLI's name (default: astra)",
-        paramLabel = "PRESERVE"
+        names = { "--cli-name", "-n" },
+        description = "The CLI's name (default: ${cli.name})",
+        paramLabel = "NAME"
     )
-    public Optional<String> $commandName;
+    public Optional<String> $cliName;
 
     @Override
     protected OutputAll execute(Supplier<NukeResult> result) {
         AstraLogger.banner();
 
         return switch (result.get()) {
-            case CouldNotResolveCommandName _ -> throwCouldNotResolveCommandName();
+            case CouldNotResolveCliName _ -> throwCouldNotResolveCliName();
             case Nuked res -> handleNuked(res);
         };
     }
@@ -139,11 +139,11 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         }
     }
 
-    private <T> T throwCouldNotResolveCommandName() {
+    private <T> T throwCouldNotResolveCliName() {
         throw new AstraCliException(EXECUTION_CANCELLED, """
-          @|bold,red Error: Could not resolve the CLI's command name.|@
+          @|bold,red Error: Could not resolve the CLI's name.|@
         
-          Please provide it using the @!--command-name|-n!@ option.
+          Please provide it using the @!--cli-name|-n!@ option.
         """, List.of(
             new Hint("Example", "astra-cli nuke -n astra-cli")
         ));
@@ -154,7 +154,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         return new NukeOperation(new NukeRequest(
             $dryRun,
             $preserveAstrarc,
-            $commandName,
+            $cliName,
             this::promptShouldDeleteAstrarc
         ));
     }

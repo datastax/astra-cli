@@ -12,11 +12,11 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Get the SwaggerUI endpoint for the database",
-    command = "astra db get-endpoint-swagger mydb"
+    command = "${cli.name} db get-endpoint-swagger mydb"
 )
 @Example(
     comment = "Get the SwaggerUI endpoint for the database in a specific region",
-    command = "astra db get-endpoint-swagger mydb --region us-east1"
+    command = "${cli.name} db get-endpoint-swagger mydb --region us-east1"
 )
 public class EndpointSwaggerCmd extends AbstractEndpointGetCmd {
     @Override

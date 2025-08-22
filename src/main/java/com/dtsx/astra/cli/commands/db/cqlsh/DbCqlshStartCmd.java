@@ -19,11 +19,11 @@ import java.util.Optional;
 )
 @Example(
     comment = "Launch cqlsh for a database",
-    command = "astra db cqlsh start my_db"
+    command = "${cli.name} db cqlsh start my_db"
 )
 @Example(
     comment = "Launch cqlsh with a specific keyspace",
-    command = "astra db cqlsh start my_db -k my_keyspace"
+    command = "${cli.name} db cqlsh start my_db -k my_keyspace"
 )
 public class DbCqlshStartCmd extends AbstractCqlshExecCmd {
     @Parameters(

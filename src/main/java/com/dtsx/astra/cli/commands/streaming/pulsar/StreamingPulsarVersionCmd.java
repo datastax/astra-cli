@@ -11,7 +11,7 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Display pulsar's version information",
-    command = "astra streaming pulsar version"
+    command = "${cli.name} streaming pulsar version"
 )
 public class StreamingPulsarVersionCmd extends AbstractPulsarExecCmd {
     @Override

@@ -27,11 +27,11 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 )
 @Example(
     comment = "Delete a profile named 'my_profile'",
-    command = "astra config delete my_profile"
+    command = "${cli.name} config delete my_profile"
 )
 @Example(
     comment = "Delete a profile named 'my_profile' without failing if it does not exist",
-    command = "astra config delete my_profile --if-exists"
+    command = "${cli.name} config delete my_profile --if-exists"
 )
 public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
     @Parameters(
@@ -66,7 +66,7 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
         val message = "Profile %s does not exist; nothing to delete.".formatted(highlight($profileName));
 
         return OutputAll.response(message, mkData(false), List.of(
-            new Hint("See your existing profiles:", "astra config list")
+            new Hint("See your existing profiles:", "${cli.name} config list")
         ));
     }
 
@@ -79,7 +79,7 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
             $profileName
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("See your existing profiles:", "astra config list")
+            new Hint("See your existing profiles:", "${cli.name} config list")
         ));
     }
 

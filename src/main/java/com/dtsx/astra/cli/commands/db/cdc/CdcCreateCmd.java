@@ -29,15 +29,15 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
 )
 @Example(
     comment = "Create a CDC",
-    command = "astra db create-cdc my_db -t my_table --tenant my_tenant"
+    command = "${cli.name} db create-cdc my_db -t my_table --tenant my_tenant"
 )
 @Example(
     comment = "Create a CDC with a specific keyspace and topic partitions",
-    command = "astra db create-cdc my_db -k my_keyspace -t my_table --tenant my_tenant --topic-partitions 5"
+    command = "${cli.name} db create-cdc my_db -k my_keyspace -t my_table --tenant my_tenant --topic-partitions 5"
 )
 @Example(
     comment = "Create a CDC without failing if it already exists",
-    command = "astra db create-cdc my_db -t my_table --tenant my_tenant --if-not-exists"
+    command = "${cli.name} db create-cdc my_db -t my_table --tenant my_tenant --if-not-exists"
 )
 public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     @Option(
@@ -105,7 +105,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         );
 
         return OutputAll.response(msg, mkData(false), List.of(
-            new Hint("List existing CDCs:", "astra db list-cdcs " + $dbRef)
+            new Hint("List existing CDCs:", "${cli.name} db list-cdcs " + $dbRef)
         ));
     }
 
@@ -134,7 +134,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
             $dbRef
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-not-exists"),
-            new Hint("List existing CDCs:", "astra db list-cdcs " + $dbRef)
+            new Hint("List existing CDCs:", "${cli.name} db list-cdcs " + $dbRef)
         ));
     }
 

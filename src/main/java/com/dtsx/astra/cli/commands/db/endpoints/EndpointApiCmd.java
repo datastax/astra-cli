@@ -12,11 +12,11 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Get the API endpoint for the database",
-    command = "astra db get-endpoint-api mydb"
+    command = "${cli.name} db get-endpoint-api mydb"
 )
 @Example(
     comment = "Get the API endpoint for the database in a specific region",
-    command = "astra db get-endpoint-api mydb --region us-east1"
+    command = "${cli.name} db get-endpoint-api mydb --region us-east1"
 )
 public class EndpointApiCmd extends AbstractEndpointGetCmd {
     @Override

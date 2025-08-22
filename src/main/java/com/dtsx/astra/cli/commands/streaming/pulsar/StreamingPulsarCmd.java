@@ -14,14 +14,14 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Launch pulsar shell for a tenant",
-    command = "astra streaming pulsar shell my_tenant"
+    command = "${cli.name} streaming pulsar shell my_tenant"
 )
 @Example(
     comment = "Get pulsar version",
-    command = "astra streaming pulsar version"
+    command = "${cli.name} streaming pulsar version"
 )
 @Example(
     comment = "Get pulsar executable path",
-    command = "astra streaming pulsar path"
+    command = "${cli.name} streaming pulsar path"
 )
 public class StreamingPulsarCmd {}

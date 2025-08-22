@@ -34,27 +34,27 @@ import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
 )
 @Example(
     comment = "Create a basic Astra vector database in the 'us-east1' region",
-    command = "astra db create my_db --region us-east1"
+    command = "${cli.name} db create my_db --region us-east1"
 )
 @Example(
     comment = "Specify a specific default keyspace for the database",
-    command = "astra db create my_db --region us-east1 -k my_keyspace"
+    command = "${cli.name} db create my_db --region us-east1 -k my_keyspace"
 )
 @Example(
     comment = "Create a classic non-vector database",
-    command = "astra db create my_db --region us-east1 --non-vector"
+    command = "${cli.name} db create my_db --region us-east1 --non-vector"
 )
 @Example(
     comment = "Create a database without waiting for it to become active",
-    command = "astra db create my_db --async"
+    command = "${cli.name} db create my_db --async"
 )
 @Example(
     comment = "Create a database if it doesn't already exist",
-    command = "astra db create my_db --region us-east1 --if-not-exists"
+    command = "${cli.name} db create my_db --region us-east1 --if-not-exists"
 )
 @Example(
     comment = "List available vector database regions for creating a database",
-    command = "astra db list-regions-vector"
+    command = "${cli.name} db list-regions-vector"
 )
 public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implements WithSetTimeout {
     @ArgGroup(heading = "%nWhat to do if the database already exists:%n")
@@ -84,7 +84,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         @Option(
             names = { "-r", "--region" },
             paramLabel = "DB_REGION",
-            description = "Cloud provider region to provision. @|bold Use one of the `astra db list-regions-*` commands to see available regions.|@"
+            description = "Cloud provider region to provision. @|bold Use one of the `${cli.name} db list-regions-*` commands to see available regions.|@"
         )
         public RegionName region;
 
@@ -183,8 +183,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         val data = mkData(dbId, false, currStatus, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Resume the database:", "astra db resume %s".formatted($dbRef)),
-            new Hint("Get information about the existing database:", "astra db get %s".formatted($dbRef))
+            new Hint("Resume the database:", "${cli.name} db resume %s".formatted($dbRef)),
+            new Hint("Get information about the existing database:", "${cli.name} db get %s".formatted($dbRef))
         ));
     }
 
@@ -202,7 +202,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-not-exists"),
             new Hint("Example fix:", originalArgs(), "--allow-duplicate-names"),
-            new Hint("Get information about the existing database:", "astra db get %s".formatted($dbRef))
+            new Hint("Get information about the existing database:", "${cli.name} db get %s".formatted($dbRef))
         ));
     }
 
@@ -222,7 +222,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         val data = mkData(dbId, false, DatabaseStatusType.ACTIVE, awaited);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Get more information about the existing database:", "astra db get %s".formatted($dbRef))
+            new Hint("Get more information about the existing database:", "${cli.name} db get %s".formatted($dbRef))
         ));
     }
 
@@ -236,8 +236,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         val data = mkData(dbId, true, currStatus, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef)),
-            new Hint("Get more information about the new database:", "astra db get %s".formatted($dbRef))
+            new Hint("Poll the database's status:", "${cli.name} db status %s".formatted($dbRef)),
+            new Hint("Get more information about the new database:", "${cli.name} db get %s".formatted($dbRef))
         ));
     }
 
@@ -251,7 +251,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         val data = mkData(dbId, true, DatabaseStatusType.ACTIVE, waitTime);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Get more information about the new database:", "astra db get %s".formatted($dbRef))
+            new Hint("Get more information about the new database:", "${cli.name} db get %s".formatted($dbRef))
         ));
     }
 

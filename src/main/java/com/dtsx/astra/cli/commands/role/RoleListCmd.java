@@ -9,6 +9,6 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "List all available roles in your organization",
-    command = "astra role list"
+    command = "${cli.name} role list"
 )
 public final class RoleListCmd extends RoleListImpl {}

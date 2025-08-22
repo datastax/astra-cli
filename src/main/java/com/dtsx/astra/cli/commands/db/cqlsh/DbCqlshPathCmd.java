@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 )
 @Example(
     comment = "Get the path to the cqlsh executable",
-    command = "astra db cqlsh path"
+    command = "${cli.name} db cqlsh path"
 )
 @Example(
     comment = "Use the cqlsh exe to run a custom command",
-    command = "$(astra db cqlsh path) --help"
+    command = "$(${cli.name} db cqlsh path) --help"
 )
 @Example(
     comment = "Get path only if cqlsh exists, don't install",
-    command = "astra db cqlsh path --if-exists"
+    command = "${cli.name} db cqlsh path --if-exists"
 )
 public class DbCqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
     @Option(
@@ -67,11 +67,11 @@ public class DbCqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
         throw new AstraCliException(FILE_ISSUE, """
           @|bold,red No cqlsh installation was found in '%s'.|@
         
-          Please install @!cqlsh!@ by running any cqlsh command through @!astra!@.
+          Please install @!cqlsh!@ by running any cqlsh command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize cqlsh installations done outside of astra.|@
         """.formatted(AstraHome.DIR.getAbsolutePath()), List.of(
-            new Hint("Example command to install cqlsh (no --if-exists flag):", "astra db cqlsh path")
+            new Hint("Example command to install cqlsh (no --if-exists flag):", "${cli.name} db cqlsh path")
         ));
     }
 }

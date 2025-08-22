@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.core.output.prompters.builders.ConfirmerBuilder;
@@ -98,7 +99,7 @@ public class AstraConsole {
                 sb.append(color.on());
                 colorUsed = true;
             } else if (item instanceof String str) {
-                val processedStr = HIGHLIGHT_PATTERN.matcher(str).replaceAll((match) ->
+                val processedStr = HIGHLIGHT_PATTERN.matcher(str.replace("${cli.name}", CliProperties.cliName())).replaceAll((match) ->
                     AstraColors.highlight(match.group(1)));
 
                 sb.append(AstraColors.ansi().new Text(processedStr, AstraColors.colorScheme()));

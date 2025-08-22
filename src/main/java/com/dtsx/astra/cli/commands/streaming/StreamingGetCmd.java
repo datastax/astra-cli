@@ -24,11 +24,11 @@ import java.util.function.Supplier;
 )
 @Example(
     comment = "Get information about a specific tenant",
-    command = "astra streaming get my_tenant"
+    command = "${cli.name} streaming get my_tenant"
 )
 @Example(
     comment = "Get a specific attribute of a tenant",
-    command = "astra streaming get my_tenant --key region"
+    command = "${cli.name} streaming get my_tenant --key region"
 )
 public class StreamingGetCmd extends AbstractStreamingTenantSpecificCmd<StreamingInfo> {
     public enum StreamingGetKeys {

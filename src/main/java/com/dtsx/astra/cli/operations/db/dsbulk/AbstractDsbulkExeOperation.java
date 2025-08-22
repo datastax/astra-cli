@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -8,7 +8,6 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.CoreDsbulkOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -76,7 +75,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
     }
 
     private Either<DsbulkExecResult, File> downloadDsbulk() {
-        val downloadResult = downloadsGateway.downloadDsbulk(CLIProperties.dsbulk());
+        val downloadResult = downloadsGateway.downloadDsbulk(CliProperties.dsbulk());
 
         return downloadResult.bimap(
             DsbulkInstallFailed::new,

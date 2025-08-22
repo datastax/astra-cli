@@ -19,7 +19,7 @@ import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
 )
 @Example(
     comment = "List all regions for the database",
-    command = "astra db list-regions my_db"
+    command = "${cli.name} db list-regions my_db"
 )
 public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
     @Override

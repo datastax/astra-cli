@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 )
 @Example(
     comment = "Get the Pulsar token for a tenant",
-    command = "astra streaming pulsar-token my_tenant"
+    command = "${cli.name} streaming pulsar-token my_tenant"
 )
 public class StreamingPulsarTokenCmd extends AbstractStreamingTenantSpecificCmd<String> {
     @Override

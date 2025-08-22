@@ -19,7 +19,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingStatusOperation.S
 )
 @Example(
     comment = "Get the status of a streaming tenant",
-    command = "astra streaming status my_tenant"
+    command = "${cli.name} streaming status my_tenant"
 )
 public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<TenantStatus> {
     @Override

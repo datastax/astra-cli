@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 )
 @Example(
     comment = "List all available cloud providers for streaming tenants",
-    command = "astra streaming list-clouds"
+    command = "${cli.name} streaming list-clouds"
 )
 public class StreamingListCloudsCmd extends AbstractStreamingCmd<Set<CloudProviderType>> {
     @Override

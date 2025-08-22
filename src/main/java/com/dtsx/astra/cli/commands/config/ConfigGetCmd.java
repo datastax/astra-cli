@@ -42,15 +42,15 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 @Example(
     comment = "Get the configuration of the default profile",
-    command = "astra config get"
+    command = "${cli.name} config get"
 )
 @Example(
     comment = "Get the configuration of a specific profile",
-    command = "astra config get my_profile"
+    command = "${cli.name} config get my_profile"
 )
 @Example(
     comment = "Get the unwrap of a specific key",
-    command = "astra config get my_profile -k ASTRA_DB_APPLICATION_TOKEN"
+    command = "${cli.name} config get my_profile -k ASTRA_DB_APPLICATION_TOKEN"
 )
 public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     @Parameters(
@@ -114,7 +114,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         
           Ensure that the correct configuration file is being used and that the profile name is correct.
         """.formatted(name), List.of(
-            new Hint("List your profiles:", "astra config list")
+            new Hint("List your profiles:", "${cli.name} config list")
         ));
     }
 
@@ -148,7 +148,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
             section.name(),
             section.pairs().stream().map(p -> "- " + highlight(p.key())).collect(Collectors.joining(NL)),
             renderComment("Get the values of the keys in this profile with:"),
-            renderCommand("astra config get " + section.name())
+            renderCommand("${cli.name} config get " + section.name())
         );
     }
 

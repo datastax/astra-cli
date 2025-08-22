@@ -18,19 +18,19 @@ import java.util.stream.Stream;
 )
 @Example(
     comment = "List all available regions for vector Astra DB databases",
-    command = "astra db region list-regions-vector"
+    command = "${cli.name} db region list-regions-vector"
 )
 @Example(
     comment = "Filter by cloud provider",
-    command = "astra db region list-regions-vector --cloud AWS,GCP"
+    command = "${cli.name} db region list-regions-vector --cloud AWS,GCP"
 )
 @Example(
     comment = "Filter by partial region name",
-    command = "astra db region list-regions-vector --filter us-,ca-"
+    command = "${cli.name} db region list-regions-vector --filter us-,ca-"
 )
 @Example(
     comment = "Filter by zone",
-    command = "astra db region list-regions-vector --zone Europe"
+    command = "${cli.name} db region list-regions-vector --zone Europe"
 )
 public class RegionListVectorCmd extends AbstractRegionListCmd {
     @Override

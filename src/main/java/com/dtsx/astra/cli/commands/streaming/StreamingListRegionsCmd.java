@@ -25,15 +25,15 @@ import java.util.stream.Stream;
 )
 @Example(
     comment = "List all available regions for streaming tenants",
-    command = "astra streaming list-regions"
+    command = "${cli.name} streaming list-regions"
 )
 @Example(
     comment = "Filter by cloud provider",
-    command = "astra streaming list-regions --cloud aws,gcp"
+    command = "${cli.name} streaming list-regions --cloud aws,gcp"
 )
 @Example(
     comment = "Filter by partial region name",
-    command = "astra streaming list-regions --filter us-"
+    command = "${cli.name} streaming list-regions --filter us-"
 )
 public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRegion>> {
     @Option(

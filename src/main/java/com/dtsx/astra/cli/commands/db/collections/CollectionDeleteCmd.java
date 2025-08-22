@@ -24,15 +24,15 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperat
 )
 @Example(
     comment = "Delete a collection",
-    command = "astra db delete-collection my_db -c my_collection"
+    command = "${cli.name} db delete-collection my_db -c my_collection"
 )
 @Example(
     comment = "Delete a collection from a non-default keyspace",
-    command = "astra db delete-collection my_db -k my_keyspace -c my_collection"
+    command = "${cli.name} db delete-collection my_db -k my_keyspace -c my_collection"
 )
 @Example(
     comment = "Delete a collection without failing if it doesn't exist",
-    command = "astra db delete-collection my_db -c my_collection --if-exists"
+    command = "${cli.name} db delete-collection my_db -c my_collection --if-exists"
 )
 public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<CollectionDeleteResult> {
     @Option(
@@ -62,7 +62,7 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
 
         return OutputAll.response(message, data, List.of(
             new Hint("See all existing collections in the database:",
-                "astra db list-collections %s --all".formatted($keyspaceRef.db()))
+                "${cli.name} db list-collections %s --all".formatted($keyspaceRef.db()))
         ));
     }
 
@@ -89,7 +89,7 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
             $keyspaceRef.db()
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("See all existing collections in the database:", "astra db list-collections %s --all".formatted($keyspaceRef.db()))
+            new Hint("See all existing collections in the database:", "${cli.name} db list-collections %s --all".formatted($keyspaceRef.db()))
         ));
     }
 

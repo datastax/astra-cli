@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshPathOperation.CqlPathResponse;
@@ -21,14 +21,14 @@ public class DbCqlshPathOperation implements Operation<CqlPathResponse> {
 
     @Override
     public CqlPathResponse execute() {
-        val existingPath = downloadsGateway.cqlshPath(CLIProperties.cqlsh());
+        val existingPath = downloadsGateway.cqlshPath(CliProperties.cqlsh());
         
         if (existingPath.isPresent()) {
             return new ExePathFound(existingPath.get());
         }
         
         if (shouldInstall) {
-            val installResult = downloadsGateway.downloadCqlsh(CLIProperties.cqlsh());
+            val installResult = downloadsGateway.downloadCqlsh(CliProperties.cqlsh());
 
             if (installResult.isRight()) {
                 return new ExePathFound(installResult.getRight());

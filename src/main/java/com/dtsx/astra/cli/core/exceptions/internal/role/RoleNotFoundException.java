@@ -10,7 +10,7 @@ public class RoleNotFoundException extends AstraCliException {
         
           The specified role does not exist.
         
-          Use @!astra role list!@ to see all available roles.
+          Use @!${cli.name} role list!@ to see all available roles.
         """.formatted(role));
     }
 }

@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.
 )
 @Example(
     comment = "Create a new keyspace",
-    command = "astra db create-keyspace my_db -k my_keyspace"
+    command = "${cli.name} db create-keyspace my_db -k my_keyspace"
 )
 @Example(
     comment = "Create a new keyspace without failing if it already exists",
-    command = "astra db create-keyspace my_db -k my_keyspace --if-not-exists"
+    command = "${cli.name} db create-keyspace my_db -k my_keyspace --if-not-exists"
 )
 @Example(
     comment = "Create a new keyspace without waiting for the database to become active",
-    command = "astra db create-keyspace my_db -k my_keyspace --async"
+    command = "${cli.name} db create-keyspace my_db -k my_keyspace --async"
 )
 public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceCreateResult> {
     @Option(
@@ -86,7 +86,7 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
         val data = mkData(true, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll the database status:", "astra db status %s".formatted($keyspaceRef.db()))
+            new Hint("Poll the database status:", "${cli.name} db status %s".formatted($keyspaceRef.db()))
         ));
     }
 

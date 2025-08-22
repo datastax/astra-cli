@@ -42,7 +42,7 @@ public class ExamplesRenderer {
                 sb.append("  ").append(renderComment(comment)).append(NL);
             }
 
-            sb.append("  ").append(renderCommand(example.command())).append(NL);
+            sb.append("  ").append(renderCommand(AstraConsole.format(example.command()))).append(NL);
 
             for (val output : example.output()) {
                 sb.append("  ").append(output).append(NL);

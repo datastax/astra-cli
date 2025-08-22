@@ -26,11 +26,11 @@ import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
 )
 @Example(
     comment = "Describe a table in the default keyspace",
-    command = "astra db describe-table my_db -c my_table"
+    command = "${cli.name} db describe-table my_db -c my_table"
 )
 @Example(
     comment = "Describe a table in a specific keyspace",
-    command = "astra db describe-table my_db -k my_keyspace -c my_table"
+    command = "${cli.name} db describe-table my_db -k my_keyspace -c my_table"
 )
 public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResult> {
     @Override
@@ -88,7 +88,7 @@ public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResu
             $keyspaceRef.name(),
             $keyspaceRef.db()
         ), List.of(
-            new Hint("List existing tables:", "astra db list-tables %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name()))
+            new Hint("List existing tables:", "${cli.name} db list-tables %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name()))
         ));
     }
 

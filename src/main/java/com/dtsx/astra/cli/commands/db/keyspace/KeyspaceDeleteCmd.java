@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.
 )
 @Example(
     comment = "Delete a keyspace",
-    command = "astra db delete-keyspace my_db -k my_keyspace"
+    command = "${cli.name} db delete-keyspace my_db -k my_keyspace"
 )
 @Example(
     comment = "Delete a keyspace without failing if it doesn't exist",
-    command = "astra db delete-keyspace my_db -k my_keyspace --if-exists"
+    command = "${cli.name} db delete-keyspace my_db -k my_keyspace --if-exists"
 )
 @Example(
     comment = "Delete a keyspace without waiting for the database to become active",
-    command = "astra db delete-keyspace my_db -k my_keyspace --async"
+    command = "${cli.name} db delete-keyspace my_db -k my_keyspace --async"
 )
 public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceDeleteResult> {
     @Option(
@@ -75,7 +75,7 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
         val data = mkData(false, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("List existing keyspaces:", "astra db list-keyspaces %s".formatted($keyspaceRef.db()))
+            new Hint("List existing keyspaces:", "${cli.name} db list-keyspaces %s".formatted($keyspaceRef.db()))
         ));
     }
 
@@ -88,7 +88,7 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
         val data = mkData(true, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Check the database status:", "astra db status %s".formatted($keyspaceRef.db()))
+            new Hint("Check the database status:", "${cli.name} db status %s".formatted($keyspaceRef.db()))
         ));
     }
 
@@ -114,7 +114,7 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
             $keyspaceRef.db()
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("List existing keyspaces:", "astra db list-keyspaces %s".formatted($keyspaceRef.db()))
+            new Hint("List existing keyspaces:", "${cli.name} db list-keyspaces %s".formatted($keyspaceRef.db()))
         ));
     }
 

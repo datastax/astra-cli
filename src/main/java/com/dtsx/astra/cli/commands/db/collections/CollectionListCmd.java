@@ -24,15 +24,15 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperatio
 )
 @Example(
     comment = "List all collections in the default keyspace",
-    command = "astra db list-collections my_db"
+    command = "${cli.name} db list-collections my_db"
 )
 @Example(
     comment = "List all collections in a specific keyspace",
-    command = "astra db list-collections my_db -k my_keyspace"
+    command = "${cli.name} db list-collections my_db -k my_keyspace"
 )
 @Example(
     comment = "List all collections in all keyspaces",
-    command = "astra db list-collections my_db --all"
+    command = "${cli.name} db list-collections my_db --all"
 )
 public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionListResult>> {
     @Option(

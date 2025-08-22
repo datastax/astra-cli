@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.*;
 )
 @Example(
     comment = "Create a region in a database",
-    command = "astra db create-region my_db -r us-west-2"
+    command = "${cli.name} db create-region my_db -r us-west-2"
 )
 @Example(
     comment = "Create a region without failing if it already exists",
-    command = "astra db create-region my_db -r us-west-2 --if-not-exists"
+    command = "${cli.name} db create-region my_db -r us-west-2 --if-not-exists"
 )
 @Example(
     comment = "Create a region without waiting for the database to become active",
-    command = "astra db create-region my_db -r us-west-2 --async"
+    command = "${cli.name} db create-region my_db -r us-west-2 --async"
 )
 public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<RegionCreateResult> {
     @Option(
@@ -74,7 +74,7 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
         val data = mkData(false, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("List existing regions:", "astra db list-regions %s".formatted($dbRef))
+            new Hint("List existing regions:", "${cli.name} db list-regions %s".formatted($dbRef))
         ));
     }
 
@@ -87,7 +87,7 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
         val data = mkData(true, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef))
+            new Hint("Poll the database's status:", "${cli.name} db status %s".formatted($dbRef))
         ));
     }
 
@@ -113,7 +113,7 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
             $dbRef
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-not-exists"),
-            new Hint("List existing regions:", "astra db list-regions %s".formatted($dbRef))
+            new Hint("List existing regions:", "${cli.name} db list-regions %s".formatted($dbRef))
         ));
     }
 

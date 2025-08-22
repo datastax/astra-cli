@@ -42,7 +42,7 @@ public abstract class AbstractPulsarExecCmd extends AbstractStreamingCmd<PulsarE
         
           Please ensure you have a stable network connection and sufficient permissions, then try again.
         """.formatted(error), List.of(
-            new Hint("Retry installation:", "astra streaming pulsar version")
+            new Hint("Retry installation:", "${cli.name} streaming pulsar version")
         ));
     }
 }

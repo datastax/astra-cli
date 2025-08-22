@@ -15,6 +15,6 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Show your current token",
-    command = "astra token"
+    command = "${cli.name} token"
 )
 public final class TokenCmd extends TokenGetImpl {}

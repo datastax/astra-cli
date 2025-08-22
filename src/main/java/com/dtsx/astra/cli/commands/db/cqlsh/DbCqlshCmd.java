@@ -15,18 +15,18 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Launch cqlsh for a database",
-    command = "astra db cqlsh start my_db"
+    command = "${cli.name} db cqlsh start my_db"
 )
 @Example(
     comment = "Launch cqlsh with a specific keyspace",
-    command = "astra db cqlsh start my_db -k my_keyspace"
+    command = "${cli.name} db cqlsh start my_db -k my_keyspace"
 )
 @Example(
     comment = "Execute a CQL statement",
-    command = "astra db cqlsh exec my_db \"SELECT * FROM my_keyspace.my_table\""
+    command = "${cli.name} db cqlsh exec my_db \"SELECT * FROM my_keyspace.my_table\""
 )
 @Example(
     comment = "Execute a CQL file",
-    command = "astra db cqlsh exec my_db -f script.cql"
+    command = "${cli.name} db cqlsh exec my_db -f script.cql"
 )
 public class DbCqlshCmd {}

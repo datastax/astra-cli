@@ -9,6 +9,6 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Show organization information",
-    command = "astra org get"
+    command = "${cli.name} org get"
 )
 public class OrgGetCmd extends OrgGetImpl {}

@@ -30,15 +30,15 @@ import static com.dtsx.astra.cli.operations.user.UserInviteOperation.*;
 
 @Example(
     comment = "Invite a user with default \"Database Administrator\" role",
-    command = "astra user invite john@example.com"
+    command = "${cli.name} user invite john@example.com"
 )
 @Example(
     comment = "Invite a user with specific roles",
-    command = "astra user invite john@example.com --role 'R/W User' --role 'Billing Admin'"
+    command = "${cli.name} user invite john@example.com --role 'R/W User' --role 'Billing Admin'"
 )
 @Example(
     comment = "Invite a user without failing if they already exist",
-    command = "astra user invite john@example.com --if-not-exists"
+    command = "${cli.name} user invite john@example.com --if-not-exists"
 )
 @Command(
     name = "invite",
@@ -102,7 +102,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
         val message = "User %s already exists; nothing to invite.".formatted(highlight(user));
         
         return OutputAll.response(message, mkData(false, null), List.of(
-            new Hint("See all existing users:", "astra user list")
+            new Hint("See all existing users:", "${cli.name} user list")
         ));
     }
 
@@ -117,7 +117,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
             user
         ), List.of(
             new Hint("Example fix:", originalArgsWithFlag, "--if-not-exists"),
-            new Hint("See all existing users:", "astra user list")
+            new Hint("See all existing users:", "${cli.name} user list")
         ));
     }
 

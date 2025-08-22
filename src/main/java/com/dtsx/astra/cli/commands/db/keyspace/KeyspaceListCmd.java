@@ -22,7 +22,7 @@ import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.Ke
 )
 @Example(
     comment = "List all keyspaces in a database",
-    command = "astra db list-keyspaces my_db"
+    command = "${cli.name} db list-keyspaces my_db"
 )
 public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     @Override

@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.*;
 )
 @Example(
     comment = "Delete a region from a database",
-    command = "astra db delete-region my_db -r us-west-2"
+    command = "${cli.name} db delete-region my_db -r us-west-2"
 )
 @Example(
     comment = "Delete a region without failing if it doesn't exist",
-    command = "astra db delete-region my_db -r us-west-2 --if-exists"
+    command = "${cli.name} db delete-region my_db -r us-west-2 --if-exists"
 )
 @Example(
     comment = "Delete a region without waiting for the database to become active",
-    command = "astra db delete-region my_db -r us-west-2 --async"
+    command = "${cli.name} db delete-region my_db -r us-west-2 --async"
 )
 public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<RegionDeleteResult> {
     @Option(
@@ -74,8 +74,8 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
         val data = mkData(false, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("List all regions in the database:", "astra db list-regions %s".formatted($dbRef)),
-            new Hint("Get database information:", "astra db get %s".formatted($dbRef))
+            new Hint("List all regions in the database:", "${cli.name} db list-regions %s".formatted($dbRef)),
+            new Hint("Get database information:", "${cli.name} db get %s".formatted($dbRef))
         ));
     }
 
@@ -88,8 +88,8 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
         val data = mkData(true, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll the database's status:", "astra db status %s".formatted($dbRef)),
-            new Hint("List remaining regions in the database:", "astra db list-regions %s".formatted($dbRef))
+            new Hint("Poll the database's status:", "${cli.name} db status %s".formatted($dbRef)),
+            new Hint("List remaining regions in the database:", "${cli.name} db list-regions %s".formatted($dbRef))
         ));
     }
 
@@ -103,7 +103,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
         val data = mkData(true, waitTime);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("List remaining regions in the database:", "astra db list-regions %s".formatted($dbRef))
+            new Hint("List remaining regions in the database:", "${cli.name} db list-regions %s".formatted($dbRef))
         ));
     }
 
@@ -117,7 +117,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
             $dbRef
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("List existing regions:", "astra db list-regions %s".formatted($dbRef))
+            new Hint("List existing regions:", "${cli.name} db list-regions %s".formatted($dbRef))
         ));
     }
 

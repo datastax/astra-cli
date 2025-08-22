@@ -23,7 +23,7 @@ import java.util.Optional;
 )
 @Example(
     comment = "Launch pulsar shell for a tenant",
-    command = "astra streaming pulsar shell my_tenant"
+    command = "${cli.name} streaming pulsar shell my_tenant"
 )
 public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
     @Parameters(

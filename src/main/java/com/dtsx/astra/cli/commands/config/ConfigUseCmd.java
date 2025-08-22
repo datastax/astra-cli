@@ -5,10 +5,11 @@ import com.dtsx.astra.cli.config.AstraConfig.Profile;
 import com.dtsx.astra.cli.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
-import com.dtsx.astra.cli.core.exceptions.internal.config.ProfileNotFoundException;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
@@ -21,11 +22,13 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 @Command(
     name = "use",
@@ -33,11 +36,11 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 )
 @Example(
     comment = "Set an existing profile as the default",
-    command = "config use my_profile"
+    command = "${cli.name} config use my_profile"
 )
 @Example(
     comment = "Set a profile as the default when creating it",
-    command = "config create my_profile -t @token.txt --default"
+    command = "${cli.name} config create my_profile -t @token.txt --default"
 )
 public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     @Parameters(
@@ -52,8 +55,16 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     public final OutputAll execute(Supplier<ConfigUseResult> result) {
         return switch (result.get()) {
             case ProfileSetAsDefault(var profileName) -> OutputAll.message("Default profile set to " + highlight(profileName));
-            case ProfileNotFound(var profileName) -> throw new ProfileNotFoundException(profileName);
+            case ProfileNotFound(var profileName) -> throwProfileNotFound(profileName);
         };
+    }
+
+    private <T> T throwProfileNotFound(ProfileName profileName) {
+        throw new AstraCliException(PROFILE_NOT_FOUND, """
+          @|bold,red Error: A profile with the name '%s' could not be found.|@
+        """.formatted(profileName), List.of(
+            new Hint("See your existing profiles", "${cli.name} config list")
+        ));
     }
 
     @Override

@@ -24,15 +24,15 @@ import static com.dtsx.astra.cli.operations.db.table.TableDeleteOperation.*;
 )
 @Example(
     comment = "Delete a table",
-    command = "astra db delete-table my_db -c my_table"
+    command = "${cli.name} db delete-table my_db -c my_table"
 )
 @Example(
     comment = "Delete a table from a non-default keyspace",
-    command = "astra db delete-table my_db -k my_keyspace -c my_table"
+    command = "${cli.name} db delete-table my_db -k my_keyspace -c my_table"
 )
 @Example(
     comment = "Delete a table without failing if it doesn't exist",
-    command = "astra db delete-table my_db -c my_table --if-exists"
+    command = "${cli.name} db delete-table my_db -c my_table --if-exists"
 )
 public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> {
     @Option(
@@ -60,8 +60,8 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
         val data = mkData(false);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("List all tables in this keyspace:", "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name())),
-            new Hint("List all tables in all keyspaces:", "astra db list-tables %s --all".formatted($dbRef))
+            new Hint("List all tables in this keyspace:", "${cli.name} db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name())),
+            new Hint("List all tables in all keyspaces:", "${cli.name} db list-tables %s --all".formatted($dbRef))
         ));
     }
 
@@ -74,7 +74,7 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
         val data = mkData(true);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("List remaining tables in this keyspace:", "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
+            new Hint("List remaining tables in this keyspace:", "${cli.name} db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
         ));
     }
 
@@ -88,7 +88,7 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
             $keyspaceRef
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("List existing tables:", "astra db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
+            new Hint("List existing tables:", "${cli.name} db list-tables %s -k %s".formatted($dbRef, $keyspaceRef.name()))
         ));
     }
 

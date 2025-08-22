@@ -26,11 +26,11 @@ import static com.dtsx.astra.cli.operations.token.TokenDeleteOperation.*;
 )
 @Example(
     comment = "Delete a specific token",
-    command = "astra token delete <client_id>"
+    command = "${cli.name} token delete <client_id>"
 )
 @Example(
     comment = "Delete a token without failing if it doesn't exist",
-    command = "astra token delete <client_id> --if-exists"
+    command = "${cli.name} token delete <client_id> --if-exists"
 )
 public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
     @Parameters(
@@ -68,7 +68,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
         val data = mkData(false);
         
         return OutputAll.response(message, data, List.of(
-            new Hint("See all available tokens:", "astra token list")
+            new Hint("See all available tokens:", "${cli.name} token list")
         ));
     }
 
@@ -83,7 +83,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
             tokenId
         ), List.of(
             new Hint("Example fix:", originalArgsWithFlag, "--if-exists"),
-            new Hint("See all available tokens:", "astra token list")
+            new Hint("See all available tokens:", "${cli.name} token list")
         ));
     }
 

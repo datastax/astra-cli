@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 )
 @Example(
     comment = "Get the path to the dsbulk executable",
-    command = "astra db dsbulk path"
+    command = "${cli.name} db dsbulk path"
 )
 @Example(
     comment = "Use the dsbulk exe to run a custom command",
-    command = "$(astra db dsbulk path) --help"
+    command = "$(${cli.name} db dsbulk path) --help"
 )
 @Example(
     comment = "Get path only if dsbulk exists, don't install",
-    command = "astra db dsbulk path --if-exists"
+    command = "${cli.name} db dsbulk path --if-exists"
 )
 public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
     @Option(
@@ -67,11 +67,11 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
         throw new AstraCliException(FILE_ISSUE, """
           @|bold,red No dsbulk installation was found in '%s'.|@
         
-          Please install @!dsbulk!@ by running any dsbulk command through @!astra!@.
+          Please install @!dsbulk!@ by running any dsbulk command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize dsbulk installations done outside of astra.|@
         """.formatted(AstraHome.DIR.getAbsolutePath()), List.of(
-            new Hint("Example command to install dsbulk (no --if-exists flag):", "astra db dsbulk path")
+            new Hint("Example command to install dsbulk (no --if-exists flag):", "${cli.name} db dsbulk path")
         ));
     }
 }

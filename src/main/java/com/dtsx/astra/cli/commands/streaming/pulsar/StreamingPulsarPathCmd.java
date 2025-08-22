@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 )
 @Example(
     comment = "Get the path to the pulsar executable",
-    command = "astra streaming pulsar path"
+    command = "${cli.name} streaming pulsar path"
 )
 @Example(
     comment = "Use the pulsar exe to run a custom command",
-    command = "$(astra streaming pulsar path) --help"
+    command = "$(${cli.name} streaming pulsar path) --help"
 )
 @Example(
     comment = "Get path only if pulsar exists, don't install",
-    command = "astra streaming pulsar path --if-exists"
+    command = "${cli.name} streaming pulsar path --if-exists"
 )
 public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathResponse> {
     @Option(
@@ -67,11 +67,11 @@ public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathRespo
         throw new AstraCliException(FILE_ISSUE, """
           @|bold,red No pulsar installation was found in '%s'.|@
         
-          Please install @!pulsar!@ by running any pulsar command through @!astra!@.
+          Please install @!pulsar!@ by running any pulsar command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize pulsar installations done outside of astra.|@
         """.formatted(AstraHome.DIR.getAbsolutePath()), List.of(
-            new Hint("Example command to install pulsar:", "astra streaming pulsar version")
+            new Hint("Example command to install pulsar:", "${cli.name} streaming pulsar version")
         ));
     }
 }

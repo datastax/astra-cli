@@ -25,11 +25,11 @@ import static com.dtsx.astra.cli.operations.role.RoleGetOperation.RoleGetRequest
 )
 @Example(
     comment = "Get details for a specific role by name",
-    command = "astra role get \"Database Administrator\""
+    command = "${cli.name} role get \"Database Administrator\""
 )
 @Example(
     comment = "Get details for a specific role by ID",
-    command = "astra role get 12345678-abcd-1234-abcd-123456789012"
+    command = "${cli.name} role get 12345678-abcd-1234-abcd-123456789012"
 )
 public class RoleGetCmd extends AbstractRoleCmd<Role> {
     @Parameters(

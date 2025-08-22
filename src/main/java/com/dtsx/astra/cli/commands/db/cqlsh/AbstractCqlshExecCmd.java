@@ -63,7 +63,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
         
           Please ensure you have a stable network connection and sufficient permissions, then try again.
         """.formatted(error), List.of(
-            new Hint("Retry installation:", "astra db cqlsh version")
+            new Hint("Retry installation:", "${cli.name} db cqlsh version")
         ));
     }
 }

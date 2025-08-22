@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
 )
 @Example(
     comment = "List your tokens' information",
-    command = "astra token list"
+    command = "${cli.name} token list"
 )
 public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override

@@ -29,11 +29,11 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Execute a CQL statement",
-    command = "astra db cqlsh exec my_db \"SELECT * FROM my_keyspace.my_table\""
+    command = "${cli.name} db cqlsh exec my_db \"SELECT * FROM my_keyspace.my_table\""
 )
 @Example(
     comment = "Execute a CQL file",
-    command = "astra db cqlsh exec my_db -f script.cql"
+    command = "${cli.name} db cqlsh exec my_db -f script.cql"
 )
 public class DbCqlshExecCmd extends DbCqlshStartCmd {
     @Parameters(

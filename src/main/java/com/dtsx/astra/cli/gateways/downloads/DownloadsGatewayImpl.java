@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
-import com.dtsx.astra.cli.CLIProperties.ExternalSoftware;
+import com.dtsx.astra.cli.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;

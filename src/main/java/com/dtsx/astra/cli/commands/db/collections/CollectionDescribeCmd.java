@@ -25,11 +25,11 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOper
 )
 @Example(
     comment = "Describe a collection in the default keyspace",
-    command = "astra db describe-collection my_db -c my_collection"
+    command = "${cli.name} db describe-collection my_db -c my_collection"
 )
 @Example(
     comment = "Describe a collection in a specific keyspace",
-    command = "astra db describe-collection my_db -k my_keyspace -c my_collection"
+    command = "${cli.name} db describe-collection my_db -k my_keyspace -c my_collection"
 )
 public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<CollectionDescribeResult> {
     @Override
@@ -109,9 +109,9 @@ public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<Collect
             $keyspaceRef.db()
         ), List.of(
             new Hint("List existing collections:",
-                "astra db list-collections %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name())),
+                "${cli.name} db list-collections %s -k %s".formatted($keyspaceRef.db(), $keyspaceRef.name())),
             new Hint("Create the collection:",
-                "astra db create-collection %s -k %s -c %s [...options]".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
+                "${cli.name} db create-collection %s -k %s -c %s [...options]".formatted($keyspaceRef.db(), $keyspaceRef.name(), $collRef.name()))
         ));
     }
 

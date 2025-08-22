@@ -36,19 +36,19 @@ import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
 )
 @Example(
     comment = "Delete an existing Astra database",
-    command = "astra db delete my_db"
+    command = "${cli.name} db delete my_db"
 )
 @Example(
     comment = "Delete an existing Astra database without confirmation (required for non-interactive shells)",
-    command = "astra db delete my_db --yes"
+    command = "${cli.name} db delete my_db --yes"
 )
 @Example(
     comment = "Delete an existing Astra database without failing if it does not exist",
-    command = "astra db delete my_db --if-exists"
+    command = "${cli.name} db delete my_db --if-exists"
 )
 @Example(
     comment = "Delete an existing Astra database without waiting for complete termination",
-    command = "astra db delete my_db --async"
+    command = "${cli.name} db delete my_db --async"
 )
 public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implements WithSetTimeout {
     @Option(
@@ -91,7 +91,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
         val data = mkData(false, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("See your existing databases:", "astra db list")
+            new Hint("See your existing databases:", "${cli.name} db list")
         ));
     }
 
@@ -103,7 +103,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
         val data = mkData(true, null);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("Poll its status with:", "astra db status " + dbRef)
+            new Hint("Poll its status with:", "${cli.name} db status " + dbRef)
         ));
     }
 
@@ -127,7 +127,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             dbRef
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("See your existing databases:", "astra db list")
+            new Hint("See your existing databases:", "${cli.name} db list")
         ));
     }
 

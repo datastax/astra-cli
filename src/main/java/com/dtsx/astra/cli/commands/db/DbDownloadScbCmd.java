@@ -28,15 +28,15 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 @Example(
     comment = "Download the SCB for a database, targeting the default region",
-    command = "astra db download-scb my_db"
+    command = "${cli.name} db download-scb my_db"
 )
 @Example(
     comment = "Download the SCB for a database, targeting a specific region",
-    command = "astra db download-scb my_db -r us-east1"
+    command = "${cli.name} db download-scb my_db -r us-east1"
 )
 @Example(
     comment = "Download the SCB for a database, saving it to a specific file",
-    command = "astra db download-scb my_db -f /path/to/scb.zip"
+    command = "${cli.name} db download-scb my_db -f /path/to/scb.zip"
 )
 public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> {
     @Option(

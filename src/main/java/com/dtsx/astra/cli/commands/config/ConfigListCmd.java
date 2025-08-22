@@ -8,7 +8,7 @@ import picocli.CommandLine.Command;
     description = "List your Astra CLI configurations."
 )
 @Example(
-    command = "astra config list",
+    command = "${cli.name} config list",
     comment = "List your Astra CLI configurations."
 )
 public final class ConfigListCmd extends ConfigListImpl {}

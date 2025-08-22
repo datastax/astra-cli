@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 )
 @Example(
     comment = "List all available cloud providers",
-    command = "astra db list-clouds"
+    command = "${cli.name} db list-clouds"
 )
 public class CloudsListCmd extends AbstractRegionCmd<Set<CloudProviderType>> {
     @Override

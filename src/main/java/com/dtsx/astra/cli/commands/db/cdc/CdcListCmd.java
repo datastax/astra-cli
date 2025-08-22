@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
 )
 @Example(
     comment = "List all CDCs in a database",
-    command = "astra db list-cdcs my_db"
+    command = "${cli.name} db list-cdcs my_db"
 )
 public class CdcListCmd extends AbstractCdcCmd<Stream<CdcInfo>> {
     @Override

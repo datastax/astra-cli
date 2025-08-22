@@ -31,15 +31,15 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
 )
 @Example(
     comment = "Delete a CDC by ID",
-    command = "astra db delete-cdc my_db --cdc-id abc123"
+    command = "${cli.name} db delete-cdc my_db --cdc-id abc123"
 )
 @Example(
     comment = "Delete a CDC by table and tenant",
-    command = "astra db delete-cdc my_db -k my_keyspace -t my_table --tenant my_tenant"
+    command = "${cli.name} db delete-cdc my_db -k my_keyspace -t my_table --tenant my_tenant"
 )
 @Example(
     comment = "Delete a CDC without failing if it doesn't exist",
-    command = "astra db delete-cdc my_db --cdc-id abc123 --if-exists"
+    command = "${cli.name} db delete-cdc my_db --cdc-id abc123 --if-exists"
 )
 public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
     @ArgGroup(multiplicity = "1")
@@ -115,7 +115,7 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         );
 
         return OutputAll.response(msg, mkData(false), List.of(
-            new Hint("List existing CDCs", "astra db list-cdcs " + $dbRef)
+            new Hint("List existing CDCs", "${cli.name} db list-cdcs " + $dbRef)
         ));
     }
 
@@ -128,7 +128,7 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         );
 
         return OutputAll.response(msg, mkData(true), List.of(
-            new Hint("List existing CDCs", "astra db list-cdcs " + $dbRef)
+            new Hint("List existing CDCs", "${cli.name} db list-cdcs " + $dbRef)
         ));
     }
 
@@ -142,7 +142,7 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
             $dbRef
         ), List.of(
             new Hint("Example fix", originalArgs(), "--if-exists"),
-            new Hint("List existing CDCs", "astra db list-cdcs " + $dbRef)
+            new Hint("List existing CDCs", "${cli.name} db list-cdcs " + $dbRef)
         ));
     }
 

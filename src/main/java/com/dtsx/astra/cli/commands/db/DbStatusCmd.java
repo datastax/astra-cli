@@ -18,7 +18,7 @@ import static com.dtsx.astra.cli.operations.db.DbStatusOperation.*;
 )
 @Example(
     comment = "Get the status of a database",
-    command = "astra db status my_db"
+    command = "${cli.name} db status my_db"
 )
 public class DbStatusCmd extends AbstractPromptForDbCmd<DatabaseStatusType> {
     @Override

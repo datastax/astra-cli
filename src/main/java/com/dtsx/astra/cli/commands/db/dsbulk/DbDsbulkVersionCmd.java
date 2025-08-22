@@ -10,7 +10,7 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Display dsbulk's version information",
-    command = "astra db dsbulk version"
+    command = "${cli.name} db dsbulk version"
 )
 public class DbDsbulkVersionCmd extends AbstractDsbulkExecCmd {
     @Override

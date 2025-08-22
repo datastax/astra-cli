@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.config;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -85,15 +85,15 @@ public class AstraConfig {
                 throw new AstraCliException(FILE_ISSUE, """
                   @|bold,red Error: The default configuration file (%s) does not exist.|@
                 
-                  Please run @!astra setup!@ to create the default configuration file, and set up your Astra credentials.
+                  Please run @!${cli.name} setup!@ to create the default configuration file, and set up your Astra credentials.
                 
                   Alternatively, you can specify credentials via the @!--config-file!@ or @!--token!@ options.
                 """.formatted(
                     file.getAbsolutePath()
                 ), List.of(
-                    new Hint("Interactively set up your configuration file", "astra setup"),
-                    new Hint("Programmatically set up your configuration file", "astra config create [name] --token <token> [--env <env>]"),
-                    new Hint("Example custom config file usage", "astra db list --config-file ~/.custom_astrarc")
+                    new Hint("Interactively set up your configuration file", "${cli.name} setup"),
+                    new Hint("Programmatically set up your configuration file", "${cli.name} config create [name] --token <token> [--env <env>]"),
+                    new Hint("Example custom config file usage", "${cli.name} db list --config-file ~/.custom_astrarc")
                 ));
             } else {
                 throw new AstraCliException(FILE_ISSUE, """
@@ -129,8 +129,8 @@ public class AstraConfig {
                                 """.formatted(
                                     AstraColors.PURPLE_300.useOrQuote(TOKEN_KEY),
                                     highlight(section.name()),
-                                    highlight("astra config delete '" + profileName.unwrap() + "'"),
-                                    highlight("astra config create '" + profileName.unwrap() + "' --token <token> [--env <env>] -f")
+                                    highlight("${cli.name} config delete '" + profileName.unwrap() + "'"),
+                                    highlight("${cli.name} config create '" + profileName.unwrap() + "' --token <token> [--env <env>] -f")
                                 )))
                             );
                         }
@@ -157,7 +157,7 @@ public class AstraConfig {
     }
 
     public static File resolveDefaultAstraConfigFile() {
-        return new File(System.getProperty("user.home") + File.separator + CLIProperties.rcFileName());
+        return new File(System.getProperty("user.home") + File.separator + CliProperties.rcFileName());
     }
 
     public boolean profileExists(ProfileName profileName) {
@@ -180,7 +180,7 @@ public class AstraConfig {
               - Running %s to delete all profiles with this name, then re-create the profile correctly.
             """.formatted(
                 highlight(profileName),
-                highlight("astra config delete '" + profileName.unwrap() + "'")
+                highlight("${cli.name} config delete '" + profileName.unwrap() + "'")
             )), backingFile);
         }
 

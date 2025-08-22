@@ -30,13 +30,13 @@ public class NukeOperation implements Operation<NukeResult> {
     public record NukeRequest(
         boolean dryRun,
         Optional<Boolean> preserveAstrarc,
-        Optional<String> commandName,
+        Optional<String> cliName,
         BiFunction<File, Boolean, Boolean> promptShouldDeleteAstrarc
     ) {}
 
     public sealed interface NukeResult {}
     public record Nuked(Set<File> deletedFiles, Set<File> updatedFiles, Map<File, SkipReason> skipped, Optional<String> finalDeleteCmd) implements NukeResult {}
-    public record CouldNotResolveCommandName() implements NukeResult {}
+    public record CouldNotResolveCliName() implements NukeResult {}
 
     public sealed interface SkipReason {
         String reason();
@@ -65,21 +65,21 @@ public class NukeOperation implements Operation<NukeResult> {
 
     @Override
     public NukeResult execute() {
-        val binaryFile = resolveBinaryFile();
+        val cliBinary = resolveCliBinary();
 
-        val commandName = binaryFile
+        val cliName = cliBinary
             .map(File::getName)
-            .or(() -> request.commandName);
+            .or(() -> request.cliName);
 
-        if (commandName.isEmpty()) {
-            return new CouldNotResolveCommandName();
+        if (cliName.isEmpty()) {
+            return new CouldNotResolveCliName();
         }
 
         val astraHome = resolveAstraHome();
         val astraRc = resolveAstraRc();
-        val rcFiles = resolveRcFilesWithAutocomplete(commandName.get());
+        val rcFiles = resolveRcFilesWithAutocomplete(cliName.get());
 
-        val processRunningFromInsideAstraHome = binaryFile.isPresent() && binaryFile.get().toPath().startsWith(astraHome.toPath());
+        val processRunningFromInsideAstraHome = cliBinary.isPresent() && cliBinary.get().toPath().startsWith(astraHome.toPath());
 
         val shouldPreserveAstrarcAstraRc = request.preserveAstrarc.orElseGet(() -> {
             if (!astraRc.exists()) {
@@ -88,7 +88,7 @@ public class NukeOperation implements Operation<NukeResult> {
             return !request.promptShouldDeleteAstrarc.apply(astraRc, request.dryRun);
         });
 
-        val res = mkResult(binaryFile, processRunningFromInsideAstraHome, astraHome);
+        val res = mkResult(cliBinary, processRunningFromInsideAstraHome, astraHome);
 
         if (!shouldPreserveAstrarcAstraRc) {
             delete(astraRc, res);
@@ -127,13 +127,13 @@ public class NukeOperation implements Operation<NukeResult> {
         return new Nuked(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashMap<>(), finalDeleteCmd);
     }
 
-    private Optional<File> resolveBinaryFile() {
+    private Optional<File> resolveCliBinary() {
         val file = ProcessHandle.current()
             .info()
             .command()
             .map(File::new);
 
-        if (file.isEmpty() || (!file.get().toPath().endsWith("astra") && !ImageInfo.inImageCode())) {
+        if (file.isEmpty() || !ImageInfo.inImageCode()) {
             return Optional.empty();
         }
 
@@ -148,13 +148,13 @@ public class NukeOperation implements Operation<NukeResult> {
         return AstraConfig.resolveDefaultAstraConfigFile();
     }
 
-    private Set<Pair<File, String>> resolveRcFilesWithAutocomplete(String commandName) {
+    private Set<Pair<File, String>> resolveRcFilesWithAutocomplete(String cliName) {
         if (isWindows()) {
             return Set.of();
         }
 
         val autocompletePattern = Pattern.compile(
-            "^.*(?:source|\\.)\\s+<\\(\\s*" + commandName + "\\s+compgen(?:\\s+[^)]*)?\\s*\\)\\s*$",
+            "^.*(?:source|\\.)\\s+<\\(\\s*" + cliName + "\\s+compgen(?:\\s+[^)]*)?\\s*\\)\\s*$",
             Pattern.MULTILINE
         );
 

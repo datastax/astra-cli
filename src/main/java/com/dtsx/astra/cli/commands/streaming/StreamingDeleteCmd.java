@@ -24,11 +24,11 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingDeleteOperation.*
 )
 @Example(
     comment = "Delete an existing streaming tenant",
-    command = "astra streaming delete my_tenant"
+    command = "${cli.name} streaming delete my_tenant"
 )
 @Example(
     comment = "Delete an existing streaming tenant without failing if it does not exist",
-    command = "astra streaming delete my_tenant --if-exists"
+    command = "${cli.name} streaming delete my_tenant --if-exists"
 )
 public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<StreamingDeleteResult> {
     @Option(
@@ -55,7 +55,7 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
         val data = mkData(false);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("See your existing tenants:", "astra streaming list")
+            new Hint("See your existing tenants:", "${cli.name} streaming list")
         ));
     }
 
@@ -78,7 +78,7 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
             $tenantName
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
-            new Hint("See your existing tenants:", "astra streaming list")
+            new Hint("See your existing tenants:", "${cli.name} streaming list")
         ));
     }
 

@@ -13,10 +13,10 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "List all available roles",
-    command = "astra role list"
+    command = "${cli.name} role list"
 )
 @Example(
     comment = "Get details for a specific role",
-    command = "astra role get \"Database Administrator\""
+    command = "${cli.name} role get \"Database Administrator\""
 )
 public class RoleCmd {}

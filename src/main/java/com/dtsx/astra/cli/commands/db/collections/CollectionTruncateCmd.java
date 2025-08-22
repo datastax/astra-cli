@@ -21,11 +21,11 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionTruncateOper
 )
 @Example(
     comment = "Truncate a collection in the default keyspace",
-    command = "astra db truncate-collection my_db -c my_collection"
+    command = "${cli.name} db truncate-collection my_db -c my_collection"
 )
 @Example(
     comment = "Truncate a collection in a specific keyspace",
-    command = "astra db truncate-collection my_db -k my_keyspace -c my_collection"
+    command = "${cli.name} db truncate-collection my_db -k my_keyspace -c my_collection"
 )
 public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<CollectionTruncateResult> {
     @Override
@@ -50,7 +50,7 @@ public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<Collect
             $keyspaceRef.name(),
             $keyspaceRef.db()
         ), List.of(
-            new Hint("See all existing collections in the database:", "astra db list-collections %s --all".formatted($keyspaceRef.db()))
+            new Hint("See all existing collections in the database:", "${cli.name} db list-collections %s --all".formatted($keyspaceRef.db()))
         ));
     }
 

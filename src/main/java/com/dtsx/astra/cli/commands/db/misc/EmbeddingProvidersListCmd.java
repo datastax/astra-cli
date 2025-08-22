@@ -22,7 +22,7 @@ import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperat
 )
 @Example(
     comment = "Find all available embedding providers for a database",
-    command = "astra db list-embedding-providers my_db"
+    command = "${cli.name} db list-embedding-providers my_db"
 )
 public class EmbeddingProvidersListCmd extends AbstractPromptForDbCmd<EmbeddingProviderResult> {
     @Override

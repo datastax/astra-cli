@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands;
 
-import com.dtsx.astra.cli.CLIProperties;
+import com.dtsx.astra.cli.CliProperties;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
@@ -25,11 +25,11 @@ import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static picocli.CommandLine.Help.Ansi.OFF;
 
 @Command(
-    versionProvider = CLIProperties.class,
+    versionProvider = CliProperties.class,
     mixinStandardHelpOptions = true,
     commandListHeading = "%nCommands:%n",
     descriptionHeading = "%n",
-    footer = "%nSee 'astra <command> <subcommand> --help' for help on a specific subcommand."
+    footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
 )
 public abstract class AbstractCmd<OpRes> implements Runnable {
     public static final String DEFAULT_VALUE = "  @|faint (default: |@@|faint,italic ${DEFAULT-VALUE}|@@|faint )|@";
@@ -135,6 +135,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected final List<String> originalArgs() {
-        return new ArrayList<>() {{ add("astra"); addAll(spec.commandLine().getParseResult().originalArgs()); }};
+        return new ArrayList<>() {{ add(CliProperties.cliName()); addAll(spec.commandLine().getParseResult().originalArgs()); }};
     }
 }

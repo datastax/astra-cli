@@ -74,7 +74,7 @@ public class RegionDeleteOperation implements Operation<RegionDeleteResult> {
             """.formatted(
                 region.unwrap(),
                 dbRef,
-                AstraColors.highlight("astra db list-regions " + dbRef),
+                AstraColors.highlight("${cli.name} db list-regions " + dbRef),
                 AstraColors.highlight("--if-exists")
             ));
         }

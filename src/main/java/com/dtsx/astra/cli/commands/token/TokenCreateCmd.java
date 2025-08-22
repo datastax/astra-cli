@@ -24,7 +24,7 @@ import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCrea
 )
 @Example(
     comment = "Create a token with a specific role",
-    command = "astra token create --role \"Organization Administrator\""
+    command = "${cli.name} token create --role \"Organization Administrator\""
 )
 public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     @Option(

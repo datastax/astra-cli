@@ -76,15 +76,15 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
         if (result.isDefault()) {
             return OutputHuman.response(creationMessage + "\n\nIt has been set as the default profile.", List.of(
-                new Hint("Try it out!", "astra db list"),
-                new Hint("Manage your profiles", "astra config list")
+                new Hint("Try it out!", "${cli.name} db list"),
+                new Hint("Manage your profiles", "${cli.name} config list")
             ));
         }
 
         return OutputHuman.response(creationMessage, List.of(
-            new Hint("Set it as the default profile with:", "astra config use " + result.profileName()),
-            new Hint("Explicitly use this profile in commands like:", "astra db list --profile " + result.profileName()),
-            new Hint("Manage your profiles", "astra config list")
+            new Hint("Set it as the default profile with:", "${cli.name} config use " + result.profileName()),
+            new Hint("Explicitly use this profile in commands like:", "${cli.name} db list --profile " + result.profileName()),
+            new Hint("Manage your profiles", "${cli.name} config list")
         ));
     }
 
@@ -126,7 +126,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             
               The setup process requires user interaction, but no console is available.
             
-              Please use @!astra config create!@ to programmatically create profiles instead.
+              Please use @!${cli.name} config create!@ to programmatically create profiles instead.
             """);
         }
 
@@ -144,7 +144,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         """.formatted(
             existing.getAbsolutePath(),
             renderComment("Example:"),
-            renderCommand("astra db list --token <your_token>")
+            renderCommand("${cli.name} db list --token <your_token>")
         );
 
         AstraConsole.println(trimIndent(prompt));
@@ -161,7 +161,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           @|faint Your config file already exists at|@ @|faint,italic %s|@
         
-          Hint: You can use the @!astra config!@ commands to manage your profiles.
+          Hint: You can use the @!${cli.name} config!@ commands to manage your profiles.
        
           %s
           %s
@@ -170,7 +170,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         """.formatted(
             existing.getAbsolutePath(),
             renderComment("Example:"),
-            renderCommand("astra config list")
+            renderCommand("${cli.name} config list")
         );
 
         val shouldContinue = AstraConsole.confirm(prompt)
@@ -188,7 +188,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         val prompt = """
           @|bold A profile with this name already exists with token|@ %s @|bold for environment|@ %s@|bold .|@
         
-          You can use @!astra config get %s!@ to get more information about the existing profile.
+          You can use @!${cli.name} config get %s!@ to get more information about the existing profile.
         
           Do you wish to overwrite it?
         """.formatted(

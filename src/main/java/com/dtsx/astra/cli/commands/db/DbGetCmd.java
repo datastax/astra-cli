@@ -27,11 +27,11 @@ import static com.dtsx.astra.cli.operations.db.DbGetOperation.DbGetResult;
 )
 @Example(
     comment = "Get information about a specific database",
-    command = "astra db get my_db"
+    command = "${cli.name} db get my_db"
 )
 @Example(
     comment = "Get a specific attribute of a database",
-    command = "astra db get my_db --key id"
+    command = "${cli.name} db get my_db --key id"
 )
 public class DbGetCmd extends AbstractPromptForDbCmd<DbGetResult> {
     public enum DbGetKeys {

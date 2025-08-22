@@ -19,7 +19,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingExistOperation.St
 )
 @Example(
     comment = "Check if a streaming tenant exists",
-    command = "astra streaming exist my_tenant"
+    command = "${cli.name} streaming exist my_tenant"
 )
 public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolean> {
     @Override

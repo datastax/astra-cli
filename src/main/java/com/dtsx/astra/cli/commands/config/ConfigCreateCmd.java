@@ -34,23 +34,23 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 )
 @Example(
     comment = "(Recommended) Interactively create a new profile",
-    command = "astra setup"
+    command = "${cli.name} setup"
 )
 @Example(
     comment = "Programmatically create a new profile",
-    command = "astra config create my_profile -t AstraCS:..."
+    command = "${cli.name} config create my_profile -t AstraCS:..."
 )
 @Example(
-    comment = { "(Recommended)", "Securely create a new profile with the token provided from any file containing the token" },
-    command = "astra config create my_profile -t @token.txt"
+    comment = "(Recommended) Securely create a new profile with the token provided from a file",
+    command = "${cli.name} config create my_profile -t @token.txt"
 )
 @Example(
     comment = "Create a new profile with the default name (organization name)",
-    command = "astra config create -t AstraCS:..."
+    command = "${cli.name} config create -t AstraCS:..."
 )
 @Example(
     comment = "Create a new profile and set it as the default profile",
-    command = "astra config create my_profile -t AstraCS:... --default"
+    command = "${cli.name} config create my_profile -t AstraCS:... --default"
 )
 public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(
@@ -113,7 +113,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         }
 
         return OutputAll.response(creationMessage, data, List.of(
-            new Hint("Set it as the default profile:", "astra config use " + result.profileName())
+            new Hint("Set it as the default profile:", "${cli.name} config use " + result.profileName())
         ));
     }
 
@@ -137,7 +137,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             mainMsg
         ), List.of(
             new Hint("Example fix:", originalArgsWithoutFailIfExists, "--yes"),
-            new Hint("See the values of the existing profile:", "astra config get " + profileName)
+            new Hint("See the values of the existing profile:", "${cli.name} config get " + profileName)
         ));
     }
 
@@ -155,7 +155,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
           Please create the profile using a different name, then:
           - Pass the @!--default!@ flag while creating the profile, or
-          - Create the profile, then run @!astra config use <profile>!@ to set it as default.
+          - Create the profile, then run @!${cli.name} config use <profile>!@ to set it as default.
         """, List.of(
             new Hint("Example fix (replacing <new_name>):", originalArgsWithoutDefault, defaultFlag)
         ));

@@ -11,7 +11,7 @@ import picocli.CommandLine.Command;
 )
 @Example(
     comment = "Display cqlsh's version information",
-    command = "astra db cqlsh version"
+    command = "${cli.name} db cqlsh version"
 )
 public class DbCqlshVersionCmd extends AbstractCqlshExecCmd {
     @Override

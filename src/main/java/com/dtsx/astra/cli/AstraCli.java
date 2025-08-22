@@ -36,7 +36,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
-    name = "astra",
+    name = "${cli.name}",
     subcommands = {
         CommandLine.HelpCommand.class,
         SetupCmd.class,
@@ -53,15 +53,15 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Setup the Astra CLI",
-    command = "astra setup"
+    command = "${cli.name} setup"
 )
 @Example(
     comment = "List databases",
-    command = "astra db list"
+    command = "${cli.name} db list"
 )
 @Example(
     comment = "Create a vector database",
-    command = "astra db create demo -r us-east1 --vector"
+    command = "${cli.name} db create demo -r us-east1 --vector"
 )
 public class AstraCli extends AbstractCmd<Void> {
     @Override
