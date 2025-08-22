@@ -112,7 +112,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     private String evokeProperExecuteFunction() {
-        var ref = new Object() {
+        val ref = new Object() {
             Optional<OpRes> cachedResult = Optional.empty();
         };
 

@@ -5,13 +5,15 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
+import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation.UnloadRequest;
+import lombok.val;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DbUnloadOperation extends AbstractDsbulkExeOperation<DbUnloadOperation.UnloadRequest> {
+public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRequest> {
     public record UnloadRequest(
         DbRef dbRef,
         String keyspace,
@@ -30,28 +32,30 @@ public class DbUnloadOperation extends AbstractDsbulkExeOperation<DbUnloadOperat
         int maxErrors
     ) implements CoreDsbulkOptions {}
 
-    public DbUnloadOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, UnloadRequest request) {
+    public DbDsbulkUnloadOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, UnloadRequest request) {
         super(dbGateway, downloadsGateway, request);
     }
 
     @Override
     Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        var cmd = new ArrayList<String>();
+        return buildCoreFlags(request).map(coreFlags -> {
+            val cmd = new ArrayList<>(coreFlags);
+            
+            cmd.add("unload");
 
-        cmd.add("unload");
+            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.encoding(), request.skipRecords(), request.maxErrors());
 
-        addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.encoding(), request.skipRecords(), request.maxErrors());
-
-        if (request.query() != null && !request.query().isEmpty()) {
-            cmd.add("-query");
-            cmd.add(request.query());
-        }
-        
-        if (request.mapping() != null && !request.mapping().isEmpty()) {
-            cmd.add("-m");
-            cmd.add(request.mapping());
-        }
-        
-        return Either.right(cmd);
+            if (request.query() != null && !request.query().isEmpty()) {
+                cmd.add("-query");
+                cmd.add(request.query());
+            }
+            
+            if (request.mapping() != null && !request.mapping().isEmpty()) {
+                cmd.add("-m");
+                cmd.add(request.mapping());
+            }
+            
+            return cmd;
+        });
     }
 }

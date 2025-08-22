@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CoreCqlshOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ import static com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.C
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @RequiredArgsConstructor
-public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshExecResult> {
+public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> implements Operation<CqlshExecResult> {
     protected final DbGateway dbGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
@@ -34,6 +36,12 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshE
     public record ScbDownloadFailed(String error) implements CqlshExecResult {}
     public record Executed(int exitCode) implements CqlshExecResult {}
 
+    public interface CoreCqlshOptions {
+        boolean debug();
+        Optional<String> encoding();
+        int connectTimeout();
+    }
+
     abstract Either<CqlshExecResult, List<String>> buildCommandLine();
 
     @Override
@@ -41,6 +49,7 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshE
         return downloadCqlsh().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
                 add(exe.getAbsolutePath());
+                addAll(buildCoreFlags());
                 addAll(flags);
             }};
 
@@ -130,5 +139,23 @@ public abstract class AbstractCqlshExeOperation<Req> implements Operation<CqlshE
             ScbDownloadFailed::new,
             List::getFirst
         );
+    }
+
+    private List<String> buildCoreFlags() {
+        val flags = new ArrayList<String>();
+
+         if (request.debug()) {
+            flags.add("--debug");
+        }
+
+        if (request.encoding().isPresent()) {
+            flags.add("--encoding");
+            flags.add(request.encoding().get());
+        }
+
+        flags.add("--connect-timeout");
+        flags.add(String.valueOf(request.connectTimeout()));
+
+        return flags;
     }
 }

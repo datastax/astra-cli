@@ -5,13 +5,15 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
+import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkCountOperation.CountRequest;
+import lombok.val;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DbCountOperation extends AbstractDsbulkExeOperation<DbCountOperation.CountRequest> {
+public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequest> {
     public record CountRequest(
         DbRef dbRef,
         String keyspace,
@@ -24,21 +26,23 @@ public class DbCountOperation extends AbstractDsbulkExeOperation<DbCountOperatio
         AstraToken token
     ) implements CoreDsbulkOptions {}
 
-    public DbCountOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, CountRequest request) {
+    public DbDsbulkCountOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, CountRequest request) {
         super(dbGateway, downloadsGateway, request);
     }
 
     @Override
     Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        var cmd = new ArrayList<String>();
+        return buildCoreFlags(request).map(coreFlags -> {
+            val cmd = new ArrayList<>(coreFlags);
 
-        cmd.add("count");
+            cmd.add("count");
 
-        if (request.query() != null && !request.query().isEmpty()) {
-            cmd.add("--schema.query");
-            cmd.add(request.query());
-        }
-        
-        return Either.right(cmd);
+            if (request.query() != null && !request.query().isEmpty()) {
+                cmd.add("--schema.query");
+                cmd.add(request.query());
+            }
+            
+            return cmd;
+        });
     }
 }

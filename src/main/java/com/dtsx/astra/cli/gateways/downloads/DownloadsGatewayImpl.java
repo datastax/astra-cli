@@ -13,10 +13,8 @@ import lombok.SneakyThrows;
 import lombok.val;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
@@ -65,6 +63,32 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         return installGenericArchive(AstraHome.Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell");
     }
 
+    @Override
+    public Optional<File> cqlshPath(ExternalSoftware cqlsh) {
+        return getPath(AstraHome.Dirs::cqlshExists, AstraHome.Dirs::useCqlsh, "cqlsh");
+    }
+
+    @Override
+    public Optional<File> dsbulkPath(ExternalSoftware dsbulk) {
+        return getPath(() -> AstraHome.Dirs.dsbulkExists(dsbulk.version()), () -> AstraHome.Dirs.useDsbulk(dsbulk.version()), "dsbulk");
+    }
+
+    @Override
+    public Optional<File> pulsarShellPath(ExternalSoftware pulsar) {
+        return getPath(() -> AstraHome.Dirs.pulsarExists(pulsar.version()), () -> AstraHome.Dirs.usePulsar(pulsar.version()), "pulsar-shell");
+    }
+
+    private Optional<File> getPath(Supplier<Boolean> dirExists, Supplier<File> getDir, String exe) {
+        if (dirExists.get()) {
+            val exeFile = new File(getDir.get(), "bin/" + exe);
+
+            if (exeFile.exists() && exeFile.canExecute()) {
+                return Optional.of(exeFile);
+            }
+        }
+        return Optional.empty();
+    }
+
     @SneakyThrows
     private Either<String, File> installGenericArchive(File installDir, String url, String exe) {
         if (installDir.isFile()) {
@@ -96,7 +120,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
                 return null;
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            AstraLogger.exception(e);
             return Either.left("Failed to extract " + exe + " archive %s: %s".formatted(tarFile.getAbsolutePath(), e.getMessage()));
         }
 

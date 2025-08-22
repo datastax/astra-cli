@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.commands.db.dsbulk;
 
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
-import com.dtsx.astra.cli.operations.db.dsbulk.DbLoadOperation;
-import com.dtsx.astra.cli.operations.db.dsbulk.DbLoadOperation.LoadRequest;
+import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkLoadOperation;
+import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkLoadOperation.LoadRequest;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -11,7 +11,7 @@ import picocli.CommandLine.Option;
     name = "load",
     description = "Load data leveraging DSBulk"
 )
-public class DbLoadCmd extends AbstractDsbulkExecCmd {
+public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(
         names = { "--url" },
         description = "File location to load data",
@@ -72,7 +72,7 @@ public class DbLoadCmd extends AbstractDsbulkExecCmd {
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
-        return new DbLoadOperation(dbGateway, downloadsGateway, new LoadRequest(
+        return new DbDsbulkLoadOperation(dbGateway, downloadsGateway, new LoadRequest(
             $dbRef,
             $keyspace,
             $table,

@@ -45,6 +45,20 @@ public class AstraHome {
             FileUtils.createDirIfNotExists(file, "");
             return file;
         }
+
+        public static boolean cqlshExists() {
+            return CQLSH.exists();
+        }
+
+        public static boolean dsbulkExists(String version) {
+            val file = new File(DIR, "dsbulk-" + version);
+            return file.exists();
+        }
+
+        public static boolean pulsarExists(String version) {
+            val file = new File(DIR, "lunastreaming-shell-" + version);
+            return file.exists();
+        }
     }
 
     public static boolean exists() {

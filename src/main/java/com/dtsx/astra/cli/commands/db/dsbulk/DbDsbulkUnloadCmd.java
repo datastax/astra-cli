@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.commands.db.dsbulk;
 
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
-import com.dtsx.astra.cli.operations.db.dsbulk.DbUnloadOperation;
-import com.dtsx.astra.cli.operations.db.dsbulk.DbUnloadOperation.UnloadRequest;
+import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation;
+import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation.UnloadRequest;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -11,7 +11,7 @@ import picocli.CommandLine.Option;
     name = "unload",
     description = "Unload data leveraging DSBulk"
 )
-public class DbUnloadCmd extends AbstractDsbulkExecCmd {
+public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(
         names = { "--url" },
         description = { "The URL or path of the resource(s) to read from or write to", DEFAULT_VALUE },
@@ -66,7 +66,7 @@ public class DbUnloadCmd extends AbstractDsbulkExecCmd {
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
-        return new DbUnloadOperation(dbGateway, downloadsGateway, new UnloadRequest(
+        return new DbDsbulkUnloadOperation(dbGateway, downloadsGateway, new UnloadRequest(
             $dbRef,
             $keyspace,
             $table,

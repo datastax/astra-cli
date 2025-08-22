@@ -11,6 +11,7 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface DownloadsGateway {
     static DownloadsGateway mkDefault(AstraToken token, AstraEnvironment env) {
@@ -24,4 +25,10 @@ public interface DownloadsGateway {
     Either<String, File> downloadDsbulk(ExternalSoftware dsbulk);
 
     Either<String, File> downloadPulsarShell(ExternalSoftware pulsar);
+
+    Optional<File> cqlshPath(ExternalSoftware cqlsh);
+
+    Optional<File> dsbulkPath(ExternalSoftware dsbulk);
+
+    Optional<File> pulsarShellPath(ExternalSoftware pulsar);
 }

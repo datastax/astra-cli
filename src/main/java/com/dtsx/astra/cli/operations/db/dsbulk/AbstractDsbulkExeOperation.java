@@ -22,7 +22,7 @@ import java.util.function.Function;
 import static com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 
 @RequiredArgsConstructor
-public abstract class AbstractDsbulkExeOperation<Req extends CoreDsbulkOptions> implements Operation<DsbulkExecResult> {
+public abstract class AbstractDsbulkExeOperation<Req> implements Operation<DsbulkExecResult> {
     protected final DbGateway dbGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
@@ -48,10 +48,9 @@ public abstract class AbstractDsbulkExeOperation<Req extends CoreDsbulkOptions> 
 
     @Override
     public DsbulkExecResult execute() {
-        return downloadDsbulk().flatMap((exe) -> buildCoreFlags().flatMap((coreFlags) -> buildCommandLine().map((flags) -> {
+        return downloadDsbulk().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
                 add(exe.getAbsolutePath());
-                addAll(coreFlags);
                 addAll(flags);
             }};
 
@@ -73,7 +72,7 @@ public abstract class AbstractDsbulkExeOperation<Req extends CoreDsbulkOptions> 
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
-        }))).fold(l -> l, r -> r);
+        })).fold(l -> l, r -> r);
     }
 
     private Either<DsbulkExecResult, File> downloadDsbulk() {
@@ -100,37 +99,37 @@ public abstract class AbstractDsbulkExeOperation<Req extends CoreDsbulkOptions> 
         );
     }
 
-    private Either<DsbulkExecResult, List<String>> buildCoreFlags() {
-        return downloadSCB(request.dbRef()).map(scbFile -> {
+    protected Either<DsbulkExecResult, List<String>> buildCoreFlags(CoreDsbulkOptions options) {
+        return downloadSCB(options.dbRef()).map(scbFile -> {
             val flags = new ArrayList<String>();
             
             flags.add("-u");
             flags.add("token");
             
             flags.add("-p");
-            flags.add(request.token().unwrap());
+            flags.add(options.token().unwrap());
             
             flags.add("-b");
             flags.add(scbFile.getAbsolutePath());
 
-            if (request.keyspace() != null && !request.keyspace().isEmpty()) {
+            if (options.keyspace() != null && !options.keyspace().isEmpty()) {
                 flags.add("-k");
-                flags.add(request.keyspace());
+                flags.add(options.keyspace());
             }
 
-            if (request.table() != null && !request.table().isEmpty()) {
+            if (options.table() != null && !options.table().isEmpty()) {
                 flags.add("-t");
-                flags.add(request.table());
+                flags.add(options.table());
             }
 
-            if (request.encoding() != null && !request.encoding().isEmpty()) {
+            if (options.encoding() != null && !options.encoding().isEmpty()) {
                 flags.add("-encoding");
-                flags.add(request.encoding());
+                flags.add(options.encoding());
             }
 
-            if (request.logDir() != null && !request.logDir().isEmpty()) {
+            if (options.logDir() != null && !options.logDir().isEmpty()) {
                 flags.add("-logDir");
-                flags.add(request.logDir());
+                flags.add(options.logDir());
             }
 
             flags.add("--log.verbosity");
@@ -139,12 +138,12 @@ public abstract class AbstractDsbulkExeOperation<Req extends CoreDsbulkOptions> 
             flags.add("--schema.allowMissingFields");
             flags.add("true");
 
-            if (request.maxConcurrentQueries() != null && !request.maxConcurrentQueries().isEmpty()) {
+            if (options.maxConcurrentQueries() != null && !options.maxConcurrentQueries().isEmpty()) {
                 flags.add("-maxConcurrentQueries");
-                flags.add(request.maxConcurrentQueries());
+                flags.add(options.maxConcurrentQueries());
             }
 
-            request.dsBulkConfig().fold(
+            options.dsBulkConfig().fold(
                 configFile -> {
                     flags.add("-f");
                     flags.add(configFile.getAbsolutePath());

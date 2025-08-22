@@ -13,11 +13,16 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 
 import java.io.Console;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 public class AstraConsole {
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
+
+    public static InputStream getIn() {
+        return System.in;
+    }
 
     public static PrintStream getOut() {
         return System.out;
@@ -86,10 +91,12 @@ public class AstraConsole {
 
     public static String format(Object... args) {
         val sb = new StringBuilder();
+        var colorUsed = false;
 
         for (val item : args) {
             if (item instanceof AstraColors color) {
                 sb.append(color.on());
+                colorUsed = true;
             } else if (item instanceof String str) {
                 val processedStr = HIGHLIGHT_PATTERN.matcher(str).replaceAll((match) ->
                     AstraColors.highlight(match.group(1)));
@@ -100,7 +107,10 @@ public class AstraConsole {
             }
         }
 
-        sb.append(AstraColors.reset());
+        if (colorUsed) {
+            sb.append(AstraColors.reset());
+        }
+
         return sb.toString();
     }
 
