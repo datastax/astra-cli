@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.formats;
 
+import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -17,19 +18,12 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 public interface OutputJson {
     String renderAsJson();
 
-    static OutputJson response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps) {
+    static OutputJson response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode code) {
         return () -> serializeValue(Map.of(
-            "code", OK,
+            "code", code,
             "message", trimIndent(message.toString()),
             "data", Optional.ofNullable(data),
             "nextSteps", Optional.ofNullable(nextSteps)
-        ));
-    }
-
-    static OutputJson message(CharSequence message) {
-        return () -> serializeValue(Map.of(
-            "code", OK,
-            "message", message
         ));
     }
 

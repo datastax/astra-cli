@@ -3,7 +3,6 @@ package com.dtsx.astra.cli.core.exceptions;
 import com.dtsx.astra.cli.core.exceptions.external.AuthenticationExceptionMapper;
 import com.dtsx.astra.cli.core.exceptions.external.DatabaseNotFoundExceptionMapper;
 import com.dtsx.astra.cli.core.exceptions.external.UserInterruptExceptionMapper;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
@@ -31,8 +30,7 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
             return ExceptionHandlerUtils.handleAstraCliException(cliErr, cmd);
         }
 
-        e.printStackTrace(AstraConsole.getErr());
-        return 2;
+        return ExceptionHandlerUtils.handleUncaughtException(unmappedE);
     }
 
     public interface ExternalExceptionMapper<E extends Exception> {

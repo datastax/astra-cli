@@ -24,7 +24,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingStatusOperation.S
 public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<TenantStatus> {
     @Override
     protected final OutputHuman executeHuman(Supplier<TenantStatus> result) {
-        return OutputHuman.message("Tenant %s is %s".formatted(highlight($tenantName), highlight(result.get())));
+        return OutputHuman.response("Tenant %s is %s".formatted(highlight($tenantName), highlight(result.get())));
     }
 
     @Override

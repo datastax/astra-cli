@@ -34,6 +34,10 @@ public class StringUtils {
     }
 
     public static String withIndent(String input, int targetIndent) {
+        return withIndent(input, " ".repeat(targetIndent));
+    }
+
+    public static String withIndent(String input, String indentStr) {
         val lines = input.split("\n", -1);
 
         val start = lines.length > 0 && stripAnsiCodes(lines[0]).trim().isEmpty()
@@ -56,8 +60,6 @@ public class StringUtils {
                 minIndent = Math.min(minIndent, findVisibleTextStart(strippedLine));
             }
         }
-
-        val indentStr = " ".repeat(targetIndent);
 
         for (int i = 0; i < trimmedLines.length; i++) {
             trimmedLines[i] = indentStr + trimLeadingSpaces(trimmedLines[i], minIndent);

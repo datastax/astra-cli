@@ -32,7 +32,6 @@ import picocli.CommandLine.Help;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
@@ -70,11 +69,11 @@ public class AstraCli extends AbstractCmd<Void> {
 
         val sj = new StringJoiner(NL);
 
-        sj.add("Documentation: " + highlight("https://awesome-astra.github.io/docs/pages/astra/astra-cli/"));
+        sj.add("Documentation: @!https://awesome-astra.github.io/docs/pages/astra/astra-cli/!@");
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
 
-        return OutputHuman.message(sj);
+        return OutputHuman.response(sj);
     }
 
     @Override

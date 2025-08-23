@@ -83,7 +83,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     }
 
     private OutputHuman renderHuman(Ini.IniSection section) {
-        return OutputHuman.message(section.render(true));
+        return OutputHuman.response(section.render(true));
     }
 
     private OutputJson renderJson(Ini.IniSection section) {

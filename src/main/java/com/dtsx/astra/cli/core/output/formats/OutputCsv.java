@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.formats;
 
+import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -18,7 +19,7 @@ public interface OutputCsv {
     String renderAsCsv();
 
     @SneakyThrows
-    static OutputCsv response(CharSequence message, @Nullable Map<String, Object> data) {
+    static OutputCsv response(CharSequence message, @Nullable Map<String, Object> data, ExitCode code) {
         val sb = new StringBuilder().append("code,message");
 
         val lhm = Optional.ofNullable(data).map(OutputCsv::serializeData)
@@ -29,17 +30,13 @@ public interface OutputCsv {
         }
 
         sb.append(NL);
-        sb.append(OK.name()).append(OutputSerializer.trySerializeAsCsv(trimIndent(message.toString())));
+        sb.append(code.name()).append(OutputSerializer.trySerializeAsCsv(trimIndent(message.toString())));
 
         for (val value : lhm.values()) {
             sb.append(',').append(value);
         }
 
         return sb::toString;
-    }
-
-    static OutputCsv message(CharSequence s) {
-        return () -> "code,message" + NL + OK.name() + "," + OutputSerializer.trySerializeAsCsv(s);
     }
 
     static OutputCsv serializeValue(Object o) {

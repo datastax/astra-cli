@@ -31,7 +31,9 @@ public class NukeOperation implements Operation<NukeResult> {
         boolean dryRun,
         Optional<Boolean> preserveAstrarc,
         Optional<String> cliName,
-        BiFunction<File, Boolean, Boolean> promptShouldDeleteAstrarc
+        boolean yes,
+        BiFunction<File, Boolean, Boolean> promptShouldDeleteAstrarc,
+        Runnable assertShouldNuke
     ) {}
 
     public sealed interface NukeResult {}
@@ -65,6 +67,10 @@ public class NukeOperation implements Operation<NukeResult> {
 
     @Override
     public NukeResult execute() {
+        if (!request.dryRun && !request.yes) {
+            request.assertShouldNuke.run();
+        }
+
         val cliBinary = resolveCliBinary();
 
         val cliName = cliBinary

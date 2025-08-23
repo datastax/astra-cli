@@ -238,6 +238,7 @@ tasks.register("includeJansiNativeLibResources") {
 tasks.register("createDynamicProperties") {
     val outputFile = layout.buildDirectory.file("resources/main/dynamic.properties").get().asFile
 
+    inputs.property("cliSystemProperties", providers.provider { cliSystemProperties })
     outputs.file(outputFile)
 
     doLast {

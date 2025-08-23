@@ -25,9 +25,9 @@ public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolea
     @Override
     protected final OutputHuman executeHuman(Supplier<Boolean> exists) {
         if (exists.get()) {
-            return OutputHuman.message("Tenant %s exists.".formatted(highlight($tenantName)));
+            return OutputHuman.response("Tenant %s exists.".formatted(highlight($tenantName)));
         } else {
-            return OutputHuman.message("Tenant %s does not exist.".formatted(highlight($tenantName)));
+            return OutputHuman.response("Tenant %s does not exist.".formatted(highlight($tenantName)));
         }
     }
 

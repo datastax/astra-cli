@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.formats;
 
+import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,8 +9,12 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public interface OutputAll extends OutputHuman, OutputJson, OutputCsv {
+    static OutputAll response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode exitCode) {
+        return instance(() -> OutputHuman.response(message, nextSteps), () -> OutputJson.response(message, data, nextSteps, exitCode), () -> OutputCsv.response(message, data, exitCode));
+    }
+
     static OutputAll response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps) {
-        return instance(() -> OutputHuman.response(message, nextSteps), () -> OutputJson.response(message, data, nextSteps), () -> OutputCsv.response(message, data));
+        return response(message, data, nextSteps, ExitCode.OK);
     }
 
     static OutputAll response(CharSequence message, @Nullable Map<String, Object> data) {
@@ -17,11 +22,7 @@ public interface OutputAll extends OutputHuman, OutputJson, OutputCsv {
     }
 
     static OutputAll response(CharSequence message) {
-        return response(message, null, null);
-    }
-
-    static OutputAll message(CharSequence s) {
-        return instance(() -> OutputHuman.message(s), () -> OutputJson.message(s), () -> OutputCsv.message(s));
+        return response(message, null);
     }
 
     static OutputAll serializeValue(Object o) {

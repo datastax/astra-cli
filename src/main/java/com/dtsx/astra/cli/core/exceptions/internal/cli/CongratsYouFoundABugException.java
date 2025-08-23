@@ -4,8 +4,6 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import org.jetbrains.annotations.Nullable;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 public class CongratsYouFoundABugException extends AstraCliException {
     public CongratsYouFoundABugException(String error) {
         this(error, null);
@@ -17,9 +15,9 @@ public class CongratsYouFoundABugException extends AstraCliException {
         
           @|bold Congratulations, you have found a bug in the Astra CLI.|@
 
-          Please file an issue here: %s
+          Please file an issue here: https://github.com/datastax/astra-cli/issues/new?template=bug_report.md
   
-          A full debug log was generated at %s
+          A full debug log was generated at @!%s!@
    
           If you can, please provide the following information:
             - The command you executed
@@ -29,9 +27,8 @@ public class CongratsYouFoundABugException extends AstraCliException {
        
           Thank you for your help in making Astra CLI better!
         """.formatted(
-            error,
-            highlight("https://github.com/datastax/astra-cli/issues/new?template=bug_report.md"),
-            highlight(AstraLogger.useSessionLogFilePath())
+            error.replace("\n", "//"),
+            AstraLogger.useSessionLogFilePath()
         ));
 
         if (cause != null) {

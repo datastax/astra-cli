@@ -25,15 +25,15 @@ public interface OutputHuman {
             }
         }
 
-        return message(s);
-    }
-
-    static OutputHuman message(StringJoiner s) {
-        return message(s.toString());
-    }
-
-    static OutputHuman message(CharSequence s) {
         return s::toString;
+    }
+
+    static OutputHuman response(CharSequence message) {
+        return response(message, null);
+    }
+
+    static OutputHuman response(StringJoiner sj) {
+        return response(sj.toString(), null);
     }
 
     static OutputHuman serializeValue(Object o) {

@@ -53,7 +53,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     @Override
     public final OutputAll execute(Supplier<ConfigUseResult> result) {
         return switch (result.get()) {
-            case ProfileSetAsDefault(var profileName) -> OutputAll.message("Default profile set to " + highlight(profileName));
+            case ProfileSetAsDefault(var profileName) -> OutputAll.response("Default profile set to " + highlight(profileName));
             case ProfileNotFound(var profileName) -> throwProfileNotFound(profileName);
         };
     }

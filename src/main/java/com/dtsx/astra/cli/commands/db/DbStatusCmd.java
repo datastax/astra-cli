@@ -28,7 +28,7 @@ public class DbStatusCmd extends AbstractPromptForDbCmd<DatabaseStatusType> {
 
     @Override
     protected final OutputHuman executeHuman(Supplier<DatabaseStatusType> result) {
-        return OutputHuman.message("Database %s is %s".formatted(highlight($dbRef), highlight(result.get())));
+        return OutputHuman.response("Database %s is %s".formatted(highlight($dbRef), highlight(result.get())));
     }
 
     @Override

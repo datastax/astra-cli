@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -28,8 +29,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.capitalizeFirstLetter;
 public class NukeCmd extends AbstractCmd<NukeResult> {
     @Option(
         names = { "--dry-run" },
-        description = "Simulate the nuke operation without deleting any files",
-        paramLabel = "DRY_RUN"
+        description = "Simulate the nuke operation without deleting any files"
     )
     public boolean $dryRun;
 
@@ -47,6 +47,14 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         paramLabel = "NAME"
     )
     public Optional<String> $cliName;
+
+    @Option(
+        names = { "--yes", "-y" },
+        description = "Whether to nuke without confirmation (if not a dry run)",
+        defaultValue = "false",
+        fallbackValue = "false"
+    )
+    public boolean $yes;
 
     @Override
     protected OutputAll execute(Supplier<NukeResult> result) {
@@ -89,9 +97,9 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         val summary = new StringBuilder();
         val nothingToReport = new ArrayList<String>();
 
-        appendToSummary(summary, nothingToReport, "were deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "had their content updated", res.updatedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "were skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
+        appendToSummary(summary, nothingToReport, "Deleted files", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "Updated files", res.updatedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "Skipped files", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
 
         switch (nothingToReport.size()) {
             case 3 -> summary.append("@|faint No files were deleted, updated, or skipped.|@").append(NL);
@@ -155,17 +163,19 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             $dryRun,
             $preserveAstrarc,
             $cliName,
-            this::promptShouldDeleteAstrarc
+            $yes,
+            this::promptShouldDeleteAstrarc,
+            this::assertShouldNuke
         ));
     }
 
     private boolean promptShouldDeleteAstrarc(File file, boolean isDryRun) {
         val secondLine = (isDryRun)
             ? "This is a dry-run, so the file @|underline @!will not actually be deleted!@|@."
-            : "Your credentials @!may be lost!@ if you proceed. A backup is recommended.";
+            : "Your credentials @!may be lost!@ if you do. A backup is recommended.";
 
         val prompt = """
-          Do you want to delete the @!.astrarc!@ file located at @|underline @!%s!@|@?
+          Do you also want to delete the @!.astrarc!@ file located at @|underline @!%s!@|@?
         
           %s
         """.formatted(file.getAbsolutePath(), secondLine);
@@ -175,5 +185,23 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             .fallbackFlag("--preserve-astrarc")
             .fix(originalArgs(), "--[no-]preserve-astrarc")
             .clearAfterSelection();
+    }
+
+    private void assertShouldNuke() {
+        val prompt = """
+          Are you sure you want to entirely delete Astra CLI from your system?
+        
+          This action is @!irreversible!@ and will delete all Astra CLI files from your system.
+        """;
+
+        val shouldNuke = AstraConsole.confirm(prompt)
+            .defaultNo()
+            .fallbackFlag("--yes")
+            .fix(originalArgs(), "--yes")
+            .clearAfterSelection();
+
+        if (!shouldNuke) {
+            throw new ExecutionCancelledException();
+        }
     }
 }
