@@ -13,6 +13,7 @@ import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -25,6 +26,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class SetupOperation implements Operation<SetupResult> {
     private final BiFunction<AstraToken, AstraEnvironment, OrgGateway> createOrgGateway;
+    private final OrgGateway.Stateless statelessOrgGateway;
     private final SetupRequest request;
 
     public record SetupRequest(
@@ -35,6 +37,7 @@ public class SetupOperation implements Operation<SetupResult> {
         Consumer<File> assertShouldContinueIfAlreadySetup,
         Consumer<Profile> assertShouldOverwriteExistingProfile,
         Supplier<AstraToken> promptForToken,
+        Function<AstraEnvironment, Boolean> promptForGuessedEnvConfirmation,
         Function<AstraEnvironment, AstraEnvironment> promptForEnv,
         Function<String, ProfileName> promptForName,
         Supplier<Boolean> promptShouldSetDefault
@@ -42,7 +45,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
     public sealed interface SetupResult {}
     public record ProfileCreated(ProfileName profileName, boolean overwritten, boolean isDefault) implements SetupResult {}
-    public record InvalidToken() implements SetupResult {}
+    public record InvalidToken(Optional<AstraEnvironment> hint) implements SetupResult {}
 
     @Override
     public SetupResult execute() {
@@ -85,20 +88,43 @@ public class SetupOperation implements Operation<SetupResult> {
 
     private Either<SetupResult, ProfileDetails> resolveProfileDetails(SetupOperation.SetupRequest request) {
         val token = request.token.orElseGet(request.promptForToken);
-        val env = request.env.orElseGet(() -> request.promptForEnv.apply(AstraEnvironment.PROD));
+
+        val envAndOrg = resolveEnvAndOrg(token);
+
+        if (envAndOrg.isLeft()) {
+            return Either.left(new InvalidToken(envAndOrg.getLeft()));
+        }
+
+        val profileName = resolveProfileName(envAndOrg.getRight().getRight(), request);
+
+        return Either.right(
+            new ProfileDetails(profileName, token, envAndOrg.getRight().getLeft())
+        );
+    }
+
+    private Either<Optional<AstraEnvironment>, Pair<AstraEnvironment, Organization>> resolveEnvAndOrg(AstraToken token) {
+        var guessedEnv = Optional.<AstraEnvironment>empty();
+
+        if (request.env().isEmpty()) {
+            val guessed = statelessOrgGateway.resolveOrganizationEnvironment(token);
+
+            if (guessed.isPresent()) {
+                guessedEnv = Optional.of(guessed.get().getLeft());
+            }
+
+            if (guessed.isPresent() && request.promptForGuessedEnvConfirmation.apply(guessed.get().getLeft())) {
+                return Either.right(guessed.get());
+            }
+        }
+
+        val env = request.env().orElseGet(() -> request.promptForEnv.apply(AstraEnvironment.PROD));
 
         val orgGateway = createOrgGateway.apply(token, env);
         val org = validateTokenAndFetchOrg(orgGateway);
 
-        if (org.isEmpty()) {
-            return Either.left(new InvalidToken());
-        }
-
-        val profileName = resolveProfileName(org.get(), request);
-
-        return Either.right(
-            new ProfileDetails(profileName, token, env)
-        );
+        return org.isPresent()
+            ? Either.right(Pair.create(env, org.get()))
+            : Either.left(guessedEnv);
     }
 
     private Optional<Organization> validateTokenAndFetchOrg(OrgGateway orgGateway) {

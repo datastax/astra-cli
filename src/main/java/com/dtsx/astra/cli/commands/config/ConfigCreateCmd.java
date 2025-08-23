@@ -1,13 +1,15 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.core.config.ProfileName;
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
@@ -92,12 +94,14 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     private Optional<Boolean> $overwrite;
 
     @Override
-    public final OutputAll execute(Supplier<ConfigCreateResult> result) {
-        return switch (result.get()) {
+    public final OutputAll execute(Supplier<ConfigCreateResult> resultSupplier) {
+        val result = resultSupplier.get();
+
+        return switch (result) {
             case ProfileCreated pc -> handleConfigCreated(pc);
             case ProfileIllegallyExists(var profileName) -> throwProfileAlreadyExists(profileName);
             case ViolatedFailIfExists() -> throwAttemptedToSetDefault();
-            case InvalidToken() -> throwInvalidToken();
+            case InvalidToken(var hint) -> throwInvalidToken(hint);
         };
     }
 
@@ -109,10 +113,10 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         val data = mkData(result.profileName(), result.isDefault(), result.overwritten());
 
         if (result.isDefault()) {
-            return OutputAll.response(creationMessage + NL + NL + "It is now the default profile.", data);
+            return OutputAll.response(creationMessage + mkHint() + NL + NL + "It is now the default profile.", data);
         }
 
-        return OutputAll.response(creationMessage, data, List.of(
+        return OutputAll.response(creationMessage + mkHint(), data, List.of(
             new Hint("Set it as the default profile:", "${cli.name} config use " + result.profileName())
         ));
     }
@@ -161,21 +165,23 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         ));
     }
 
-    private <T> T throwInvalidToken() {
+    private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
+        val hintStr = hint
+            .map((env) -> " It is, however, valid for @!" + env.name().toLowerCase() + "!@.")
+            .orElse("");
+
         throw new AstraCliException(INVALID_TOKEN, """
           @|bold,red Error: The token you provided is invalid.|@
         
-          The token %s matches the expect format, but is not a valid Astra token.
+          The token is not a valid Astra token for the given Astra environment.%s
         
-          If you are targeting a non-production environment, ensure that the right environment is set with the @!--env!@ option.
-        """.formatted(
-            highlight($token)
-        ));
+          If you are targeting a different environment, ensure that the right environment is set with the @!--env!@ option.
+        """.formatted(hintStr));
     }
 
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
-        return new ConfigCreateOperation(config(true), OrgGateway.mkDefault($token, $env), new CreateConfigRequest(
+        return new ConfigCreateOperation(config(true), OrgGateway.mkDefault($token, $env), OrgGateway.Stateless.mkDefault(), new CreateConfigRequest(
             $profileName,
             $token,
             $env,
@@ -201,6 +207,12 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         if (!allowOverwrite) {
             throwProfileAlreadyExists(profileName);
         }
+    }
+
+    private String mkHint() {
+        return (OutputType.isHuman() && CliEnvironment.isTty())
+            ? NL + NL + "(Hint: Use @!${cli.name} setup!@ for an interactive profile creation experience!)"
+            : null;
     }
 
     private Map<String, Object> mkData(ProfileName profileName, Boolean isDefault, Boolean wasOverwritten) {

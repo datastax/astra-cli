@@ -65,7 +65,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     protected OutputHuman executeHuman(Supplier<SetupResult> result) {
         return switch (result.get()) {
             case ProfileCreated pc -> handleProfileCreated(pc);
-            case InvalidToken() -> throwInvalidToken();
+            case InvalidToken(var hint) -> throwInvalidToken(hint);
         };
     }
 
@@ -88,20 +88,25 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         ));
     }
 
-    private <T> T throwInvalidToken() {
+    private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
+        val hintStr = hint
+            .map((env) -> " It is, however, valid for @!" + env.name().toLowerCase() + "!@.")
+            .orElse("");
+
         throw new AstraCliException(INVALID_TOKEN, """
           @|bold,red Error: The token you provided is invalid.|@
         
-          The token is not a valid Astra token.
+          The token is not a valid Astra token for the given Astra environment.%s
         
-          If you are targeting a non-production environment, ensure that the right environment is set with the @!--env!@ option.
-        """);
+          If you are targeting a different environment, ensure that the right environment is set with the @!--env!@ option.
+        """.formatted(hintStr));
     }
 
     @Override
     protected Operation<SetupResult> mkOperation() {
         return new SetupOperation(
             OrgGateway::mkDefault,
+            OrgGateway.Stateless.mkDefault(),
             new SetupRequest(
                 $token,
                 $env,
@@ -110,6 +115,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
                 this::assertShouldContinueIfAlreadySetup,
                 this::assertShouldOverwriteExistingProfile,
                 this::promptForToken,
+                this::promptForGuessedEnvConfirmation,
                 this::promptForEnv,
                 this::promptForName,
                 this::promptShouldSetDefault
@@ -218,6 +224,18 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             .fallbackFlag("--token")
             .fix(originalArgs(), "--token <your_token>")
             .dontClearAfterSelection();
+    }
+
+    private boolean promptForGuessedEnvConfirmation(AstraEnvironment env) {
+        val prompt = """
+          It looks like your token is valid for the @!%s!@ environment. Do you want to use this environment?
+        """.formatted(env.name().toLowerCase());
+
+        return AstraConsole.confirm(prompt)
+            .defaultYes()
+            .fallbackFlag("")
+            .fix(List.of(), "")
+            .clearAfterSelection();
     }
 
     private AstraEnvironment promptForEnv(AstraEnvironment defaultEnv) {

@@ -12,6 +12,7 @@ import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.graalvm.collections.Pair;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -20,6 +21,7 @@ import java.util.function.Consumer;
 public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     private final AstraConfig config;
     private final OrgGateway orgGateway;
+    private final OrgGateway.Stateless statelessOrgGateway;
     private final CreateConfigRequest request;
 
     public record CreateConfigRequest(
@@ -35,14 +37,14 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     public record ProfileCreated(ProfileName profileName, boolean overwritten, boolean isDefault) implements ConfigCreateResult {}
     public record ProfileIllegallyExists(ProfileName profileName) implements ConfigCreateResult {}
     public record ViolatedFailIfExists() implements ConfigCreateResult {}
-    public record InvalidToken() implements ConfigCreateResult {}
+    public record InvalidToken(Optional<AstraEnvironment> hint) implements ConfigCreateResult {}
 
     @Override
     public ConfigCreateResult execute() {
         val org = validateTokenAndFetchOrg(orgGateway);
 
         if (org.isEmpty()) {
-            return new InvalidToken();
+            return new InvalidToken(statelessOrgGateway.resolveOrganizationEnvironment(request.token).map(Pair::getLeft));
         }
 
         val profileName = resolveProfileName(org.get(), request);

@@ -6,6 +6,6 @@ public class CliEnvironment {
     }
 
     public static boolean isTty() {
-        return System.console() != null;
+        return System.console() != null && System.console().isTerminal();
     }
 }

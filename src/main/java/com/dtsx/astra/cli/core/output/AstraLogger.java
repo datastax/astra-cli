@@ -135,6 +135,10 @@ public class AstraLogger {
         log(AstraColors.CYAN_600.use("[INFO] ") + String.join("", msg), Level.REGULAR, true);
     }
 
+    public static void hint(String... msg) {
+        log("@|green [HINT]|@ " + String.join("", msg), Level.REGULAR, true);
+    }
+
     public static void warn(String... msg) {
         log(AstraColors.ORANGE_400.use("[WARNING] ") + String.join("", msg), Level.REGULAR, true);
     }
