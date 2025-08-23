@@ -11,15 +11,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_END;
+import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_START;
 import static com.dtsx.astra.cli.core.output.AstraColors.PURPLE_300;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
@@ -30,28 +34,13 @@ public class AstraLogger {
 
     private static File sessionLogFile;
     private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
-    
+
+    private static boolean shouldDumpLogs = false;
+
     private static File getLogFile() {
         if (sessionLogFile == null) {
-            val logsDir = AstraHome.Dirs.useLogs();
             val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(java.time.ZoneId.systemDefault()));
-
-            sessionLogFile = new File(logsDir, "astra-" + timestamp + ".log");
-
-            try {
-                val logFiles = logsDir.listFiles();
-
-                if (logFiles != null) {
-                    Stream.of(logFiles)
-                        .sorted((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()))
-                        .skip(10)
-                        .forEach((f) -> {
-                            try {
-                                f.delete();
-                            } catch (Exception _) {}
-                        });
-                }
-            } catch (Exception _) {}
+            sessionLogFile = new File(AstraHome.Dirs.useLogs(), timestamp + ".astra.log");
         }
         return sessionLogFile;
     }
@@ -82,7 +71,10 @@ public class AstraLogger {
     }
 
     public static class Mixin {
-        @Option(names = { "-v", "--verbose" }, description = "Enable verbose logging output")
+        @Option(
+            names = { "-v", "--verbose" },
+            description = "Enable verbose logging output"
+        )
         public void setVerbose(boolean verbose) {
             if (verbose) {
                 level = Level.VERBOSE;
@@ -91,12 +83,46 @@ public class AstraLogger {
             }
         }
 
-        @Option(names = { "-q", "--quiet" }, description = "Suppress informational output")
+        @Option(
+            names = { "-q", "--quiet" },
+            description = "Suppress informational output"
+        )
         public void setQuiet(boolean quiet) {
             if (quiet) {
                 level = Level.QUIET;
             } else {
                 level = Level.REGULAR;
+            }
+        }
+
+        @Option(
+            names = { "--dump-logs" },
+            description = { "Write all logs to an optionally specified file", DEFAULT_START + "${cli.home-folder-path}/logs/<file>.log" + DEFAULT_END },
+            fallbackValue = "__fallback__",
+            paramLabel = "FILE",
+            arity = "0..1"
+        )
+        public void setDumpLogs(Optional<File> dest) {
+            dest.ifPresent((file) -> {
+                if (file.equals(new File("false"))) {
+                    shouldDumpLogs = false;
+                    return;
+                }
+
+                shouldDumpLogs = true;
+
+                if (!file.equals(new File("__fallback__"))) {
+                    sessionLogFile = file;
+                }
+
+                AstraLogger.info("Dumping logs to '", getLogFile().getAbsolutePath(), "' at the end of this command.");
+            });
+        }
+
+        @Option(names = { "--no-dump-logs" }, hidden = true)
+        public void setDumpLogs(boolean noDumpLogs) {
+            if (noDumpLogs) {
+                shouldDumpLogs = false;
             }
         }
     }
@@ -160,7 +186,20 @@ public class AstraLogger {
         return e;
     }
 
-    public static void dumpLogs() {
+    private static boolean logsDumped = false;
+
+    public static boolean shouldDumpLogs() {
+        return shouldDumpLogs;
+    }
+
+    public static void dumpLogsToFile() {
+        if (logsDumped) {
+            return;
+        }
+        logsDumped = true;
+
+        deleteOldLogs(AstraHome.Dirs.useLogs());
+
         try (var writer = new FileWriter(getLogFile())) {
             for (String line : accumulated) {
                 writer.write(AstraColors.stripAnsi(line));
@@ -189,5 +228,24 @@ public class AstraLogger {
                 globalSpinner.resume();
             }
         }
+    }
+
+    private static void deleteOldLogs(File logsDir) {
+        try {
+            val logFiles = logsDir.listFiles();
+
+            if (logFiles != null) {
+                Stream.of(logFiles)
+                    .sorted((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()))
+                    .skip(25)
+                    .forEach((f) -> {
+                        try {
+                            Files.delete(f.toPath());
+                        } catch (Exception e) {
+                            AstraLogger.exception("Error deleting old log file '", f.getAbsolutePath(), "': ", e.getMessage());
+                        }
+                    });
+            }
+        } catch (Exception _) {}
     }
 }

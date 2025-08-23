@@ -44,7 +44,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     }
 
     public static class ConfigSpec {
-        @Option(names = { "--config-file", "-cf" }, description = "The astrarc file to use", paramLabel = "PATH")
+        @Option(names = { "--config-file", "-cf" }, description = { "The astrarc file to use", DEFAULT_START + "${cli.rc-file-path}" + DEFAULT_END }, paramLabel = "PATH")
         private Optional<File> configFile;
 
         @Option(names = { "--profile", "-p" }, completionCandidates = AvailableProfilesCompletion.class, description = "Specify the astrarc profile to use", paramLabel = "NAME")

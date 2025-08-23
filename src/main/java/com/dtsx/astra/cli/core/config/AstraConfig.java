@@ -141,15 +141,7 @@ public class AstraConfig {
     }
 
     public static File resolveDefaultAstraConfigFile() {
-        if (System.getenv(CliProperties.rcEnvVar()) != null) {
-            return new File(System.getenv(CliProperties.rcEnvVar()));
-        }
-
-        if (System.getenv("XDG_CONFIG_HOME") != null) { // TODO - should we do this?
-            return new File(System.getenv("XDG_CONFIG_HOME") + File.separator + CliProperties.homeFolderName(false) + File.separator + CliProperties.rcFileName());
-        }
-
-        return new File(System.getProperty("user.home") + File.separator + CliProperties.rcFileName());
+        return CliProperties.defaultRcFile();
     }
 
     public boolean profileExists(ProfileName profileName) {

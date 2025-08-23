@@ -7,8 +7,11 @@ import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.IVersionProvider;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+
+import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 public class CliProperties implements IVersionProvider {
     static {
@@ -26,6 +29,8 @@ public class CliProperties implements IVersionProvider {
             }
         }
         cliName(); // load cli.name into system properties
+        defaultRcFile();
+        defaultHomeFolder();
     }
 
     public record ExternalSoftware(String url, String version) {}
@@ -52,6 +57,68 @@ public class CliProperties implements IVersionProvider {
 
     public static String homeFolderName(boolean useDotPrefix) {
         return ((useDotPrefix) ? "." : "") + prop("cli.home-folder-name");
+    }
+
+    private static @Nullable File cachedRcFile = null;
+
+    public static File defaultRcFile() {
+        if (cachedRcFile != null) {
+            return cachedRcFile;
+        }
+
+        val customPath = System.getenv(CliProperties.rcEnvVar());
+
+        if (customPath != null) {
+            System.setProperty("cli.rc-file-path", customPath);
+            cachedRcFile = new File(customPath);
+        }
+        else if (System.getenv("XDG_CONFIG_HOME") != null) { // TODO - should we do this?
+            val path = File.separator + CliProperties.homeFolderName(false) + File.separator + CliProperties.rcFileName();
+
+            System.setProperty("cli.rc-file-path", (isWindows() ? "%XDG_CONFIG_HOME%" : "$XDG_CONFIG_HOME") + path);
+            cachedRcFile = new File(System.getenv("XDG_CONFIG_HOME") + path);
+        }
+        else {
+            val path = File.separator + CliProperties.rcFileName();
+
+            System.setProperty("cli.rc-file-path", (isWindows() ? "%USERPROFILE%" : "~") + path);
+            cachedRcFile = new File(System.getProperty("user.home") + path);
+        }
+
+        return cachedRcFile;
+    }
+
+    private static @Nullable File cachedHomeFolder = null;
+
+    public static File defaultHomeFolder() {
+        if (cachedHomeFolder != null) {
+            return cachedHomeFolder;
+        }
+
+        val customPath = System.getenv(CliProperties.homeEnvVar());
+
+        if (customPath != null) {
+            System.setProperty("cli.home-folder-path", customPath);
+            cachedHomeFolder = new File(customPath);
+        }
+        else if (System.getenv("XDG_DATA_HOME") != null) { // TODO - should we do this?
+            val path = File.separator + CliProperties.homeFolderName(false);
+
+            System.setProperty("cli.home-folder-path", (isWindows() ? "%XDG_DATA_HOME%" : "XDG_DATA_HOME") + path);
+            cachedHomeFolder = new File(System.getenv("XDG_DATA_HOME") + path);
+        }
+        else {
+            val base = (isWindows())
+                ? System.getenv("LOCALAPPDATA")
+                : System.getProperty("user.home");
+
+            val path = File.separator + CliProperties.homeFolderName(true);
+
+            System.setProperty("cli.home-folder-path", (isWindows() ? "%LOCALAPPDATA%" : "~") + path);
+            cachedHomeFolder = new File(base + path);
+        }
+
+        return cachedHomeFolder;
     }
 
     private static @Nullable String cachedCliName = null;

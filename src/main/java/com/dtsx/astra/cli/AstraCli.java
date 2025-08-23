@@ -105,7 +105,13 @@ public class AstraCli extends AbstractCmd<Void> {
             return new Help(spec, cs);
         });
 
-        cmd.execute(args);
+        val exitCode = cmd.execute(args);
+
+        if (AstraLogger.shouldDumpLogs()) {
+            AstraLogger.dumpLogsToFile();
+        }
+
+        exit(exitCode);
     }
 
     public static <T> T exit(int exitCode) {

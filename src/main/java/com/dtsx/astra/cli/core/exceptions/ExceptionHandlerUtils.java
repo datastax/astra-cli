@@ -27,7 +27,7 @@ public class ExceptionHandlerUtils {
         AstraLogger.exception(err);
 
         if (err.shouldDumpLogs()) {
-            AstraLogger.dumpLogs();
+            AstraLogger.dumpLogsToFile();
         }
 
         if (err.shouldPrintHelpMessage()) {
@@ -55,7 +55,7 @@ public class ExceptionHandlerUtils {
 
         AstraConsole.errorln(rendered);
         AstraLogger.exception(err);
-        AstraLogger.dumpLogs();
+        AstraLogger.dumpLogsToFile();
 
         return 99;
     }

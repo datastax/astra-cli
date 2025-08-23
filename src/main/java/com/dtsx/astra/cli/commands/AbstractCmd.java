@@ -32,7 +32,9 @@ import static picocli.CommandLine.Help.Ansi.OFF;
     footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
 )
 public abstract class AbstractCmd<OpRes> implements Runnable {
-    public static final String DEFAULT_VALUE = "  @|faint (default: |@@|faint,italic ${DEFAULT-VALUE}|@@|faint )|@";
+    public static final String DEFAULT_START = "  @|faint (default: |@@|faint,italic ";
+    public static final String DEFAULT_END = "|@@|faint )|@\"";
+    public static final String DEFAULT_VALUE = DEFAULT_START + "${DEFAULT-VALUE}" + DEFAULT_END;
 
     @Spec
     protected CommandSpec spec;

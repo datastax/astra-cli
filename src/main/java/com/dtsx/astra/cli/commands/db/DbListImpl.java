@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
 
 public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
-    @Option(names = "--vector", description = "Only show vector-enabled databases")
+    @Option(names = { "--vector" }, description = "Only show vector-enabled databases")
     protected boolean $vectorOnly;
 
     @Override
