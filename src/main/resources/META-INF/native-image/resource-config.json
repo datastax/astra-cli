@@ -12,6 +12,9 @@
       },
       {
         "pattern": "\\Qstatic.properties\\E"
+      },
+      {
+        "pattern": "\\Qdynamic.properties\\E"
       }
     ]
   },

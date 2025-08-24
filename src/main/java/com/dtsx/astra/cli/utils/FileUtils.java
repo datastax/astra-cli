@@ -38,25 +38,7 @@ public class FileUtils {
             throw new CannotCreateFileException(file, extra, e);
         }
     }
-
-    public String sanitizeFileName(String name) {
-        while (name.contains("..")) {
-            name = name.replace("..", "__");
-        }
-
-        name = name.replace("\\", "_");
-        name = name.replace("/", "_");
-
-        name = name.replaceAll("[:*?\"<>|]", "_");
-        name = name.replaceAll("\\p{Cntrl}", "_");
-
-        if (name.length() > 100) {
-            name = name.substring(0, 100);
-        }
-
-        return name;
-    }
-
+    
     @SneakyThrows
     public static void downloadFile(String urlStr, String file) {
         val urlConnection = (HttpURLConnection) new URI(urlStr).toURL().openConnection();

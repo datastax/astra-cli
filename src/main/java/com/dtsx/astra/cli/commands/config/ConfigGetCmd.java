@@ -54,7 +54,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     @Parameters(
         arity = "0..1",
-        description = { "Name of the profile to display", DEFAULT_VALUE },
+        description = "Name of the profile to display",
         completionCandidates = AvailableProfilesCompletion.class,
         paramLabel = "PROFILE"
     )

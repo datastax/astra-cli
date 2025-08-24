@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -55,10 +54,14 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
 
             val process = AstraLogger.loading("Starting cqlsh", (_) -> {
                 try {
-                    return new ProcessBuilder(commandLine)
+                    val res = new ProcessBuilder(commandLine)
                         .inheritIO()
                         .start();
-                } catch (IOException e) {
+
+                    Thread.sleep(500); // cqlsh doesn't print anything
+
+                    return res;
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });

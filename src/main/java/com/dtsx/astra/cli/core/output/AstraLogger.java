@@ -190,28 +190,6 @@ public class AstraLogger {
         return e;
     }
 
-    private static boolean logsDumped = false;
-
-    public static boolean shouldDumpLogs() {
-        return shouldDumpLogs;
-    }
-
-    public static void dumpLogsToFile() {
-        if (logsDumped) {
-            return;
-        }
-        logsDumped = true;
-
-        deleteOldLogs(AstraHome.Dirs.useLogs());
-
-        try (var writer = new FileWriter(getLogFile())) {
-            for (String line : accumulated) {
-                writer.write(AstraColors.stripAnsi(line));
-                writer.write(System.lineSeparator());
-            }
-        } catch (Exception _) {}
-    }
-
     private static void log(String msg, Level minLevel, boolean appendToAccumulated) {
         if (appendToAccumulated) {
             accumulated.add(msg);
@@ -232,6 +210,28 @@ public class AstraLogger {
                 globalSpinner.resume();
             }
         }
+    }
+
+    private static boolean logsDumped = false;
+
+    public static boolean shouldDumpLogs() {
+        return shouldDumpLogs;
+    }
+
+    public static void dumpLogsToFile() {
+        if (logsDumped) {
+            return;
+        }
+        logsDumped = true;
+
+        deleteOldLogs(AstraHome.Dirs.useLogs());
+
+        try (var writer = new FileWriter(getLogFile())) {
+            for (String line : accumulated) {
+                writer.write(AstraColors.stripAnsi(AstraConsole.format(line)));
+                writer.write(System.lineSeparator());
+            }
+        } catch (Exception _) {}
     }
 
     private static void deleteOldLogs(File logsDir) {

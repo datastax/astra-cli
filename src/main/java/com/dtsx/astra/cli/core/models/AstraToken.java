@@ -2,8 +2,11 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
+
+import java.util.stream.Stream;
 
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -12,6 +15,14 @@ public class AstraToken implements AstraColors.Highlightable {
 
     public static Either<String, AstraToken> parse(@NonNull String token) {
         return Utils.trimAndValidateBasics("Astra token", token).flatMap((t) -> {
+            if (StringUtils.isValidJson(token)) {
+                return Either.left("Astra token should not be passed as JSON; it should be a plain string");
+            }
+
+            if (Stream.of(".txt", ".json", ".yaml", ".yml", ".env", ".csv").anyMatch(token::endsWith)) {
+                return Either.left("Astra token looks like a file name; please use the @file syntax to pass the token from a file, where the file contains only the token as a plain string (e.g. `--token @token.txt`)");
+            }
+
             if (!t.startsWith("AstraCS:")) {
                 return Either.left("Astra token should start with 'AstraCS:'");
             }

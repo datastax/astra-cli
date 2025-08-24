@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.core.completions;
 
-import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.TenantCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;
-import com.dtsx.astra.cli.utils.FileUtils;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
@@ -26,7 +25,25 @@ public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
     @Override
     protected Optional<File> useCacheDir() {
         return profileName.flatMap((name) -> (
-            super.useCacheDir().map((dir) -> new File(dir, FileUtils.sanitizeFileName(name.unwrap()))
+            super.useCacheDir().map((dir) -> new File(dir, sanitizeFileName(name.unwrap()))
         )));
+    }
+
+    public String sanitizeFileName(String name) {
+        while (name.contains("..")) {
+            name = name.replace("..", "__");
+        }
+
+        name = name.replace("\\", "_");
+        name = name.replace("/", "_");
+
+        name = name.replaceAll("[:*?\"<>|]", "_");
+        name = name.replaceAll("\\p{Cntrl}", "_");
+
+        if (name.length() > 66) {
+            name = name.substring(0, 66);
+        }
+
+        return name;
     }
 }

@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
-import static com.dtsx.astra.cli.utils.StringUtils.capitalizeFirstLetter;
+import static com.dtsx.astra.cli.utils.StringUtils.capitalize;
 
 @Command(
     name = "nuke",
@@ -131,7 +131,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         if (files.isEmpty()) {
             nothingToReport.add(operation);
         } else {
-            sb.append(capitalizeFirstLetter(operation)).append(" files").append(":").append(NL);
+            sb.append(capitalize(operation)).append(" files").append(":").append(NL);
 
             for (val file : files.entrySet()) {
                 sb.append("→ ").append(highlight(file.getKey().getAbsolutePath()));

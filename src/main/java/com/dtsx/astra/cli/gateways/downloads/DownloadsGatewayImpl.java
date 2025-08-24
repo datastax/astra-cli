@@ -41,7 +41,9 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
                     return null;
                 });
             } catch (Exception e) {
-                return Either.left("Failed to download secure connect bundle for database %s in region %s: %s".formatted(highlight(ref), highlight(datacenter.getRegion()), e.getMessage()));
+                AstraLogger.exception("Failed to download secure connect bundle for database '%s' in region '%s'".formatted(ref, datacenter.getRegion()));
+                AstraLogger.exception(e);
+                return Either.left("Failed to download secure connect bundle for database '%s' in region '%s': %s".formatted(ref, datacenter.getRegion(), e.getMessage()));
             }
         }
 

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.IVersionProvider;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class CliProperties implements IVersionProvider {
                 }
 
                 System.getProperties().load(stream);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new CongratsYouFoundABugException("Could not read '" + file + "' - '" + e.getMessage() + "'", e);
             }
         }

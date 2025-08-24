@@ -39,7 +39,8 @@ public class DbCqlshExecCmd extends DbCqlshStartCmd {
     @Parameters(
         index = "1",
         description = "Execute the statement and quit",
-        paramLabel = "STATEMENT"
+        paramLabel = "STATEMENT",
+        arity = "0..1"
     )
     public Optional<String> $statement;
 
