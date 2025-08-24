@@ -11,7 +11,9 @@ import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CoreCqls
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -34,11 +36,13 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
     public record CqlshInstallFailed(String error) implements CqlshExecResult {}
     public record ScbDownloadFailed(String error) implements CqlshExecResult {}
     public record Executed(int exitCode) implements CqlshExecResult {}
+    public record ExecutedWithOutput(int exitCode, List<String> stdout, List<String> stderr) implements CqlshExecResult {}
 
     public interface CoreCqlshOptions {
         boolean debug();
         Optional<String> encoding();
         int connectTimeout();
+        boolean captureOutput();
     }
 
     abstract Either<CqlshExecResult, List<String>> buildCommandLine();
@@ -52,14 +56,10 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
                 addAll(flags);
             }};
 
-            val process = AstraLogger.loading("Starting cqlsh", (_) -> {
+            val startedProcess = AstraLogger.loading("Starting cqlsh", (_) -> {
                 try {
-                    val res = new ProcessBuilder(commandLine)
-                        .inheritIO()
-                        .start();
-
-                    Thread.sleep(500); // cqlsh doesn't print anything
-
+                    val res = startProcess(commandLine);
+                    Thread.sleep(500); // cqlsh doesn't print anything immediately, so let spinner run a bit longer
                     return res;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -67,14 +67,38 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
             });
 
             try {
-                val res = new Executed(process.waitFor());
+                val result = startedProcess.waitFor();
                 Thread.sleep(500);
-                return res;
+                return result;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
         })).fold(l -> l, r -> r);
+    }
+
+    @FunctionalInterface
+    interface RunningProcess {
+        CqlshExecResult waitFor() throws InterruptedException;
+    }
+
+    private RunningProcess startProcess(List<String> commandLine) throws Exception {
+        val pb = new ProcessBuilder(commandLine);
+
+        if (request.captureOutput()) {
+            val process = pb.start();
+
+            val stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            val stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+            val output = stdOut.lines().toList();
+            val error = stdErr.lines().toList();
+
+            return () -> new ExecutedWithOutput(process.waitFor(), output, error);
+        } else {
+            val process = pb.inheritIO().start();
+            return () -> new Executed(process.waitFor());
+        }
     }
 
     private Either<CqlshExecResult, File> downloadCqlsh() {

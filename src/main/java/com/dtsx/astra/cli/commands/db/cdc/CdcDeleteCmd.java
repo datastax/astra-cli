@@ -3,11 +3,7 @@ package com.dtsx.astra.cli.commands.db.cdc;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.CdcId;
-import com.dtsx.astra.cli.core.models.CdcRef;
-import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.TableRef;
-import com.dtsx.astra.cli.core.models.TenantName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -17,13 +13,15 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.core.output.ExitCode.*;
+import static com.dtsx.astra.cli.core.output.ExitCode.CDC_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "delete-cdc",
@@ -146,8 +144,8 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasDeleted) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted) {
+        return sequencedMapOf(
             "wasDeleted", wasDeleted
         );
     }

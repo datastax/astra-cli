@@ -17,16 +17,17 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.USER_ALREADY_INVITED;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.USER_ALREADY_INVITED;
 import static com.dtsx.astra.cli.operations.user.UserInviteOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Example(
     comment = "Invite a user with default \"Database Administrator\" role",
@@ -121,8 +122,8 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasInvited, @Nullable List<UUID> roleIds) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasInvited, @Nullable List<UUID> roleIds) {
+        return sequencedMapOf(
             "wasInvited", wasInvited,
             "roleIds", Optional.ofNullable(roleIds)
         );

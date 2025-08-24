@@ -62,7 +62,7 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public Optional<Database> tryFindOneDb(DbRef ref) {
+    public Optional<Database> tryFindOne(DbRef ref) {
         try {
             return Optional.of(findOne(ref));
         } catch (DbNotFoundException e) {
@@ -71,12 +71,12 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public boolean dbExists(DbRef ref) {
-        return AstraLogger.loading("Checking if database " + highlight(ref) + " exists", (_) -> tryFindOneDb(ref).isPresent());
+    public boolean exists(DbRef ref) {
+        return AstraLogger.loading("Checking if database " + highlight(ref) + " exists", (_) -> tryFindOne(ref).isPresent());
     }
 
     @Override
-    public Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout) {
+    public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout) {
         val currentStatus = AstraLogger.loading("Fetching current currStatus of db " + highlight(ref), (_) -> findOne(ref))
             .getStatus();
 
@@ -223,10 +223,10 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
         if (!allowDuplicate) {
             val existingDb = AstraLogger.loading("Checking if database " + highlight(name) + " already exists", (_) -> (
-                tryFindOneDb(DbRef.fromNameUnsafe(name))
+                tryFindOne(DbRef.fromNameUnsafe(name))
             ));
 
             if (existingDb.isPresent()) {
@@ -261,8 +261,8 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public DeletionStatus<DbRef> deleteDb(DbRef ref) {
-        if (!dbExists(ref)) {
+    public DeletionStatus<DbRef> delete(DbRef ref) {
+        if (!exists(ref)) {
             return DeletionStatus.notFound(ref);
         }
 

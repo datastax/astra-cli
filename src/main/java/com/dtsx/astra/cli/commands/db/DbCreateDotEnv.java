@@ -19,8 +19,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
@@ -175,8 +176,8 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
         };
     }
 
-    private Map<String, Object> mkData(String status, boolean overwriteOccurred, @Nullable File file) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(String status, boolean overwriteOccurred, @Nullable File file) {
+        return sequencedMapOf(
             "status", status,
             "overwriteOccurred", overwriteOccurred,
             "file", Optional.ofNullable(file).map(File::getAbsolutePath)

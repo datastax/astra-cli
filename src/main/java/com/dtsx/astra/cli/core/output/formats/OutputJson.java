@@ -8,18 +8,19 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.OK;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @FunctionalInterface
 public interface OutputJson {
     String renderAsJson();
 
-    static OutputJson response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode code) {
-        return () -> serializeValue(Map.of(
+    static OutputJson response(CharSequence message, @Nullable SequencedMap<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode code) {
+        return () -> serializeValue(sequencedMapOf(
             "code", code,
             "message", trimIndent(message.toString()),
             "data", Optional.ofNullable(data),
@@ -28,14 +29,14 @@ public interface OutputJson {
     }
 
     static OutputJson serializeValue(Object o) {
-        return () -> serializeValue(Map.of(
+        return () -> serializeValue(sequencedMapOf(
             "code", OK,
             "data", o
         ));
     }
 
     @SneakyThrows
-    private static String serializeValue(Map<String, ?> data) {
+    private static String serializeValue(SequencedMap<String, ?> data) {
         return new ObjectMapper()
             .registerModule(new Jdk8Module())
             .writerWithDefaultPrettyPrinter()

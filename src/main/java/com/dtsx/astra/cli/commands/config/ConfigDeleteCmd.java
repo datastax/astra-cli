@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
+import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -14,12 +14,13 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "delete",
@@ -83,8 +84,8 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasDeleted) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted) {
+        return sequencedMapOf(
             "wasDeleted", wasDeleted
         );
     }

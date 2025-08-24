@@ -6,15 +6,11 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
 import com.dtsx.astra.sdk.db.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -70,9 +66,18 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public List<Datacenter> findForDb(DbRef dbRef) {
+    public List<Datacenter> findAllForDb(DbRef dbRef) {
         return AstraLogger.loading("Fetching regions for db " + highlight(dbRef), (_) -> (
             api.dbOpsClient(dbRef).datacenters().findAll().toList()
+        ));
+    }
+
+    @Override
+    public Optional<Datacenter> findOneForDb(DbRef dbRef, RegionName regionName) {
+        return AstraLogger.loading("Fetching region " + highlight(regionName) + " for db " + highlight(dbRef), (_) -> (
+            findAllForDb(dbRef).stream()
+                .filter(dc -> dc.getRegion().equalsIgnoreCase(regionName.unwrap()))
+                .findFirst()
         ));
     }
 
@@ -121,7 +126,7 @@ public class RegionGatewayImpl implements RegionGateway {
 
     private boolean existsInDb(DbRef dbRef, RegionName region) {
         return AstraLogger.loading("Checking if region " + highlight(region) + " exists in db " + highlight(dbRef), (_) -> (
-            findForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
+            findAllForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
         ));
     }
 }

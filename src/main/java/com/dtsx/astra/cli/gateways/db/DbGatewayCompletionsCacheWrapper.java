@@ -39,8 +39,8 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public Optional<Database> tryFindOneDb(DbRef ref) {
-        val res = delegate.tryFindOneDb(ref);
+    public Optional<Database> tryFindOne(DbRef ref) {
+        val res = delegate.tryFindOne(ref);
 
         if (res.isPresent()) {
             cache.addToCache(res.get().getInfo().getName());
@@ -52,8 +52,8 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public boolean dbExists(DbRef ref) {
-        val exists = delegate.dbExists(ref);
+    public boolean exists(DbRef ref) {
+        val exists = delegate.exists(ref);
 
         if (exists) {
             addRefToCache(ref);
@@ -65,8 +65,8 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout) {
-        val res = delegate.resumeDb(ref, timeout);
+    public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout) {
+        val res = delegate.resume(ref, timeout);
         addRefToCache(ref);
         return res;
     }
@@ -84,15 +84,15 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
-        val status = delegate.createDb(name, keyspace, region, cloud, tier, capacityUnits, vector, allowDuplicate);
+    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+        val status = delegate.create(name, keyspace, region, cloud, tier, capacityUnits, vector, allowDuplicate);
         cache.addToCache(name);
         return status;
     }
 
     @Override
-    public DeletionStatus<DbRef> deleteDb(DbRef ref) {
-        val status = delegate.deleteDb(ref);
+    public DeletionStatus<DbRef> delete(DbRef ref) {
+        val status = delegate.delete(ref);
         removeRefFromCache(ref);
         return status;
     }

@@ -16,17 +16,18 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.*;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "create",
@@ -255,8 +256,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         ));
     }
 
-    private Map<String, Object> mkData(UUID dbId, Boolean wasCreated, DatabaseStatusType currentStatus, @Nullable Duration waitedDuration) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(UUID dbId, Boolean wasCreated, DatabaseStatusType currentStatus, @Nullable Duration waitedDuration) {
+        return sequencedMapOf(
             "dbId", dbId,
             "wasCreated", wasCreated,
             "currentStatus", currentStatus,

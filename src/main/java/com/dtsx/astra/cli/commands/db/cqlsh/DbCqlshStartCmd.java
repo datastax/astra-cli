@@ -1,17 +1,18 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
-import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
-import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation;
-import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
+import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.ExecSource;
+import lombok.val;
+import org.jetbrains.annotations.Nullable;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
+import java.io.File;
 import java.util.Optional;
+
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "start",
@@ -25,54 +26,46 @@ import java.util.Optional;
     comment = "Launch cqlsh with a specific keyspace",
     command = "${cli.name} db cqlsh start my_db -k my_keyspace"
 )
-public class DbCqlshStartCmd extends AbstractCqlshExecCmd {
-    @Parameters(
-        index = "0",
-        completionCandidates = DbNamesCompletion.class,
-        paramLabel = "DB",
-        description = "The name/ID of the Astra database to connect to"
-    )
-    public DbRef $dbRef;
+public class DbCqlshStartCmd extends DbCqlshStartImpl {
+    @ArgGroup
+    public @Nullable RawExecSource $execSource;
 
-//    @Option(
-//        names = { "-e", "--execute" },
-//        description = "Execute the statement and quit",
-//        paramLabel = "STATEMENT"
-//    )
-//    public Optional<String> $execute;
-//
-//    @Option(
-//        names = { "-f", "--file" },
-//        description = "Execute commands from a CQL file, then exit",
-//        paramLabel = "FILE"
-//    )
-//    public Optional<File> $file;
+    public static class RawExecSource {
+        @Option(
+            names = { "-e", "--execute" },
+            description = "Execute the statement then quit",
+            paramLabel = "STATEMENT",
+            hidden = true
+        )
+        public Optional<String> $statement;
 
-    @Option(
-        names = { "-k", "--keyspace" },
-        description = "Authenticate to the given keyspace",
-        paramLabel = "KEYSPACE"
-    )
-    public Optional<String> $keyspace;
-
-    @Option(
-        names = { "--request-timeout" },
-        description = { "Request timeout in seconds", DEFAULT_VALUE },
-        paramLabel = "TIMEOUT",
-        defaultValue = "20"
-    )
-    public int $requestTimeout;
+        @Option(
+            names = { "-f", "--file" },
+            description = "Execute commands from a CQL file then quit",
+            paramLabel = "FILE",
+            hidden = true
+        )
+        public Optional<File> $file;
+    }
 
     @Override
-    protected Operation<CqlshExecResult> mkOperation() {
-        return new DbCqlshStartOperation(dbGateway, downloadsGateway, new CqlshRequest(
-            $dbRef,
-            $debug,
-            $encoding,
-            $keyspace,
-            $connectTimeout,
-            $requestTimeout,
-            profile()
-        ));
+    protected boolean captureOutputForNonHumanOutput() {
+        return false;
+    }
+
+    @Override
+    protected Optional<ExecSource> execSource() {
+        val ret = Optional.ofNullable($execSource)
+            .flatMap(raw -> raw.$statement
+                .<ExecSource>map(ExecSource.Statement::new)
+                .or(() -> raw.$file.map(ExecSource.CqlFile::new))
+            );
+
+        if (ret.isPresent()) {
+            AstraLogger.warn("The @!---execute!@ and @!--file!@ options are @!deprecated!@ and will be removed in future versions.");
+            AstraLogger.warn("Please use the " + highlight("${cli.name} db cqlsh exec") + " command instead.");
+        }
+
+        return ret;
     }
 }

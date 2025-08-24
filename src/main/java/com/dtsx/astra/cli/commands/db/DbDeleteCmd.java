@@ -16,8 +16,8 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -29,6 +29,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "delete",
@@ -168,8 +169,8 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
         }
     }
 
-    private Map<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
+        return sequencedMapOf(
             "wasDeleted", wasDeleted,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );

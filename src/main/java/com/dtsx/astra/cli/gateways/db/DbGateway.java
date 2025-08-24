@@ -29,19 +29,19 @@ public interface DbGateway {
 
     Stream<Database> findAll();
 
-    Optional<Database> tryFindOneDb(DbRef ref);
+    Optional<Database> tryFindOne(DbRef ref);
 
-    boolean dbExists(DbRef ref);
+    boolean exists(DbRef ref);
 
-    Pair<DatabaseStatusType, Duration> resumeDb(DbRef ref, Optional<Integer> timeout);
+    Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout);
 
     Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout);
 
     CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly);
 
-    CreationStatus<Database> createDb(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate);
+    CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate);
 
-    DeletionStatus<DbRef> deleteDb(DbRef ref);
+    DeletionStatus<DbRef> delete(DbRef ref);
 
     FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef);
 }

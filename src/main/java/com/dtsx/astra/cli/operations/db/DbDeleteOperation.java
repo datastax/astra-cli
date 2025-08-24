@@ -37,7 +37,7 @@ public class DbDeleteOperation implements Operation<DbDeleteResult> {
     @Override
     public DbDeleteResult execute() {
         if (!request.forceDelete) {
-            val dbInfo = dbGateway.tryFindOneDb(request.dbRef);
+            val dbInfo = dbGateway.tryFindOne(request.dbRef);
 
             if (dbInfo.isEmpty()) {
                 return handleDbNotFound(request.ifExists);
@@ -46,7 +46,7 @@ public class DbDeleteOperation implements Operation<DbDeleteResult> {
             request.assertShouldDelete.accept(dbInfo.get().getInfo().getName(), UUID.fromString(dbInfo.get().getId()));
         }
 
-        val status = dbGateway.deleteDb(request.dbRef);
+        val status = dbGateway.delete(request.dbRef);
 
         return switch (status) {
             case DeletionStatus.Deleted<?> _ -> handleDbDeleted(request.dbRef, request.lrOptions);

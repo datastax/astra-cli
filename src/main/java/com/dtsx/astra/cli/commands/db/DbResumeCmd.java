@@ -15,8 +15,8 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -24,6 +24,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @Command(
@@ -127,8 +128,8 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
         return OutputAll.response(message, data);
     }
 
-    private Map<String, Object> mkData(Boolean wasResumed, DatabaseStatusType currentStatus, @Nullable Duration waitedDuration) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasResumed, DatabaseStatusType currentStatus, @Nullable Duration waitedDuration) {
+        return sequencedMapOf(
             "wasHibernated", wasResumed,
             "currentStatus", currentStatus,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)

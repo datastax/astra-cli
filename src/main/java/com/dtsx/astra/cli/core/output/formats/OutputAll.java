@@ -5,19 +5,19 @@ import com.dtsx.astra.cli.core.output.Hint;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
+import java.util.SequencedMap;
 import java.util.function.Supplier;
 
 public interface OutputAll extends OutputHuman, OutputJson, OutputCsv {
-    static OutputAll response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode exitCode) {
+    static OutputAll response(CharSequence message, @Nullable SequencedMap<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode exitCode) {
         return instance(() -> OutputHuman.response(message, nextSteps), () -> OutputJson.response(message, data, nextSteps, exitCode), () -> OutputCsv.response(message, data, exitCode));
     }
 
-    static OutputAll response(CharSequence message, @Nullable Map<String, Object> data, @Nullable List<Hint> nextSteps) {
+    static OutputAll response(CharSequence message, @Nullable SequencedMap<String, Object> data, @Nullable List<Hint> nextSteps) {
         return response(message, data, nextSteps, ExitCode.OK);
     }
 
-    static OutputAll response(CharSequence message, @Nullable Map<String, Object> data) {
+    static OutputAll response(CharSequence message, @Nullable SequencedMap<String, Object> data) {
         return response(message, data, null);
     }
 

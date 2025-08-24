@@ -15,13 +15,15 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.core.output.ExitCode.*;
+import static com.dtsx.astra.cli.core.output.ExitCode.CDC_ALREADY_EXISTS;
+import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "create-cdc",
@@ -138,8 +140,8 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasCreated) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasCreated) {
+        return sequencedMapOf(
             "wasCreated", wasCreated
         );
     }

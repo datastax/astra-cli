@@ -56,7 +56,7 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
             !request.nonVector
         );
 
-        val status = dbGateway.createDb(
+        val status = dbGateway.create(
             request.dbName,
             request.db,
             request.region,
@@ -86,7 +86,7 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
             return new DbCreateOperation.DatabaseAlreadyExistsWithStatus(dbId, dbStatus);
         }
 
-        val awaited = dbGateway.resumeDb(DbRef.fromId(dbId), Optional.of(request.lrOptions.timeout()));
+        val awaited = dbGateway.resume(DbRef.fromId(dbId), Optional.of(request.lrOptions.timeout()));
 
         return new DbCreateOperation.DatabaseAlreadyExistsAndIsActive(dbId, dbStatus, awaited.getRight());
     }

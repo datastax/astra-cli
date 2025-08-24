@@ -18,14 +18,15 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "create",
@@ -167,8 +168,8 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
         ));
     }
 
-    private Map<String, Object> mkData(TenantName tenantName, Boolean wasCreated, TenantStatus currentStatus) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(TenantName tenantName, Boolean wasCreated, TenantStatus currentStatus) {
+        return sequencedMapOf(
             "tenantName", tenantName,
             "wasCreated", wasCreated,
             "currentStatus", currentStatus

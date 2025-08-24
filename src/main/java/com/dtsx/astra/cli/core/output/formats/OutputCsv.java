@@ -7,8 +7,8 @@ import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.OK;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -19,7 +19,7 @@ public interface OutputCsv {
     String renderAsCsv();
 
     @SneakyThrows
-    static OutputCsv response(CharSequence message, @Nullable Map<String, Object> data, ExitCode code) {
+    static OutputCsv response(CharSequence message, @Nullable SequencedMap<String, Object> data, ExitCode code) {
         val sb = new StringBuilder().append("code,message");
 
         val lhm = Optional.ofNullable(data).map(OutputCsv::serializeData)
@@ -44,7 +44,7 @@ public interface OutputCsv {
     }
 
     @SneakyThrows
-    private static LinkedHashMap<String, Object> serializeData(Map<String, Object> data) {
+    private static LinkedHashMap<String, Object> serializeData(SequencedMap<String, Object> data) {
         val map = new LinkedHashMap<String, Object>(data.size());
 
         for (val e : data.entrySet()) {

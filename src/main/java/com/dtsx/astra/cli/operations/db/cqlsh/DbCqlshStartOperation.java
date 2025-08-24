@@ -1,16 +1,20 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
 import lombok.val;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshRequest> {
     public DbCqlshStartOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, CqlshRequest request) {
@@ -22,10 +26,19 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
         boolean debug,
         Optional<String> encoding,
         Optional<String> keyspace,
+        Optional<ExecSource> execSource,
         int connectTimeout,
         int requestTimeout,
-        Profile profile
+        Profile profile,
+        Supplier<String> readStdin,
+        boolean captureOutput
     ) implements CoreCqlshOptions {}
+
+    public sealed interface ExecSource {
+        record Statement(String cql) implements ExecSource {}
+        record CqlFile(File file) implements ExecSource {}
+        record Stdin() implements ExecSource {}
+    }
 
     @Override
     protected Either<CqlshExecResult, List<String>> buildCommandLine() {
@@ -51,6 +64,27 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
 
         commands.add("--request-timeout");
         commands.add(String.valueOf(request.requestTimeout()));
+
+        if (request.execSource().isPresent()) {
+            switch (request.execSource().get()) {
+                case ExecSource.Statement(var stmt) -> {
+                    commands.add("-e");
+                    commands.add(stmt);
+                }
+                case ExecSource.CqlFile(var file) -> {
+                    commands.add("-f");
+                    commands.add(file.getAbsolutePath());
+                }
+                case ExecSource.Stdin _ -> {
+                    if (CliEnvironment.isTty()) {
+                        AstraLogger.info("Reading CQL statements from stdin...");
+                        AstraLogger.info("Use backslashes for multi-line statements");
+                    }
+                    commands.add("-e");
+                    commands.add(request.readStdin.get());
+                }
+            }
+        }
 
         return Either.right(commands);
     }

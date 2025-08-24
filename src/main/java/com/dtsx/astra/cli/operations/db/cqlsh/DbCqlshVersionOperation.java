@@ -16,7 +16,8 @@ public class DbCqlshVersionOperation extends AbstractCqlshExeOperation<CqlshVers
     public record CqlshVersionRequest(
         boolean debug,
         Optional<String> encoding,
-        int connectTimeout
+        int connectTimeout,
+        boolean captureOutput
     ) implements CoreCqlshOptions {}
 
     @Override

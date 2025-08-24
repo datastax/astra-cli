@@ -12,14 +12,15 @@ import picocli.CommandLine.Option;
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
@@ -123,8 +124,8 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         """).formatted(error));
     }
 
-    private Map<String, Object> mkData(File dest) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(File dest) {
+        return sequencedMapOf(
             "file", dest.getAbsolutePath()
         );
     }

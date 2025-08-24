@@ -8,11 +8,11 @@ import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
+import java.util.SequencedMap;
 
 @Getter
 public class AstraCliException extends RuntimeException {
-    private final @Nullable Map<String, Object> metadata;
+    private final @Nullable SequencedMap<String, Object> metadata;
     private final @Nullable List<Hint> nextSteps;
     private final ExitCode code;
 
@@ -24,7 +24,7 @@ public class AstraCliException extends RuntimeException {
         this(code, message, null, null);
     }
 
-    public AstraCliException(ExitCode code, String message, @Nullable Map<String, Object> metadata) {
+    public AstraCliException(ExitCode code, String message, @Nullable SequencedMap<String, Object> metadata) {
         this(code, message, metadata, null);
     }
 
@@ -32,7 +32,7 @@ public class AstraCliException extends RuntimeException {
         this(code, message, null, nextSteps);
     }
 
-    public AstraCliException(ExitCode code, String message, @Nullable Map<String, Object> metadata, @Nullable List<Hint> nextSteps) {
+    public AstraCliException(ExitCode code, String message, @Nullable SequencedMap<String, Object> metadata, @Nullable List<Hint> nextSteps) {
         super(AstraConsole.format(StringUtils.trimIndent(message)));
         this.nextSteps = nextSteps;
         this.metadata = metadata;

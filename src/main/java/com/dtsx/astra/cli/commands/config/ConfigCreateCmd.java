@@ -20,13 +20,14 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
@@ -215,8 +216,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             : null;
     }
 
-    private Map<String, Object> mkData(ProfileName profileName, Boolean isDefault, Boolean wasOverwritten) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(ProfileName profileName, Boolean isDefault, Boolean wasOverwritten) {
+        return sequencedMapOf(
             "profileName", profileName,
             "isDefault", isDefault,
             "wasOverwritten", wasOverwritten

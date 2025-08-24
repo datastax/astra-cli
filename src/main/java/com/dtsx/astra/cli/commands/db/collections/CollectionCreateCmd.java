@@ -11,14 +11,15 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "create-collection",
@@ -168,8 +169,8 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasCreated) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasCreated) {
+        return sequencedMapOf(
             "wasCreated", wasCreated
         );
     }

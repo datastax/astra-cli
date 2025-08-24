@@ -10,13 +10,14 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "delete-collection",
@@ -93,8 +94,8 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasDeleted) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted) {
+        return sequencedMapOf(
             "wasDeleted", wasDeleted
         );
     }

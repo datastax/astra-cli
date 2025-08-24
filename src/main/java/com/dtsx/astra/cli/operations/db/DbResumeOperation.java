@@ -34,7 +34,7 @@ public class DbResumeOperation implements Operation<DbResumeResult> {
 
     @Override
     public DbResumeResult execute() {
-        val pair = dbGateway.resumeDb(request.dbRef, Optional.of(request.lrOptions.timeout()).filter((_) -> !request.lrOptions.dontWait()));
+        val pair = dbGateway.resume(request.dbRef, Optional.of(request.lrOptions.timeout()).filter((_) -> !request.lrOptions.dontWait()));
 
         val initialStatus = pair.getLeft();
         val awaitedDuration = pair.getRight();

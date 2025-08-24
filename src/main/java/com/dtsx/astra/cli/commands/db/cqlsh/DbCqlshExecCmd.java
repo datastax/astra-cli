@@ -1,27 +1,15 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
-import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraLogger;
-import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
-import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshExecOperation;
-import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshExecOperation.ExecRequest;
+import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.ExecSource;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Optional;
-
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "exec",
@@ -35,7 +23,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     comment = "Execute a CQL file",
     command = "${cli.name} db cqlsh exec my_db -f script.cql"
 )
-public class DbCqlshExecCmd extends DbCqlshStartCmd {
+public class DbCqlshExecCmd extends DbCqlshStartImpl {
     @Parameters(
         index = "1",
         description = "Execute the statement and quit",
@@ -52,51 +40,22 @@ public class DbCqlshExecCmd extends DbCqlshStartCmd {
     public Optional<File> $file;
 
     @Override
-    protected Operation<CqlshExecResult> mkOperation() {
-        val execSource = $statement.filter(s -> !s.trim().equals("-")).<Either<String, File>>map(Either::left)
-            .or(() -> $file.map(Either::right));
+    protected boolean captureOutputForNonHumanOutput() {
+        return true;
+    }
 
+    @Override
+    protected Optional<ExecSource> execSource() {
+        // arg group doesn't work well with optional parameters, so we do it manually
         if ($statement.isPresent() && $file.isPresent()) {
             throw new ParameterException(spec.commandLine(), "Cannot specify both a statement and a file to execute; please choose just one.");
         }
 
-        return new DbCqlshExecOperation(dbGateway, downloadsGateway, new ExecRequest(
-            $dbRef,
-            $debug,
-            $encoding,
-            execSource,
-            $keyspace,
-            $connectTimeout,
-            $requestTimeout,
-            profile(),
-            this::readStdin
-        ));
-    }
+        val execSource = $statement.filter(s -> !s.trim().equals("-"))
+            .<ExecSource>map(ExecSource.Statement::new)
+            .or(() -> $file.map(ExecSource.CqlFile::new))
+            .orElseGet(ExecSource.Stdin::new);
 
-    private String readStdin() {
-        try (val reader = new BufferedReader(new InputStreamReader(AstraConsole.getIn()))) {
-            val sb = new StringBuilder();
-            var line = "";
-
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().endsWith("\\")) {
-                    sb.append(line, 0, line.lastIndexOf('\\') - 1);
-                    sb.append(NL);
-                } else {
-                    sb.append(line);
-                    break;
-                }
-            }
-
-            return sb.toString();
-        } catch (IOException e) {
-            AstraLogger.exception(e);
-
-            throw new AstraCliException("""
-              @|bold,red Error: Attempted to read from standard input, but something went wrong:|@
-            
-              "%s"
-            """.formatted(e.getMessage()));
-        }
+        return Optional.of(execSource);
     }
 }

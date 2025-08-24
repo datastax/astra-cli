@@ -11,16 +11,17 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.REGION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.REGION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "create-region",
@@ -117,8 +118,8 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasCreated, @Nullable Duration waitedDuration) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasCreated, @Nullable Duration waitedDuration) {
+        return sequencedMapOf(
             "wasCreated", wasCreated,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );

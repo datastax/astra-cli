@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.token;
 
-import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -11,13 +11,14 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.token.TokenDeleteOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "delete", 
@@ -87,8 +88,8 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasDeleted) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted) {
+        return sequencedMapOf(
             "wasDeleted", wasDeleted
         );
     }

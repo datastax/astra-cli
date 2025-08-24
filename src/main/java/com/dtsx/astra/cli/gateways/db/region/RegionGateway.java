@@ -2,15 +2,16 @@ package com.dtsx.astra.cli.gateways.db.region;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -25,7 +26,9 @@ public interface RegionGateway {
 
     SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllClassic();
 
-    List<Datacenter> findForDb(DbRef dbRef);
+    List<Datacenter> findAllForDb(DbRef dbRef);
+
+    Optional<Datacenter> findOneForDb(DbRef dbRef, RegionName regionName);
 
     Set<CloudProviderType> findAvailableClouds();
 

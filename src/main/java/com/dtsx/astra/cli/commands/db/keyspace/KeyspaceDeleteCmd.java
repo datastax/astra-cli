@@ -2,25 +2,26 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
+import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "delete-keyspace",
@@ -118,8 +119,8 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
         ));
     }
 
-    private Map<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
-        return Map.of(
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
+        return sequencedMapOf(
             "wasDeleted", wasDeleted,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );
