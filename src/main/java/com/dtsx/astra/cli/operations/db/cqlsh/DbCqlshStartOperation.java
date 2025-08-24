@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -29,6 +30,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
         Optional<ExecSource> execSource,
         int connectTimeout,
         int requestTimeout,
+        Optional<RegionName> region,
         Profile profile,
         Supplier<String> readStdin,
         boolean captureOutput
@@ -44,7 +46,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
     protected Either<CqlshExecResult, List<String>> buildCommandLine() {
         val commands = new ArrayList<String>();
 
-        val scbFile = downloadSCB(request.dbRef);
+        val scbFile = downloadSCB(request.dbRef, request.region);
 
         if (scbFile.isLeft()) {
             return Either.left(scbFile.getLeft());

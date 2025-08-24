@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.db.dsbulk;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation.UnloadRequest;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRequest> {
     public record UnloadRequest(
@@ -29,7 +31,8 @@ public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRe
         String mapping,
         boolean header,
         int skipRecords,
-        int maxErrors
+        int maxErrors,
+        Optional<RegionName> region
     ) implements CoreDsbulkOptions {}
 
     public DbDsbulkUnloadOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, UnloadRequest request) {

@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.db.dsbulk;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkCountOperation.CountRequest;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequest> {
     public record CountRequest(
@@ -23,7 +25,8 @@ public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequ
         String maxConcurrentQueries,
         String logDir,
         Either<File, Map<String, String>> dsBulkConfig,
-        AstraToken token
+        AstraToken token,
+        Optional<RegionName> region
     ) implements CoreDsbulkOptions {}
 
     public DbDsbulkCountOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, CountRequest request) {

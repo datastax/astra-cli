@@ -3,11 +3,13 @@ package com.dtsx.astra.cli.operations.db.cqlsh;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CoreCqlshOptions;
+import com.dtsx.astra.cli.utils.DbUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -15,10 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -153,13 +152,13 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
         return cqlshExe;
     }
 
-    protected Either<CqlshExecResult, File> downloadSCB(DbRef dbRef) {
+    protected Either<CqlshExecResult, File> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
             dbRef,
             db.getInfo().getName(),
-            db.getInfo().getDatacenters().stream().limit(1).toList()
+            Collections.singleton(DbUtils.resolveDatacenter(db, regionName))
         );
 
         return scbPaths.bimap(

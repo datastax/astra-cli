@@ -4,18 +4,18 @@ import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.utils.DbUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
@@ -41,6 +41,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         String logDir();
         Either<File, Map<String, String>> dsBulkConfig();
         AstraToken token();
+        Optional<RegionName> region();
     }
 
     abstract Either<DsbulkExecResult, List<String>> buildCommandLine();
@@ -83,13 +84,13 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         );
     }
 
-    protected Either<DsbulkExecResult, File> downloadSCB(DbRef dbRef) {
+    protected Either<DsbulkExecResult, File> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
             dbRef,
             db.getInfo().getName(),
-            db.getInfo().getDatacenters().stream().limit(1).toList()
+            Collections.singleton(DbUtils.resolveDatacenter(db, regionName))
         );
 
         return scbPaths.bimap(
@@ -99,7 +100,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
     }
 
     protected Either<DsbulkExecResult, List<String>> buildCoreFlags(CoreDsbulkOptions options) {
-        return downloadSCB(options.dbRef()).map(scbFile -> {
+        return downloadSCB(options.dbRef(), options.region()).map(scbFile -> {
             val flags = new ArrayList<String>();
             
             flags.add("-u");

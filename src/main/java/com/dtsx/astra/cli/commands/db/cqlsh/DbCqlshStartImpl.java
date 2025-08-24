@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands.db.cqlsh;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.operations.Operation;
@@ -45,6 +46,13 @@ public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
     )
     public int $requestTimeout;
 
+    @Option(
+        names = { "--region", "-r" },
+        description = "The region to use. Uses the db's default region if not specified.",
+        paramLabel = "REGION"
+    )
+    private Optional<RegionName> $region;
+
     protected abstract Optional<ExecSource> execSource();
 
     @Override
@@ -57,6 +65,7 @@ public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
             execSource(),
             $connectTimeout,
             $requestTimeout,
+            $region,
             profile(),
             this::readStdin,
             captureOutput

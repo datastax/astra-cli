@@ -1,14 +1,13 @@
 package com.dtsx.astra.cli.operations.db;
 
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.exceptions.internal.db.RegionNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.utils.DbUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
-import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -68,20 +67,7 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
         return downloadsGateway.downloadCloudSecureBundles(
             request.dbRef,
             db.getInfo().getName(),
-            List.of(resolveDatacenter(db))
+            List.of(DbUtils.resolveDatacenter(db, request.region))
         ).map(List::getFirst);
-    }
-
-    private Datacenter resolveDatacenter(Database db) {
-        return request.region
-            .map((r) -> (
-                db.getInfo().getDatacenters().stream()
-                    .filter(dc -> dc.getRegion().equalsIgnoreCase(r.unwrap()))
-                    .findFirst()
-                    .orElseThrow(() -> new RegionNotFoundException(request.dbRef, r))
-            ))
-            .orElseGet(() -> (
-                db.getInfo().getDatacenters().stream().findFirst().orElseThrow()
-            ));
     }
 }

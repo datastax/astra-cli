@@ -81,7 +81,8 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $mapping,
             $header,
             $skipRecords,
-            $maxErrors
+            $maxErrors,
+            $region
         ));
     }
 }

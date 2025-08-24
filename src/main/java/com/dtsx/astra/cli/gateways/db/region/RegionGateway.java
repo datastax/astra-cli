@@ -28,8 +28,6 @@ public interface RegionGateway {
 
     List<Datacenter> findAllForDb(DbRef dbRef);
 
-    Optional<Datacenter> findOneForDb(DbRef dbRef, RegionName regionName);
-
     Set<CloudProviderType> findAvailableClouds();
 
     CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProviderType cp);

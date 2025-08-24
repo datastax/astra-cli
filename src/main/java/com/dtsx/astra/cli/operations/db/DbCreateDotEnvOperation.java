@@ -4,18 +4,18 @@ import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.KeyspaceNotFoundException;
-import com.dtsx.astra.cli.core.exceptions.internal.db.RegionNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.gateways.db.DbGateway;
-import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
-import com.dtsx.astra.cli.gateways.org.OrgGateway;
-import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile.EnvComment;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile.EnvKVPair;
 import com.dtsx.astra.cli.core.parsers.env.EnvParseException;
+import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
+import com.dtsx.astra.cli.gateways.org.OrgGateway;
+import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.utils.DbUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.org.domain.Organization;
@@ -34,8 +34,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.CreateDotEnvResult;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.EnvKey.*;
-import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
 
 @RequiredArgsConstructor
 public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
@@ -237,15 +237,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
     private RegionName resolveRegion(CreateDotEnvRequest request) {
         if (cachedRegion == null) {
-            cachedRegion = request.region
-                .map(r -> db(request).getInfo().getDatacenters().stream()
-                    .map(Datacenter::getRegion)
-                    .filter(region -> region.equalsIgnoreCase(r.unwrap()))
-                    .findFirst()
-                    .map(RegionName::mkUnsafe)
-                    .orElseThrow(() -> new RegionNotFoundException(request.dbRef, r))
-                )
-                .orElseGet(() -> RegionName.mkUnsafe(db(request).getInfo().getRegion()));
+            cachedRegion = DbUtils.resolveRegionName(db(request), request.region);
         }
         return cachedRegion;
     }
@@ -292,10 +284,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
     }
 
     private Datacenter resolveDatacenter(CreateDotEnvRequest request) {
-        return db(request).getInfo().getDatacenters().stream()
-            .filter(dc -> dc.getRegion().equalsIgnoreCase(resolveRegion(request).unwrap()))
-            .findFirst()
-            .orElseThrow(() -> new RegionNotFoundException(request.dbRef, resolveRegion(request)));
+        return DbUtils.resolveDatacenter(db(request), request.region);
     }
 
     private record EnvSetter(EnvFile envFile, CreateDotEnvRequest request, boolean overwrite) {

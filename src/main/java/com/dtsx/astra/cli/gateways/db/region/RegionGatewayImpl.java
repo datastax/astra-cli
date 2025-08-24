@@ -73,15 +73,6 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public Optional<Datacenter> findOneForDb(DbRef dbRef, RegionName regionName) {
-        return AstraLogger.loading("Fetching region " + highlight(regionName) + " for db " + highlight(dbRef), (_) -> (
-            findAllForDb(dbRef).stream()
-                .filter(dc -> dc.getRegion().equalsIgnoreCase(regionName.unwrap()))
-                .findFirst()
-        ));
-    }
-
-    @Override
     public Set<CloudProviderType> findAvailableClouds() {
         return AstraLogger.loading("Finding cloud providers for all available regions", (_) -> (
             api.astraOpsClient().db().regions()

@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands.db.dsbulk;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.RegionName;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -58,7 +59,14 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         paramLabel = "DIRECTORY",
         defaultValue = "./logs"
     )
-    protected String $logDir;
+    public String $logDir;
+
+    @Option(
+        names = { "--region", "-r" },
+        description = "The region to use. Uses the db's default region if not specified.",
+        paramLabel = "REGION"
+    )
+    public Optional<RegionName> $region;
     
     @ArgGroup
     private @Nullable DsBulkConfigProvider $dsBulkConfigProvider;

@@ -88,7 +88,8 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $skipRecords,
             $maxErrors,
             $dryRun,
-            $allowMissingFields
+            $allowMissingFields,
+            $region
         ));
     }
 }

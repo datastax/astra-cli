@@ -30,7 +30,8 @@ public class DbDsbulkCountCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $maxConcurrentQueries,
             $logDir,
             $configProvider(),
-            profile().token()
+            profile().token(),
+            $region
         ));
     }
 }
