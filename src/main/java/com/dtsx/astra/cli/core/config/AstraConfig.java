@@ -19,8 +19,9 @@ import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -42,7 +43,7 @@ public class AstraConfig {
     private final Ini backingIni;
 
     @Getter
-    private final File backingFile;
+    private final Path backingFile;
 
     public List<Profile> getValidatedProfiles() {
         return profiles.stream().map((e) -> e.fold(
@@ -53,18 +54,18 @@ public class AstraConfig {
         )).toList();
     }
 
-    public static AstraConfig readAstraConfigFile(@Nullable File file, boolean createIfNotExists) {
-        val usingDefault = file == null;
+    public static AstraConfig readAstraConfigFile(@Nullable Path path, boolean createIfNotExists) {
+        val usingDefault = path == null;
 
         if (usingDefault) {
-            file = resolveDefaultAstraConfigFile();
+            path = resolveDefaultAstraConfigFile();
         }
 
         if (createIfNotExists) {
-            FileUtils.createFileIfNotExists(file, null);
+            FileUtils.createFileIfNotExists(path, null);
         }
 
-        if (!file.exists()) {
+        if (!Files.exists(path)) {
             if (usingDefault) {
                 throw new AstraCliException(FILE_ISSUE, """
                   @|bold,red Error: The default configuration file (%s) does not exist.|@
@@ -72,9 +73,7 @@ public class AstraConfig {
                   Please run @!${cli.name} setup!@ to create the default configuration file, and set up your Astra credentials.
                 
                   Alternatively, you can specify credentials via the @!--config-file!@ or @!--token!@ options.
-                """.formatted(
-                    file.getAbsolutePath()
-                ), List.of(
+                """.formatted(path), List.of(
                     new Hint("Interactively set up your configuration file", "${cli.name} setup"),
                     new Hint("Programmatically set up your configuration file", "${cli.name} config create [name] --token <token> [--env <env>]"),
                     new Hint("Example custom config file usage", "${cli.name} db list --config-file ~/.custom_astrarc")
@@ -89,7 +88,7 @@ public class AstraConfig {
         }
 
         try {
-            val iniFile = Ini.readIniFile(file);
+            val iniFile = Ini.readIniFile(path);
 
             val profiles = iniFile.getSections().stream()
                 .map((section) -> {
@@ -132,15 +131,15 @@ public class AstraConfig {
                 })
                 .toList();
 
-            return new AstraConfig(new ArrayList<>(profiles), iniFile, file);
+            return new AstraConfig(new ArrayList<>(profiles), iniFile, path);
         } catch (IniParseException e) {
-            throw new AstraConfigFileException(e.getMessage(), file);
-        } catch (FileNotFoundException e) {
-            throw new AstraConfigFileException("The configuration file could not be found.", file);
+            throw new AstraConfigFileException(e.getMessage(), path);
+        } catch (IOException e) {
+            throw new AstraConfigFileException("Error opening config file: " + e.getMessage(), path);
         }
     }
 
-    public static File resolveDefaultAstraConfigFile() {
+    public static Path resolveDefaultAstraConfigFile() {
         return CliProperties.defaultRcFile();
     }
 

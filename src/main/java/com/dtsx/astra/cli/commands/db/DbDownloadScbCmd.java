@@ -10,9 +10,9 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -53,7 +53,7 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         description = "Destination file. Defaults to `~/.astra/scb/scb_<name/id>_<region>.zip`",
         paramLabel = "DEST"
     )
-    public Optional<File> $destination;
+    public Optional<Path> $destination;
 
     @Override
     protected DbDownloadScbOperation mkOperation() {
@@ -70,12 +70,12 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         };
     }
 
-    private OutputAll handleScbDownloaded(File file) {
+    private OutputAll handleScbDownloaded(Path file) {
         return OutputAll.response("""
           The secure connect bundle was download to the following path:
           %s
         """.formatted(
-            highlight(file.getAbsolutePath())
+            highlight(file)
         ), mkData(file));
     }
 
@@ -92,9 +92,9 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
 
         val potentialFix =
             (fail.ex() instanceof FileAlreadyExistsException)
-                ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("rm " + fail.dest().getPath()) :
+                ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("rm " + fail.dest()) :
             (fail.ex() instanceof NoSuchFileException)
-                ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("mkdir -p " + fail.dest().getParentFile().getPath())
+                ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("mkdir -p " + fail.dest().getParent())
                 : "";
 
         throw new AstraCliException(FILE_ISSUE, trimIndent("""
@@ -107,8 +107,8 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         
           %s
         """).formatted(
-            highlight(fail.source().getAbsolutePath()),
-            highlight(fail.dest().getAbsolutePath()),
+            highlight(fail.source()),
+            highlight(fail.dest()),
             errorMessage + potentialFix,
             fail.deleteSucceeded()
                 ? "@|green The downloaded file has been successfully deleted; it no longer exists in the 'Downloaded to' location.|@"
@@ -125,9 +125,9 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         """).formatted(error));
     }
 
-    private LinkedHashMap<String, Object> mkData(File dest) {
+    private LinkedHashMap<String, Object> mkData(Path dest) {
         return sequencedMapOf(
-            "file", dest.getAbsolutePath()
+            "file", dest
         );
     }
 

@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,7 +50,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
     public CqlshExecResult execute() {
         return downloadCqlsh().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
-                add(exe.getAbsolutePath());
+                add(exe.toString());
                 addAll(buildCoreFlags());
                 addAll(flags);
             }};
@@ -100,7 +100,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
         }
     }
 
-    private Either<CqlshExecResult, File> downloadCqlsh() {
+    private Either<CqlshExecResult, Path> downloadCqlsh() {
         val downloadResult = downloadsGateway.downloadCqlsh(CliProperties.cqlsh());
 
         return downloadResult.bimap(
@@ -109,9 +109,9 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
         );
     }
 
-    private File tryPatchCqlsh(File cqlshExe) {
+    private Path tryPatchCqlsh(Path cqlshExe) {
         try {
-            val content = Files.readAllLines(cqlshExe.toPath());
+            val content = Files.readAllLines(cqlshExe);
 
             val matcher = Pattern.compile("^for interpreter in (python.*\\s*)+; do\\s*$");
 
@@ -142,17 +142,17 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
                 replaced.add(updatedLine.index, "# Patched by `astra-cli` to try known supported Python versions first");
                 replaced.add(updatedLine.index + 1, "# Previous line: `" + updatedLine.content + "`");
 
-                Files.writeString(cqlshExe.toPath(), String.join(NL, replaced));
+                Files.writeString(cqlshExe, String.join(NL, replaced));
             }
         } catch (Exception e) {
-            AstraLogger.exception("Error occurred attempting to patch '" + cqlshExe.getAbsolutePath() + "'");
+            AstraLogger.exception("Error occurred attempting to patch '" + cqlshExe + "'");
             AstraLogger.exception(e);
         }
 
         return cqlshExe;
     }
 
-    protected Either<CqlshExecResult, File> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
+    protected Either<CqlshExecResult, Path> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(

@@ -83,6 +83,11 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     public static void main(String... args) {
+        exit(run(args));
+    }
+
+    @SneakyThrows
+    public static int run(String... args) {
         @Cleanup val jansi = JansiUtils.installIfNecessary();
         val cmd = new CommandLine(new AstraCli());
 
@@ -111,7 +116,7 @@ public class AstraCli extends AbstractCmd<Void> {
             AstraLogger.dumpLogsToFile();
         }
 
-        exit(exitCode);
+        return exitCode;
     }
 
     public static <T> T exit(int exitCode) {

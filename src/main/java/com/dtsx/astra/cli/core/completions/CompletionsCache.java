@@ -1,15 +1,15 @@
 package com.dtsx.astra.cli.core.completions;
 
 import com.dtsx.astra.cli.core.config.AstraHome;
+import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,6 @@ public abstract class CompletionsCache {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @SneakyThrows
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void update(Function<Set<String>, Set<String>> mkCandidates) {
         if (!AstraHome.exists()) {
             return;
@@ -41,30 +40,34 @@ public abstract class CompletionsCache {
         var currentCandidates = Set.<String>of();
 
         try {
-            currentCandidates = Files.readAllLines(cacheFile.get().toPath()).stream().map(this::readJsonString).collect(Collectors.toSet());
-        } catch (Exception _) {}
+            currentCandidates = Files.readAllLines(cacheFile.get()).stream().map(this::readJsonString).collect(Collectors.toSet());
+        } catch (Exception e) {
+            AstraLogger.exception("An error occurred reading cache file '%s'".formatted(cacheFile), e);
+            return;
+        }
 
         val candidates = mkCandidates.apply(currentCandidates);
 
+        if (cachedCandidates != null && cachedCandidates.equals(candidates)) {
+            return;
+        }
+
+        cachedCandidates = Set.copyOf(candidates);
+
         try {
-            if (cachedCandidates != null && cachedCandidates.equals(candidates)) {
-                return;
-            }
-
-            cachedCandidates = Set.copyOf(candidates);
-
             if (candidates.isEmpty()) {
-                cacheFile.get().delete();
+                Files.deleteIfExists(cacheFile.get());
                 return;
             }
 
-            cacheFile.get().getParentFile().mkdirs();
+            Files.createDirectories(cacheFile.get().getParent());
 
-            @Cleanup val writer = new FileWriter(cacheFile.get());
+            @Cleanup val writer = Files.newBufferedWriter(cacheFile.get());
             writer.write(String.join(NL, candidates.stream().map(this::writeJsonString).toList()));
-        } catch (Exception _) {
+        } catch (Exception e) {
             try {
-                cacheFile.get().delete();
+                Files.deleteIfExists(cacheFile.get());
+                AstraLogger.exception("An error occurred updating cache file '%s'".formatted(cacheFile), e);
             } catch (Exception _) {}
         }
     }
@@ -81,9 +84,9 @@ public abstract class CompletionsCache {
         update((s) -> setAdd(s, completion));
     }
 
-    protected abstract Optional<File> useCacheFile();
+    protected abstract Optional<Path> useCacheFile();
 
-    protected Optional<File> useCacheDir() {
+    protected Optional<Path> useCacheDir() {
         return Optional.of(AstraHome.Dirs.useCompletionsCache());
     }
 

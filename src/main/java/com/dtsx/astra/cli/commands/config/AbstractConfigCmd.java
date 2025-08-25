@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.config.AstraConfig;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public abstract class AbstractConfigCmd<OpRes> extends AbstractCmd<OpRes> {
     @Option(
@@ -14,7 +14,7 @@ public abstract class AbstractConfigCmd<OpRes> extends AbstractCmd<OpRes> {
         description = "The astrarc file to use",
         paramLabel = $ConfigFile.LABEL
     )
-    private File $configFile;
+    private Path $configFile;
 
     @Nullable
     private AstraConfig cachedAstraConfig;

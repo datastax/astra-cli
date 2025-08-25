@@ -13,7 +13,7 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
@@ -81,7 +81,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
             description = "Configuration file for DSBulk loader options",
             paramLabel = "CONFIG_FILE"
         )
-        public Optional<File> configFile;
+        public Optional<Path> configFile;
         
         @Option(
             names = { "--dsbulk-flags", "-F" },
@@ -91,10 +91,10 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         public Map<String, String> flags;
     }
 
-    protected Either<File, Map<String, String>> $configProvider() {
+    protected Either<Path, Map<String, String>> $configProvider() {
         return $dsBulkConfigProvider != null
             ? ($dsBulkConfigProvider.configFile
-                .<Either<File, Map<String, String>>>map(Either::left)
+                .<Either<Path, Map<String, String>>>map(Either::left)
                 .orElseGet(() -> Either.right($dsBulkConfigProvider.flags)))
             : Either.right(emptyMap());
     }

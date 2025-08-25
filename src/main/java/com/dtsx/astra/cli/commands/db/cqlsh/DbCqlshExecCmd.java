@@ -8,7 +8,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 @Command(
@@ -37,7 +37,7 @@ public class DbCqlshExecCmd extends DbCqlshStartImpl {
         description = "Execute commands from a CQL file, then exit",
         paramLabel = "FILE"
     )
-    public Optional<File> $file;
+    public Optional<Path> $file;
 
     @Override
     protected boolean captureOutputForNonHumanOutput() {

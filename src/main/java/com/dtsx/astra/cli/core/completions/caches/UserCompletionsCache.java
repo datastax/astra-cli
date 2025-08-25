@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.core.completions.caches;
 
-import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
+import com.dtsx.astra.cli.core.config.ProfileName;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public class UserCompletionsCache extends ProfileLinkedCompletionsCache {
@@ -12,7 +12,7 @@ public class UserCompletionsCache extends ProfileLinkedCompletionsCache {
     }
 
     @Override
-    protected Optional<File> useCacheFile() {
-        return super.useCacheDir().map((dir) -> new File(dir, "user_emails"));
+    protected Optional<Path> useCacheFile() {
+        return super.useCacheDir().map((dir) -> dir.resolve("user_emails"));
     }
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.TypeConversionException;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public abstract class TypeConverters {
@@ -17,7 +18,8 @@ public abstract class TypeConverters {
         new TypeConverter(RoleRef.class, RoleRef::parse),
         new TypeConverter(TenantName.class, TenantName::parse),
         new TypeConverter(UserRef.class, UserRef::parse),
-        new TypeConverter(ProfileName.class, ProfileName::parse)
+        new TypeConverter(ProfileName.class, ProfileName::parse),
+        new TypeConverter(Path.class, Misc::parsePath)
     );
 
     private interface Parseable {
@@ -39,6 +41,12 @@ public abstract class TypeConverters {
             return parseable.parse(value).getRight((msg) -> {
                 throw new TypeConversionException(msg);
             });
+        }
+    }
+
+    private static class Misc {
+        public static Either<String, ?> parsePath(String value) {
+            return Either.right(CliEnvironment.path(value));
         }
     }
 }

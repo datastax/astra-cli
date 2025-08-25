@@ -10,6 +10,7 @@ import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Help.ColorScheme;
 import picocli.CommandLine.Option;
 
+import java.nio.file.Path;
 import java.util.UUID;
 
 @Accessors(fluent = true)
@@ -110,6 +111,10 @@ public enum AstraColors implements Ansi.IStyle {
 
     public static String highlight(String s) {
         return AstraColors.BLUE_300.useOrQuote(s);
+    }
+
+    public static String highlight(Path p) {
+        return highlight(p.toString());
     }
 
     public static String highlight(UUID u) {

@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class StreamingPulsarPathOperation implements Operation<StreamingPulsarPathOperation.PulsarPathResponse> {
@@ -14,7 +14,7 @@ public class StreamingPulsarPathOperation implements Operation<StreamingPulsarPa
     private final boolean shouldInstall;
 
     public sealed interface PulsarPathResponse {}
-    public record ExePathFound(File path) implements PulsarPathResponse {}
+    public record ExePathFound(Path path) implements PulsarPathResponse {}
     public record NoInstallationFound() implements PulsarPathResponse {}
     public record InstallationFailed(String error) implements PulsarPathResponse {}
 

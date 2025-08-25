@@ -9,7 +9,7 @@ import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkCountOperation.CountRequest;
 import lombok.val;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequ
         String encoding,
         String maxConcurrentQueries,
         String logDir,
-        Either<File, Map<String, String>> dsBulkConfig,
+        Either<Path, Map<String, String>> dsBulkConfig,
         AstraToken token,
         Optional<RegionName> region
     ) implements CoreDsbulkOptions {}

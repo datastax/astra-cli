@@ -2,25 +2,22 @@ package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.config.AstraHome;
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.val;
 import picocli.CommandLine.Option;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_END;
 import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_START;
@@ -32,21 +29,21 @@ public class AstraLogger {
     private static Level level = Level.REGULAR;
     private static LoadingSpinner globalSpinner;
 
-    private static File sessionLogFile;
+    private static Path sessionLogFile;
     private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
     private static boolean shouldDumpLogs = false;
 
-    private static File getLogFile() {
+    private static Path getLogFile() {
         if (sessionLogFile == null) {
             val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(java.time.ZoneId.systemDefault()));
-            sessionLogFile = new File(AstraHome.Dirs.useLogs(), timestamp + ".astra.log");
+            sessionLogFile = AstraHome.Dirs.useLogs().resolve(timestamp + ".astra.log");
         }
         return sessionLogFile;
     }
 
     public static String useSessionLogFilePath() {
-        return getLogFile().getAbsolutePath();
+        return getLogFile().toString();
     }
 
     public static void banner() {
@@ -102,20 +99,20 @@ public class AstraLogger {
             paramLabel = "FILE",
             arity = "0..1"
         )
-        public void setDumpLogs(Optional<File> dest) {
-            dest.ifPresent((file) -> {
-                if (file.equals(new File("false"))) {
+        public void setDumpLogs(Optional<Path> dest) {
+            dest.ifPresent((path) -> {
+                if (path.toString().equalsIgnoreCase("false")) {
                     shouldDumpLogs = false;
                     return;
                 }
 
                 shouldDumpLogs = true;
 
-                if (!file.equals(new File("__fallback__"))) {
-                    sessionLogFile = file;
+                if (path.toString().equalsIgnoreCase("__fallback__")) {
+                    sessionLogFile = path;
                 }
 
-                AstraLogger.info("Dumping logs to '", getLogFile().getAbsolutePath(), "' at the end of this command.");
+                AstraLogger.info("Dumping logs to '", getLogFile().toString(), "' at the end of this command.");
             });
         }
 
@@ -183,6 +180,11 @@ public class AstraLogger {
         log(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE, true);
     }
 
+    public static <E extends Throwable> E exception(String msg, E e) {
+        exception(msg);
+        return exception(e);
+    }
+
     public static <E extends Throwable> E exception(E e) {
         val sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
@@ -226,7 +228,7 @@ public class AstraLogger {
 
         deleteOldLogs(AstraHome.Dirs.useLogs());
 
-        try (var writer = new FileWriter(getLogFile())) {
+        try (var writer = Files.newBufferedWriter(getLogFile())) {
             for (String line : accumulated) {
                 writer.write(AstraColors.stripAnsi(AstraConsole.format(line)));
                 writer.write(System.lineSeparator());
@@ -234,22 +236,26 @@ public class AstraLogger {
         } catch (Exception _) {}
     }
 
-    private static void deleteOldLogs(File logsDir) {
+    private static void deleteOldLogs(Path logsDir) {
         try {
-            val logFiles = logsDir.listFiles();
+            @Cleanup val logFiles = Files.list(logsDir);
 
-            if (logFiles != null) {
-                Stream.of(logFiles)
-                    .sorted((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()))
-                    .skip(25)
-                    .forEach((f) -> {
-                        try {
-                            Files.delete(f.toPath());
-                        } catch (Exception e) {
-                            AstraLogger.exception("Error deleting old log file '", f.getAbsolutePath(), "': ", e.getMessage());
-                        }
-                    });
-            }
+            logFiles
+                .sorted(Comparator.comparing((path) -> {
+                    try {
+                        return Files.getLastModifiedTime(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }))
+                .skip(25)
+                .forEach((f) -> {
+                    try {
+                        Files.delete(f);
+                    } catch (Exception e) {
+                        AstraLogger.exception("Error deleting old log file '", f.toString(), "': ", e.getMessage());
+                    }
+                });
         } catch (Exception _) {}
     }
 }

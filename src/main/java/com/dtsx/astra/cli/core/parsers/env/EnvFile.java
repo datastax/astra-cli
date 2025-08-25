@@ -1,42 +1,26 @@
 package com.dtsx.astra.cli.core.parsers.env;
 
-/*-
- * #%L
- * Astra CLI
- * --
- * Copyright (C) 2022 - 2023 DataStax
- * --
- * Licensed under the Apache License, Version 2.0
- * You may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.val;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public record EnvFile(@Getter ArrayList<EnvNode> nodes) {
-    public static EnvFile readEnvFile(File file) throws EnvParseException, FileNotFoundException {
-        try (val scanner = new Scanner(file)) {
+    @SneakyThrows
+    public static EnvFile readEnvFile(Path path) throws EnvParseException, FileNotFoundException {
+        if (!Files.exists(path)) {
+            throw new FileNotFoundException(path.toString()); // todo catch if file is dir
+        }
+
+        try (val scanner = new Scanner(path)) {
             return new EnvParser().parseEnvFile(scanner);
         }
     }
@@ -84,16 +68,9 @@ public record EnvFile(@Getter ArrayList<EnvNode> nodes) {
         return sj.toString();
     }
 
-    public Map<String, String> toMap() {
-        return nodes.stream()
-            .filter(EnvKVPair.class::isInstance)
-            .map(EnvKVPair.class::cast)
-            .collect(Collectors.toMap(EnvKVPair::key, EnvKVPair::value));
-    }
-
     @SneakyThrows
-    public void writeToFile(File file) {
-        try (val writer = new FileWriter(file)) {
+    public void writeToFile(Path file) {
+        try (val writer = Files.newBufferedWriter(file)) {
             writer.write(render(false));
         }
     }

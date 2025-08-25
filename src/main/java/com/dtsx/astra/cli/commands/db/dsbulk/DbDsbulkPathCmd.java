@@ -15,7 +15,7 @@ import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkPathOperation.NoInstallat
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -59,8 +59,8 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
         };
     }
 
-    public OutputAll handleExePathFound(File file) {
-        return OutputAll.response(file.getAbsolutePath());
+    public OutputAll handleExePathFound(Path file) {
+        return OutputAll.response(file.toString());
     }
 
     public <T> T throwNoInstallationFound() {
@@ -70,7 +70,7 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
           Please install @!dsbulk!@ by running any dsbulk command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize dsbulk installations done outside of astra.|@
-        """.formatted(AstraHome.DIR.getAbsolutePath()), List.of(
+        """.formatted(AstraHome.DIR), List.of(
             new Hint("Example command to install dsbulk (no --if-exists flag):", "${cli.name} db dsbulk path")
         ));
     }

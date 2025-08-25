@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshPathOperation.CqlPathRespon
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class DbCqlshPathOperation implements Operation<CqlPathResponse> {
@@ -15,7 +15,7 @@ public class DbCqlshPathOperation implements Operation<CqlPathResponse> {
     private final boolean shouldInstall;
 
     public sealed interface CqlPathResponse {}
-    public record ExePathFound(File path) implements CqlPathResponse {}
+    public record ExePathFound(Path path) implements CqlPathResponse {}
     public record NoInstallationFound() implements CqlPathResponse {}
     public record InstallationFailed(String error) implements CqlPathResponse {}
 

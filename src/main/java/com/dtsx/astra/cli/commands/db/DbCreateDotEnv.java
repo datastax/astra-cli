@@ -20,7 +20,7 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +85,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
         description = "The file to append the .env content to. If not specified, defaults to .env. If --print is true, the --file option will be used as the initial content; otherwise it will print a new .env file.",
         paramLabel = "FILE"
     )
-    private Optional<File> $file;
+    private Optional<Path> $file;
 
     @Option(
         names = { $Keyspace.LONG, $Keyspace.SHORT },
@@ -143,9 +143,9 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
             
               Please double check the content of the file before using it, and manually add it to your .gitignore file.
             """.formatted(
-                highlight(outputFile.getAbsolutePath())
+                highlight(outputFile)
             ), mkData("created", false, outputFile), List.of(
-                new Hint("View the env file", "cat " + outputFile.getAbsolutePath())
+                new Hint("View the env file", "cat " + outputFile)
             ));
 
             case UpdatedDotEnvFile(var outputFile, var overwritten) -> OutputAll.response("""
@@ -155,18 +155,18 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
 
               Please double check the content of the file before using it, and ensure it is added to your .gitignore file.
             """.formatted(
-                highlight(outputFile.getAbsolutePath()),
+                highlight(outputFile),
                 (overwritten) ? "were overwritten" : "were left in the env file, with the new keys added to the end"
             ), mkData("updated", overwritten, outputFile), List.of(
-                new Hint("View the env file", "cat " + outputFile.getAbsolutePath())
+                new Hint("View the env file", "cat " + outputFile)
             ));
 
             case NothingToUpdate(var outputFile) -> OutputAll.response("""
               No changes needed to be made to the .env file at %s.
             """.formatted(
-                highlight(outputFile.getAbsolutePath())
+                highlight(outputFile)
             ), mkData("no_change", false, outputFile), List.of(
-                new Hint("View the env file", "cat " + outputFile.getAbsolutePath())
+                new Hint("View the env file", "cat " + outputFile)
             ));
 
             case FailedToDownloadSCB(var reason) -> throw new AstraCliException(DOWNLOAD_ISSUE, """
@@ -178,11 +178,11 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
         };
     }
 
-    private LinkedHashMap<String, Object> mkData(String status, boolean overwriteOccurred, @Nullable File file) {
+    private LinkedHashMap<String, Object> mkData(String status, boolean overwriteOccurred, @Nullable Path file) {
         return sequencedMapOf(
             "status", status,
             "overwriteOccurred", overwriteOccurred,
-            "file", Optional.ofNullable(file).map(File::getAbsolutePath)
+            "file", Optional.ofNullable(file).map(Path::toString)
         );
     }
 
@@ -249,16 +249,5 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
             .fallbackFlag("--overwrite")
             .fix(originalArgs(), "--overwrite")
             .dontClearAfterSelection();
-
-//        if (response.equals(ConfirmResponse.NO_ANSWER)) {
-//            throw new AstraCliException(EXECUTION_CANCELLED, """
-//              @|bold, red Error: Operation was canceled because clashing keys were found in the .env file.|@
-//
-//              To avoid this error, you can:
-//              - Interactively answer 'y' to overwrite the duplicate keys,
-//              - Use the @!--overwrite!@ option to automatically overwrite the duplicate keys, or
-//              - Use the @!--no-overwrite!@ option to leave the duplicate keys in the env file.
-//            """);
-//        }
     }
 }

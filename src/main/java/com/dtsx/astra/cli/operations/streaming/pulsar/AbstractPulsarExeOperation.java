@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -37,7 +39,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
     public PulsarExecResult execute() {
         return downloadPulsar().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
-                add(exe.getAbsolutePath());
+                add(exe.toString());
                 addAll(flags);
             }};
 
@@ -62,7 +64,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
         })).fold(l -> l, r -> r);
     }
 
-    private Either<PulsarExecResult, File> downloadPulsar() {
+    private Either<PulsarExecResult, Path> downloadPulsar() {
         val downloadResult = downloadsGateway.downloadPulsarShell(CliProperties.pulsar());
 
         return downloadResult.bimap(
@@ -71,27 +73,26 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
         );
     }
 
-    protected Either<PulsarExecResult, File> mkPulsarConfFile(TenantName tenantName) {
+    protected Either<PulsarExecResult, Path> mkPulsarConfFile(TenantName tenantName) {
         val tenant = streamingGateway.findOne(tenantName);
 
-        val confFile = new File(
-            AstraHome.Dirs.usePulsar(CliProperties.pulsar().version()),
+        val confFile = AstraHome.Dirs.usePulsar(CliProperties.pulsar().version()).resolve(
             "client-" + tenant.getCloudProvider() + "-" + tenant.getCloudRegion() + "-" + tenant.getTenantName() + ".conf"
         );
 
-        if (confFile.exists() && confFile.isDirectory()) {
-            return Either.left(new ConfFileCreationFailed("A file with the same name already exists and is a directory: " + confFile.getAbsolutePath()));
+        if (Files.exists(confFile) && Files.isDirectory(confFile)) {
+            return Either.left(new ConfFileCreationFailed("A file with the same name already exists and is a directory: " + confFile));
         }
 
         FileUtils.createFileIfNotExists(confFile, null);
 
-        try (FileWriter writer = new FileWriter(confFile)) {
+        try (val writer = Files.newBufferedWriter(confFile)) {
             genConfFileContents(writer, tenant);
             writer.flush();
             writer.close();
             return Either.right(confFile);
         } catch (IOException e1) {
-            return Either.left(new ConfFileCreationFailed("Failed to write to Pulsar configuration file %s: %s".formatted(confFile.getAbsolutePath(), e1.getMessage())));
+            return Either.left(new ConfFileCreationFailed("Failed to write to Pulsar configuration file %s: %s".formatted(confFile, e1.getMessage())));
         }
     }
 

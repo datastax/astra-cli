@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkPathOperation.DsbulkPathR
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class DbDsbulkPathOperation implements Operation<DsbulkPathResponse> {
@@ -15,7 +15,7 @@ public class DbDsbulkPathOperation implements Operation<DsbulkPathResponse> {
     private final boolean shouldInstall;
 
     public sealed interface DsbulkPathResponse {}
-    public record ExePathFound(File path) implements DsbulkPathResponse {}
+    public record ExePathFound(Path path) implements DsbulkPathResponse {}
     public record NoInstallationFound() implements DsbulkPathResponse {}
     public record InstallationFailed(String error) implements DsbulkPathResponse {}
 

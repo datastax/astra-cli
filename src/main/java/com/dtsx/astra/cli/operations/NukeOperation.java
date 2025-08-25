@@ -1,20 +1,22 @@
 package com.dtsx.astra.cli.operations;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.file.PathUtils;
 import org.graalvm.collections.Pair;
 import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
@@ -32,12 +34,12 @@ public class NukeOperation implements Operation<NukeResult> {
         Optional<Boolean> preserveAstrarc,
         Optional<String> cliName,
         boolean yes,
-        BiFunction<File, Boolean, Boolean> promptShouldDeleteAstrarc,
+        BiFunction<Path, Boolean, Boolean> promptShouldDeleteAstrarc,
         Runnable assertShouldNuke
     ) {}
 
     public sealed interface NukeResult {}
-    public record Nuked(Set<File> deletedFiles, Set<File> updatedFiles, Map<File, SkipReason> skipped, Optional<String> finalDeleteCmd) implements NukeResult {}
+    public record Nuked(Set<Path> deletedFiles, Set<Path> updatedFiles, Map<Path, SkipReason> skipped, Optional<String> finalDeleteCmd) implements NukeResult {}
     public record CouldNotResolveCliName() implements NukeResult {}
 
     public sealed interface SkipReason {
@@ -74,7 +76,7 @@ public class NukeOperation implements Operation<NukeResult> {
         val cliBinary = resolveCliBinary();
 
         val cliName = cliBinary
-            .map(File::getName)
+            .map(PathUtils::getFileNameString)
             .or(() -> request.cliName);
 
         if (cliName.isEmpty()) {
@@ -85,10 +87,10 @@ public class NukeOperation implements Operation<NukeResult> {
         val astraRc = resolveAstraRc();
         val rcFiles = resolveRcFilesWithAutocomplete(cliName.get());
 
-        val processRunningFromInsideAstraHome = cliBinary.isPresent() && cliBinary.get().toPath().startsWith(astraHome.toPath());
+        val processRunningFromInsideAstraHome = cliBinary.isPresent() && cliBinary.get().startsWith(astraHome);
 
         val shouldPreserveAstrarcAstraRc = request.preserveAstrarc.orElseGet(() -> {
-            if (!astraRc.exists()) {
+            if (!Files.exists(astraRc)) {
                 return false;
             }
             return !request.promptShouldDeleteAstrarc.apply(astraRc, request.dryRun);
@@ -100,16 +102,20 @@ public class NukeOperation implements Operation<NukeResult> {
             delete(astraRc, res);
         }
 
-        val astraHomeFiles = astraHome.listFiles();
+        try {
+            @Cleanup val astraHomeFiles = Files.list(astraHome);
 
-        if (Files.exists(astraHome.toPath()) && astraHomeFiles != null) {
-            if (processRunningFromInsideAstraHome) {
-                Arrays.stream(astraHomeFiles).filter(f -> f.toPath().endsWith("/cli")).forEach((f) -> delete(f, res));
+            if (Files.exists(astraHome)) {
+                if (processRunningFromInsideAstraHome) {
+                    astraHomeFiles.filter(f -> f.endsWith("/cli")).forEach((f) -> delete(f, res));
+                } else {
+                    delete(astraHome, res);
+                }
             } else {
-                delete(astraHome, res);
+                res.skipped().put(astraHome, new SkipReason.NotFound("delete"));
             }
-        } else {
-            res.skipped().put(astraHome, new SkipReason.NotFound("delete"));
+        } catch (IOException e) {
+            res.skipped().put(astraHome, new SkipReason.JustCouldNot("delete", e.getMessage()));
         }
 
         rcFiles.forEach((pair) -> {
@@ -119,25 +125,25 @@ public class NukeOperation implements Operation<NukeResult> {
         return res;
     }
 
-    private static @NotNull Nuked mkResult(Optional<File> maybeBinaryFile, boolean processRunningFromInsideAstraHome, File astraHome) {
+    private static @NotNull Nuked mkResult(Optional<Path> maybeBinaryFile, boolean processRunningFromInsideAstraHome, Path astraHome) {
         val finalDeleteCmd = maybeBinaryFile.map((binaryFile) -> (
             (!isWindows())
                 ? (processRunningFromInsideAstraHome)
-                    ? "rm -rf " + astraHome.getAbsolutePath()
-                    : "rm " + binaryFile.getAbsolutePath()
+                    ? "rm -rf " + astraHome
+                    : "rm " + binaryFile
                 : (processRunningFromInsideAstraHome)
-                    ? "rmdir /s /q " + astraHome.getAbsolutePath()
-                    : "del " + binaryFile.getAbsolutePath()
+                    ? "rmdir /s /q " + astraHome
+                    : "del " + binaryFile
         ));
 
         return new Nuked(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashMap<>(), finalDeleteCmd);
     }
 
-    private Optional<File> resolveCliBinary() {
+    private Optional<Path> resolveCliBinary() {
         val file = ProcessHandle.current()
             .info()
             .command()
-            .map(File::new);
+            .map(CliEnvironment::path);
 
         if (file.isEmpty() || !ImageInfo.inImageCode()) {
             return Optional.empty();
@@ -146,15 +152,15 @@ public class NukeOperation implements Operation<NukeResult> {
         return file;
     }
 
-    private File resolveAstraHome() {
+    private Path resolveAstraHome() {
         return AstraHome.DIR;
     }
 
-    private File resolveAstraRc() {
+    private Path resolveAstraRc() {
         return AstraConfig.resolveDefaultAstraConfigFile();
     }
 
-    private Set<Pair<File, String>> resolveRcFilesWithAutocomplete(String cliName) {
+    private Set<Pair<Path, String>> resolveRcFilesWithAutocomplete(String cliName) {
         if (isWindows()) {
             return Set.of();
         }
@@ -165,11 +171,11 @@ public class NukeOperation implements Operation<NukeResult> {
         );
 
         return Stream.of(".bashrc", ".zshrc", ".profile", ".bash_profile", ".zprofile")
-            .map(name -> new File(System.getProperty("user.home"), name))
-            .filter(File::exists)
+            .map(name -> CliEnvironment.path(System.getProperty("user.home"), name))
+            .filter(Files::exists)
             .flatMap((f) -> {
                 return Either
-                    .tryCatch(() -> Files.readString(f.toPath()), (e) -> {
+                    .tryCatch(() -> Files.readString(f), (e) -> {
                         AstraLogger.warn("Could not read file '", f.toString(), "' to check for any astra-cli autocomplete entries: ", e.getMessage());
                         return null;
                     })
@@ -178,66 +184,66 @@ public class NukeOperation implements Operation<NukeResult> {
 
                         return (matcher.find())
                             ? Stream.of(Pair.create(f, matcher.replaceAll("")))
-                            : Stream.<Pair<File, String>>of();
+                            : Stream.<Pair<Path, String>>of();
                     })
                     .fold(_ -> Stream.of(), r -> r);
             })
             .collect(Collectors.toSet());
     }
 
-    private void delete(File file, Nuked res) {
-        if (failsPreliminaryChecks(file, res, "delete")) {
+    private void delete(Path path, Nuked res) {
+        if (failsPreliminaryChecks(path, res, "delete")) {
             return;
         }
 
         try {
             if (!request.dryRun) {
-                if (file.isDirectory()) {
-                    FileUtils.deleteDirectory(file);
+                if (Files.isDirectory(path)) {
+                    PathUtils.deleteDirectory(path);
                 } else {
-                    FileUtils.delete(file);
+                    PathUtils.delete(path);
                 }
             }
-            res.deletedFiles().add(file);
+            res.deletedFiles().add(path);
         } catch (Exception e) {
-            res.skipped().put(file, new SkipReason.JustCouldNot("delete", e.getMessage()));
+            res.skipped().put(path, new SkipReason.JustCouldNot("delete", e.getMessage()));
         }
     }
 
-    private void update(File file, String newContent, Nuked res) {
-        if (failsPreliminaryChecks(file, res, "update")) {
+    private void update(Path path, String newContent, Nuked res) {
+        if (failsPreliminaryChecks(path, res, "update")) {
             return;
         }
 
         try {
             if (!request.dryRun) {
-                Files.writeString(file.toPath(), newContent);
+                Files.writeString(path, newContent);
             }
-            res.updatedFiles().add(file);
+            res.updatedFiles().add(path);
         } catch (IOException e) {
-            res.skipped().put(file, new SkipReason.JustCouldNot("update", e.getMessage()));
+            res.skipped().put(path, new SkipReason.JustCouldNot("update", e.getMessage()));
         }
     }
 
-    private boolean failsPreliminaryChecks(File file, Nuked res, String operation) {
-        if (!Files.exists(file.toPath())) {
-            res.skipped().put(file, new SkipReason.NotFound(operation));
+    private boolean failsPreliminaryChecks(Path path, Nuked res, String operation) {
+        if (!Files.exists(path)) {
+            res.skipped().put(path, new SkipReason.NotFound(operation));
             return true;
         }
 
-        if (needsSudo(file)) {
-            res.skipped().put(file, new SkipReason.NeedsSudo(operation));
+        if (needsSudo(path)) {
+            res.skipped().put(path, new SkipReason.NeedsSudo(operation));
             return true;
         }
 
         return false;
     }
 
-    private boolean needsSudo(File file) {
+    private boolean needsSudo(Path path) {
         try {
-            return !Files.isWritable(file.toPath());
+            return !Files.isWritable(path);
         } catch (Exception e) {
-            AstraLogger.warn("Could not determine if file '", file.toString(), "' needs sudo: ", e.getMessage());
+            AstraLogger.warn("Could not determine if file '", path.toString(), "' needs sudo: ", e.getMessage());
             return false;
         }
     }

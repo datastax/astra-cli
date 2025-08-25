@@ -13,8 +13,8 @@ import com.dtsx.astra.cli.utils.DbUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
@@ -39,7 +39,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         String encoding();
         String maxConcurrentQueries();
         String logDir();
-        Either<File, Map<String, String>> dsBulkConfig();
+        Either<Path, Map<String, String>> dsBulkConfig();
         AstraToken token();
         Optional<RegionName> region();
     }
@@ -50,7 +50,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
     public DsbulkExecResult execute() {
         return downloadDsbulk().flatMap((exe) -> buildCommandLine().map((flags) -> {
             val commandLine = new ArrayList<String>() {{
-                add(exe.getAbsolutePath());
+                add(exe.toString());
                 addAll(flags);
             }};
 
@@ -75,7 +75,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         })).fold(l -> l, r -> r);
     }
 
-    private Either<DsbulkExecResult, File> downloadDsbulk() {
+    private Either<DsbulkExecResult, Path> downloadDsbulk() {
         val downloadResult = downloadsGateway.downloadDsbulk(CliProperties.dsbulk());
 
         return downloadResult.bimap(
@@ -84,7 +84,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         );
     }
 
-    protected Either<DsbulkExecResult, File> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
+    protected Either<DsbulkExecResult, Path> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
@@ -110,7 +110,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             flags.add(options.token().unwrap());
             
             flags.add("-b");
-            flags.add(scbFile.getAbsolutePath());
+            flags.add(scbFile.toString());
 
             if (options.keyspace() != null && !options.keyspace().isEmpty()) {
                 flags.add("-k");
@@ -146,7 +146,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             options.dsBulkConfig().fold(
                 configFile -> {
                     flags.add("-f");
-                    flags.add(configFile.getAbsolutePath());
+                    flags.add(configFile.toString());
                     return null;
                 },
                 configMap -> {

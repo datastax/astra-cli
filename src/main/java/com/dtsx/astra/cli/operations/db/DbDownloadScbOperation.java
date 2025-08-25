@@ -11,9 +11,9 @@ import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,15 +26,15 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
     private final DbDownloadScbRequest request;
 
     public sealed interface DownloadScbResult {}
-    public record ScbDownloaded(File file) implements DownloadScbResult {}
+    public record ScbDownloaded(Path file) implements DownloadScbResult {}
     public record ScbDownloadFailed(String error) implements DownloadScbResult {}
-    public record ScbDownloadedAndMoved(File dest) implements DownloadScbResult {}
-    public record ScbDownloadedAndMoveFailed(File source, File dest, boolean deleteSucceeded, IOException ex) implements DownloadScbResult {}
+    public record ScbDownloadedAndMoved(Path dest) implements DownloadScbResult {}
+    public record ScbDownloadedAndMoveFailed(Path source, Path dest, boolean deleteSucceeded, IOException ex) implements DownloadScbResult {}
 
     public record DbDownloadScbRequest(
         DbRef dbRef,
         Optional<RegionName> region,
-        Optional<File> destination
+        Optional<Path> destination
     ) {}
 
     @Override
@@ -47,7 +47,7 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
         );
     }
 
-    private DownloadScbResult handleDownloadedFiles(File downloadedFile) {
+    private DownloadScbResult handleDownloadedFiles(Path downloadedFile) {
         if (request.destination.isEmpty()) {
             return new ScbDownloaded(downloadedFile);
         }
@@ -55,15 +55,19 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
         val destFile = request.destination.get();
 
         try {
-            Files.move(downloadedFile.toPath(), destFile.toPath());
+            Files.move(downloadedFile, destFile);
             return new ScbDownloadedAndMoved(destFile);
         } catch (IOException e) {
-            val deleteSucceeded = downloadedFile.delete();
-            return new ScbDownloadedAndMoveFailed(downloadedFile, destFile, deleteSucceeded, e);
+            try {
+                Files.delete(downloadedFile);
+                return new ScbDownloadedAndMoveFailed(downloadedFile, destFile, true, e);
+            } catch (IOException ex) {
+                return new ScbDownloadedAndMoveFailed(downloadedFile, destFile, false, e);
+            }
         }
     }
 
-    private Either<String, File> downloadSCB(Database db) {
+    private Either<String, Path> downloadSCB(Database db) {
         return downloadsGateway.downloadCloudSecureBundles(
             request.dbRef,
             db.getInfo().getName(),

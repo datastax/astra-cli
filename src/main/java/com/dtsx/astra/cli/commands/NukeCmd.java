@@ -13,7 +13,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -128,14 +128,14 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         ));
     }
 
-    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String operation, Map<File, Optional<SkipReason>> files) {
+    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String operation, Map<Path, Optional<SkipReason>> files) {
         if (files.isEmpty()) {
             nothingToReport.add(operation);
         } else {
             sb.append(capitalize(operation)).append(" files").append(":").append(NL);
 
             for (val file : files.entrySet()) {
-                sb.append("→ ").append(highlight(file.getKey().getAbsolutePath()));
+                sb.append("→ ").append(highlight(file.getKey()));
 
                 if (file.getValue().isPresent()) {
                     sb.append(" - ").append(file.getValue().get().reason());
@@ -170,7 +170,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         ));
     }
 
-    private boolean promptShouldDeleteAstrarc(File file, boolean isDryRun) {
+    private boolean promptShouldDeleteAstrarc(Path file, boolean isDryRun) {
         val secondLine = (isDryRun)
             ? "This is a dry-run, so the file @|underline @!will not actually be deleted!@|@."
             : "Your credentials @!may be lost!@ if you do. A backup is recommended.";
@@ -179,7 +179,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
           Do you also want to delete the @!.astrarc!@ file located at @|underline @!%s!@|@?
         
           %s
-        """.formatted(file.getAbsolutePath(), secondLine);
+        """.formatted(file, secondLine);
 
         return AstraConsole.confirm(prompt)
             .defaultNo()

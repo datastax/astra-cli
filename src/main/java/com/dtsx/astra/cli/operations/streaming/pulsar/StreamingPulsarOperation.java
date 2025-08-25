@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.streaming.pulsar.StreamingPulsarOperation.PulsarRequest;
 import lombok.val;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarR
     public record PulsarRequest(
         TenantName tenantName,
         boolean failOnError,
-        Optional<Either<String, File>> execute,
+        Optional<Either<String, Path>> execute,
         boolean noProgress
     ) {}
 
@@ -37,7 +37,7 @@ public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarR
         }
 
         commands.add("--config");
-        commands.add(pulsarConfFile.getRight().getAbsolutePath());
+        commands.add(pulsarConfFile.getRight().toString());
 
         if (request.noProgress) {
             commands.add("--no-progress");
@@ -54,7 +54,7 @@ public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarR
             }),
             toFn((file) -> {
                 commands.add("--filename");
-                commands.add(file.getAbsolutePath());
+                commands.add(file.toString());
             })
         ));
 

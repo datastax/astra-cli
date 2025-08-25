@@ -16,7 +16,8 @@ import lombok.val;
 import org.graalvm.collections.Pair;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -33,8 +34,8 @@ public class SetupOperation implements Operation<SetupResult> {
         Optional<AstraToken> token,
         Optional<AstraEnvironment> env,
         Optional<ProfileName> name,
-        Consumer<File> assertShouldSetup,
-        Consumer<File> assertShouldContinueIfAlreadySetup,
+        Consumer<Path> assertShouldSetup,
+        Consumer<Path> assertShouldContinueIfAlreadySetup,
         Consumer<Profile> assertShouldOverwriteExistingProfile,
         Supplier<AstraToken> promptForToken,
         Function<AstraEnvironment, Boolean> promptForGuessedEnvConfirmation,
@@ -58,7 +59,7 @@ public class SetupOperation implements Operation<SetupResult> {
         }
 
         return resolveProfileDetails(request).foldMap((details) -> {
-            if (configFile.exists()) {
+            if (Files.exists(configFile)) {
                 config().lookupProfile(details.profileName).ifPresent(request.assertShouldOverwriteExistingProfile);
             }
 
@@ -153,7 +154,7 @@ public class SetupOperation implements Operation<SetupResult> {
     private boolean ifConfigExistsAnd(Function<AstraConfig, Boolean> fn) {
         val configFile = AstraConfig.resolveDefaultAstraConfigFile();
 
-        if (configFile.exists()) {
+        if (Files.exists(configFile)) {
             return fn.apply(config());
         }
 

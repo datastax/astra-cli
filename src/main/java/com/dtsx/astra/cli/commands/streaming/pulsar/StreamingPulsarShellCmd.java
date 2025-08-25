@@ -14,7 +14,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 @Command(
@@ -49,7 +49,7 @@ public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
             description = "Input filename with a list of commands to be executed. Each command must be separated by a newline",
             paramLabel = "FILE"
         )
-        public Optional<File> $commandsFile;
+        public Optional<Path> $commandsFile;
     }
 
     @Option(
@@ -69,7 +69,7 @@ public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
         return new StreamingPulsarOperation(streamingGateway, downloadsGateway, new PulsarRequest(
             $tenantName,
             $failOnError,
-            Optional.ofNullable($exec).map(e -> e.$execute.<Either<String, File>>map(Either::left).orElseGet(() -> Either.right(e.$commandsFile.orElseThrow()))),
+            Optional.ofNullable($exec).map(e -> e.$execute.<Either<String, Path>>map(Either::left).orElseGet(() -> Either.right(e.$commandsFile.orElseThrow()))),
             $noProgress
         ));
     }

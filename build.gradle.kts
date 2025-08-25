@@ -108,6 +108,10 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
 
 tasks.test {
     useJUnitPlatform()
+
+    jvmArgs = listOf(
+        "--enable-native-access=ALL-UNNAMED"
+    )
 }
 
 val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile

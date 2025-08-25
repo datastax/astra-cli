@@ -11,8 +11,11 @@ import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.io.file.PathUtils;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -23,18 +26,18 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     private final APIProvider api;
 
     @Override
-    public Either<String, List<File>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters) {
+    public Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters) {
         val dbOpsClient = api.dbOpsClient(ref);
-        val result = new ArrayList<File>();
+        val result = new ArrayList<Path>();
 
         for (val datacenter : datacenters) {
             try {
                 AstraLogger.loading("Downloading secure connect bundle for database %s in region %s".formatted(highlight(ref), highlight(datacenter.getRegion())), (_) -> {
                     val scbName = dbOpsClient.buildScbFileName(dbName, datacenter.getRegion());
-                    val scbPath = new File(AstraHome.Dirs.useScb(), scbName);
+                    val scbPath = AstraHome.Dirs.useScb().resolve(scbName);
 
-                    if (!scbPath.exists()) {
-                        FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath.getAbsolutePath());
+                    if (Files.notExists(scbPath)) {
+                        FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath);
                     }
 
                     result.add(scbPath);
@@ -51,40 +54,40 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @Override
-    public Either<String, File> downloadCqlsh(ExternalSoftware cqlsh) {
+    public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) {
         return installGenericArchive(AstraHome.Dirs.useCqlsh(), cqlsh.url(), "cqlsh");
     }
 
     @Override
-    public Either<String, File> downloadDsbulk(ExternalSoftware dsbulk) {
+    public Either<String, Path> downloadDsbulk(ExternalSoftware dsbulk) {
         return installGenericArchive(AstraHome.Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), "dsbulk");
     }
 
     @Override
-    public Either<String, File> downloadPulsarShell(ExternalSoftware pulsar) {
+    public Either<String, Path> downloadPulsarShell(ExternalSoftware pulsar) {
         return installGenericArchive(AstraHome.Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell");
     }
 
     @Override
-    public Optional<File> cqlshPath(ExternalSoftware cqlsh) {
+    public Optional<Path> cqlshPath(ExternalSoftware cqlsh) {
         return getPath(AstraHome.Dirs::cqlshExists, AstraHome.Dirs::useCqlsh, "cqlsh");
     }
 
     @Override
-    public Optional<File> dsbulkPath(ExternalSoftware dsbulk) {
+    public Optional<Path> dsbulkPath(ExternalSoftware dsbulk) {
         return getPath(() -> AstraHome.Dirs.dsbulkExists(dsbulk.version()), () -> AstraHome.Dirs.useDsbulk(dsbulk.version()), "dsbulk");
     }
 
     @Override
-    public Optional<File> pulsarShellPath(ExternalSoftware pulsar) {
+    public Optional<Path> pulsarShellPath(ExternalSoftware pulsar) {
         return getPath(() -> AstraHome.Dirs.pulsarExists(pulsar.version()), () -> AstraHome.Dirs.usePulsar(pulsar.version()), "pulsar-shell");
     }
 
-    private Optional<File> getPath(Supplier<Boolean> dirExists, Supplier<File> getDir, String exe) {
+    private Optional<Path> getPath(Supplier<Boolean> dirExists, Supplier<Path> getDir, String exe) {
         if (dirExists.get()) {
-            val exeFile = new File(getDir.get(), "bin/" + exe);
+            val exeFile = getDir.get().resolve("bin/" + exe);
 
-            if (exeFile.exists() && exeFile.canExecute()) {
+            if (Files.exists(exeFile) && Files.isExecutable(exeFile)) {
                 return Optional.of(exeFile);
             }
         }
@@ -92,28 +95,27 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @SneakyThrows
-    private Either<String, File> installGenericArchive(File installDir, String url, String exe) {
-        if (installDir.isFile()) {
-            return Either.left("%s is a file; expected it to be a directory".formatted(installDir.getAbsolutePath()));
+    private Either<String, Path> installGenericArchive(Path installDir, String url, String exe) {
+        if (Files.isRegularFile(installDir)) {
+            return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
         }
 
-        val tarFile = new File(installDir.getParentFile(), exe + "-download.tar.gz");
-        val exeFile = new File(installDir, "bin/" + exe);
+        val tarFile = installDir.getParent().resolve(exe + "-download.tar.gz");
+        val exeFile = installDir.resolve("bin/" + exe);
 
-        if (Objects.requireNonNull(installDir.list()).length > 0) {
+        if (!PathUtils.isEmptyDirectory(tarFile)) {
             return Either.right(exeFile);
         }
 
-        //noinspection ResultOfMethodCallIgnored
-        tarFile.delete();
+        Files.deleteIfExists(tarFile);
 
         try {
             AstraLogger.loading("Downloading " + exe + ", please wait", (_) -> {
-                FileUtils.downloadFile(url, tarFile.getAbsolutePath());
+                FileUtils.downloadFile(url, tarFile);
                 return null;
             });
         } catch (Exception e) {
-            return Either.left("Failed to download " + exe + " archive from %s: %s".formatted(url, e.getMessage()));
+            return Either.left("Failed to download " + exe + " archive from %s: '%s'".formatted(url, e.getMessage()));
         }
 
         try {
@@ -123,15 +125,19 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             });
         } catch (Exception e) {
             AstraLogger.exception(e);
-            return Either.left("Failed to extract " + exe + " archive %s: %s".formatted(tarFile.getAbsolutePath(), e.getMessage()));
+            return Either.left("Failed to extract " + exe + " archive %s: '%s'".formatted(tarFile, e.getMessage()));
         }
 
-        if (!exeFile.setExecutable(true, false)) {
-            return Either.left("Failed to make " + exe + " executable at %s".formatted(exeFile.getAbsolutePath()));
+        try {
+            Files.setPosixFilePermissions(exeFile, Set.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_EXECUTE));
+        } catch (Exception e) {
+            return Either.left("Failed to set execute permissions on %s: '%s'".formatted(exeFile, e.getMessage()));
         }
 
-        if (!tarFile.delete()) {
-            return Either.left("Failed to delete temporary " + exe + " archive %s".formatted(tarFile.getAbsolutePath()));
+        try {
+            Files.delete(tarFile);
+        } catch (Exception e) {
+            return Either.left("Failed to delete temporary " + exe + " archive %s: '%s'".formatted(tarFile, e.getMessage()));
         }
 
         return Either.right(exeFile);

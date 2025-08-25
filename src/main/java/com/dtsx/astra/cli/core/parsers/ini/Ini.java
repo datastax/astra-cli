@@ -2,17 +2,19 @@ package com.dtsx.astra.cli.core.parsers.ini;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.utils.StringUtils;
-import lombok.*;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.val;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public record Ini(@Getter ArrayList<TopLevelIniNode> nodes) {
-    public static Ini readIniFile(File file) throws IniParseException, FileNotFoundException {
+    public static Ini readIniFile(Path file) throws IniParseException, IOException {
         try (val scanner = new Scanner(file)) {
             return new IniParser().parseIniFile(scanner);
         }
@@ -46,8 +48,8 @@ public record Ini(@Getter ArrayList<TopLevelIniNode> nodes) {
     }
 
     @SneakyThrows
-    public void writeToFile(File file) {
-        try (val writer = new FileWriter(file)) {
+    public void writeToFile(Path file) {
+        try (val writer = Files.newBufferedWriter(file)) {
             writer.write(render(false));
         }
     }

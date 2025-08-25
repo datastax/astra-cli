@@ -13,39 +13,39 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 @UtilityClass
 public class FileUtils {
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void createFileIfNotExists(File file, @Nullable String extra) {
+    public void createFileIfNotExists(Path path, @Nullable String extra) {
         try {
-            file.createNewFile();
+            Files.createFile(path);
+        } catch (FileAlreadyExistsException _) {
+           // whatever
         } catch (Exception e) {
-            throw new CannotCreateFileException(file, extra, e);
+            throw new CannotCreateFileException(path, extra, e);
         }
     }
 
-    public void createDirIfNotExists(File file, @Nullable String extra) {
+    public void createDirIfNotExists(Path path, @Nullable String extra) {
         try {
-            Files.createDirectories(file.toPath());
+            Files.createDirectories(path);
         } catch (Exception e) {
-            throw new CannotCreateFileException(file, extra, e);
+            throw new CannotCreateFileException(path, extra, e);
         }
     }
     
     @SneakyThrows
-    public static void downloadFile(String urlStr, String file) {
+    public static void downloadFile(String urlStr, Path path) {
         val urlConnection = (HttpURLConnection) new URI(urlStr).toURL().openConnection();
         val buffer = new byte[1024];
 
         @Cleanup val bis = new BufferedInputStream(urlConnection.getInputStream());
-        @Cleanup val fis = new FileOutputStream(file);
+        @Cleanup val fis = Files.newOutputStream(path);
 
         int count;
 
@@ -55,30 +55,32 @@ public class FileUtils {
     }
 
     @SneakyThrows
-    public static void extractTarArchiveInPlace(File tarFile) {
-        val outputDir = tarFile.getParentFile();
+    public static void extractTarArchiveInPlace(Path tarFile) {
+        val outputDir = tarFile.getParent();
 
-        @Cleanup val fis = new FileInputStream(tarFile);
+        @Cleanup val fis = Files.newInputStream(tarFile);
         @Cleanup val gzIn = new GzipCompressorInputStream(fis);
         @Cleanup val tis = new TarArchiveInputStream(gzIn);
 
         TarArchiveEntry tarEntry;
 
         while ((tarEntry = tis.getNextEntry()) != null) {
-            val outputFile = new File(outputDir, tarEntry.getName()).getCanonicalFile();
+            val entryPath = outputDir.resolve(tarEntry.getName()).normalize();
 
             if (tarEntry.isDirectory()) {
-                if (!outputFile.exists() && outputFile.mkdirs()) {
-                    AstraLogger.debug("Created directory: %s".formatted(outputFile.getAbsolutePath()));
+                if (Files.notExists(entryPath)) {
+                    Files.createDirectories(entryPath);
+                    AstraLogger.debug("Created directory: %s".formatted(entryPath));
                 }
             } else {
-                val parent = outputFile.getParentFile();
+                val parent = entryPath.getParent();
 
-                if (parent != null && parent.mkdirs()) {
-                    AstraLogger.debug("Created directory: %s".formatted(parent.getAbsolutePath()));
+                if (parent != null && Files.notExists(parent)) {
+                    Files.createDirectories(parent);
+                    AstraLogger.debug("Created directory: %s".formatted(parent));
                 }
 
-                try (val fos = new FileOutputStream(outputFile)) {
+                try (val fos = Files.newOutputStream(entryPath)) {
                     IOUtils.copy(tis, fos);
                 }
             }

@@ -27,7 +27,7 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -125,7 +125,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         );
     }
 
-    private void assertShouldSetup(File existing) {
+    private void assertShouldSetup(Path existing) {
         AstraLogger.banner();
 
         if (AstraConsole.getConsole() == null) {
@@ -150,7 +150,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           %s
           %s
         """.formatted(
-            existing.getAbsolutePath(),
+            existing,
             renderComment("Example:"),
             renderCommand("${cli.name} db list --token <your_token>")
         );
@@ -161,7 +161,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         AstraConsole.println();
     }
 
-    private void assertShouldContinueIfAlreadySetup(File existing) {
+    private void assertShouldContinueIfAlreadySetup(Path existing) {
         AstraLogger.banner();
 
         val prompt = """
@@ -176,7 +176,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           Do you want to continue and create a new profile?
         """.formatted(
-            existing.getAbsolutePath(),
+            existing,
             renderComment("Example:"),
             renderCommand("${cli.name} config list")
         );

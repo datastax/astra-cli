@@ -11,7 +11,7 @@ import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
 import lombok.val;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +38,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
 
     public sealed interface ExecSource {
         record Statement(String cql) implements ExecSource {}
-        record CqlFile(File file) implements ExecSource {}
+        record CqlFile(Path file) implements ExecSource {}
         record Stdin() implements ExecSource {}
     }
 
@@ -57,7 +57,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
         commands.add("-p");
         commands.add(request.profile().token().unwrap());
         commands.add("-b");
-        commands.add(scbFile.getRight().getAbsolutePath());
+        commands.add(scbFile.getRight().toString());
 
         if (request.keyspace().isPresent()) {
             commands.add("-k");
@@ -75,7 +75,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
                 }
                 case ExecSource.CqlFile(var file) -> {
                     commands.add("-f");
-                    commands.add(file.getAbsolutePath());
+                    commands.add(file.toString());
                 }
                 case ExecSource.Stdin _ -> {
                     if (CliEnvironment.isTty()) {

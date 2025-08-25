@@ -9,7 +9,7 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
@@ -45,7 +45,7 @@ public class DbCqlshStartCmd extends DbCqlshStartImpl {
             paramLabel = "FILE",
             hidden = true
         )
-        public Optional<File> $file;
+        public Optional<Path> $file;
     }
 
     @Override

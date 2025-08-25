@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,7 +63,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             description = { "The astrarc file to use", $ConfigFile.DEFAULT_DESC },
             paramLabel = $ConfigFile.LABEL
         )
-        private Optional<File> $configFile;
+        private Optional<Path> $configFile;
 
         @Option(
             names = { $Profile.LONG, $Profile.SHORT },
@@ -98,8 +98,8 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         val profile = config.lookupProfile(profileName);
 
         if (profile.isEmpty()) {
-            val filePath = config.backingFile().getAbsolutePath();
-            val isDefaultConfigFile = filePath.equals(AstraConfig.resolveDefaultAstraConfigFile().getAbsolutePath());
+            val filePath = config.backingFile();
+            val isDefaultConfigFile = filePath.equals(AstraConfig.resolveDefaultAstraConfigFile());
 
             if (config.getValidatedProfiles().isEmpty()) {
                 val hints = (isDefaultConfigFile)
@@ -109,7 +109,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                     )
                     : List.of(
                         new Hint("Interactively create a new profile (default config file only)", "${cli.name} setup"),
-                        new Hint("Programmatically create a new profile", "${cli.name} config create <name> --token <token> [--env <env>] -cf " + config.backingFile().getPath())
+                        new Hint("Programmatically create a new profile", "${cli.name} config create <name> --token <token> [--env <env>] -cf " + config.backingFile())
                     );
 
                 throw new AstraCliException(PROFILE_NOT_FOUND, """
@@ -129,7 +129,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 """.formatted(
                     highlight(filePath)
                 ), List.of(
-                    new Hint("Set a profile as default:", "${cli.name} config use" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile().getPath())),
+                    new Hint("Set a profile as default:", "${cli.name} config use" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile())),
                     new Hint("Specify a profile to use:", originalArgs(), "--profile <name>")
                 ));
             } else {
@@ -141,7 +141,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                     profileName.unwrap(),
                     highlight(filePath)
                 ), List.of(
-                    new Hint("List available profiles:", "${cli.name} config list" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile().getPath()))
+                    new Hint("List available profiles:", "${cli.name} config list" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile()))
                 ));
             }
         }

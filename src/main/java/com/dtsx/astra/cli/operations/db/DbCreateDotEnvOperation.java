@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.operations.db;
 
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -24,8 +25,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +41,6 @@ import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.EnvKey.*;
 
 @RequiredArgsConstructor
 public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
-    private static final File DEFAULT_ENV_FILE = new File(".env");
-
     private final DbGateway dbGateway;
     private final OrgGateway orgGateway;
     private final DownloadsGateway downloadsGateway;
@@ -51,7 +51,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         DbRef dbRef,
         Optional<KeyspaceRef> ksRef,
         Optional<RegionName> region,
-        Optional<File> file,
+        Optional<Path> file,
         boolean print,
         Set<EnvKey> keys,
         Optional<Boolean> overwrite,
@@ -60,33 +60,35 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
     public sealed interface CreateDotEnvResult {}
 
-    public record CreatedDotEnvFile(File file) implements CreateDotEnvResult {}
-    public record UpdatedDotEnvFile(File file, boolean overwritten) implements CreateDotEnvResult {}
+    public record CreatedDotEnvFile(Path file) implements CreateDotEnvResult {}
+    public record UpdatedDotEnvFile(Path file, boolean overwritten) implements CreateDotEnvResult {}
     public record CreatedDotEnvContent(EnvFile content) implements CreateDotEnvResult {}
-    public record NothingToUpdate(File file) implements CreateDotEnvResult {}
+    public record NothingToUpdate(Path file) implements CreateDotEnvResult {}
     public record FailedToDownloadSCB(String reason) implements CreateDotEnvResult {}
 
     @Override
     public CreateDotEnvResult execute() {
-        val source = resolveSourceContent(request.file(), request.print());
+        val DEFAULT_ENV_FILE = CliEnvironment.path(".env");
+
+        val source = resolveSourceContent(request.file(), request.print(), DEFAULT_ENV_FILE);
 
         val shouldOverwrite = shouldOverwrite(source, request);
 
         val maybeScbPath = (request.keys.contains(ASTRA_DB_SECURE_BUNDLE_PATH))
             ? downloadAndResolveScbPath(request)
-            : Either.<String, File>right(null);
+            : Either.<String, Path>right(null);
 
         return maybeScbPath.fold(
             FailedToDownloadSCB::new,
-            (scbFile) -> {
-                val wasUpdated = appendToEnvFile(source, request, shouldOverwrite, scbFile);
+            (scbPath) -> {
+                val wasUpdated = appendToEnvFile(source, request, shouldOverwrite, scbPath);
 
                 if (request.print) {
                     return new CreatedDotEnvContent(source);
                 }
 
                 val outputFile = request.file().orElse(DEFAULT_ENV_FILE);
-                val fileAlreadyExists = outputFile.exists();
+                val fileAlreadyExists = Files.exists(outputFile);
 
                 if (wasUpdated) {
                     source.writeToFile(outputFile);
@@ -137,12 +139,12 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         ASTRA_STREAMING_WEBSOCKET_URL,
     }
 
-    private EnvFile resolveSourceContent(Optional<File> file, boolean print) {
+    private EnvFile resolveSourceContent(Optional<Path> file, boolean print, Path defaultEnvFile) {
         if (print && file.isEmpty()) {
             return new EnvFile(new ArrayList<>());
         }
 
-        val envFile = file.orElse(DEFAULT_ENV_FILE);
+        val envFile = file.orElse(defaultEnvFile);
 
         try {
             return EnvFile.readEnvFile(envFile);
@@ -168,7 +170,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         return diff.isEmpty() || request.askIfShouldOverwrite.apply(diff);
     }
 
-    private boolean appendToEnvFile(EnvFile source, CreateDotEnvRequest request, boolean overwrite, @Nullable File scbFile) {
+    private boolean appendToEnvFile(EnvFile source, CreateDotEnvRequest request, boolean overwrite, @Nullable Path scbPath) {
         val envSetter = new EnvSetter(source, request, overwrite);
         var wasUpdated = false;
 
@@ -192,7 +194,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         }
 
         {
-            wasUpdated |= envSetter.set(ASTRA_DB_SECURE_BUNDLE_PATH, () -> Optional.ofNullable(scbFile).map(File::getAbsolutePath).orElse(null));
+            wasUpdated |= envSetter.set(ASTRA_DB_SECURE_BUNDLE_PATH, () -> Optional.ofNullable(scbPath).map(Path::toString).orElse(null));
             wasUpdated |= envSetter.set(ASTRA_DB_SECURE_BUNDLE_URL, () -> resolveScbUrl(request));
         }
 
@@ -255,7 +257,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         return cachedKeyspace;
     }
 
-    private Either<String, File> downloadAndResolveScbPath(CreateDotEnvRequest request) {
+    private Either<String, Path> downloadAndResolveScbPath(CreateDotEnvRequest request) {
         val dbName = db(request).getInfo().getName();
         val datacenter = resolveDatacenter(request);
 
@@ -303,8 +305,8 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
     }
 
     public static class EnvParseExceptionWrapper extends AstraCliException {
-        public EnvParseExceptionWrapper(EnvParseException e, File file) {
-            super("@|bold,red An error occurred parsing the .env file '%s':|@%n%n%s".formatted(file.getAbsolutePath(), e.getMessage()));
+        public EnvParseExceptionWrapper(EnvParseException e, Path file) {
+            super("@|bold,red An error occurred parsing the .env file '%s':|@%n%n%s".formatted(file, e.getMessage()));
         }
     }
 }

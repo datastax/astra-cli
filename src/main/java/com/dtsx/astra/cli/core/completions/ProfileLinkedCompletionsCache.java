@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +23,9 @@ public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
     }
 
     @Override
-    protected Optional<File> useCacheDir() {
+    protected Optional<Path> useCacheDir() {
         return profileName.flatMap((name) -> (
-            super.useCacheDir().map((dir) -> new File(dir, sanitizeFileName(name.unwrap()))
+            super.useCacheDir().map((dir) -> dir.resolve(sanitizeFileName(name.unwrap()))
         )));
     }
 
