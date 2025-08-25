@@ -33,7 +33,7 @@ import static picocli.CommandLine.Help.Ansi.OFF;
 )
 public abstract class AbstractCmd<OpRes> implements Runnable {
     public static final String DEFAULT_START = "  @|faint (default: |@@|faint,italic ";
-    public static final String DEFAULT_END = "|@@|faint )|@\"";
+    public static final String DEFAULT_END = "|@@|faint )|@";
     public static final String DEFAULT_VALUE = DEFAULT_START + "${DEFAULT-VALUE}" + DEFAULT_END;
 
     @Spec

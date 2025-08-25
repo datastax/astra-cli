@@ -25,7 +25,7 @@ import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
 )
 public class CdcListCmd extends AbstractCdcCmd<Stream<CdcInfo>> {
     @Override
-    protected OutputJson executeJson(Supplier<Stream<CdcInfo>> result) {
+    protected final OutputJson executeJson(Supplier<Stream<CdcInfo>> result) {
         return OutputJson.serializeValue(result.get().map(CdcInfo::raw).toList());
     }
 

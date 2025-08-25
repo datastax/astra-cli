@@ -33,7 +33,7 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOper
 )
 public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<CollectionDescribeResult> {
     @Override
-    protected OutputJson executeJson(Supplier<CollectionDescribeResult> result) {
+    protected final OutputJson executeJson(Supplier<CollectionDescribeResult> result) {
             return switch (result.get()) {
             case CollectionNotFound() -> throwCollectionNotFound();
             case CollectionFound(var info) -> OutputJson.serializeValue(info.raw());

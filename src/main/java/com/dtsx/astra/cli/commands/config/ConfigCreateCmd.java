@@ -1,5 +1,8 @@
 package com.dtsx.astra.cli.commands.config;
 
+import com.dtsx.astra.cli.core.CliConstants.$Env;
+import com.dtsx.astra.cli.core.CliConstants.$Profile;
+import com.dtsx.astra.cli.core.CliConstants.$Token;
 import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
@@ -58,25 +61,25 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(
         arity = "0..1",
-        description = "Profile name (defaults to organization name if not specified)",
-        paramLabel = "PROFILE"
+        description = { "Profile name", DEFAULT_START + "organization name" + DEFAULT_END },
+        paramLabel = $Profile.LABEL
     )
     public Optional<ProfileName> $profileName;
 
     @Option(
-        names = { "-t", "--token" },
-        description = "Astra authentication token (must start with 'AstraCS:')",
-        paramLabel = "TOKEN",
+        names = { $Token.LONG, $Token.SHORT },
+        description = "Astra authentication token",
+        paramLabel = $Token.LABEL,
         required = true
     )
     public AstraToken $token;
 
     @Option(
-        names = { "-e", "--env" },
+        names = { $Env.LONG, $Env.SHORT },
         description = { "Astra environment to connect to", DEFAULT_VALUE },
         completionCandidates = AstraEnvCompletion.class,
-        paramLabel = "ASTRA_ENV",
-        defaultValue = "prod"
+        defaultValue = $Env.DEFAULT,
+        paramLabel = $Env.LABEL
     )
     public AstraEnvironment $env;
 
@@ -88,7 +91,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { "--overwrite" },
-        description = { "Whether to overwrite any existing profile(s) with the same name", DEFAULT_VALUE },
+        description = "Overwrite existing profile(s) with the same name",
         paramLabel = "PRINT",
         negatable = true
     )
@@ -131,7 +134,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
         val mainMsg = (wasFailIfExists)
             ? "The @!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
-            : "To overwrite it, either interactively respond @!yes@! to the prompt, or use the @!--yes!@ option to proceed without confirmation.";
+            : "To overwrite it, either interactively respond @!yes@! to the prompt, or use the @!--overwrite!@ option to proceed without confirmation.";
 
         throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists in the configuration file.|@
@@ -141,7 +144,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             profileName,
             mainMsg
         ), List.of(
-            new Hint("Example fix:", originalArgsWithoutFailIfExists, "--yes"),
+            new Hint("Example fix:", originalArgsWithoutFailIfExists, "--overwrite"),
             new Hint("See the values of the existing profile:", "${cli.name} config get " + profileName)
         ));
     }
@@ -201,8 +204,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
         val allowOverwrite = AstraConsole.confirm(msg)
             .defaultNo()
-            .fallbackFlag("--yes")
-            .fix(originalArgs(), "--yes")
+            .fallbackFlag("--overwrite")
+            .fix(originalArgs(), "--overwrite")
             .clearAfterSelection();
 
         if (!allowOverwrite) {

@@ -1,7 +1,8 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
-import com.dtsx.astra.cli.core.models.CollectionRef;
+import com.dtsx.astra.cli.core.CliConstants.$Collection;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.models.CollectionRef;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
@@ -9,9 +10,9 @@ public abstract class AbstractCollectionSpecificCmd<OpRes> extends AbstractColle
     protected CollectionRef $collRef;
 
     @Option(
-        names = { "--collection", "-c" },
-        description = { "The collection to use", DEFAULT_VALUE },
-        paramLabel = "COLLECTION",
+        names = { $Collection.LONG, $Collection.SHORT },
+        description = "The collection to use",
+        paramLabel = $Collection.LABEL,
         required = true
     )
     private String actualCollectionRefOption;

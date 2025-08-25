@@ -10,7 +10,7 @@ import picocli.CommandLine.Command;
         UserListCmd.class,
         UserGetCmd.class,
         UserInviteCmd.class,
-        UserDeleteCmd.class
+        UserDeleteCmd.class,
     }
 )
 @Example(

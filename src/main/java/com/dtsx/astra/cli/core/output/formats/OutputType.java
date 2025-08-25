@@ -28,7 +28,13 @@ public enum OutputType {
     }
 
     public static class Mixin {
-        @Option(names = { "--output", "-o" }, completionCandidates = OutputTypeCompletion.class, defaultValue = "human", description = "One of: ${COMPLETION-CANDIDATES}", paramLabel = "FORMAT")
+        @Option(
+            names = { "--output", "-o" },
+            completionCandidates = OutputTypeCompletion.class,
+            defaultValue = "human",
+            description = "One of: ${COMPLETION-CANDIDATES}",
+            paramLabel = "FORMAT"
+        )
         public void setRequested(OutputType type) {
             if (OutputType.requested == null) {
                 OutputType.requested = type;

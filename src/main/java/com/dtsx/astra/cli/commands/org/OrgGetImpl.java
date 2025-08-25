@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public abstract class OrgGetImpl extends AbstractOrgCmd<Organization> {
     @Override
-    protected OutputJson executeJson(Supplier<Organization> org) {
+    protected final OutputJson executeJson(Supplier<Organization> org) {
         return OutputJson.serializeValue(org);
     }
 

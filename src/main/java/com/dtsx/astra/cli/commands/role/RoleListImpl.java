@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public abstract class RoleListImpl extends AbstractRoleCmd<Stream<RoleInfo>> {
     @Override
-    protected OutputJson executeJson(Supplier<Stream<RoleInfo>> result) {
+    protected final OutputJson executeJson(Supplier<Stream<RoleInfo>> result) {
         return OutputJson.serializeValue(result.get().map(RoleInfo::raw).toList());
     }
 

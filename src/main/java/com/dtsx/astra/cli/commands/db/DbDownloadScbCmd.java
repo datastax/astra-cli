@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -41,18 +42,18 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> {
     @Option(
-        names = { "-r", "--region" },
+        names = { $Regions.LONG, $Regions.SHORT },
         description = "The cloud provider region to target. Defaults to the default region of the database.",
-        paramLabel = "DB_REGION"
+        paramLabel = $Regions.LABEL
     )
-    private Optional<RegionName> $region;
+    public Optional<RegionName> $region;
 
     @Option(
-        names = { "-f", "--output-file" },
+        names = { "-f", "--file" },
         description = "Destination file. Defaults to `~/.astra/scb/scb_<name/id>_<region>.zip`",
         paramLabel = "DEST"
     )
-    private Optional<File> $destination;
+    public Optional<File> $destination;
 
     @Override
     protected DbDownloadScbOperation mkOperation() {

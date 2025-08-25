@@ -1,5 +1,8 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
+import com.dtsx.astra.cli.core.CliConstants.$Db;
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
+import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -24,17 +27,16 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
     @Parameters(
-        index = "0",
         completionCandidates = DbNamesCompletion.class,
-        paramLabel = "DB",
-        description = "The name/ID of the Astra database to connect to"
+        description = "The name/ID of the Astra database to connect to",
+        paramLabel = $Db.LABEL
     )
     public DbRef $dbRef;
 
     @Option(
-        names = { "-k", "--keyspace" },
+        names = { $Keyspace.LONG, $Keyspace.SHORT },
         description = "Authenticate to the given keyspace",
-        paramLabel = "KEYSPACE"
+        paramLabel = $Keyspace.LABEL
     )
     public Optional<String> $keyspace;
 
@@ -47,9 +49,9 @@ public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
     public int $requestTimeout;
 
     @Option(
-        names = { "--region", "-r" },
+        names = { $Regions.LONG, $Regions.SHORT },
         description = "The region to use. Uses the db's default region if not specified.",
-        paramLabel = "REGION"
+        paramLabel = $Regions.LABEL
     )
     private Optional<RegionName> $region;
 

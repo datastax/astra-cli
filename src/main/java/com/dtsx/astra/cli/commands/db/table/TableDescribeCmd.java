@@ -34,7 +34,7 @@ import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
 )
 public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResult> {
     @Override
-    protected OutputJson executeJson(Supplier<TableDescribeResult> result) {
+    protected final OutputJson executeJson(Supplier<TableDescribeResult> result) {
         return switch (result.get()) {
             case TableNotFound() -> throwTableNotFound();
             case TableFound(var info) -> OutputJson.serializeValue(info.raw());

@@ -23,18 +23,18 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 )
 public class CompletionsCmd implements Runnable {
     @Spec
-    CommandSpec spec;
+    private CommandSpec spec;
 
     @Option(
         names = { "-n", "--cli-name" },
         description = { "CLI name to use in the completion script", DEFAULT_VALUE },
         defaultValue = "${cli.name}"
     )
-    String cliName;
+    public String $cliName;
 
     public void run() {
         val script = AutoComplete.bash(
-            cliName,
+            $cliName,
             spec.root().commandLine()
         );
 

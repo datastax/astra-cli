@@ -72,7 +72,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     }
 
     @Override
-    protected OutputAll execute(Supplier<CqlshExecResult> result) {
+    protected final OutputAll execute(Supplier<CqlshExecResult> result) {
         if (!captureOutputForNonHumanOutput()) {
             return super.execute(result);
         }

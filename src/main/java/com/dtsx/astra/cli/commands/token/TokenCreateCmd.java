@@ -34,14 +34,14 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
         paramLabel = "ROLE",
         required = true
     )
-    private RoleRef $role;
+    public RoleRef $role;
 
     @Option(
         names = { "-d", "--description" },
         description = "An optional description for this token",
-        paramLabel = "DESCRIPTION"
+        paramLabel = "DESC"
     )
-    private Optional<String> $description;
+    public Optional<String> $description;
 
     @Override
     public final OutputJson executeJson(Supplier<CreateTokenResponse> tokenResponse) {

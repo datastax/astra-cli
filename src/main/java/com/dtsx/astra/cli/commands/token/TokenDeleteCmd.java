@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.token;
 
+import com.dtsx.astra.cli.core.CliConstants.$Token;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -35,18 +36,17 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 )
 public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
     @Parameters(
-        index = "0",
         description = "Token identifier",
-        paramLabel = "TOKEN"
+        paramLabel = $Token.LABEL
     )
-    private String tokenId;
+    public String $tokenId;
 
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if token does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    public boolean ifExists;
+    public boolean $ifExists;
 
     @Override
     public final OutputAll execute(Supplier<TokenDeleteResult> result) {
@@ -65,7 +65,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
     }
 
     private OutputAll handleTokenNotFound() {
-        val message = "Token %s does not exist; nothing to delete.".formatted(highlight(tokenId));
+        val message = "Token %s does not exist; nothing to delete.".formatted(highlight($tokenId));
         val data = mkData(false);
         
         return OutputAll.response(message, data, List.of(
@@ -81,7 +81,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
 
           The specified token does not exist. To avoid this error, pass the @!--if-exists!@ flag to skip this error if the token doesn't exist.
         """.formatted(
-            tokenId
+            $tokenId
         ), List.of(
             new Hint("Example fix:", originalArgsWithFlag, "--if-exists"),
             new Hint("See all available tokens:", "${cli.name} token list")
@@ -96,6 +96,6 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
 
     @Override
     protected Operation<TokenDeleteResult> mkOperation() {
-        return new TokenDeleteOperation(tokenGateway, new TokenDeleteRequest(tokenId, ifExists));
+        return new TokenDeleteOperation(tokenGateway, new TokenDeleteRequest($tokenId, $ifExists));
     }
 }

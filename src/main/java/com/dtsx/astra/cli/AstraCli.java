@@ -64,7 +64,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 public class AstraCli extends AbstractCmd<Void> {
     @Override
-    public OutputHuman executeHuman(Supplier<Void> v) {
+    public final OutputHuman executeHuman(Supplier<Void> v) {
         AstraLogger.banner();
 
         val sj = new StringJoiner(NL);

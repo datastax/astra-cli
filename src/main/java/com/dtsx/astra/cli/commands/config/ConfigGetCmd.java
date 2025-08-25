@@ -1,9 +1,10 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.core.config.InvalidProfile;
-import com.dtsx.astra.cli.core.config.Profile;
+import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
+import com.dtsx.astra.cli.core.config.InvalidProfile;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -11,7 +12,10 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.Hint;
-import com.dtsx.astra.cli.core.output.formats.*;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputCsv;
+import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.core.parsers.ini.Ini;
 import com.dtsx.astra.cli.operations.Operation;
@@ -56,7 +60,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         arity = "0..1",
         description = "Name of the profile to display",
         completionCandidates = AvailableProfilesCompletion.class,
-        paramLabel = "PROFILE"
+        paramLabel = $Profile.LABEL
     )
     public Optional<String> $profileName;
 
@@ -66,7 +70,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         completionCandidates = ProfileKeysCompletion.class,
         paramLabel = "KEY"
     )
-    public Optional<String> $key = Optional.empty();
+    public Optional<String> $key;
 
     @Override
     public final OutputAll execute(Supplier<GetConfigResult> result) {

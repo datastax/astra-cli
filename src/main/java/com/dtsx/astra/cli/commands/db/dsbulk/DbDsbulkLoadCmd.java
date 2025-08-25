@@ -38,7 +38,8 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(
         names = { "--header" },
         description = { "Read, Write Header in input file", DEFAULT_VALUE },
-        defaultValue = "true"
+        defaultValue = "true",
+        fallbackValue = "true"
     )
     public boolean $header;
 

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -9,10 +10,10 @@ public abstract class AbstractKeyspaceSpecificCmd<OpRes> extends AbstractKeyspac
     protected KeyspaceRef $keyspaceRef;
 
     @Option(
-        names = { "--keyspace", "-k" },
+        names = { $Keyspace.LONG, $Keyspace.SHORT },
         description = { "The keyspace to use", DEFAULT_VALUE },
-        paramLabel = "KEYSPACE",
-        defaultValue = "default_keyspace"
+        defaultValue = $Keyspace.DEFAULT,
+        paramLabel = $Keyspace.LABEL
     )
     private String actualKeyspaceRefOption;
 

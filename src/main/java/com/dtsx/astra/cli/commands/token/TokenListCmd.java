@@ -25,7 +25,7 @@ import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
 )
 public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override
-    protected OutputJson executeJson(Supplier<Stream<TokenInfo>> tokens) {
+    protected final OutputJson executeJson(Supplier<Stream<TokenInfo>> tokens) {
         return OutputJson.serializeValue(tokens.get().map((t) -> Map.of(
             "generatedOn", t.generatedOn(),
             "clientId", t.clientId(),

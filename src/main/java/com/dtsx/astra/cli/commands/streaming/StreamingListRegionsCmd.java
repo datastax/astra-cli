@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.streaming;
 
+import com.dtsx.astra.cli.core.CliConstants.$Cloud;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
@@ -39,21 +40,21 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
     @Option(
         names = { "-f", "--filter" },
         description = "Comma-separated case-insensitive partial-match filters on the region name",
-        split = ",",
-        paramLabel = "FILTER"
+        paramLabel = "FILTER",
+        split = ","
     )
     public @Nullable List<String> $nameFilter;
 
     @Option(
-        names = { "-c", "--cloud" },
+        names = { $Cloud.LONG, $Cloud.SHORT },
         description = "Comma-separated list of cloud providers to filter on",
-        split = ",",
-        paramLabel = "FILTER"
+        paramLabel = "FILTER",
+        split = ","
     )
     public @Nullable List<CloudProviderType> $cloudFilter;
 
     @Override
-    protected OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
+    protected final OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
             .map((r) -> Map.of(
                 "cloudProvider", r.cloudProvider(),
@@ -67,7 +68,7 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
     }
 
     @Override
-    protected OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
+    protected final OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
             .map((r) -> Map.of(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.isPremium()),

@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public abstract class UserListImpl extends AbstractUserCmd<Stream<UserInfo>> {
     @Override
-    protected OutputJson executeJson(Supplier<Stream<UserInfo>> result) {
+    protected final OutputJson executeJson(Supplier<Stream<UserInfo>> result) {
         return OutputJson.serializeValue(result.get().map(UserInfo::raw).toList());
     }
 

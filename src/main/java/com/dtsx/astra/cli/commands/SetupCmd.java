@@ -1,8 +1,10 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.core.CliConstants.$Env;
+import com.dtsx.astra.cli.core.CliConstants.$Token;
+import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
-import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
@@ -40,17 +42,17 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 )
 public class SetupCmd extends AbstractCmd<SetupResult> {
     @Option(
-        names = { "--token" },
+        names = { $Token.LONG, $Token.SHORT },
         description = "Token to use authenticate each call. If not provided, you will be prompted for it",
-        paramLabel = "TOKEN"
+        paramLabel = $Token.LABEL
     )
     public Optional<AstraToken> $token;
 
     @Option(
-        names = { "--env" },
+        names = { $Env.LONG, $Env.SHORT },
         description = "Astra environment for the token to target. If not provided, you will be prompted for it",
         completionCandidates = AstraEnvCompletion.class,
-        paramLabel = "ENV"
+        paramLabel = $Env.LABEL
     )
     public Optional<AstraEnvironment> $env;
 
@@ -62,7 +64,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     public Optional<ProfileName> $name;
 
     @Override
-    protected OutputHuman executeHuman(Supplier<SetupResult> result) {
+    protected final OutputHuman executeHuman(Supplier<SetupResult> result) {
         return switch (result.get()) {
             case ProfileCreated pc -> handleProfileCreated(pc);
             case InvalidToken(var hint) -> throwInvalidToken(hint);

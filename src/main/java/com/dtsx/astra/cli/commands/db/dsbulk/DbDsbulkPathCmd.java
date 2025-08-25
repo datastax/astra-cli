@@ -51,7 +51,7 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
     }
 
     @Override
-    protected OutputAll execute(Supplier<DsbulkPathResponse> result) {
+    protected final OutputAll execute(Supplier<DsbulkPathResponse> result) {
         return switch (result.get()) {
             case ExePathFound(var file) -> handleExePathFound(file);
             case NoInstallationFound _ -> throwNoInstallationFound();

@@ -8,7 +8,7 @@ import picocli.CommandLine.Command;
     description = "Discover Astra roles",
     subcommands = {
         RoleListCmd.class,
-        RoleGetCmd.class
+        RoleGetCmd.class,
     }
 )
 @Example(

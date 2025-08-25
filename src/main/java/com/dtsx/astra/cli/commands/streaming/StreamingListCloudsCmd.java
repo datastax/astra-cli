@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 )
 public class StreamingListCloudsCmd extends AbstractStreamingCmd<Set<CloudProviderType>> {
     @Override
-    protected OutputJson executeJson(Supplier<Set<CloudProviderType>> clouds) {
+    protected final OutputJson executeJson(Supplier<Set<CloudProviderType>> clouds) {
         val data = clouds.get()
             .stream()
             .map((cloud) -> Map.of("cloudProvider", cloud.name()))
@@ -34,7 +34,7 @@ public class StreamingListCloudsCmd extends AbstractStreamingCmd<Set<CloudProvid
     }
 
     @Override
-    protected OutputAll execute(Supplier<Set<CloudProviderType>> clouds) {
+    protected final OutputAll execute(Supplier<Set<CloudProviderType>> clouds) {
         val data = clouds.get()
             .stream()
             .map((cloud) -> Map.of("Cloud Provider", cloud.name().toLowerCase()))

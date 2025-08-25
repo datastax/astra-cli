@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
+import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -86,16 +88,16 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     private Optional<File> $file;
 
     @Option(
-        names = { "--keyspace", "-k" },
+        names = { $Keyspace.LONG, $Keyspace.SHORT },
         description = "The keyspace to use. Uses the db's default keyspace if not specified.",
-        paramLabel = "KEYSPACE"
+        paramLabel = $Keyspace.LABEL
     )
     private Optional<String> $keyspace;
 
     @Option(
-        names = { "--region", "-r" },
+        names = { $Regions.LONG, $Regions.SHORT },
         description = "The region to use. Uses the db's default region if not specified.",
-        paramLabel = "REGION"
+        paramLabel = $Regions.LABEL
     )
     private Optional<RegionName> $region;
 

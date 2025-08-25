@@ -42,7 +42,7 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
     public boolean $all;
 
     @Override
-    protected OutputJson executeJson(Supplier<Stream<TableListResult>> result) {
+    protected final OutputJson executeJson(Supplier<Stream<TableListResult>> result) {
         validateParams();
 
         if ($all) {

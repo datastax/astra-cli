@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
@@ -15,9 +16,9 @@ public abstract class AbstractLongRunningKeyspaceRequiredCmd<OpRes> extends Abst
     protected LongRunningOptionsMixin lrMixin;
 
     @Option(
-        names = { "--keyspace", "-k" },
-        description = { "The keyspace to use", DEFAULT_VALUE },
-        paramLabel = "KEYSPACE",
+        names = { $Keyspace.LONG, $Keyspace.SHORT },
+        description = "The keyspace to use",
+        paramLabel = $Keyspace.LABEL,
         required = true
     )
     private String actualKeyspaceRefOption;

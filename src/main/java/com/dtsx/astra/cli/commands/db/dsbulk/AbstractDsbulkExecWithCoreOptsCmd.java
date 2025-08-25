@@ -1,5 +1,9 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
+import com.dtsx.astra.cli.core.CliConstants.$Db;
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
+import com.dtsx.astra.cli.core.CliConstants.$Regions;
+import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -18,22 +22,22 @@ import static java.util.Collections.emptyMap;
 public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkExecCmd {
     @Parameters(
         completionCandidates = DbNamesCompletion.class,
-        paramLabel = "DB",
-        description = "The name or ID of the Astra database to operate on"
+        description = "The name or ID of the Astra database to operate on",
+        paramLabel = $Db.LABEL
     )
     protected DbRef $dbRef;
 
     @Option(
-        names = { "-k", "--keyspace" },
+        names = { $Keyspace.LONG, $Keyspace.SHORT },
         description = "Keyspace used for loading or unloading data",
-        paramLabel = "KEYSPACE"
+        paramLabel = $Keyspace.LABEL
     )
     public String $keyspace;
     
     @Option(
-        names = { "-t", "--table" },
-        description = "Table used for loading or unloading data. Table names should not be quoted and are case-sensitive",
-        paramLabel = "TABLE"
+        names = { $Table.LONG, $Table.SHORT },
+        description = "Table used for loading or unloading data.",
+        paramLabel = $Table.LABEL
     )
     public String $table;
 
@@ -62,9 +66,9 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
     public String $logDir;
 
     @Option(
-        names = { "--region", "-r" },
+        names = { $Regions.LONG, $Regions.SHORT },
         description = "The region to use. Uses the db's default region if not specified.",
-        paramLabel = "REGION"
+        paramLabel = $Regions.LABEL
     )
     public Optional<RegionName> $region;
     

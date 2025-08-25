@@ -1,10 +1,14 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.core.CliConstants.$ConfigFile;
+import com.dtsx.astra.cli.core.CliConstants.$Env;
+import com.dtsx.astra.cli.core.CliConstants.$Profile;
+import com.dtsx.astra.cli.core.CliConstants.$Token;
+import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
-import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -25,30 +29,49 @@ import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @ArgGroup
-    private @Nullable CredsProvider credsProvider;
+    private @Nullable CredsProvider $credsProvider;
 
     public static class CredsProvider {
         @ArgGroup(exclusive = false)
-        public @Nullable ConfigSpec config;
+        public @Nullable ConfigSpec $config;
 
         @ArgGroup(exclusive = false)
-        public @Nullable CredsSpec creds;
+        public @Nullable CredsSpec $creds;
     }
 
     public static class CredsSpec {
-        @Option(names = { "--token" }, description = "Override the default astra token", paramLabel = "TOKEN", required = true)
-        public AstraToken token;
+        @Option(
+            names = { $Token.LONG },
+            description = "Override the default astra token",
+            paramLabel = $Token.LABEL,
+            required = true
+        )
+        public AstraToken $token;
 
-        @Option(names = { "--env" }, completionCandidates = AstraEnvCompletion.class, description = "Override the target astra environment", paramLabel = "ENV")
-        private Optional<AstraEnvironment> env;
+        @Option(
+            names = { $Env.LONG },
+            completionCandidates = AstraEnvCompletion.class,
+            description = "Override the target astra environment",
+            paramLabel = $Env.LABEL
+        )
+        private Optional<AstraEnvironment> $env;
     }
 
     public static class ConfigSpec {
-        @Option(names = { "--config-file", "-cf" }, description = { "The astrarc file to use", DEFAULT_START + "${cli.rc-file-path}" + DEFAULT_END }, paramLabel = "PATH")
-        private Optional<File> configFile;
+        @Option(
+            names = { $ConfigFile.LONG, $ConfigFile.SHORT },
+            description = { "The astrarc file to use", $ConfigFile.DEFAULT_DESC },
+            paramLabel = $ConfigFile.LABEL
+        )
+        private Optional<File> $configFile;
 
-        @Option(names = { "--profile", "-p" }, completionCandidates = AvailableProfilesCompletion.class, description = "Specify the astrarc profile to use", paramLabel = "NAME")
-        public Optional<ProfileName> profileName;
+        @Option(
+            names = { $Profile.LONG, $Profile.SHORT },
+            completionCandidates = AvailableProfilesCompletion.class,
+            description = "The astrarc profile to use",
+            paramLabel = $Profile.LABEL
+        )
+        public Optional<ProfileName> $profileName;
     }
 
     private @Nullable Profile cachedProfile;
@@ -60,16 +83,16 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             return cachedProfile;
         }
 
-        if (credsProvider != null && credsProvider.creds != null) {
-            return cachedProfile = new Profile(Optional.empty(), credsProvider.creds.token, credsProvider.creds.env.orElse(AstraEnvironment.PROD));
+        if ($credsProvider != null && $credsProvider.$creds != null) {
+            return cachedProfile = new Profile(Optional.empty(), $credsProvider.$creds.$token, $credsProvider.$creds.$env.orElse(AstraEnvironment.PROD));
         }
 
-        val profileName = (credsProvider != null && credsProvider.config != null && credsProvider.config.profileName.isPresent())
-            ? credsProvider.config.profileName.get()
+        val profileName = ($credsProvider != null && $credsProvider.$config != null && $credsProvider.$config.$profileName.isPresent())
+            ? $credsProvider.$config.$profileName.get()
             : ProfileName.DEFAULT;
 
-        val config = (credsProvider != null && credsProvider.config != null)
-            ? AstraConfig.readAstraConfigFile(credsProvider.config.configFile.orElse(null), false)
+        val config = ($credsProvider != null && $credsProvider.$config != null)
+            ? AstraConfig.readAstraConfigFile($credsProvider.$config.$configFile.orElse(null), false)
             : AstraConfig.readAstraConfigFile(null, false);
 
         val profile = config.lookupProfile(profileName);

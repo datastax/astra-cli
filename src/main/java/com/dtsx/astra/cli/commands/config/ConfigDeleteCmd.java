@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.config;
 
+import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -38,7 +39,7 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
     @Parameters(
         description = "Name of the profile to delete",
         completionCandidates = AvailableProfilesCompletion.class,
-        paramLabel = "PROFILE"
+        paramLabel = $Profile.LABEL
     )
     public ProfileName $profileName;
 

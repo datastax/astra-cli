@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.CliConstants.$Db;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -17,8 +18,8 @@ public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes>
     @Parameters(
         arity = "0..1",
         completionCandidates = DbNamesCompletion.class,
-        paramLabel = "DB",
-        description = "The name or ID of the Astra database to operate on"
+        description = "The name or ID of the Astra database to operate on",
+        paramLabel = $Db.LABEL
     )
     protected DbRef $dbRef;
 

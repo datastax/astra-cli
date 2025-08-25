@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
+import com.dtsx.astra.cli.core.CliConstants.$ConfigFile;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
@@ -8,16 +9,20 @@ import picocli.CommandLine.Option;
 import java.io.File;
 
 public abstract class AbstractConfigCmd<OpRes> extends AbstractCmd<OpRes> {
-    @Option(names = { "--config-file", "-cf" }, description = "The astrarc file to use", paramLabel = "PATH")
-    private File configFile;
+    @Option(
+        names = { $ConfigFile.LONG, $ConfigFile.SHORT },
+        description = "The astrarc file to use",
+        paramLabel = $ConfigFile.LABEL
+    )
+    private File $configFile;
 
     @Nullable
-    private AstraConfig astraConfig;
+    private AstraConfig cachedAstraConfig;
 
     public AstraConfig config(boolean createIfNotExists) {
-        if (astraConfig == null) {
-            this.astraConfig = AstraConfig.readAstraConfigFile(configFile, createIfNotExists);
+        if (cachedAstraConfig == null) {
+            this.cachedAstraConfig = AstraConfig.readAstraConfigFile($configFile, createIfNotExists);
         }
-        return astraConfig;
+        return cachedAstraConfig;
     }
 }

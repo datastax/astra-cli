@@ -1,5 +1,8 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.core.CliConstants.$Cloud;
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
+import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -83,23 +86,24 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
     public static class DatabaseCreationOptions {
         @Option(
-            names = { "-r", "--region" },
-            paramLabel = "DB_REGION",
-            description = "Cloud provider region to provision. @|bold Use one of the `${cli.name} db list-regions-*` commands to see available regions.|@"
+            names = { $Regions.LONG, $Regions.SHORT },
+            description = "Cloud provider region to provision. @|bold Use one of the `${cli.name} db list-regions-*` commands to see available regions.|@",
+            paramLabel = $Regions.LABEL
         )
         public RegionName region;
 
         @Option(
-            names = { "-c", "--cloud" },
-            description = "The cloud provider where the db should be created. Inferred from the region if not provided."
+            names = { $Cloud.LONG, $Cloud.SHORT },
+            description = "The cloud provider where the db should be created. Inferred from the region if not provided.",
+            paramLabel = $Cloud.LABEL
         )
         public Optional<CloudProviderType> cloud;
 
         @Option(
-            names = { "-k", "--keyspace" },
-            paramLabel = "KEYSPACE",
+            names = { $Keyspace.LONG, $Keyspace.SHORT },
             description = { "Default keyspace for the database", DEFAULT_VALUE },
-            defaultValue = "default_keyspace"
+            defaultValue = $Keyspace.DEFAULT,
+            paramLabel = $Keyspace.LABEL
         )
         public String keyspace;
 

@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> {
     @Override
-    protected OutputJson executeJson(Supplier<Stream<TenantInfo>> result) {
+    protected final OutputJson executeJson(Supplier<Stream<TenantInfo>> result) {
         return OutputJson.serializeValue(result.get().map(TenantInfo::raw).toList());
     }
 

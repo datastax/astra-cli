@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.commands.streaming;
 
+import com.dtsx.astra.cli.core.CliConstants.$Cloud;
+import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -51,7 +53,8 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<StreamingCreateResult> {
     @Option(
         names = { "--if-not-exists" },
-        description = { "Don't error if the tenant already exists", DEFAULT_VALUE }
+        description = { "Don't error if the tenant already exists", DEFAULT_VALUE },
+        defaultValue = "false"
     )
     public boolean $ifNotExists;
 
@@ -65,18 +68,17 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
             description = { "Plan for the tenant", DEFAULT_VALUE },
             defaultValue = "serverless"
         )
-        public String plan;
+        public String $plan;
 
         @Option(
             names = { "-e", "--email" },
             paramLabel = "EMAIL",
-            description = { "User email", DEFAULT_VALUE },
-            defaultValue = "user@example.com"
+            description = "User email"
         )
-        public String userEmail;
+        public String $userEmail;
 
         @ArgGroup(multiplicity = "1")
-        public ClusterOrCloud clusterOrCloud;
+        public ClusterOrCloud $clusterOrCloud;
     }
 
     public static class ClusterOrCloud {
@@ -85,37 +87,38 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
             paramLabel = "CLUSTER",
             description = "Dedicated cluster, replacement for cloud/region"
         )
-        public Optional<String> cluster;
+        public Optional<String> $cluster;
 
         @ArgGroup(exclusive = false)
-        public @Nullable RegionSpec regionSpec;
+        public @Nullable RegionSpec $regionSpec;
     }
 
     public static class RegionSpec {
         @Option(
-            names = { "-r", "--region" },
-            paramLabel = "REGION",
+            names = { $Regions.LONG, $Regions.SHORT },
             description = "Cloud provider region to provision",
+            paramLabel = $Regions.LABEL,
             required = true
         )
-        public RegionName region;
+        public RegionName $region;
 
         @Option(
-            names = { "-c", "--cloud" },
-            description = "The cloud provider where the tenant should be created. Inferred from the region if not provided."
+            names = { $Cloud.LONG, $Cloud.SHORT },
+            description = "The cloud provider where the tenant should be created. Inferred from the region if not provided.",
+            paramLabel = $Cloud.LABEL
         )
-        public Optional<CloudProviderType> cloud;
+        public Optional<CloudProviderType> $cloud;
     }
 
     @Override
     protected Operation<StreamingCreateResult> mkOperation() {
         return new StreamingCreateOperation(streamingGateway, new StreamingCreateRequest(
             $tenantName,
-            ($tenantCreationOptions.clusterOrCloud.regionSpec != null)
-                ? Either.right(Pair.create($tenantCreationOptions.clusterOrCloud.regionSpec.cloud, $tenantCreationOptions.clusterOrCloud.regionSpec.region))
-                : Either.left($tenantCreationOptions.clusterOrCloud.cluster.orElseThrow()),
-            $tenantCreationOptions.plan,
-            $tenantCreationOptions.userEmail,
+            ($tenantCreationOptions.$clusterOrCloud.$regionSpec != null)
+                ? Either.right(Pair.create($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, $tenantCreationOptions.$clusterOrCloud.$regionSpec.$region))
+                : Either.left($tenantCreationOptions.$clusterOrCloud.$cluster.orElseThrow()),
+            $tenantCreationOptions.$plan,
+            $tenantCreationOptions.$userEmail,
             $ifNotExists
         ));
     }

@@ -51,7 +51,7 @@ public class DbCqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
     }
 
     @Override
-    protected OutputAll execute(Supplier<CqlPathResponse> result) {
+    protected final OutputAll execute(Supplier<CqlPathResponse> result) {
         return switch (result.get()) {
             case ExePathFound(var file) -> handleExePathFound(file);
             case NoInstallationFound _ -> throwNoInstallationFound();

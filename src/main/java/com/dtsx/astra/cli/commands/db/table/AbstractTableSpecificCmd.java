@@ -1,7 +1,8 @@
 package com.dtsx.astra.cli.commands.db.table;
 
-import com.dtsx.astra.cli.core.models.TableRef;
+import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.models.TableRef;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 
@@ -9,9 +10,9 @@ public abstract class AbstractTableSpecificCmd<OpRes> extends AbstractTableCmd<O
     protected TableRef $tableRef;
 
     @Option(
-        names = { "--table", "-t" },
-        description = { "The table to use", DEFAULT_VALUE },
-        paramLabel = "TABLE",
+        names = { $Table.LONG, $Table.SHORT },
+        description = "The table to use",
+        paramLabel = $Table.LABEL,
         required = true
     )
     private String actualTableRefOption;

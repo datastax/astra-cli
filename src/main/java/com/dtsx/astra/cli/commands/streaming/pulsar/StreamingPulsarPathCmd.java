@@ -40,8 +40,9 @@ import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 )
 public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathResponse> {
     @Option(
-        names = {"--if-exists"},
-        description = "Only return path if pulsar exists, don't install automatically"
+        names = { "--if-exists" },
+        description = { "Only return path if pulsar exists, don't install automatically", DEFAULT_VALUE },
+        defaultValue = "false"
     )
     public boolean $ifExists;
 
@@ -51,7 +52,7 @@ public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathRespo
     }
 
     @Override
-    protected OutputAll execute(Supplier<PulsarPathResponse> result) {
+    protected final OutputAll execute(Supplier<PulsarPathResponse> result) {
         return switch (result.get()) {
             case ExePathFound(var file) -> handleExePathFound(file);
             case NoInstallationFound _ -> throwNoInstallationFound();

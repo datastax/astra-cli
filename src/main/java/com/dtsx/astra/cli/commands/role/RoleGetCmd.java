@@ -29,7 +29,7 @@ import static com.dtsx.astra.cli.operations.role.RoleGetOperation.RoleGetRequest
 )
 @Example(
     comment = "Get details for a specific role by ID",
-    command = "${cli.name} role get 12345678-abcd-1234-abcd-123456789012"
+    command = "${cli.name} role get \"12345678-abcd-1234-abcd-123456789012\""
 )
 public class RoleGetCmd extends AbstractRoleCmd<Role> {
     @Parameters(
@@ -37,15 +37,15 @@ public class RoleGetCmd extends AbstractRoleCmd<Role> {
         paramLabel = "ROLE",
         completionCandidates = RoleNamesCompletion.class
     )
-    public RoleRef role;
+    public RoleRef $role;
 
     @Override
     protected Operation<Role> mkOperation() {
-        return new RoleGetOperation(roleGateway, new RoleGetRequest(role));
+        return new RoleGetOperation(roleGateway, new RoleGetRequest($role));
     }
 
     @Override
-    public OutputJson executeJson(Supplier<Role> result) {
+    public final OutputJson executeJson(Supplier<Role> result) {
         return OutputJson.serializeValue(result);
     }
 

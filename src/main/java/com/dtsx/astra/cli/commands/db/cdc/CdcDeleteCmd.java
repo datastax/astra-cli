@@ -1,5 +1,9 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
+import com.dtsx.astra.cli.core.CliConstants.$Table;
+import com.dtsx.astra.cli.core.CliConstants.$Tenant;
+import com.dtsx.astra.cli.core.completions.impls.TenantNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -53,29 +57,30 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         public String cdcId;
 
         @ArgGroup(exclusive = false)
-        TableTenant tableTenant;
+        public TableTenant tableTenant;
 
         static class TableTenant {
             @Option(
-                names = { "--keyspace", "-k" },
-                description = { "The keyspace", DEFAULT_VALUE },
-                paramLabel = "KEYSPACE",
+                names = { $Keyspace.LONG, $Keyspace.SHORT },
+                description = "The keyspace",
+                paramLabel = $Keyspace.LABEL,
                 required = true
             )
             public String keyspace;
 
             @Option(
-                names = { "--table", "-t" },
-                description = { "The table", DEFAULT_VALUE },
-                paramLabel = "TABLE",  
+                names = { $Table.LONG },
+                description =  "The table",
+                paramLabel = $Table.LABEL,
                 required = true
             )
             public String table;
 
             @Option(
-                names = { "--tenant" },
-                description = { "The tenant name", DEFAULT_VALUE },
-                paramLabel = "TENANT",
+                names = { $Tenant.LONG },
+                description = "The tenant name",
+                completionCandidates = TenantNamesCompletion.class,
+                paramLabel = $Tenant.LABEL,
                 required = true
             )
             public String tenant;

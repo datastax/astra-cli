@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.db.cdc;
 
-import com.dtsx.astra.cli.core.completions.impls.TenantNamesCompletion;
+import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
+import com.dtsx.astra.cli.core.CliConstants.$Table;
+import com.dtsx.astra.cli.core.CliConstants.$Tenant;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -43,26 +45,25 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 )
 public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     @Option(
-        names = { "--keyspace", "-k" },
+        names = { $Keyspace.LONG, $Keyspace.SHORT },
         description = { "Keyspace where the table resides", DEFAULT_VALUE },
-        paramLabel = "KEYSPACE",
-        defaultValue = "default_keyspace"
+        defaultValue = $Keyspace.DEFAULT,
+        paramLabel = $Keyspace.LABEL
     )
     public String $keyspace;
 
     @Option(
-        names = { "--table", "-t" },
-        description = { "The table or collection to create CDC for", DEFAULT_VALUE },
-        paramLabel = "TABLE",
+        names = { $Table.LONG },
+        description = "The table or collection to create CDC for",
+        paramLabel = $Table.LABEL,
         required = true
     )
     public String $table;
 
     @Option(
-        names = { "--tenant" },
-        description = { "The tenant name", DEFAULT_VALUE },
-        paramLabel = "TENANT",
-        completionCandidates = TenantNamesCompletion.class,
+        names = { $Tenant.LONG },
+        description = "The tenant name",
+        paramLabel = $Tenant.LABEL,
         required = true
     )
     public TenantName $tenant;

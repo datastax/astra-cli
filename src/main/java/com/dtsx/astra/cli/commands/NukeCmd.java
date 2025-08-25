@@ -29,7 +29,8 @@ import static com.dtsx.astra.cli.utils.StringUtils.capitalize;
 public class NukeCmd extends AbstractCmd<NukeResult> {
     @Option(
         names = { "--dry-run" },
-        description = "Simulate the nuke operation without deleting any files"
+        description = { "Simulate the nuke operation without deleting any files", DEFAULT_VALUE },
+        defaultValue = "false"
     )
     public boolean $dryRun;
 
@@ -43,21 +44,21 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     @Option(
         names = { "--cli-name", "-n" },
-        description = "The CLI's name (default: ${cli.name})",
+        description = { "The CLI's name", DEFAULT_START + "${cli.name}" + DEFAULT_END },
         paramLabel = "NAME"
     )
     public Optional<String> $cliName;
 
     @Option(
         names = { "--yes", "-y" },
-        description = "Whether to nuke without confirmation (if not a dry run)",
+        description = { "Whether to nuke without confirmation (if not a dry run)", DEFAULT_VALUE },
         defaultValue = "false",
         fallbackValue = "false"
     )
     public boolean $yes;
 
     @Override
-    protected OutputAll execute(Supplier<NukeResult> result) {
+    protected final OutputAll execute(Supplier<NukeResult> result) {
         AstraLogger.banner();
 
         return switch (result.get()) {

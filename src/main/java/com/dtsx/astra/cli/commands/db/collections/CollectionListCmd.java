@@ -43,7 +43,7 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
     public boolean $all;
 
     @Override
-    protected OutputJson executeJson(Supplier<Stream<CollectionListResult>> result) {
+    protected final OutputJson executeJson(Supplier<Stream<CollectionListResult>> result) {
         validateParams();
 
         if ($all) {

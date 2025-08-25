@@ -51,7 +51,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
         paramLabel = "USER",
         completionCandidates = UserEmailsCompletion.class
     )
-    public UserRef user;
+    public UserRef $user;
 
     @Option(
         names = { "-r", "--roles" },
@@ -59,27 +59,27 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
         defaultValue = "Database Administrator",
         split = ","
     )
-    public List<RoleRef> roles;
+    public List<RoleRef> $roles;
 
     @Option(
         names = { "--if-not-exists" },
         description = { "Do not fail if user already exists", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    public boolean ifNotExists;
+    public boolean $ifNotExists;
 
     @Override
     protected void prelude() {
         super.prelude();
 
-        if (roles.isEmpty()) {
+        if ($roles.isEmpty()) {
             throw new ParameterException(spec.commandLine(), "At least one role must be specified for the user via the --roles option.");
         }
     }
 
     @Override
     protected Operation<UserInviteResult> mkOperation() {
-        return new UserInviteOperation(userGateway, new UserInviteRequest(user, roles, ifNotExists));
+        return new UserInviteOperation(userGateway, new UserInviteRequest($user, $roles, $ifNotExists));
     }
 
     @Override
@@ -92,15 +92,15 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
     }
 
     private OutputAll handleUserInvited(List<UUID> roleIds) {
-        val message = (roles.size() == 1)
-            ? "User %s has been invited with role %s.".formatted(highlight(user), highlight(roles.getFirst()))
-            : "User %s has been invited with roles %s.".formatted(highlight(user), roles.stream().map(AstraColors::highlight).collect(Collectors.joining(", ")));
+        val message = ($roles.size() == 1)
+            ? "User %s has been invited with role %s.".formatted(highlight($user), highlight($roles.getFirst()))
+            : "User %s has been invited with roles %s.".formatted(highlight($user), $roles.stream().map(AstraColors::highlight).collect(Collectors.joining(", ")));
 
         return OutputAll.response(message, mkData(true, roleIds));
     }
 
     private OutputAll handleUserAlreadyExists() {
-        val message = "User %s already exists; nothing to invite.".formatted(highlight(user));
+        val message = "User %s already exists; nothing to invite.".formatted(highlight($user));
         
         return OutputAll.response(message, mkData(false, null), List.of(
             new Hint("See all existing users:", "${cli.name} user list")
@@ -115,7 +115,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
 
           This may be expected, but to avoid this error, pass the @!--if-not-exists!@ flag to skip this error if the user already exists.
         """.formatted(
-            user
+            $user
         ), List.of(
             new Hint("Example fix:", originalArgsWithFlag, "--if-not-exists"),
             new Hint("See all existing users:", "${cli.name} user list")

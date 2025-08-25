@@ -40,18 +40,18 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
         paramLabel = "USER",
         completionCandidates = UserEmailsCompletion.class
     )
-    public UserRef user;
+    public UserRef $user;
 
     @Option(
         names = { "--if-exists" },
         description = { "Do not fail if user does not exist", DEFAULT_VALUE },
         defaultValue = "false"
     )
-    public boolean ifExists;
+    public boolean $ifExists;
 
     @Override
     protected Operation<UserDeleteResult> mkOperation() {
-        return new UserDeleteOperation(userGateway, new UserDeleteRequest(user, ifExists));
+        return new UserDeleteOperation(userGateway, new UserDeleteRequest($user, $ifExists));
     }
 
     @Override
@@ -64,13 +64,13 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
     }
 
     private OutputAll handleUserDeleted() {
-        val message = "User %s has been deleted (async operation).".formatted(highlight(user));
+        val message = "User %s has been deleted (async operation).".formatted(highlight($user));
 
         return OutputAll.response(message, mkData(true));
     }
 
     private OutputAll handleUserNotFound() {
-        val message = "User %s does not exist; nothing to delete.".formatted(highlight(user));
+        val message = "User %s does not exist; nothing to delete.".formatted(highlight($user));
         
         return OutputAll.response(message, mkData(false), List.of(
             new Hint("See all existing users:", "${cli.name} user list")
@@ -83,7 +83,7 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
 
           This may be expected, but to avoid this error, pass the @!--if-exists!@ flag to skip this error if the user doesn't exist.
         """.formatted(
-            user
+            $user
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),
             new Hint("See all existing users:", "${cli.name} user list")

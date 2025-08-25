@@ -38,7 +38,8 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(
         names = { "--header" },
         description = { "Enable or disable whether the files begin with a header line", DEFAULT_VALUE },
-        defaultValue = "true"
+        defaultValue = "true",
+        fallbackValue = "true"
     )
     public boolean $header;
 

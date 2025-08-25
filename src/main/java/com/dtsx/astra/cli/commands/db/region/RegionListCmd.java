@@ -28,7 +28,7 @@ public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
     }
 
     @Override
-    protected OutputJson executeJson(Supplier<FoundRegions> result) {
+    protected final OutputJson executeJson(Supplier<FoundRegions> result) {
         return OutputJson.serializeValue(result.get().regions());
     }
 

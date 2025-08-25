@@ -9,7 +9,7 @@ import picocli.CommandLine.Command;
     subcommands = {
         OrgGetCmd.class,
         OrgIdCmd.class,
-        OrgNameCmd.class
+        OrgNameCmd.class,
     }
 )
 @Example(

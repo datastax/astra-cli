@@ -39,10 +39,10 @@ public class UserGetCmd extends AbstractUserCmd<User> {
         paramLabel = "USER",
         completionCandidates = UserEmailsCompletion.class
     )
-    public UserRef user;
+    public UserRef $user;
 
     @Override
-    public OutputJson executeJson(Supplier<User> result) {
+    public final OutputJson executeJson(Supplier<User> result) {
         return OutputJson.serializeValue(result);
     }
 
@@ -64,9 +64,8 @@ public class UserGetCmd extends AbstractUserCmd<User> {
         }});
     }
 
-
     @Override
     protected Operation<User> mkOperation() {
-        return new UserGetOperation(userGateway, new UserGetRequest(user));
+        return new UserGetOperation(userGateway, new UserGetRequest($user));
     }
 }
