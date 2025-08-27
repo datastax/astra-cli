@@ -7,14 +7,13 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
-import com.dtsx.astra.cli.utils.EnumFolder;
 import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.Cleanup;
@@ -28,6 +27,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,24 +80,28 @@ public class DbGatewayImpl implements DbGateway {
         val currentStatus = AstraLogger.loading("Fetching current currStatus of db " + highlight(ref), (_) -> findOne(ref))
             .getStatus();
 
-        return new EnumFolder<DatabaseStatusType, Pair<DatabaseStatusType, Duration>>(DatabaseStatusType.class)
-            .on(ACTIVE, () -> {
-                return Pair.create(currentStatus, Duration.ZERO);
-            })
-            .on(HIBERNATED, () -> {
+        val expectedStatuses = Arrays.stream(DatabaseStatusType.values())
+            .filter(status -> status != ACTIVE && status != HIBERNATED && status != MAINTENANCE && status != INITIALIZING && status != PENDING)
+            .toList();
+
+        return switch (currentStatus) {
+            case ACTIVE -> {
+                yield Pair.create(currentStatus, Duration.ZERO);
+            }
+            case HIBERNATED -> {
                 AstraLogger.loading("Resuming database '%s'".formatted(ref), (_) -> {
                     resumeDbInternal(ref);
                     return null;
                 });
-                return Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
-            })
-            .on(MAINTENANCE, INITIALIZING, PENDING, () -> {
-                return Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
-            })
-            .exhaustive((expected, _) -> {
-                throw new UnexpectedDbStatusException(ref, currentStatus, expected);
-            })
-            .run(currentStatus);
+                yield Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
+            }
+            case MAINTENANCE, INITIALIZING, PENDING -> {
+                yield Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
+            }
+            default -> {
+                throw new UnexpectedDbStatusException(ref, currentStatus, expectedStatuses);
+            }
+        };
     }
 
     @SneakyThrows

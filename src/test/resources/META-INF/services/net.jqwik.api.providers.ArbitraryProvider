@@ -1,0 +1,6 @@
+com.dtsx.astra.cli.testlib.arbitraries.AstraTokenProvider
+com.dtsx.astra.cli.testlib.arbitraries.DataclassProvider
+com.dtsx.astra.cli.testlib.arbitraries.ParseableProvider
+com.dtsx.astra.cli.testlib.arbitraries.DatabaseProvider
+com.dtsx.astra.cli.testlib.arbitraries.EitherProvider
+com.dtsx.astra.cli.testlib.arbitraries.PairProvider

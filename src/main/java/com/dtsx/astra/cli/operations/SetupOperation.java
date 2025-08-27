@@ -58,7 +58,7 @@ public class SetupOperation implements Operation<SetupResult> {
             request.assertShouldSetup.accept(configFile);
         }
 
-        return resolveProfileDetails(request).foldMap((details) -> {
+        return resolveProfileDetails(request).map((details) -> {
             if (Files.exists(configFile)) {
                 config().lookupProfile(details.profileName).ifPresent(request.assertShouldOverwriteExistingProfile);
             }
@@ -78,7 +78,7 @@ public class SetupOperation implements Operation<SetupResult> {
             });
 
             return new ProfileCreated(details.profileName, false, shouldSetDefault);
-        });
+        }).fold(l -> l, r -> r);
     }
 
     private record ProfileDetails(

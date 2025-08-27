@@ -7,6 +7,22 @@ public sealed interface Either<L, R> {
     record Left<L, R>(L unwrap) implements Either<L, R> {}
     record Right<L, R>(R unwrap) implements Either<L, R> {}
 
+    static <L, R> Either<L, R> left(L value) {
+        return new Left<>(value);
+    }
+
+    static <L, R> Either<L, R> right(R value) {
+        return new Right<>(value);
+    }
+
+    static <L, R> Either<L, R> tryCatch(Callable<R> supplier, Function<Exception, L> exceptionHandler) {
+        try {
+            return right(supplier.call());
+        } catch (Exception e) {
+            return left(exceptionHandler.apply(e));
+        }
+    }
+
     default <U> U fold(Function<L, U> leftMapper, Function<R, U> rightMapper) {
         return switch (this) {
             case Left<L, R> left -> leftMapper.apply(left.unwrap);
@@ -47,36 +63,12 @@ public sealed interface Either<L, R> {
         return bimap(left -> left, rightMapper);
     }
 
-
-    default L foldMap(Function<R, L> rightMapper) {
-        return switch (this) {
-            case Left<L, R> left -> left.unwrap;
-            case Right<L, R> right -> rightMapper.apply(right.unwrap);
-        };
-    }
-
     default boolean isLeft() {
         return this instanceof Left<?, ?>;
     }
 
     default boolean isRight() {
         return this instanceof Right<?, ?>;
-    }
-
-    static <L, R> Either<L, R> left(L value) {
-        return new Left<>(value);
-    }
-
-    static <L, R> Either<L, R> right(R value) {
-        return new Right<>(value);
-    }
-
-    static <L, R> Either<L, R> tryCatch(Callable<R> supplier, Function<Exception, L> exceptionHandler) {
-        try {
-            return right(supplier.call());
-        } catch (Exception e) {
-            return left(exceptionHandler.apply(e));
-        }
     }
 
     default <R2> Either<L, R2> flatMap(Function<R, Either<L, R2>> mapper) {

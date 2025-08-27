@@ -31,7 +31,7 @@ public abstract class CompletionsCache {
             return;
         }
 
-        val cacheFile = useCacheFile();
+        val cacheFile = useCacheDir().map(dir -> dir.resolve(useCacheFile()));
 
         if (cacheFile.isEmpty()) {
             return;
@@ -84,7 +84,7 @@ public abstract class CompletionsCache {
         update((s) -> setAdd(s, completion));
     }
 
-    protected abstract Optional<Path> useCacheFile();
+    protected abstract String useCacheFile();
 
     protected Optional<Path> useCacheDir() {
         return Optional.of(AstraHome.Dirs.useCompletionsCache());

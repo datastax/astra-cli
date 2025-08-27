@@ -43,3 +43,4 @@ bin/
 
 /token
 comp.bash
+/.jqwik-database

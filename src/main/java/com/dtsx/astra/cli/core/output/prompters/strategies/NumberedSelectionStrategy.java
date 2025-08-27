@@ -12,7 +12,7 @@ import java.io.Console;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.utils.StringUtils.isInteger;
+import static com.dtsx.astra.cli.utils.StringUtils.isPositiveInteger;
 import static com.dtsx.astra.cli.utils.StringUtils.truncate;
 
 public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
@@ -95,7 +95,7 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
             else if (input.isEmpty()) {
                 AstraConsole.print(CLEAR_MOVE_UP);
             }
-            else if (isInteger(input)) {
+            else if (isPositiveInteger(input)) {
                 return Optional.of(req.mapper().apply(req.options().get(Integer.parseInt(input) - 1)));
             }
             else if ("q".equals(input)) {

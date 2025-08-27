@@ -28,7 +28,7 @@ dependencies {
     implementation("com.datastax.astra:astra-db-java:2.0.0")
     implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
 
-    implementation("org.apache.commons:commons-compress:1.27.1")
+    implementation("org.apache.commons:commons-compress:1.28.0")
 
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
@@ -37,13 +37,20 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
+    testImplementation("org.assertj:assertj-core:3.27.4")
+    testImplementation("net.jqwik:jqwik:1.9.3")
+
     implementation("info.picocli:picocli-jansi-graalvm:1.2.0")
     implementation("org.fusesource.jansi:jansi:2.4.2")
 
     compileOnly("org.jetbrains:annotations:26.0.2")
+    testCompileOnly("org.jetbrains:annotations:26.0.2")
 
     compileOnly("org.projectlombok:lombok:1.18.38")
+    testCompileOnly("org.projectlombok:lombok:1.18.38")
+
     annotationProcessor("org.projectlombok:lombok:1.18.38")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
 }
 
 tasks.compileJava {
@@ -107,11 +114,17 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
 }
 
 tasks.test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeEngines("junit-jupiter", "jqwik")
+    }
 
     jvmArgs = listOf(
         "--enable-native-access=ALL-UNNAMED"
     )
+}
+
+tasks.named<JavaCompile>("compileTestJava") {
+    options.compilerArgs.add("-parameters")
 }
 
 val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
@@ -249,7 +262,7 @@ tasks.register("createDynamicProperties") {
         val output = cliSystemProperties.map { (key, value) -> "$key=$value" }.joinToString("\n")
 
         outputFile.parentFile.mkdirs()
-        outputFile.writeText(output);
+        outputFile.writeText(output)
 
         resourcePatterns.add(
             "\\Qdynamic.properties\\E"

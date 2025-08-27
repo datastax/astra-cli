@@ -5,9 +5,10 @@
     <option name="description" value="" />
   </component>
   <component name="EntryPointsManager">
-    <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="picocli.CommandLine.Mixin" />
-      <item index="1" class="java.lang.String" itemvalue="picocli.CommandLine.Option" />
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="net.jqwik.api.Provide" />
+      <item index="1" class="java.lang.String" itemvalue="picocli.CommandLine.Mixin" />
+      <item index="2" class="java.lang.String" itemvalue="picocli.CommandLine.Option" />
     </list>
     <writeAnnotations>
       <writeAnnotation name="picocli.CommandLine.ArgGroup" />
