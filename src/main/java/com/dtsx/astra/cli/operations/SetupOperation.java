@@ -1,11 +1,12 @@
 package com.dtsx.astra.cli.operations;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.datatypes.TriFunction;
 import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
 import com.dtsx.astra.sdk.exception.AuthenticationException;
@@ -19,14 +20,14 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class SetupOperation implements Operation<SetupResult> {
-    private final BiFunction<AstraToken, AstraEnvironment, OrgGateway> createOrgGateway;
+    private final CliContext ctx;
+    private final TriFunction<AstraToken, AstraEnvironment, CliContext, OrgGateway> createOrgGateway;
     private final OrgGateway.Stateless statelessOrgGateway;
     private final SetupRequest request;
 
@@ -50,7 +51,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
     @Override
     public SetupResult execute() {
-        val configFile = AstraConfig.resolveDefaultAstraConfigFile();
+        val configFile = AstraConfig.resolveDefaultAstraConfigFile(ctx);
 
         if (ifConfigExistsAnd(c -> !c.profiles().isEmpty())) {
             request.assertShouldContinueIfAlreadySetup.accept(configFile);
@@ -120,7 +121,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
         val env = request.env().orElseGet(() -> request.promptForEnv.apply(AstraEnvironment.PROD));
 
-        val orgGateway = createOrgGateway.apply(token, env);
+        val orgGateway = createOrgGateway.apply(token, env, ctx);
         val org = validateTokenAndFetchOrg(orgGateway);
 
         return org.isPresent()
@@ -129,7 +130,7 @@ public class SetupOperation implements Operation<SetupResult> {
     }
 
     private Optional<Organization> validateTokenAndFetchOrg(OrgGateway orgGateway) {
-        return AstraLogger.loading("Validating your Astra token", (_) -> {
+        return ctx.log().loading("Validating your Astra token", (_) -> {
             try {
                 return Optional.of(orgGateway.current());
             } catch (AuthenticationException e) {
@@ -146,13 +147,13 @@ public class SetupOperation implements Operation<SetupResult> {
 
     private AstraConfig config() {
         if (cachedConfig == null) {
-            cachedConfig = AstraConfig.readAstraConfigFile(null, true);
+            cachedConfig = AstraConfig.readAstraConfigFile(ctx, null, true);
         }
         return cachedConfig;
     }
 
     private boolean ifConfigExistsAnd(Function<AstraConfig, Boolean> fn) {
-        val configFile = AstraConfig.resolveDefaultAstraConfigFile();
+        val configFile = AstraConfig.resolveDefaultAstraConfigFile(ctx);
 
         if (Files.exists(configFile)) {
             return fn.apply(config());

@@ -29,7 +29,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -134,7 +133,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     protected final OutputAll execute(Supplier<CreateDotEnvResult> result) {
         return switch (result.get()) {
             case CreatedDotEnvContent(var content) -> OutputAll.response(
-                content.render(true),
+                content.render(ctx.colors()),
                 mkData("printed", false, null)
             );
 
@@ -143,7 +142,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
             
               Please double check the content of the file before using it, and manually add it to your .gitignore file.
             """.formatted(
-                highlight(outputFile)
+                ctx.highlight(outputFile)
             ), mkData("created", false, outputFile), List.of(
                 new Hint("View the env file", "cat " + outputFile)
             ));
@@ -155,7 +154,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
 
               Please double check the content of the file before using it, and ensure it is added to your .gitignore file.
             """.formatted(
-                highlight(outputFile),
+                ctx.highlight(outputFile),
                 (overwritten) ? "were overwritten" : "were left in the env file, with the new keys added to the end"
             ), mkData("updated", overwritten, outputFile), List.of(
                 new Hint("View the env file", "cat " + outputFile)
@@ -164,7 +163,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
             case NothingToUpdate(var outputFile) -> OutputAll.response("""
               No changes needed to be made to the .env file at %s.
             """.formatted(
-                highlight(outputFile)
+                ctx.highlight(outputFile)
             ), mkData("no_change", false, outputFile), List.of(
                 new Hint("View the env file", "cat " + outputFile)
             ));
@@ -228,11 +227,11 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     private boolean askIfShouldOverwrite(Set<String> duplicates) {
         var duplicatesStr = duplicates.stream()
             .limit(4)
-            .map(k -> "- " + highlight(k))
+            .map(k -> "- " + ctx.highlight(k))
             .collect(Collectors.joining(NL));
 
         if (duplicates.size() > 4) {
-            duplicatesStr += "\n- and %s more...".formatted(AstraColors.PURPLE_300.use(String.valueOf(duplicates.size() - 5)));
+            duplicatesStr += "\n- and %s more...".formatted(ctx.colors().PURPLE_300.use(String.valueOf(duplicates.size() - 5)));
         }
 
         val msg = """
@@ -244,7 +243,7 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
           Do you want to overwrite them?
         """.formatted(duplicatesStr);
 
-        return AstraConsole.confirm(msg)
+        return ctx.console().confirm(msg)
             .defaultNo()
             .fallbackFlag("--overwrite")
             .fix(originalArgs(), "--overwrite")

@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.token.TokenDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -65,7 +64,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
     }
 
     private OutputAll handleTokenNotFound() {
-        val message = "Token %s does not exist; nothing to delete.".formatted(highlight($tokenId));
+        val message = "Token %s does not exist; nothing to delete.".formatted(ctx.highlight($tokenId));
         val data = mkData(false);
         
         return OutputAll.response(message, data, List.of(

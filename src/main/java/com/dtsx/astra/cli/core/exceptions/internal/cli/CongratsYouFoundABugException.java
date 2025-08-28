@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.exceptions.internal.cli;
 
+import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import org.jetbrains.annotations.Nullable;
 
 public class CongratsYouFoundABugException extends AstraCliException {
@@ -28,11 +28,11 @@ public class CongratsYouFoundABugException extends AstraCliException {
           Thank you for your help in making Astra CLI better!
         """.formatted(
             error.replace("\n", "//"),
-            AstraLogger.useSessionLogFilePath()
+            AstraCli.unsafeGlobalCliContext().log().useSessionLogFilePath()
         ));
 
         if (cause != null) {
-            AstraLogger.exception(cause);
+            AstraCli.unsafeGlobalCliContext().log().exception(cause);
         }
     }
 

@@ -1,16 +1,15 @@
 package com.dtsx.astra.cli.core.exceptions.internal.db;
 
-import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 
 import java.util.List;
 
 public class UnexpectedDbStatusException extends AstraCliException {
     public UnexpectedDbStatusException(DbRef ref, DatabaseStatusType got, List<DatabaseStatusType> expected) {
-        super(AstraColors.RED_500.use("""
-            @|bold Database %s has unexpected status '%s'.|@
+        super("""
+            @|bold,red Database %s has unexpected status '%s'.|@
             
             Expected one of: %s
             
@@ -20,6 +19,6 @@ public class UnexpectedDbStatusException extends AstraCliException {
                 ref.toString(),
                 got.toString(),
                 expected.stream().map(DatabaseStatusType::toString).toList()
-            )));
+            ));
     }
 }

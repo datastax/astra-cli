@@ -67,7 +67,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
-        return new DbDsbulkUnloadOperation(dbGateway, downloadsGateway, new UnloadRequest(
+        return new DbDsbulkUnloadOperation(ctx, dbGateway, downloadsGateway, new UnloadRequest(
             $dbRef,
             $keyspace,
             $table,

@@ -8,7 +8,6 @@ import com.dtsx.astra.cli.core.exceptions.internal.misc.WindowsUnsupportedExcept
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
-import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.*;
 import lombok.val;
@@ -52,13 +51,13 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
-        WindowsUnsupportedException.throwIfWindows();
+        WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
     }
 
     @Override
     protected Operation<CqlshExecResult> mkOperation() {
-        return mkOperation(captureOutputForNonHumanOutput() && OutputType.isNotHuman());
+        return mkOperation(captureOutputForNonHumanOutput() && ctx.outputIsNotHuman());
     }
 
     @Override
@@ -80,7 +79,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
         return switch (result.get()) {
             case CqlshInstallFailed(var msg) -> throwCqlshInstallationFailed(msg);
             case ScbDownloadFailed(var msg) -> throwCqlshInstallationFailed(msg);
-            case Executed _ -> throw new CongratsYouFoundABugException("Should not be able to get to `execute` with `Executed` when output is `" + OutputType.requested() + "`");
+            case Executed _ -> throw new CongratsYouFoundABugException("Should not be able to get to `execute` with `Executed` when output is `" + ctx.outputType() + "`");
             case ExecutedWithOutput res -> handleExecutedWithOutput(res);
         };
     }

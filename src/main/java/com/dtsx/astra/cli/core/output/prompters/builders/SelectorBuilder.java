@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.prompters.builders;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.output.prompters.CLIPrompter;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +10,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class SelectorBuilder {
-    private final String prompt;
+    private final CliContext ctx;
     private final boolean noInput;
+    private final String prompt;
 
     public <T> NeedsOptions<T> options(NEList<T> options) {
         return new NeedsOptions<>(options);
@@ -55,11 +55,11 @@ public class SelectorBuilder {
         private final Function<T, String> mapper;
 
         public NeedsFix<T> fallbackFlag(String flag) {
-            return new NeedsFix<>(options, defaultOption, mapper, highlight(flag) + " flag");
+            return new NeedsFix<>(options, defaultOption, mapper, ctx.highlight(flag) + " flag");
         }
 
         public NeedsFix<T> fallbackIndex(int index) {
-            return new NeedsFix<>(options, defaultOption, mapper, "parameter at index " + highlight(index));
+            return new NeedsFix<>(options, defaultOption, mapper, "parameter at index " + ctx.highlight(index));
         }
     }
 
@@ -92,9 +92,8 @@ public class SelectorBuilder {
         }
 
         private T clearAfterSelection(boolean clearAfterSelection) {
-            return CLIPrompter.select(
+            return new CLIPrompter(ctx, noInput).select(
                 prompt,
-                noInput,
                 options,
                 defaultOption,
                 mapper,

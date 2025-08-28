@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -69,8 +68,8 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     private OutputAll handleKeyspaceAlreadyExists() {
         val message = "Keyspace %s already exists in database %s.".formatted(
-            highlight($keyspaceRef),
-            highlight($keyspaceRef.db())
+            ctx.highlight($keyspaceRef),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(false, null);
@@ -80,8 +79,8 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     private OutputAll handleKeyspaceCreated() {
         val message = "Keyspace %s has been created in database %s (database may not be active yet).".formatted(
-            highlight($keyspaceRef),
-            highlight($keyspaceRef.db())
+            ctx.highlight($keyspaceRef),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(true, null);
@@ -93,8 +92,8 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     private OutputAll handleKeyspaceCreatedAndDbActive(Duration waitTime) {
         val message = "Keyspace %s has been created in database %s.%n%nThe database is now active after waiting %d seconds.".formatted(
-            highlight($keyspaceRef),
-            highlight($keyspaceRef.db()),
+            ctx.highlight($keyspaceRef),
+            ctx.highlight($keyspaceRef.db()),
             waitTime.toSeconds()
         );
 

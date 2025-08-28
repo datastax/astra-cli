@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
@@ -21,8 +22,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface DbGateway {
-    static DbGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
-        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(APIProvider.mkDefault(token, env), token, env, GlobalInfoCache.INSTANCE, RegionGateway.mkDefault(token, env)), dbCompletionsCache);
+    static DbGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache, CliContext ctx) {
+        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), token, env, GlobalInfoCache.INSTANCE, RegionGateway.mkDefault(token, env, ctx)), dbCompletionsCache);
     }
 
     Database findOne(DbRef ref);

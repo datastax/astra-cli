@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
@@ -86,7 +85,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
 
     private OutputAll handleDbNotFound(DbRef dbRef) {
         val message = "Database %s does not exist; nothing to delete.".formatted(
-            highlight(dbRef)
+            ctx.highlight(dbRef)
         );
 
         val data = mkData(false, null);
@@ -98,7 +97,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
 
     private OutputAll handleDbDeleted(DbRef dbRef) {
         val message = "Database %s has been deleted (though it may still be terminating, and not yet fully terminated).".formatted(
-            highlight(dbRef)
+            ctx.highlight(dbRef)
         );
 
         val data = mkData(true, null);
@@ -110,7 +109,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
 
     private OutputAll handleDbDeletedAndTerminated(DbRef dbRef, Duration waitTime) {
         val message = "Database %s has been deleted and fully terminated (waited %ds for termination).".formatted(
-            highlight(dbRef),
+            ctx.highlight(dbRef),
             waitTime.toSeconds()
         );
 
@@ -150,7 +149,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
           To confirm, type the name below or press @!Ctrl+C!@ to cancel.
         """.formatted(dbName, id);
 
-        val shouldDelete = AstraConsole.prompt(prompt)
+        val shouldDelete = ctx.console().prompt(prompt)
             .mapper(Function.identity())
             .requireAnswer()
             .fallbackFlag("--yes")

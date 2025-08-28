@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
 
 @Command(
@@ -38,7 +37,7 @@ public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResu
 
     private OutputAll handleTableTruncated() {
         return OutputAll.response("Table %s has been truncated. All rows have been deleted from the table.".formatted(
-            highlight($tableRef.name())
+            ctx.highlight($tableRef.name())
         ));
     }
 

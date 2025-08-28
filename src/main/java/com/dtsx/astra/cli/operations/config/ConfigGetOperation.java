@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.parsers.ini.Ini;
+import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation.GetConfigResult;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +21,9 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
     private final GetConfigRequest request;
 
     public sealed interface GetConfigResult {}
-    public record ProfileSection(Ini.IniSection section) implements GetConfigResult {}
+    public record ProfileSection(IniSection section) implements GetConfigResult {}
     public record SpecificKeyValue(String value) implements GetConfigResult {}
-    public record KeyNotFound(String key, Ini.IniSection section) implements GetConfigResult {}
+    public record KeyNotFound(String key, IniSection section) implements GetConfigResult {}
     public record ProfileNotFound(String profileName) implements GetConfigResult {}
 
     public record GetConfigRequest(

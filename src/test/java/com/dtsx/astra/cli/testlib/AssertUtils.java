@@ -14,6 +14,10 @@ public abstract class AssertUtils {
         return assertThat(actual).isEqualTo(expected);
     }
 
+    public static <T> T assertNonNull(T t) {
+        return assertThat(t).isNotNull().actual();
+    }
+
     public static <T, R> R assertNotCalled(T t) {
         throw new AssertionError("This function should not have been called");
     }

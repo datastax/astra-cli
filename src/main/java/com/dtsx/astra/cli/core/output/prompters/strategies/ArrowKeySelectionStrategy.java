@@ -1,11 +1,8 @@
 package com.dtsx.astra.cli.core.output.prompters.strategies;
 
-import com.dtsx.astra.cli.core.CliEnvironment;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.core.output.prompters.PromptRequest;
 import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy;
 import lombok.SneakyThrows;
@@ -13,9 +10,6 @@ import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     private static final int ESC = 27;
@@ -36,6 +30,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     private static final String UNDERLINE_START = "\033[4m";
     private static final String UNDERLINE_END = "\033[24m";
 
+    private final CliContext ctx;
     private final PromptRequest.Closed<T> req;
     
     private String filterText = "";
@@ -45,7 +40,8 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     private List<String> filteredOptions;
     private int selectedIndex;
 
-    public ArrowKeySelectionStrategy(PromptRequest.Closed<T> req) {
+    public ArrowKeySelectionStrategy(CliContext ctx, PromptRequest.Closed<T> req) {
+        this.ctx = ctx;
         this.req = req;
         this.fixedPrompt = req.prompt().replace("\n", "\r\n");
         this.filteredOptions = List.copyOf(req.options());
@@ -54,13 +50,13 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     
     public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
-        public boolean isSupported() {
-            return OutputType.isHuman() && CliEnvironment.isTty() && !isWindows() && AstraColors.enabled();
+        public boolean isSupported(CliContext ctx) {
+            return ctx.outputIsHuman() && ctx.isTty() && ctx.isNotWindows() && ctx.ansiEnabled();
         }
         
         @Override
-        public <T> SelectionStrategy<T> mkInstance(PromptRequest.Closed<T> request) {
-            return new ArrowKeySelectionStrategy<>(request);
+        public <T> SelectionStrategy<T> mkInstance(CliContext ctx, PromptRequest.Closed<T> request) {
+            return new ArrowKeySelectionStrategy<>(ctx, request);
         }
     }
     
@@ -86,39 +82,39 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private void showPromptAndStartSelector() {
-        AstraConsole.println(fixedPrompt);
-        AstraConsole.print(HIDE_CURSOR);
+        ctx.console().println(fixedPrompt);
+        ctx.console().print(HIDE_CURSOR);
         redraw();
     }
     
     private void redraw() {
         if (filteredOptions.isEmpty()) {
-            AstraConsole.printf("\r%s%s%n", AstraColors.NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
-            AstraConsole.printf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
+            ctx.console().printf("\r%s%s%n", ctx.colors().NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
+            ctx.console().printf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
         } else {
             val defaultIndex = req.defaultOption().map(filteredOptions::indexOf);
 
             for (int i = 0; i < filteredOptions.size(); i++) {
                 drawOption(i, defaultIndex.isPresent() && defaultIndex.get() == i);
             }
-            AstraConsole.printf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
+            ctx.console().printf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
         }
     }
     
     private void drawOption(int index, boolean isDefault) {
         val isSelected = index == selectedIndex;
-        val prefix = isSelected ? AstraColors.BLUE_300.use(">") : " ";
+        val prefix = isSelected ? ctx.colors().BLUE_300.use(">") : " ";
         val option = filteredOptions.get(index);
 
         val optionStr = (isSelected)
-            ? highlight(highlightMatch(option))
+            ? ctx.highlight(highlightMatch(option))
             : highlightMatch(option);
 
         val isDefaultStr = (isDefault && req.labelDefault())
-            ? AstraColors.PURPLE_300.use(" (default)")
+            ? ctx.colors().PURPLE_300.use(" (default)")
             : "";
 
-        AstraConsole.printf("\r%s %s%s%n", prefix, optionStr, isDefaultStr);
+        ctx.console().printf("\r%s %s%s%n", prefix, optionStr, isDefaultStr);
     }
     
     private String highlightMatch(String option) {
@@ -139,8 +135,8 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
     
     private String formatFilter(String filter) {
-        if (AstraColors.enabled()) {
-            return AstraColors.NEUTRAL_400.use(UNDERLINE_START + filter + UNDERLINE_END);
+        if (ctx.ansiEnabled()) {
+            return ctx.colors().NEUTRAL_400.use(UNDERLINE_START + filter + UNDERLINE_END);
         } else {
             return '"' + filter + '"';
         }
@@ -218,7 +214,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
             clearSelector();
 
             if (!req.clearAfterSelection()) {
-                AstraConsole.printf("@!> %s!@\r\n\r\n", selected);
+                ctx.console().printf("@!> %s!@\r\n\r\n", selected);
             }
             
             return Optional.of(req.mapper().apply(selected));
@@ -263,13 +259,13 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
         val lastDrawnLines = Math.max(filteredOptions.size(), 1) + 2;
 
         for (int i = 0; i < lastDrawnLines; i++) {
-            AstraConsole.print(MOVE_UP_CLEAR);
+            ctx.console().print(MOVE_UP_CLEAR);
         }
     }
     
     private void clearPrompt() {
         for (int i = 0; i < fixedPrompt.split("\n").length; i++) {
-            AstraConsole.print(MOVE_UP_CLEAR);
+            ctx.console().print(MOVE_UP_CLEAR);
         }
     }
     
@@ -310,7 +306,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private void cleanup(Thread shutdownHook) {
-        AstraConsole.print(SHOW_CURSOR);
+        ctx.console().print(SHOW_CURSOR);
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
         disableRawMode();
     }

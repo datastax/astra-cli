@@ -9,9 +9,6 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
@@ -32,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
@@ -73,8 +69,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
     private OutputHuman handleProfileCreated(ProfileCreated result) {
         val creationMessage = NL + ((result.overwritten())
-            ? "@|bold Profile|@ %s @|bold successfully overwritten.|@".formatted(highlight(result.profileName()))
-            : "@|bold Profile|@ %s @|bold successfully created.|@".formatted(highlight(result.profileName())));
+            ? "@|bold Profile|@ %s @|bold successfully overwritten.|@".formatted(ctx.highlight(result.profileName()))
+            : "@|bold Profile|@ %s @|bold successfully created.|@".formatted(ctx.highlight(result.profileName())));
 
         if (result.isDefault()) {
             return OutputHuman.response(creationMessage + "\n\nIt has been set as the default profile.", List.of(
@@ -107,8 +103,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     @Override
     protected Operation<SetupResult> mkOperation() {
         return new SetupOperation(
+            ctx,
             OrgGateway::mkDefault,
-            OrgGateway.Stateless.mkDefault(),
+            OrgGateway.Stateless.mkDefault(ctx),
             new SetupRequest(
                 $token,
                 $env,
@@ -126,9 +123,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private void assertShouldSetup(Path existing) {
-        AstraLogger.banner();
+        ctx.log().banner();
 
-        if (AstraConsole.getConsole() == null) {
+        if (ctx.isNotTty()) {
             throw new AstraCliException("""
               @|bold,red Error: Cannot run setup in non-interactive mode.|@
             
@@ -136,6 +133,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             
               Please use @!${cli.name} config create!@ to programmatically create profiles instead.
             """);
+        } else {
+            assert ctx.console().getConsole() != null; // not necessary, just makes the linter shut up
         }
 
         val prompt = """
@@ -151,18 +150,18 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           %s
         """.formatted(
             existing,
-            renderComment("Example:"),
-            renderCommand("${cli.name} db list --token <your_token>")
+            renderComment(ctx.colors(), "Example:"),
+            renderCommand(ctx.colors(), "${cli.name} db list --token <your_token>")
         );
 
-        AstraConsole.println(trimIndent(prompt));
-        AstraConsole.println();
-        AstraConsole.getConsole().readPassword(AstraConsole.format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "));
-        AstraConsole.println();
+        ctx.console().println(trimIndent(prompt));
+        ctx.console().println();
+        ctx.console().getConsole().readPassword(ctx.console().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "));
+        ctx.console().println();
     }
 
     private void assertShouldContinueIfAlreadySetup(Path existing) {
-        AstraLogger.banner();
+        ctx.log().banner();
 
         val prompt = """
           @|bold Looks like you're already set up!|@
@@ -177,11 +176,11 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           Do you want to continue and create a new profile?
         """.formatted(
             existing,
-            renderComment("Example:"),
-            renderCommand("${cli.name} config list")
+            renderComment(ctx.colors(), "Example:"),
+            renderCommand(ctx.colors(), "${cli.name} config list")
         );
 
-        val shouldContinue = AstraConsole.confirm(prompt)
+        val shouldContinue = ctx.console().confirm(prompt)
             .defaultYes()
             .fallbackFlag("")
             .fix(List.of(), "")
@@ -200,12 +199,12 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           Do you wish to overwrite it?
         """.formatted(
-            highlight(existing.token().toString()),
-            highlight(existing.env().name().toLowerCase()),
+            ctx.highlight(existing.token().toString()),
+            ctx.highlight(existing.env().name().toLowerCase()),
             existing.name().orElseThrow()
         );
 
-        val shouldOverwrite = AstraConsole.confirm(prompt)
+        val shouldOverwrite = ctx.console().confirm(prompt)
             .defaultNo()
             .fallbackFlag("")
             .fix(List.of(), "")
@@ -217,11 +216,11 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private AstraToken promptForToken() {
-        val prompt = AstraColors.PURPLE_300.use("(Required)") + " Enter your Astra token (it should start with @!AstraCS!@)";
+        val prompt = ctx.colors().PURPLE_300.use("(Required)") + " Enter your Astra token (it should start with @!AstraCS!@)";
 
-        return AstraConsole.prompt(prompt)
+        return ctx.console().prompt(prompt)
             .mapper(input -> AstraToken.parse(input).getRight(InvalidTokenException::new))
-            .echoOff(StringUtils::maskToken)
+            .echoOff((s) -> StringUtils.maskToken(ctx.colors(), s))
             .requireAnswer()
             .fallbackFlag("--token")
             .fix(originalArgs(), "--token <your_token>")
@@ -233,7 +232,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           It looks like your token is valid for the @!%s!@ environment. Do you want to use this environment?
         """.formatted(env.name().toLowerCase());
 
-        return AstraConsole.confirm(prompt)
+        return ctx.console().confirm(prompt)
             .defaultYes()
             .fallbackFlag("")
             .fix(List.of(), "")
@@ -241,9 +240,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private AstraEnvironment promptForEnv(AstraEnvironment defaultEnv) {
-        val prompt = AstraColors.PURPLE_300.use("(Optional)") + " Enter the target Astra environment (defaults to @!prod!@)";
+        val prompt = ctx.colors().PURPLE_300.use("(Optional)") + " Enter the target Astra environment (defaults to @!prod!@)";
 
-        return AstraConsole.select(prompt)
+        return ctx.console().select(prompt)
             .options(AstraEnvironment.values())
             .defaultOption(defaultEnv)
             .mapper(e -> e.name().toLowerCase())
@@ -253,9 +252,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private ProfileName promptForName(String defaultName) {
-        val prompt = AstraColors.PURPLE_300.use("(Optional)") + " Enter a name for your profile (defaults to your org name)";
+        val prompt = ctx.colors().PURPLE_300.use("(Optional)") + " Enter a name for your profile (defaults to your org name)";
 
-        return AstraConsole.prompt(prompt)
+        return ctx.console().prompt(prompt)
             .mapper(ProfileName::mkUnsafe)
             .defaultOption(defaultName)
             .fallbackFlag("--name")
@@ -270,7 +269,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           Do you want to set this profile as the default instead?
         """;
 
-        return AstraConsole.confirm(prompt)
+        return ctx.console().confirm(prompt)
             .defaultNo()
             .fallbackFlag("")
             .fix(List.of(), "")

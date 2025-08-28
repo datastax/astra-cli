@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.core.completions;
 
-import com.dtsx.astra.cli.core.config.AstraHome;
-import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.CliContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -20,14 +20,17 @@ import java.util.stream.Collectors;
 import static com.dtsx.astra.cli.utils.MiscUtils.setAdd;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
+@RequiredArgsConstructor
 public abstract class CompletionsCache {
+    private final CliContext ctx;
+
     private @Nullable Set<String> cachedCandidates;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @SneakyThrows
     public void update(Function<Set<String>, Set<String>> mkCandidates) {
-        if (!AstraHome.exists()) {
+        if (!ctx.home().exists()) {
             return;
         }
 
@@ -42,7 +45,7 @@ public abstract class CompletionsCache {
         try {
             currentCandidates = Files.readAllLines(cacheFile.get()).stream().map(this::readJsonString).collect(Collectors.toSet());
         } catch (Exception e) {
-            AstraLogger.exception("An error occurred reading cache file '%s'".formatted(cacheFile), e);
+            ctx.log().exception("An error occurred reading cache file '%s'".formatted(cacheFile), e);
             return;
         }
 
@@ -67,7 +70,7 @@ public abstract class CompletionsCache {
         } catch (Exception e) {
             try {
                 Files.deleteIfExists(cacheFile.get());
-                AstraLogger.exception("An error occurred updating cache file '%s'".formatted(cacheFile), e);
+                ctx.log().exception("An error occurred updating cache file '%s'".formatted(cacheFile), e);
             } catch (Exception _) {}
         }
     }
@@ -87,7 +90,7 @@ public abstract class CompletionsCache {
     protected abstract String useCacheFile();
 
     protected Optional<Path> useCacheDir() {
-        return Optional.of(AstraHome.Dirs.useCompletionsCache());
+        return Optional.of(ctx.home().Dirs.useCompletionsCache());
     }
 
     @SneakyThrows

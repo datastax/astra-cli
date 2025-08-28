@@ -27,7 +27,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -180,9 +179,9 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
     private OutputAll handleDbAlreadyExistsWithStatus(UUID dbId, DatabaseStatusType currStatus) {
         val message = "Database %s already exists with id %s, and has status %s.".formatted(
-            highlight($dbRef),
-            highlight(dbId),
-            highlight(currStatus)
+            ctx.highlight($dbRef),
+            ctx.highlight(dbId),
+            ctx.highlight(currStatus)
         );
 
         val data = mkData(dbId, false, currStatus, null);
@@ -214,14 +213,14 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
     private OutputAll handleDbAlreadyExistsAndIsActive(UUID dbId, DatabaseStatusType prevStatus, Duration awaited) {
         val message = awaited.isZero() 
             ? "Database %s already exists with id %s, and was already active; no action was required.".formatted(
-                highlight($dbRef),
-                highlight(dbId)
+                ctx.highlight($dbRef),
+                ctx.highlight(dbId)
             )
             : "Database %s already exists with id %s, and had status %s. It is now active after waiting %s seconds.".formatted(
-                highlight($dbRef),
-                highlight(dbId),
-                highlight(prevStatus),
-                highlight(awaited.toSeconds())
+                ctx.highlight($dbRef),
+                ctx.highlight(dbId),
+                ctx.highlight(prevStatus),
+                ctx.highlight(awaited.toSeconds())
             );
 
         val data = mkData(dbId, false, DatabaseStatusType.ACTIVE, awaited);
@@ -233,9 +232,9 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
     private OutputAll handleDbCreationStarted(UUID dbId, DatabaseStatusType currStatus) {
         val message = "Database %s has been created with id %s, and currently has status %s.".formatted(
-            highlight($dbRef),
-            highlight(dbId),
-            highlight(currStatus)
+            ctx.highlight($dbRef),
+            ctx.highlight(dbId),
+            ctx.highlight(currStatus)
         );
 
         val data = mkData(dbId, true, currStatus, null);
@@ -248,9 +247,9 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
     private OutputAll handleDbCreated(UUID dbId, Duration waitTime) {
         val message = "Database %s has been created with id %s. It is now active after waiting %s seconds.".formatted(
-            highlight($dbRef),
-            highlight(dbId),
-            highlight(waitTime.toSeconds())
+            ctx.highlight($dbRef),
+            ctx.highlight(dbId),
+            ctx.highlight(waitTime.toSeconds())
         );
 
         val data = mkData(dbId, true, DatabaseStatusType.ACTIVE, waitTime);

@@ -1,17 +1,17 @@
 package com.dtsx.astra.cli.core.output.prompters.builders;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.prompters.CLIPrompter;
 import lombok.RequiredArgsConstructor;
 import org.graalvm.collections.Pair;
 
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class ConfirmerBuilder {
-    private final String prompt;
+    private final CliContext ctx;
     private final boolean noInput;
+    private final String prompt;
 
     public NeedsFallback defaultYes() {
         return new NeedsFallback(Optional.of(true));
@@ -30,11 +30,11 @@ public class ConfirmerBuilder {
         private final Optional<Boolean> defaultOption;
 
         public NeedsFix fallbackFlag(String flag) {
-            return new NeedsFix(defaultOption, highlight(flag) + " flag");
+            return new NeedsFix(defaultOption, ctx.highlight(flag) + " flag");
         }
 
         public NeedsFix fallbackIndex(int index) {
-            return new NeedsFix(defaultOption, "parameter at index " + highlight(index));
+            return new NeedsFix(defaultOption, "parameter at index " + ctx.highlight(index));
         }
     }
 
@@ -63,9 +63,8 @@ public class ConfirmerBuilder {
         }
 
         public boolean clearAfterSelection(boolean clearAfterSelection) {
-            return CLIPrompter.confirm(
+            return new CLIPrompter(ctx, noInput).confirm(
                 prompt,
-                noInput,
                 defaultOption,
                 fallback,
                 fix,

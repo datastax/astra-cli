@@ -71,7 +71,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
         val cp = cloudProvider.name().toLowerCase();
 
         if (hasFreeTier) {
-            return cp + ShellTable.highlight(" (free)");
+            return cp + ShellTable.highlight(ctx, " (free)");
         }
 
         return cp;

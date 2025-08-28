@@ -1,7 +1,8 @@
 package com.dtsx.astra.cli.core.models;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -12,7 +13,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class DbRef implements AstraColors.Highlightable {
+public class DbRef implements Highlightable {
     private final Either<UUID, String> ref;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
@@ -59,7 +60,7 @@ public class DbRef implements AstraColors.Highlightable {
     }
 
     @Override
-    public String highlight() {
-        return AstraColors.highlight(ref.fold(UUID::toString, name -> name));
+    public String highlight(CliContext ctx) {
+        return ctx.highlight(ref.fold(UUID::toString, name -> name));
     }
 }

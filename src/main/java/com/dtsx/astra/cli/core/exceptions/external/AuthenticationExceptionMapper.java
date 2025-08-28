@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.exceptions.external;
 
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler.ExternalExceptionMapper;
 import com.dtsx.astra.sdk.exception.AuthenticationException;
@@ -8,7 +9,6 @@ import lombok.val;
 import picocli.CommandLine;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 public class AuthenticationExceptionMapper implements ExternalExceptionMapper<AuthenticationException> {
     @Override
@@ -17,7 +17,7 @@ public class AuthenticationExceptionMapper implements ExternalExceptionMapper<Au
     }
 
     @Override
-    public AstraCliException mapExceptionInternal(AuthenticationException ex, CommandLine commandLine, CommandLine.ParseResult fullParseResult) {
+    public AstraCliException mapExceptionInternal(AuthenticationException ex, CommandLine commandLine, CommandLine.ParseResult fullParseResult, CliContext ctx) {
         val userObj = commandLine.getCommandSpec().userObject();
 
         var profile = (userObj instanceof AbstractConnectedCmd<?> cmd)
@@ -28,7 +28,7 @@ public class AuthenticationExceptionMapper implements ExternalExceptionMapper<Au
             (profile != null && profile.isArgsProvided())
                 ? "token provided via the command line" :
             (profile != null)
-                ? "token provided in the configuration file for profile '" + highlight(profile.nameOrDefault()) + "'"
+                ? "token provided in the configuration file for profile '" + ctx.highlight(profile.nameOrDefault()) + "'"
                 : "used token";
 
         return new AstraCliException(INVALID_TOKEN, """

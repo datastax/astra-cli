@@ -142,7 +142,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
     @Group
     public class bimap {
         @Property
-        public <L, R, L2> void bimap_maps_left(@ForAll L initL) {
+        public <L, R> void bimap_maps_left(@ForAll L initL) {
             val either = Either.<L, R>left(initL);
 
             val result = either.bimap(l -> "Left: " + l, AssertUtils::assertNotCalled);
@@ -153,7 +153,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
         }
 
         @Property
-        public <L, R, R2> void bimap_maps_right(@ForAll R initR) {
+        public <L, R> void bimap_maps_right(@ForAll R initR) {
             val either = Either.<L, R>right(initR);
 
             val result = either.bimap(AssertUtils::assertNotCalled, r -> "Right: " + r);

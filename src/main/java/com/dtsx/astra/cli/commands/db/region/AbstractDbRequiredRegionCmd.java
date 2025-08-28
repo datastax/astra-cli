@@ -11,6 +11,6 @@ public abstract class AbstractDbRequiredRegionCmd<OpRes> extends AbstractDbRequi
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        regionGateway = RegionGateway.mkDefault(profile().token(), profile().env());
+        regionGateway = RegionGateway.mkDefault(profile().token(), profile().env(), ctx);
     }
 }

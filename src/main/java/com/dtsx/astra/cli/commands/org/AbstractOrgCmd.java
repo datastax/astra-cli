@@ -11,6 +11,6 @@ public abstract class AbstractOrgCmd<OpRes> extends AbstractConnectedCmd<OpRes> 
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        orgGateway = OrgGateway.mkDefault(profile().token(), profile().env());
+        orgGateway = OrgGateway.mkDefault(profile().token(), profile().env(), ctx);
     }
 }

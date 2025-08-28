@@ -15,6 +15,6 @@ import picocli.CommandLine.Command;
 public class DbDsbulkVersionCmd extends AbstractDsbulkExecCmd {
     @Override
     protected DbDsbulkVersionOperation mkOperation() {
-        return new DbDsbulkVersionOperation(dbGateway, downloadsGateway);
+        return new DbDsbulkVersionOperation(ctx, dbGateway, downloadsGateway);
     }
 }

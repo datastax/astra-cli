@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.CDC_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
@@ -113,8 +112,8 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         val msg = """
           CDC %s does not exist in database %s; nothing to delete.
         """.formatted(
-            highlight(cdcRef()),
-            highlight($dbRef)
+            ctx.highlight(cdcRef()),
+            ctx.highlight($dbRef)
         );
 
         return OutputAll.response(msg, mkData(false), List.of(
@@ -126,8 +125,8 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         val msg = """
           CDC %s has been deleted from database %s.
         """.formatted(
-            highlight(cdcRef()),
-            highlight($dbRef)
+            ctx.highlight(cdcRef()),
+            ctx.highlight($dbRef)
         );
 
         return OutputAll.response(msg, mkData(true), List.of(

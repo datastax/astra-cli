@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.operations.db.region;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -11,11 +11,11 @@ import lombok.val;
 
 import java.util.List;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
+import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.FoundRegions;
 
 @RequiredArgsConstructor
 public class RegionListOperation implements Operation<FoundRegions> {
+    private final CliContext ctx;
     private final RegionGateway regionGateway;
     private final DbGateway dbGateway;
     private final RegionListRequest request;
@@ -31,7 +31,7 @@ public class RegionListOperation implements Operation<FoundRegions> {
     public FoundRegions execute() {
         val dcs = regionGateway.findAllForDb(request.dbRef);
 
-        val defaultRegion = AstraLogger.loading("Fetching default region for db " + highlight(request.dbRef), (_) -> (
+        val defaultRegion = ctx.log().loading("Fetching default region for db " + ctx.highlight(request.dbRef), (_) -> (
             dbGateway.findOne(request.dbRef).getInfo().getRegion()
         ));
 

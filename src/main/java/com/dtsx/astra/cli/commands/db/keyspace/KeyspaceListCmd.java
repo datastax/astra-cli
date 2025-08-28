@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
@@ -54,6 +53,6 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     }
 
     private String mkKeyspaceDisplayName(String name, boolean isDefault) {
-        return isDefault ? AstraColors.PURPLE_300.use(name + " (in use)") : name;
+        return isDefault ? ctx.colors().PURPLE_300.use(name + " (in use)") : name;
     }
 }

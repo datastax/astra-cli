@@ -11,6 +11,6 @@ public abstract class AbstractCollectionCmd<OpRes> extends AbstractKeyspaceSpeci
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        collectionGateway = CollectionGateway.mkDefault(profile().token(), profile().env());
+        collectionGateway = CollectionGateway.mkDefault(profile().token(), profile().env(), ctx);
     }
 }

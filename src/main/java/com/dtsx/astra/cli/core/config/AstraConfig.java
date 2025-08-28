@@ -1,15 +1,16 @@
 package com.dtsx.astra.cli.core.config;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.config.AstraConfigFileException;
 import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.Hint;
-import com.dtsx.astra.cli.core.parsers.ini.Ini;
+import com.dtsx.astra.cli.core.parsers.ini.IniFile;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
+import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
@@ -17,7 +18,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.val;
-import org.apache.commons.io.file.PathUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
@@ -38,10 +37,12 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
 
+    private final CliContext ctx;
+
     @Getter
     private final ArrayList<Either<InvalidProfile, Profile>> profiles;
 
-    private final Ini backingIni;
+    private final IniFile backingIniFile;
 
     @Getter
     private final Path backingFile;
@@ -55,11 +56,11 @@ public class AstraConfig {
         )).toList();
     }
 
-    public static AstraConfig readAstraConfigFile(@Nullable Path path, boolean createIfNotExists) {
+    public static AstraConfig readAstraConfigFile(CliContext ctx, @Nullable Path path, boolean createIfNotExists) {
         val usingDefault = path == null;
 
         if (usingDefault) {
-            path = resolveDefaultAstraConfigFile();
+            path = resolveDefaultAstraConfigFile(ctx);
         }
 
         if (createIfNotExists) {
@@ -89,12 +90,12 @@ public class AstraConfig {
         }
 
         try {
-            val iniFile = Ini.readIniFile(path);
+            val iniFile = IniFile.readFile(path);
 
             val profiles = iniFile.getSections().stream()
                 .map((section) -> {
                     val maybeProfileName = ProfileName.parse(section.name()).bimap(
-                        (msg) -> new InvalidProfile(section, "Error parsing profile name " + highlight(section.name()) + ": " + msg),
+                        (msg) -> new InvalidProfile(section, "Error parsing profile name " + ctx.highlight(section.name()) + ": " + msg),
                         Function.identity()
                     );
 
@@ -111,10 +112,10 @@ public class AstraConfig {
                                   - Running %s to delete this profile, or
                                   - Running %s to set the token for this profile.
                                 """.formatted(
-                                    AstraColors.PURPLE_300.useOrQuote(TOKEN_KEY),
-                                    highlight(section.name()),
-                                    highlight("${cli.name} config delete '" + profileName.unwrap() + "'"),
-                                    highlight("${cli.name} config create '" + profileName.unwrap() + "' --token <token> [--env <env>] -f")
+                                    ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY),
+                                    ctx.highlight(section.name()),
+                                    ctx.highlight("${cli.name} config delete '" + profileName.unwrap() + "'"),
+                                    ctx.highlight("${cli.name} config create '" + profileName.unwrap() + "' --token <token> [--env <env>] -f")
                                 )))
                             );
                         }
@@ -125,14 +126,14 @@ public class AstraConfig {
                             .orElse(AstraEnvironment.PROD);
 
                         return AstraToken.parse(token.get()).bimap(
-                            (msg) -> new InvalidProfile(section, "Error parsing token for profile " + highlight(profileName.unwrap()) + ": " + msg),
+                            (msg) -> new InvalidProfile(section, "Error parsing token for profile " + ctx.highlight(profileName.unwrap()) + ": " + msg),
                             (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env)
                         );
                     });
                 })
                 .toList();
 
-            return new AstraConfig(new ArrayList<>(profiles), iniFile, path);
+            return new AstraConfig(ctx, new ArrayList<>(profiles), iniFile, path);
         } catch (IniParseException e) {
             throw new AstraConfigFileException(e.getMessage(), path);
         } catch (IOException e) {
@@ -140,8 +141,8 @@ public class AstraConfig {
         }
     }
 
-    public static Path resolveDefaultAstraConfigFile() {
-        return CliProperties.defaultRcFile();
+    public static Path resolveDefaultAstraConfigFile(CliContext ctx) {
+        return CliProperties.defaultRcFile(ctx.isWindows());
     }
 
     public boolean profileExists(ProfileName profileName) {
@@ -157,14 +158,14 @@ public class AstraConfig {
 
         if (matching.size() > 1) {
             throw new AstraConfigFileException(trimIndent("""
-              Multiple profiles were found for name %s. Please ensure profile names are unique.
+              Multiple profiles were found for name @!%s!@. Please ensure profile names are unique.
  
               You can fix this by either
               - Manually editing the configuration file to remove duplicates, or
-              - Running %s to delete all profiles with this name, then re-create the profile correctly.
+              - Running @!%s!@ to delete all profiles with this name, then re-create the profile correctly.
             """.formatted(
-                highlight(profileName),
-                highlight("${cli.name} config delete '" + profileName.unwrap() + "'")
+                profileName,
+                "${cli.name} config delete '" + profileName.unwrap() + "'"
             )), backingFile);
         }
 
@@ -180,7 +181,7 @@ public class AstraConfig {
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
             profiles.add(Either.right(new Profile(Optional.of(name), token, env)));
 
-            backingIni.addSection(name.unwrap(), new HashMap<>() {{
+            backingIniFile.addSection(name.unwrap(), new HashMap<>() {{
                 put(TOKEN_KEY, token.unwrap());
 
                 if (env != AstraEnvironment.PROD) {
@@ -194,28 +195,28 @@ public class AstraConfig {
 
             profiles.add(Either.right(new Profile(Optional.of(target), src.token(), src.env())));
 
-            val srcSection = backingIni.getSections().stream()
+            val srcSection = backingIniFile.getSections().stream()
                 .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
                 .findFirst()
                 .orElseThrow();
 
-            backingIni.addSection(target.unwrap(), srcSection);
+            backingIniFile.addSection(target.unwrap(), srcSection);
         }
 
         public void deleteProfile(ProfileName profileName) {
             profiles.removeIf(isProfileName(profileName));
-            backingIni.deleteSection(profileName.unwrap());
-            ProfileLinkedCompletionsCache.mkInstances(profileName).forEach((c) -> c.update((_) -> Set.of()));
+            backingIniFile.deleteSection(profileName.unwrap());
+            ProfileLinkedCompletionsCache.mkInstances(ctx, profileName).forEach((c) -> c.update((_) -> Set.of()));
         }
     }
 
     public void modify(Consumer<ProfileModificationCtx> consumer) {
         consumer.accept(new ProfileModificationCtx());
-        backingIni.writeToFile(backingFile);
+        backingIniFile.writeToFile(backingFile);
     }
 
-    public Optional<Ini.IniSection> getProfileSection(String sectionName) {
-        return backingIni.getSections().stream()
+    public Optional<IniSection> getProfileSection(String sectionName) {
+        return backingIniFile.getSections().stream()
             .filter(s -> s.name().equals(sectionName))
             .findFirst();
     }

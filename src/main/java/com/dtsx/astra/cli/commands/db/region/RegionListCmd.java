@@ -24,7 +24,7 @@ import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
 public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
     @Override
     protected RegionListOperation mkOperation() {
-        return new RegionListOperation(regionGateway, dbGateway, new RegionListRequest($dbRef));
+        return new RegionListOperation(ctx, regionGateway, dbGateway, new RegionListRequest($dbRef));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
         val data = result.get().regions().stream()
             .map((dc) -> Map.of(
                 "Cloud Provider", dc.getCloudProvider().name().toLowerCase(),
-                "Region", dc.getRegion() + (dc == result.get().defaultRegion() ? ShellTable.highlight(" (default)") : ""),
+                "Region", dc.getRegion() + (dc == result.get().defaultRegion() ? ShellTable.highlight(ctx, " (default)") : ""),
                 "Tier", dc.getTier(),
                 "Status", dc.getStatus()
             ))

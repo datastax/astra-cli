@@ -9,7 +9,6 @@ import picocli.CommandLine.Command;
 
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbStatusOperation.*;
 
 @Command(
@@ -23,12 +22,12 @@ import static com.dtsx.astra.cli.operations.db.DbStatusOperation.*;
 public class DbStatusCmd extends AbstractPromptForDbCmd<DatabaseStatusType> {
     @Override
     protected DbStatusOperation mkOperation() {
-        return new DbStatusOperation(dbGateway, new DbStatusRequest($dbRef));
+        return new DbStatusOperation(ctx, dbGateway, new DbStatusRequest($dbRef));
     }
 
     @Override
     protected final OutputHuman executeHuman(Supplier<DatabaseStatusType> result) {
-        return OutputHuman.response("Database %s is %s".formatted(highlight($dbRef), highlight(result.get())));
+        return OutputHuman.response("Database %s is %s".formatted(ctx.highlight($dbRef), ctx.highlight(result.get())));
     }
 
     @Override

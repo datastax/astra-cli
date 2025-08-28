@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -69,8 +68,8 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     private OutputAll handleKeyspaceNotFound() {
         val message = "Keyspace %s does not exist in database %s; nothing to delete.".formatted(
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db())
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(false, null);
@@ -82,8 +81,8 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     private OutputAll handleKeyspaceDeleted() {
         val message = "Keyspace %s has been deleted from database %s (database may not be active yet).".formatted(
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db())
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(true, null);
@@ -95,8 +94,8 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
 
     private OutputAll handleKeyspaceDeletedAndDbActive(Duration waitTime) {
         val message = "Keyspace %s has been deleted from database %s. The database is now active after waiting %d seconds.".formatted(
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db()),
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db()),
             waitTime.toSeconds()
         );
 

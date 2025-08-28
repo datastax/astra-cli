@@ -1,11 +1,11 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshRequest> {
-    public DbCqlshStartOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, CqlshRequest request) {
-        super(dbGateway, downloadsGateway, request);
+    public DbCqlshStartOperation(CliContext ctx, DbGateway dbGateway, DownloadsGateway downloadsGateway, CqlshRequest request) {
+        super(ctx, dbGateway, downloadsGateway, request);
     }
 
     public record CqlshRequest(
@@ -79,8 +79,8 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
                 }
                 case ExecSource.Stdin _ -> {
                     if (CliEnvironment.isTty()) {
-                        AstraLogger.info("Reading CQL statements from stdin...");
-                        AstraLogger.info("Use backslashes for multi-line statements");
+                        ctx.log().info("Reading CQL statements from stdin...");
+                        ctx.log().info("Use backslashes for multi-line statements");
                     }
                     commands.add("-e");
                     commands.add(request.readStdin.get());

@@ -16,6 +16,6 @@ import picocli.CommandLine.Command;
 public class StreamingPulsarVersionCmd extends AbstractPulsarExecCmd {
     @Override
     protected StreamingPulsarVersionOperation mkOperation() {
-        return new StreamingPulsarVersionOperation(streamingGateway, downloadsGateway, new PulsarVersionRequest());
+        return new StreamingPulsarVersionOperation(ctx, streamingGateway, downloadsGateway, new PulsarVersionRequest());
     }
 }

@@ -1,152 +1,113 @@
 package com.dtsx.astra.cli.core.output;
 
-import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.val;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
+import picocli.CommandLine.Help.Ansi.IStyle;
 import picocli.CommandLine.Help.ColorScheme;
 import picocli.CommandLine.Option;
 
-import java.nio.file.Path;
-import java.util.UUID;
+import java.util.Optional;
 
 @Accessors(fluent = true)
-public enum AstraColors implements Ansi.IStyle {
-    PURPLE_300(175, 110, 195),
-    PURPLE_500(110, 46, 164),
-
-    YELLOW_300(223, 161, 67),
-    YELLOW_500(162, 91, 39),
-
-    GREEN_300(128, 189, 244),
-    GREEN_500(61, 126, 64),
-
-    BLUE_300(129, 163, 231),
-    BLUE_500(46, 101, 211),
-
-    RED_300(221, 127, 135),
-    RED_500(199, 49, 44),
-
-    MAGENTA_400(239, 134, 180),
-    MAGENTA_600(191, 57, 111),
-
-    CYAN_400(91, 176, 248),
-    CYAN_600(48, 113, 189),
-
-    ORANGE_400(239, 137, 67),
-    ORANGE_600(173, 84, 31),
-
-    NEUTRAL_300(167, 170, 173),
-    NEUTRAL_400(138, 141, 144),
-    NEUTRAL_500(108, 111, 115),
-
-    TEAL_400(85, 186, 185),
-    TEAL_600(53, 123, 120);
-
+@RequiredArgsConstructor
+public class AstraColors {
+    private static final String CSI = "\u001B[";
     private static final String DISABLE_STRING = CSI + "39m";
 
     @Getter
-    @Setter
-    private static Ansi ansi = Ansi.ON;
+    private final Ansi ansi;
 
-    @Getter
-    private static ColorScheme colorScheme = new ColorScheme.Builder(Help.defaultColorScheme(Ansi.AUTO))
-        .options(AstraColors.BLUE_300)
-        .parameters(AstraColors.BLUE_300)
-        .build();
+    @RequiredArgsConstructor
+    public class AstraColor implements IStyle {
+        private final int red;
+        private final int green;
+        private final int blue;
 
-    public static boolean enabled() {
-        return ansi.enabled();
+        @Override
+        public String on() {
+            return ansi.enabled() ? (CSI + "38;2;" + (red & 255) + ";" + (green & 255) + ";" + (blue & 255) + "m") : "";
+        }
+
+        @Override
+        public String off() {
+            return ansi.enabled() ? DISABLE_STRING : "";
+        }
+
+        public String use(String string) {
+            return on() + string + off();
+        }
+
+        public String useOrQuote(String string) {
+            return ansi.enabled() ? (on() + string + off()) : "'" + string + "'";
+        }
     }
 
-    public static String reset() {
-        return ansi().enabled() ? DISABLE_STRING : "";
+    public final AstraColor PURPLE_300 = new AstraColor(175, 110, 195);
+    public final AstraColor PURPLE_500 = new AstraColor(110, 46, 164);
+
+    public final AstraColor YELLOW_300 = new AstraColor(223, 161, 67);
+    public final AstraColor YELLOW_500 = new AstraColor(162, 91, 39);
+
+    public final AstraColor GREEN_300 = new AstraColor(128, 189, 244);
+    public final AstraColor GREEN_500 = new AstraColor(61, 126, 64);
+
+    public final AstraColor BLUE_300 = new AstraColor(129, 163, 231);
+    public final AstraColor BLUE_500 = new AstraColor(46, 101, 211);
+
+    public final AstraColor RED_300 = new AstraColor(221, 127, 135);
+    public final AstraColor RED_500 = new AstraColor(199, 49, 44);
+
+    public final AstraColor MAGENTA_400 = new AstraColor(239, 134, 180);
+    public final AstraColor MAGENTA_600 = new AstraColor(191, 57, 111);
+
+    public final AstraColor CYAN_400 = new AstraColor(91, 176, 248);
+    public final AstraColor CYAN_600 = new AstraColor(48, 113, 189);
+
+    public final AstraColor ORANGE_400 = new AstraColor(239, 137, 67);
+    public final AstraColor ORANGE_600 = new AstraColor(173, 84, 31);
+
+    public final AstraColor NEUTRAL_300 = new AstraColor(167, 170, 173);
+    public final AstraColor NEUTRAL_400 = new AstraColor(138, 141, 144);
+    public final AstraColor NEUTRAL_500 = new AstraColor(108, 111, 115);
+
+    public final AstraColor TEAL_400 = new AstraColor(85, 186, 185);
+    public final AstraColor TEAL_600 = new AstraColor(53, 123, 120);
+
+    public static final ColorScheme DEFAULT_COLOR_SCHEME;
+
+    static {
+        val colors = new AstraColors(Ansi.AUTO);
+
+        DEFAULT_COLOR_SCHEME = new ColorScheme.Builder(Help.defaultColorScheme(Ansi.AUTO))
+            .options(colors.BLUE_300)
+            .parameters(colors.BLUE_300)
+            .build();
+    }
+
+    public String reset() {
+        return ansi.enabled() ? DISABLE_STRING : "";
     }
 
     public static String stripAnsi(String str) {
         return str.replaceAll("\\u001B\\[[;\\d]*m", "");
     }
 
+    @Accessors(fluent = true)
     public static class Mixin {
+        @Getter
+        private Optional<Ansi> ansi = Optional.empty();
+
         @Option(names = "--color", negatable = true, description = "Force colored output")
-        public void setAnsi(boolean ansi) {
-            AstraColors.ansi = (ansi) ? Ansi.ON : Ansi.OFF;
+        private void setAnsi(boolean ansi) {
+            if (ansi) {
+                this.ansi = Optional.of(Ansi.ON);
+            } else {
+                this.ansi = Optional.of(Ansi.OFF);
+            }
         }
-
-        public ColorScheme getColorScheme() {
-            val ansi = (AstraColors.ansi == null) ? Ansi.ON : AstraColors.ansi;
-
-            return colorScheme = new Help.ColorScheme.Builder(colorScheme)
-                .ansi(ansi)
-                .build();
-        }
-    }
-
-    private final String enableString;
-
-    AstraColors(int red, int green, int blue) {
-        this.enableString = CSI + "38;2;" + (red & 255) + ";" + (green & 255) + ";" + (blue & 255) + "m";
-    }
-
-    @Override
-    public String on() {
-        return enabled() ? enableString : "";
-    }
-
-    @Override
-    public String off() {
-        return reset();
-    }
-
-    public String use(String string) {
-        return enabled() ? (enableString + string + DISABLE_STRING) : string;
-    }
-
-    public String useOrQuote(String string) {
-        return enabled() ? (enableString + string + DISABLE_STRING) : "'" + string + "'";
-    }
-
-    public static String highlight(String s) {
-        return AstraColors.BLUE_300.useOrQuote(s);
-    }
-
-    public static String highlight(Path p) {
-        return highlight(p.toString());
-    }
-
-    public static String highlight(UUID u) {
-        return highlight(u.toString());
-    }
-
-    public static String highlight(long l) {
-        return enabled() ? AstraColors.BLUE_300.use(String.valueOf(l)) : String.valueOf(l);
-    }
-
-    public static String highlight(Highlightable h) {
-        return h.highlight();
-    }
-
-    public static String highlight(DatabaseStatusType status) {
-        if (!enabled()) {
-            return "'" + status.name() + "'";
-        }
-
-        val color = switch (status) {
-            case ACTIVE -> AstraColors.GREEN_500;
-            case ERROR, TERMINATED, UNKNOWN -> AstraColors.RED_500;
-            case DECOMMISSIONING, TERMINATING, DEGRADED -> AstraColors.YELLOW_500;
-            case HIBERNATED, PARKED, PREPARED -> AstraColors.BLUE_500;
-            case INITIALIZING, PENDING, HIBERNATING, PARKING, MAINTENANCE, PREPARING, RESIZING, RESUMING, UNPARKING -> AstraColors.YELLOW_300;
-            default -> AstraColors.NEUTRAL_500;
-        };
-
-        return color.use(status.name());
-    }
-
-    public interface Highlightable {
-        String highlight();
     }
 }

@@ -1,7 +1,8 @@
 package com.dtsx.astra.cli.core.models;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.Highlightable;
 import com.dtsx.astra.cli.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
@@ -10,7 +11,7 @@ import java.util.stream.Stream;
 
 @Value
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class AstraToken implements AstraColors.Highlightable {
+public class AstraToken implements Highlightable {
     String token;
 
     public static Either<String, AstraToken> parse(@NonNull String token) {
@@ -55,8 +56,8 @@ public class AstraToken implements AstraColors.Highlightable {
     }
 
     @Override
-    public String highlight() {
-        return AstraColors.highlight(token);
+    public String highlight(CliContext ctx) {
+        return ctx.highlight(token);
     }
 
     @Override

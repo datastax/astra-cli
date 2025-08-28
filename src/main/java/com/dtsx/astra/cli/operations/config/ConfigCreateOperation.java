@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.operations.config;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.ConfigCreateResult;
@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
+    private final CliContext ctx;
     private final AstraConfig config;
     private final OrgGateway orgGateway;
     private final OrgGateway.Stateless statelessOrgGateway;
@@ -82,7 +83,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     }
 
     private Optional<Organization> validateTokenAndFetchOrg(OrgGateway orgGateway) {
-        return AstraLogger.loading("Validating your Astra token", (_) -> {
+        return ctx.log().loading("Validating your Astra token", (_) -> {
             try {
                 return Optional.of(orgGateway.current());
             } catch (AuthenticationException e) {

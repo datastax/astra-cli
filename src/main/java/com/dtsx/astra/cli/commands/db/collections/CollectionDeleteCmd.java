@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -54,9 +53,9 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
 
     private OutputAll handleCollectionNotFound() {
         val message = "Collection %s does not exist in keyspace %s of database %s; nothing to delete.".formatted(
-            highlight($collRef.name()),
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db())
+            ctx.highlight($collRef.name()),
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(false);
@@ -69,9 +68,9 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
 
     private OutputAll handleCollectionDeleted() {
         val message = "Collection %s has been deleted from keyspace %s in database %s.".formatted(
-            highlight($collRef.name()),
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db())
+            ctx.highlight($collRef.name()),
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(true);

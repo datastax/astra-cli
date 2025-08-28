@@ -7,8 +7,6 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation;
@@ -59,7 +57,7 @@ public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
 
     @Override
     protected Operation<CqlshExecResult> mkOperation(boolean captureOutput) {
-        return new DbCqlshStartOperation(dbGateway, downloadsGateway, new CqlshRequest(
+        return new DbCqlshStartOperation(ctx, dbGateway, downloadsGateway, new CqlshRequest(
             $dbRef,
             $debug,
             $encoding,
@@ -75,7 +73,7 @@ public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
     }
 
     private String readStdin() {
-        try (val reader = new BufferedReader(new InputStreamReader(AstraConsole.getIn()))) {
+        try (val reader = new BufferedReader(new InputStreamReader(ctx.console().getIn()))) {
             val sb = new StringBuilder();
             var line = "";
 
@@ -91,7 +89,7 @@ public abstract class DbCqlshStartImpl extends AbstractCqlshExecCmd {
 
             return sb.toString();
         } catch (IOException e) {
-            AstraLogger.exception(e);
+            ctx.log().exception(e);
 
             throw new AstraCliException("""
               @|bold,red Error: Attempted to read from standard input, but something went wrong:|@

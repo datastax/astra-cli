@@ -73,7 +73,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
-        return new DbDsbulkLoadOperation(dbGateway, downloadsGateway, new LoadRequest(
+        return new DbDsbulkLoadOperation(ctx, dbGateway, downloadsGateway, new LoadRequest(
             $dbRef,
             $keyspace,
             $table,

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.table;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 
 import java.util.List;
@@ -12,8 +13,8 @@ public record RenderableShellTable(List<? extends Map<String, ?>> raw, List<Stri
     }
 
     @Override
-    public String renderAsHuman() {
-        return new ShellTableRendererHuman(this).renderAsHuman();
+    public String renderAsHuman(CliContext ctx) {
+        return new ShellTableRendererHuman(this).renderAsHuman(ctx);
     }
 
     @Override

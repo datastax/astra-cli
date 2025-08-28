@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.streaming;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
@@ -19,8 +20,8 @@ import java.util.SortedMap;
 import java.util.stream.Stream;
 
 public interface StreamingGateway {
-    static StreamingGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache) {
-        return new StreamingGatewayCompletionsCacheWrapper(new StreamingGatewayImpl(APIProvider.mkDefault(token, env)), tenantCompletionsCache);
+    static StreamingGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache, CliContext ctx) {
+        return new StreamingGatewayCompletionsCacheWrapper(new StreamingGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx)), tenantCompletionsCache);
     }
 
     Tenant findOne(TenantName tenantName);

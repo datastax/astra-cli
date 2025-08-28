@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.user;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
@@ -16,8 +17,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface UserGateway {
-    static UserGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache) {
-        return new UserGatewayCompletionsCacheWrapper(new UserGatewayImpl(APIProvider.mkDefault(token, env), new RoleGatewayImpl(APIProvider.mkDefault(token, env))), userCompletionsCache);
+    static UserGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx) {
+        return new UserGatewayCompletionsCacheWrapper(new UserGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx))), userCompletionsCache);
     }
 
     User findOne(UserRef user);

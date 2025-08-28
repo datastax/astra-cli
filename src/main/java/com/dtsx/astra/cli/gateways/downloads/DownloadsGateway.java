@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
@@ -14,8 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DownloadsGateway {
-    static DownloadsGateway mkDefault(AstraToken token, AstraEnvironment env) {
-        return new DownloadsGatewayImpl(APIProvider.mkDefault(token, env));
+    static DownloadsGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
+        return new DownloadsGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
     }
 
     Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters);

@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -10,8 +11,6 @@ import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusExceptio
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.sdk.db.domain.*;
@@ -34,11 +33,11 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 
 @RequiredArgsConstructor
 public class DbGatewayImpl implements DbGateway {
+    private final CliContext ctx;
     private final APIProvider api;
     private final AstraToken token;
     private final AstraEnvironment env;
@@ -47,7 +46,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public Stream<Database> findAll() {
-        return AstraLogger.loading("Fetching all databases", (_) -> 
+        return ctx.log().loading("Fetching all databases", (_) -> 
             api.astraOpsClient().db().search(DatabaseFilter.builder()
                 .limit(1000)
                 .build())
@@ -56,7 +55,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public Database findOne(DbRef ref) {
-        return AstraLogger.loading("Fetching info for database " + highlight(ref), (_) ->
+        return ctx.log().loading("Fetching info for database " + ctx.highlight(ref), (_) ->
             api.dbOpsClient(ref).find().orElseThrow(() -> new DbNotFoundException(ref))
         );
     }
@@ -72,12 +71,12 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public boolean exists(DbRef ref) {
-        return AstraLogger.loading("Checking if database " + highlight(ref) + " exists", (_) -> tryFindOne(ref).isPresent());
+        return ctx.log().loading("Checking if database " + ctx.highlight(ref) + " exists", (_) -> tryFindOne(ref).isPresent());
     }
 
     @Override
     public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout) {
-        val currentStatus = AstraLogger.loading("Fetching current currStatus of db " + highlight(ref), (_) -> findOne(ref))
+        val currentStatus = ctx.log().loading("Fetching current currStatus of db " + ctx.highlight(ref), (_) -> findOne(ref))
             .getStatus();
 
         val expectedStatuses = Arrays.stream(DatabaseStatusType.values())
@@ -89,7 +88,7 @@ public class DbGatewayImpl implements DbGateway {
                 yield Pair.create(currentStatus, Duration.ZERO);
             }
             case HIBERNATED -> {
-                AstraLogger.loading("Resuming database '%s'".formatted(ref), (_) -> {
+                ctx.log().loading("Resuming database '%s'".formatted(ref), (_) -> {
                     resumeDbInternal(ref);
                     return null;
                 });
@@ -143,7 +142,7 @@ public class DbGatewayImpl implements DbGateway {
         val startTime = System.currentTimeMillis();
 
         var status = new AtomicReference<>(
-            AstraLogger.loading("Fetching initial status of database %s".formatted(highlight(ref)), (_) -> findOne(ref).getStatus())
+            ctx.log().loading("Fetching initial status of database %s".formatted(ctx.highlight(ref)), (_) -> findOne(ref).getStatus())
         );
 
         if (status.get().equals(target)) {
@@ -151,9 +150,9 @@ public class DbGatewayImpl implements DbGateway {
         }
 
         val initialMessage = "Waiting for database %s to become %s (currently %s)"
-            .formatted(highlight(ref), highlight(target), highlight(status.get()));
+            .formatted(ctx.highlight(ref), ctx.highlight(target), ctx.highlight(status.get()));
 
-        return AstraLogger.loading(initialMessage, (updateMsg) -> {
+        return ctx.log().loading(initialMessage, (updateMsg) -> {
             var cycles = 0;
 
             while (!status.get().equals(target)) {
@@ -166,13 +165,13 @@ public class DbGatewayImpl implements DbGateway {
                 try {
                     updateMsg.accept(
                         "Waiting for database %s to become %s (currently %s, elapsed: %ds)"
-                            .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
+                            .formatted(ctx.highlight(ref), ctx.highlight(target), ctx.highlight(status.get()), elapsed.toSeconds())
                     );
 
                     if (cycles % 5 == 0) {
                         updateMsg.accept(
                             "Checking if database %s is status %s (currently %s, elapsed: %ds)"
-                                .formatted(highlight(ref), highlight(target), AstraColors.highlight(status.get()), elapsed.toSeconds())
+                                .formatted(ctx.highlight(ref), ctx.highlight(target), ctx.highlight(status.get()), elapsed.toSeconds())
                         );
 
                         status.set(findOne(ref).getStatus());
@@ -229,7 +228,7 @@ public class DbGatewayImpl implements DbGateway {
     @Override
     public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
         if (!allowDuplicate) {
-            val existingDb = AstraLogger.loading("Checking if database " + highlight(name) + " already exists", (_) -> (
+            val existingDb = ctx.log().loading("Checking if database " + ctx.highlight(name) + " already exists", (_) -> (
                 tryFindOne(DbRef.fromNameUnsafe(name))
             ));
 
@@ -238,7 +237,7 @@ public class DbGatewayImpl implements DbGateway {
             }
         }
 
-        val id = AstraLogger.loading("Creating database %s".formatted(highlight(name)), (_) -> {
+        val id = ctx.log().loading("Creating database %s".formatted(ctx.highlight(name)), (_) -> {
             val builder = DatabaseCreationRequest.builder()
                 .name(name)
                 .tier(tier)
@@ -259,7 +258,7 @@ public class DbGatewayImpl implements DbGateway {
         dbCache.cacheDbId(name, id);
         dbCache.cacheDbRegion(id, region);
 
-        val newDb = AstraLogger.loading("Fetching info for newly created database " + highlight(name), (_) -> findOne(DbRef.fromId(id)));
+        val newDb = ctx.log().loading("Fetching info for newly created database " + ctx.highlight(name), (_) -> findOne(DbRef.fromId(id)));
 
         return CreationStatus.created(newDb);
     }
@@ -270,7 +269,7 @@ public class DbGatewayImpl implements DbGateway {
             return DeletionStatus.notFound(ref);
         }
 
-        AstraLogger.loading("Deleting database " + highlight(ref), (_) -> {
+        ctx.log().loading("Deleting database " + ctx.highlight(ref), (_) -> {
             api.dbOpsClient(ref).delete();
             return null;
         });
@@ -280,7 +279,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
-        return AstraLogger.loading("Fetching embedding providers for database " + highlight(dbRef), (_) -> {
+        return ctx.log().loading("Fetching embedding providers for database " + ctx.highlight(dbRef), (_) -> {
             val admin = api.dataApiDatabaseAdmin(dbRef);
             return admin.findEmbeddingProviders();
         });

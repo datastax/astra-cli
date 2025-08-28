@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.REGION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -68,8 +67,8 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionNotFound() {
         val message = "Region %s does not exist in database %s; nothing to delete.".formatted(
-            highlight($region),
-            highlight($dbRef)
+            ctx.highlight($region),
+            ctx.highlight($dbRef)
         );
 
         val data = mkData(false, null);
@@ -82,8 +81,8 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionDeleted() {
         val message = "Region %s has been deleted from database %s (database may not be active yet).".formatted(
-            highlight($region),
-            highlight($dbRef)
+            ctx.highlight($region),
+            ctx.highlight($dbRef)
         );
 
         val data = mkData(true, null);
@@ -96,9 +95,9 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionDeletedAndDbActive(Duration waitTime) {
         val message = "Region %s has been deleted from database %s. Database is now active after waiting %s seconds.".formatted(
-            highlight($region),
-            highlight($dbRef),
-            highlight(waitTime.toSeconds())
+            ctx.highlight($region),
+            ctx.highlight($dbRef),
+            ctx.highlight(waitTime.toSeconds())
         );
 
         val data = mkData(true, waitTime);

@@ -17,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.USER_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.user.UserDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -64,13 +63,13 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
     }
 
     private OutputAll handleUserDeleted() {
-        val message = "User %s has been deleted (async operation).".formatted(highlight($user));
+        val message = "User %s has been deleted (async operation).".formatted(ctx.highlight($user));
 
         return OutputAll.response(message, mkData(true));
     }
 
     private OutputAll handleUserNotFound() {
-        val message = "User %s does not exist; nothing to delete.".formatted(highlight($user));
+        val message = "User %s does not exist; nothing to delete.".formatted(ctx.highlight($user));
         
         return OutputAll.response(message, mkData(false), List.of(
             new Hint("See all existing users:", "${cli.name} user list")

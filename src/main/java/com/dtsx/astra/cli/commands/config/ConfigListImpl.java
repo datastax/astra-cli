@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.commands.config;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
@@ -60,6 +59,6 @@ public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult>
     }
 
     private String mkConfigDisplayName(String name, boolean isInUse) {
-        return isInUse ? AstraColors.PURPLE_300.use(name + " (in use)") : name;
+        return isInUse ? ctx.colors().PURPLE_300.use(name + " (in use)") : name;
     }
 }

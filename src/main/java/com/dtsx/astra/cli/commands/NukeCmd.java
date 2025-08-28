@@ -2,8 +2,6 @@ package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.NukeOperation;
@@ -17,7 +15,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.capitalize;
@@ -59,7 +56,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     @Override
     protected final OutputAll execute(Supplier<NukeResult> result) {
-        AstraLogger.banner();
+        ctx.log().banner();
 
         return switch (result.get()) {
             case CouldNotResolveCliName _ -> throwCouldNotResolveCliName();
@@ -135,7 +132,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             sb.append(capitalize(operation)).append(" files").append(":").append(NL);
 
             for (val file : files.entrySet()) {
-                sb.append("→ ").append(highlight(file.getKey()));
+                sb.append("→ ").append(ctx.highlight(file.getKey()));
 
                 if (file.getValue().isPresent()) {
                     sb.append(" - ").append(file.getValue().get().reason());
@@ -160,7 +157,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     @Override
     protected Operation<NukeResult> mkOperation() {
-        return new NukeOperation(new NukeRequest(
+        return new NukeOperation(ctx, new NukeRequest(
             $dryRun,
             $preserveAstrarc,
             $cliName,
@@ -181,7 +178,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
           %s
         """.formatted(file, secondLine);
 
-        return AstraConsole.confirm(prompt)
+        return ctx.console().confirm(prompt)
             .defaultNo()
             .fallbackFlag("--preserve-astrarc")
             .fix(originalArgs(), "--[no-]preserve-astrarc")
@@ -195,7 +192,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
           This action is @!irreversible!@ and will delete all Astra CLI files from your system.
         """;
 
-        val shouldNuke = AstraConsole.confirm(prompt)
+        val shouldNuke = ctx.console().confirm(prompt)
             .defaultNo()
             .fallbackFlag("--yes")
             .fix(originalArgs(), "--yes")

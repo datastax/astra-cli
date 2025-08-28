@@ -16,7 +16,7 @@ import picocli.CommandLine.Command;
 public class DbCqlshVersionCmd extends AbstractCqlshExecCmd {
     @Override
     protected DbCqlshVersionOperation mkOperation(boolean captureOutput) {
-        return new DbCqlshVersionOperation(dbGateway, downloadsGateway, new CqlshVersionRequest(
+        return new DbCqlshVersionOperation(ctx, dbGateway, downloadsGateway, new CqlshVersionRequest(
             $debug,
             $encoding,
             $connectTimeout,

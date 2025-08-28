@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
-import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
@@ -19,10 +18,9 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class DownloadsGatewayImpl implements DownloadsGateway {
+    private final CliContext ctx;
     private final APIProvider api;
 
     @Override
@@ -32,9 +30,9 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         for (val datacenter : datacenters) {
             try {
-                AstraLogger.loading("Downloading secure connect bundle for database %s in region %s".formatted(highlight(ref), highlight(datacenter.getRegion())), (_) -> {
+                ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
                     val scbName = dbOpsClient.buildScbFileName(dbName, datacenter.getRegion());
-                    val scbPath = AstraHome.Dirs.useScb().resolve(scbName);
+                    val scbPath = ctx.home().Dirs.useScb().resolve(scbName);
 
                     if (Files.notExists(scbPath)) {
                         FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath);
@@ -44,8 +42,8 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
                     return null;
                 });
             } catch (Exception e) {
-                AstraLogger.exception("Failed to download secure connect bundle for database '%s' in region '%s'".formatted(ref, datacenter.getRegion()));
-                AstraLogger.exception(e);
+                ctx.log().exception("Failed to download secure connect bundle for database '%s' in region '%s'".formatted(ref, datacenter.getRegion()));
+                ctx.log().exception(e);
                 return Either.left("Failed to download secure connect bundle for database '%s' in region '%s': %s".formatted(ref, datacenter.getRegion(), e.getMessage()));
             }
         }
@@ -55,32 +53,32 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) {
-        return installGenericArchive(AstraHome.Dirs.useCqlsh(), cqlsh.url(), "cqlsh");
+        return installGenericArchive(ctx.home().Dirs.useCqlsh(), cqlsh.url(), "cqlsh", ctx);
     }
 
     @Override
     public Either<String, Path> downloadDsbulk(ExternalSoftware dsbulk) {
-        return installGenericArchive(AstraHome.Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), "dsbulk");
+        return installGenericArchive(ctx.home().Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), "dsbulk", ctx);
     }
 
     @Override
     public Either<String, Path> downloadPulsarShell(ExternalSoftware pulsar) {
-        return installGenericArchive(AstraHome.Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell");
+        return installGenericArchive(ctx.home().Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell", ctx);
     }
 
     @Override
     public Optional<Path> cqlshPath(ExternalSoftware cqlsh) {
-        return getPath(AstraHome.Dirs::cqlshExists, AstraHome.Dirs::useCqlsh, "cqlsh");
+        return getPath(ctx.home().Dirs::cqlshExists, ctx.home().Dirs::useCqlsh, "cqlsh");
     }
 
     @Override
     public Optional<Path> dsbulkPath(ExternalSoftware dsbulk) {
-        return getPath(() -> AstraHome.Dirs.dsbulkExists(dsbulk.version()), () -> AstraHome.Dirs.useDsbulk(dsbulk.version()), "dsbulk");
+        return getPath(() -> ctx.home().Dirs.dsbulkExists(dsbulk.version()), () -> ctx.home().Dirs.useDsbulk(dsbulk.version()), "dsbulk");
     }
 
     @Override
     public Optional<Path> pulsarShellPath(ExternalSoftware pulsar) {
-        return getPath(() -> AstraHome.Dirs.pulsarExists(pulsar.version()), () -> AstraHome.Dirs.usePulsar(pulsar.version()), "pulsar-shell");
+        return getPath(() -> ctx.home().Dirs.pulsarExists(pulsar.version()), () -> ctx.home().Dirs.usePulsar(pulsar.version()), "pulsar-shell");
     }
 
     private Optional<Path> getPath(Supplier<Boolean> dirExists, Supplier<Path> getDir, String exe) {
@@ -95,7 +93,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @SneakyThrows
-    private Either<String, Path> installGenericArchive(Path installDir, String url, String exe) {
+    private Either<String, Path> installGenericArchive(Path installDir, String url, String exe, CliContext ctx) {
         if (Files.isRegularFile(installDir)) {
             return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
         }
@@ -110,7 +108,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         Files.deleteIfExists(tarFile);
 
         try {
-            AstraLogger.loading("Downloading " + exe + ", please wait", (_) -> {
+            ctx.log().loading("Downloading " + exe + ", please wait", (_) -> {
                 FileUtils.downloadFile(url, tarFile);
                 return null;
             });
@@ -119,12 +117,12 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
-            AstraLogger.loading("Extracting " + exe + " archive, please wait", (_) -> {
-                FileUtils.extractTarArchiveInPlace(tarFile);
+            ctx.log().loading("Extracting " + exe + " archive, please wait", (_) -> {
+                FileUtils.extractTarArchiveInPlace(tarFile, ctx);
                 return null;
             });
         } catch (Exception e) {
-            AstraLogger.exception(e);
+            ctx.log().exception(e);
             return Either.left("Failed to extract " + exe + " archive %s: '%s'".formatted(tarFile, e.getMessage()));
         }
 

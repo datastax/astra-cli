@@ -21,7 +21,7 @@ public abstract class AbstractPulsarExecCmd extends AbstractStreamingCmd<PulsarE
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
-        WindowsUnsupportedException.throwIfWindows();
+        WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
     }
 

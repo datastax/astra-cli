@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -134,8 +133,8 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
 
     private OutputAll handleTenantAlreadyExistsWithStatus(TenantName tenantName, TenantStatus currStatus) {
         val message = "Tenant %s already exists and has status %s.".formatted(
-            highlight(tenantName),
-            highlight(currStatus)
+            ctx.highlight(tenantName),
+            ctx.highlight(currStatus)
         );
 
         val data = mkData(tenantName, false, currStatus);
@@ -161,7 +160,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
 
     private OutputAll handleTenantCreated(TenantName tenantName, TenantStatus currStatus) {
         val message = "Tenant %s has been created.".formatted(
-            highlight(tenantName)
+            ctx.highlight(tenantName)
         );
 
         val data = mkData(tenantName, true, currStatus);

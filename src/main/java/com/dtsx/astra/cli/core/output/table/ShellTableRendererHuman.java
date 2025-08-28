@@ -1,8 +1,11 @@
 package com.dtsx.astra.cli.core.output.table;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraColors.AstraColor;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.*;
@@ -10,12 +13,18 @@ import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
-public record ShellTableRendererHuman(RenderableShellTable table) implements OutputHuman {
-    private static final AstraColors TABLE_COLOR = AstraColors.BLUE_300;
-    private static final AstraColors DATA_COLOR = AstraColors.NEUTRAL_300;
+@RequiredArgsConstructor
+public final class ShellTableRendererHuman implements OutputHuman {
+    private final RenderableShellTable table;
+
+    private AstraColor TABLE_COLOR;
+    private AstraColor DATA_COLOR;
 
     @Override
-    public String renderAsHuman() {
+    public String renderAsHuman(CliContext ctx) {
+        this.TABLE_COLOR = ctx.colors().BLUE_300;
+        this.DATA_COLOR = ctx.colors().NEUTRAL_300;
+
         val serialized = serialize(table.raw());
         val colSizes = computeColumnWidths(serialized, table.columns());
 

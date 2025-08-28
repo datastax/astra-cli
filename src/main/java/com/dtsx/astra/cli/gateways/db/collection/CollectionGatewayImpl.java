@@ -6,34 +6,26 @@ import com.datastax.astra.client.collections.definition.CollectionDefinition.Ind
 import com.datastax.astra.client.collections.definition.CollectionDescriptor;
 import com.datastax.astra.client.core.vector.SimilarityMetric;
 import com.datastax.astra.client.exceptions.DataAPIException;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.APIProviderImpl;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class CollectionGatewayImpl implements CollectionGateway {
-    private final APIProviderImpl api;
-
-    public CollectionGatewayImpl(AstraToken token, AstraEnvironment env) {
-        this.api = (APIProviderImpl) APIProvider.mkDefault(token, env);
-    }
+    private final CliContext ctx;
+    private final APIProvider api;
 
     @Override
     public List<CollectionDescriptor> findAll(KeyspaceRef ksRef) {
-        return AstraLogger.loading("Listing collections for keyspace " + highlight(ksRef), (_) ->
+        return ctx.log().loading("Listing collections for keyspace " + ctx.highlight(ksRef), (_) ->
             api.dataApiDatabase(ksRef).listCollections()
         );
     }
@@ -41,7 +33,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
     @Override
     public Optional<CollectionDefinition> findOne(CollectionRef collRef) {
         try {
-            return AstraLogger.loading("Getting collection " + highlight(collRef), (_) -> {
+            return ctx.log().loading("Getting collection " + ctx.highlight(collRef), (_) -> {
                 return Optional.of(
                     api.dataApiDatabase(collRef.keyspace()).getCollection(collRef.name()).getDefinition()
                 );
@@ -56,7 +48,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
 
     @Override
     public long estimatedDocumentCount(CollectionRef collRef) {
-        return AstraLogger.loading("Estimating document count for collection " + highlight(collRef), (_) -> {
+        return ctx.log().loading("Estimating document count for collection " + ctx.highlight(collRef), (_) -> {
             return api.dataApiDatabase(collRef.keyspace()).getCollection(collRef.name()).estimatedDocumentCount();
         });
     }
@@ -93,7 +85,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
             .allow(indexingAllow)
             .deny(indexingDeny));
 
-        AstraLogger.loading("Creating collection " + highlight(collRef), (_) -> {
+        ctx.log().loading("Creating collection " + ctx.highlight(collRef), (_) -> {
             api.dataApiDatabase(collRef.keyspace()).createCollection(collRef.name(), collDef);
             return null;
         });
@@ -107,7 +99,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
             return DeletionStatus.notFound(collRef);
         }
 
-        AstraLogger.loading("Deleting collection " + highlight(collRef), (_) -> {
+        ctx.log().loading("Deleting collection " + ctx.highlight(collRef), (_) -> {
             api.dataApiDatabase(collRef.keyspace()).dropCollection(collRef.name());
             return null;
         });
@@ -121,7 +113,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
             return DeletionStatus.notFound(collRef);
         }
 
-        AstraLogger.loading("Truncating collection " + highlight(collRef), (_) -> {
+        ctx.log().loading("Truncating collection " + ctx.highlight(collRef), (_) -> {
             api.dataApiDatabase(collRef.keyspace()).getCollection(collRef.name()).deleteAll();
             return null;
         });
@@ -130,7 +122,7 @@ public class CollectionGatewayImpl implements CollectionGateway {
     }
 
     private boolean exists(CollectionRef collRef) {
-        return AstraLogger.loading("Checking if collection " + highlight(collRef) + " exists", (_) -> {
+        return ctx.log().loading("Checking if collection " + ctx.highlight(collRef) + " exists", (_) -> {
             return findOne(collRef).isPresent();
         });
     }

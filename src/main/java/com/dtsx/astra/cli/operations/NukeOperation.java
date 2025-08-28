@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.operations;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.AstraConfig;
-import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,7 @@ import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 @RequiredArgsConstructor
 public class NukeOperation implements Operation<NukeResult> {
+    private final CliContext ctx;
     private final NukeRequest request;
 
     public record NukeRequest(
@@ -153,11 +153,11 @@ public class NukeOperation implements Operation<NukeResult> {
     }
 
     private Path resolveAstraHome() {
-        return AstraHome.DIR;
+        return ctx.home().DIR;
     }
 
     private Path resolveAstraRc() {
-        return AstraConfig.resolveDefaultAstraConfigFile();
+        return AstraConfig.resolveDefaultAstraConfigFile(ctx);
     }
 
     private Set<Pair<Path, String>> resolveRcFilesWithAutocomplete(String cliName) {
@@ -176,7 +176,7 @@ public class NukeOperation implements Operation<NukeResult> {
             .flatMap((f) -> {
                 return Either
                     .tryCatch(() -> Files.readString(f), (e) -> {
-                        AstraLogger.warn("Could not read file '", f.toString(), "' to check for any astra-cli autocomplete entries: ", e.getMessage());
+                        ctx.log().warn("Could not read file '", f.toString(), "' to check for any astra-cli autocomplete entries: ", e.getMessage());
                         return null;
                     })
                     .map((content) -> {
@@ -243,7 +243,7 @@ public class NukeOperation implements Operation<NukeResult> {
         try {
             return !Files.isWritable(path);
         } catch (Exception e) {
-            AstraLogger.warn("Could not determine if file '", path.toString(), "' needs sudo: ", e.getMessage());
+            ctx.log().warn("Could not determine if file '", path.toString(), "' needs sudo: ", e.getMessage());
             return false;
         }
     }

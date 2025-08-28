@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.operations.streaming.pulsar;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
-import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -14,7 +13,8 @@ import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 public abstract class AbstractPulsarExeOperation<Req> implements Operation<PulsarExecResult> {
+    protected final CliContext ctx;
     protected final StreamingGateway streamingGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
@@ -43,7 +44,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
                 addAll(flags);
             }};
 
-            val process = AstraLogger.loading("Starting pulsar", (_) -> {
+            val process = ctx.log().loading("Starting pulsar", (_) -> {
                 try {
                     return new ProcessBuilder(commandLine)
                         .inheritIO()
@@ -76,7 +77,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
     protected Either<PulsarExecResult, Path> mkPulsarConfFile(TenantName tenantName) {
         val tenant = streamingGateway.findOne(tenantName);
 
-        val confFile = AstraHome.Dirs.usePulsar(CliProperties.pulsar().version()).resolve(
+        val confFile = ctx.home().Dirs.usePulsar(CliProperties.pulsar().version()).resolve(
             "client-" + tenant.getCloudProvider() + "-" + tenant.getCloudRegion() + "-" + tenant.getTenantName() + ".conf"
         );
 

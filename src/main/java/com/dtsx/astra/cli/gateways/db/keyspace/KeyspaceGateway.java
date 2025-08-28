@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.db.keyspace;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -12,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface KeyspaceGateway {
-    static KeyspaceGateway mkDefault(AstraToken token, AstraEnvironment env) {
-        return new KeyspaceGatewayImpl(APIProvider.mkDefault(token, env));
+    static KeyspaceGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
+        return new KeyspaceGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
     }
 
     record FoundKeyspaces(

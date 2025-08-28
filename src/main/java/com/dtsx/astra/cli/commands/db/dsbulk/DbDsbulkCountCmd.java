@@ -21,7 +21,7 @@ public class DbDsbulkCountCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
-        return new DbDsbulkCountOperation(dbGateway, downloadsGateway, new CountRequest(
+        return new DbDsbulkCountOperation(ctx, dbGateway, downloadsGateway, new CountRequest(
             $dbRef,
             $keyspace,
             $table,

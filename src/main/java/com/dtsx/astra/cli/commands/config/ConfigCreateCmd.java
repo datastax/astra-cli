@@ -3,16 +3,13 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.core.CliConstants.$Env;
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.CliConstants.$Token;
-import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
@@ -28,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -111,8 +107,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     private OutputAll handleConfigCreated(ProfileCreated result) {
         val creationMessage = (result.overwritten())
-            ? "Configuration profile %s successfully overwritten.".formatted(highlight(result.profileName()))
-            : "Configuration profile %s successfully created.".formatted(highlight(result.profileName()));
+            ? "Configuration profile %s successfully overwritten.".formatted(ctx.highlight(result.profileName()))
+            : "Configuration profile %s successfully created.".formatted(ctx.highlight(result.profileName()));
 
         val data = mkData(result.profileName(), result.isDefault(), result.overwritten());
 
@@ -185,7 +181,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
-        return new ConfigCreateOperation(config(true), OrgGateway.mkDefault($token, $env), OrgGateway.Stateless.mkDefault(), new CreateConfigRequest(
+        return new ConfigCreateOperation(ctx, config(true), OrgGateway.mkDefault($token, $env, ctx), OrgGateway.Stateless.mkDefault(ctx), new CreateConfigRequest(
             $profileName,
             $token,
             $env,
@@ -202,7 +198,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
           Do you wish to overwrite it?
         """).formatted(profileName);
 
-        val allowOverwrite = AstraConsole.confirm(msg)
+        val allowOverwrite = ctx.console().confirm(msg)
             .defaultNo()
             .fallbackFlag("--overwrite")
             .fix(originalArgs(), "--overwrite")
@@ -214,7 +210,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     }
 
     private String mkHint() {
-        return (OutputType.isHuman() && CliEnvironment.isTty())
+        return (ctx.outputIsHuman() && ctx.isTty())
             ? NL + NL + "(Hint: Use @!${cli.name} setup!@ for an interactive profile creation experience!)"
             : null;
     }

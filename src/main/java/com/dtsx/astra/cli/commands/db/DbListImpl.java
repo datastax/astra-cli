@@ -1,11 +1,10 @@
 package com.dtsx.astra.cli.commands.db;
 
-import com.dtsx.astra.cli.core.output.formats.OutputJson;
-import com.dtsx.astra.cli.operations.db.DbListOperation;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.db.DbListOperation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.val;
@@ -16,7 +15,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.operations.db.DbListOperation.*;
+import static com.dtsx.astra.cli.operations.db.DbListOperation.DbListRequest;
 
 public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     @Option(names = { "--vector" }, description = "Only show vector-enabled databases")
@@ -60,11 +59,11 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     }
 
     private String vector(Database db) {
-        return db.getInfo().getDbType() != null ? PlatformChars.PRESENCE_INDICATOR : "";
+        return db.getInfo().getDbType() != null ? PlatformChars.presenceIndicator(ctx.isWindows()) : "";
     }
 
     private String status(Database db) {
-        return AstraColors.highlight(db.getStatus());
+        return ctx.highlight(db.getStatus());
     }
 
     @Override

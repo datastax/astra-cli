@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.prompters.builders;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.prompters.CLIPrompter;
 import lombok.RequiredArgsConstructor;
 import org.graalvm.collections.Pair;
@@ -8,12 +9,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class PrompterBuilder {
-    private final String prompt;
+    private final CliContext ctx;
     private final boolean noInput;
+    private final String prompt;
 
     public <T> NeedsDefaultsOrEchoOff<T> mapper(Function<String, T> mapper) {
         return new NeedsDefaultsOrEchoOff<>(mapper);
@@ -59,11 +59,11 @@ public class PrompterBuilder {
         private final Function<String, String> displayContentWhenDone;
 
         public NeedsFix<T> fallbackFlag(String flag) {
-            return new NeedsFix<>(defaultOption, mapper, echoOff, displayContentWhenDone, highlight(flag) + " flag");
+            return new NeedsFix<>(defaultOption, mapper, echoOff, displayContentWhenDone, ctx.highlight(flag) + " flag");
         }
 
         public NeedsFix<T> fallbackIndex(int index) {
-            return new NeedsFix<>(defaultOption, mapper, echoOff, displayContentWhenDone, "parameter at index " + highlight(index));
+            return new NeedsFix<>(defaultOption, mapper, echoOff, displayContentWhenDone, "parameter at index " + ctx.highlight(index));
         }
     }
 
@@ -98,9 +98,8 @@ public class PrompterBuilder {
         }
 
         private T clearAfterSelection(boolean clearAfterSelection) {
-            return CLIPrompter.prompt(
+            return new CLIPrompter(ctx, noInput).prompt(
                 prompt,
-                noInput,
                 defaultOption,
                 mapper,
                 echoOff,

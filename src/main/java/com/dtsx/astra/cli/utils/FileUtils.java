@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.utils;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.CannotCreateFileException;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -55,7 +55,7 @@ public class FileUtils {
     }
 
     @SneakyThrows
-    public static void extractTarArchiveInPlace(Path tarFile) {
+    public static void extractTarArchiveInPlace(Path tarFile, CliContext ctx) {
         val outputDir = tarFile.getParent();
 
         @Cleanup val fis = Files.newInputStream(tarFile);
@@ -70,14 +70,14 @@ public class FileUtils {
             if (tarEntry.isDirectory()) {
                 if (Files.notExists(entryPath)) {
                     Files.createDirectories(entryPath);
-                    AstraLogger.debug("Created directory: %s".formatted(entryPath));
+                    ctx.log().debug("Created directory: %s".formatted(entryPath));
                 }
             } else {
                 val parent = entryPath.getParent();
 
                 if (parent != null && Files.notExists(parent)) {
                     Files.createDirectories(parent);
-                    AstraLogger.debug("Created directory: %s".formatted(parent));
+                    ctx.log().debug("Created directory: %s".formatted(parent));
                 }
 
                 try (val fos = Files.newOutputStream(entryPath)) {

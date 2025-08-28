@@ -10,7 +10,6 @@ import picocli.CommandLine.Command;
 
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.streaming.StreamingStatusOperation.StreamingStatusRequest;
 
 @Command(
@@ -24,7 +23,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingStatusOperation.S
 public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<TenantStatus> {
     @Override
     protected final OutputHuman executeHuman(Supplier<TenantStatus> result) {
-        return OutputHuman.response("Tenant %s is %s".formatted(highlight($tenantName), highlight(result.get())));
+        return OutputHuman.response("Tenant %s is %s".formatted(ctx.highlight($tenantName), ctx.highlight(result.get())));
     }
 
     @Override
@@ -34,6 +33,6 @@ public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<Tenan
 
     @Override
     protected Operation<TenantStatus> mkOperation() {
-        return new StreamingStatusOperation(streamingGateway, new StreamingStatusRequest($tenantName));
+        return new StreamingStatusOperation(ctx, streamingGateway, new StreamingStatusRequest($tenantName));
     }
 }

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -36,8 +37,8 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
         Optional<RegionName> region
     ) implements CoreDsbulkOptions {}
 
-    public DbDsbulkLoadOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, LoadRequest request) {
-        super(dbGateway, downloadsGateway, request);
+    public DbDsbulkLoadOperation(CliContext ctx, DbGateway dbGateway, DownloadsGateway downloadsGateway, LoadRequest request) {
+        super(ctx, dbGateway, downloadsGateway, request);
     }
 
     @Override

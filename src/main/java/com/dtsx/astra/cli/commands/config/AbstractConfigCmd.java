@@ -21,7 +21,7 @@ public abstract class AbstractConfigCmd<OpRes> extends AbstractCmd<OpRes> {
 
     public AstraConfig config(boolean createIfNotExists) {
         if (cachedAstraConfig == null) {
-            this.cachedAstraConfig = AstraConfig.readAstraConfigFile($configFile, createIfNotExists);
+            this.cachedAstraConfig = AstraConfig.readAstraConfigFile(ctx, $configFile, createIfNotExists);
         }
         return cachedAstraConfig;
     }

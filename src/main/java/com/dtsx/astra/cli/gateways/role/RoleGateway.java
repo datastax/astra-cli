@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.role;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.AstraToken;
@@ -11,8 +12,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface RoleGateway {
-    static RoleGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache) {
-        return new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(APIProvider.mkDefault(token, env)), roleCompletionsCache);
+    static RoleGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache, CliContext ctx) {
+        return new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx)), roleCompletionsCache);
     }
 
     Stream<Role> findAll();

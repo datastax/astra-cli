@@ -1,10 +1,8 @@
 package com.dtsx.astra.cli.operations.db.region;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -14,7 +12,7 @@ import lombok.val;
 import java.time.Duration;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
-import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.*;
+import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.RegionCreateResult;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @RequiredArgsConstructor
@@ -62,23 +60,6 @@ public class RegionCreateOperation implements Operation<RegionCreateResult> {
             return new RegionAlreadyExists();
         } else {
             return new RegionIllegallyAlreadyExists();
-        }
-    }
-
-    public static class RegionAlreadyExistsException extends AstraCliException {
-        public RegionAlreadyExistsException(RegionName region, DbRef dbRef) {
-            super("""
-              @|bold,red Error: Region '%s' already exists in database '%s'.|@
-            
-              This may be expected, but to avoid this error:
-              - Run %s to see the existing regions.
-              - Pass the %s flag to skip this error if the region already exists.
-            """.formatted(
-                region.unwrap(),
-                dbRef,
-                AstraColors.highlight("${cli.name} db list-regions " + dbRef),
-                AstraColors.highlight("--if-not-exists")
-            ));
         }
     }
 }

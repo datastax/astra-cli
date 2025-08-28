@@ -1,11 +1,11 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -22,6 +22,7 @@ import static com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation
 
 @RequiredArgsConstructor
 public abstract class AbstractDsbulkExeOperation<Req> implements Operation<DsbulkExecResult> {
+    protected final CliContext ctx;
     protected final DbGateway dbGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
@@ -54,7 +55,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
                 addAll(flags);
             }};
 
-            val process = AstraLogger.loading("Starting dsbulk", (_) -> {
+            val process = ctx.log().loading("Starting dsbulk", (_) -> {
                 try {
                     return new ProcessBuilder(commandLine)
                         .inheritIO()

@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.CDC_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
@@ -102,9 +101,9 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         val msg = """
           CDC already exists for table %s with tenant %s in database %s.
         """.formatted(
-            highlight(tableRef().toString()),
-            highlight($tenant),
-            highlight($dbRef)
+            ctx.highlight(tableRef().toString()),
+            ctx.highlight($tenant),
+            ctx.highlight($dbRef)
         );
 
         return OutputAll.response(msg, mkData(false), List.of(
@@ -116,9 +115,9 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         val msg = """
           CDC has been created for table %s with tenant %s in database %s.
         """.formatted(
-            highlight(tableRef().toString()),
-            highlight($tenant),
-            highlight($dbRef)
+            ctx.highlight(tableRef().toString()),
+            ctx.highlight($tenant),
+            ctx.highlight($dbRef)
         );
 
         return OutputAll.response(msg, mkData(true));

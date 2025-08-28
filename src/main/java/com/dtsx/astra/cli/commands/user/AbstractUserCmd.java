@@ -12,6 +12,6 @@ public abstract class AbstractUserCmd<OpRes> extends AbstractConnectedCmd<OpRes>
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        userGateway = UserGateway.mkDefault(profile().token(), profile().env(), new UserCompletionsCache(profile().name()));
+        userGateway = UserGateway.mkDefault(profile().token(), profile().env(), new UserCompletionsCache(ctx, profile().name()), ctx);
     }
 }

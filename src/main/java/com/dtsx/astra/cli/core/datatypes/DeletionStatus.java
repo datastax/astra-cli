@@ -11,4 +11,6 @@ public sealed interface DeletionStatus<T> {
     static <T> DeletionStatus<T> notFound(T value) {
         return new NotFound<>(value);
     }
+
+    T value();
 }

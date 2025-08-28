@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.table.TableDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -54,8 +53,8 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
 
     private OutputAll handleTableNotFound() {
         val message = "Table %s does not exist in keyspace %s; nothing to delete.".formatted(
-            highlight($tableRef.name()),
-            highlight($keyspaceRef)
+            ctx.highlight($tableRef.name()),
+            ctx.highlight($keyspaceRef)
         );
 
         val data = mkData(false);
@@ -68,8 +67,8 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
 
     private OutputAll handleTableDeleted() {
         val message = "Table %s has been deleted from keyspace %s.".formatted(
-            highlight($tableRef.name()),
-            highlight($keyspaceRef)
+            ctx.highlight($tableRef.name()),
+            ctx.highlight($keyspaceRef)
         );
 
         val data = mkData(true);

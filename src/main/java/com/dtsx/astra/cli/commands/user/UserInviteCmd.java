@@ -5,7 +5,6 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -24,7 +23,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.USER_ALREADY_INVITED;
 import static com.dtsx.astra.cli.operations.user.UserInviteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -93,14 +91,14 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
 
     private OutputAll handleUserInvited(List<UUID> roleIds) {
         val message = ($roles.size() == 1)
-            ? "User %s has been invited with role %s.".formatted(highlight($user), highlight($roles.getFirst()))
-            : "User %s has been invited with roles %s.".formatted(highlight($user), $roles.stream().map(AstraColors::highlight).collect(Collectors.joining(", ")));
+            ? "User %s has been invited with role %s.".formatted(ctx.highlight($user), ctx.highlight($roles.getFirst()))
+            : "User %s has been invited with roles %s.".formatted(ctx.highlight($user), $roles.stream().map(r -> r.highlight(ctx)).collect(Collectors.joining(", ")));
 
         return OutputAll.response(message, mkData(true, roleIds));
     }
 
     private OutputAll handleUserAlreadyExists() {
-        val message = "User %s already exists; nothing to invite.".formatted(highlight($user));
+        val message = "User %s already exists; nothing to invite.".formatted(ctx.highlight($user));
         
         return OutputAll.response(message, mkData(false, null), List.of(
             new Hint("See all existing users:", "${cli.name} user list")

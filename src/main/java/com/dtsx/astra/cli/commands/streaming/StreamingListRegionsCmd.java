@@ -84,7 +84,7 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
         val cp = cloudProvider.toLowerCase();
 
         if (isPremium) {
-            return cp + ShellTable.highlight(" (premium)");
+            return cp + ShellTable.highlight(ctx, " (premium)");
         }
 
         return cp;

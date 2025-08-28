@@ -21,7 +21,7 @@ public abstract class AbstractDsbulkExecCmd extends AbstractDbCmd<DsbulkExecResu
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
-        WindowsUnsupportedException.throwIfWindows();
+        WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
     }
 

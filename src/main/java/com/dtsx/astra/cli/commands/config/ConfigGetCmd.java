@@ -9,15 +9,13 @@ import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputCsv;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
-import com.dtsx.astra.cli.core.parsers.ini.Ini;
+import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation;
 import lombok.val;
@@ -32,7 +30,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEY_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
@@ -86,11 +83,11 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         };
     }
 
-    private OutputHuman renderHuman(Ini.IniSection section) {
-        return OutputHuman.response(section.render(true));
+    private OutputHuman renderHuman(IniSection section) {
+        return OutputHuman.response(section.render(ctx.colors()));
     }
 
-    private OutputJson renderJson(Ini.IniSection section) {
+    private OutputJson renderJson(IniSection section) {
         return OutputJson.serializeValue(Map.of(
             "name", section.name(),
             "attributes", section.pairs().stream().map((p) -> Map.of(
@@ -101,7 +98,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         ));
     }
 
-    private OutputCsv renderCsv(Ini.IniSection section) {
+    private OutputCsv renderCsv(IniSection section) {
         val data = new LinkedHashMap<String, Object>();
 
         for (var pair : section.pairs()) {
@@ -121,11 +118,11 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         ));
     }
 
-    private <T> T throwKeyNotFound(String key, Ini.IniSection section) {
+    private <T> T throwKeyNotFound(String key, IniSection section) {
         throw new AstraCliException(KEY_NOT_FOUND, section.pairs().isEmpty() ? mkNoKeysMsg(key, section) : mkKeysMsg(key, section));
     }
 
-    private String mkNoKeysMsg(String key, Ini.IniSection section) {
+    private String mkNoKeysMsg(String key, IniSection section) {
         return """
           @|bold,red Error: Key '%s' does not exist in profile '%s'.|@
         
@@ -133,11 +130,11 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         """.formatted(
             key,
             section.name(),
-            highlight(section.name())
+            ctx.highlight(section.name())
         );
     }
 
-    private String mkKeysMsg(String key, Ini.IniSection section) {
+    private String mkKeysMsg(String key, IniSection section) {
         return """
           @|bold,red Error: Key '%s' does not exist in profile '%s'.|@
         
@@ -149,9 +146,9 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
         """.formatted(
             key,
             section.name(),
-            section.pairs().stream().map(p -> "- " + highlight(p.key())).collect(Collectors.joining(NL)),
-            renderComment("Get the values of the keys in this profile with:"),
-            renderCommand("${cli.name} config get " + section.name())
+            section.pairs().stream().map(p -> "- " + ctx.highlight(p.key())).collect(Collectors.joining(NL)),
+            renderComment(ctx.colors(), "Get the values of the keys in this profile with:"),
+            renderCommand(ctx.colors(), "${cli.name} config get " + section.name())
         );
     }
 
@@ -174,7 +171,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
 
                     return p.fold(
                         (_) -> paddedName + " @|bold,red (invalid)|@",
-                        (profile) -> paddedName + " " + AstraColors.NEUTRAL_500.use("(" + profile.env().name().toLowerCase() + ")")
+                        (profile) -> paddedName + " " + ctx.colors().NEUTRAL_500.use("(" + profile.env().name().toLowerCase() + ")")
                     );
                 }
             ));
@@ -184,7 +181,7 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
             .findFirst()
             .orElse(null);
 
-        val selected = AstraConsole.select("Select a profile to look at")
+        val selected = ctx.console().select("Select a profile to look at")
             .options(candidates)
             .defaultOption(defaultProfile)
             .mapper(profileToDisplayMap::get)

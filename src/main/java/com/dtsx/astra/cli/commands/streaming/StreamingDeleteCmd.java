@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.streaming.StreamingDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -50,7 +49,7 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
 
     private OutputAll handleTenantNotFound() {
         val message = "Tenant %s does not exist; nothing to delete.".formatted(
-            highlight($tenantName)
+            ctx.highlight($tenantName)
         );
 
         val data = mkData(false);
@@ -62,7 +61,7 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
 
     private OutputAll handleTenantDeleted() {
         val message = "Tenant %s has been deleted.".formatted(
-            highlight($tenantName)
+            ctx.highlight($tenantName)
         );
 
         val data = mkData(true);

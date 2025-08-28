@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.streaming;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
@@ -27,25 +28,26 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class StreamingGatewayImpl implements StreamingGateway {
+    private final CliContext ctx;
     private final APIProvider apiProvider;
 
     @Override
     public Tenant findOne(TenantName tenantName) {
-        return AstraLogger.loading("Fetching streaming tenant " + tenantName, (_) -> {
+        return ctx.log().loading("Fetching streaming tenant " + tenantName, (_) -> {
             return apiProvider.astraOpsClient().streaming().get(tenantName.unwrap());
         });
     }
 
     @Override
     public Stream<Tenant> findAll() {
-        return AstraLogger.loading("Fetching all streaming tenants", (_) -> {
+        return ctx.log().loading("Fetching all streaming tenants", (_) -> {
             return apiProvider.astraOpsClient().streaming().findAll();
         });
     }
 
     @Override
     public boolean exists(TenantName tenantName) {
-        return AstraLogger.loading("Checking if streaming tenant " + tenantName + " exists", (_) -> {
+        return ctx.log().loading("Checking if streaming tenant " + tenantName + " exists", (_) -> {
             return apiProvider.astraOpsClient().streaming().exist(tenantName.unwrap());
         });
     }
@@ -58,7 +60,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
             return DeletionStatus.notFound(tenantName);
         }
         
-        AstraLogger.loading("Deleting streaming tenant " + tenantName, (_) -> {
+        ctx.log().loading("Deleting streaming tenant " + tenantName, (_) -> {
             apiProvider.astraOpsClient().streaming().delete(tenantName.unwrap());
             return null;
         });
@@ -68,7 +70,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
 
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions() {
-        return AstraLogger.loading("Fetching streaming regions", (_) -> (
+        return ctx.log().loading("Fetching streaming regions", (_) -> (
             apiProvider.astraOpsClient().streaming().regions()
                 .findAllServerless()
                 .collect(Collectors.toMap(
@@ -87,7 +89,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
 
     @Override
     public Set<CloudProviderType> findAvailableClouds() {
-        return AstraLogger.loading("Finding cloud providers for all available streaming regions", (_) -> (
+        return ctx.log().loading("Finding cloud providers for all available streaming regions", (_) -> (
             apiProvider.astraOpsClient().streaming().regions().findAllServerless()
                 .map(StreamingRegion::getCloudProvider)
                 .map(String::toUpperCase)
@@ -156,7 +158,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
 
         val createTenant = createTenantBuilder.build();
         
-        AstraLogger.loading("Creating streaming tenant " + tenantName, (_) -> {
+        ctx.log().loading("Creating streaming tenant " + tenantName, (_) -> {
             apiProvider.astraOpsClient().streaming().create(createTenant);
             return null;
         });

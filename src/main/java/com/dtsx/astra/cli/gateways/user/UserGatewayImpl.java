@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.gateways.user;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.sdk.org.domain.Role;
@@ -19,23 +19,22 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class UserGatewayImpl implements UserGateway {
+    private final CliContext ctx;
     private final APIProvider apiProvider;
     private final RoleGateway roleGateway;
 
     @Override
     public Stream<User> findAll() {
-        return AstraLogger.loading("Loading users", (_) -> 
+        return ctx.log().loading("Loading users", (_) -> 
             apiProvider.astraOpsClient().users().findAll());
     }
 
     private Optional<User> tryFindOne(UserRef user) {
         return user.fold(
-            id -> AstraLogger.loading("Looking up user by ID " + highlight(user), (_) -> apiProvider.astraOpsClient().users().find(id.toString())),
-            email -> AstraLogger.loading("Looking up user by email " + highlight(user), (_) -> apiProvider.astraOpsClient().users().findByEmail(email))
+            id -> ctx.log().loading("Looking up user by ID " + ctx.highlight(user), (_) -> apiProvider.astraOpsClient().users().find(id.toString())),
+            email -> ctx.log().loading("Looking up user by email " + ctx.highlight(user), (_) -> apiProvider.astraOpsClient().users().findByEmail(email))
         );
     }
 
@@ -64,7 +63,7 @@ public class UserGatewayImpl implements UserGateway {
             ))
             .toList();
 
-        AstraLogger.loading("Inviting user " + highlight(user), (_) -> {
+        ctx.log().loading("Inviting user " + ctx.highlight(user), (_) -> {
             apiProvider.astraOpsClient().users().invite(email, roleIds.toArray(new String[0]));
             return null;
         });
@@ -84,7 +83,7 @@ public class UserGatewayImpl implements UserGateway {
 
         val userObj = userOpt.get();
 
-        AstraLogger.loading("Deleting user " + highlight(user), (_) -> {
+        ctx.log().loading("Deleting user " + ctx.highlight(user), (_) -> {
             apiProvider.astraOpsClient().users().delete(userObj.getUserId());
             return null;
         });

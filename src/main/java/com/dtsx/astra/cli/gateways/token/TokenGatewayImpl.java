@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.gateways.token;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.RoleRef;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
@@ -14,16 +14,15 @@ import lombok.val;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
-
 @RequiredArgsConstructor
 public class TokenGatewayImpl implements TokenGateway {
+    private final CliContext ctx;
     private final APIProvider apiProvider;
     private final RoleGateway roleGateway;
 
     @Override
     public Stream<IamToken> findAll() {
-        return AstraLogger.loading("Fetching tokens for the current org", (_) -> 
+        return ctx.log().loading("Fetching tokens for the current org", (_) -> 
             apiProvider.astraOpsClient().tokens().findAll());
     }
 
@@ -36,7 +35,7 @@ public class TokenGatewayImpl implements TokenGateway {
     public CreateTokenResponse create(RoleRef roleRef, Optional<String> description) {
         val role = roleGateway.findOne(roleRef);
 
-        return AstraLogger.loading("Creating token with role " + highlight(role.getName()), (_) -> {
+        return ctx.log().loading("Creating token with role " + ctx.highlight(role.getName()), (_) -> {
             val client = apiProvider.astraOpsClient().tokens();
 
             val body = """
@@ -61,7 +60,7 @@ public class TokenGatewayImpl implements TokenGateway {
             return DeletionStatus.notFound(null);
         }
         
-        AstraLogger.loading("Deleting token " + highlight(clientId), (_) -> {
+        ctx.log().loading("Deleting token " + ctx.highlight(clientId), (_) -> {
             apiProvider.astraOpsClient().tokens().delete(clientId);
             return null;
         });

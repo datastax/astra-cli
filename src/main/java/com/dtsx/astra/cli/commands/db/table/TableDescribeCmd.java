@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
 
 @Command(
@@ -58,14 +57,14 @@ public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResu
 
         attrs.put("Name", info.name());
         attrs.put("", "");
-        attrs.put(highlight("COLUMNS"), "");
+        attrs.put(ctx.highlight("COLUMNS"), "");
 
         info.columns().forEach((columnName, columnInfo) -> {
             attrs.put(columnName, columnInfo.cqlDefinition());
         });
 
         attrs.put("", "");
-        attrs.put(highlight("PRIMARY KEY"), "");
+        attrs.put(ctx.highlight("PRIMARY KEY"), "");
         
         if (!info.primaryKey().partitionBy().isEmpty()) {
             val partitionKey = String.join(", ", info.primaryKey().partitionBy());

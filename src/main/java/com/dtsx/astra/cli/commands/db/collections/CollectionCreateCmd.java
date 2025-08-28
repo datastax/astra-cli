@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -128,9 +127,9 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
 
     private OutputAll handleCollectionAlreadyExists() {
         val message = "Collection %s already exists in keyspace %s of database %s.".formatted(
-            highlight($collRef.name()),
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db())
+            ctx.highlight($collRef.name()),
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(false);
@@ -142,9 +141,9 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
 
     private OutputAll handleCollectionCreated() {
         val message = "Collection %s has been created in keyspace %s of database %s.".formatted(
-            highlight($collRef.name()),
-            highlight($keyspaceRef.name()),
-            highlight($keyspaceRef.db())
+            ctx.highlight($collRef.name()),
+            ctx.highlight($keyspaceRef.name()),
+            ctx.highlight($keyspaceRef.db())
         );
 
         val data = mkData(true);

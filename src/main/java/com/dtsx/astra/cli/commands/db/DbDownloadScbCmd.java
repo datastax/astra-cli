@@ -17,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
@@ -75,7 +74,7 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
           The secure connect bundle was download to the following path:
           %s
         """.formatted(
-            highlight(file)
+            ctx.highlight(file)
         ), mkData(file));
     }
 
@@ -92,9 +91,9 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
 
         val potentialFix =
             (fail.ex() instanceof FileAlreadyExistsException)
-                ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("rm " + fail.dest()) :
+                ? NL + NL + renderComment(ctx.colors(), "Potential fix:") + NL + renderCommand(ctx.colors(), "rm " + fail.dest()) :
             (fail.ex() instanceof NoSuchFileException)
-                ? NL + NL + renderComment("Potential fix:") + NL + renderCommand("mkdir -p " + fail.dest().getParent())
+                ? NL + NL + renderComment(ctx.colors(), "Potential fix:") + NL + renderCommand(ctx.colors(), "mkdir -p " + fail.dest().getParent())
                 : "";
 
         throw new AstraCliException(FILE_ISSUE, trimIndent("""
@@ -107,8 +106,8 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         
           %s
         """).formatted(
-            highlight(fail.source()),
-            highlight(fail.dest()),
+            ctx.highlight(fail.source()),
+            ctx.highlight(fail.dest()),
             errorMessage + potentialFix,
             fail.deleteSucceeded()
                 ? "@|green The downloaded file has been successfully deleted; it no longer exists in the 'Downloaded to' location.|@"

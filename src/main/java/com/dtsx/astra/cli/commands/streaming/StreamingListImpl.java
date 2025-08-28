@@ -25,7 +25,7 @@ public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> 
                 "name", tenant.name(),
                 "cloud", tenant.cloud().name(),
                 "region", tenant.region().unwrap(),
-                "status", tenant.status().highlight()
+                "status", tenant.status().highlight(ctx)
             ))
             .toList();
 

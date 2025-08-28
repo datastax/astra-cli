@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.output.formats;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +33,8 @@ public interface OutputAll extends OutputHuman, OutputJson, OutputCsv {
     static OutputAll instance(Supplier<OutputHuman> human, Supplier<OutputJson> json, Supplier<OutputCsv> csv) {
         return new OutputAll() {
             @Override
-            public String renderAsHuman() {
-                return human.get().renderAsHuman();
+            public String renderAsHuman(CliContext ctx) {
+                return human.get().renderAsHuman(ctx);
             }
 
             @Override
@@ -48,9 +49,9 @@ public interface OutputAll extends OutputHuman, OutputJson, OutputCsv {
         };
     }
 
-    default String render(OutputType type) {
-        return switch (type) {
-            case HUMAN -> renderAsHuman();
+    default String render(CliContext ctx) {
+        return switch (ctx.outputType()) {
+            case HUMAN -> renderAsHuman(ctx);
             case JSON -> renderAsJson();
             case CSV -> renderAsCsv();
         };

@@ -1,14 +1,12 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -27,7 +25,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 @Command(
@@ -54,7 +51,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     @Override
     public final OutputAll execute(Supplier<ConfigUseResult> result) {
         return switch (result.get()) {
-            case ProfileSetAsDefault(var profileName) -> OutputAll.response("Default profile set to " + highlight(profileName));
+            case ProfileSetAsDefault(var profileName) -> OutputAll.response("Default profile set to " + ctx.highlight(profileName));
             case ProfileNotFound(var profileName) -> throwProfileNotFound(profileName);
         };
     }
@@ -93,14 +90,14 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
                     }};
 
                     val tagsAsString = (!tags.isEmpty())
-                        ? AstraColors.NEUTRAL_500.use(" (" + String.join(", ", tags) + ")")
+                        ? ctx.colors().NEUTRAL_500.use(" (" + String.join(", ", tags) + ")")
                         : "";
 
                     return name + " ".repeat(maxNameLength - name.length()) + tagsAsString;
                 }
             ));
 
-        return AstraConsole.select("Select a profile to set as default")
+        return ctx.console().select("Select a profile to set as default")
             .options(candidates)
             .requireAnswer()
             .mapper(profileToDisplayMap::get)

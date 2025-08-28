@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.db.cdc;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.*;
@@ -10,8 +11,8 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import java.util.stream.Stream;
 
 public interface CdcGateway {
-    static CdcGateway mkDefault(AstraToken token, AstraEnvironment env) {
-        return new CdcGatewayImpl(APIProvider.mkDefault(token, env));
+    static CdcGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
+        return new CdcGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
     }
 
     Stream<CdcDefinition> findAll(DbRef dbRef);

@@ -27,7 +27,6 @@ public class CliEnvironment {
 
     @VisibleForTesting
     public static void setFileSystem(FileSystem fileSystem) {
-        System.out.println("Setting test file system: " + fileSystem);
         fs = fileSystem;
     }
 }

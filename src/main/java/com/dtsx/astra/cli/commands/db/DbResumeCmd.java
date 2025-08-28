@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
@@ -71,7 +70,7 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
 
     private OutputAll handleDatabaseAwaited(Duration duration) {
         val message = "Database %s was not in a state that required resuming, but is now active after waiting %d seconds.".formatted(
-            highlight($dbRef),
+            ctx.highlight($dbRef),
             duration.getSeconds()
         );
 
@@ -82,7 +81,7 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
 
     private OutputAll handleDatabaseResumedAwaited(Duration duration) {
         val message = "Database %s was resumed, and is now active after waiting %d seconds.".formatted(
-            highlight($dbRef),
+            ctx.highlight($dbRef),
             duration.getSeconds()
         );
 
@@ -94,8 +93,8 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
     private OutputAll handleDatabaseNeedsAwaiting(Database database) {
         val currentStatus = database.getStatus();
         val message = "Database %s was not in a state that required resuming, but is not yet active (current status: %s).".formatted(
-            highlight($dbRef),
-            highlight(currentStatus)
+            ctx.highlight($dbRef),
+            ctx.highlight(currentStatus)
         );
 
         val data = mkData(false, currentStatus, null);
@@ -109,8 +108,8 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
         val currentStatus = database.getStatus();
 
         val message = "Database %s was resumed, but is not yet active (current status: %s).".formatted(
-            highlight($dbRef),
-            highlight(currentStatus)
+            ctx.highlight($dbRef),
+            ctx.highlight(currentStatus)
         );
 
         val data = mkData(true, currentStatus, null);
@@ -121,7 +120,7 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
     }
 
     private OutputAll handleDatabaseAlreadyActiveNoWait() {
-        val message = "Database %s is already active; no action was required.".formatted(highlight($dbRef));
+        val message = "Database %s is already active; no action was required.".formatted(ctx.highlight($dbRef));
 
         val data = mkData(false, ACTIVE, Duration.ZERO);
 

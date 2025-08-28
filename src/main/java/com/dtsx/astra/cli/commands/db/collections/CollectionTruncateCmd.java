@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionTruncateOperation.*;
 
 @Command(
@@ -38,7 +37,7 @@ public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<Collect
 
     private OutputAll handleCollectionTruncated() {
         return OutputAll.response("Collection %s has been truncated. All documents have been deleted from the collection.".formatted(
-            highlight($collRef)
+            ctx.highlight($collRef)
         ));
     }
 

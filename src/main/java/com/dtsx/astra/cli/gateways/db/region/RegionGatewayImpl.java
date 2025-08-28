@@ -1,29 +1,31 @@
 package com.dtsx.astra.cli.gateways.db.region;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
-
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @RequiredArgsConstructor
 public class RegionGatewayImpl implements RegionGateway {
+    private final CliContext ctx;
     private final APIProvider api;
 
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector) {
         val regionType = vector ? RegionType.VECTOR : RegionType.ALL;
 
-        return AstraLogger.loading("Fetching all available " + ((vector) ? "vector" : "serverless") + " regions", (_) -> (
+        return ctx.log().loading("Fetching all available " + ((vector) ? "vector" : "serverless") + " regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(regionType)
                 .collect(Collectors.toMap(
@@ -42,7 +44,7 @@ public class RegionGatewayImpl implements RegionGateway {
 
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllClassic() {
-        return AstraLogger.loading("Fetching all available classic regions", (_) -> (
+        return ctx.log().loading("Fetching all available classic regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAll()
                 .collect(Collectors.toMap(
@@ -67,14 +69,14 @@ public class RegionGatewayImpl implements RegionGateway {
 
     @Override
     public List<Datacenter> findAllForDb(DbRef dbRef) {
-        return AstraLogger.loading("Fetching regions for db " + highlight(dbRef), (_) -> (
+        return ctx.log().loading("Fetching regions for db " + ctx.highlight(dbRef), (_) -> (
             api.dbOpsClient(dbRef).datacenters().findAll().toList()
         ));
     }
 
     @Override
     public Set<CloudProviderType> findAvailableClouds() {
-        return AstraLogger.loading("Finding cloud providers for all available regions", (_) -> (
+        return ctx.log().loading("Finding cloud providers for all available regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(RegionType.ALL)
                 .map(DatabaseRegionServerless::getCloudProvider)
@@ -91,7 +93,7 @@ public class RegionGatewayImpl implements RegionGateway {
             return CreationStatus.alreadyExists(region);
         }
 
-        AstraLogger.loading("Creating region " + highlight(region) + " for db " + highlight(ref), (_) -> {
+        ctx.log().loading("Creating region " + ctx.highlight(region) + " for db " + ctx.highlight(ref), (_) -> {
             api.dbOpsClient(ref).datacenters().create(tier, cp, region.unwrap());
             return null;
         });
@@ -107,7 +109,7 @@ public class RegionGatewayImpl implements RegionGateway {
             return DeletionStatus.notFound(region);
         }
 
-        AstraLogger.loading("Deleting region " + highlight(region) + " from db " + highlight(ref), (_) -> {
+        ctx.log().loading("Deleting region " + ctx.highlight(region) + " from db " + ctx.highlight(ref), (_) -> {
             api.dbOpsClient(ref).datacenters().delete(region.unwrap());
             return null;
         });
@@ -116,7 +118,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     private boolean existsInDb(DbRef dbRef, RegionName region) {
-        return AstraLogger.loading("Checking if region " + highlight(region) + " exists in db " + highlight(dbRef), (_) -> (
+        return ctx.log().loading("Checking if region " + ctx.highlight(region) + " exists in db " + ctx.highlight(dbRef), (_) -> (
             findAllForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
         ));
     }

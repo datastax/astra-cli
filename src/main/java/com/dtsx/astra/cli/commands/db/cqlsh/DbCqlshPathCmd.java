@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
 import com.dtsx.astra.cli.commands.db.AbstractDbCmd;
-import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -70,7 +69,7 @@ public class DbCqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
           Please install @!cqlsh!@ by running any cqlsh command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize cqlsh installations done outside of astra.|@
-        """.formatted(AstraHome.DIR), List.of(
+        """.formatted(ctx.home().DIR), List.of(
             new Hint("Example command to install cqlsh (no --if-exists flag):", "${cli.name} db cqlsh path")
         ));
     }

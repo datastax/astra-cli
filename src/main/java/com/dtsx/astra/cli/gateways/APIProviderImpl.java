@@ -6,13 +6,13 @@ import com.datastax.astra.client.admin.DatabaseAdmin;
 import com.datastax.astra.client.core.options.DataAPIClientOptions;
 import com.datastax.astra.client.databases.Database;
 import com.datastax.astra.client.databases.DatabaseOptions;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.sdk.AstraOpsClient;
@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNIQUENESS_ISSUE;
 
 @RequiredArgsConstructor
 public class APIProviderImpl implements APIProvider {
+    private final CliContext ctx;
     private final AstraToken token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
@@ -74,7 +74,7 @@ public class APIProviderImpl implements APIProvider {
     private UUID resolveId(DbRef ref) {
         val cachedId = dbCache.lookupDbId(ref);
 
-        return cachedId.orElseGet(() -> AstraLogger.loading("Resolving ID for database " + highlight(ref), (_) ->
+        return cachedId.orElseGet(() -> ctx.log().loading("Resolving ID for database " + ctx.highlight(ref), (_) ->
             tryResolveDb(ref)
                 .map(com.dtsx.astra.sdk.db.domain.Database::getId)
                 .map(UUID::fromString)
@@ -87,7 +87,7 @@ public class APIProviderImpl implements APIProvider {
 
         return cachedRegion
             .map(RegionName::unwrap)
-            .orElseGet(() -> AstraLogger.loading("Resolving region for database " + highlight(ref), (_) ->
+            .orElseGet(() -> ctx.log().loading("Resolving region for database " + ctx.highlight(ref), (_) ->
                 tryResolveDb(ref)
                     .map(com.dtsx.astra.sdk.db.domain.Database::getInfo)
                     .map(DatabaseInfo::getRegion)

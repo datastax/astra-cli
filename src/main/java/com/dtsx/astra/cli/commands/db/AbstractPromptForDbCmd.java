@@ -5,8 +5,6 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Parameters;
@@ -36,13 +34,7 @@ public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes>
     protected abstract String dbRefPrompt();
 
     private DbRef promptForDbRef(String prompt) {
-        val dbs = dbGateway.findAll().toList();
-
-        if (dbs.isEmpty()) {
-            throw new AstraCliException("""
-              @|bold,red No databases found to select from|@
-            """);
-        }
+        val dbs = NEList.parse(dbGateway.findAll().toList()).orElseThrow(() -> new AstraCliException("@|bold,red No databases found to select from|@"));
 
         val namesAreUnique = dbs.stream()
             .map(db -> db.getInfo().getName())
@@ -58,14 +50,12 @@ public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes>
             db -> db,
             db -> db.getInfo().getName() + " ".repeat(maxNameLength - db.getInfo().getName().length()) +
                 (namesAreUnique
-                    ? " " + AstraColors.NEUTRAL_500.use("(" + db.getInfo().getCloudProvider().name() + " " + db.getInfo().getRegion() + ")")
-                    : " " + AstraColors.NEUTRAL_500.use("(" + db.getId() + ")"))
+                    ? " " + ctx.colors().NEUTRAL_500.use("(" + db.getInfo().getCloudProvider().name() + " " + db.getInfo().getRegion() + ")")
+                    : " " + ctx.colors().NEUTRAL_500.use("(" + db.getId() + ")"))
         ));
 
-        val neDbs = NEList.of(dbs);
-
-        val db = AstraConsole.select(prompt)
-            .options(neDbs)
+        val db = ctx.console().select(prompt)
+            .options(dbs)
             .requireAnswer()
             .mapper(dbToDisplayMap::get)
             .fallbackIndex(0)

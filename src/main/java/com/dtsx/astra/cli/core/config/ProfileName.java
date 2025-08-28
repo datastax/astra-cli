@@ -1,13 +1,14 @@
 package com.dtsx.astra.cli.core.config;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.Utils;
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Value;
 
 @Value
-public class ProfileName implements AstraColors.Highlightable {
+public class ProfileName implements Highlightable {
     public static final ProfileName DEFAULT = ProfileName.mkUnsafe("default");
 
     String name;
@@ -40,7 +41,7 @@ public class ProfileName implements AstraColors.Highlightable {
     }
 
     @Override
-    public String highlight() {
-        return AstraColors.highlight(unwrap());
+    public String highlight(CliContext ctx) {
+        return ctx.highlight(unwrap());
     }
 }

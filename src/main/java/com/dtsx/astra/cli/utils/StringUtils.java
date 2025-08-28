@@ -87,17 +87,17 @@ public class StringUtils {
         return strippedLine.indexOf(trimmed);
     }
 
-    public static String renderComment(CharSequence comment) {
-        return AstraColors.NEUTRAL_400.use("# " + comment);
+    public static String renderComment(AstraColors colors, CharSequence comment) {
+        return colors.NEUTRAL_400.use("# " + comment);
     }
 
-    public static String renderCommand(CharSequence command) {
-        return AstraColors.BLUE_300.use("$ ") + command;
+    public static String renderCommand(AstraColors colors, CharSequence command) {
+        return colors.BLUE_300.use("$ ") + command;
     }
 
-    public static String maskToken(@NonNull String token) {
+    public static String maskToken(AstraColors colors, @NonNull String token) {
         return AstraToken.parse(token).fold(
-            _ -> AstraColors.RED_500.use("<invalid_token('" + truncate(token, 4) + "')>"),
+            _ -> colors.RED_500.use("<invalid_token('" + truncate(token, 4) + "')>"),
             AstraToken::toString
         );
     }

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.operations.streaming.pulsar;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -15,8 +16,8 @@ import java.util.Optional;
 import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
 
 public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarRequest> {
-    public StreamingPulsarOperation(StreamingGateway streamingGateway, DownloadsGateway downloadsGateway, PulsarRequest request) {
-        super(streamingGateway, downloadsGateway, request);
+    public StreamingPulsarOperation(CliContext ctx, StreamingGateway streamingGateway, DownloadsGateway downloadsGateway, PulsarRequest request) {
+        super(ctx, streamingGateway, downloadsGateway, request);
     }
 
     public record PulsarRequest(

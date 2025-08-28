@@ -1,13 +1,14 @@
 package com.dtsx.astra.cli.core.completions.caches;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.config.ProfileName;
 
 import java.util.Optional;
 
 public class TenantCompletionsCache extends ProfileLinkedCompletionsCache {
-    public TenantCompletionsCache(Optional<ProfileName> profileName) {
-        super(profileName);
+    public TenantCompletionsCache(CliContext ctx, Optional<ProfileName> profileName) {
+        super(ctx, profileName);
     }
 
     @Override

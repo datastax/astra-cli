@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output.formats;
 
-import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
 import lombok.val;
@@ -14,18 +14,20 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @FunctionalInterface
 public interface OutputHuman {
-    String renderAsHuman();
+    String renderAsHuman(CliContext ctx);
 
     static OutputHuman response(CharSequence message, @Nullable List<Hint> nextSteps) {
         val s = new StringJoiner(NL + NL).add(trimIndent(message.toString()));
 
-        if (AstraLogger.getLevel().ordinal() > QUIET.ordinal() && nextSteps != null) {
-            for (val nextStep : nextSteps) {
-                s.add(renderComment(nextStep.comment()) + NL + renderCommand(nextStep.command()));
+        return (ctx) -> {
+            if (ctx.logLevel().ordinal() > QUIET.ordinal() && nextSteps != null) {
+                for (val nextStep : nextSteps) {
+                    s.add(renderComment(ctx.colors(), nextStep.comment()) + NL + renderCommand(ctx.colors(), nextStep.command()));
+                }
             }
-        }
 
-        return s::toString;
+            return s.toString();
+        };
     }
 
     static OutputHuman response(CharSequence message) {
@@ -37,6 +39,6 @@ public interface OutputHuman {
     }
 
     static OutputHuman serializeValue(Object o) {
-        return () -> OutputSerializer.trySerializeAsHuman(o);
+        return (_) -> OutputSerializer.trySerializeAsHuman(o);
     }
 }

@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -26,6 +26,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @RequiredArgsConstructor
 public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> implements Operation<CqlshExecResult> {
+    protected final CliContext ctx;
     protected final DbGateway dbGateway;
     protected final DownloadsGateway downloadsGateway;
     protected final Req request;
@@ -55,7 +56,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
                 addAll(flags);
             }};
 
-            val startedProcess = AstraLogger.loading("Starting cqlsh", (_) -> {
+            val startedProcess = ctx.log().loading("Starting cqlsh", (_) -> {
                 try {
                     val res = startProcess(commandLine);
                     Thread.sleep(500); // cqlsh doesn't print anything immediately, so let spinner run a bit longer
@@ -137,7 +138,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
                 .collect(Collectors.toList());
 
             if (!content.equals(replaced)) {
-                AstraLogger.info("Patched cqlsh script to try known supported Python versions first");
+                ctx.log().info("Patched cqlsh script to try known supported Python versions first");
 
                 replaced.add(updatedLine.index, "# Patched by `astra-cli` to try known supported Python versions first");
                 replaced.add(updatedLine.index + 1, "# Previous line: `" + updatedLine.content + "`");
@@ -145,8 +146,8 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
                 Files.writeString(cqlshExe, String.join(NL, replaced));
             }
         } catch (Exception e) {
-            AstraLogger.exception("Error occurred attempting to patch '" + cqlshExe + "'");
-            AstraLogger.exception(e);
+            ctx.log().exception("Error occurred attempting to patch '" + cqlshExe + "'");
+            ctx.log().exception(e);
         }
 
         return cqlshExe;

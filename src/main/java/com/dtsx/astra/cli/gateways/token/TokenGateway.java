@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.gateways.token;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.caches.RoleCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.AstraToken;
@@ -14,8 +15,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface TokenGateway {
-    static TokenGateway mkDefault(AstraToken token, AstraEnvironment env) {
-        return new TokenGatewayImpl(APIProvider.mkDefault(token, env), RoleGateway.mkDefault(token, env, new RoleCompletionsCache()));
+    static TokenGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
+        return new TokenGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), RoleGateway.mkDefault(token, env, new RoleCompletionsCache(ctx), ctx));
     }
 
     Stream<IamToken> findAll();

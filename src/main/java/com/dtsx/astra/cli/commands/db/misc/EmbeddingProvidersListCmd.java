@@ -38,8 +38,8 @@ public class EmbeddingProvidersListCmd extends AbstractPromptForDbCmd<EmbeddingP
                 "Display Name", r.displayName().orElse("N/A"),
                 "Models", String.valueOf(r.modelsCount()),
                 "Parameters", String.valueOf(r.parametersCount()),
-                "Auth Header", r.hasAuthHeader() ? PlatformChars.PRESENCE_INDICATOR : "",
-                "Auth Secret", r.hasAuthSecret() ? PlatformChars.PRESENCE_INDICATOR : ""
+                "Auth Header", r.hasAuthHeader() ? PlatformChars.presenceIndicator(ctx.isWindows()) : "",
+                "Auth Secret", r.hasAuthSecret() ? PlatformChars.presenceIndicator(ctx.isWindows()) : ""
             ))
             .toList();
 

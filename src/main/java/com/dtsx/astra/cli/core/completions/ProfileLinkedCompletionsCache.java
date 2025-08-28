@@ -1,24 +1,28 @@
 package com.dtsx.astra.cli.core.completions;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.TenantCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;
 import com.dtsx.astra.cli.core.config.ProfileName;
-import lombok.RequiredArgsConstructor;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
     private final Optional<ProfileName> profileName;
 
-    public static List<ProfileLinkedCompletionsCache> mkInstances(ProfileName profileName) {
+    public ProfileLinkedCompletionsCache(CliContext ctx, Optional<ProfileName> profileName) {
+        super(ctx);
+        this.profileName = profileName;
+    }
+
+    public static List<ProfileLinkedCompletionsCache> mkInstances(CliContext ctx, ProfileName profileName) {
         return List.of(
-            new DbCompletionsCache(Optional.of(profileName)),
-            new UserCompletionsCache(Optional.of(profileName)),
-            new TenantCompletionsCache(Optional.of(profileName))
+            new DbCompletionsCache(ctx, Optional.of(profileName)),
+            new UserCompletionsCache(ctx, Optional.of(profileName)),
+            new TenantCompletionsCache(ctx, Optional.of(profileName))
         );
     }
 

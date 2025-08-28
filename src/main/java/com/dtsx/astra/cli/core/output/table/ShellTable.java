@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.core.output.table;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.CliContext;
 import lombok.val;
 
 import java.util.*;
@@ -14,8 +14,8 @@ public record ShellTable(List<? extends Map<String, ?>> raw) {
         return new RenderableShellTable(rows, Arrays.asList("Attribute", "Value"));
     }
 
-    public static String highlight(String s) {
-        return AstraColors.PURPLE_300.use(s);
+    public static String highlight(CliContext ctx, String s) {
+        return ctx.colors().PURPLE_300.use(s);
     }
 
     public RenderableShellTable withColumns(String... columnNames) {

@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.ExecSource;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +11,6 @@ import picocli.CommandLine.Option;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 
 @Command(
     name = "start",
@@ -62,8 +60,8 @@ public class DbCqlshStartCmd extends DbCqlshStartImpl {
             );
 
         if (ret.isPresent()) {
-            AstraLogger.warn("The @!---execute!@ and @!--file!@ options are @!deprecated!@ and will be removed in future versions.");
-            AstraLogger.warn("Please use the " + highlight("${cli.name} db cqlsh exec") + " command instead.");
+            ctx.log().warn("The @!---execute!@ and @!--file!@ options are @!deprecated!@ and will be removed in future versions.");
+            ctx.log().warn("Please use the " + ctx.highlight("${cli.name} db cqlsh exec") + " command instead.");
         }
 
         return ret;

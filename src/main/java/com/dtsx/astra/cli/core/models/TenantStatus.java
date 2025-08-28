@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.core.models;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.AstraColors.Highlightable;
+import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +19,11 @@ public class TenantStatus implements Highlightable {
     }
 
     @Override
-    public String highlight() {
+    public String highlight(CliContext ctx) {
         return switch (unwrap) {
-            case "active" -> AstraColors.GREEN_500.useOrQuote(unwrap);
-            case "error" -> AstraColors.RED_500.useOrQuote(unwrap);
-            default -> AstraColors.NEUTRAL_300.useOrQuote(unwrap);
+            case "active" -> ctx.colors().GREEN_500.useOrQuote(unwrap);
+            case "error" -> ctx.colors().RED_500.useOrQuote(unwrap);
+            default -> ctx.colors().NEUTRAL_300.useOrQuote(unwrap);
         };
     }
 

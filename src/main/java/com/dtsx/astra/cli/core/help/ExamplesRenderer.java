@@ -1,9 +1,11 @@
 package com.dtsx.astra.cli.core.help;
 
-import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import picocli.CommandLine;
+import picocli.CommandLine.Help.Ansi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +29,8 @@ public class ExamplesRenderer {
             return help.createHeading("%nExamples:%n");
         });
 
-        cmd.getHelpSectionMap().put(SECTION_DETAILS_KEY, (help) -> {
-            return AstraConsole.format(renderExamples(examples));
+        cmd.getHelpSectionMap().put(SECTION_DETAILS_KEY, (_) -> {
+            return renderExamples(examples);
         });
 
         cmd.setHelpSectionKeys(insertSectionKeys(cmd.getHelpSectionKeys()));
@@ -37,12 +39,14 @@ public class ExamplesRenderer {
     private static String renderExamples(Example[] examples) {
         val sb = new StringBuilder();
 
+        val colors = new AstraColors(Ansi.AUTO);
+
         for (val example : examples) {
             for (val comment : example.comment()) {
-                sb.append("  ").append(renderComment(comment)).append(NL);
+                sb.append("  ").append(renderComment(colors, comment)).append(NL);
             }
 
-            sb.append("  ").append(renderCommand(AstraConsole.format(example.command()))).append(NL);
+            sb.append("  ").append(renderCommand(colors, example.command().replace("${cli.name}", CliProperties.cliName()))).append(NL);
 
             for (val output : example.output()) {
                 sb.append("  ").append(output).append(NL);

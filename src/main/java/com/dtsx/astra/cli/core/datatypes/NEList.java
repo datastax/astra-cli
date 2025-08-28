@@ -1,14 +1,18 @@
 package com.dtsx.astra.cli.core.datatypes;
 
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.Delegate;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
+@ToString
+@EqualsAndHashCode
 public class NEList<E> implements List<E> {
     @Delegate
     private final List<E> delegate;
@@ -17,25 +21,11 @@ public class NEList<E> implements List<E> {
         this.delegate = Collections.unmodifiableList(delegate);
     }
 
-    public static <E> NEList<E> of(@NonNull List<E> list) {
-        if (list.isEmpty()) {
-            throw new IllegalArgumentException("Attempted to create an NEList from an empty list");
-        }
-        return new NEList<>(list);
-    }
-
-    public static <E> NEList<E> of(@NonNull Set<E> set) {
-        if (set.isEmpty()) {
-            throw new IllegalArgumentException("Attempted to create an NEList from an empty set");
-        }
-        return new NEList<>(List.copyOf(set));
-    }
-
-    public static <E> Optional<NEList<E>> parse(@NonNull List<E> list) {
+    public static <E> Optional<NEList<E>> parse(@NonNull Collection<E> list) {
         if (list.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(new NEList<>(list));
+        return Optional.of(new NEList<>(List.copyOf(list)));
     }
 
     @SafeVarargs

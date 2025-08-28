@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.core.output.formats;
 
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
-import org.jetbrains.annotations.Nullable;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import picocli.CommandLine.Option;
 
 public enum OutputType {
@@ -10,23 +10,15 @@ public enum OutputType {
     JSON,
     CSV;
 
-    private static @Nullable OutputType requested = null;
-
-    public static OutputType requested() {
-        if (requested == null) {
-            throw new CongratsYouFoundABugException("Can not access OutputType.requested() yet");
-        }
-        return requested;
+    public boolean isHuman() {
+        return this == HUMAN;
     }
 
-    public static boolean isHuman() {
-        return requested() == HUMAN;
+    public boolean isNotHuman() {
+        return this != HUMAN;
     }
 
-    public static boolean isNotHuman() {
-        return requested() != HUMAN;
-    }
-
+    @Accessors(fluent = true)
     public static class Mixin {
         @Option(
             names = { "--output", "-o" },
@@ -35,10 +27,7 @@ public enum OutputType {
             description = "One of: ${COMPLETION-CANDIDATES}",
             paramLabel = "FORMAT"
         )
-        public void setRequested(OutputType type) {
-            if (OutputType.requested == null) {
-                OutputType.requested = type;
-            }
-        }
+        @Getter
+        private OutputType requested;
     }
 }

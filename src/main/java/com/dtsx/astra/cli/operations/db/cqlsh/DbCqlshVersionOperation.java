@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -9,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class DbCqlshVersionOperation extends AbstractCqlshExeOperation<CqlshVersionRequest> {
-    public DbCqlshVersionOperation(DbGateway dbGateway, DownloadsGateway downloadsGateway, CqlshVersionRequest request) {
-        super(dbGateway, downloadsGateway, request);
+    public DbCqlshVersionOperation(CliContext ctx, DbGateway dbGateway, DownloadsGateway downloadsGateway, CqlshVersionRequest request) {
+        super(ctx, dbGateway, downloadsGateway, request);
     }
 
     public record CqlshVersionRequest(

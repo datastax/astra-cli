@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.REGION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
@@ -68,8 +67,8 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionAlreadyExists() {
         val message = "Region %s already exists in database %s.".formatted(
-            highlight($region),
-            highlight($dbRef)
+            ctx.highlight($region),
+            ctx.highlight($dbRef)
         );
 
         val data = mkData(false, null);
@@ -81,8 +80,8 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionCreated() {
         val message = "Region %s has been created in database %s (database may not be active yet).".formatted(
-            highlight($region),
-            highlight($dbRef)
+            ctx.highlight($region),
+            ctx.highlight($dbRef)
         );
 
         val data = mkData(true, null);
@@ -94,9 +93,9 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionCreatedAndDbActive(Duration waitTime) {
         val message = "Region %s has been created in database %s. The database is now active after waiting %s seconds.".formatted(
-            highlight($region),
-            highlight($dbRef),
-            highlight(waitTime.toSeconds())
+            ctx.highlight($region),
+            ctx.highlight($dbRef),
+            ctx.highlight(waitTime.toSeconds())
         );
 
         val data = mkData(true, waitTime);

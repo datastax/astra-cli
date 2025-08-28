@@ -19,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
@@ -59,13 +58,13 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
     }
 
     private OutputAll handleProfileDeleted() {
-        val message = "Profile %s deleted successfully.".formatted(highlight($profileName));
+        val message = "Profile %s deleted successfully.".formatted(ctx.highlight($profileName));
 
         return OutputAll.response(message, mkData(true));
     }
 
     private OutputAll handleProfileDoesNotExist() {
-        val message = "Profile %s does not exist; nothing to delete.".formatted(highlight($profileName));
+        val message = "Profile %s does not exist; nothing to delete.".formatted(ctx.highlight($profileName));
 
         return OutputAll.response(message, mkData(false), List.of(
             new Hint("See your existing profiles:", "${cli.name} config list")

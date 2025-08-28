@@ -1,9 +1,7 @@
 package com.dtsx.astra.cli.core.output.prompters.strategies;
 
-import com.dtsx.astra.cli.core.CliEnvironment;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.output.AstraConsole;
-import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.core.output.prompters.PromptRequest;
 import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy;
 import lombok.val;
@@ -20,25 +18,27 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
     private static final String MOVE_UP_CLEAR = "\033[1A\033[2K\r";
     private static final String CLEAR_MOVE_UP = "\033[2K\033[1A\r\033[2C";
 
+    private final CliContext ctx;
     private final PromptRequest.Closed<T> req;
     private final Console console;
 
     private int sliceStart = 0;
 
-    public NumberedSelectionStrategy(PromptRequest.Closed<T> req) {
+    public NumberedSelectionStrategy(CliContext ctx, PromptRequest.Closed<T> req) {
+        this.ctx = ctx;
         this.req = req;
-        this.console = Objects.requireNonNull(AstraConsole.getConsole());
+        this.console = Objects.requireNonNull(ctx.console().getConsole());
     }
 
     public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
-        public boolean isSupported() {
-            return OutputType.isHuman() && CliEnvironment.isTty();
+        public boolean isSupported(CliContext ctx) {
+            return ctx.outputIsHuman() && ctx.isTty();
         }
 
         @Override
-        public <T> SelectionStrategy<T> mkInstance(PromptRequest.Closed<T> request) {
-            return new NumberedSelectionStrategy<>(request);
+        public <T> SelectionStrategy<T> mkInstance(CliContext ctx, PromptRequest.Closed<T> request) {
+            return new NumberedSelectionStrategy<>(ctx, request);
         }
     }
 
@@ -54,32 +54,32 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
             clearPrompt();
             clearOptionsAndFooter();
         } else {
-            AstraConsole.println();
+            ctx.console().println();
         }
 
         return result;
     }
 
     private void drawPrompt() {
-        AstraConsole.println(req.prompt());
+        ctx.console().println(req.prompt());
     }
 
     private void drawOptions() {
         for (var i = sliceStart; i < sliceStart + PAGE_SIZE && i < req.options().size(); i++) {
-            AstraConsole.printf("@!%d)!@ %s%n", i + 1, req.options().get(i));
+            ctx.console().printf("@!%d)!@ %s%n", i + 1, req.options().get(i));
         }
     }
 
     private void drawFooter() {
-        AstraConsole.printf("%n");
+        ctx.console().printf("%n");
 
         if (paginationEnabled()) {
-            AstraConsole.printf("[@!n!@]ext page, [@!p!@]revious page, [@!1-%d!@] to select (showing @!%d-%d!@):%n", req.options().size(), sliceStart + 1, sliceEnd());
+            ctx.console().printf("[@!n!@]ext page, [@!p!@]revious page, [@!1-%d!@] to select (showing @!%d-%d!@):%n", req.options().size(), sliceStart + 1, sliceEnd());
         } else {
-            AstraConsole.printf("[@!1-%d!@] to select:%n", req.options().size());
+            ctx.console().printf("[@!1-%d!@] to select:%n", req.options().size());
         }
 
-        AstraConsole.printf("@!> !@");
+        ctx.console().printf("@!> !@");
     }
 
     private Optional<T> handleInput() {
@@ -93,7 +93,7 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
                 handlePreviousPage();
             }
             else if (input.isEmpty()) {
-                AstraConsole.print(CLEAR_MOVE_UP);
+                ctx.console().print(CLEAR_MOVE_UP);
             }
             else if (isPositiveInteger(input)) {
                 return Optional.of(req.mapper().apply(req.options().get(Integer.parseInt(input) - 1)));
@@ -134,13 +134,13 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
 
     private void clearOptionsAndFooter() {
         for (int i = 0; i < (sliceEnd() - sliceStart) + 3; i++) {
-            AstraConsole.print(MOVE_UP_CLEAR);
+            ctx.console().print(MOVE_UP_CLEAR);
         }
     }
 
     private void clearPrompt() {
         for (int i = 0; i < req.prompt().split("\n").length + 1; i++) {
-            AstraConsole.print(MOVE_UP_CLEAR);
+            ctx.console().print(MOVE_UP_CLEAR);
         }
     }
 

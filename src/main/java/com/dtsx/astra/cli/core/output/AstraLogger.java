@@ -1,10 +1,11 @@
 package com.dtsx.astra.cli.core.output;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
-import com.dtsx.astra.cli.core.config.AstraHome;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 import lombok.val;
 import picocli.CommandLine.Option;
 
@@ -14,40 +15,60 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_END;
 import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_START;
-import static com.dtsx.astra.cli.core.output.AstraColors.PURPLE_300;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
+@Accessors(fluent = true)
 public class AstraLogger {
     @Getter
-    private static Level level = Level.REGULAR;
-    private static LoadingSpinner globalSpinner;
+    private final Level level;
+    private final Supplier<CliContext> ctxSupplier;
 
-    private static Path sessionLogFile;
-    private static final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
+    private final boolean shouldDumpLogs;
+    private final Supplier<Path> sessionLogFile;
 
-    private static boolean shouldDumpLogs = false;
+    private final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
-    private static Path getLogFile() {
-        if (sessionLogFile == null) {
-            val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(java.time.ZoneId.systemDefault()));
-            sessionLogFile = AstraHome.Dirs.useLogs().resolve(timestamp + ".astra.log");
+    private LoadingSpinner globalSpinner;
+
+    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo) {
+        this.level = level;
+        this.ctxSupplier = ctxSupplier;
+        this.shouldDumpLogs = shouldDumpLogs;
+
+        if (dumpLogsTo.isPresent()) {
+            this.sessionLogFile = dumpLogsTo::get;
+
+            info("Dumping logs to '", dumpLogsTo.get().toString(), "' at the end of this command.");
+        } else {
+            val cachedLogFile = new Object() {
+                Path ref = null;
+            };
+
+            this.sessionLogFile = () -> {
+                if (cachedLogFile.ref == null) {
+                    val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(ZoneId.systemDefault()));
+                    cachedLogFile.ref = ctx().home().Dirs.useLogs().resolve(timestamp + ".astra.log");
+                }
+                return cachedLogFile.ref;
+            };
         }
-        return sessionLogFile;
     }
 
-    public static String useSessionLogFilePath() {
-        return getLogFile().toString();
+    public String useSessionLogFilePath() {
+        return sessionLogFile.get().toString();
     }
 
-    public static void banner() {
-        val banner = PURPLE_300.use("""
+    public void banner() {
+        val banner = ctx().colors().PURPLE_300.use("""
              _____            __
             /  _  \\   _______/  |_____________
            /  /_\\  \\ /  ___/\\   __\\_  __ \\__  \\
@@ -67,30 +88,27 @@ public class AstraLogger {
         VERBOSE,
     }
 
+    @Accessors(fluent = true)
     public static class Mixin {
+        @Getter
         @Option(
             names = { "-v", "--verbose" },
             description = "Enable verbose logging output"
         )
-        public void setVerbose(boolean verbose) {
-            if (verbose) {
-                level = Level.VERBOSE;
-            } else {
-                level = Level.REGULAR;
-            }
-        }
+        private boolean verbose;
 
+        @Getter
         @Option(
             names = { "-q", "--quiet" },
             description = "Suppress informational output"
         )
-        public void setQuiet(boolean quiet) {
-            if (quiet) {
-                level = Level.QUIET;
-            } else {
-                level = Level.REGULAR;
-            }
-        }
+        private boolean quiet;
+
+        @Getter
+        private boolean shouldDumpLogs = false;
+
+        @Getter
+        private Optional<Path> dumpLogsTo = Optional.empty();
 
         @Option(
             names = { "--dump-logs" },
@@ -99,62 +117,60 @@ public class AstraLogger {
             paramLabel = "FILE",
             arity = "0..1"
         )
-        public void setDumpLogs(Optional<Path> dest) {
+        private void setDumpLogs(Optional<Path> dest) {
             dest.ifPresent((path) -> {
                 if (path.toString().equalsIgnoreCase("false")) {
                     shouldDumpLogs = false;
-                    return;
+                    dumpLogsTo = Optional.empty();
+                } else {
+                    shouldDumpLogs = true;
+
+                    if (path.toString().equalsIgnoreCase("__fallback__")) {
+                        dumpLogsTo = Optional.of(path);
+                    }
                 }
-
-                shouldDumpLogs = true;
-
-                if (path.toString().equalsIgnoreCase("__fallback__")) {
-                    sessionLogFile = path;
-                }
-
-                AstraLogger.info("Dumping logs to '", getLogFile().toString(), "' at the end of this command.");
             });
         }
 
         @Option(names = { "--no-dump-logs" }, hidden = true)
-        public void setDumpLogs(boolean noDumpLogs) {
+        private void setDumpLogs(boolean noDumpLogs) {
             if (noDumpLogs) {
                 shouldDumpLogs = false;
             }
         }
     }
 
-    public static void debug(String... msg) {
-        log(AstraColors.NEUTRAL_300.use("[DEBUG] ") + String.join("", msg), Level.VERBOSE, true);
+    public void debug(String... msg) {
+        log(ctx().colors().NEUTRAL_300.use("[DEBUG] ") + String.join("", msg), Level.VERBOSE, true);
     }
 
-    public static void info(String... msg) {
-        log(AstraColors.CYAN_600.use("[INFO] ") + String.join("", msg), Level.REGULAR, true);
+    public void info(String... msg) {
+        log(ctx().colors().CYAN_600.use("[INFO] ") + String.join("", msg), Level.REGULAR, true);
     }
 
-    public static void hint(String... msg) {
+    public void hint(String... msg) {
         log("@|green [HINT]|@ " + String.join("", msg), Level.REGULAR, true);
     }
 
-    public static void warn(String... msg) {
-        log(AstraColors.ORANGE_400.use("[WARNING] ") + String.join("", msg), Level.REGULAR, true);
+    public void warn(String... msg) {
+        log(ctx().colors().ORANGE_400.use("[WARNING] ") + String.join("", msg), Level.REGULAR, true);
     }
 
-    public static void started(String... msg) {
+    public void started(String... msg) {
         log("@|green [STARTED]|@ " + String.join("", msg), Level.VERBOSE, true);
     }
 
-    public static void done(String... msg) {
+    public void done(String... msg) {
         log("@|green [DONE]|@ " + String.join("", msg), Level.VERBOSE, true);
     }
 
-    public static <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
+    public <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
         started(initialMsg);
 
         boolean isFirstLoading = globalSpinner == null;
         
         if (isFirstLoading) {
-            globalSpinner = new LoadingSpinner(initialMsg);
+            globalSpinner = new LoadingSpinner(initialMsg, ctx());
             globalSpinner.start();
         } else {
             globalSpinner.pushMessage(initialMsg);
@@ -176,23 +192,23 @@ public class AstraLogger {
         }
     }
 
-    public static void exception(String... msg) {
-        log(AstraColors.RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE, true);
+    public void exception(String... msg) {
+        log(ctx().colors().RED_500.use("[ERROR] ") + String.join("", msg), Level.VERBOSE, true);
     }
 
-    public static <E extends Throwable> E exception(String msg, E e) {
+    public <E extends Throwable> E exception(String msg, E e) {
         exception(msg);
         return exception(e);
     }
 
-    public static <E extends Throwable> E exception(E e) {
+    public <E extends Throwable> E exception(E e) {
         val sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
         exception(sw.toString());
         return e;
     }
 
-    private static void log(String msg, Level minLevel, boolean appendToAccumulated) {
+    private void log(String msg, Level minLevel, boolean appendToAccumulated) {
         if (appendToAccumulated) {
             accumulated.add(msg);
         }
@@ -206,7 +222,7 @@ public class AstraLogger {
         }
 
         try {
-            AstraConsole.errorln(msg);
+            ctx().console().errorln(msg);
         } finally {
             if (globalSpinner != null) {
                 globalSpinner.resume();
@@ -214,29 +230,29 @@ public class AstraLogger {
         }
     }
 
-    private static boolean logsDumped = false;
+    private boolean logsDumped = false;
 
-    public static boolean shouldDumpLogs() {
+    public boolean shouldDumpLogs() {
         return shouldDumpLogs;
     }
 
-    public static void dumpLogsToFile() {
+    public void dumpLogsToFile() {
         if (logsDumped) {
             return;
         }
         logsDumped = true;
 
-        deleteOldLogs(AstraHome.Dirs.useLogs());
+        deleteOldLogs(ctx().home().Dirs.useLogs());
 
-        try (var writer = Files.newBufferedWriter(getLogFile())) {
+        try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
             for (String line : accumulated) {
-                writer.write(AstraColors.stripAnsi(AstraConsole.format(line)));
+                writer.write(AstraColors.stripAnsi(ctx().console().format(line)));
                 writer.write(System.lineSeparator());
             }
         } catch (Exception _) {}
     }
 
-    private static void deleteOldLogs(Path logsDir) {
+    private void deleteOldLogs(Path logsDir) {
         try {
             @Cleanup val logFiles = Files.list(logsDir);
 
@@ -253,9 +269,13 @@ public class AstraLogger {
                     try {
                         Files.delete(f);
                     } catch (Exception e) {
-                        AstraLogger.exception("Error deleting old log file '", f.toString(), "': ", e.getMessage());
+                        exception("Error deleting old log file '", f.toString(), "': ", e.getMessage());
                     }
                 });
         } catch (Exception _) {}
+    }
+    
+    private CliContext ctx() {
+        return ctxSupplier.get();
     }
 }

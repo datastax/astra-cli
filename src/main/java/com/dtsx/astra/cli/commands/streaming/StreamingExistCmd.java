@@ -9,7 +9,6 @@ import picocli.CommandLine.Command;
 
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.operations.streaming.StreamingExistOperation.StreamingExistRequest;
 
 @Command(
@@ -25,9 +24,9 @@ public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolea
     @Override
     protected final OutputHuman executeHuman(Supplier<Boolean> exists) {
         if (exists.get()) {
-            return OutputHuman.response("Tenant %s exists.".formatted(highlight($tenantName)));
+            return OutputHuman.response("Tenant %s exists.".formatted(ctx.highlight($tenantName)));
         } else {
-            return OutputHuman.response("Tenant %s does not exist.".formatted(highlight($tenantName)));
+            return OutputHuman.response("Tenant %s does not exist.".formatted(ctx.highlight($tenantName)));
         }
     }
 

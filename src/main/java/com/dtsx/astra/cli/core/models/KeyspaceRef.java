@@ -1,14 +1,15 @@
 package com.dtsx.astra.cli.core.models;
 
-import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class KeyspaceRef implements AstraColors.Highlightable {
+public class KeyspaceRef implements Highlightable {
     private final String name;
     private final DbRef dbRef;
 
@@ -35,8 +36,8 @@ public class KeyspaceRef implements AstraColors.Highlightable {
     }
 
     @Override
-    public String highlight() {
-        return AstraColors.highlight(name);
+    public String highlight(CliContext ctx) {
+        return ctx.highlight(name);
     }
 
     @Override

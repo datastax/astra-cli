@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.core.exceptions;
 
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.utils.StringUtils;
@@ -33,7 +32,7 @@ public class AstraCliException extends RuntimeException {
     }
 
     public AstraCliException(ExitCode code, String message, @Nullable SequencedMap<String, Object> metadata, @Nullable List<Hint> nextSteps) {
-        super(AstraConsole.format(StringUtils.trimIndent(message)));
+        super(StringUtils.trimIndent(message));
         this.nextSteps = nextSteps;
         this.metadata = metadata;
         this.code = code;

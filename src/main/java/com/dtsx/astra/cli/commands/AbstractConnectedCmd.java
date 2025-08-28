@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.highlight;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
@@ -92,14 +91,14 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             : ProfileName.DEFAULT;
 
         val config = ($credsProvider != null && $credsProvider.$config != null)
-            ? AstraConfig.readAstraConfigFile($credsProvider.$config.$configFile.orElse(null), false)
-            : AstraConfig.readAstraConfigFile(null, false);
+            ? AstraConfig.readAstraConfigFile(ctx, $credsProvider.$config.$configFile.orElse(null), false)
+            : AstraConfig.readAstraConfigFile(ctx, null, false);
 
         val profile = config.lookupProfile(profileName);
 
         if (profile.isEmpty()) {
             val filePath = config.backingFile();
-            val isDefaultConfigFile = filePath.equals(AstraConfig.resolveDefaultAstraConfigFile());
+            val isDefaultConfigFile = filePath.equals(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
             if (config.getValidatedProfiles().isEmpty()) {
                 val hints = (isDefaultConfigFile)
@@ -117,7 +116,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 
                   > Using configuration file at %s
                 """.formatted(
-                    highlight(filePath)
+                    ctx.highlight(filePath)
                 ), hints);
             }
 
@@ -127,7 +126,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
           
                   > Using configuration file at %s
                 """.formatted(
-                    highlight(filePath)
+                    ctx.highlight(filePath)
                 ), List.of(
                     new Hint("Set a profile as default:", "${cli.name} config use" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile())),
                     new Hint("Specify a profile to use:", originalArgs(), "--profile <name>")
@@ -139,7 +138,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                   > Using configuration file at %s
                 """.formatted(
                     profileName.unwrap(),
-                    highlight(filePath)
+                    ctx.highlight(filePath)
                 ), List.of(
                     new Hint("List available profiles:", "${cli.name} config list" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile()))
                 ));
@@ -153,6 +152,6 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        downloadsGateway = DownloadsGateway.mkDefault(profile().token(), profile().env());
+        downloadsGateway = DownloadsGateway.mkDefault(profile().token(), profile().env(), ctx);
     }
 }
