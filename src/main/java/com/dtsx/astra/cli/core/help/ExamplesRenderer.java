@@ -18,7 +18,7 @@ public class ExamplesRenderer {
     private final String SECTION_DETAILS_KEY = "examples";
 
     // loosely based on https://github.com/remkop/picocli/blob/main/picocli-examples/src/main/java/picocli/examples/customhelp/EnvironmentVariablesSection.java#L54
-    public void installRenderer(CommandLine cmd) {
+    public void installRenderer(CommandLine cmd, String[] args) {
         val examples = cmd.getCommandSpec().userObject().getClass().getAnnotationsByType(Example.class);
 
         if (examples.length == 0) {
@@ -30,16 +30,16 @@ public class ExamplesRenderer {
         });
 
         cmd.getHelpSectionMap().put(SECTION_DETAILS_KEY, (_) -> {
-            return renderExamples(examples);
+            return renderExamples(examples, args);
         });
 
         cmd.setHelpSectionKeys(insertSectionKeys(cmd.getHelpSectionKeys()));
     }
 
-    private static String renderExamples(Example[] examples) {
+    private String renderExamples(Example[] examples, String[] args) {
         val sb = new StringBuilder();
 
-        val colors = new AstraColors(Ansi.AUTO);
+        val colors = new AstraColors(resolveAnsi(args));
 
         for (val example : examples) {
             for (val comment : example.comment()) {
@@ -60,12 +60,36 @@ public class ExamplesRenderer {
         return sb.toString();
     }
 
-    private static List<String> insertSectionKeys(List<String> baseSectionKeys) {
+    private List<String> insertSectionKeys(List<String> baseSectionKeys) {
         val index = baseSectionKeys.indexOf(CommandLine.Model.UsageMessageSpec.SECTION_KEY_FOOTER_HEADING);
 
         return new ArrayList<>(baseSectionKeys) {{
             add(index, SECTION_HEADINGS_KEY);
             add(index + 1, SECTION_DETAILS_KEY);
         }};
+    }
+
+    // Because --[no-]color is an argument which is not parsed if we are just rendering help,
+    // we'll attempt to rudimentarily scan the args to see if color is disabled or not
+    private Ansi resolveAnsi(String[] args) {
+        for (val arg : args) {
+            if (arg.equals("--color")) {
+                return Ansi.ON;
+            }
+
+            if (arg.equals("--no-color")) {
+                return Ansi.OFF;
+            }
+
+            if (arg.startsWith("--color=")) {
+                val v = arg.substring("--color=".length());
+
+                return (v.equalsIgnoreCase("false"))
+                    ? Ansi.OFF
+                    : Ansi.ON;
+            }
+        }
+
+        return Ansi.AUTO;
     }
 }

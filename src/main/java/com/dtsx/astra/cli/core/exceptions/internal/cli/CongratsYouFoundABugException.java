@@ -28,11 +28,11 @@ public class CongratsYouFoundABugException extends AstraCliException {
           Thank you for your help in making Astra CLI better!
         """.formatted(
             error.replace("\n", "//"),
-            AstraCli.unsafeGlobalCliContext().log().useSessionLogFilePath()
+            AstraCli.unsafeGlobalCliContext().get().log().useSessionLogFilePath()
         ));
 
         if (cause != null) {
-            AstraCli.unsafeGlobalCliContext().log().exception(cause);
+            AstraCli.unsafeGlobalCliContext().get().log().exception(cause);
         }
     }
 

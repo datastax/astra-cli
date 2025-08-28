@@ -14,6 +14,7 @@ import com.dtsx.astra.cli.core.output.formats.*;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Mixin;
@@ -44,6 +45,21 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @Spec
     protected CommandSpec spec;
 
+    protected CliContext ctx;
+
+    public AbstractCmd() {
+        ctx = new CliContext(
+            CliEnvironment.isWindows(),
+            CliEnvironment.isTty(),
+            OutputType.HUMAN,
+            new AstraColors(Ansi.AUTO),
+            new AstraLogger(Level.REGULAR, () -> ctx, false, Optional.empty()),
+            new AstraConsole(() -> ctx, false),
+            new AstraHome(),
+            FileSystems.getDefault()
+        );
+    }
+
     @Mixin
     private AstraColors.Mixin csMixin;
 
@@ -55,8 +71,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     @Mixin
     private AstraConsole.Mixin consoleMixin;
-
-    protected CliContext ctx;
 
     protected OutputAll execute(Supplier<OpRes> _result) {
         val otherTypes = Arrays.stream(OutputType.values()).filter(o -> o != ctx.outputType()).map(o -> o.name().toLowerCase()).toList();
@@ -122,24 +136,21 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 ? Level.VERBOSE
                 : Level.REGULAR;
 
-        var ctx = new Object() {
-            CliContext ref = null;
-        };
-
-        ctx.ref = new CliContext(
+        ctx = new CliContext(
             CliEnvironment.isWindows(),
             CliEnvironment.isTty(),
             outputTypeMixin.requested(),
             new AstraColors(ansi),
-            new AstraLogger(level, () -> ctx.ref, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo()),
-            new AstraConsole(() -> ctx.ref, consoleMixin.noInput()),
+            new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo()),
+            new AstraConsole(() -> ctx, consoleMixin.noInput()),
             new AstraHome(),
             FileSystems.getDefault()
         );
 
-        run(ctx.ref);
+        run(ctx);
     }
 
+    @VisibleForTesting
     public final void run(CliContext ctx) {
         this.ctx = ctx;
 
