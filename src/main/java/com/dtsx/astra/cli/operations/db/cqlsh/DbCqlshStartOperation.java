@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -78,7 +77,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
                     commands.add(file.toString());
                 }
                 case ExecSource.Stdin _ -> {
-                    if (CliEnvironment.isTty()) {
+                    if (ctx.isTty()) {
                         ctx.log().info("Reading CQL statements from stdin...");
                         ctx.log().info("Use backslashes for multi-line statements");
                     }

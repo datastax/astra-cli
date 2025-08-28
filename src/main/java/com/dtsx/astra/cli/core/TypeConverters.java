@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core;
 
+import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.*;
@@ -46,7 +47,7 @@ public abstract class TypeConverters {
 
     private static class Misc {
         public static Either<String, ?> parsePath(String value) {
-            return Either.right(CliEnvironment.path(value));
+            return Either.right(AstraCli.unsafeGlobalCliContext().get().path(value));
         }
     }
 }

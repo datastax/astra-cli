@@ -26,6 +26,10 @@ public record CliContext(
     AstraHome home,
     FileSystem fs
 ) {
+    public Path path(String first, String... more) {
+        return fs.getPath(first, more);
+    }
+
     public boolean ansiEnabled() {
         return colors.ansi().enabled();
     }

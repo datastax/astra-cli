@@ -31,7 +31,7 @@ public class LoadingSpinner {
     
     public void start() {
         if (isRunning.compareAndSet(false, true)) {
-            if (CliEnvironment.isTty() && ctx.outputIsHuman()) {
+            if (ctx.isTty() && ctx.outputIsHuman()) {
                 spinnerThread = new Thread(this::runSpinner);
                 spinnerThread.start();
             }
@@ -80,7 +80,7 @@ public class LoadingSpinner {
     }
     
     public void pause() {
-        if (CliEnvironment.isTty() && ctx.outputIsHuman() && spinnerThread != null) {
+        if (ctx.isTty() && ctx.outputIsHuman() && spinnerThread != null) {
             pauseLatch = new CountDownLatch(1);
             isPaused.set(true);
             
@@ -93,7 +93,7 @@ public class LoadingSpinner {
     }
     
     public void resume() {
-        if (CliEnvironment.isTty() && ctx.outputIsHuman() && spinnerThread != null) {
+        if (ctx.isTty() && ctx.outputIsHuman() && spinnerThread != null) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
@@ -125,7 +125,7 @@ public class LoadingSpinner {
                 continue;
             }
             
-            if (ctx.logLevel() != Level.QUIET && CliEnvironment.isTty()) {
+            if (ctx.logLevel() != Level.QUIET && ctx.isTty()) {
                 val currentLine = ctx.colors().BLUE_300.use(SPINNER_FRAMES[frameIndex] + " ") + getCurrentMessage() + "...";
                 val clearLine = "\r" + " ".repeat(lastLineLength.get()) + "\r";
                 ctx.console().error(clearLine + currentLine);
@@ -144,7 +144,7 @@ public class LoadingSpinner {
     }
     
     private void clearLine() {
-        if (ctx.logLevel() != Level.QUIET && CliEnvironment.isTty()) {
+        if (ctx.logLevel() != Level.QUIET && ctx.isTty()) {
             val clearSpaces = Math.max(50, lastLineLength.get());
             ctx.console().error("\r" + " ".repeat(clearSpaces) + "\r");
         }

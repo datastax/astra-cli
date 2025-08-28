@@ -90,7 +90,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @Getter
     @Accessors(fluent = true)
-    private static Supplier<CliContext> unsafeGlobalCliContext;
+    private static Supplier<CliContext> unsafeGlobalCliContext; // should only be used in cases where it doesn't super matter if the context is wrong
 
     @SneakyThrows
     public static int run(String... args) {
@@ -122,7 +122,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
         val exitCode = cmd.execute(args);
 
-        if (cli.ctx != null && cli.ctx.log().shouldDumpLogs()) {
+        if (cli.ctx.log().shouldDumpLogs()) {
             cli.ctx.log().dumpLogsToFile();
         }
 

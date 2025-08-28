@@ -142,7 +142,7 @@ public class AstraConfig {
     }
 
     public static Path resolveDefaultAstraConfigFile(CliContext ctx) {
-        return CliProperties.defaultRcFile(ctx.isWindows());
+        return ctx.path(CliProperties.defaultRcFile(ctx.isWindows()));
     }
 
     public boolean profileExists(ProfileName profileName) {

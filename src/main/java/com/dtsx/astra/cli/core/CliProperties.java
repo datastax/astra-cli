@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
+import static com.dtsx.astra.cli.core.CliEnvironment.unsafeIsWindows;
 
 public class CliProperties implements IVersionProvider {
     static {
@@ -30,8 +30,8 @@ public class CliProperties implements IVersionProvider {
             }
         }
         cliName(); // load cli.name into system properties
-        defaultRcFile(isWindows());
-        defaultHomeFolder(isWindows());
+        defaultRcFile(unsafeIsWindows());
+        defaultHomeFolder(unsafeIsWindows());
     }
 
     public record ExternalSoftware(String url, String version) {}
@@ -60,9 +60,9 @@ public class CliProperties implements IVersionProvider {
         return ((useDotPrefix) ? "." : "") + prop("cli.home-folder-name");
     }
 
-    private static @Nullable Path cachedRcFile = null;
+    private static @Nullable String cachedRcFile = null;
 
-    public static Path defaultRcFile(boolean isWindows) {
+    public static String defaultRcFile(boolean isWindows) {
         if (cachedRcFile != null) {
             return cachedRcFile;
         }
@@ -71,27 +71,27 @@ public class CliProperties implements IVersionProvider {
 
         if (customPath != null) {
             System.setProperty("cli.rc-file-path", customPath);
-            cachedRcFile = CliEnvironment.path(customPath);
+            cachedRcFile = customPath;
         }
         else if (System.getenv("XDG_CONFIG_HOME") != null) { // TODO - should we do this?
             val path = File.separator + CliProperties.homeFolderName(false) + File.separator + CliProperties.rcFileName();
 
             System.setProperty("cli.rc-file-path", (isWindows ? "%XDG_CONFIG_HOME%" : "$XDG_CONFIG_HOME") + path);
-            cachedRcFile = CliEnvironment.path(System.getenv("XDG_CONFIG_HOME") + path);
+            cachedRcFile = System.getenv("XDG_CONFIG_HOME") + path;
         }
         else {
             val path = File.separator + CliProperties.rcFileName();
 
             System.setProperty("cli.rc-file-path", (isWindows ? "%USERPROFILE%" : "~") + path);
-            cachedRcFile = CliEnvironment.path(System.getProperty("user.home") + path);
+            cachedRcFile = System.getProperty("user.home") + path;
         }
 
         return cachedRcFile;
     }
 
-    private static @Nullable Path cachedHomeFolder = null;
+    private static @Nullable String cachedHomeFolder = null;
 
-    public static Path defaultHomeFolder(boolean isWindows) {
+    public static String defaultHomeFolder(boolean isWindows) {
         if (cachedHomeFolder != null) {
             return cachedHomeFolder;
         }
@@ -100,13 +100,13 @@ public class CliProperties implements IVersionProvider {
 
         if (customPath != null) {
             System.setProperty("cli.home-folder-path", customPath);
-            cachedHomeFolder = CliEnvironment.path(customPath);
+            cachedHomeFolder = customPath;
         }
         else if (System.getenv("XDG_DATA_HOME") != null) { // TODO - should we do this?
             val path = File.separator + CliProperties.homeFolderName(false);
 
             System.setProperty("cli.home-folder-path", (isWindows ? "%XDG_DATA_HOME%" : "XDG_DATA_HOME") + path);
-            cachedHomeFolder = CliEnvironment.path(System.getenv("XDG_DATA_HOME") + path);
+            cachedHomeFolder = System.getenv("XDG_DATA_HOME") + path;
         }
         else {
             val base = (isWindows)
@@ -116,7 +116,7 @@ public class CliProperties implements IVersionProvider {
             val path = File.separator + CliProperties.homeFolderName(true);
 
             System.setProperty("cli.home-folder-path", (isWindows ? "%LOCALAPPDATA%" : "~") + path);
-            cachedHomeFolder = CliEnvironment.path(base + path);
+            cachedHomeFolder = base + path;
         }
 
         return cachedHomeFolder;

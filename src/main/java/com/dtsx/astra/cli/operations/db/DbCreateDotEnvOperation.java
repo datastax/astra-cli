@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db;
 
-import com.dtsx.astra.cli.core.CliEnvironment;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -9,9 +9,9 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
+import com.dtsx.astra.cli.core.parsers.env.EnvParseException;
 import com.dtsx.astra.cli.core.parsers.env.ast.EnvComment;
 import com.dtsx.astra.cli.core.parsers.env.ast.EnvKVPair;
-import com.dtsx.astra.cli.core.parsers.env.EnvParseException;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
@@ -41,6 +41,7 @@ import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.EnvKey.*;
 
 @RequiredArgsConstructor
 public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
+    private final CliContext ctx;
     private final DbGateway dbGateway;
     private final OrgGateway orgGateway;
     private final DownloadsGateway downloadsGateway;
@@ -68,7 +69,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
     @Override
     public CreateDotEnvResult execute() {
-        val DEFAULT_ENV_FILE = CliEnvironment.path(".env");
+        val DEFAULT_ENV_FILE = ctx.path(".env");
 
         val source = resolveSourceContent(request.file(), request.print(), DEFAULT_ENV_FILE);
 

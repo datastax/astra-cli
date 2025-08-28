@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.operations;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
@@ -21,8 +20,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.dtsx.astra.cli.core.CliEnvironment.isWindows;
 
 @RequiredArgsConstructor
 public class NukeOperation implements Operation<NukeResult> {
@@ -125,9 +122,9 @@ public class NukeOperation implements Operation<NukeResult> {
         return res;
     }
 
-    private static @NotNull Nuked mkResult(Optional<Path> maybeBinaryFile, boolean processRunningFromInsideAstraHome, Path astraHome) {
+    private @NotNull Nuked mkResult(Optional<Path> maybeBinaryFile, boolean processRunningFromInsideAstraHome, Path astraHome) {
         val finalDeleteCmd = maybeBinaryFile.map((binaryFile) -> (
-            (!isWindows())
+            (!ctx.isWindows())
                 ? (processRunningFromInsideAstraHome)
                     ? "rm -rf " + astraHome
                     : "rm " + binaryFile
@@ -143,7 +140,7 @@ public class NukeOperation implements Operation<NukeResult> {
         val file = ProcessHandle.current()
             .info()
             .command()
-            .map(CliEnvironment::path);
+            .map(ctx::path);
 
         if (file.isEmpty() || !ImageInfo.inImageCode()) {
             return Optional.empty();
@@ -161,7 +158,7 @@ public class NukeOperation implements Operation<NukeResult> {
     }
 
     private Set<Pair<Path, String>> resolveRcFilesWithAutocomplete(String cliName) {
-        if (isWindows()) {
+        if (ctx.isWindows()) {
             return Set.of();
         }
 
@@ -171,7 +168,7 @@ public class NukeOperation implements Operation<NukeResult> {
         );
 
         return Stream.of(".bashrc", ".zshrc", ".profile", ".bash_profile", ".zprofile")
-            .map(name -> CliEnvironment.path(System.getProperty("user.home"), name))
+            .map(name -> ctx.path(System.getProperty("user.home"), name))
             .filter(Files::exists)
             .flatMap((f) -> {
                 return Either

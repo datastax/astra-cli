@@ -2,19 +2,20 @@ package com.dtsx.astra.cli.core.config;
 
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.utils.FileUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@RequiredArgsConstructor
 public class AstraHome {
-    private boolean isWindows;
-    
-    public final Path DIR = resolveDefaultAstraHomeFolder();
+    public final Path DIR;
+    public final Dirs Dirs ;
 
-    public final Dirs Dirs = new Dirs();
+    public AstraHome(FileSystem fs, boolean isWindows) {
+        DIR = resolveDefaultAstraHomeFolder(fs, isWindows);
+        Dirs = new Dirs();
+    }
 
     public class Dirs {
         private final Path SCB = DIR.resolve("scb");
@@ -73,7 +74,7 @@ public class AstraHome {
         return Files.exists(DIR);
     }
 
-    private Path resolveDefaultAstraHomeFolder() {
-        return CliProperties.defaultHomeFolder(isWindows);
+    private Path resolveDefaultAstraHomeFolder(FileSystem fs, boolean isWindows) {
+        return fs.getPath(CliProperties.defaultHomeFolder(isWindows));
     }
 }

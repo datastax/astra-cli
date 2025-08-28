@@ -48,14 +48,15 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     protected CliContext ctx;
 
     public AbstractCmd() {
+        // Emergency default context in case an error somehow thrown while the real context is being built
         ctx = new CliContext(
-            CliEnvironment.isWindows(),
-            CliEnvironment.isTty(),
+            CliEnvironment.unsafeIsWindows(),
+            CliEnvironment.unsafeIsTty(),
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
             new AstraLogger(Level.REGULAR, () -> ctx, false, Optional.empty()),
             new AstraConsole(() -> ctx, false),
-            new AstraHome(),
+            new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
             FileSystems.getDefault()
         );
     }
@@ -137,13 +138,13 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 : Level.REGULAR;
 
         ctx = new CliContext(
-            CliEnvironment.isWindows(),
-            CliEnvironment.isTty(),
+            CliEnvironment.unsafeIsWindows(),
+            CliEnvironment.unsafeIsTty(),
             outputTypeMixin.requested(),
             new AstraColors(ansi),
             new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo()),
             new AstraConsole(() -> ctx, consoleMixin.noInput()),
-            new AstraHome(),
+            new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
             FileSystems.getDefault()
         );
 
