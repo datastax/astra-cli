@@ -104,8 +104,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     protected Operation<SetupResult> mkOperation() {
         return new SetupOperation(
             ctx,
-            OrgGateway::mkDefault,
-            OrgGateway.Stateless.mkDefault(ctx),
+            ctx.gateways()::mkOrgGateway,
+            ctx.gateways().mkOrgGatewayStateless(ctx),
             new SetupRequest(
                 $token,
                 $env,

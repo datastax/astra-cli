@@ -21,6 +21,8 @@ import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.JansiUtils;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.gateways.GatewayProvider;
+import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -30,7 +32,10 @@ import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
+import picocli.CommandLine.IFactory;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 
@@ -85,20 +90,22 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     public static void main(String... args) {
-        exit(run(args));
+        exit(run(FileSystems.getDefault(), new GatewayProviderImpl(), args));
     }
 
     @Getter
     @Accessors(fluent = true)
-    private static Supplier<CliContext> unsafeGlobalCliContext; // should only be used in cases where it doesn't super matter if the context is wrong
+    private static Supplier<CliContext> unsafeGlobalCliContext;
 
     @SneakyThrows
-    public static int run(String... args) {
+    public static int run(FileSystem fs, GatewayProvider gateways, String... args) {
         @Cleanup val jansi = JansiUtils.installIfNecessary();
 
         val cli = new AstraCli();
-        val cmd = new CommandLine(cli);
+        val cmd = new CommandLine(cli, mkFactory(fs, gateways));
 
+        // should only be used in dire cases where it doesn't super matter if the context is wrong,
+        // or it won't affect testability
         unsafeGlobalCliContext = () -> cli.ctx;
 
         cmd
@@ -120,13 +127,24 @@ public class AstraCli extends AbstractCmd<Void> {
             return new Help(spec, cs);
         });
 
-        val exitCode = cmd.execute(args);
+        return cmd.execute(args);
+    }
 
-        if (cli.ctx.log().shouldDumpLogs()) {
-            cli.ctx.log().dumpLogsToFile();
-        }
+    private static IFactory mkFactory(FileSystem fs, GatewayProvider gateways) {
+        return new IFactory() {
+            private final IFactory defaultFactory = CommandLine.defaultFactory();
 
-        return exitCode;
+            @Override
+            public <K> K create(Class<K> cls) throws Exception {
+                val created = defaultFactory.create(cls);
+
+                if (created instanceof AbstractCmd<?> acmd) {
+                    acmd.initCtx(fs, gateways);
+                }
+
+                return created;
+            }
+        };
     }
 
     public static <T> T exit(int exitCode) {

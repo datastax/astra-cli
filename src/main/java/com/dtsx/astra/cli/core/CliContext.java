@@ -7,7 +7,9 @@ import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
+import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import lombok.With;
 import lombok.val;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.ColorScheme;
@@ -16,6 +18,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.UUID;
 
+@With
 public record CliContext(
     boolean isWindows,
     boolean isTty,
@@ -24,7 +27,8 @@ public record CliContext(
     AstraLogger log,
     AstraConsole console,
     AstraHome home,
-    FileSystem fs
+    FileSystem fs,
+    GatewayProvider gateways
 ) {
     public Path path(String first, String... more) {
         return fs.getPath(first, more);

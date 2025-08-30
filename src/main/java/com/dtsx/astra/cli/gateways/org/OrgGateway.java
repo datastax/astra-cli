@@ -11,16 +11,10 @@ import org.graalvm.collections.Pair;
 import java.util.Optional;
 
 public interface OrgGateway {
-    static OrgGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new OrgGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     Organization current();
 
     interface Stateless {
-        static OrgGateway.Stateless mkDefault(CliContext ctx) {
-            return new StatelessImpl(ctx);
-        }
 
         Optional<Pair<AstraEnvironment, Organization>> resolveOrganizationEnvironment(AstraToken token);
     }

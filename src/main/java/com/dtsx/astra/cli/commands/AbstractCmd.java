@@ -5,12 +5,14 @@ import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.*;
+import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -21,7 +23,8 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
 
-import java.nio.file.FileSystems;
+import java.io.PrintWriter;
+import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +50,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     protected CliContext ctx;
 
-    public AbstractCmd() {
+    public void initCtx(FileSystem fs, GatewayProvider gateways) {
         // Emergency default context in case an error somehow thrown while the real context is being built
         ctx = new CliContext(
             CliEnvironment.unsafeIsWindows(),
@@ -55,9 +58,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
             new AstraLogger(Level.REGULAR, () -> ctx, false, Optional.empty()),
-            new AstraConsole(() -> ctx, false),
-            new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
-            FileSystems.getDefault()
+            new AstraConsole(System.in, new PrintWriter(System.out), new PrintWriter(System.err), () -> ctx, false),
+            new AstraHome(fs, CliEnvironment.unsafeIsWindows()),
+            fs,
+            gateways
         );
     }
 
@@ -114,16 +118,12 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     protected abstract Operation<OpRes> mkOperation();
 
-    @MustBeInvokedByOverriders
-    protected void prelude() {
-        spec.commandLine().setColorScheme(ctx.colorScheme());
-    }
-
-    @MustBeInvokedByOverriders
-    protected void postlude() {}
-
     @Override
     public final void run() {
+        if (ctx == null) {
+            throw new CongratsYouFoundABugException("initCtx(...) was not called before run()");
+        }
+
         val ansi = csMixin.ansi().orElse(
             (outputTypeMixin.requested().isHuman())
                 ? Ansi.AUTO
@@ -138,14 +138,15 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 : Level.REGULAR;
 
         ctx = new CliContext(
-            CliEnvironment.unsafeIsWindows(),
-            CliEnvironment.unsafeIsTty(),
+            ctx.isWindows(),
+            ctx.isTty(),
             outputTypeMixin.requested(),
             new AstraColors(ansi),
             new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo()),
-            new AstraConsole(() -> ctx, consoleMixin.noInput()),
-            new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
-            FileSystems.getDefault()
+            new AstraConsole(System.in, spec.commandLine().getOut(), spec.commandLine().getErr(), () -> ctx, consoleMixin.noInput()),
+            ctx.home(),
+            ctx.fs(),
+            ctx.gateways()
         );
 
         run(ctx);
@@ -157,24 +158,36 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
         this.prelude();
         val result = evokeProperExecuteFunction(ctx);
-        this.postlude();
+        this.postlude(result);
+    }
 
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        spec.commandLine().setColorScheme(ctx.colorScheme());
+    }
+
+    @MustBeInvokedByOverriders
+    protected void postlude(String result) {
         if (!result.isEmpty()) {
             val formatted = ctx.console().format(result.stripTrailing());
             ctx.console().getOut().println(formatted);
         }
+
+        if (ctx.log().shouldDumpLogs()) {
+            ctx.log().dumpLogsToFile();
+        }
     }
 
     private String evokeProperExecuteFunction(CliContext ctx) {
-        val ref = new Object() {
-            Optional<OpRes> cachedResult = Optional.empty();
+        val cachedResult = new Object() {
+            Optional<OpRes> ref = Optional.empty();
         };
 
         final Supplier<OpRes> resultFn = () -> {
-            if (ref.cachedResult.isEmpty()) {
-                ref.cachedResult = Optional.of(mkOperation().execute());
+            if (cachedResult.ref.isEmpty()) {
+                cachedResult.ref = Optional.of(mkOperation().execute());
             }
-            return ref.cachedResult.get();
+            return cachedResult.ref.get();
         };
 
         try {

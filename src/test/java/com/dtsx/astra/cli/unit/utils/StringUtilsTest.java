@@ -1,11 +1,13 @@
 package com.dtsx.astra.cli.unit.utils;
 
 import com.dtsx.astra.cli.core.models.AstraToken;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.testlib.laws.Idempotent;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
 import net.jqwik.api.*;
 import org.graalvm.collections.Pair;
+import picocli.CommandLine.Help.Ansi;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -105,7 +107,7 @@ public class StringUtilsTest {
     class maskToken {
         @Property
         public void operation_defers_to_astra_token_class(@ForAll AstraToken token) {
-            val result = StringUtils.maskToken(token.unwrap());
+            val result = StringUtils.maskToken(new AstraColors(Ansi.OFF), token.unwrap());
             
             assertThat(result).isNotNull();
         }
@@ -114,9 +116,9 @@ public class StringUtilsTest {
         public void invalid_tokens_are_masked_as_invalid(@ForAll String invalidToken) {
             Assume.that(AstraToken.parse(invalidToken).isLeft());
 
-            val result = StringUtils.maskToken(invalidToken);
+            val result = StringUtils.maskToken(new AstraColors(Ansi.OFF), invalidToken);
 
-            assertThat(result).matches(".*<invalid_token\\('.*?'\\)>.*");
+            assertThat(result).matches("<invalid_token\\('.{0,4}'\\)>");
         }
     }
 

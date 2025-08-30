@@ -14,9 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TableGateway {
-    static TableGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new TableGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     Optional<TableDefinition> findOne(TableRef collRef);
 

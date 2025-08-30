@@ -12,9 +12,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface RoleGateway {
-    static RoleGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache, CliContext ctx) {
-        return new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx)), roleCompletionsCache);
-    }
 
     Stream<Role> findAll();
 

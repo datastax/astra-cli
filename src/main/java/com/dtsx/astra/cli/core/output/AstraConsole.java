@@ -18,28 +18,25 @@ import picocli.CommandLine.Option;
 
 import java.io.Console;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class AstraConsole {
+    @Getter
+    private final InputStream in;
+
+    @Getter
+    private final PrintWriter out;
+
+    @Getter
+    private final PrintWriter err;
+
     private final Supplier<CliContext> ctxSupplier;
     private final boolean noInput;
 
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
-
-    public InputStream getIn() {
-        return System.in;
-    }
-
-    public PrintStream getOut() {
-        return System.out;
-    }
-
-    public PrintStream getErr() {
-        return System.err;
-    }
 
     @Getter @Setter
     private @Nullable Console console = System.console();
@@ -117,12 +114,12 @@ public class AstraConsole {
         return sb.toString();
     }
 
-    private void write(PrintStream ps, Object... items) {
+    private void write(PrintWriter ps, Object... items) {
         ps.print(format(items));
         ps.flush();
     }
 
-    private void writeln(PrintStream ps, Object... items) {
+    private void writeln(PrintWriter ps, Object... items) {
         ps.println(format(items));
     }
 

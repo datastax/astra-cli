@@ -20,9 +20,6 @@ import java.util.SortedMap;
 import java.util.stream.Stream;
 
 public interface StreamingGateway {
-    static StreamingGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache, CliContext ctx) {
-        return new StreamingGatewayCompletionsCacheWrapper(new StreamingGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx)), tenantCompletionsCache);
-    }
 
     Tenant findOne(TenantName tenantName);
 

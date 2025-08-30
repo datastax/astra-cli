@@ -17,9 +17,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface UserGateway {
-    static UserGateway mkDefault(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx) {
-        return new UserGatewayCompletionsCacheWrapper(new UserGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx))), userCompletionsCache);
-    }
 
     User findOne(UserRef user);
 

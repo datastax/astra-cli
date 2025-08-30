@@ -11,6 +11,6 @@ public abstract class AbstractTableCmd<OpRes> extends AbstractKeyspaceSpecificCm
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        tableGateway = TableGateway.mkDefault(profile().token(), profile().env(), ctx);
+        tableGateway = ctx.gateways().mkTableGateway(profile().token(), profile().env(), ctx);
     }
 }

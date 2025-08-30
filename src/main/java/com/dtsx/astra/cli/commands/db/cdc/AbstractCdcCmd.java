@@ -11,6 +11,6 @@ public abstract class AbstractCdcCmd<OpRes> extends AbstractDbRequiredCmd<OpRes>
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        cdcGateway = CdcGateway.mkDefault(profile().token(), profile().env(), ctx);
+        cdcGateway = ctx.gateways().mkCdcGateway(profile().token(), profile().env(), ctx);
     }
 }

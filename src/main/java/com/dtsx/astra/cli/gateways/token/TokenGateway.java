@@ -15,9 +15,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface TokenGateway {
-    static TokenGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new TokenGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), RoleGateway.mkDefault(token, env, new RoleCompletionsCache(ctx), ctx));
-    }
 
     Stream<IamToken> findAll();
 

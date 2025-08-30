@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DownloadsGateway {
-    static DownloadsGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new DownloadsGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters);
 

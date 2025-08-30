@@ -11,9 +11,6 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import java.util.stream.Stream;
 
 public interface CdcGateway {
-    static CdcGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new CdcGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     Stream<CdcDefinition> findAll(DbRef dbRef);
 

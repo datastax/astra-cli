@@ -20,11 +20,11 @@ public class AuthenticationExceptionMapper implements ExternalExceptionMapper<Au
     public AstraCliException mapExceptionInternal(AuthenticationException ex, CommandLine commandLine, CommandLine.ParseResult fullParseResult, CliContext ctx) {
         val userObj = commandLine.getCommandSpec().userObject();
 
-        var profile = (userObj instanceof AbstractConnectedCmd<?> cmd)
+        val profile = (userObj instanceof AbstractConnectedCmd<?> cmd)
             ? cmd.profile()
             : null;
 
-        var tokenMsg =
+        val tokenMsg =
             (profile != null && profile.isArgsProvided())
                 ? "token provided via the command line" :
             (profile != null)

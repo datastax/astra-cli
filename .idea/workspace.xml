@@ -5,20 +5,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/GatewayProvider.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/GatewayProviderImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/BaseCmdSnapshotTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/DbGetCmdSnapshotTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/Fixtures.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/serialized-fixtures/Database.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbCreateDotEnv.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbCreateDotEnv.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractConnectedCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractConnectedCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCreateCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/AbstractDbCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/AbstractDbCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/AbstractCdcCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/AbstractCdcCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/AbstractCollectionCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/AbstractCollectionCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/AbstractKeyspaceCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/AbstractKeyspaceCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractDbRequiredRegionCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractDbRequiredRegionCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractPromptForDbRegionCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractPromptForDbRegionCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractRegionCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractRegionCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/AbstractTableCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/AbstractTableCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/org/AbstractOrgCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/org/AbstractOrgCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/role/AbstractRoleCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/role/AbstractRoleCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/AbstractStreamingCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/AbstractStreamingCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/AbstractTokenCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/AbstractTokenCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/AbstractUserCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/AbstractUserCmd.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/TypeConverters.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/TypeConverters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraHome.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/LoadingSpinner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/LoadingSpinner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbCreateDotEnvOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbCreateDotEnvOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/DbCqlshStartOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/DbCqlshStartOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/external/AuthenticationExceptionMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/external/AuthenticationExceptionMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraConsole.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/DbGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/DbGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/cdc/CdcGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/cdc/CdcGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/collection/CollectionGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/collection/CollectionGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/keyspace/KeyspaceGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/keyspace/KeyspaceGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/region/RegionGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/region/RegionGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/table/TableGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/table/TableGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/org/OrgGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/org/OrgGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/role/RoleGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/role/RoleGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/user/UserGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/user/UserGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbGetOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbGetOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/commands/AbstractCmdTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/commands/db/DbListImplTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/utils/StringUtilsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/utils/StringUtilsTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,8 +97,8 @@
         <option value="workflow" />
         <option value="AnnotationType" />
         <option value="JUnit5 Test Class" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -127,6 +158,7 @@
     &quot;Gradle.isPositiveInteger.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.isPositiveInteger.returns_false_for_non_int_strings.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.maskToken.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.output_without_key.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.parse.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.parse.returns_empty_for_empty_collection.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.removeQuotesIfAny.executor&quot;: &quot;Run&quot;,
@@ -233,7 +265,7 @@
       <recent name="com.dtsx.astra.cli.commands.db.dsbulk" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.NEListTest">
+  <component name="RunManager" selected="Gradle.StringUtilsTest">
     <configuration name="NEListTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -258,7 +290,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="bimap" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="StringUtilsTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -271,7 +303,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.unit.core.datatypes.EitherTest$bimap&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.unit.utils.StringUtilsTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -282,7 +314,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="bimap.bimap_maps_right" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="output_without_key" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -295,7 +327,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.unit.core.datatypes.EitherTest$bimap.bimap_maps_right&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.unit.commands.db.DbGetCmdTest$output_without_key&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -356,11 +388,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.StringUtilsTest" />
+        <item itemvalue="Gradle.output_without_key" />
         <item itemvalue="Gradle.NEListTest" />
         <item itemvalue="Gradle.parse.returns_empty_for_empty_collection" />
         <item itemvalue="Gradle.parse" />
-        <item itemvalue="Gradle.bimap" />
-        <item itemvalue="Gradle.bimap.bimap_maps_right" />
       </list>
     </recent_temporary>
   </component>
@@ -406,7 +438,7 @@
       <workItem from="1756056720126" duration="36667000" />
       <workItem from="1756144419133" duration="15703000" />
       <workItem from="1756165418194" duration="34942000" />
-      <workItem from="1756263328896" duration="48114000" />
+      <workItem from="1756263328896" duration="90086000" />
     </task>
     <servers />
   </component>

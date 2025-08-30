@@ -13,9 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface KeyspaceGateway {
-    static KeyspaceGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new KeyspaceGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     record FoundKeyspaces(
         @Nullable String defaultKeyspace,

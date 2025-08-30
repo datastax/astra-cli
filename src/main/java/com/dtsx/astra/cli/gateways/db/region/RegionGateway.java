@@ -16,9 +16,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 public interface RegionGateway {
-    static RegionGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new RegionGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     record RegionInfo(String displayName, boolean hasFreeTier, String zone, Object raw) {}
 

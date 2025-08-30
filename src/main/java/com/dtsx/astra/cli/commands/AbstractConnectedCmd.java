@@ -152,6 +152,6 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        downloadsGateway = DownloadsGateway.mkDefault(profile().token(), profile().env(), ctx);
+        downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
     }
 }

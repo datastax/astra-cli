@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CollectionGateway {
-    static CollectionGateway mkDefault(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new CollectionGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
-    }
 
     Optional<CollectionDefinition> findOne(CollectionRef collRef);
 
