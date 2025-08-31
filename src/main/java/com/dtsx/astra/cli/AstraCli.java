@@ -12,16 +12,21 @@ import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.TypeConverters;
+import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
 import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.help.ExamplesRenderer;
 import com.dtsx.astra.cli.core.output.AstraColors;
+import com.dtsx.astra.cli.core.output.AstraConsole;
+import com.dtsx.astra.cli.core.output.AstraLogger;
+import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.JansiUtils;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
-import com.dtsx.astra.cli.gateways.GatewayProvider;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.Cleanup;
@@ -32,10 +37,12 @@ import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
+import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IFactory;
 
-import java.nio.file.FileSystem;
+import java.io.PrintWriter;
 import java.nio.file.FileSystems;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 
@@ -90,7 +97,19 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     public static void main(String... args) {
-        exit(run(FileSystems.getDefault(), new GatewayProviderImpl(), args));
+        val defaultCtx = new CliContext(
+            CliEnvironment.unsafeIsWindows(),
+            CliEnvironment.unsafeIsTty(),
+            OutputType.HUMAN,
+            new AstraColors(Ansi.AUTO),
+            new AstraLogger(Level.REGULAR, unsafeGlobalCliContext, false, Optional.empty()),
+            new AstraConsole(System.in, new PrintWriter(System.out), new PrintWriter(System.err), unsafeGlobalCliContext, false),
+            new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
+            FileSystems.getDefault(),
+            new GatewayProviderImpl()
+        );
+
+        exit(run(defaultCtx, args));
     }
 
     @Getter
@@ -98,20 +117,16 @@ public class AstraCli extends AbstractCmd<Void> {
     private static Supplier<CliContext> unsafeGlobalCliContext;
 
     @SneakyThrows
-    public static int run(FileSystem fs, GatewayProvider gateways, String... args) {
+    public static int run(CliContext ctx, String... args) {
         @Cleanup val jansi = JansiUtils.installIfNecessary();
 
         val cli = new AstraCli();
-        val cmd = new CommandLine(cli, mkFactory(fs, gateways));
-
-        // should only be used in dire cases where it doesn't super matter if the context is wrong,
-        // or it won't affect testability
-        unsafeGlobalCliContext = () -> cli.ctx;
+        val cmd = new CommandLine(cli, mkFactory(ctx));
 
         cmd
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
-            .setExecutionExceptionHandler(new ExecutionExceptionHandler(() -> cli.ctx))
-            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler(), () -> cli.ctx))
+            .setExecutionExceptionHandler(new ExecutionExceptionHandler(unsafeGlobalCliContext))
+            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler(), unsafeGlobalCliContext))
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
@@ -130,7 +145,7 @@ public class AstraCli extends AbstractCmd<Void> {
         return cmd.execute(args);
     }
 
-    private static IFactory mkFactory(FileSystem fs, GatewayProvider gateways) {
+    private static IFactory mkFactory(CliContext ctx) {
         return new IFactory() {
             private final IFactory defaultFactory = CommandLine.defaultFactory();
 
@@ -139,7 +154,12 @@ public class AstraCli extends AbstractCmd<Void> {
                 val created = defaultFactory.create(cls);
 
                 if (created instanceof AbstractCmd<?> acmd) {
-                    acmd.initCtx(fs, gateways);
+                    // should only be used in dire cases where it doesn't super matter if the context is wrong,
+                    // or it won't affect testability.
+                    //
+                    // ok to use here since it's used for circular referencing only, and we set it right away.
+                    unsafeGlobalCliContext = acmd::getCtx;
+                    acmd.initCtx(ctx);
                 }
 
                 return created;

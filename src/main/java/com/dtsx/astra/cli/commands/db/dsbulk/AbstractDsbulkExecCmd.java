@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.WindowsUnsupportedException;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkInstallFailed;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.Executed;
@@ -18,11 +19,14 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 
 public abstract class AbstractDsbulkExecCmd extends AbstractDbCmd<DsbulkExecResult> {
+    protected DownloadsGateway downloadsGateway;
+
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
         WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
+        downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
     }
 
     @Override

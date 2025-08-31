@@ -1,9 +1,7 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.CliProperties;
-import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.AstraColors;
@@ -12,8 +10,8 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.*;
-import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.cli.operations.Operation;
+import lombok.Getter;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -23,8 +21,6 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
 
-import java.io.PrintWriter;
-import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,21 +44,12 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @Spec
     protected CommandSpec spec;
 
+    @Getter
     protected CliContext ctx;
 
-    public void initCtx(FileSystem fs, GatewayProvider gateways) {
+    public void initCtx(CliContext ctx) {
         // Emergency default context in case an error somehow thrown while the real context is being built
-        ctx = new CliContext(
-            CliEnvironment.unsafeIsWindows(),
-            CliEnvironment.unsafeIsTty(),
-            OutputType.HUMAN,
-            new AstraColors(Ansi.AUTO),
-            new AstraLogger(Level.REGULAR, () -> ctx, false, Optional.empty()),
-            new AstraConsole(System.in, new PrintWriter(System.out), new PrintWriter(System.err), () -> ctx, false),
-            new AstraHome(fs, CliEnvironment.unsafeIsWindows()),
-            fs,
-            gateways
-        );
+        this.ctx = ctx;
     }
 
     @Mixin
@@ -126,7 +113,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
         val ansi = csMixin.ansi().orElse(
             (outputTypeMixin.requested().isHuman())
-                ? Ansi.AUTO
+                ? ctx.colors().ansi()
                 : Ansi.OFF
         );
 
@@ -135,7 +122,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 ? Level.QUIET
             : (loggerMixin.verbose())
                 ? Level.VERBOSE
-                : Level.REGULAR;
+                : ctx.logLevel();
 
         ctx = new CliContext(
             ctx.isWindows(),
@@ -143,7 +130,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             outputTypeMixin.requested(),
             new AstraColors(ansi),
             new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo()),
-            new AstraConsole(System.in, spec.commandLine().getOut(), spec.commandLine().getErr(), () -> ctx, consoleMixin.noInput()),
+            new AstraConsole(ctx.console().getIn(), ctx.console().getOut(), ctx.console().getErr(), () -> ctx, consoleMixin.noInput()),
             ctx.home(),
             ctx.fs(),
             ctx.gateways()

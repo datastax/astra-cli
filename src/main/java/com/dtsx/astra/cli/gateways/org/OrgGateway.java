@@ -1,21 +1,17 @@
 package com.dtsx.astra.cli.gateways.org;
 
-import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.org.OrgGatewayImpl.StatelessImpl;
+import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import org.graalvm.collections.Pair;
 
 import java.util.Optional;
 
-public interface OrgGateway {
-
+public interface OrgGateway extends SomeGateway {
     Organization current();
 
-    interface Stateless {
-
+    interface Stateless extends SomeGateway {
         Optional<Pair<AstraEnvironment, Organization>> resolveOrganizationEnvironment(AstraToken token);
     }
 }

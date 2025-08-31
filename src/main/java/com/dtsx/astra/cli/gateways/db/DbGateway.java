@@ -3,8 +3,10 @@ package com.dtsx.astra.cli.gateways.db;
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -14,12 +16,14 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public interface DbGateway {
-    Database findOne(DbRef ref);
-
+public interface DbGateway extends SomeGateway {
     Stream<Database> findAll();
 
     Optional<Database> tryFindOne(DbRef ref);
+
+    default Database findOne(DbRef ref) {
+        return tryFindOne(ref).orElseThrow(() -> new DbNotFoundException(ref));
+    }
 
     boolean exists(DbRef ref);
 

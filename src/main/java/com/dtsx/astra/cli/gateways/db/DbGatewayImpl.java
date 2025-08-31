@@ -54,19 +54,10 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public Database findOne(DbRef ref) {
-        return ctx.log().loading("Fetching info for database " + ctx.highlight(ref), (_) ->
-            api.dbOpsClient(ref).find().orElseThrow(() -> new DbNotFoundException(ref))
-        );
-    }
-
-    @Override
     public Optional<Database> tryFindOne(DbRef ref) {
-        try {
-            return Optional.of(findOne(ref));
-        } catch (DbNotFoundException e) {
-            return Optional.empty();
-        }
+        return ctx.log().loading("Fetching info for database " + ctx.highlight(ref), (_) ->
+            api.dbOpsClient(ref).find()
+        );
     }
 
     @Override

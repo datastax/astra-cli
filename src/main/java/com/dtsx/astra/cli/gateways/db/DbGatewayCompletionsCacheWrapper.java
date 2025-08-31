@@ -32,13 +32,6 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public Database findOne(DbRef ref) {
-        val db = delegate.findOne(ref);
-        cache.addToCache(db.getInfo().getName());
-        return db;
-    }
-
-    @Override
     public Optional<Database> tryFindOne(DbRef ref) {
         val res = delegate.tryFindOne(ref);
 

@@ -46,7 +46,7 @@ public class DbCqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
 
     @Override
     protected Operation<CqlPathResponse> mkOperation() {
-        return new DbCqlshPathOperation(downloadsGateway, !$ifExists);
+        return new DbCqlshPathOperation(ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx), !$ifExists);
     }
 
     @Override

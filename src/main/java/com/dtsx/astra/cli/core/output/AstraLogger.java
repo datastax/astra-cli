@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.config.AstraHome;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
@@ -30,7 +32,12 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class AstraLogger {
     @Getter
     private final Level level;
-    private final Supplier<CliContext> ctxSupplier;
+
+    public record SubCliContext(
+        AstraColors colors,
+        AstraHome home,
+        OutputType outputType
+    ) {}
 
     private final boolean shouldDumpLogs;
     private final Supplier<Path> sessionLogFile;
@@ -39,9 +46,9 @@ public class AstraLogger {
 
     private LoadingSpinner globalSpinner;
 
-    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo) {
+    public AstraLogger(Level level, SubCliContext ctx, boolean shouldDumpLogs, Optional<Path> dumpLogsTo) {
         this.level = level;
-        this.ctxSupplier = ctxSupplier;
+        this.ctx = ctx;
         this.shouldDumpLogs = shouldDumpLogs;
 
         if (dumpLogsTo.isPresent()) {
@@ -274,7 +281,7 @@ public class AstraLogger {
                 });
         } catch (Exception _) {}
     }
-    
+
     private CliContext ctx() {
         return ctxSupplier.get();
     }

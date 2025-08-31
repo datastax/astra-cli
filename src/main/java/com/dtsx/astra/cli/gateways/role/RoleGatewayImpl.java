@@ -22,15 +22,10 @@ public class RoleGatewayImpl implements RoleGateway {
     }
 
     @Override
-    public Optional<Role> tryFindOne(RoleRef role) {
-        return ctx.log().loading("Looking up role " + ctx.highlight(role), (_) -> role.fold(
+    public Optional<Role> tryFindOne(RoleRef ref) {
+        return ctx.log().loading("Looking up role " + ctx.highlight(ref), (_) -> ref.fold(
             id -> apiProvider.astraOpsClient().roles().find(id.toString()),
             name -> apiProvider.astraOpsClient().roles().findByName(StringUtils.removeQuotesIfAny(name))
         ));
-    }
-
-    @Override
-    public Role findOne(RoleRef role) {
-        return tryFindOne(role).orElseThrow(() -> new RoleNotFoundException(role));
     }
 }

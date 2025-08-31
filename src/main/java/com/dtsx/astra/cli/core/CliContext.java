@@ -30,6 +30,20 @@ public record CliContext(
     FileSystem fs,
     GatewayProvider gateways
 ) {
+    public static CliContext mk(
+        boolean isWindows,
+        boolean isTty,
+        OutputType outputType,
+        AstraColors colors,
+        AstraLogger log,
+        AstraConsole console,
+        AstraHome home,
+        FileSystem fs,
+        GatewayProvider gateways
+    ) {
+
+    }
+
     public Path path(String first, String... more) {
         return fs.getPath(first, more);
     }

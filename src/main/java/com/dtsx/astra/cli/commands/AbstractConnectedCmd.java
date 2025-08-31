@@ -75,8 +75,6 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
     private @Nullable Profile cachedProfile;
 
-    protected DownloadsGateway downloadsGateway;
-
     public final Profile profile() {
         if (cachedProfile != null) {
             return cachedProfile;
@@ -152,6 +150,5 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
     }
 }

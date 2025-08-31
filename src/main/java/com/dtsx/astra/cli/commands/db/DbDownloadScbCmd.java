@@ -56,7 +56,13 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
 
     @Override
     protected DbDownloadScbOperation mkOperation() {
-        return new DbDownloadScbOperation(dbGateway, downloadsGateway, new DbDownloadScbRequest($dbRef, $region, $destination));
+        val downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
+
+        return new DbDownloadScbOperation(dbGateway, downloadsGateway, new DbDownloadScbRequest(
+            $dbRef,
+            $region,
+            $destination
+        ));
     }
 
     @Override

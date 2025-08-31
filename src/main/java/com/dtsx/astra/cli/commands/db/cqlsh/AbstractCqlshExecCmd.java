@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.misc.WindowsUnsupportedExcept
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.*;
 import lombok.val;
@@ -44,6 +45,8 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     )
     public int $connectTimeout;
 
+    protected DownloadsGateway downloadsGateway;
+
     protected abstract boolean captureOutputForNonHumanOutput();
 
     protected abstract Operation<CqlshExecResult> mkOperation(boolean captureOutput);
@@ -53,6 +56,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     protected void prelude() {
         WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
+        downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
     }
 
     @Override

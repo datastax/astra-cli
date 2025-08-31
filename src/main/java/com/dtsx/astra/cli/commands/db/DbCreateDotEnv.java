@@ -190,6 +190,8 @@ public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
             Function.identity()
         ));
 
+        val downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
+
         return new DbCreateDotEnvOperation(ctx, dbGateway, orgGateway, downloadsGateway, new CreateDotEnvRequest(
             profile(),
             $dbRef,

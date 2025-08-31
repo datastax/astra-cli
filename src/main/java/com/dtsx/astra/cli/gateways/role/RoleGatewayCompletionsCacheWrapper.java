@@ -24,23 +24,16 @@ public class RoleGatewayCompletionsCacheWrapper implements RoleGateway {
     }
 
     @Override
-    public Optional<Role> tryFindOne(RoleRef role) {
-        val res = delegate.tryFindOne(role);
+    public Optional<Role> tryFindOne(RoleRef ref) {
+        val res = delegate.tryFindOne(ref);
 
         if (res.isPresent()) {
             cache.addToCache(res.get().getName());
         } else {
-            removeRefFromCache(role);
+            removeRefFromCache(ref);
         }
 
         return res;
-    }
-
-    @Override
-    public Role findOne(RoleRef role) {
-        val foundRole = delegate.findOne(role);
-        cache.addToCache(foundRole.getName());
-        return foundRole;
     }
 
     private void removeRefFromCache(RoleRef ref) {
