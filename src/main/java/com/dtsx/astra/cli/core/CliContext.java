@@ -2,10 +2,10 @@ package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.dtsx.astra.cli.core.output.Highlightable;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
+import com.dtsx.astra.cli.core.output.Highlightable;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -30,20 +30,6 @@ public record CliContext(
     FileSystem fs,
     GatewayProvider gateways
 ) {
-    public static CliContext mk(
-        boolean isWindows,
-        boolean isTty,
-        OutputType outputType,
-        AstraColors colors,
-        AstraLogger log,
-        AstraConsole console,
-        AstraHome home,
-        FileSystem fs,
-        GatewayProvider gateways
-    ) {
-
-    }
-
     public Path path(String first, String... more) {
         return fs.getPath(first, more);
     }

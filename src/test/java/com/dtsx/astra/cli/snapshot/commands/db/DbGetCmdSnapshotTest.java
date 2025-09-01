@@ -12,26 +12,20 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 public class DbGetCmdSnapshotTest extends BaseCmdSnapshotTest {
+    private final SnapshotTestOptionsModifier foundDbOpts = (b) -> b.gateway(new DbGatewayStub() {
+        @Override
+        public Optional<Database> tryFindOne(DbRef ref) {
+            return Optional.of(Fixtures.Database);
+        }
+    });
+
     @Nested
     public class human {
         @Test
         public void gets_full_information_about_a_database() {
-//            AstraCli.run(null, "db", "get", "my_db");
+            val output = run("db get hi", foundDbOpts);
 
-            val output = run("db get ");
-
-            System.out.println(output);
+            System.out.println(output.toSnapshot());
         }
-    }
-
-    @Override
-    protected SnapshotTestOptionsBuilder mkDefaultOptions() {
-        return super.mkDefaultOptions()
-            .gateway(new DbGatewayStub() {
-                @Override
-                public Optional<Database> tryFindOne(DbRef ref) {
-                    return Optional.of(Fixtures.Database);
-                }
-            });
     }
 }

@@ -15,6 +15,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraHome;
+import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
 import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
@@ -34,18 +35,19 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IFactory;
 
-import java.io.PrintWriter;
 import java.nio.file.FileSystems;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 
+import static com.dtsx.astra.cli.utils.MiscUtils.mkPrintWriter;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
@@ -97,19 +99,19 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     public static void main(String... args) {
-        val defaultCtx = new CliContext(
+        val ctxRef = new Ref<CliContext>((getCtx) -> new CliContext(
             CliEnvironment.unsafeIsWindows(),
             CliEnvironment.unsafeIsTty(),
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
-            new AstraLogger(Level.REGULAR, unsafeGlobalCliContext, false, Optional.empty()),
-            new AstraConsole(System.in, new PrintWriter(System.out), new PrintWriter(System.err), unsafeGlobalCliContext, false),
+            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty()),
+            new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), getCtx, false),
             new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
             FileSystems.getDefault(),
             new GatewayProviderImpl()
-        );
+        ));
 
-        exit(run(defaultCtx, args));
+        exit(run(ctxRef, args));
     }
 
     @Getter
@@ -117,11 +119,16 @@ public class AstraCli extends AbstractCmd<Void> {
     private static Supplier<CliContext> unsafeGlobalCliContext;
 
     @SneakyThrows
-    public static int run(CliContext ctx, String... args) {
+    @VisibleForTesting
+    public static int run(Ref<CliContext> ctxRef, String... args) {
         @Cleanup val jansi = JansiUtils.installIfNecessary();
 
         val cli = new AstraCli();
-        val cmd = new CommandLine(cli, mkFactory(ctx));
+        val cmd = new CommandLine(cli, mkFactory(ctxRef));
+
+        // should only be used in dire cases where it doesn't super matter if the context is wrong,
+        // and it won't affect testability.
+        unsafeGlobalCliContext = ctxRef::unwrap;
 
         cmd
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
@@ -129,6 +136,11 @@ public class AstraCli extends AbstractCmd<Void> {
             .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler(), unsafeGlobalCliContext))
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
+
+        ctxRef.onUpdate((ctx) -> {
+            cmd.setOut(ctx.console().getOut());
+            cmd.setErr(ctx.console().getErr());
+        });
 
         cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
 
@@ -145,7 +157,7 @@ public class AstraCli extends AbstractCmd<Void> {
         return cmd.execute(args);
     }
 
-    private static IFactory mkFactory(CliContext ctx) {
+    private static IFactory mkFactory(Ref<CliContext> ctxRef) {
         return new IFactory() {
             private final IFactory defaultFactory = CommandLine.defaultFactory();
 
@@ -154,12 +166,7 @@ public class AstraCli extends AbstractCmd<Void> {
                 val created = defaultFactory.create(cls);
 
                 if (created instanceof AbstractCmd<?> acmd) {
-                    // should only be used in dire cases where it doesn't super matter if the context is wrong,
-                    // or it won't affect testability.
-                    //
-                    // ok to use here since it's used for circular referencing only, and we set it right away.
-                    unsafeGlobalCliContext = acmd::getCtx;
-                    acmd.initCtx(ctx);
+                    acmd.initCtx(ctxRef);
                 }
 
                 return created;

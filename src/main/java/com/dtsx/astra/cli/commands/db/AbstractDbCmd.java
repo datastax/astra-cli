@@ -8,13 +8,11 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 public abstract class AbstractDbCmd<OpRes> extends AbstractConnectedCmd<OpRes> {
     protected DbGateway dbGateway;
-    protected OrgGateway orgGateway;
 
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
         dbGateway = ctx.gateways().mkDbGateway(profile().token(), profile().env(), new DbCompletionsCache(ctx, profile().name()), ctx);
-        orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env(), ctx);
     }
 }

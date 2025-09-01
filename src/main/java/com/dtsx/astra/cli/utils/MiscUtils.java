@@ -2,7 +2,14 @@ package com.dtsx.astra.cli.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -36,5 +43,22 @@ public class MiscUtils {
             r.accept(t1, t2);
             return null;
         };
+    }
+
+    // Shamelessly copied from PicoCLI's CommandLine class
+    public static PrintWriter mkPrintWriter(OutputStream stream, @MagicConstant(stringValues = { "stdout", "stderr" }) String name) {
+        return new PrintWriter(new BufferedWriter(new OutputStreamWriter(stream, charsetForName(System.getProperty("sun." + name + ".encoding")))), true);
+    }
+
+    // Shamelessly copied from PicoCLI's CommandLine class
+    private static Charset charsetForName(@Nullable String encoding) {
+        if (encoding != null) {
+            try {
+                return Charset.forName(("cp65001".equalsIgnoreCase(encoding)) ? "UTF-8" : encoding);
+            } catch (Exception e) {
+                return Charset.defaultCharset();
+            }
+        }
+        return Charset.defaultCharset();
     }
 }

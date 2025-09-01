@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.AstraColors;
@@ -11,7 +12,6 @@ import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.*;
 import com.dtsx.astra.cli.operations.Operation;
-import lombok.Getter;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -44,12 +44,13 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @Spec
     protected CommandSpec spec;
 
-    @Getter
     protected CliContext ctx;
+    private Ref<CliContext> ctxRef;
 
-    public void initCtx(CliContext ctx) {
-        // Emergency default context in case an error somehow thrown while the real context is being built
-        this.ctx = ctx;
+    public void initCtx(Ref<CliContext> ctxRef) {
+        this.ctxRef = ctxRef;
+        this.ctx = ctxRef.unwrap();
+        ctxRef.onUpdate((ctx) -> this.ctx = ctx);
     }
 
     @Mixin
@@ -124,7 +125,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 ? Level.VERBOSE
                 : ctx.logLevel();
 
-        ctx = new CliContext(
+        run(new CliContext(
             ctx.isWindows(),
             ctx.isTty(),
             outputTypeMixin.requested(),
@@ -134,15 +135,12 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.home(),
             ctx.fs(),
             ctx.gateways()
-        );
-
-        run(ctx);
+        ));
     }
 
     @VisibleForTesting
     public final void run(CliContext ctx) {
-        this.ctx = ctx;
-
+        ctxRef.set(ctx);
         this.prelude();
         val result = evokeProperExecuteFunction(ctx);
         this.postlude(result);
