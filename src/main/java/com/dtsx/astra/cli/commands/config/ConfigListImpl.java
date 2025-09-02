@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     description = "Lists your Astra CLI profiles (configurations), highlighting the one currently in use. Multiple profiles may be highlighted if they share the same credentials."
@@ -21,7 +22,7 @@ public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult>
     @Override
     public final OutputHuman executeHuman(Supplier<ListConfigResult> result) {
         val cells = result.get().profiles().stream()
-            .map((p) -> Map.of(
+            .map((p) -> sequencedMapOf(
                 "configuration", mkConfigDisplayName(p.name(), p.isInUse()),
                 "env", p.env().name()
             ))
@@ -42,10 +43,10 @@ public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult>
     @Override
     public final OutputAll executeJson(Supplier<ListConfigResult> result) {
         val cells = result.get().profiles().stream()
-            .map((p) -> Map.of(
+            .map((p) -> sequencedMapOf(
                 "name", p.name(),
                 "env", p.env().name(),
-                "token", p.token().unwrap(),
+                "token", p.token().unsafeUnwrap(),
                 "isUsedAsDefault", p.isInUse()
             ))
             .toList();

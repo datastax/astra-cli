@@ -9,11 +9,12 @@ import com.dtsx.astra.cli.operations.db.cdc.CdcListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.*;
+import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.CdcInfo;
+import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.CdcListRequest;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-cdcs",
@@ -32,7 +33,7 @@ public class CdcListCmd extends AbstractCdcCmd<Stream<CdcInfo>> {
     @Override
     public final OutputAll execute(Supplier<Stream<CdcInfo>> result) {
         val data = result.get()
-            .map((cdc) -> Map.of(
+            .map((cdc) -> sequencedMapOf(
                 "ID", cdc.id(),
                 "Keyspace", cdc.keyspace(),
                 "Table", cdc.table(),

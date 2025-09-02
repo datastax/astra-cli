@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
 @Command(
     name = "list-regions",
     description = "List all available regions for Astra streaming tenants"
@@ -56,7 +58,7 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
     @Override
     protected final OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
-            .map((r) -> Map.of(
+            .map((r) -> sequencedMapOf(
                 "cloudProvider", r.cloudProvider(),
                 "region", r.regionName(),
                 "displayName", r.displayName(),
@@ -70,7 +72,7 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
     @Override
     protected final OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
-            .map((r) -> Map.of(
+            .map((r) -> sequencedMapOf(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.isPremium()),
                 "Region", r.regionName(),
                 "Display Name", r.displayName()

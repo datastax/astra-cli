@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
 import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
-import com.dtsx.astra.cli.testlib.Fixtures;
+import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -15,18 +15,18 @@ import static org.mockito.Mockito.when;
 public class DbGetCmdSnapshotTest extends BaseCmdSnapshotTest {
     private final SnapshotTestOptionsModifier foundDbOpts = (o) -> o
         .gateway(DbGateway.class, (mock) -> {
-            when(mock.findOne(any())).thenReturn(Fixtures.Database);
+            when(mock.findOne(any())).thenReturn(Databases.One);
         })
         .verify((mocks) -> {
-            verify(mocks.dbGateway()).findOne(Fixtures.DatabaseName);
+            verify(mocks.dbGateway()).findOne(Databases.NameRef);
         });
 
     private final SnapshotTestOptionsModifier notFoundDbOpts = (o) -> o
         .gateway(DbGateway.class, (mock) -> {
-            when(mock.findOne(any())).thenThrow(new DbNotFoundException(DbRef.fromNameUnsafe("*whatever*")));
+            when(mock.findOne(any())).thenThrow(new DbNotFoundException(DbRef.fromNameUnsafe("*nonexistent*")));
         })
         .verify((mocks) -> {
-            verify(mocks.dbGateway()).findOne(DbRef.fromNameUnsafe("*whatever*"));
+            verify(mocks.dbGateway()).findOne(DbRef.fromNameUnsafe("*nonexistent*"));
         });
 
     @TestForAllOutputs
@@ -36,11 +36,11 @@ public class DbGetCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void db_partial_info(OutputType outputType) {
-        verifyRun("db get ${DatabaseName} --key keyspaces", outputType, foundDbOpts);
+        verifyRun("db get ${DatabaseName} --key regions", outputType, foundDbOpts);
     }
 
     @TestForAllOutputs
     public void db_not_found(OutputType outputType) {
-        verifyRun("db get *whatever*", outputType, notFoundDbOpts);
+        verifyRun("db get *nonexistent*", outputType, notFoundDbOpts);
     }
 }

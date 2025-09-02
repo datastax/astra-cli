@@ -5,14 +5,14 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 @RequiredArgsConstructor
-public class CloudsListOperation implements Operation<Set<CloudProviderType>> {
+public class CloudsListOperation implements Operation<SortedSet<CloudProviderType>> {
     private final RegionGateway regionGateway;
 
     @Override
-    public Set<CloudProviderType> execute() {
+    public SortedSet<CloudProviderType> execute() {
         return regionGateway.findAvailableClouds();
     }
 }

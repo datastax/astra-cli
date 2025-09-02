@@ -5,10 +5,12 @@ import lombok.val;
 
 import java.util.*;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
 public record ShellTable(List<? extends Map<String, ?>> raw) {
     public static RenderableShellTable forAttributes(LinkedHashMap<String, Object> attributes) {
         val rows = attributes.entrySet().stream()
-            .map(entry -> Map.of("Attribute", entry.getKey(), "Value", entry.getValue()))
+            .map(entry -> sequencedMapOf("Attribute", entry.getKey(), "Value", entry.getValue()))
             .toList();
 
         return new RenderableShellTable(rows, Arrays.asList("Attribute", "Value"));

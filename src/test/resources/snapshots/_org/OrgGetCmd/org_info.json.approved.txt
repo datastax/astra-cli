@@ -1,0 +1,12 @@
+---- meta ----
+command: astra org -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "id" : "123e4567-e89b-12d3-a456-426614174000",
+stdout:     "name" : "firstname.lastname@email.tld"
+stdout:   }
+stdout: }
+---- end ----

@@ -107,7 +107,7 @@ public class StringUtilsTest {
     class maskToken {
         @Property
         public void operation_defers_to_astra_token_class(@ForAll AstraToken token) {
-            val result = StringUtils.maskToken(new AstraColors(Ansi.OFF), token.unwrap());
+            val result = StringUtils.maskToken(new AstraColors(Ansi.OFF), token.unsafeUnwrap());
             
             assertThat(result).isNotNull();
         }

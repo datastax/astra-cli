@@ -1,0 +1,11 @@
+---- meta ----
+command: astra role get *nonexistent* -o csv
+exit_code: 2
+---- output ----
+stdout: code,message
+stdout: ROLE_NOT_FOUND,"Error: Role '*nonexistent*' not found.
+stdout: 
+stdout: The specified role does not exist.
+stdout: 
+stdout: Use 'astra role list' to see all available roles."
+---- end ----

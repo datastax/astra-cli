@@ -1,16 +1,16 @@
 ---- meta ----
-command: astra db get hi -o csv
+command: astra db get region_test -o csv
 exit_code: 0
 ---- output ----
 stdout: Attribute,Value
-stdout: Name,hi
-stdout: ID,8d770448-20c1-47f0-bb76-96d0d1a66b7f
-stdout: Cloud Provider,GCP
-stdout: Region,us-east1
+stdout: Name,region_test
+stdout: ID,822b0fff-6a73-4322-a8ec-09832b075287
+stdout: Cloud Provider,AWS
+stdout: Region,us-east-2
 stdout: Status,ACTIVE
 stdout: Vector,Enabled
 stdout: Default Keyspace,default_keyspace
-stdout: Creation Time,2025-06-17T02:28:00Z
-stdout: Keyspaces,"other_keyspace,default_keyspace"
-stdout: Regions,us-east1
+stdout: Creation Time,2025-08-21T20:26:03Z
+stdout: Keyspaces,default_keyspace
+stdout: Regions,"ap-south-1,us-east-2"
 ---- end ----

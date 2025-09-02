@@ -11,8 +11,8 @@ import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import org.graalvm.collections.Pair;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.stream.Stream;
 
 public interface StreamingGateway extends SomeGateway {
@@ -32,5 +32,5 @@ public interface StreamingGateway extends SomeGateway {
 
     SortedMap<CloudProviderType, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions();
 
-    Set<CloudProviderType> findAvailableClouds();
+    SortedSet<CloudProviderType> findAvailableClouds();
 }

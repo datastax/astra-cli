@@ -1,7 +1,7 @@
 ---- meta ----
-command: astra db delete hi --yes -o csv
+command: astra db delete region_test --yes -o csv
 exit_code: 0
 ---- output ----
 stdout: code,message,data.wasDeleted,data.waitedSeconds
-stdout: OK,Database 'hi' has been deleted and fully terminated (waited 6s for termination).,true,6
+stdout: OK,Database 'region_test' has been deleted and fully terminated (waited 6s for termination).,true,6
 ---- end ----

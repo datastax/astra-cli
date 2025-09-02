@@ -9,7 +9,7 @@ import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.SortedMap;
 
 public interface RegionGateway extends SomeGateway {
@@ -21,7 +21,7 @@ public interface RegionGateway extends SomeGateway {
 
     List<Datacenter> findAllForDb(DbRef dbRef);
 
-    Set<CloudProviderType> findAvailableClouds();
+    SortedSet<CloudProviderType> findAvailableClouds();
 
     CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProviderType cp);
 

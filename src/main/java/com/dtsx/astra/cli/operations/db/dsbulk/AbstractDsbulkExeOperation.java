@@ -108,7 +108,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             flags.add("token");
             
             flags.add("-p");
-            flags.add(options.token().unwrap());
+            flags.add(options.token().unsafeUnwrap());
             
             flags.add("-b");
             flags.add(scbFile.toString());

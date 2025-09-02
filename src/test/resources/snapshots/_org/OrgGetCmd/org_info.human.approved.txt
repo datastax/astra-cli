@@ -1,0 +1,11 @@
+---- meta ----
+command: astra org
+exit_code: 0
+---- output ----
+stdout: +------------+--------------------------------------+
+stdout: | Attribute  | Value                                |
+stdout: +------------+--------------------------------------+
+stdout: | Name       | firstname.lastname@email.tld         |
+stdout: | Id         | 123e4567-e89b-12d3-a456-426614174000 |
+stdout: +------------+--------------------------------------+
+---- end ----

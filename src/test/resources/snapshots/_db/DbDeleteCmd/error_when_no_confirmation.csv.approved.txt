@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db delete hi -o csv
+command: astra db delete region_test -o csv
 exit_code: 2
 ---- output ----
 stdout: code,message

@@ -6,7 +6,6 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
-import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
@@ -108,7 +107,7 @@ public class DbGatewayImpl implements DbGateway {
                 .uri(URI.create(endpoint))
                 .timeout(Duration.ofSeconds(20))
                 .header("Content-Type", "application/json")
-                .header("X-Cassandra-Token", token.unwrap())
+                .header("X-Cassandra-Token", token.unsafeUnwrap())
                 .GET()
                 .build();
 

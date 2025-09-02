@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProviderResult;
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProvidersListRequest;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-embedding-providers",
@@ -33,7 +34,7 @@ public class EmbeddingProvidersListCmd extends AbstractPromptForDbCmd<EmbeddingP
     @Override
     protected final OutputAll execute(Supplier<EmbeddingProviderResult> result) {
         val data = result.get().embeddingProviders()
-            .map(r -> Map.of(
+            .map(r -> sequencedMapOf(
                 "Key", r.key(),
                 "Display Name", r.displayName().orElse("N/A"),
                 "Models", String.valueOf(r.modelsCount()),

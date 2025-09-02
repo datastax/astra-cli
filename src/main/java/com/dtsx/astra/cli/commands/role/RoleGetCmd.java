@@ -46,7 +46,7 @@ public class RoleGetCmd extends AbstractRoleCmd<Role> {
 
     @Override
     public final OutputJson executeJson(Supplier<Role> result) {
-        return OutputJson.serializeValue(result);
+        return OutputJson.serializeValue(result.get());
     }
 
     @Override

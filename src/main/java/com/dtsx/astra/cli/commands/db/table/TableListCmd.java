@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.table.TableListOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-tables",
@@ -47,7 +48,7 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
 
         if ($all) {
             return OutputJson.serializeValue(result.get()
-                .map(res -> Map.of(
+                .map(res -> sequencedMapOf(
                     "keyspace", res.keyspace(),
                     "tables", res.tables()
                 ))
@@ -64,7 +65,7 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
         val data = result.get()
             .flatMap((res) -> (
                 res.tables().stream()
-                    .map(desc -> Map.of(
+                    .map((desc) -> sequencedMapOf(
                         "Keyspace", res.keyspace(),
                         "Name", desc.getName()
                     ))

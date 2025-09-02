@@ -1,0 +1,6 @@
+---- meta ----
+command: astra org name
+exit_code: 0
+---- output ----
+stdout: firstname.lastname@email.tld
+---- end ----

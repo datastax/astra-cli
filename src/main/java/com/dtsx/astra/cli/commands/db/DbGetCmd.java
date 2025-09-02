@@ -78,8 +78,8 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbInfo> {
             put("Vector", dbInfo.getInfo().getDbType().equals("vector") ? "Enabled" : "Disabled");
             put("Default Keyspace", dbInfo.getInfo().getKeyspace());
             put("Creation Time", dbInfo.getCreationTime());
-            put("Keyspaces", dbInfo.getInfo().getKeyspaces().stream().toList());
-            put("Regions", dbInfo.getInfo().getDatacenters().stream().map(Datacenter::getRegion).toList());
+            put("Keyspaces", dbInfo.getInfo().getKeyspaces().stream().sorted().toList());
+            put("Regions", dbInfo.getInfo().getDatacenters().stream().map(Datacenter::getRegion).sorted().toList());
         }});
     }
 

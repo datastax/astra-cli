@@ -1,0 +1,13 @@
+---- meta ----
+command: astra token delete aBc123XyZ789LmnOpQrStUvW -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Your token has been deleted.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : true
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

@@ -9,10 +9,10 @@ import lombok.*;
 
 import java.util.stream.Stream;
 
-@Value
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraToken implements Highlightable {
-    String token;
+    private final String token;
 
     public static Either<String, AstraToken> parse(@NonNull String token) {
         return Utils.trimAndValidateBasics("Astra token", token).flatMap((t) -> {
@@ -51,7 +51,7 @@ public class AstraToken implements Highlightable {
     }
 
     @JsonValue
-    public String unwrap() {
+    public String unsafeUnwrap() { // only way to get the raw token
         return token;
     }
 

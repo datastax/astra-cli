@@ -45,7 +45,7 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
 
     @Override
     public final OutputJson executeJson(Supplier<CreateTokenResponse> tokenResponse) {
-        return OutputJson.serializeValue(tokenResponse);
+        return OutputJson.serializeValue(tokenResponse.get());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -12,6 +13,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserRef implements Highlightable {
     private final Either<UUID, String> ref;
@@ -33,8 +37,8 @@ public class UserRef implements Highlightable {
     @JsonValue
     public Map<String, Object> toJson() {
         return ref.fold(
-            id -> Map.of("type", "id", "unwrap", id.toString()),
-            email -> Map.of("type", "email", "unwrap", email)
+            id -> sequencedMapOf("type", "id", "unwrap", id.toString()),
+            email -> sequencedMapOf("type", "email", "unwrap", email)
         );
     }
 

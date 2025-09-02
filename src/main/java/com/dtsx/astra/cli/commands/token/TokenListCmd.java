@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.token;
 
+import com.dtsx.astra.cli.core.completions.caches.RoleCompletionsCache;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
@@ -9,11 +10,11 @@ import com.dtsx.astra.cli.operations.token.TokenListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list",
@@ -26,7 +27,7 @@ import static com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
 public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override
     protected final OutputJson executeJson(Supplier<Stream<TokenInfo>> tokens) {
-        return OutputJson.serializeValue(tokens.get().map((t) -> Map.of(
+        return OutputJson.serializeValue(tokens.get().map((t) -> sequencedMapOf(
             "generatedOn", t.generatedOn(),
             "clientId", t.clientId(),
             "roleNames", t.roleNames(),
@@ -37,7 +38,7 @@ public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override
     public final OutputAll execute(Supplier<Stream<TokenInfo>> tokens) {
         val rows = tokens.get()
-            .map(token -> Map.of(
+            .map((token) -> sequencedMapOf(
                 "Generated On", token.generatedOn(),
                 "Client Id", token.clientId(),
                 "Roles", token.roleNames()
@@ -49,6 +50,7 @@ public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
 
     @Override
     protected Operation<Stream<TokenInfo>> mkOperation() {
+        val roleGateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx), ctx);
         return new TokenListOperation(tokenGateway, roleGateway);
     }
 }

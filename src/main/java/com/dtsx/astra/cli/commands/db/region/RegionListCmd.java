@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-regions",
@@ -35,7 +36,7 @@ public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
     @Override
     protected final OutputAll execute(Supplier<FoundRegions> result) {
         val data = result.get().regions().stream()
-            .map((dc) -> Map.of(
+            .map((dc) -> sequencedMapOf(
                 "Cloud Provider", dc.getCloudProvider().name().toLowerCase(),
                 "Region", dc.getRegion() + (dc == result.get().defaultRegion() ? ShellTable.highlight(ctx, " (default)") : ""),
                 "Tier", dc.getTier(),

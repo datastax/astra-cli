@@ -1,10 +1,10 @@
 ---- meta ----
-command: astra db delete hi --yes -o json
+command: astra db delete region_test --yes -o json
 exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Database 'hi' has been deleted and fully terminated (waited 6s for termination).",
+stdout:   "message" : "Database 'region_test' has been deleted and fully terminated (waited 6s for termination).",
 stdout:   "data" : {
 stdout:     "wasDeleted" : true,
 stdout:     "waitedSeconds" : 6

@@ -5,7 +5,6 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
@@ -68,7 +67,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     @Mixin
     protected LongRunningOptionsMixin lrMixin;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "800")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
     }
@@ -96,7 +95,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     }
 
     private OutputAll handleDbDeleted(DbRef dbRef) {
-        val message = "Database %s has been deleted (though it may still be terminating, and not yet fully terminated).".formatted(
+        val message = "Database %s is being deleted (it may not be fully terminated yet).".formatted(
             ctx.highlight(dbRef)
         );
 

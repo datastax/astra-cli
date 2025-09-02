@@ -1,0 +1,6 @@
+---- meta ----
+command: astra token delete aBc123XyZ789LmnOpQrStUvW
+exit_code: 0
+---- output ----
+stdout: Your token has been deleted.
+---- end ----

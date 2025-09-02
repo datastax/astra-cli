@@ -1,0 +1,16 @@
+---- meta ----
+command: astra token create --role R/W Svc Acct --description Test description -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "clientId" : "aBc123XyZ789LmnOpQrStUvW",
+stdout:     "generatedOn" : "2025-09-02T19:18:10.799083554Z",
+stdout:     "orgId" : "9f876543-21ab-4cde-8f90-123456789abc",
+stdout:     "roles" : [ "ad0566b5-2a67-49de-89e8-92258c2f2c98" ],
+stdout:     "secret" : "Xy-9KLmN8oPq1RsTuVwY+ZaBcDeFgHiJkLmNoPqRs.TuV-WxYz0123.4567abcdEfGhIjKlMnOpQrStUvWxYzAbCdEfGhIjKlMnOpQr",
+stdout:     "token" : "AstraCS:aBc123XyZ789LmnOpQrStUvW:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc123"
+stdout:   }
+stdout: }
+---- end ----

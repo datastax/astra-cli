@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
 public abstract class RoleListImpl extends AbstractRoleCmd<Stream<RoleInfo>> {
     @Override
     protected final OutputJson executeJson(Supplier<Stream<RoleInfo>> result) {
@@ -21,7 +23,7 @@ public abstract class RoleListImpl extends AbstractRoleCmd<Stream<RoleInfo>> {
     @Override
     protected final OutputAll execute(Supplier<Stream<RoleInfo>> result) {
         val data = result.get()
-            .map((role) -> Map.of(
+            .map((role) -> sequencedMapOf(
                 "Role Id", role.id(),
                 "Role Name", role.name()
             ))

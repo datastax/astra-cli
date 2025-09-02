@@ -13,8 +13,8 @@ import lombok.val;
 import org.graalvm.collections.Pair;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -60,7 +60,7 @@ public class StreamingGatewayCompletionsCacheWrapper implements StreamingGateway
     }
 
     @Override
-    public Set<CloudProviderType> findAvailableClouds() {
+    public SortedSet<CloudProviderType> findAvailableClouds() {
         return delegate.findAvailableClouds();
     }
 

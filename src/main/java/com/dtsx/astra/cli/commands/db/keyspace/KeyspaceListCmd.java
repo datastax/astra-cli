@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceInfo;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceListRequest;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-keyspaces",
@@ -32,7 +33,7 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     @Override
     protected final OutputHuman executeHuman(Supplier<List<KeyspaceInfo>> result) {
         val data = result.get().stream()
-            .map((ks) -> Map.of(
+            .map((ks) -> sequencedMapOf(
                 "Name", mkKeyspaceDisplayName(ks.name(), ks.isDefault())
             ))
             .toList();
@@ -43,7 +44,7 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     @Override
     protected final OutputAll execute(Supplier<List<KeyspaceInfo>> result) {
         val data = result.get().stream()
-            .map((ks) -> Map.of(
+            .map((ks) -> sequencedMapOf(
                 "name", ks.name(),
                 "isDefault", ks.isDefault()
             ))

@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEY_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
@@ -88,9 +89,9 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     }
 
     private OutputJson renderJson(IniSection section) {
-        return OutputJson.serializeValue(Map.of(
+        return OutputJson.serializeValue(sequencedMapOf(
             "name", section.name(),
-            "attributes", section.pairs().stream().map((p) -> Map.of(
+            "attributes", section.pairs().stream().map((p) -> sequencedMapOf(
                 "key", p.key(),
                 "unwrap", p.value(),
                 "comments", p.comments()

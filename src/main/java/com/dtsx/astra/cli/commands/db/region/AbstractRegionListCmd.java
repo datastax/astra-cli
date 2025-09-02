@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
 public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<FoundRegion>> {
     @Option(
         names = { "-f", "--filter" },
@@ -43,7 +45,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
     @Override
     protected final OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
-            .map((r) -> Map.of(
+            .map((r) -> sequencedMapOf(
                 "cloudProvider", r.cloudProvider().name(),
                 "region", r.raw(),
                 "hasFreeTier", r.hasFreeTier()
@@ -56,7 +58,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
     @Override
     protected final OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
-            .map((r) -> Map.of(
+            .map((r) -> sequencedMapOf(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.hasFreeTier()),
                 "Region", r.regionName(),
                 "Display Name", r.displayName(),

@@ -5,9 +5,9 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
+import com.dtsx.astra.cli.utils.JsonUtils;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
-import com.dtsx.astra.sdk.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 

@@ -39,7 +39,7 @@ public class APIProviderImpl implements APIProvider {
 
     @Override
     public AstraOpsClient astraOpsClient() {
-        return new AstraOpsClient(token.unwrap(), env);
+        return new AstraOpsClient(token.unsafeUnwrap(), env);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class APIProviderImpl implements APIProvider {
 
     @Override
     public Database dataApiDatabase(KeyspaceRef ksRef) {
-        return dataApiClient().getDatabase(resolveId(ksRef.db()), resolveRegion(ksRef.db()), new DatabaseOptions().keyspace(ksRef.name()).token(token.unwrap()));
+        return dataApiClient().getDatabase(resolveId(ksRef.db()), resolveRegion(ksRef.db()), new DatabaseOptions().keyspace(ksRef.name()).token(token.unsafeUnwrap()));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class APIProviderImpl implements APIProvider {
             case DEV -> DataAPIDestination.ASTRA_DEV;
             case TEST -> DataAPIDestination.ASTRA_TEST;
         };
-        return new DataAPIClient(token.unwrap(), new DataAPIClientOptions().destination(destination));
+        return new DataAPIClient(token.unsafeUnwrap(), new DataAPIClientOptions().destination(destination));
     }
 
     private UUID resolveId(DbRef ref) {
@@ -98,7 +98,7 @@ public class APIProviderImpl implements APIProvider {
     public Optional<com.dtsx.astra.sdk.db.domain.Database> tryResolveDb(@NotNull DbRef ref) {
         val cachedRef = dbCache.convertDbNameToIdIfCached(ref);
 
-        val dbOpsClient = new AstraOpsClient(token.unwrap(), env).db();
+        val dbOpsClient = new AstraOpsClient(token.unsafeUnwrap(), env).db();
 
         val dbInfo = cachedRef.<Optional<com.dtsx.astra.sdk.db.domain.Database>>fold(
             (id) -> dbOpsClient.findById(id.toString()),

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
 public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> {
     @Override
     protected final OutputJson executeJson(Supplier<Stream<TenantInfo>> result) {
@@ -21,7 +23,7 @@ public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> 
     @Override
     protected final OutputAll execute(Supplier<Stream<TenantInfo>> result) {
         val data = result.get()
-            .map((tenant) -> Map.of(
+            .map((tenant) -> sequencedMapOf(
                 "name", tenant.name(),
                 "cloud", tenant.cloud().name(),
                 "region", tenant.region().unwrap(),

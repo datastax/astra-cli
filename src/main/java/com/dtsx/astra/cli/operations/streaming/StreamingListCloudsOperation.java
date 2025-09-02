@@ -5,14 +5,14 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 @RequiredArgsConstructor
-public class StreamingListCloudsOperation implements Operation<Set<CloudProviderType>> {
+public class StreamingListCloudsOperation implements Operation<SortedSet<CloudProviderType>> {
     private final StreamingGateway streamingGateway;
 
     @Override
-    public Set<CloudProviderType> execute() {
+    public SortedSet<CloudProviderType> execute() {
         return streamingGateway.findAvailableClouds();
     }
 }

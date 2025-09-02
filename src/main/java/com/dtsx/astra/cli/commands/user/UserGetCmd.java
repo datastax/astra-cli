@@ -43,7 +43,7 @@ public class UserGetCmd extends AbstractUserCmd<User> {
 
     @Override
     public final OutputJson executeJson(Supplier<User> result) {
-        return OutputJson.serializeValue(result);
+        return OutputJson.serializeValue(result.get());
     }
 
     @Override

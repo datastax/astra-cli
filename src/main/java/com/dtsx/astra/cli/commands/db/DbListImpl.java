@@ -11,11 +11,11 @@ import lombok.val;
 import picocli.CommandLine.Option;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.DbListOperation.DbListRequest;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     @Option(names = { "--vector" }, description = "Only show vector-enabled databases")
@@ -29,7 +29,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     @Override
     protected final OutputAll execute(Supplier<Stream<Database>> result) {
         val data = result.get()
-            .map((db) -> Map.of(
+            .map((db) -> sequencedMapOf(
                 "Name", name(db),
                 "Id", id(db),
                 "Regions", regions(db),
@@ -51,7 +51,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     }
 
     private List<String> regions(Database db) {
-        return db.getInfo().getDatacenters().stream().map(Datacenter::getRegion).toList();
+        return db.getInfo().getDatacenters().stream().map(Datacenter::getRegion).sorted().toList();
     }
 
     private String cloud(Database db) {

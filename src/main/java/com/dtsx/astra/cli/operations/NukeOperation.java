@@ -157,9 +157,9 @@ public class NukeOperation implements Operation<NukeResult> {
         return AstraConfig.resolveDefaultAstraConfigFile(ctx);
     }
 
-    private Set<Pair<Path, String>> resolveRcFilesWithAutocomplete(String cliName) {
+    private SortedSet<Pair<Path, String>> resolveRcFilesWithAutocomplete(String cliName) {
         if (ctx.isWindows()) {
-            return Set.of();
+            return new TreeSet();
         }
 
         val autocompletePattern = Pattern.compile(
@@ -185,7 +185,7 @@ public class NukeOperation implements Operation<NukeResult> {
                     })
                     .fold(_ -> Stream.of(), r -> r);
             })
-            .collect(Collectors.toSet());
+            .collect(Collectors.toCollection(TreeSet::new));
     }
 
     private void delete(Path path, Nuked res) {

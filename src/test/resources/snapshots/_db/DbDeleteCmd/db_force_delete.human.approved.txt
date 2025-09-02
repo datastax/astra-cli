@@ -1,6 +1,6 @@
 ---- meta ----
-command: astra db delete hi --yes
+command: astra db delete region_test --yes
 exit_code: 0
 ---- output ----
-stdout: Database 'hi' has been deleted and fully terminated (waited 6s for termination).
+stdout: Database 'region_test' has been deleted and fully terminated (waited 6s for termination).
 ---- end ----

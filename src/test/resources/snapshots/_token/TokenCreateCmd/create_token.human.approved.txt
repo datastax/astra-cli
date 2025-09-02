@@ -1,0 +1,12 @@
+---- meta ----
+command: astra token create --role R/W Svc Acct --description Test description
+exit_code: 0
+---- output ----
+stdout: +---------------+---------------------------------------------------------------------------------------------------------+
+stdout: | Attribute     | Value                                                                                                   |
+stdout: +---------------+---------------------------------------------------------------------------------------------------------+
+stdout: | Client Id     | aBc123XyZ789LmnOpQrStUvW                                                                                |
+stdout: | Client Secret | Xy-9KLmN8oPq1RsTuVwY+ZaBcDeFgHiJkLmNoPqRs.TuV-WxYz0123.4567abcdEfGhIjKlMnOpQrStUvWxYzAbCdEfGhIjKlMnOpQr |
+stdout: | Token         | AstraCS:aBc123XyZ789LmnOpQrStUvW:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc123       |
+stdout: +---------------+---------------------------------------------------------------------------------------------------------+
+---- end ----

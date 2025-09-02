@@ -10,9 +10,10 @@ import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.function.Supplier;
+
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-clouds",
@@ -22,29 +23,29 @@ import java.util.function.Supplier;
     comment = "List all available cloud providers for streaming tenants",
     command = "${cli.name} streaming list-clouds"
 )
-public class StreamingListCloudsCmd extends AbstractStreamingCmd<Set<CloudProviderType>> {
+public class StreamingListCloudsCmd extends AbstractStreamingCmd<SortedSet<CloudProviderType>> {
     @Override
-    protected final OutputJson executeJson(Supplier<Set<CloudProviderType>> clouds) {
+    protected final OutputJson executeJson(Supplier<SortedSet<CloudProviderType>> clouds) {
         val data = clouds.get()
             .stream()
-            .map((cloud) -> Map.of("cloudProvider", cloud.name()))
+            .map((cloud) -> sequencedMapOf("cloudProvider", cloud.name()))
             .toList();
 
         return OutputJson.serializeValue(data);
     }
 
     @Override
-    protected final OutputAll execute(Supplier<Set<CloudProviderType>> clouds) {
+    protected final OutputAll execute(Supplier<SortedSet<CloudProviderType>> clouds) {
         val data = clouds.get()
             .stream()
-            .map((cloud) -> Map.of("Cloud Provider", cloud.name().toLowerCase()))
+            .map((cloud) -> sequencedMapOf("Cloud Provider", cloud.name().toLowerCase()))
             .toList();
 
         return new ShellTable(data).withColumns("Cloud Provider");
     }
 
     @Override
-    protected Operation<Set<CloudProviderType>> mkOperation() {
+    protected Operation<SortedSet<CloudProviderType>> mkOperation() {
         return new StreamingListCloudsOperation(streamingGateway);
     }
 }

@@ -1,7 +1,7 @@
 ---- meta ----
-command: astra db get hi --key keyspaces
+command: astra db get region_test --key regions
 exit_code: 0
 ---- output ----
-stdout: [0] other_keyspace
-stdout: [1] default_keyspace
+stdout: [0] us-east-2
+stdout: [1] ap-south-1
 ---- end ----

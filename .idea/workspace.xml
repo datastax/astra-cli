@@ -5,8 +5,97 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/JsonUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/annotations/TestForDifferentOutputs.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/DbListCmdSnapshotTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/serialized-fixtures/CreatedAstraToken.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/serialized-fixtures/Databases.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/serialized-fixtures/Organization.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/serialized-fixtures/Roles.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/prompters/strategies/TextSelectionStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/prompters/strategies/TextSelectionStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigGetCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigListImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigListImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbDeleteCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbGetCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbListImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbListImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/CdcListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/CdcListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/KeyspaceListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/KeyspaceListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/misc/CloudsListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/misc/CloudsListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/misc/EmbeddingProvidersListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/misc/EmbeddingProvidersListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractRegionListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/AbstractRegionListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/RegionListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/RegionListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/TableListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/TableListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/org/OrgGetImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/org/OrgGetImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/role/RoleGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/role/RoleGetCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/role/RoleListImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/role/RoleListImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingListCloudsCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingListCloudsCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingListImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingListImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingListRegionsCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingListRegionsCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/AbstractTokenCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/AbstractTokenCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenCreateCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenGetImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenGetImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserGetCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserListImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserListImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/role/RoleNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/role/RoleNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/AstraToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/AstraToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CdcId.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CdcId.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CdcRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CdcRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CollectionRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CollectionRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/DbRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/DbRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/KeyspaceRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/KeyspaceRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RegionName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RegionName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RoleRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RoleRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TableRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TableRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TenantName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TenantName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TenantStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TenantStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/UserRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/UserRef.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/ExitCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/ExitCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/formats/OutputJson.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/formats/OutputJson.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/table/ShellTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/table/ShellTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/APIProviderImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/APIProviderImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/DbGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/DbGatewayImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/region/RegionGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/region/RegionGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/region/RegionGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/db/region/RegionGatewayImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGatewayCompletionsCacheWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGatewayCompletionsCacheWrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/streaming/StreamingGatewayImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGatewayImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbCreateDotEnvOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/DbCreateDotEnvOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/DbCqlshStartOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/DbCqlshStartOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/dsbulk/AbstractDsbulkExeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/dsbulk/AbstractDsbulkExeOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/misc/CloudsListOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/misc/CloudsListOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/streaming/StreamingListCloudsOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/streaming/StreamingListCloudsOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/token/TokenGetOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/token/TokenGetOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/MapUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/MapUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/BaseCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/BaseCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/DbDeleteCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/DbDeleteCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/DbGetCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/DbGetCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/AssertUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/AssertUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/Fixtures.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/Fixtures.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/doubles/Utils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/utils/StringUtilsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/utils/StringUtilsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/serialized-fixtures/Database.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/delete_db_with_confirmation.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/delete_db_with_confirmation.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_invalid_confirmation.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_invalid_confirmation.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_no_confirmation.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_no_confirmation.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_no_confirmation.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_no_confirmation.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_no_confirmation.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_no_confirmation.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_full_info.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_full_info.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_full_info.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_full_info.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_full_info.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_full_info.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_not_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_not_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_partial_info.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_partial_info.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_partial_info.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_partial_info.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_partial_info.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbGetCmd/db_partial_info.json.approved.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,99 +181,111 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
-    &quot;Gradle.AstraCliSnapshotTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.AstraCliSnapshotTest.test.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.AstraCliTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.AstraCliTest.testCliMainWithHelp.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.AstraCliTest.testHelloWorld.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Build astra-cli-pico.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbDeleteCmdSnapshotTest.db_delete_with_confirmation.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbDeleteCmdSnapshotTest.delete_db_with_confirmation.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbDeleteCmdSnapshotTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbGetCmdSnapshotTest.database_full_info.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbGetCmdSnapshotTest.database_not_found.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbGetCmdSnapshotTest.database_partial_info.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbGetCmdSnapshotTest.db_not_found.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbGetCmdSnapshotTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.DbUtilsTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.EitherTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.MiscUtilsTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.NEListTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.StringUtilsTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.StringUtilsTest.removes_quotes_when_present.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.StringUtilsTest.test.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.StringUtilsest.test.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Tests in 'astra-cli-pico.test'.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Tests in 'com.dtsx.astra.cli.snapshot'.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands'.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.bimap.bimap_maps_right.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.bimap.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.capitalize.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.human.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.human.gets_full_information_about_a_database.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.isPositiveInteger.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.isPositiveInteger.returns_false_for_non_int_strings.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.maskToken.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.output_without_key.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.parse.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.parse.returns_empty_for_empty_collection.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.removeQuotesIfAny.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.removeQuotesIfAny.removes_quotes_when_present.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.resolveDatacenter.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.resolveDatacenter.returns_corresponding_datacenter_given_valid_region.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.resolveDatacenter.returns_default_datacenter_when_no_region_provided.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.setAdd.adds_elem_to_returned_set.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.setAdd.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.setAdd.idempotency.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.setDelete.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.truncate.long_strings_get_truncated.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.withIndent.adds_indent_from_min_initial_indent.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.withIndent.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AstraCliTest.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;NIXITCH_NIXPKGS_CONFIG&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_CONF_DIR&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_OTHER_STORES&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_PATH&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_PROFILES&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_REMOTE&quot;: &quot;&quot;,
-    &quot;NIXITCH_NIX_USER_PROFILE_DIR&quot;: &quot;&quot;,
-    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
-    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
-    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;C:\\Users\\wanna\\AppData\\Roaming\\JetBrains\\IntelliJIdea2025.1\\plugins\\Shell Script\\linux\\amd64\\shellcheck&quot;,
-    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
-    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_directory_selection&quot;: &quot;//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/main/java/com/dtsx/astra/cli/core/parsers/ini/ast&quot;,
-    &quot;last_opened_file_path&quot;: &quot;//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/test/resources&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Downloaded.Files.Path.Enabled": "false",
+    "Gradle.AstraCliSnapshotTest.executor": "Run",
+    "Gradle.AstraCliSnapshotTest.test.executor": "Run",
+    "Gradle.AstraCliTest.executor": "Run",
+    "Gradle.AstraCliTest.testCliMainWithHelp.executor": "Run",
+    "Gradle.AstraCliTest.testHelloWorld.executor": "Run",
+    "Gradle.Build astra-cli-pico.executor": "Run",
+    "Gradle.DbDeleteCmdSnapshotTest.db_delete_with_confirmation.executor": "Run",
+    "Gradle.DbDeleteCmdSnapshotTest.db_force_delete_async.executor": "Run",
+    "Gradle.DbDeleteCmdSnapshotTest.delete_db_with_confirmation.executor": "Run",
+    "Gradle.DbDeleteCmdSnapshotTest.error_when_invalid_confirmation.executor": "Run",
+    "Gradle.DbDeleteCmdSnapshotTest.executor": "Run",
+    "Gradle.DbGetCmdSnapshotTest.database_full_info.executor": "Run",
+    "Gradle.DbGetCmdSnapshotTest.database_not_found.executor": "Run",
+    "Gradle.DbGetCmdSnapshotTest.database_partial_info.executor": "Run",
+    "Gradle.DbGetCmdSnapshotTest.db_not_found.executor": "Run",
+    "Gradle.DbGetCmdSnapshotTest.executor": "Run",
+    "Gradle.DbListCmdSnapshotTest.executor": "Run",
+    "Gradle.DbUtilsTest.executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "Gradle.EitherTest.executor": "Run",
+    "Gradle.MiscUtilsTest.executor": "Run",
+    "Gradle.NEListTest.executor": "Run",
+    "Gradle.OrgGetCmdSnapshotTest.executor": "Run",
+    "Gradle.RoleGetCmdSnapshotTest.executor": "Run",
+    "Gradle.RoleListCmdSnapshotTest.executor": "Run",
+    "Gradle.StringUtilsTest.executor": "Run",
+    "Gradle.StringUtilsTest.removes_quotes_when_present.executor": "Run",
+    "Gradle.StringUtilsTest.test.executor": "Run",
+    "Gradle.StringUtilsest.test.executor": "Run",
+    "Gradle.Tests in 'astra-cli-pico.test'.executor": "Run",
+    "Gradle.Tests in 'com.dtsx.astra.cli.snapshot'.executor": "Run",
+    "Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands'.executor": "Run",
+    "Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands.org'.executor": "Run",
+    "Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands.token'.executor": "Run",
+    "Gradle.TokenCreateCmdSnapshotTest.create_token.executor": "Run",
+    "Gradle.TokenCreateCmdSnapshotTest.executor": "Run",
+    "Gradle.TokenGetCmdSnapshotTest.executor": "Run",
+    "Gradle.TokenListCmdSnapshotTest.executor": "Run",
+    "Gradle.bimap.bimap_maps_right.executor": "Run",
+    "Gradle.bimap.executor": "Run",
+    "Gradle.capitalize.executor": "Run",
+    "Gradle.human.executor": "Run",
+    "Gradle.human.gets_full_information_about_a_database.executor": "Run",
+    "Gradle.isPositiveInteger.executor": "Run",
+    "Gradle.isPositiveInteger.returns_false_for_non_int_strings.executor": "Run",
+    "Gradle.maskToken.executor": "Run",
+    "Gradle.output_without_key.executor": "Run",
+    "Gradle.parse.executor": "Run",
+    "Gradle.parse.returns_empty_for_empty_collection.executor": "Run",
+    "Gradle.removeQuotesIfAny.executor": "Run",
+    "Gradle.removeQuotesIfAny.removes_quotes_when_present.executor": "Run",
+    "Gradle.resolveDatacenter.executor": "Run",
+    "Gradle.resolveDatacenter.returns_corresponding_datacenter_given_valid_region.executor": "Run",
+    "Gradle.resolveDatacenter.returns_default_datacenter_when_no_region_provided.executor": "Run",
+    "Gradle.setAdd.adds_elem_to_returned_set.executor": "Run",
+    "Gradle.setAdd.executor": "Run",
+    "Gradle.setAdd.idempotency.executor": "Run",
+    "Gradle.setDelete.executor": "Run",
+    "Gradle.truncate.long_strings_get_truncated.executor": "Run",
+    "Gradle.withIndent.adds_indent_from_min_initial_indent.executor": "Run",
+    "Gradle.withIndent.executor": "Run",
+    "JUnit.AstraCliTest.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "NIXITCH_NIXPKGS_CONFIG": "",
+    "NIXITCH_NIX_CONF_DIR": "",
+    "NIXITCH_NIX_OTHER_STORES": "",
+    "NIXITCH_NIX_PATH": "",
+    "NIXITCH_NIX_PROFILES": "",
+    "NIXITCH_NIX_REMOTE": "",
+    "NIXITCH_NIX_USER_PROFILE_DIR": "",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "C:\\Users\\wanna\\AppData\\Roaming\\JetBrains\\IntelliJIdea2025.1\\plugins\\Shell Script\\linux\\amd64\\shellcheck",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_directory_selection": "//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/main/java/com/dtsx/astra/cli/core/parsers/ini/ast",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/me/work/astra-cli-pico/src/test/resources",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.sourceCode",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;Markdown&quot;,
-      &quot;HTTP Request&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Markdown",
+      "HTTP Request"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.dtsx.astra.cli.commands.streaming.pulsar" />
@@ -236,8 +337,8 @@
       <recent name="com.dtsx.astra.cli.testlib.laws" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.DbDeleteCmdSnapshotTest">
-    <configuration name="DbDeleteCmdSnapshotTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+  <component name="RunManager" selected="Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands'">
+    <configuration name="Tests in 'com.dtsx.astra.cli.snapshot.commands'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -250,7 +351,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.db.DbDeleteCmdSnapshotTest&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.*&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -261,7 +362,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="DbDeleteCmdSnapshotTest.db_delete_with_confirmation" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="Tests in 'com.dtsx.astra.cli.snapshot.commands.token'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -274,7 +375,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.db.DbDeleteCmdSnapshotTest.db_delete_with_confirmation&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.token.*&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -285,7 +386,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="DbDeleteCmdSnapshotTest.delete_db_with_confirmation" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="TokenCreateCmdSnapshotTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -298,7 +399,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.db.DbDeleteCmdSnapshotTest.delete_db_with_confirmation&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.token.TokenCreateCmdSnapshotTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -309,7 +410,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="DbGetCmdSnapshotTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="TokenCreateCmdSnapshotTest.create_token" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -322,7 +423,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.db.DbGetCmdSnapshotTest&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.token.TokenCreateCmdSnapshotTest.create_token&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -333,7 +434,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="Tests in 'astra-cli-pico.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="TokenGetCmdSnapshotTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -345,6 +446,8 @@
         <option name="taskNames">
           <list>
             <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.token.TokenGetCmdSnapshotTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -357,11 +460,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.DbDeleteCmdSnapshotTest" />
-        <item itemvalue="Gradle.DbDeleteCmdSnapshotTest.delete_db_with_confirmation" />
-        <item itemvalue="Gradle.DbDeleteCmdSnapshotTest.db_delete_with_confirmation" />
-        <item itemvalue="Gradle.Tests in 'astra-cli-pico.test'" />
-        <item itemvalue="Gradle.DbGetCmdSnapshotTest" />
+        <item itemvalue="Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands'" />
+        <item itemvalue="Gradle.Tests in 'com.dtsx.astra.cli.snapshot.commands.token'" />
+        <item itemvalue="Gradle.TokenGetCmdSnapshotTest" />
+        <item itemvalue="Gradle.TokenCreateCmdSnapshotTest" />
+        <item itemvalue="Gradle.TokenCreateCmdSnapshotTest.create_token" />
       </list>
     </recent_temporary>
   </component>
@@ -409,7 +512,8 @@
       <workItem from="1756165418194" duration="34942000" />
       <workItem from="1756263328896" duration="118866000" />
       <workItem from="1756690469235" duration="50041000" />
-      <workItem from="1756831806109" duration="86000" />
+      <workItem from="1756831806109" duration="13822000" />
+      <workItem from="1756848226976" duration="1112000" />
     </task>
     <servers />
   </component>

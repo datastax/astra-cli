@@ -1,0 +1,9 @@
+---- meta ----
+command: astra token delete *nonexistent* --if-exists
+exit_code: 0
+---- output ----
+stdout: Token '*nonexistent*' does not exist; nothing to delete.
+stdout: 
+stdout: # See all available tokens:
+stdout: $ astra token list
+---- end ----

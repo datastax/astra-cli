@@ -182,7 +182,7 @@ public class AstraConfig {
             profiles.add(Either.right(new Profile(Optional.of(name), token, env)));
 
             backingIniFile.addSection(name.unwrap(), new HashMap<>() {{
-                put(TOKEN_KEY, token.unwrap());
+                put(TOKEN_KEY, token.unsafeUnwrap());
 
                 if (env != AstraEnvironment.PROD) {
                     put(ENV_KEY, env.name());

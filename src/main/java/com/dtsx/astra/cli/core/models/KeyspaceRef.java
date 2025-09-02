@@ -5,9 +5,11 @@ import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class KeyspaceRef implements Highlightable {
     private final String name;

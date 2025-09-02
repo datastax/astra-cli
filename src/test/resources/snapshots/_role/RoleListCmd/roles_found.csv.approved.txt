@@ -1,0 +1,11 @@
+---- meta ----
+command: astra role list -o csv
+exit_code: 0
+---- output ----
+stdout: Role Id,Role Name
+stdout: b4ed0e9e-67e8-47b6-8b58-c6629be961a9,R/W Svc Acct
+stdout: 43745b73-ad46-46e4-b826-c15d06d2cea0,Admin User
+stdout: 67c4b5dc-dd3f-4b2d-be51-09be12836d57,API Admin User
+stdout: ad0566b5-2a67-49de-89e8-92258c2f2c98,Organization Administrator
+stdout: 16a4b1d7-a615-41f8-95ca-52b0280f4d77,RO Svc Acct
+---- end ----

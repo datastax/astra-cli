@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db list -o csv
+exit_code: 0
+---- output ----
+stdout: Name,Id,Regions,Cloud,V,Status
+---- end ----

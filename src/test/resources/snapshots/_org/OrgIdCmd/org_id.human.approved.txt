@@ -1,0 +1,6 @@
+---- meta ----
+command: astra org id
+exit_code: 0
+---- output ----
+stdout: 123e4567-e89b-12d3-a456-426614174000
+---- end ----

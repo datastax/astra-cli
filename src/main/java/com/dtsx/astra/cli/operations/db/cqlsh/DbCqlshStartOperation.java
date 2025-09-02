@@ -54,7 +54,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
         commands.add("-u");
         commands.add("token");
         commands.add("-p");
-        commands.add(request.profile().token().unwrap());
+        commands.add(request.profile().token().unsafeUnwrap());
         commands.add("-b");
         commands.add(scbFile.getRight().toString());
 

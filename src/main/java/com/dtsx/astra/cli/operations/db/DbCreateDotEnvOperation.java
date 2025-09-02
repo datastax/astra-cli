@@ -182,14 +182,14 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         {
             wasUpdated |= envSetter.set(ASTRA_ORG_ID, () -> org().getId());
             wasUpdated |= envSetter.set(ASTRA_ORG_NAME, () -> org().getName());
-            wasUpdated |= envSetter.set(ASTRA_ORG_TOKEN, request.profile.token()::unwrap);
+            wasUpdated |= envSetter.set(ASTRA_ORG_TOKEN, request.profile.token()::unsafeUnwrap);
         }
 
         {
             wasUpdated |= envSetter.set(ASTRA_DB_ID, () -> db(request).getId());
             wasUpdated |= envSetter.set(ASTRA_DB_REGION, () -> resolveRegion(request).unwrap());
             wasUpdated |= envSetter.set(ASTRA_DB_KEYSPACE, () -> resolveKeyspace(request));
-            wasUpdated |= envSetter.set(ASTRA_DB_APPLICATION_TOKEN, request.profile.token()::unwrap);
+            wasUpdated |= envSetter.set(ASTRA_DB_APPLICATION_TOKEN, request.profile.token()::unsafeUnwrap);
             wasUpdated |= envSetter.set(ASTRA_DB_ENVIRONMENT, () -> request.profile.env().name().toLowerCase());
         }
 

@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.testlib;
 
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
-import com.dtsx.astra.sdk.utils.JsonUtils;
+import com.dtsx.astra.cli.utils.JsonUtils;
 import lombok.Cleanup;
 import lombok.val;
 import org.apache.commons.csv.CSVFormat;
@@ -39,7 +39,7 @@ public abstract class AssertUtils {
         }
 
         try {
-            val node = JsonUtils.getObjectMapper().readTree(asString);
+            val node = JsonUtils.objectMapper().readTree(asString);
 
             if (!node.isObject()) {
                 return Assertions.fail("String is not a valid JSON object (is a " + node.getNodeType() + ")");

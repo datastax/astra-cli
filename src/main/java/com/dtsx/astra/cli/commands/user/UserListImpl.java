@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+
 public abstract class UserListImpl extends AbstractUserCmd<Stream<UserInfo>> {
     @Override
     protected final OutputJson executeJson(Supplier<Stream<UserInfo>> result) {
@@ -21,7 +23,7 @@ public abstract class UserListImpl extends AbstractUserCmd<Stream<UserInfo>> {
     @Override
     protected final OutputAll execute(Supplier<Stream<UserInfo>> result) {
         val data = result.get()
-            .map((user) -> Map.of(
+            .map((user) -> sequencedMapOf(
                 "User Id", user.userId(),
                 "User Email", user.email(),
                 "Status", user.status()

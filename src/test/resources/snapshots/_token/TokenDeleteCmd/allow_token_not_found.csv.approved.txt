@@ -1,0 +1,7 @@
+---- meta ----
+command: astra token delete *nonexistent* --if-exists -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,data.wasDeleted
+stdout: OK,Token '*nonexistent*' does not exist; nothing to delete.,false
+---- end ----

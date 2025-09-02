@@ -4,18 +4,20 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Accessors;
 
-@Value
-@Accessors(fluent = true)
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class TenantStatus implements Highlightable {
-    String unwrap;
+    private final String unwrap;
 
     public static TenantStatus mkUnsafe(String status) {
         return new TenantStatus(status.toLowerCase());
+    }
+
+    public String unwrap() {
+        return unwrap;
     }
 
     @Override

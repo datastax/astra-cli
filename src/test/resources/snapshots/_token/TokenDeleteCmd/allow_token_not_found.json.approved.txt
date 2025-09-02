@@ -1,0 +1,16 @@
+---- meta ----
+command: astra token delete *nonexistent* --if-exists -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Token '*nonexistent*' does not exist; nothing to delete.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : false
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "command" : "astra token list",
+stdout:     "comment" : "See all available tokens:"
+stdout:   } ]
+stdout: }
+---- end ----

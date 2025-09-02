@@ -29,4 +29,5 @@ public enum ExitCode {
     INVALID_TOKEN,
     NO_ANSWER,
     UNSUPPORTED_EXECUTION,
+    ROLE_NOT_FOUND,
 }

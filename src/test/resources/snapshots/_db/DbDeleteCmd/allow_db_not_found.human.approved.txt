@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db delete *nonexistent* --yes --if-exists
+exit_code: 0
+---- output ----
+stdout: Database '*nonexistent*' does not exist; nothing to delete.
+stdout: 
+stdout: # See your existing databases:
+stdout: $ astra db list
+---- end ----

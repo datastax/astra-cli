@@ -1,0 +1,11 @@
+---- meta ----
+command: astra role get *nonexistent* -o json
+exit_code: 2
+---- output ----
+stdout: {
+stdout:   "code" : "ROLE_NOT_FOUND",
+stdout:   "message" : "Error: Role '*nonexistent*' not found.\n\nThe specified role does not exist.\n\nUse 'astra role list' to see all available roles.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

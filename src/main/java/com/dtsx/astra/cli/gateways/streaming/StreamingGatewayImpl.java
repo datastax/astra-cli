@@ -5,10 +5,8 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
-import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
@@ -19,10 +17,7 @@ import lombok.val;
 import org.graalvm.collections.Pair;
 
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,13 +83,13 @@ public class StreamingGatewayImpl implements StreamingGateway {
     }
 
     @Override
-    public Set<CloudProviderType> findAvailableClouds() {
+    public SortedSet<CloudProviderType> findAvailableClouds() {
         return ctx.log().loading("Finding cloud providers for all available streaming regions", (_) -> (
             apiProvider.astraOpsClient().streaming().regions().findAllServerless()
                 .map(StreamingRegion::getCloudProvider)
                 .map(String::toUpperCase)
                 .map(CloudProviderType::valueOf)
-                .collect(Collectors.toSet())
+                .collect(Collectors.toCollection(TreeSet::new))
         ));
     }
 

@@ -10,10 +10,7 @@ import com.dtsx.astra.sdk.db.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -75,13 +72,13 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public Set<CloudProviderType> findAvailableClouds() {
+    public SortedSet<CloudProviderType> findAvailableClouds() {
         return ctx.log().loading("Finding cloud providers for all available regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(RegionType.ALL)
                 .map(DatabaseRegionServerless::getCloudProvider)
                 .map(CloudProviderType::valueOf)
-                .collect(Collectors.toSet())
+                .collect(Collectors.toCollection(TreeSet::new))
         ));
     }
 

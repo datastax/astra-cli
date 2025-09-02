@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 public abstract class TokenGetImpl extends AbstractTokenCmd<AstraToken> {
     @Override
     public final OutputAll execute(Supplier<AstraToken> token) {
-        return OutputAll.serializeValue(token.get().unwrap());
+        return OutputAll.serializeValue(token.get().unsafeUnwrap());
     }
 
     @Override

@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperation.CollectionListRequest;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperation.CollectionListResult;
+import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "list-collections",
@@ -51,7 +52,7 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
         }
 
         return OutputJson.serializeValue(result.get()
-            .map(res -> Map.of(
+            .map((res) -> sequencedMapOf(
                 "keyspace", res.keyspace(),
                 "collections", res.collections()
             ))
@@ -65,7 +66,7 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
         val data = result.get()
             .flatMap((res) -> (
                 res.collections().stream()
-                    .map(desc -> Map.of(
+                    .map((desc) -> sequencedMapOf(
                         "Keyspace", res.keyspace(),
                         "Name", desc.getName()
                     ))

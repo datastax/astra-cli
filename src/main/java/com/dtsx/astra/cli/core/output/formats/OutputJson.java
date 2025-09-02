@@ -2,7 +2,9 @@ package com.dtsx.astra.cli.core.output.formats;
 
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +19,11 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @FunctionalInterface
 public interface OutputJson {
+    ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+        .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+        .addModule(new Jdk8Module())
+        .build();
+
     String renderAsJson();
 
     abstract class Fields {
@@ -44,8 +51,7 @@ public interface OutputJson {
 
     @SneakyThrows
     private static String serializeValue(SequencedMap<String, ?> data) {
-        return new ObjectMapper()
-            .registerModule(new Jdk8Module())
+        return OBJECT_MAPPER
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(data);
     }

@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db delete hi -o json
+command: astra db delete region_test -o json
 exit_code: 2
 ---- output ----
 stdout: {
@@ -7,8 +7,8 @@ stdout:   "code" : "UNSUPPORTED_EXECUTION",
 stdout:   "message" : "Error: Can not interactively select an option when the output type is not 'human'\n\nPlease programmatically pass an option using the '--yes' flag, or use the 'human' output format instead.",
 stdout:   "data" : null,
 stdout:   "nextSteps" : [ {
-stdout:     "comment" : "Example fix",
-stdout:     "command" : "astra db delete hi -o json --yes"
+stdout:     "command" : "astra db delete region_test -o json --yes",
+stdout:     "comment" : "Example fix"
 stdout:   } ]
 stdout: }
 ---- end ----
