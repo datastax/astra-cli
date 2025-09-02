@@ -5,8 +5,6 @@ import com.dtsx.astra.cli.core.output.prompters.PromptRequest;
 import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy;
 import lombok.val;
 
-import java.io.Console;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -16,12 +14,10 @@ public class TextSelectionStrategy<T> implements SelectionStrategy<T> {
 
     private final CliContext ctx;
     private final PromptRequest.Open<T> req;
-    private final Console console;
 
     public TextSelectionStrategy(CliContext ctx, PromptRequest.Open<T> req) {
         this.ctx = ctx;
         this.req = req;
-        this.console = Objects.requireNonNull(ctx.console().getConsole());
     }
 
     public static class Meta implements SelectionStrategy.Meta.Open {
@@ -58,11 +54,7 @@ public class TextSelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private Optional<String> readAnswer(String prompt) {
-        val res = (req.echoOff())
-            ? Optional.ofNullable(console.readPassword(prompt)).map(String::valueOf)
-            : Optional.ofNullable(console.readLine(prompt));
-
-        return res.filter(s -> !s.isBlank());
+        return Optional.ofNullable(ctx.console().unsafeReadLine(prompt, req.echoOff())).filter(s -> !s.isBlank());
     }
 
     private void clearPrompt() {

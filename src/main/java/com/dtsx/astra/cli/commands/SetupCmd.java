@@ -11,7 +11,6 @@ import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
-import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.SetupOperation;
 import com.dtsx.astra.cli.operations.SetupOperation.InvalidToken;
@@ -156,7 +155,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
         ctx.console().println(trimIndent(prompt));
         ctx.console().println();
-        ctx.console().getConsole().readPassword(ctx.console().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "));
+        ctx.console().unsafeReadLine(ctx.console().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "), false);
         ctx.console().println();
     }
 

@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db delete hi --yes
+exit_code: 0
+---- output ----
+stdout: Database 'hi' has been deleted and fully terminated (waited 6s for termination).
+---- end ----

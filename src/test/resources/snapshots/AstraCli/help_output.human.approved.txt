@@ -1,0 +1,52 @@
+---- meta ----
+command: astra 
+exit_code: 0
+---- output ----
+stderr: 
+stderr:      _____            __
+stderr:     /  _  \   _______/  |_____________
+stderr:    /  /_\  \ /  ___/\   __\_  __ \__  \
+stderr:   /    |    \\___ \  |  |  |  | \ //__ \_
+stderr:   \____|__  /____  > |__|  |__|  (____  /
+stderr:           \/     \/                   \/
+stderr: 
+stderr:                        Version: 1.0.0-alpha.0
+stdout: Documentation: 'https://awesome-astra.github.io/docs/pages/astra/astra-cli/'
+stdout: 
+stdout: Usage: astra [-hqvV] [--[no-]color] [--no-input] [--dump-logs[=FILE]]
+stdout:              [-o=FORMAT] [COMMAND]
+stdout: 
+stdout: 
+stdout:       --[no-]color         Force colored output
+stdout:       --dump-logs[=FILE]   Write all logs to an optionally specified file
+stdout:                              (default: ~/.astra-dev/logs/<file>.log)
+stdout:   -h, --help               Show this help message and exit.
+stdout:       --no-input           Never ask for user input (e.g. confirmation prompts)
+stdout:   -o, --output=FORMAT      One of: human, json, csv
+stdout:   -q, --quiet              Suppress informational output
+stdout:   -v, --verbose            Enable verbose logging output
+stdout:   -V, --version            Print version information and exit.
+stdout: 
+stdout: Commands:
+stdout:   setup      Interactively set up the Astra CLI and create profiles
+stdout:   config     Manage your Astra CLI configuration profiles.
+stdout:   db         Manage your Astra databases
+stdout:   org        Show organization information
+stdout:   role       Discover Astra roles
+stdout:   streaming  Manage Astra streaming tenants
+stdout:   token      Manage your Astra tokens
+stdout:   user       Manage users in your organization
+stdout:   nuke       Entirely delete Astra CLI from your system
+stdout: 
+stdout: Examples:
+stdout:   # Setup the Astra CLI
+stdout:   $ astra setup
+stdout: 
+stdout:   # List databases
+stdout:   $ astra db list
+stdout: 
+stdout:   # Create a vector database
+stdout:   $ astra db create demo -r us-east1 --vector
+stdout: 
+stdout: See 'astra <command> <subcommand> --help' for help on a specific subcommand.
+---- end ----

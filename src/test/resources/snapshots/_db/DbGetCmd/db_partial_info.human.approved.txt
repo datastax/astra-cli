@@ -1,0 +1,7 @@
+---- meta ----
+command: astra db get hi --key keyspaces
+exit_code: 0
+---- output ----
+stdout: [0] other_keyspace
+stdout: [1] default_keyspace
+---- end ----

@@ -14,6 +14,7 @@ import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.doubles.GatewayProviderMock;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.With;
 import lombok.val;
 import org.approvaltests.Approvals;
@@ -28,20 +29,27 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.file.FileSystems;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.testlib.AssertUtils.assertIsValidCsvOutput;
 import static com.dtsx.astra.cli.testlib.AssertUtils.assertIsValidJsonOutput;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static org.mockito.Mockito.*;
 
 public class BaseCmdSnapshotTest {
+    private static final Pattern TRAILING_SPACES = Pattern.compile(" +$");
+
     public interface SnapshotTestOptionsModifier extends Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> {}
 
     @With
     private record SnapshotTestOptions(
         List<String> stdin,
-        GatewayProviderMock gatewayProvider
+        GatewayProviderMock gateways,
+        List<Consumer<GatewayProviderMock>> verifyFns
     ) {}
 
     public record CmdOutput(
@@ -61,11 +69,15 @@ public class BaseCmdSnapshotTest {
             val interleavedOutput = new StringBuilder();
 
             for (val line : rawOutput) {
-                if (line instanceof StdoutLine) {
-                    interleavedOutput.append(NL).append("stdout: ").append(line.unwrap());
-                } else if (line instanceof StderrLine) {
-                    interleavedOutput.append(NL).append("stderr: ").append(line.unwrap());
-                }
+                val label = switch (line) {
+                    case StdoutLine _ -> "stdout";
+                    case StderrLine _ -> "stderr";
+                    case StdinLine _ ->  "readln";
+                };
+
+                val content = TRAILING_SPACES.matcher(line.unwrap()).replaceAll(m -> "☐".repeat(m.group().length()));
+
+                interleavedOutput.append(NL).append(label).append(": ").append(content);
             }
 
             return """
@@ -82,38 +94,33 @@ public class BaseCmdSnapshotTest {
         }
     }
 
-    public interface OutputLine { String unwrap(); }
+    public sealed interface OutputLine { String unwrap(); }
     public record StdoutLine(String unwrap) implements OutputLine {}
     public record StderrLine(String unwrap) implements OutputLine {}
+    public record StdinLine(String unwrap) implements OutputLine {}
 
-    protected final void verifyRun(String cmd, SnapshotTestOptionsModifier optionsFn) {
-        verifyRun(cmd, OutputType.HUMAN, optionsFn);
-    }
-
-    protected final void verifyRun(String cmd, OutputType outputType, SnapshotTestOptionsModifier optionsFn) {
-        val outputTypeStr = outputType.name().toLowerCase();
-
-        val outputTypeFlag = (outputType.isNotHuman())
-            ? " -o " + outputTypeStr
-            : "";
-
-        val output = run(cmd + outputTypeFlag, optionsFn);
+    @SuppressWarnings("UnusedReturnValue")
+    protected final CmdOutput verifyRun(String cmd, OutputType outputType, SnapshotTestOptionsModifier optionsFn) {
+        val output = run(cmd, outputType, optionsFn);
 
         switch (outputType) {
             case JSON -> assertIsValidJsonOutput(output.stdout());
             case CSV -> assertIsValidCsvOutput(output.stdout());
         }
 
-        verifyRun(output, o -> o.forFile().withAdditionalInformation(outputTypeStr));
+        val approvalsOptions = new Options()
+            .forFile().withNamer(new FolderBasedApprovalNamer())
+            .forFile().withAdditionalInformation(outputType.name().toLowerCase());
+
+        Approvals.verify(output.toSnapshot(), approvalsOptions);
+
+        return output;
     }
 
-    private void verifyRun(CmdOutput output, Function<Options, Options> optionsMod) {
-        Approvals.verify(output.toSnapshot(), optionsMod.apply(new Options().forFile().withNamer(new FolderBasedApprovalNamer())));
-    }
-
-    private CmdOutput run(String cmd, SnapshotTestOptionsModifier optionsMod) {
+    protected final CmdOutput run(String cmd, OutputType outputType, SnapshotTestOptionsModifier optionsMod) {
         val options = optionsMod.apply(mkDefaultOptions()).options;
 
+        val inputStream = mkFakeInput(options.stdin);
         val outputLines = Collections.synchronizedList(new ArrayList<OutputLine>());
 
         val ctxRef = new Ref<CliContext>((getCtx) -> new CliContext(
@@ -122,12 +129,38 @@ public class BaseCmdSnapshotTest {
             null,
             new AstraColors(Ansi.OFF),
             new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty()),
-            new AstraConsole(mkFakeInput(options.stdin), mkFakeWriter(outputLines, StdoutLine::new), mkFakeWriter(outputLines, StderrLine::new), getCtx, false),
+            mkConsole(inputStream, getCtx, outputLines),
             new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
             FileSystems.getDefault(),
-            options.gatewayProvider
+            options.gateways
         ));
 
+        val cmdParts = buildCmdParts(cmd, outputType);
+        val exitCode = AstraCli.run(ctxRef, cmdParts);
+
+        assertInputStreamEmpty(inputStream);
+        options.verifyFns.forEach(fn -> fn.accept(options.gateways));
+
+        return new CmdOutput(exitCode, outputLines, cmdParts);
+    }
+
+    private @NotNull AstraConsole mkConsole(InputStream inputStream, Supplier<CliContext> getCtx, List<OutputLine> outputLines) {
+
+        val readLineImpl = (Function<String, String>) (prompt) -> {
+            try {
+                Arrays.stream(prompt.split("\\R")).map(StdoutLine::new).forEach(outputLines::add);
+                val read = new Scanner(inputStream).nextLine();
+                outputLines.add(new StdinLine(read));
+                return read;
+            } catch (NoSuchElementException e) {
+                return null;
+            }
+        };
+
+        return new AstraConsole(inputStream, mkFakeWriter(outputLines, StdoutLine::new), mkFakeWriter(outputLines, StderrLine::new), readLineImpl, getCtx, false);
+    }
+
+    private String[] buildCmdParts(String cmd, OutputType outputType) {
         val replacements = Map.of(
             "${DatabaseName}", Fixtures.DatabaseName.toString()
         );
@@ -136,16 +169,16 @@ public class BaseCmdSnapshotTest {
             cmd = cmd.replace(e.getKey(), e.getValue());
         }
 
-        val cmdParts = Arrays.stream(cmd.split("(?<!\\\\) ")).filter(s -> !s.isEmpty()).toArray(String[]::new);
+        cmd += (outputType.isNotHuman())
+            ? " -o " + outputType.name().toLowerCase()
+            : "";
 
-        val exitCode = AstraCli.run(ctxRef, cmdParts);
-
-        return new CmdOutput(exitCode, outputLines, cmdParts);
+        return Arrays.stream(cmd.split("(?<!\\\\) ")).filter(s -> !s.isEmpty()).toArray(String[]::new);
     }
 
     @MustBeInvokedByOverriders
     protected SnapshotTestOptionsBuilder mkDefaultOptions() {
-        return new SnapshotTestOptionsBuilder(new SnapshotTestOptions(List.of(), new GatewayProviderMock()));
+        return new SnapshotTestOptionsBuilder(new SnapshotTestOptions(List.of(), new GatewayProviderMock(), List.of()));
     }
 
     private InputStream mkFakeInput(List<String> lines) {
@@ -167,6 +200,17 @@ public class BaseCmdSnapshotTest {
         });
     }
 
+    @SneakyThrows
+    private void assertInputStreamEmpty(InputStream inputStream) {
+        int remaining = inputStream.available();
+
+        if (remaining > 0) {
+            byte[] leftover = new byte[remaining];
+            int read = inputStream.read(leftover);
+            throw new AssertionError("There are " + remaining + " unread bytes in the input stream: '" + new String(leftover, 0, read) + "'");
+        }
+    }
+
     @RequiredArgsConstructor
     protected static class SnapshotTestOptionsBuilder {
         private final SnapshotTestOptions options;
@@ -183,8 +227,16 @@ public class BaseCmdSnapshotTest {
             return stdin(List.of(lines));
         }
 
-        public SnapshotTestOptionsBuilder gateway(SomeGateway instance) {
-            return new SnapshotTestOptionsBuilder(options.withGatewayProvider(options.gatewayProvider.withInstance(instance)));
+        public <G extends SomeGateway> SnapshotTestOptionsBuilder gateway(Class<G> clazz, Consumer<G> withInstance) {
+            val instance = mock(clazz, withSettings().defaultAnswer(RETURNS_SMART_NULLS));
+            withInstance.accept(instance);
+            return new SnapshotTestOptionsBuilder(options.withGateways(options.gateways.withInstance(instance)));
+        }
+
+        public SnapshotTestOptionsBuilder verify(Consumer<GatewayProviderMock> fn) {
+            val newVerifyFns = new ArrayList<>(options.verifyFns);
+            newVerifyFns.add(fn);
+            return new SnapshotTestOptionsBuilder(options.withVerifyFns(newVerifyFns));
         }
     }
 }

@@ -1,0 +1,16 @@
+---- meta ----
+command: astra db delete hi
+exit_code: 2
+---- output ----
+stdout: You are about to permanently delete database 'hi' (8d770448-20c1-47f0-bb76-96d0d1a66b7f).
+stdout: 
+stdout: To confirm, type the name below or press 'Ctrl+C' to cancel.
+stdout: '>'☐
+stdout: 
+stderr: Error: No input provided and no default option is available
+stderr: 
+stderr: Please interactively answer the question, or programmatically pass an option using the '--yes' flag.
+stderr: 
+stderr: # Potential fix
+stderr: $ astra db delete hi --yes
+---- end ----

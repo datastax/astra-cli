@@ -19,6 +19,7 @@ import picocli.CommandLine.Option;
 import java.io.Console;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -32,6 +33,9 @@ public class AstraConsole {
 
     @Getter
     private final PrintWriter err;
+
+    @Getter
+    private final @Nullable Function<String, String> readLineImpl;
 
     private final Supplier<CliContext> ctxSupplier;
     private final boolean noInput;
@@ -49,21 +53,21 @@ public class AstraConsole {
     }
 
     public void print(Object... items) {
-        if (ctx().outputIsHuman()) {
+        if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
         write(getOut(), items);
     }
 
     public void printf(@PrintFormat String format, Object... items) {
-        if (ctx().outputIsHuman()) {
+        if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
         write(getOut(), format.formatted(items));
     }
 
     public void println(Object... items) {
-        if (ctx().outputIsHuman()) {
+        if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.println() when the output format is not 'human'");
         }
         writeln(getOut(), items);
@@ -91,6 +95,20 @@ public class AstraConsole {
 
     public PrompterBuilder prompt(String prompt) {
         return new PrompterBuilder(ctx(), noInput, prompt);
+    }
+
+    public String unsafeReadLine(@Nullable String prompt, boolean echoOff) {
+        if (readLineImpl != null) {
+            return readLineImpl.apply(prompt);
+        }
+
+        if (console == null) {
+            throw new CongratsYouFoundABugException("System.console() is null, unable to read input"); // should only be used internally in prompters
+        }
+
+        return (echoOff)
+            ? String.valueOf(console.readPassword(prompt != null ? prompt : ""))
+            : console.readLine(prompt != null ? prompt : "");
     }
 
     public String format(Object... args) {

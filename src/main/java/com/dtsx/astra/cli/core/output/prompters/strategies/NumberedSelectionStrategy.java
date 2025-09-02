@@ -6,8 +6,6 @@ import com.dtsx.astra.cli.core.output.prompters.PromptRequest;
 import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy;
 import lombok.val;
 
-import java.io.Console;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.utils.StringUtils.isPositiveInteger;
@@ -20,14 +18,12 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
 
     private final CliContext ctx;
     private final PromptRequest.Closed<T> req;
-    private final Console console;
 
     private int sliceStart = 0;
 
     public NumberedSelectionStrategy(CliContext ctx, PromptRequest.Closed<T> req) {
         this.ctx = ctx;
         this.req = req;
-        this.console = Objects.requireNonNull(ctx.console().getConsole());
     }
 
     public static class Meta implements SelectionStrategy.Meta.Closed {
@@ -84,7 +80,7 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
 
     private Optional<T> handleInput() {
         while (true) {
-            val input = console.readLine().trim();
+            val input = ctx.console().unsafeReadLine(null, false).trim();
 
             if ("n".equals(input)) {
                 handleNextPage();

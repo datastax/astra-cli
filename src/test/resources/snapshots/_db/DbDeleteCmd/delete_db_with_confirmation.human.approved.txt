@@ -1,0 +1,12 @@
+---- meta ----
+command: astra db delete hi --timeout 36
+exit_code: 0
+---- output ----
+stdout: You are about to permanently delete database 'hi' (8d770448-20c1-47f0-bb76-96d0d1a66b7f).
+stdout: 
+stdout: To confirm, type the name below or press 'Ctrl+C' to cancel.
+stdout: '>'☐
+readln: hi
+stdout: 
+stdout: Database 'hi' has been deleted and fully terminated (waited 6s for termination).
+---- end ----

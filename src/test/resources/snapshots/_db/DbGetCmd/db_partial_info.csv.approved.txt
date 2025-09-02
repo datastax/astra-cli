@@ -1,0 +1,7 @@
+---- meta ----
+command: astra db get hi --key keyspaces -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,data
+stdout: OK,,"other_keyspace,default_keyspace"
+---- end ----

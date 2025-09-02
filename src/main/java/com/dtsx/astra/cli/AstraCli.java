@@ -105,7 +105,7 @@ public class AstraCli extends AbstractCmd<Void> {
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
             new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty()),
-            new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), getCtx, false),
+            new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), null, getCtx, false),
             new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
             FileSystems.getDefault(),
             new GatewayProviderImpl()

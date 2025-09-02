@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db get hi
+exit_code: 0
+---- output ----
+stdout: +------------------+--------------------------------------+
+stdout: | Attribute        | Value                                |
+stdout: +------------------+--------------------------------------+
+stdout: | Name             | hi                                   |
+stdout: | ID               | 8d770448-20c1-47f0-bb76-96d0d1a66b7f |
+stdout: | Cloud Provider   | GCP                                  |
+stdout: | Region           | us-east1                             |
+stdout: | Status           | ACTIVE                               |
+stdout: | Vector           | Enabled                              |
+stdout: | Default Keyspace | default_keyspace                     |
+stdout: | Creation Time    | 2025-06-17T02:28:00Z                 |
+stdout: | Keyspaces        | [0] other_keyspace                   |
+stdout: |                  | [1] default_keyspace                 |
+stdout: | Regions          | [0] us-east1                         |
+stdout: +------------------+--------------------------------------+
+---- end ----

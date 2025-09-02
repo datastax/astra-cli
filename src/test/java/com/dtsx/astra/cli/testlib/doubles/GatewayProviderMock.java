@@ -46,77 +46,129 @@ public class GatewayProviderMock implements GatewayProvider {
         UserGateway.class
     );
 
+    public DbGateway dbGateway() {
+        return returnIfEnabled(DbGateway.class);
+    }
+
+    public OrgGateway orgGateway() {
+        return returnIfEnabled(OrgGateway.class);
+    }
+
+    public OrgGateway.Stateless orgGatewayStateless() {
+        return returnIfEnabled(OrgGateway.Stateless.class);
+    }
+
+    public CollectionGateway collectionGateway() {
+        return returnIfEnabled(CollectionGateway.class);
+    }
+
+    public KeyspaceGateway keyspaceGateway() {
+        return returnIfEnabled(KeyspaceGateway.class);
+    }
+
+    public CdcGateway cdcGateway() {
+        return returnIfEnabled(CdcGateway.class);
+    }
+
+    public RegionGateway regionGateway() {
+        return returnIfEnabled(RegionGateway.class);
+    }
+
+    public DownloadsGateway downloadsGateway() {
+        return returnIfEnabled(DownloadsGateway.class);
+    }
+
+    public StreamingGateway streamingGateway() {
+        return returnIfEnabled(StreamingGateway.class);
+    }
+
+    public RoleGateway roleGateway() {
+        return returnIfEnabled(RoleGateway.class);
+    }
+
+    public TableGateway tableGateway() {
+        return returnIfEnabled(TableGateway.class);
+    }
+
+    public TokenGateway tokenGateway() {
+        return returnIfEnabled(TokenGateway.class);
+    }
+
+    public UserGateway userGateway() {
+        return returnIfEnabled(UserGateway.class);
+    }
+
     @Override
     public DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache, CliContext ctx) {
-        return returnIfEnabled(DbGateway.class);
+        return dbGateway();
     }
 
     @Override
     public OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(OrgGateway.class);
+        return orgGateway();
     }
 
     @Override
     public OrgGateway.Stateless mkOrgGatewayStateless(CliContext ctx) {
-        return returnIfEnabled(OrgGateway.Stateless.class);
+        return orgGatewayStateless();
     }
 
     @Override
     public CollectionGateway mkCollectionGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(CollectionGateway.class);
+        return collectionGateway();
     }
 
     @Override
     public KeyspaceGateway mkKeyspaceGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(KeyspaceGateway.class);
+        return keyspaceGateway();
     }
 
     @Override
     public CdcGateway mkCdcGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(CdcGateway.class);
+        return cdcGateway();
     }
 
     @Override
     public RegionGateway mkRegionGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(RegionGateway.class);
+        return regionGateway();
     }
 
     @Override
     public DownloadsGateway mkDownloadsGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(DownloadsGateway.class);
+        return downloadsGateway();
     }
 
     @Override
     public StreamingGateway mkStreamingGateway(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache, CliContext ctx) {
-        return returnIfEnabled(StreamingGateway.class);
+        return streamingGateway();
     }
 
     @Override
     public RoleGateway mkRoleGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache, CliContext ctx) {
-        return returnIfEnabled(RoleGateway.class);
+        return roleGateway();
     }
 
     @Override
     public TableGateway mkTableGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(TableGateway.class);
+        return tableGateway();
     }
 
     @Override
     public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return returnIfEnabled(TokenGateway.class);
+        return tokenGateway();
     }
 
     @Override
     public UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx) {
-        return returnIfEnabled(UserGateway.class);
+        return userGateway();
     }
 
     public GatewayProviderMock withInstance(SomeGateway instance) {
         val newInstances = new HashMap<>(instances);
 
         val allGatewayInterfaces = recursivelyFindAllInterfaces(instance.getClass())
-                .filter(CLASSES::contains)
-                .toList();
+            .filter(CLASSES::contains)
+            .toList();
 
         for (val clazz : allGatewayInterfaces) {
             newInstances.put(clazz, instance);

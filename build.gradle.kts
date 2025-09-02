@@ -18,6 +18,8 @@ plugins {
 group = "com.dtsx.astra.cli"
 version = "1.0.0-alpha.0"
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 repositories {
     mavenCentral()
 }
@@ -55,8 +57,9 @@ dependencies {
     // snapshot tests (golden-master-esque)
     testImplementation("com.approvaltests:approvaltests:25.0.23")
 
-    // mocking
+    // mocking (also, https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#mockito-instrumentation)
     testImplementation("org.mockito:mockito-core:5.19.0")
+    mockitoAgent("org.mockito:mockito-core:5.19.0") { isTransitive = false }
 
     // verifying csv output
     testImplementation("org.apache.commons:commons-csv:1.14.1")
@@ -138,7 +141,8 @@ tasks.test {
     }
 
     jvmArgs = listOf(
-        "--enable-native-access=ALL-UNNAMED"
+        "--enable-native-access=ALL-UNNAMED",
+        "-javaagent:${mockitoAgent.asPath}"
     )
 }
 

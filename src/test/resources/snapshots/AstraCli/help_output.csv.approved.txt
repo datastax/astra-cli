@@ -1,0 +1,11 @@
+---- meta ----
+command: astra -o csv
+exit_code: 2
+---- output ----
+stdout: code,message
+stdout: UNSUPPORTED_EXECUTION,"Error: This operation does not support outputting in the 'csv' format.
+stdout: 
+stdout: No operation was executed; no changes were made.
+stdout: 
+stdout: Please retry with another output format using '--output <human|json>' or '-o <human|json>'."
+---- end ----
