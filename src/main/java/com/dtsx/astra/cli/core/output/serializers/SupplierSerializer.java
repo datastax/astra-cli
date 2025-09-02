@@ -12,16 +12,16 @@ enum SupplierSerializer implements OutputSerializer<Supplier<?>> {
 
     @Override
     public String serializeAsHumanInternal(Supplier<?> s) {
-        return OutputSerializer.trySerializeAsHuman(s.get());
+        return OutputSerializer.serializeAsHuman(s.get());
     }
 
     @Override
     public Object serializeAsJsonInternal(Supplier<?> s) {
-        return OutputSerializer.trySerializeAsJson(s.get());
+        return OutputSerializer.serializeAsJson(s.get());
     }
 
     @Override
     public String serializeAsCsvInternal(Supplier<?> s) {
-        return OutputSerializer.trySerializeAsCsv(s.get());
+        return OutputSerializer.serializeAsCsv(s.get());
     }
 }

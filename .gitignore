@@ -42,5 +42,6 @@ bin/
 .DS_Store
 
 /token
-comp.bash
+/comp.bash
 /.jqwik-database
+/.approval_tests_temp

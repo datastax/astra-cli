@@ -14,7 +14,7 @@ import java.util.SortedMap;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class RegionGatewayStub implements RegionGateway {
+public class RegionGatewayStub extends GatewayStub implements RegionGateway {
     @Override
     public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector) {
         return methodIllegallyCalled();

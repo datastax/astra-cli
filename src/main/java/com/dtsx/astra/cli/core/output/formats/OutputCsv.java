@@ -19,20 +19,22 @@ public interface OutputCsv {
     String renderAsCsv();
 
     @SneakyThrows
-    static OutputCsv response(CharSequence message, @Nullable SequencedMap<String, Object> data, ExitCode code) {
+    static OutputCsv response(CharSequence message, @Nullable SequencedMap<String, Object> rawData, ExitCode code) {
         val sb = new StringBuilder().append("code,message");
 
-        val lhm = Optional.ofNullable(data).map(OutputCsv::serializeData)
+        val serializedData = Optional.ofNullable(rawData).map(OutputCsv::serializeData)
             .orElseGet(LinkedHashMap::new);
 
-        for (val key : lhm.keySet()) {
+        for (val key : serializedData.keySet()) {
             sb.append(',').append(key);
         }
 
         sb.append(NL);
-        sb.append(code.name()).append(OutputSerializer.trySerializeAsCsv(trimIndent(message.toString())));
+        sb.append(code.name());
+        sb.append(",");
+        sb.append(OutputSerializer.serializeAsCsv(trimIndent(message.toString())));
 
-        for (val value : lhm.values()) {
+        for (val value : serializedData.values()) {
             sb.append(',').append(value);
         }
 
@@ -40,7 +42,7 @@ public interface OutputCsv {
     }
 
     static OutputCsv serializeValue(Object o) {
-        return () -> "code,data" + NL + OK.name() + "," + OutputSerializer.trySerializeAsCsv(o);
+        return () -> "code,message,data" + NL + OK.name() + ",," + OutputSerializer.serializeAsCsv(o);
     }
 
     @SneakyThrows
@@ -49,8 +51,8 @@ public interface OutputCsv {
 
         for (val e : data.entrySet()) {
             map.put(
-                OutputSerializer.trySerializeAsCsv("data." + e.getKey()),
-                OutputSerializer.trySerializeAsCsv(e.getValue())
+                OutputSerializer.serializeAsCsv("data." + e.getKey()),
+                OutputSerializer.serializeAsCsv(e.getValue())
             );
         }
 

@@ -23,26 +23,45 @@ repositories {
 }
 
 dependencies {
+    // shuts up some errors about missing SLF4J implementations
     implementation("org.slf4j:slf4j-nop:2.0.17")
 
+    // for underlying api calls
     implementation("com.datastax.astra:astra-db-java:2.0.0")
     implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
 
+    // unzip downloaded external programs (cqlsh, dsbulk, etc)
     implementation("org.apache.commons:commons-compress:1.28.0")
 
+    // guess
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
     implementation("info.picocli:picocli-codegen:4.7.7")
 
+    // help with cross-platform console output
+    implementation("org.fusesource.jansi:jansi:2.4.2")
+    implementation("info.picocli:picocli-jansi-graalvm:1.2.0")
+
+    // guess
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
+    // prettier assertions, may remove if it ends up not being super useful
     testImplementation("org.assertj:assertj-core:3.27.4")
+
+    // property-based testing
     testImplementation("net.jqwik:jqwik:1.9.3")
 
-    implementation("info.picocli:picocli-jansi-graalvm:1.2.0")
-    implementation("org.fusesource.jansi:jansi:2.4.2")
+    // snapshot tests (golden-master-esque)
+    testImplementation("com.approvaltests:approvaltests:25.0.23")
 
+    // mocking
+    testImplementation("org.mockito:mockito-core:5.19.0")
+
+    // verifying csv output
+    testImplementation("org.apache.commons:commons-csv:1.14.1")
+
+    // compileOnly & annotationProcessor declarations need to be duplicated to work for both main and test source sets
     compileOnly("org.jetbrains:annotations:26.0.2")
     testCompileOnly("org.jetbrains:annotations:26.0.2")
 

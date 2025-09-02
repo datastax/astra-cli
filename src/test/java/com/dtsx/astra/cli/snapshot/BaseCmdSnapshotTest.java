@@ -9,11 +9,15 @@ import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.SomeGateway;
+import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.doubles.GatewayProviderMock;
 import lombok.RequiredArgsConstructor;
 import lombok.With;
 import lombok.val;
+import org.approvaltests.Approvals;
+import org.approvaltests.core.Options;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine.Help.Ansi;
@@ -27,6 +31,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.testlib.AssertUtils.assertIsValidCsvOutput;
+import static com.dtsx.astra.cli.testlib.AssertUtils.assertIsValidJsonOutput;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public class BaseCmdSnapshotTest {
@@ -40,7 +46,8 @@ public class BaseCmdSnapshotTest {
 
     public record CmdOutput(
         int exitCode,
-        List<OutputLine> rawOutput
+        List<OutputLine> rawOutput,
+        String[] command
     ) {
         public String stdout() {
             return rawOutput.stream()
@@ -49,19 +56,29 @@ public class BaseCmdSnapshotTest {
                 .collect(Collectors.joining(NL));
         }
 
-        public String stderr() {
-            return rawOutput.stream()
-                .filter(StderrLine.class::isInstance)
-                .map(OutputLine::unwrap)
-                .collect(Collectors.joining(NL));
-        }
-
+        // inspired by https://insta.rs/docs/cmd
         public String toSnapshot() {
-            return "exit_code: " + exitCode + NL +
-                "----- stdout -----" + NL +
-                stdout() + NL +
-                "----- stderr -----" + NL +
-                stderr() + NL;
+            val interleavedOutput = new StringBuilder();
+
+            for (val line : rawOutput) {
+                if (line instanceof StdoutLine) {
+                    interleavedOutput.append(NL).append("stdout: ").append(line.unwrap());
+                } else if (line instanceof StderrLine) {
+                    interleavedOutput.append(NL).append("stderr: ").append(line.unwrap());
+                }
+            }
+
+            return """
+            ---- meta ----
+            command: astra %s
+            exit_code: %d
+            ---- output ----%s
+            ---- end ----
+            """.formatted(
+                String.join(" ", command),
+                exitCode,
+                interleavedOutput
+            );
         }
     }
 
@@ -69,12 +86,33 @@ public class BaseCmdSnapshotTest {
     public record StdoutLine(String unwrap) implements OutputLine {}
     public record StderrLine(String unwrap) implements OutputLine {}
 
-    protected final CmdOutput run(String cmd) {
-        return run(cmd, b -> b);
+    protected final void verifyRun(String cmd, SnapshotTestOptionsModifier optionsFn) {
+        verifyRun(cmd, OutputType.HUMAN, optionsFn);
     }
 
-    protected final CmdOutput run(String cmd, SnapshotTestOptionsModifier optionsFn) {
-        val options = optionsFn.apply(mkDefaultOptions()).options;
+    protected final void verifyRun(String cmd, OutputType outputType, SnapshotTestOptionsModifier optionsFn) {
+        val outputTypeStr = outputType.name().toLowerCase();
+
+        val outputTypeFlag = (outputType.isNotHuman())
+            ? " -o " + outputTypeStr
+            : "";
+
+        val output = run(cmd + outputTypeFlag, optionsFn);
+
+        switch (outputType) {
+            case JSON -> assertIsValidJsonOutput(output.stdout());
+            case CSV -> assertIsValidCsvOutput(output.stdout());
+        }
+
+        verifyRun(output, o -> o.forFile().withAdditionalInformation(outputTypeStr));
+    }
+
+    private void verifyRun(CmdOutput output, Function<Options, Options> optionsMod) {
+        Approvals.verify(output.toSnapshot(), optionsMod.apply(new Options().forFile().withNamer(new FolderBasedApprovalNamer())));
+    }
+
+    private CmdOutput run(String cmd, SnapshotTestOptionsModifier optionsMod) {
+        val options = optionsMod.apply(mkDefaultOptions()).options;
 
         val outputLines = Collections.synchronizedList(new ArrayList<OutputLine>());
 
@@ -83,16 +121,26 @@ public class BaseCmdSnapshotTest {
             true,
             null,
             new AstraColors(Ansi.OFF),
-            new AstraLogger(Level.QUIET, getCtx, false, Optional.empty()),
+            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty()),
             new AstraConsole(mkFakeInput(options.stdin), mkFakeWriter(outputLines, StdoutLine::new), mkFakeWriter(outputLines, StderrLine::new), getCtx, false),
             new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
             FileSystems.getDefault(),
             options.gatewayProvider
         ));
 
-        val exitCode = AstraCli.run(ctxRef, cmd.split("(?<!\\\\) "));
+        val replacements = Map.of(
+            "${DatabaseName}", Fixtures.DatabaseName.toString()
+        );
 
-        return new CmdOutput(exitCode, outputLines);
+        for (val e : replacements.entrySet()) {
+            cmd = cmd.replace(e.getKey(), e.getValue());
+        }
+
+        val cmdParts = Arrays.stream(cmd.split("(?<!\\\\) ")).filter(s -> !s.isEmpty()).toArray(String[]::new);
+
+        val exitCode = AstraCli.run(ctxRef, cmdParts);
+
+        return new CmdOutput(exitCode, outputLines, cmdParts);
     }
 
     @MustBeInvokedByOverriders
@@ -123,7 +171,7 @@ public class BaseCmdSnapshotTest {
     protected static class SnapshotTestOptionsBuilder {
         private final SnapshotTestOptions options;
 
-        public SnapshotTestOptionsBuilder with(SnapshotTestOptionsModifier modifier) {
+        public SnapshotTestOptionsBuilder use(SnapshotTestOptionsModifier modifier) {
             return modifier.apply(this);
         }
 

@@ -39,6 +39,6 @@ public interface OutputHuman {
     }
 
     static OutputHuman serializeValue(Object o) {
-        return (_) -> OutputSerializer.trySerializeAsHuman(o);
+        return (_) -> OutputSerializer.serializeAsHuman(o);
     }
 }

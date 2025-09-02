@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class OrgGatewayStub implements OrgGateway {
+public class OrgGatewayStub extends GatewayStub implements OrgGateway {
     @Override
     public Organization current() {
         return methodIllegallyCalled();

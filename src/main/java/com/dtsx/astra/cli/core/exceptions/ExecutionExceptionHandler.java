@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.exceptions;
 
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.exceptions.external.AuthenticationExceptionMapper;
 import com.dtsx.astra.cli.core.exceptions.external.DatabaseNotFoundExceptionMapper;
 import com.dtsx.astra.cli.core.exceptions.external.UserInterruptExceptionMapper;
@@ -11,7 +12,6 @@ import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParseResult;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
@@ -22,21 +22,21 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
             new UserInterruptExceptionMapper()
         );
 
-    private final Supplier<CliContext> ctx;
+    private final Ref<CliContext> ctxRef;
 
     @Override
     public int handleExecutionException(Exception unmappedE, CommandLine cmd, ParseResult parseResult) {
         val e = EXTERNAL_ERROR_MAPPERS.stream()
             .filter(m -> m.canMap(unmappedE))
             .findFirst()
-            .<Exception>map(m -> m.mapException(unmappedE, cmd, parseResult, ctx.get()))
+            .<Exception>map(m -> m.mapException(unmappedE, cmd, parseResult, ctxRef.get()))
             .orElse(unmappedE);
 
         if (e instanceof AstraCliException cliErr) {
-            return ExceptionHandlerUtils.handleAstraCliException(cliErr, cmd, ctx.get());
+            return ExceptionHandlerUtils.handleAstraCliException(cliErr, cmd, ctxRef.get());
         }
 
-        return ExceptionHandlerUtils.handleUncaughtException(unmappedE, ctx.get());
+        return ExceptionHandlerUtils.handleUncaughtException(unmappedE, ctxRef.get());
     }
 
     public interface ExternalExceptionMapper<E extends Exception> {

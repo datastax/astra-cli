@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class DbGatewayStub implements DbGateway {
+public class DbGatewayStub extends GatewayStub implements DbGateway {
     @Override
     public Stream<Database> findAll() {
         return methodIllegallyCalled();

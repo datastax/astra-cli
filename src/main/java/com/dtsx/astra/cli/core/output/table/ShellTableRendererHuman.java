@@ -50,7 +50,7 @@ public final class ShellTableRendererHuman implements OutputHuman {
                 Map<String, List<String>> ret = new HashMap<>();
 
                 for (val entry : map.entrySet()) {
-                    val serialized = OutputSerializer.trySerializeAsHuman(entry.getValue())
+                    val serialized = OutputSerializer.serializeAsHuman(entry.getValue())
                         .split(NL);
 
                     ret.put(entry.getKey(), List.of(serialized));

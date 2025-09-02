@@ -49,7 +49,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     public void initCtx(Ref<CliContext> ctxRef) {
         this.ctxRef = ctxRef;
-        this.ctx = ctxRef.unwrap();
+        this.ctx = ctxRef.get();
         ctxRef.onUpdate((ctx) -> this.ctx = ctx);
     }
 
@@ -81,6 +81,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
         throw new AstraCliException(UNSUPPORTED_EXECUTION, """
           @|bold,red Error: This operation does not support outputting in the '|@@|bold,red,italic %s|@@|bold,red ' format.|@
+        
+          No operation was executed; no changes were made.
         
           Please retry with another output format using '--output <%s>' or '-o <%s>'.
         """.formatted(
@@ -154,8 +156,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @MustBeInvokedByOverriders
     protected void postlude(String result) {
         if (!result.isEmpty()) {
-            val formatted = ctx.console().format(result.stripTrailing());
-            ctx.console().getOut().println(formatted);
+            ctx.console().unsafePrintln(result.stripTrailing());
         }
 
         if (ctx.log().shouldDumpLogs()) {

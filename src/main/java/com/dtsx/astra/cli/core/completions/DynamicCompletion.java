@@ -19,7 +19,7 @@ public abstract class DynamicCompletion implements Iterable<String> {
         INSTANCES.add(instance);
     }
 
-    public static Set<DynamicCompletion> mkInstances() {
+    public static Set<DynamicCompletion> getInstances() {
         return INSTANCES;
     }
 

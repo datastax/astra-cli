@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class StreamingGatewayStub implements StreamingGateway {
+public class StreamingGatewayStub extends GatewayStub implements StreamingGateway {
     @Override
     public Tenant findOne(TenantName tenantName) {
         return methodIllegallyCalled();

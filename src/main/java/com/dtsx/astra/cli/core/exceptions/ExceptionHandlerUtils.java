@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import picocli.CommandLine;
 
+import java.util.function.Consumer;
+
 import static com.dtsx.astra.cli.core.output.ExitCode.UNCAUGHT;
 import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 
@@ -16,11 +18,7 @@ public class ExceptionHandlerUtils {
 
         val message = renderMessage(response, ctx);
 
-        if (message.stripTrailing().endsWith("\n")) {
-            ctx.console().error(message);
-        } else {
-            ctx.console().errorln(message);
-        }
+        getPrintFnForOutput(ctx).accept(message.stripTrailing());
 
         ctx.log().exception(err);
 
@@ -51,7 +49,7 @@ public class ExceptionHandlerUtils {
 
         val rendered = renderMessage(OutputAll.response(message, null, null, UNCAUGHT), ctx);
 
-        ctx.console().errorln(rendered);
+        getPrintFnForOutput(ctx).accept(rendered.stripTrailing());
         ctx.log().exception(err);
         ctx.log().dumpLogsToFile();
 
@@ -63,6 +61,13 @@ public class ExceptionHandlerUtils {
             case HUMAN -> response.renderAsHuman(ctx);
             case JSON -> response.renderAsJson();
             case CSV -> response.renderAsCsv();
+        };
+    }
+
+    private Consumer<String> getPrintFnForOutput(CliContext ctx) {
+        return switch (ctx.outputType()) {
+            case HUMAN -> ctx.console()::errorln;
+            case JSON, CSV -> ctx.console()::unsafePrintln;
         };
     }
 }

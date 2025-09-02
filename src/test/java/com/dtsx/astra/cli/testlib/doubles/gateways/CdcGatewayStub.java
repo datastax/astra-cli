@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class CdcGatewayStub implements CdcGateway {
+public class CdcGatewayStub extends GatewayStub implements CdcGateway {
     @Override
     public Stream<CdcDefinition> findAll(DbRef dbRef) {
         return methodIllegallyCalled();

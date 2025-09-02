@@ -27,7 +27,7 @@ public record ShellTableRendererCsv(RenderableShellTable table) implements Outpu
                 val ret = new StringJoiner(",");
 
                 for (val col : columns) {
-                    ret.add(OutputSerializer.trySerializeAsCsv(row.get(col)));
+                    ret.add(OutputSerializer.serializeAsCsv(row.get(col)));
                 }
 
                 return ret.toString();

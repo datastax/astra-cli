@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class TokenGatewayStub implements TokenGateway {
+public class TokenGatewayStub extends GatewayStub implements TokenGateway {
     @Override
     public Stream<IamToken> findAll() {
         return methodIllegallyCalled();

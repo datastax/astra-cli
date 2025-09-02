@@ -8,7 +8,7 @@ import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class KeyspaceGatewayStub implements KeyspaceGateway {
+public class KeyspaceGatewayStub extends GatewayStub implements KeyspaceGateway {
     @Override
     public FoundKeyspaces findAll(DbRef dbRef) {
         return methodIllegallyCalled();

@@ -126,14 +126,16 @@ public class AstraCli extends AbstractCmd<Void> {
         val cli = new AstraCli();
         val cmd = new CommandLine(cli, mkFactory(ctxRef));
 
+        cli.initCtx(ctxRef); // top-level command needs to be initialized manually since picocli doesn't use the factory for it
+
         // should only be used in dire cases where it doesn't super matter if the context is wrong,
         // and it won't affect testability.
-        unsafeGlobalCliContext = ctxRef::unwrap;
+        unsafeGlobalCliContext = ctxRef::get;
 
         cmd
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
-            .setExecutionExceptionHandler(new ExecutionExceptionHandler(unsafeGlobalCliContext))
-            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler(), unsafeGlobalCliContext))
+            .setExecutionExceptionHandler(new ExecutionExceptionHandler(ctxRef))
+            .setParameterExceptionHandler(new ParameterExceptionHandler(cmd.getParameterExceptionHandler(), ctxRef))
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
@@ -144,7 +146,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
         cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
 
-        for (val converter : TypeConverters.INSTANCES) {
+        for (val converter : TypeConverters.mkInstances(ctxRef)) {
             cmd.registerConverter(converter.clazz(), converter);
         }
 

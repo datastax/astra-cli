@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class DownloadsGatewayStub implements DownloadsGateway {
+public class DownloadsGatewayStub extends GatewayStub implements DownloadsGateway {
     @Override
     public Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters) {
         return methodIllegallyCalled();

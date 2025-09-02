@@ -19,19 +19,26 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 public interface OutputJson {
     String renderAsJson();
 
+    abstract class Fields {
+        public static final String CODE = "code";
+        public static final String MESSAGE = "message";
+        public static final String DATA = "data";
+        public static final String NEXT_STEPS = "nextSteps";
+    }
+
     static OutputJson response(CharSequence message, @Nullable SequencedMap<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode code) {
         return () -> serializeValue(sequencedMapOf(
-            "code", code,
-            "message", trimIndent(message.toString()),
-            "data", Optional.ofNullable(data),
-            "nextSteps", Optional.ofNullable(nextSteps)
+            Fields.CODE, code,
+            Fields.MESSAGE, trimIndent(message.toString()),
+            Fields.DATA, Optional.ofNullable(data),
+            Fields.NEXT_STEPS, Optional.ofNullable(nextSteps)
         ));
     }
 
     static OutputJson serializeValue(Object o) {
         return () -> serializeValue(sequencedMapOf(
-            "code", OK,
-            "data", o
+            Fields.CODE, OK,
+            Fields.DATA, o
         ));
     }
 

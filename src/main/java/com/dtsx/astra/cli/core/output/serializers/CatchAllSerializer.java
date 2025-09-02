@@ -22,6 +22,10 @@ enum CatchAllSerializer implements OutputSerializer<Object> {
 
     @Override
     public String serializeAsCsvInternal(Object o) {
+        if (o == null) {
+            return "";
+        }
+
         val s = o.toString();
 
         if (s.contains(",") || s.contains("\"") || s.contains("\n")) {

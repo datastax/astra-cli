@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class TableGatewayStub implements TableGateway {
+public class TableGatewayStub extends GatewayStub implements TableGateway {
     @Override
     public Optional<TableDefinition> findOne(TableRef collRef) {
         return methodIllegallyCalled();

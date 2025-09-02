@@ -38,7 +38,7 @@ public class CompletionsCmd implements Runnable {
             spec.root().commandLine()
         );
 
-        val instances = DynamicCompletion.mkInstances();
+        val instances = DynamicCompletion.getInstances();
 
         val lines = script.split(NL);
         val estimatedSize = script.length() + (instances.size() * 100) + 500;

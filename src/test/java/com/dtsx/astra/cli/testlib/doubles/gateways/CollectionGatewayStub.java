@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class CollectionGatewayStub implements CollectionGateway {
+public class CollectionGatewayStub extends GatewayStub implements CollectionGateway {
     @Override
     public Optional<CollectionDefinition> findOne(CollectionRef collRef) {
         return methodIllegallyCalled();

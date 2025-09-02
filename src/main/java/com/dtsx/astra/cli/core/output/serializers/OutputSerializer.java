@@ -8,48 +8,37 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public interface OutputSerializer<T> {
     List<OutputSerializer<?>> SERIALIZERS = List.of(
-        ListSerializer.INSTANCE,
+        OptionalSerializer.INSTANCE,
+        SupplierSerializer.INSTANCE,
         EnumSerializer.INSTANCE,
-        CatchAllSerializer.INSTANCE,
-        SupplierSerializer.INSTANCE
+        CollectionSerializer.INSTANCE,
+        CatchAllSerializer.INSTANCE
     );
 
     boolean canSerialize(Object o);
-
-    default String serializeAsHuman(Object t) {
-        return serializeAsHumanInternal((T) t);
-    }
-
-    default Object serializeAsJson(Object t) {
-        return serializeAsJsonInternal((T) t);
-    }
-
-    default String serializeAsCsv(Object t) {
-        return serializeAsCsvInternal((T) t);
-    }
 
     String serializeAsHumanInternal(T t);
     Object serializeAsJsonInternal(T t);
     String serializeAsCsvInternal(T t);
 
-    static OutputSerializer<?> findSerializerForObj(Object o) {
+    static OutputSerializer<Object> findSerializerForObj(Object o) {
         for (val serializer : SERIALIZERS) {
             if (serializer.canSerialize(o)) {
-                return serializer;
+                return (OutputSerializer<Object>) serializer;
             }
         }
         throw new CongratsYouFoundABugException("No serializer found for object: " + o.getClass().getName());
     }
 
-    static String trySerializeAsHuman(Object o) {
-        return findSerializerForObj(o).serializeAsHuman(o);
+    static String serializeAsHuman(Object o) {
+        return findSerializerForObj(o).serializeAsHumanInternal(o);
     }
 
-    static Object trySerializeAsJson(Object o) {
-        return findSerializerForObj(o).serializeAsJson(o);
+    static Object serializeAsJson(Object o) {
+        return findSerializerForObj(o).serializeAsJsonInternal(o);
     }
 
-    static String trySerializeAsCsv(Object o) {
-        return findSerializerForObj(o).serializeAsCsv(o);
+    static String serializeAsCsv(Object o) {
+        return findSerializerForObj(o).serializeAsCsvInternal(o);
     }
 }

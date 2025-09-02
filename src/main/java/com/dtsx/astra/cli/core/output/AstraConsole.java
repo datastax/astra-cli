@@ -69,6 +69,10 @@ public class AstraConsole {
         writeln(getOut(), items);
     }
 
+    public void unsafePrintln(Object... items) {
+        writeln(getOut(), items); // no check on output format
+    }
+
     public void error(Object... items) {
         write(getErr(), items);
     }

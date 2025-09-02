@@ -7,20 +7,20 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Ref<T> {
-    private T unwrap;
+    private T value;
 
     private final List<Consumer<T>> listeners = new ArrayList<>();
 
     public Ref(Function<Supplier<T>, T> ctxFn) {
-        this.unwrap = ctxFn.apply(this::unwrap);
+        this.value = ctxFn.apply(this::get);
     }
 
-    public T unwrap() {
-        return unwrap;
+    public T get() {
+        return value;
     }
 
     public void set(T ctx) {
-        this.unwrap = ctx;
+        this.value = ctx;
         listeners.forEach(l -> l.accept(ctx));
     }
 

@@ -19,7 +19,7 @@ public record ShellTableRendererJson(RenderableShellTable table) implements Outp
                 row.entrySet().stream()
                     .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> OutputSerializer.trySerializeAsJson(e.getValue())
+                        e -> OutputSerializer.serializeAsJson(e.getValue())
                     )))
             .toList();
     }

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.testlib.doubles.Utils.methodIllegallyCalled;
 
-public class UserGatewayStub implements UserGateway {
+public class UserGatewayStub extends GatewayStub implements UserGateway {
     @Override
     public User findOne(UserRef user) {
         return methodIllegallyCalled();

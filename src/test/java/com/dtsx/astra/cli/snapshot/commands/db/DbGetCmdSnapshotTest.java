@@ -1,31 +1,46 @@
 package com.dtsx.astra.cli.snapshot.commands.db;
 
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
+import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.doubles.gateways.DbGatewayStub;
 import com.dtsx.astra.sdk.db.domain.Database;
-import lombok.val;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.testlib.AssertUtils.assertEquals;
+
 public class DbGetCmdSnapshotTest extends BaseCmdSnapshotTest {
-    private final SnapshotTestOptionsModifier foundDbOpts = (b) -> b.gateway(new DbGatewayStub() {
+    private final SnapshotTestOptionsModifier foundDbOpts = (o) -> o.gateway(new DbGatewayStub() {
         @Override
         public Optional<Database> tryFindOne(DbRef ref) {
+            assertEquals(ref, Fixtures.DatabaseName);
             return Optional.of(Fixtures.Database);
         }
     });
 
-    @Nested
-    public class human {
-        @Test
-        public void gets_full_information_about_a_database() {
-            val output = run("db get hi", foundDbOpts);
-
-            System.out.println(output.toSnapshot());
+    private final SnapshotTestOptionsModifier notFoundDbOpts = (o) -> o.gateway(new DbGatewayStub() {
+        @Override
+        public Optional<Database> tryFindOne(DbRef ref) {
+            assertEquals(ref, "<whatever>");
+            return Optional.empty();
         }
+    });
+
+    @TestForAllOutputs
+    public void db_full_info(OutputType outputType) {
+        verifyRun("db get ${DatabaseName}", outputType, foundDbOpts);
+    }
+
+    @TestForAllOutputs
+    public void db_partial_info(OutputType outputType) {
+        verifyRun("db get ${DatabaseName} --key keyspaces", outputType, foundDbOpts);
+    }
+
+    @TestForAllOutputs
+    public void db_not_found(OutputType outputType) {
+        verifyRun("db get <whatever>", outputType, notFoundDbOpts);
     }
 }

@@ -15,7 +15,7 @@ public class CongratsYouFoundABugException extends AstraCliException {
         
           @|bold Congratulations, you have found a bug in the Astra CLI.|@
 
-          Please file an issue here: https://github.com/datastax/astra-cli/issues/new?template=bug_report.md
+          Please file an issue here: @!https://github.com/datastax/astra-cli/issues/new?template=bug_report.md!@
   
           A full debug log was generated at @!%s!@
    
