@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db describe-collection two_regions_db -c test_coll -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "vector" : {
+stdout:       "dimension" : 5,
+stdout:       "metric" : "cosine"
+stdout:     },
+stdout:     "lexical" : {
+stdout:       "enabled" : false
+stdout:     },
+stdout:     "rerank" : {
+stdout:       "enabled" : false
+stdout:     }
+stdout:   }
+stdout: }
+---- end ----

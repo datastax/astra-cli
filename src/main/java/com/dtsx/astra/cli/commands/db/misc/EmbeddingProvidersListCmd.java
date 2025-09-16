@@ -1,16 +1,18 @@
 package com.dtsx.astra.cli.commands.db.misc;
 
+import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
 import com.dtsx.astra.cli.commands.db.AbstractPromptForDbCmd;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
-import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProviderResult;
@@ -28,7 +30,13 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class EmbeddingProvidersListCmd extends AbstractPromptForDbCmd<EmbeddingProviderResult> {
     @Override
     protected final OutputJson executeJson(Supplier<EmbeddingProviderResult> result) {
-        return OutputJson.serializeValue(result.get().raw());
+        val deterministicallyOrderedResult = new FindEmbeddingProvidersResult(
+            result.get().raw().getEmbeddingProviders().entrySet().stream()
+                .peek(e -> e.getValue().setSupportedAuthentication(new TreeMap<>(e.getValue().getSupportedAuthentication())))
+                .collect(TreeMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll)
+        );
+
+        return OutputJson.serializeValue(deterministicallyOrderedResult);
     }
 
     @Override

@@ -77,7 +77,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
         val maybeScbPath = (request.keys.contains(ASTRA_DB_SECURE_BUNDLE_PATH))
             ? downloadAndResolveScbPath(request)
-            : Either.<String, Path>right(null);
+            : Either.<String, Path>pure(null);
 
         return maybeScbPath.fold(
             FailedToDownloadSCB::new,

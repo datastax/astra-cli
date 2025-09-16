@@ -33,7 +33,7 @@ public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
         )));
     }
 
-    public String sanitizeFileName(String name) {
+    private String sanitizeFileName(String name) {
         while (name.contains("..")) {
             name = name.replace("..", "__");
         }

@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db truncate-table two_regions_db -t test_table
+exit_code: 2
+---- output ----
+stderr: Error: Table test_table does not exist in keyspace default_keyspace.
+stderr: 
+stderr: # List existing tables:
+stderr: $ astra db list-tables two_regions_db -k default_keyspace
+---- end ----

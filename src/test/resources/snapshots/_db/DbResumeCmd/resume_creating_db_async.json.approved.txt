@@ -1,0 +1,18 @@
+---- meta ----
+command: astra db resume 822b0fff-6a73-4322-a8ec-09832b075287 --async -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Database '822b0fff-6a73-4322-a8ec-09832b075287' was not in a state that required resuming, but is not yet active (current status: 'INITIALIZING').",
+stdout:   "data" : {
+stdout:     "wasHibernated" : false,
+stdout:     "currentStatus" : "INITIALIZING",
+stdout:     "waitedSeconds" : null
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "Poll the database's status:",
+stdout:     "command" : "astra db status 822b0fff-6a73-4322-a8ec-09832b075287"
+stdout:   } ]
+stdout: }
+---- end ----

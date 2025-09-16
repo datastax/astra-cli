@@ -1,0 +1,15 @@
+---- meta ----
+command: astra db list-clouds -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "Cloud Provider" : "gcp"
+stdout:   }, {
+stdout:     "Cloud Provider" : "azure"
+stdout:   }, {
+stdout:     "Cloud Provider" : "aws"
+stdout:   } ]
+stdout: }
+---- end ----

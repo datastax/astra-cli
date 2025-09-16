@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
-import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
+import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifier;import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.snapshot.annotations.TestForDifferentOutputs;
 import com.dtsx.astra.cli.snapshot.annotations.TestForHumanOutput;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;

@@ -12,6 +12,7 @@ public interface OutputSerializer<T> {
         SupplierSerializer.INSTANCE,
         EnumSerializer.INSTANCE,
         CollectionSerializer.INSTANCE,
+        NullSerializer.INSTANCE,
         CatchAllSerializer.INSTANCE
     );
 

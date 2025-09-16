@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.core.models;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.Highlightable;
-import com.dtsx.astra.cli.utils.StringUtils;
+import com.dtsx.astra.cli.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
@@ -16,7 +16,7 @@ public class AstraToken implements Highlightable {
 
     public static Either<String, AstraToken> parse(@NonNull String token) {
         return Utils.trimAndValidateBasics("Astra token", token).flatMap((t) -> {
-            if (StringUtils.isValidJson(token)) {
+            if (JsonUtils.isValidJson(token)) {
                 return Either.left("Astra token should not be passed as JSON; it should be a plain string");
             }
 
@@ -42,7 +42,7 @@ public class AstraToken implements Highlightable {
                 return Either.left("The second part of the Astra token should be exactly 24 characters long; yours is " + split[1].length());
             }
 
-            return Either.right(mkUnsafe(t));
+            return Either.pure(mkUnsafe(t));
         });
     }
 

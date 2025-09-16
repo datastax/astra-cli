@@ -9,9 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -44,13 +43,13 @@ public abstract class AbstractRegionListOperation implements Operation<Stream<Fo
             .reversed()
             .stream()
             .filter((e1) -> (
-                passesCloudFilter(request.cloudFilter, e1) && e1.getValue() != null &&
-                    e1.getValue().sequencedEntrySet().stream().anyMatch(e -> passesNameFilter(request.nameFilter, e)) &&
-                    e1.getValue().sequencedEntrySet().stream().anyMatch(e -> passesZoneFilter(request.nameFilter, e))
+                e1.getValue() != null && passesCloudFilter(request.cloudFilter, e1)
             ))
             .flatMap((e1) -> e1.getValue()
                 .sequencedEntrySet()
                 .stream()
+                .filter((e2) -> passesNameFilter(request.nameFilter, e2))
+                .filter((e2) -> passesZoneFilter(request.zoneFilter, e2))
                 .map((e2) -> new FoundRegion(
                     e1.getKey(),
                     e2.getKey(),
@@ -62,14 +61,14 @@ public abstract class AbstractRegionListOperation implements Operation<Stream<Fo
             );
     }
 
-    private boolean passesNameFilter(@Nullable List<String> nameFilter,Entry<String, RegionInfo> entry) {
+    private boolean passesNameFilter(@Nullable List<String> nameFilter, Entry<String, RegionInfo> entry) {
         return nameFilter == null || nameFilter.stream().anyMatch((f) ->
             entry.getKey().toLowerCase().contains(f.toLowerCase()) || entry.getValue().displayName().toLowerCase().contains(f.toLowerCase())
         );
     }
 
     private boolean passesCloudFilter(@Nullable List<CloudProviderType> cloudFilter, Entry<CloudProviderType, ? extends SortedMap<String, RegionInfo>> entry) {
-        return cloudFilter == null || !cloudFilter.contains(entry.getKey());
+        return cloudFilter == null || cloudFilter.contains(entry.getKey());
     }
 
     private boolean passesZoneFilter(@Nullable List<String> zoneFilter, Entry<String, RegionInfo> entry) {

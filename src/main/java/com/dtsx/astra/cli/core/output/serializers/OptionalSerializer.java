@@ -12,16 +12,16 @@ enum OptionalSerializer implements OutputSerializer<Optional<?>> {
 
     @Override
     public String serializeAsHumanInternal(Optional<?> s) {
-        return s.map(OutputSerializer::serializeAsHuman).orElse("<n/a>");
+        return s.map(OutputSerializer::serializeAsHuman).orElse(OutputSerializer.serializeAsHuman(null));
     }
 
     @Override
     public Object serializeAsJsonInternal(Optional<?> s) {
-        return s.map(OutputSerializer::serializeAsJson).orElse(null);
+        return s.map(OutputSerializer::serializeAsJson).orElse(OutputSerializer.serializeAsJson(null));
     }
 
     @Override
     public String serializeAsCsvInternal(Optional<?> s) {
-        return s.map(OutputSerializer::serializeAsCsv).orElse("");
+        return s.map(OutputSerializer::serializeAsCsv).orElse(OutputSerializer.serializeAsCsv(null));
     }
 }

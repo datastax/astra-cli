@@ -46,7 +46,7 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
     )
     public boolean ifExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "60")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
     }

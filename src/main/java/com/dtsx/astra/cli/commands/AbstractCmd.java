@@ -44,6 +44,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @Spec
     protected CommandSpec spec;
 
+    // in a perfect world (*cough*, kotlin) `ctx` would be a something like `val ctx get() = ctxRef.get()`
+    // so that their lifecycle is tied together, but alas, we are in Java land, and I'd rather do `ctx` than `ctx()` here
     protected CliContext ctx;
     private Ref<CliContext> ctxRef;
 
@@ -132,17 +134,18 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.isTty(),
             outputTypeMixin.requested(),
             new AstraColors(ansi),
-            new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo()),
+            new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo(), loggerMixin.enableSpinner()),
             new AstraConsole(ctx.console().getIn(), ctx.console().getOut(), ctx.console().getErr(), ctx.console().getReadLineImpl(), () -> ctx, consoleMixin.noInput()),
             ctx.home(),
             ctx.fs(),
-            ctx.gateways()
+            ctx.gateways(),
+            ctx.forceProfile()
         ));
     }
 
     @VisibleForTesting
     public final void run(CliContext ctx) {
-        ctxRef.set(ctx);
+        ctxRef.modify((_) -> ctx);
         this.prelude();
         val result = evokeProperExecuteFunction(ctx);
         this.postlude(result);

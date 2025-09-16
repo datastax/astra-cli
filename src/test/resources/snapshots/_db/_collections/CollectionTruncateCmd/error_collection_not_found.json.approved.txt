@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db truncate-collection two_regions_db -c test_coll -o json
+exit_code: 2
+---- output ----
+stdout: {
+stdout:   "code" : "COLLECTION_NOT_FOUND",
+stdout:   "message" : "Error: Collection 'test_coll' does not exist in keyspace 'default_keyspace' of database 'two_regions_db'.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "See all existing collections in the database:",
+stdout:     "command" : "astra db list-collections two_regions_db --all"
+stdout:   } ]
+stdout: }
+---- end ----

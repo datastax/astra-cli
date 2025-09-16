@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db list-clouds -o csv
+exit_code: 0
+---- output ----
+stdout: Cloud Provider
+stdout: gcp
+stdout: azure
+stdout: aws
+---- end ----

@@ -17,6 +17,10 @@ public class TableRef implements Highlightable {
             .map((trimmed) -> new TableRef(trimmed, keyspace));
     }
 
+    public static TableRef mkUnsafe(@NonNull KeyspaceRef keyspace, @NonNull String name) {
+        return new TableRef(name, keyspace);
+    }
+
     @JsonValue
     public String name() {
         return name;

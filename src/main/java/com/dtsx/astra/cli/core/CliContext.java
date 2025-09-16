@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.core.config.AstraHome;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -9,27 +10,35 @@ import com.dtsx.astra.cli.core.output.Highlightable;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
+import lombok.Value;
 import lombok.With;
+import lombok.experimental.Accessors;
 import lombok.val;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.ColorScheme;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.UUID;
 
 @With
-public record CliContext(
-    boolean isWindows,
-    boolean isTty,
-    OutputType outputType,
-    AstraColors colors,
-    AstraLogger log,
-    AstraConsole console,
-    AstraHome home,
-    FileSystem fs,
-    GatewayProvider gateways
-) {
+@Value
+@Accessors(fluent = true)
+public class CliContext {
+    boolean isWindows;
+    boolean isTty;
+    OutputType outputType;
+    AstraColors colors;
+    AstraLogger log;
+    AstraConsole console;
+    AstraHome home;
+    FileSystem fs;
+    GatewayProvider gateways;
+
+    // necessary for testing purpose only
+    Optional<Profile> forceProfile;
+
     public Path path(String first, String... more) {
         return fs.getPath(first, more);
     }

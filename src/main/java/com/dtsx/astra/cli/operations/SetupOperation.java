@@ -99,7 +99,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
         val profileName = resolveProfileName(envAndOrg.getRight().getRight(), request);
 
-        return Either.right(
+        return Either.pure(
             new ProfileDetails(profileName, token, envAndOrg.getRight().getLeft())
         );
     }
@@ -115,7 +115,7 @@ public class SetupOperation implements Operation<SetupResult> {
             }
 
             if (guessed.isPresent() && request.promptForGuessedEnvConfirmation.apply(guessed.get().getLeft())) {
-                return Either.right(guessed.get());
+                return Either.pure(guessed.get());
             }
         }
 
@@ -125,7 +125,7 @@ public class SetupOperation implements Operation<SetupResult> {
         val org = validateTokenAndFetchOrg(orgGateway);
 
         return org.isPresent()
-            ? Either.right(Pair.create(env, org.get()))
+            ? Either.pure(Pair.create(env, org.get()))
             : Either.left(guessedEnv);
     }
 

@@ -1,0 +1,10 @@
+---- meta ----
+command: astra db describe-collection two_regions_db -c test_coll -o csv
+exit_code: 0
+---- output ----
+stdout: Attribute,Value
+stdout: Name,test_coll
+stdout: Estimated Count,12345
+stdout: Vector Dimension,5
+stdout: Similarity Metric,cosine
+---- end ----

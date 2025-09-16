@@ -95,7 +95,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         return $dsBulkConfigProvider != null
             ? ($dsBulkConfigProvider.configFile
                 .<Either<Path, Map<String, String>>>map(Either::left)
-                .orElseGet(() -> Either.right($dsBulkConfigProvider.flags)))
-            : Either.right(emptyMap());
+                .orElseGet(() -> Either.pure($dsBulkConfigProvider.flags)))
+            : Either.pure(emptyMap());
     }
 }

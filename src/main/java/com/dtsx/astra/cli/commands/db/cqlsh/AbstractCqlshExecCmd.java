@@ -56,7 +56,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     protected void prelude() {
         WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
-        downloadsGateway = ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx);
+        downloadsGateway = ctx.gateways().mkDownloadsGateway(ctx);
     }
 
     @Override

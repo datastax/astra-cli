@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db create two_regions_db -r us-east-1 --if-not-exists
+exit_code: 0
+---- output ----
+stdout: Database 'two_regions_db' already exists with id '822b0fff-6a73-4322-a8ec-09832b075287', and was already active; no action was required.
+stdout: 
+stdout: # Get more information about the existing database:
+stdout: $ astra db get two_regions_db
+---- end ----

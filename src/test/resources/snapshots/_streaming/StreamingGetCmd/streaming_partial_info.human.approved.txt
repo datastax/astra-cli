@@ -1,0 +1,6 @@
+---- meta ----
+command: astra streaming get tenant1 --key status
+exit_code: 0
+---- output ----
+stdout: active
+---- end ----

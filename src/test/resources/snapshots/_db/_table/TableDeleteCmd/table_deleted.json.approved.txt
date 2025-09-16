@@ -1,0 +1,16 @@
+---- meta ----
+command: astra db delete-table two_regions_db -t test_table -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Table 'test_table' has been deleted from keyspace 'default_keyspace'.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : true
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "List remaining tables in this keyspace:",
+stdout:     "command" : "astra db list-tables two_regions_db -k default_keyspace"
+stdout:   } ]
+stdout: }
+---- end ----

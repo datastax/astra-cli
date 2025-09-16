@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db truncate-table two_regions_db -t test_table -o json
+exit_code: 2
+---- output ----
+stdout: {
+stdout:   "code" : "TABLE_NOT_FOUND",
+stdout:   "message" : "Error: Table test_table does not exist in keyspace default_keyspace.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "List existing tables:",
+stdout:     "command" : "astra db list-tables two_regions_db -k default_keyspace"
+stdout:   } ]
+stdout: }
+---- end ----

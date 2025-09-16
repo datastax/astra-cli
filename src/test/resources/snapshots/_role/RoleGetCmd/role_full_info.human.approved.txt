@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra role get R/W Svc Acct
+command: astra role get 'R/W Svc Acct'
 exit_code: 0
 ---- output ----
 stdout: +-------------+------------------------------------------------------+

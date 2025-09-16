@@ -1,7 +1,7 @@
 ---- meta ----
-command: astra db get region_test --key regions
+command: astra db get two_regions_db --key regions
 exit_code: 0
 ---- output ----
-stdout: [0] us-east-2
-stdout: [1] ap-south-1
+stdout: [0] ap-south-1
+stdout: [1] us-east-2
 ---- end ----

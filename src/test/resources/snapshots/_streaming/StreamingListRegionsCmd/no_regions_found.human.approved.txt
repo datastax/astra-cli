@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming list-regions
+exit_code: 0
+---- output ----
+stdout: +-----------------+---------+---------------+
+stdout: | Cloud Provider  | Region  | Display Name  |
+stdout: +-----------------+---------+---------------+
+stdout: +-----------------+---------+---------------+
+---- end ----

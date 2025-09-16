@@ -20,9 +20,9 @@ public class RoleRef implements Highlightable {
     public static Either<String, RoleRef> parse(@NonNull String ref) {
         return Utils.trimAndValidateBasics("Role name/id", ref).flatMap(trimmed -> {
             try {
-                return Either.right(new RoleRef(Either.left(UUID.fromString(trimmed))));
+                return Either.pure(new RoleRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {
-                return Either.right(new RoleRef(Either.right(trimmed)));
+                return Either.pure(new RoleRef(Either.pure(trimmed)));
             }
         });
     }
@@ -32,7 +32,7 @@ public class RoleRef implements Highlightable {
     }
 
     public static RoleRef fromNameUnsafe(@NonNull String name) {
-        return new RoleRef(Either.right(name));
+        return new RoleRef(Either.pure(name));
     }
 
     public <T> T fold(Function<UUID, T> idMapper, Function<String, T> nameMapper) {

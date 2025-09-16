@@ -1,11 +1,11 @@
 ---- meta ----
-command: astra db get region_test
+command: astra db get two_regions_db
 exit_code: 0
 ---- output ----
 stdout: +------------------+--------------------------------------+
 stdout: | Attribute        | Value                                |
 stdout: +------------------+--------------------------------------+
-stdout: | Name             | region_test                          |
+stdout: | Name             | two_regions_db                       |
 stdout: | ID               | 822b0fff-6a73-4322-a8ec-09832b075287 |
 stdout: | Cloud Provider   | AWS                                  |
 stdout: | Region           | us-east-2                            |

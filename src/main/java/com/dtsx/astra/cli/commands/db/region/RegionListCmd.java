@@ -4,14 +4,15 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.region.RegionListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.*;
+import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.FoundRegions;
+import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.RegionListRequest;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
@@ -24,7 +25,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 )
 public class RegionListCmd extends AbstractPromptForDbRegionCmd<FoundRegions> {
     @Override
-    protected RegionListOperation mkOperation() {
+    protected Operation<FoundRegions> mkOperation() {
         return new RegionListOperation(ctx, regionGateway, dbGateway, new RegionListRequest($dbRef));
     }
 

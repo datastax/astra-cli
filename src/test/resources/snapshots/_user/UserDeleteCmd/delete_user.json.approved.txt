@@ -1,0 +1,13 @@
+---- meta ----
+command: astra user delete alice@example.bob -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "User 'alice@example.bob' has been deleted.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : true
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

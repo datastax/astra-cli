@@ -54,7 +54,7 @@ public abstract class TypeConverters {
 
     private static class Misc {
         public static Either<String, ?> parsePath(String value, CliContext ctx) {
-            return Either.right(ctx.path(value));
+            return Either.pure(ctx.path(value));
         }
     }
 }

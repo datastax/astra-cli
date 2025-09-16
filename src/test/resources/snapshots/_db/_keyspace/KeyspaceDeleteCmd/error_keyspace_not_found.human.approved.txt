@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db delete-keyspace two_regions_db -k default_keyspace
+exit_code: 2
+---- output ----
+stderr: Error: Keyspace 'default_keyspace' does not exist in database 'two_regions_db'.
+stderr: 
+stderr: To ignore this error, provide the '--if-exists' flag to skip this error if the keyspace doesn't exist.
+stderr: 
+stderr: # Example fix:
+stderr: $ astra db delete-keyspace two_regions_db -k default_keyspace --if-exists
+stderr: 
+stderr: # List existing keyspaces:
+stderr: $ astra db list-keyspaces two_regions_db
+---- end ----

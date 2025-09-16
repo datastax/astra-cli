@@ -32,7 +32,7 @@ dependencies {
     implementation("com.datastax.astra:astra-db-java:2.0.0")
     implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
 
-    // unzip downloaded external programs (cqlsh, dsbulk, etc)
+    // unzip downloaded external programs (cqlsh, dsbulk, etc.)
     implementation("org.apache.commons:commons-compress:1.28.0")
 
     // guess
@@ -57,12 +57,21 @@ dependencies {
     // snapshot tests (golden-master-esque)
     testImplementation("com.approvaltests:approvaltests:25.0.23")
 
+    // in-memory file system for testing
+    testImplementation("com.google.jimfs:jimfs:1.3.0")
+
     // mocking (also, https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#mockito-instrumentation)
     testImplementation("org.mockito:mockito-core:5.19.0")
     mockitoAgent("org.mockito:mockito-core:5.19.0") { isTransitive = false }
 
     // verifying csv output
     testImplementation("org.apache.commons:commons-csv:1.14.1")
+
+    // using modified env-vars/system-props for testing + capturing system.exit() calls
+    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.8")
+
+    // test creds and such from .env files
+    testImplementation("io.github.cdimascio:dotenv-java:3.2.0")
 
     // compileOnly & annotationProcessor declarations need to be duplicated to work for both main and test source sets
     compileOnly("org.jetbrains:annotations:26.0.2")

@@ -32,7 +32,7 @@ public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolea
 
     @Override
     protected final OutputAll execute(Supplier<Boolean> exists) {
-        return OutputAll.serializeValue(exists);
+        return OutputAll.serializeValue(exists.get());
     }
 
     @Override

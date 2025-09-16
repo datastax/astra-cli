@@ -71,8 +71,8 @@ public class GatewayProviderImpl implements GatewayProvider {
     }
 
     @Override
-    public DownloadsGateway mkDownloadsGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new DownloadsGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public DownloadsGateway mkDownloadsGateway(CliContext ctx) {
+        return new DownloadsGatewayImpl(ctx);
     }
 
     @Override

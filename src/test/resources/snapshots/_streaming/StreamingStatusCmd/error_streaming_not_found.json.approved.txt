@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming status tenant1 -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : "i_like_cars"
+stdout: }
+---- end ----

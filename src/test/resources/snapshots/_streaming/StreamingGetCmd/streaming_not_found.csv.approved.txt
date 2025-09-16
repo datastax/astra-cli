@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming get *nonexistent* -o csv
+exit_code: 2
+---- output ----
+stdout: code,message
+stdout: TENANT_NOT_FOUND,"Error: Tenant '*nonexistent*' not found.
+stdout: 
+stdout: Use 'astra streaming list' to see all available tenants."
+---- end ----

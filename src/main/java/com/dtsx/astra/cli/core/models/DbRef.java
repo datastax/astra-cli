@@ -20,15 +20,15 @@ public class DbRef implements Highlightable {
     public static Either<String, DbRef> parse(@NonNull String ref) {
         return Utils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
             try {
-                return Either.right(new DbRef(Either.left(UUID.fromString(trimmed))));
+                return Either.pure(new DbRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {
-                return Either.right(new DbRef(Either.right(trimmed)));
+                return Either.pure(new DbRef(Either.pure(trimmed)));
             }
         });
     }
 
     public static DbRef fromNameUnsafe(@NonNull String name) {
-        return new DbRef(Either.right(name));
+        return new DbRef(Either.pure(name));
     }
 
     public static DbRef fromId(@NonNull UUID id) {

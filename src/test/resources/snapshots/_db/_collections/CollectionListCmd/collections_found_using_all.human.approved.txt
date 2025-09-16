@@ -1,0 +1,13 @@
+---- meta ----
+command: astra db list-collections two_regions_db --all
+exit_code: 0
+---- output ----
+stdout: +-----------+------------+
+stdout: | Keyspace  | Name       |
+stdout: +-----------+------------+
+stdout: | ks1       | test_coll  |
+stdout: | ks1       | other_coll |
+stdout: | ks2       | test_coll  |
+stdout: | ks2       | other_coll |
+stdout: +-----------+------------+
+---- end ----

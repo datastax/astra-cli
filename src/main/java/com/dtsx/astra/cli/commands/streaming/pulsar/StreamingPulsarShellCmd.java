@@ -69,7 +69,7 @@ public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
         return new StreamingPulsarOperation(ctx, streamingGateway, downloadsGateway, new PulsarRequest(
             $tenantName,
             $failOnError,
-            Optional.ofNullable($exec).map(e -> e.$execute.<Either<String, Path>>map(Either::left).orElseGet(() -> Either.right(e.$commandsFile.orElseThrow()))),
+            Optional.ofNullable($exec).map(e -> e.$execute.<Either<String, Path>>map(Either::left).orElseGet(() -> Either.pure(e.$commandsFile.orElseThrow()))),
             $noProgress
         ));
     }

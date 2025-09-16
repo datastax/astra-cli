@@ -59,6 +59,6 @@ public class StreamingPulsarOperation extends AbstractPulsarExeOperation<PulsarR
             })
         ));
 
-        return Either.right(commands);
+        return Either.pure(commands);
     }
 }

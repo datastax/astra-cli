@@ -1,0 +1,16 @@
+---- meta ----
+command: astra streaming delete tenant1 --if-exists -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Tenant 'tenant1' does not exist; nothing to delete.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : false
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "See your existing tenants:",
+stdout:     "command" : "astra streaming list"
+stdout:   } ]
+stdout: }
+---- end ----

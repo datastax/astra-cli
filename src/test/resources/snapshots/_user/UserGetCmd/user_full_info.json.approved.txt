@@ -1,0 +1,23 @@
+---- meta ----
+command: astra user get alice@example.bob -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "UserID" : "ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o",
+stdout:     "Email" : "alice@example.bob",
+stdout:     "Status" : "active",
+stdout:     "Roles" : [ {
+stdout:       "ID" : "b4ed0e9e-67e8-47b6-8b58-c6629be961a9",
+stdout:       "Name" : "R/W Svc Acct",
+stdout:       "Policy" : {
+stdout:         "description" : "R/W Svc Acct",
+stdout:         "effect" : "allow",
+stdout:         "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ],
+stdout:         "actions" : [ "accesslist-read", "db-all-keyspace-describe", "db-keyspace-describe", "db-table-select", "db-table-modify", "db-table-describe", "db-graphql", "db-rest", "db-cql" ]
+stdout:       }
+stdout:     } ]
+stdout:   }
+stdout: }
+---- end ----

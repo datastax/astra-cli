@@ -1,9 +1,9 @@
 ---- meta ----
-command: astra db get region_test -o csv
+command: astra db get two_regions_db -o csv
 exit_code: 0
 ---- output ----
 stdout: Attribute,Value
-stdout: Name,region_test
+stdout: Name,two_regions_db
 stdout: ID,822b0fff-6a73-4322-a8ec-09832b075287
 stdout: Cloud Provider,AWS
 stdout: Region,us-east-2

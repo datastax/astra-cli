@@ -15,7 +15,7 @@ enum EnumSerializer implements OutputSerializer<Enum<?>> {
 
     @Override
     public Object serializeAsJsonInternal(Enum<?> s) {
-        return s;
+        return s.name();
     }
 
     @Override

@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db create two_regions_db -r us-east-1 --allow-duplicate-names
+exit_code: 0
+---- output ----
+stdout: Database 'two_regions_db' has been created with id '822b0fff-6a73-4322-a8ec-09832b075287'. It is now active after waiting 6 seconds.
+stdout: 
+stdout: # Get more information about the new database:
+stdout: $ astra db get two_regions_db
+---- end ----

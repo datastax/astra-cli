@@ -19,9 +19,10 @@ public class Ref<T> {
         return value;
     }
 
-    public void set(T ctx) {
-        this.value = ctx;
-        listeners.forEach(l -> l.accept(ctx));
+    public Ref<T> modify(Function<T, T> fn) {
+        value = fn.apply(value);
+        listeners.forEach(l -> l.accept(value));
+        return this;
     }
 
     public void onUpdate(Consumer<T> listener) {

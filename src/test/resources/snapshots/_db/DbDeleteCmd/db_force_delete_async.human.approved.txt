@@ -1,9 +1,9 @@
 ---- meta ----
-command: astra db delete region_test --yes --async
+command: astra db delete two_regions_db --yes --async
 exit_code: 0
 ---- output ----
-stdout: Database 'region_test' is being deleted (it may not be fully terminated yet).
+stdout: Database 'two_regions_db' is being deleted (it may not be fully terminated yet).
 stdout: 
 stdout: # Poll its status with:
-stdout: $ astra db status region_test
+stdout: $ astra db status two_regions_db
 ---- end ----

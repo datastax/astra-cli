@@ -16,6 +16,6 @@ public class StreamingPulsarVersionOperation extends AbstractPulsarExeOperation<
 
     @Override
     protected Either<PulsarExecResult, List<String>> buildCommandLine() {
-        return Either.right(List.of("version"));
+        return Either.pure(List.of("version"));
     }
 }

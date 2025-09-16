@@ -7,11 +7,11 @@ stdout:   "code" : "DATABASE_NOT_FOUND",
 stdout:   "message" : "Error: Database '*nonexistent*' could not be found.\n\nTo ignore this error, you can use the '--if-exists' option to avoid failing if the database does not exist.",
 stdout:   "data" : null,
 stdout:   "nextSteps" : [ {
-stdout:     "command" : "astra db delete *nonexistent* --yes -o json --if-exists",
-stdout:     "comment" : "Example fix:"
+stdout:     "comment" : "Example fix:",
+stdout:     "command" : "astra db delete *nonexistent* --yes -o json --if-exists"
 stdout:   }, {
-stdout:     "command" : "astra db list",
-stdout:     "comment" : "See your existing databases:"
+stdout:     "comment" : "See your existing databases:",
+stdout:     "command" : "astra db list"
 stdout:   } ]
 stdout: }
 ---- end ----

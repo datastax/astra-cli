@@ -102,7 +102,7 @@
     "terminationTime": "0001-01-01T00:00:00Z",
     "lastUsageTime": "2025-08-21T20:30:11Z",
     "info": {
-      "name": "region_test",
+      "name": "two_regions_db",
       "keyspace": "default_keyspace",
       "dbType": "vector",
       "keyspaces": [

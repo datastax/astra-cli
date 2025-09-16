@@ -1,0 +1,15 @@
+---- meta ----
+command: astra db resume two_regions_db -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Database 'two_regions_db' was resumed, and is now active after waiting 100 seconds.",
+stdout:   "data" : {
+stdout:     "wasHibernated" : true,
+stdout:     "currentStatus" : "ACTIVE",
+stdout:     "waitedSeconds" : 100
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

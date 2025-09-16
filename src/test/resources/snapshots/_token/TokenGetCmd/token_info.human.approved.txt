@@ -1,6 +1,6 @@
 ---- meta ----
-command: astra token --token AstraCS:aBc123XyZ789LmnOpQrStUvW:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc123
+command: astra token --token AstraCS:fakefakefakefakefakefake:fakefakefakefakefakefakefakefakefakefakefakefakefakefakefakefake
 exit_code: 0
 ---- output ----
-stdout: AstraCS:aBc123XyZ789LmnOpQrStUvW:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc123
+stdout: AstraCS:fakefakefakefakefakefake:fakefakefakefakefakefakefakefakefakefakefakefakefakefakefakefake
 ---- end ----

@@ -1,0 +1,8 @@
+---- meta ----
+command: astra db create-keyspace two_regions_db -k default_keyspace
+exit_code: 0
+---- output ----
+stdout: Keyspace 'default_keyspace' has been created in database 'two_regions_db'.
+stdout: 
+stdout: The database is now active after waiting 9 seconds.
+---- end ----

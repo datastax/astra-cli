@@ -7,8 +7,8 @@ stdout:   "code" : "UNSUPPORTED_EXECUTION",
 stdout:   "message" : "Error: This operation does not support outputting in the 'json' format.\n\nNo operation was executed; no changes were made.\n\nPlease retry with another output format using '--output <human|csv>' or '-o <human|csv>'.",
 stdout:   "data" : null,
 stdout:   "nextSteps" : [ {
-stdout:     "command" : "astra -o human",
-stdout:     "comment" : "Example fix"
+stdout:     "comment" : "Example fix",
+stdout:     "command" : "astra -o human"
 stdout:   } ]
 stdout: }
 ---- end ----

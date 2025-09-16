@@ -1,0 +1,7 @@
+---- meta ----
+command: astra db get-endpoint-api 822b0fff-6a73-4322-a8ec-09832b075287 -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,data
+stdout: OK,,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com
+---- end ----

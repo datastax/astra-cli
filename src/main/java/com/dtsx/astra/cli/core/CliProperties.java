@@ -105,7 +105,7 @@ public class CliProperties implements IVersionProvider {
         else if (System.getenv("XDG_DATA_HOME") != null) { // TODO - should we do this?
             val path = File.separator + CliProperties.homeFolderName(false);
 
-            System.setProperty("cli.home-folder-path", (isWindows ? "%XDG_DATA_HOME%" : "XDG_DATA_HOME") + path);
+            System.setProperty("cli.home-folder-path", (isWindows ? "%XDG_DATA_HOME%" : "$XDG_DATA_HOME") + path);
             cachedHomeFolder = System.getenv("XDG_DATA_HOME") + path;
         }
         else {

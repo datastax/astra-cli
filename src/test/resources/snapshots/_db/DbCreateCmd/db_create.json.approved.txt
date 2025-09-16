@@ -1,0 +1,19 @@
+---- meta ----
+command: astra db create two_regions_db -r us-east-1 -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Database 'two_regions_db' has been created with id '822b0fff-6a73-4322-a8ec-09832b075287'. It is now active after waiting 6 seconds.",
+stdout:   "data" : {
+stdout:     "dbId" : "822b0fff-6a73-4322-a8ec-09832b075287",
+stdout:     "wasCreated" : true,
+stdout:     "currentStatus" : "ACTIVE",
+stdout:     "waitedSeconds" : 6
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "Get more information about the new database:",
+stdout:     "command" : "astra db get two_regions_db"
+stdout:   } ]
+stdout: }
+---- end ----

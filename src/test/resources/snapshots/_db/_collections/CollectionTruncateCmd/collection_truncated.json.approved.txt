@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db truncate-collection two_regions_db -c test_coll -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Collection 'default_keyspace.test_coll' has been truncated. All documents have been deleted from the collection.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

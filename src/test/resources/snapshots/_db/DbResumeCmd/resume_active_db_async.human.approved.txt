@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db resume 822b0fff-6a73-4322-a8ec-09832b075287 --async
+exit_code: 0
+---- output ----
+stdout: Database '822b0fff-6a73-4322-a8ec-09832b075287' is already active; no action was required.
+---- end ----

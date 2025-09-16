@@ -1,0 +1,8 @@
+---- meta ----
+command: astra user get nonexistent@example.com
+exit_code: 2
+---- output ----
+stderr: Error: User 'nonexistent@example.com' not found.
+stderr: 
+stderr: Use 'astra user list' to see all available users.
+---- end ----

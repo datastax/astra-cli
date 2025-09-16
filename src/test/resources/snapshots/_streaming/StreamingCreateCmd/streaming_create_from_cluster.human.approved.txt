@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming create tenant1 --cluster *cluster*
+exit_code: 0
+---- output ----
+stdout: Tenant 'tenant1' has been created.
+stdout: 
+stdout: # Get more information about the new tenant:
+stdout: $ astra streaming get tenant1
+---- end ----

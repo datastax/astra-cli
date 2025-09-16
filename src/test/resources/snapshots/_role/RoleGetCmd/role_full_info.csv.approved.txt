@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra role get R/W Svc Acct -o csv
+command: astra role get 'R/W Svc Acct' -o csv
 exit_code: 0
 ---- output ----
 stdout: Attribute,Value

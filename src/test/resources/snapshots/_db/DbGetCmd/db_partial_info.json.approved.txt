@@ -1,9 +1,9 @@
 ---- meta ----
-command: astra db get region_test --key regions -o json
+command: astra db get two_regions_db --key regions -o json
 exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "data" : [ "us-east-2", "ap-south-1" ]
+stdout:   "data" : [ "ap-south-1", "us-east-2" ]
 stdout: }
 ---- end ----

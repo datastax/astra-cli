@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming list
+exit_code: 0
+---- output ----
+stdout: +-------+--------+---------+---------+
+stdout: | name  | cloud  | region  | status  |
+stdout: +-------+--------+---------+---------+
+stdout: +-------+--------+---------+---------+
+---- end ----

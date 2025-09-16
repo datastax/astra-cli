@@ -23,11 +23,15 @@ public class UserRef implements Highlightable {
     public static Either<String, UserRef> parse(@NonNull String ref) {
         return Utils.trimAndValidateBasics("User email/id", ref).flatMap(trimmed -> {
             try {
-                return Either.right(new UserRef(Either.left(UUID.fromString(trimmed))));
+                return Either.pure(new UserRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {
-                return Either.right(new UserRef(Either.right(trimmed)));
+                return Either.pure(new UserRef(Either.pure(trimmed)));
             }
         });
+    }
+
+    public static UserRef fromEmailUnsafe(@NonNull String email) {
+        return new UserRef(Either.pure(email));
     }
 
     public <T> T fold(Function<UUID, T> idMapper, Function<String, T> emailMapper) {

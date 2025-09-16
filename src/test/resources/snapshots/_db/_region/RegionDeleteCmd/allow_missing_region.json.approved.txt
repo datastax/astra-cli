@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db delete-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2 --if-exists --async -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Region 'us-east-2' does not exist in database '822b0fff-6a73-4322-a8ec-09832b075287'; nothing to delete.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : false,
+stdout:     "waitedSeconds" : null
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "List all regions in the database:",
+stdout:     "command" : "astra db list-regions 822b0fff-6a73-4322-a8ec-09832b075287"
+stdout:   }, {
+stdout:     "comment" : "Get database information:",
+stdout:     "command" : "astra db get 822b0fff-6a73-4322-a8ec-09832b075287"
+stdout:   } ]
+stdout: }
+---- end ----

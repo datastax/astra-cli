@@ -1,17 +1,17 @@
 ---- meta ----
-command: astra db delete region_test --yes --async -o json
+command: astra db delete two_regions_db --yes --async -o json
 exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Database 'region_test' is being deleted (it may not be fully terminated yet).",
+stdout:   "message" : "Database 'two_regions_db' is being deleted (it may not be fully terminated yet).",
 stdout:   "data" : {
 stdout:     "wasDeleted" : true,
 stdout:     "waitedSeconds" : null
 stdout:   },
 stdout:   "nextSteps" : [ {
-stdout:     "command" : "astra db status region_test",
-stdout:     "comment" : "Poll its status with:"
+stdout:     "comment" : "Poll its status with:",
+stdout:     "command" : "astra db status two_regions_db"
 stdout:   } ]
 stdout: }
 ---- end ----

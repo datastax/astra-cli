@@ -12,7 +12,7 @@ public class DbCompletionsCache extends ProfileLinkedCompletionsCache {
     }
 
     @Override
-    protected String useCacheFile() {
+    protected String useCacheFileName() {
         return "db_names";
     }
 }

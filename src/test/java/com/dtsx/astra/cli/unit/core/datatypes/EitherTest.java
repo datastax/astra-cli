@@ -27,7 +27,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
 
         @Property
         public <T> void right_lifts_anything_into_either(@ForAll T t) {
-            val right = Either.right(t);
+            val right = Either.pure(t);
 
             assertThat(right).isInstanceOf(Either.Right.class);
             assertThat(((Either.Right<?, T>) right).unwrap()).isEqualTo(t);
@@ -66,7 +66,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
 
         @Property
         public <L, R> void fold_dispatches_to_right(@ForAll R r) {
-            val either = Either.<L, R>right(r);
+            val either = Either.<L, R>pure(r);
 
             val result = either.fold(
                 _ -> fail("Left should not be called"),
@@ -81,7 +81,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
     public class getters {
         @Property
         public <L, R> void getRight_returns_value_on_right(@ForAll R r, @ForAll Exception e) throws Exception {
-            val either = Either.<L, R>right(r);
+            val either = Either.<L, R>pure(r);
 
             val result = either.getRight(_ -> e);
 
@@ -110,7 +110,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
 
         @Property
         public <L, R> void getLeft_throws_exception_on_right(@ForAll R r) {
-            val either = Either.<L, R>right(r);
+            val either = Either.<L, R>pure(r);
 
             try {
                 either.getLeft(rightVal -> new Exception("Right value: " + rightVal.toString()));
@@ -132,7 +132,7 @@ public class EitherTest implements Monad<Either<Object, Object>> {
 
         @Property
         public <L, R> void isRight_returns_true_for_right(@ForAll R r) {
-            val either = Either.<L, R>right(r);
+            val either = Either.<L, R>pure(r);
 
             assertThat(either.isRight()).isTrue();
             assertThat(either.isLeft()).isFalse();
@@ -154,18 +154,18 @@ public class EitherTest implements Monad<Either<Object, Object>> {
 
         @Property
         public <L, R> void bimap_maps_right(@ForAll R initR) {
-            val either = Either.<L, R>right(initR);
+            val either = Either.<L, R>pure(initR);
 
             val result = either.bimap(AssertUtils::assertNotCalled, r -> "Right: " + r);
 
             assertThat(result)
                 .isInstanceOf(Either.Right.class)
-                .isEqualTo(Either.right("Right: " + initR));
+                .isEqualTo(Either.pure("Right: " + initR));
         }
     }
 
     @Override
     public Monad.Params<Either<Object, Object>> monad() {
-        return Monad.params(Either::right, Either::flatMap, Either::map);
+        return Monad.params(Either::pure, Either::flatMap, Either::map);
     }
 }

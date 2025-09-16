@@ -1,0 +1,9 @@
+---- meta ----
+command: astra user delete nonexistent@example.com --if-exists
+exit_code: 0
+---- output ----
+stdout: User 'nonexistent@example.com' does not exist; nothing to delete.
+stdout: 
+stdout: # See all existing users:
+stdout: $ astra user list
+---- end ----

@@ -1,0 +1,33 @@
+---- meta ----
+command: astra db list-regions-serverless -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "cloudProvider" : "AWS",
+stdout:     "region" : "*fake_raw_region (us-east-1)*",
+stdout:     "hasFreeTier" : false
+stdout:   }, {
+stdout:     "cloudProvider" : "AWS",
+stdout:     "region" : "*fake_raw_region (us-west-2)*",
+stdout:     "hasFreeTier" : true
+stdout:   }, {
+stdout:     "cloudProvider" : "AZURE",
+stdout:     "region" : "*fake_raw_region (eastus)*",
+stdout:     "hasFreeTier" : false
+stdout:   }, {
+stdout:     "cloudProvider" : "AZURE",
+stdout:     "region" : "*fake_raw_region (westus2)*",
+stdout:     "hasFreeTier" : true
+stdout:   }, {
+stdout:     "cloudProvider" : "GCP",
+stdout:     "region" : "*fake_raw_region (us-central1)*",
+stdout:     "hasFreeTier" : false
+stdout:   }, {
+stdout:     "cloudProvider" : "GCP",
+stdout:     "region" : "*fake_raw_region (us-east1)*",
+stdout:     "hasFreeTier" : true
+stdout:   } ]
+stdout: }
+---- end ----

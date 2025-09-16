@@ -28,7 +28,7 @@ public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<Tenan
 
     @Override
     protected final OutputAll execute(Supplier<TenantStatus> result) {
-        return OutputAll.serializeValue(result);
+        return OutputAll.serializeValue(result.get());
     }
 
     @Override

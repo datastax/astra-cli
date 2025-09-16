@@ -87,6 +87,6 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
             }
         }
 
-        return Either.right(commands);
+        return Either.pure(commands);
     }
 }

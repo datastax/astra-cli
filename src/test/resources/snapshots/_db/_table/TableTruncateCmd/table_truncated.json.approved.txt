@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db truncate-table two_regions_db -t test_table -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Table 'test_table' has been truncated. All rows have been deleted from the table.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

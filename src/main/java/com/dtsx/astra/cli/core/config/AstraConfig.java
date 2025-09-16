@@ -179,7 +179,7 @@ public class AstraConfig {
 
     public class ProfileModificationCtx {
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
-            profiles.add(Either.right(new Profile(Optional.of(name), token, env)));
+            profiles.add(Either.pure(new Profile(Optional.of(name), token, env)));
 
             backingIniFile.addSection(name.unwrap(), new HashMap<>() {{
                 put(TOKEN_KEY, token.unsafeUnwrap());
@@ -193,7 +193,7 @@ public class AstraConfig {
         public void copyProfile(Profile src, ProfileName target) {
             deleteProfile(target);
 
-            profiles.add(Either.right(new Profile(Optional.of(target), src.token(), src.env())));
+            profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env())));
 
             val srcSection = backingIniFile.getSections().stream()
                 .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))

@@ -45,3 +45,6 @@ bin/
 /comp.bash
 /.jqwik-database
 /.approval_tests_temp
+/.cli_tests_temp
+/*fake*
+/.env

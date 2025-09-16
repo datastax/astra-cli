@@ -32,7 +32,7 @@ public interface GatewayProvider {
     
     RegionGateway mkRegionGateway(AstraToken token, AstraEnvironment env, CliContext ctx);
     
-    DownloadsGateway mkDownloadsGateway(AstraToken token, AstraEnvironment env, CliContext ctx);
+    DownloadsGateway mkDownloadsGateway(CliContext ctx);
     
     StreamingGateway mkStreamingGateway(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache, CliContext ctx);
     

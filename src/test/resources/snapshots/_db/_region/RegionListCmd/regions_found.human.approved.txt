@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db list-regions two_regions_db
+exit_code: 0
+---- output ----
+stdout: +-----------------+---------------------+------------+---------+
+stdout: | Cloud Provider  | Region              | Tier       | Status  |
+stdout: +-----------------+---------------------+------------+---------+
+stdout: | aws             | us-east-2 (default) | serverless |         |
+stdout: | aws             | ap-south-1          | serverless |         |
+stdout: +-----------------+---------------------+------------+---------+
+---- end ----

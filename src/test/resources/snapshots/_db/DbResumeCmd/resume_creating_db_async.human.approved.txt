@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db resume 822b0fff-6a73-4322-a8ec-09832b075287 --async
+exit_code: 0
+---- output ----
+stdout: Database '822b0fff-6a73-4322-a8ec-09832b075287' was not in a state that required resuming, but is not yet active (current status: 'INITIALIZING').
+stdout: 
+stdout: # Poll the database's status:
+stdout: $ astra db status 822b0fff-6a73-4322-a8ec-09832b075287
+---- end ----

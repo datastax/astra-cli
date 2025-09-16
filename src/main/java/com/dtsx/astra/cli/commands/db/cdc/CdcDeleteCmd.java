@@ -36,7 +36,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 )
 @Example(
     comment = "Delete a CDC by table and tenant",
-    command = "${cli.name} db delete-cdc my_db -k my_keyspace -t my_table --tenant my_tenant"
+    command = "${cli.name} db delete-cdc my_db -k my_keyspace --table my_table --tenant my_tenant"
 )
 @Example(
     comment = "Delete a CDC without failing if it doesn't exist",

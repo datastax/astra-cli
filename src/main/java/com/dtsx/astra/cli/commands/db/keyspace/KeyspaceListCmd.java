@@ -9,7 +9,6 @@ import lombok.val;
 import picocli.CommandLine.Command;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceListOperation.KeyspaceInfo;
@@ -54,6 +53,6 @@ public class KeyspaceListCmd extends AbstractKeyspaceCmd<List<KeyspaceInfo>> {
     }
 
     private String mkKeyspaceDisplayName(String name, boolean isDefault) {
-        return isDefault ? ctx.colors().PURPLE_300.use(name + " (in use)") : name;
+        return isDefault ? ctx.colors().PURPLE_300.use(name + " (default)") : name;
     }
 }

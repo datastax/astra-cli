@@ -1,0 +1,726 @@
+---- meta ----
+command: astra db list-embedding-providers two_regions_db -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "embeddingProviders" : {
+stdout:       "azureOpenAI" : {
+stdout:         "displayName" : "Azure OpenAI",
+stdout:         "url" : "https://{resourceName}.openai.azure.com/openai/deployments/{deploymentId}/embeddings?api-version=2024-02-01",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "api-key",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "api-key",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ {
+stdout:           "name" : "resourceName",
+stdout:           "type" : "STRING",
+stdout:           "required" : true,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Azure OpenAI Service name",
+stdout:           "displayName" : "Resource name",
+stdout:           "hint" : ""
+stdout:         }, {
+stdout:           "name" : "deploymentId",
+stdout:           "type" : "STRING",
+stdout:           "required" : true,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Deployment name",
+stdout:           "displayName" : "Deployment ID",
+stdout:           "hint" : ""
+stdout:         } ],
+stdout:         "models" : [ {
+stdout:           "name" : "text-embedding-3-large",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : true,
+stdout:             "defaultValue" : "1536",
+stdout:             "validation" : {
+stdout:               "numericRange" : [ 256, 3072 ]
+stdout:             },
+stdout:             "help" : "Vector dimension to use in the database and when calling Azure OpenAI."
+stdout:           } ]
+stdout:         }, {
+stdout:           "name" : "text-embedding-3-small",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : true,
+stdout:             "defaultValue" : "1536",
+stdout:             "validation" : {
+stdout:               "numericRange" : [ 2, 1536 ]
+stdout:             },
+stdout:             "help" : "Vector dimension to use in the database and when calling Azure OpenAI."
+stdout:           } ]
+stdout:         }, {
+stdout:           "name" : "text-embedding-ada-002",
+stdout:           "vectorDimension" : 1536,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "api-key",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "api-key",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "bedrock" : {
+stdout:         "displayName" : "Amazon Bedrock",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "aws_access_key_id",
+stdout:               "accepted" : "x-embedding-access-id"
+stdout:             }, {
+stdout:               "forwarded" : "aws_secret_access_key",
+stdout:               "accepted" : "x-embedding-secret-id"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "aws_access_key_id",
+stdout:               "accepted" : "accessId"
+stdout:             }, {
+stdout:               "forwarded" : "aws_secret_access_key",
+stdout:               "accepted" : "secretKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ {
+stdout:           "name" : "region",
+stdout:           "type" : "STRING",
+stdout:           "required" : true,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "AWS region where the model is hosted.",
+stdout:           "displayName" : "",
+stdout:           "hint" : ""
+stdout:         } ],
+stdout:         "models" : [ {
+stdout:           "name" : "amazon.titan-embed-text-v1",
+stdout:           "vectorDimension" : 1536,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "amazon.titan-embed-text-v2:0",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : false,
+stdout:             "defaultValue" : "1024",
+stdout:             "validation" : { },
+stdout:             "help" : "Vector dimension to use in the database and when calling Amazon Bedrock Titan V2 embedding model."
+stdout:           } ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : false,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "aws_access_key_id",
+stdout:             "accepted" : "accessId"
+stdout:           }, {
+stdout:             "forwarded" : "aws_secret_access_key",
+stdout:             "accepted" : "secretKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "aws_access_key_id",
+stdout:             "accepted" : "x-embedding-access-id"
+stdout:           }, {
+stdout:             "forwarded" : "aws_secret_access_key",
+stdout:             "accepted" : "x-embedding-secret-id"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "cohere" : {
+stdout:         "displayName" : "Cohere",
+stdout:         "url" : "https://api.cohere.ai/v1/",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ ],
+stdout:         "models" : [ {
+stdout:           "name" : "embed-english-v2.0",
+stdout:           "vectorDimension" : 4096,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "embed-english-v3.0",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "embed-multilingual-v3.0",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : false,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "huggingface" : {
+stdout:         "displayName" : "Hugging Face - Serverless",
+stdout:         "url" : "https://router.huggingface.co/hf-inference/models/{modelId}/pipeline/feature-extraction",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ ],
+stdout:         "models" : [ {
+stdout:           "name" : "BAAI/bge-base-en-v1.5",
+stdout:           "vectorDimension" : 768,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "BAAI/bge-large-en-v1.5",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "BAAI/bge-small-en-v1.5",
+stdout:           "vectorDimension" : 384,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "intfloat/multilingual-e5-large",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "intfloat/multilingual-e5-large-instruct",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "sentence-transformers/all-MiniLM-L6-v2",
+stdout:           "vectorDimension" : 384,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "huggingfaceDedicated" : {
+stdout:         "displayName" : "Hugging Face - Dedicated",
+stdout:         "url" : "https://{endpointName}.{regionName}.{cloudName}.endpoints.huggingface.cloud/embeddings",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ {
+stdout:           "name" : "endpointName",
+stdout:           "type" : "STRING",
+stdout:           "required" : true,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Add the first part of the dedicated endpoint URL",
+stdout:           "displayName" : "Endpoint name",
+stdout:           "hint" : "Add endpoint name"
+stdout:         }, {
+stdout:           "name" : "regionName",
+stdout:           "type" : "STRING",
+stdout:           "required" : true,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Add the second part of the dedicated endpoint URL",
+stdout:           "displayName" : "Region name",
+stdout:           "hint" : "Add region name"
+stdout:         }, {
+stdout:           "name" : "cloudName",
+stdout:           "type" : "STRING",
+stdout:           "required" : true,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Add the third part of the dedicated endpoint URL",
+stdout:           "displayName" : "Cloud provider where the dedicated endpoint is deployed",
+stdout:           "hint" : "Add cloud name"
+stdout:         } ],
+stdout:         "models" : [ {
+stdout:           "name" : "endpoint-defined-model",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : true,
+stdout:             "defaultValue" : "",
+stdout:             "validation" : {
+stdout:               "numericRange" : [ 2, 3072 ]
+stdout:             },
+stdout:             "help" : "Vector dimension to use in the database, should be the same as the model used by the endpoint."
+stdout:           } ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "jinaAI" : {
+stdout:         "displayName" : "Jina AI",
+stdout:         "url" : "https://api.jina.ai/v1/embeddings",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ ],
+stdout:         "models" : [ {
+stdout:           "name" : "jina-embeddings-v2-base-code",
+stdout:           "vectorDimension" : 768,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "jina-embeddings-v2-base-de",
+stdout:           "vectorDimension" : 768,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "jina-embeddings-v2-base-en",
+stdout:           "vectorDimension" : 768,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "jina-embeddings-v2-base-es",
+stdout:           "vectorDimension" : 768,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "jina-embeddings-v2-base-zh",
+stdout:           "vectorDimension" : 768,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "jina-embeddings-v3",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : true,
+stdout:             "defaultValue" : "1024",
+stdout:             "validation" : {
+stdout:               "numericRange" : [ 1, 1024 ]
+stdout:             },
+stdout:             "help" : "Vector dimension to use in the database and when calling Jina AI."
+stdout:           }, {
+stdout:             "name" : "task",
+stdout:             "type" : "string",
+stdout:             "required" : false,
+stdout:             "defaultValue" : "text-matching",
+stdout:             "validation" : { },
+stdout:             "help" : "Select the downstream task for which the embeddings will be used. The model will return the optimized embeddings for that task. Available options are: retrieval.passage, retrieval.query, separation, classification, text-matching. For more information, please refer to the Jina AI documentation: https://jina.ai/news/jina-embeddings-v3-a-frontier-multilingual-embedding-model/."
+stdout:           }, {
+stdout:             "name" : "late_chunking",
+stdout:             "type" : "boolean",
+stdout:             "required" : false,
+stdout:             "defaultValue" : "false",
+stdout:             "validation" : { },
+stdout:             "help" : "Apply the late chunking technique to leverage the model's long-context capabilities for generating contextual chunk embeddings. For more information, please refer to the Jina AI documentation: https://jina.ai/news/jina-embeddings-v3-a-frontier-multilingual-embedding-model/."
+stdout:           } ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "mistral" : {
+stdout:         "displayName" : "Mistral AI",
+stdout:         "url" : "https://api.mistral.ai/v1/embeddings",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ ],
+stdout:         "models" : [ {
+stdout:           "name" : "mistral-embed",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "nvidia" : {
+stdout:         "displayName" : "Nvidia",
+stdout:         "url" : "http://nemoservice.nemo:8080/v1/embeddings",
+stdout:         "supportedAuthentication" : {
+stdout:           "NONE" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ ],
+stdout:         "models" : [ {
+stdout:           "name" : "NV-Embed-QA",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "nvidia/nv-embedqa-e5-v5",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : null,
+stdout:         "headerAuthentication" : null
+stdout:       },
+stdout:       "openai" : {
+stdout:         "displayName" : "OpenAI",
+stdout:         "url" : "https://api.openai.com/v1/",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ {
+stdout:           "name" : "organizationId",
+stdout:           "type" : "STRING",
+stdout:           "required" : false,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Organization ID will be passed as an OpenAI organization",
+stdout:           "displayName" : "Organization ID",
+stdout:           "hint" : "Add an (optional) organization ID"
+stdout:         }, {
+stdout:           "name" : "projectId",
+stdout:           "type" : "STRING",
+stdout:           "required" : false,
+stdout:           "defaultValue" : "",
+stdout:           "validation" : { },
+stdout:           "help" : "Project ID will be passed as an OpenAI project header",
+stdout:           "displayName" : "Project ID",
+stdout:           "hint" : "Add an (optional) project ID"
+stdout:         } ],
+stdout:         "models" : [ {
+stdout:           "name" : "text-embedding-3-large",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : true,
+stdout:             "defaultValue" : "3072",
+stdout:             "validation" : {
+stdout:               "numericRange" : [ 256, 3072 ]
+stdout:             },
+stdout:             "help" : "Vector dimension to use in the database and when calling OpenAI."
+stdout:           } ]
+stdout:         }, {
+stdout:           "name" : "text-embedding-3-small",
+stdout:           "parameters" : [ {
+stdout:             "name" : "vectorDimension",
+stdout:             "type" : "number",
+stdout:             "required" : true,
+stdout:             "defaultValue" : "1536",
+stdout:             "validation" : {
+stdout:               "numericRange" : [ 2, 1536 ]
+stdout:             },
+stdout:             "help" : "Vector dimension to use in the database and when calling OpenAI."
+stdout:           } ]
+stdout:         }, {
+stdout:           "name" : "text-embedding-ada-002",
+stdout:           "vectorDimension" : 1536,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "upstageAI" : {
+stdout:         "displayName" : "Upstage",
+stdout:         "url" : "https://api.upstage.ai/v1/solar/embeddings",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ ],
+stdout:         "models" : [ {
+stdout:           "name" : "solar-embedding-1-large",
+stdout:           "vectorDimension" : 4096,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       },
+stdout:       "voyageAI" : {
+stdout:         "displayName" : "Voyage AI",
+stdout:         "url" : "https://api.voyageai.com/v1/embeddings",
+stdout:         "supportedAuthentication" : {
+stdout:           "HEADER" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "x-embedding-api-key"
+stdout:             } ]
+stdout:           },
+stdout:           "NONE" : {
+stdout:             "enabled" : false,
+stdout:             "tokens" : [ ]
+stdout:           },
+stdout:           "SHARED_SECRET" : {
+stdout:             "enabled" : true,
+stdout:             "tokens" : [ {
+stdout:               "forwarded" : "Authorization",
+stdout:               "accepted" : "providerKey"
+stdout:             } ]
+stdout:           }
+stdout:         },
+stdout:         "parameters" : [ {
+stdout:           "name" : "autoTruncate",
+stdout:           "type" : "BOOLEAN",
+stdout:           "required" : false,
+stdout:           "defaultValue" : "true",
+stdout:           "validation" : { },
+stdout:           "help" : "Whether to truncate the input texts to fit within the context length. Defaults to true.",
+stdout:           "displayName" : "",
+stdout:           "hint" : ""
+stdout:         } ],
+stdout:         "models" : [ {
+stdout:           "name" : "voyage-2",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "voyage-code-2",
+stdout:           "vectorDimension" : 1536,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "voyage-finance-2",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "voyage-large-2",
+stdout:           "vectorDimension" : 1536,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "voyage-large-2-instruct",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "voyage-law-2",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         }, {
+stdout:           "name" : "voyage-multilingual-2",
+stdout:           "vectorDimension" : 1024,
+stdout:           "parameters" : [ ]
+stdout:         } ],
+stdout:         "sharedSecretAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "providerKey"
+stdout:           } ]
+stdout:         },
+stdout:         "headerAuthentication" : {
+stdout:           "enabled" : true,
+stdout:           "tokens" : [ {
+stdout:             "forwarded" : "Authorization",
+stdout:             "accepted" : "x-embedding-api-key"
+stdout:           } ]
+stdout:         }
+stdout:       }
+stdout:     }
+stdout:   }
+stdout: }
+---- end ----

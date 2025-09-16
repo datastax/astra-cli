@@ -1,0 +1,6 @@
+---- meta ----
+command: astra streaming exist tenant1
+exit_code: 0
+---- output ----
+stdout: Tenant 'tenant1' does not exist.
+---- end ----

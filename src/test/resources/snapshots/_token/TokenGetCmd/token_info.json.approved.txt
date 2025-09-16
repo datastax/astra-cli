@@ -1,9 +1,9 @@
 ---- meta ----
-command: astra token --token AstraCS:aBc123XyZ789LmnOpQrStUvW:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc123 -o json
+command: astra token --token AstraCS:fakefakefakefakefakefake:fakefakefakefakefakefakefakefakefakefakefakefakefakefakefakefake -o json
 exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "data" : "AstraCS:aBc123XyZ789LmnOpQrStUvW:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc123"
+stdout:   "data" : "AstraCS:fakefakefakefakefakefake:fakefakefakefakefakefakefakefakefakefakefakefakefakefakefakefake"
 stdout: }
 ---- end ----

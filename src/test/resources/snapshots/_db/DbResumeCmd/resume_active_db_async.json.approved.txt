@@ -1,0 +1,15 @@
+---- meta ----
+command: astra db resume 822b0fff-6a73-4322-a8ec-09832b075287 --async -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Database '822b0fff-6a73-4322-a8ec-09832b075287' is already active; no action was required.",
+stdout:   "data" : {
+stdout:     "wasHibernated" : false,
+stdout:     "currentStatus" : "ACTIVE",
+stdout:     "waitedSeconds" : 0
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

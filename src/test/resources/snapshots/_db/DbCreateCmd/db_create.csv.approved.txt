@@ -1,0 +1,7 @@
+---- meta ----
+command: astra db create two_regions_db -r us-east-1 -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,data.dbId,data.wasCreated,data.currentStatus,data.waitedSeconds
+stdout: OK,Database 'two_regions_db' has been created with id '822b0fff-6a73-4322-a8ec-09832b075287'. It is now active after waiting 6 seconds.,822b0fff-6a73-4322-a8ec-09832b075287,true,ACTIVE,6
+---- end ----

@@ -114,7 +114,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
         return new StreamingCreateOperation(streamingGateway, new StreamingCreateRequest(
             $tenantName,
             ($tenantCreationOptions.$clusterOrCloud.$regionSpec != null)
-                ? Either.right(Pair.create($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, $tenantCreationOptions.$clusterOrCloud.$regionSpec.$region))
+                ? Either.pure(Pair.create($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, $tenantCreationOptions.$clusterOrCloud.$regionSpec.$region))
                 : Either.left($tenantCreationOptions.$clusterOrCloud.$cluster.orElseThrow()),
             $tenantCreationOptions.$plan,
             $tenantCreationOptions.$userEmail,

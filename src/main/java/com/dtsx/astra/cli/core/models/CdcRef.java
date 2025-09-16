@@ -26,7 +26,7 @@ public class CdcRef implements Highlightable {
     }
 
     public static CdcRef fromDefinition(TableRef tableRef, TenantName tenantName) {
-        return new CdcRef(tableRef.db(), Either.right(Pair.create(tableRef, tenantName)));
+        return new CdcRef(tableRef.db(), Either.pure(Pair.create(tableRef, tenantName)));
     }
 
     public boolean isId() {

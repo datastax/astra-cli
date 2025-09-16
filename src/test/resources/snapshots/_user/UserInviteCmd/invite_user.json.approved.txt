@@ -1,0 +1,14 @@
+---- meta ----
+command: astra user invite alice@example.bob --roles 'R/W Svc Acct' -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "User 'alice@example.bob' has been invited with role 'R/W Svc Acct'.",
+stdout:   "data" : {
+stdout:     "wasInvited" : true,
+stdout:     "roleIds" : [ "b4ed0e9e-67e8-47b6-8b58-c6629be961a9" ]
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

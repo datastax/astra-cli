@@ -11,7 +11,7 @@ import picocli.CommandLine.Command;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.TABLE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
 
 @Command(
@@ -20,11 +20,11 @@ import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
 )
 @Example(
     comment = "Truncate a table in the default keyspace",
-    command = "${cli.name} db truncate-table my_db -c my_table"
+    command = "${cli.name} db truncate-table my_db -t my_table"
 )
 @Example(
     comment = "Truncate a table in a specific keyspace",
-    command = "${cli.name} db truncate-table my_db -k my_keyspace -c my_table"
+    command = "${cli.name} db truncate-table my_db -k my_keyspace -t my_table"
 )
 public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResult> {
     @Override
@@ -42,7 +42,7 @@ public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResu
     }
 
     private <T> T throwTableNotFound() {
-        throw new AstraCliException(COLLECTION_NOT_FOUND, """
+        throw new AstraCliException(TABLE_NOT_FOUND, """
           @|bold,red Error: Table %s does not exist in keyspace %s.|@
         """.formatted(
             $tableRef.name(),

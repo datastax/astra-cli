@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db create-keyspace two_regions_db -k default_keyspace --if-not-exists
+exit_code: 0
+---- output ----
+stdout: Keyspace 'default_keyspace' already exists in database 'two_regions_db'.
+---- end ----

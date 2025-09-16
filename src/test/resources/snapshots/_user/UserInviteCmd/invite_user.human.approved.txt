@@ -1,0 +1,6 @@
+---- meta ----
+command: astra user invite alice@example.bob --roles 'R/W Svc Acct'
+exit_code: 0
+---- output ----
+stdout: User 'alice@example.bob' has been invited with role 'R/W Svc Acct'.
+---- end ----

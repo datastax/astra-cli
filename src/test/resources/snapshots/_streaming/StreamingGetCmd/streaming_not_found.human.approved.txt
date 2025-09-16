@@ -1,0 +1,8 @@
+---- meta ----
+command: astra streaming get *nonexistent*
+exit_code: 2
+---- output ----
+stderr: Error: Tenant '*nonexistent*' not found.
+stderr: 
+stderr: Use 'astra streaming list' to see all available tenants.
+---- end ----

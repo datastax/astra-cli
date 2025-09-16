@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +52,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
     }
 
     @Override
-    protected RegionDeleteOperation mkOperation() {
+    protected Operation<RegionDeleteResult> mkOperation() {
         return new RegionDeleteOperation(regionGateway, dbGateway, new RegionDeleteRequest($dbRef, $region, $ifExists, lrMixin.options()));
     }
 

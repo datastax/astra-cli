@@ -1,0 +1,17 @@
+---- meta ----
+command: astra user invite alice@example.bob --roles 'R/W Svc Acct' --if-not-exists -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "User 'alice@example.bob' already exists; nothing to invite.",
+stdout:   "data" : {
+stdout:     "wasInvited" : false,
+stdout:     "roleIds" : null
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "See all existing users:",
+stdout:     "command" : "astra user list"
+stdout:   } ]
+stdout: }
+---- end ----

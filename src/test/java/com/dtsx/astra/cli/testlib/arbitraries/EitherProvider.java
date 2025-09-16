@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class EitherProvider implements ArbitraryProvider {
     @Override
     public boolean canProvideFor(TypeUsage targetType) {
-        return targetType.isOfType(Either.class);
+        return targetType.canBeAssignedTo(TypeUsage.of(Either.class, TypeUsage.wildcard(TypeUsage.OBJECT_TYPE), TypeUsage.wildcard(TypeUsage.OBJECT_TYPE)));
     }
 
     @Override
@@ -25,7 +25,7 @@ public class EitherProvider implements ArbitraryProvider {
         return subtypeProvider.apply(typeL).stream()
             .flatMap((arbL) ->
                 subtypeProvider.apply(typeR).stream().map((arbR) ->
-                    Arbitraries.oneOf(arbL.map(Either::left), arbR.map(Either::right))
+                    Arbitraries.oneOf(arbL.map(Either::left), arbR.map(Either::pure))
                 )
             )
             .collect(Collectors.toSet());

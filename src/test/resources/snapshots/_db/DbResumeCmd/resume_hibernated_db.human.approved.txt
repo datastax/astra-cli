@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db resume two_regions_db
+exit_code: 0
+---- output ----
+stdout: Database 'two_regions_db' was resumed, and is now active after waiting 100 seconds.
+---- end ----

@@ -12,7 +12,6 @@ import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
-import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -78,6 +77,10 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     public final Profile profile() {
         if (cachedProfile != null) {
             return cachedProfile;
+        }
+
+        if (ctx.forceProfile().isPresent()) {
+            return cachedProfile = ctx.forceProfile().get();
         }
 
         if ($credsProvider != null && $credsProvider.$creds != null) {

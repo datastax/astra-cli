@@ -8,46 +8,46 @@ stdout:   "data" : [ {
 stdout:     "ID" : "b4ed0e9e-67e8-47b6-8b58-c6629be961a9",
 stdout:     "Name" : "R/W Svc Acct",
 stdout:     "Policy" : {
-stdout:       "actions" : [ "accesslist-read", "db-all-keyspace-describe", "db-keyspace-describe", "db-table-select", "db-table-modify", "db-table-describe", "db-graphql", "db-rest", "db-cql" ],
 stdout:       "description" : "R/W Svc Acct",
 stdout:       "effect" : "allow",
-stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ]
+stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ],
+stdout:       "actions" : [ "accesslist-read", "db-all-keyspace-describe", "db-keyspace-describe", "db-table-select", "db-table-modify", "db-table-describe", "db-graphql", "db-rest", "db-cql" ]
 stdout:     }
 stdout:   }, {
 stdout:     "ID" : "43745b73-ad46-46e4-b826-c15d06d2cea0",
 stdout:     "Name" : "Admin User",
 stdout:     "Policy" : {
-stdout:       "actions" : [ "org-read", "org-billing-read", "org-billing-write", "org-cmk-read", "org-cmk-write", "org-user-read", "org-user-write", "org-db-create", "org-db-passwordreset", "org-db-terminate", "org-db-suspend", "org-db-addpeering", "org-db-managemigratorproxy", "org-db-expand", "org-db-view", "db-all-keyspace-create", "db-all-keyspace-describe", "db-manage-privateendpoint", "db-keyspace-grant", "db-keyspace-modify", "db-keyspace-describe", "db-keyspace-create", "db-keyspace-authorize", "db-keyspace-alter", "db-keyspace-drop", "db-manage-region", "db-table-select", "db-table-grant", "db-table-modify", "db-table-describe", "db-table-create", "db-table-authorize", "db-table-alter", "db-table-drop", "db-graphql", "db-rest", "db-cql", "db-data-import", "db-manage-thirdpartymetrics" ],
 stdout:       "description" : "Admin User",
 stdout:       "effect" : "allow",
-stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ]
+stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ],
+stdout:       "actions" : [ "org-read", "org-billing-read", "org-billing-write", "org-cmk-read", "org-cmk-write", "org-user-read", "org-user-write", "org-db-create", "org-db-passwordreset", "org-db-terminate", "org-db-suspend", "org-db-addpeering", "org-db-managemigratorproxy", "org-db-expand", "org-db-view", "db-all-keyspace-create", "db-all-keyspace-describe", "db-manage-privateendpoint", "db-keyspace-grant", "db-keyspace-modify", "db-keyspace-describe", "db-keyspace-create", "db-keyspace-authorize", "db-keyspace-alter", "db-keyspace-drop", "db-manage-region", "db-table-select", "db-table-grant", "db-table-modify", "db-table-describe", "db-table-create", "db-table-authorize", "db-table-alter", "db-table-drop", "db-graphql", "db-rest", "db-cql", "db-data-import", "db-manage-thirdpartymetrics" ]
 stdout:     }
 stdout:   }, {
 stdout:     "ID" : "67c4b5dc-dd3f-4b2d-be51-09be12836d57",
 stdout:     "Name" : "API Admin User",
 stdout:     "Policy" : {
-stdout:       "actions" : [ "accesslist-read", "org-billing-read", "org-billing-write", "org-user-read", "org-user-write", "org-db-view", "org-db-create", "org-db-passwordreset", "org-db-terminate", "org-db-suspend", "org-db-addpeering", "org-db-managemigratorproxy", "org-db-expand", "org-db-view", "org-stream-manage", "db-manage-privateendpoint", "db-all-keyspace-create", "db-all-keyspace-describe", "db-keyspace-grant", "db-keyspace-modify", "db-keyspace-describe", "db-keyspace-create", "db-keyspace-authorize", "db-keyspace-alter", "db-keyspace-drop", "db-manage-region", "db-table-select", "db-table-grant", "db-table-modify", "db-table-describe", "db-table-create", "db-table-authorize", "db-table-alter", "db-table-drop", "db-graphql", "db-rest" ],
 stdout:       "description" : "API Admin User",
 stdout:       "effect" : "allow",
-stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*", "drn:astra:org:__ORG_ID__:stream:*" ]
+stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*", "drn:astra:org:__ORG_ID__:stream:*" ],
+stdout:       "actions" : [ "accesslist-read", "org-billing-read", "org-billing-write", "org-user-read", "org-user-write", "org-db-view", "org-db-create", "org-db-passwordreset", "org-db-terminate", "org-db-suspend", "org-db-addpeering", "org-db-managemigratorproxy", "org-db-expand", "org-db-view", "org-stream-manage", "db-manage-privateendpoint", "db-all-keyspace-create", "db-all-keyspace-describe", "db-keyspace-grant", "db-keyspace-modify", "db-keyspace-describe", "db-keyspace-create", "db-keyspace-authorize", "db-keyspace-alter", "db-keyspace-drop", "db-manage-region", "db-table-select", "db-table-grant", "db-table-modify", "db-table-describe", "db-table-create", "db-table-authorize", "db-table-alter", "db-table-drop", "db-graphql", "db-rest" ]
 stdout:     }
 stdout:   }, {
 stdout:     "ID" : "ad0566b5-2a67-49de-89e8-92258c2f2c98",
 stdout:     "Name" : "Organization Administrator",
 stdout:     "Policy" : {
-stdout:       "actions" : [ "accesslist-read", "accesslist-write", "org-read", "org-write", "org-audits-read", "org-cmk-read", "org-cmk-write", "org-role-read", "org-role-write", "org-role-delete", "org-external-auth-read", "org-external-auth-write", "org-notification-write", "org-token-read", "org-token-write", "org-billing-read", "org-billing-write", "org-user-read", "org-user-write", "org-db-create", "org-db-passwordreset", "org-db-terminate", "org-db-suspend", "org-db-addpeering", "org-db-managemigratorproxy", "org-db-expand", "org-db-view", "org-integrations-read", "org-integrations-write", "org-stream-manage", "db-manage-privateendpoint", "db-all-keyspace-create", "db-all-keyspace-describe", "db-keyspace-grant", "db-keyspace-modify", "db-keyspace-describe", "db-keyspace-create", "db-keyspace-authorize", "db-keyspace-alter", "db-keyspace-drop", "db-manage-region", "db-table-select", "db-table-grant", "db-table-modify", "db-table-describe", "db-table-create", "db-table-authorize", "db-table-alter", "db-table-drop", "db-graphql", "db-rest", "db-cql", "db-data-import", "db-manage-thirdpartymetrics" ],
 stdout:       "description" : "Organization Administrator",
 stdout:       "effect" : "allow",
-stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*", "drn:astra:org:__ORG_ID__:stream:*", "drn:astra:org:__ORG_ID__:role:*" ]
+stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*", "drn:astra:org:__ORG_ID__:stream:*", "drn:astra:org:__ORG_ID__:role:*" ],
+stdout:       "actions" : [ "accesslist-read", "accesslist-write", "org-read", "org-write", "org-audits-read", "org-cmk-read", "org-cmk-write", "org-role-read", "org-role-write", "org-role-delete", "org-external-auth-read", "org-external-auth-write", "org-notification-write", "org-token-read", "org-token-write", "org-billing-read", "org-billing-write", "org-user-read", "org-user-write", "org-db-create", "org-db-passwordreset", "org-db-terminate", "org-db-suspend", "org-db-addpeering", "org-db-managemigratorproxy", "org-db-expand", "org-db-view", "org-integrations-read", "org-integrations-write", "org-stream-manage", "db-manage-privateendpoint", "db-all-keyspace-create", "db-all-keyspace-describe", "db-keyspace-grant", "db-keyspace-modify", "db-keyspace-describe", "db-keyspace-create", "db-keyspace-authorize", "db-keyspace-alter", "db-keyspace-drop", "db-manage-region", "db-table-select", "db-table-grant", "db-table-modify", "db-table-describe", "db-table-create", "db-table-authorize", "db-table-alter", "db-table-drop", "db-graphql", "db-rest", "db-cql", "db-data-import", "db-manage-thirdpartymetrics" ]
 stdout:     }
 stdout:   }, {
 stdout:     "ID" : "16a4b1d7-a615-41f8-95ca-52b0280f4d77",
 stdout:     "Name" : "RO Svc Acct",
 stdout:     "Policy" : {
-stdout:       "actions" : [ "accesslist-read", "db-all-keyspace-describe", "db-keyspace-describe", "db-table-select", "db-table-describe", "db-graphql", "db-rest", "db-cql" ],
 stdout:       "description" : "RO Svc Acct",
 stdout:       "effect" : "allow",
-stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ]
+stdout:       "resources" : [ "drn:astra:org:__ORG_ID__", "drn:astra:org:__ORG_ID__:db:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*", "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*" ],
+stdout:       "actions" : [ "accesslist-read", "db-all-keyspace-describe", "db-keyspace-describe", "db-table-select", "db-table-describe", "db-graphql", "db-rest", "db-cql" ]
 stdout:     }
 stdout:   } ]
 stdout: }

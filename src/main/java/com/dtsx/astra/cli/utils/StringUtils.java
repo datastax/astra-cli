@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.utils;
 
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.AstraColors;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +11,6 @@ import lombok.val;
 @UtilityClass
 public class StringUtils {
     public static final String NL = System.lineSeparator();
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static String removeQuotesIfAny(@NonNull String str) {
         if (str.length() >= 2 && ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'")))) {
@@ -31,6 +28,8 @@ public class StringUtils {
     }
 
     public static String withIndent(String input, String indentStr) {
+        input = (input == null) ? "" : input;
+
         val lines = input.split("\n", -1);
 
         val start = lines.length > 0 && stripAnsiCodes(lines[0]).isBlank()
@@ -121,14 +120,5 @@ public class StringUtils {
             return str;
         }
         return Character.toUpperCase(str.charAt(0)) + str.substring(1);
-    }
-
-    public static boolean isValidJson(String str) {
-        try {
-            OBJECT_MAPPER.readTree(str);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

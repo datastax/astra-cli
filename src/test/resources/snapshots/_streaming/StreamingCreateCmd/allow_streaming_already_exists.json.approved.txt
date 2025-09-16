@@ -1,0 +1,18 @@
+---- meta ----
+command: astra streaming create tenant1 --cluster *cluster* --if-not-exists -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Tenant 'tenant1' already exists and has status 'active'.",
+stdout:   "data" : {
+stdout:     "tenantName" : "tenant1",
+stdout:     "wasCreated" : false,
+stdout:     "currentStatus" : "active"
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "Get information about the existing tenant:",
+stdout:     "command" : "astra streaming get tenant1"
+stdout:   } ]
+stdout: }
+---- end ----

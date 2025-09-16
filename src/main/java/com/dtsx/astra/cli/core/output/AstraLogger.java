@@ -37,12 +37,14 @@ public class AstraLogger {
 
     private final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
-    private LoadingSpinner globalSpinner;
+    private Optional<LoadingSpinner> globalSpinner = Optional.empty();
+    private final boolean enableSpinner;
 
-    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo) {
+    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo, boolean enableSpinner) {
         this.level = level;
         this.ctxSupplier = ctxSupplier;
         this.shouldDumpLogs = shouldDumpLogs;
+        this.enableSpinner = enableSpinner;
 
         if (dumpLogsTo.isPresent()) {
             this.sessionLogFile = dumpLogsTo::get;
@@ -103,6 +105,16 @@ public class AstraLogger {
             description = "Suppress informational output"
         )
         private boolean quiet;
+
+        @Getter
+        @Option(
+            names = { "--spinner" },
+            description = "Enable/disable the loading spinner",
+            negatable = true,
+            defaultValue = "${cli.output.spinner.default:true}",
+            fallbackValue = "true"
+        )
+        private boolean enableSpinner;
 
         @Getter
         private boolean shouldDumpLogs = false;
@@ -167,26 +179,26 @@ public class AstraLogger {
     public <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
         started(initialMsg);
 
-        boolean isFirstLoading = globalSpinner == null;
+        val isFirstLoading = globalSpinner.isEmpty();
 
-        if (isFirstLoading) {
-            globalSpinner = new LoadingSpinner(initialMsg, ctx());
-            globalSpinner.start();
+        if (isFirstLoading && enableSpinner) {
+            globalSpinner = Optional.of(new LoadingSpinner(initialMsg, ctx()));
+            globalSpinner.get().start();
         } else {
-            globalSpinner.pushMessage(initialMsg);
+            globalSpinner.ifPresent(s -> s.pushMessage(initialMsg));
         }
 
         try {
             return supplier.apply((msg) -> {
-                globalSpinner.updateMessage(msg);
+                globalSpinner.ifPresent(s -> s.updateMessage(msg));
                 accumulated.add("[LOADING:UPDATED] " + msg);
             });
         } finally {
             if (isFirstLoading) {
-                globalSpinner.stop();
-                globalSpinner = null;
+                globalSpinner.ifPresent(LoadingSpinner::stop);
+                globalSpinner = Optional.empty();
             } else {
-                globalSpinner.popMessage();
+                globalSpinner.ifPresent(LoadingSpinner::popMessage);
             }
             done(initialMsg);
         }
@@ -217,16 +229,12 @@ public class AstraLogger {
             return;
         }
 
-        if (globalSpinner != null) {
-            globalSpinner.pause();
-        }
+        globalSpinner.ifPresent(LoadingSpinner::pause);
 
         try {
             ctx().console().errorln(msg);
         } finally {
-            if (globalSpinner != null) {
-                globalSpinner.resume();
-            }
+            globalSpinner.ifPresent(LoadingSpinner::resume);
         }
     }
 

@@ -1,0 +1,11 @@
+---- meta ----
+command: astra user list
+exit_code: 0
+---- output ----
+stdout: +--------------------------------------+-------------------+---------+
+stdout: | User Id                              | User Email        | Status  |
+stdout: +--------------------------------------+-------------------+---------+
+stdout: | ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o | alice@example.bob | active  |
+stdout: | b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6 | example@bob.alice | invited |
+stdout: +--------------------------------------+-------------------+---------+
+---- end ----

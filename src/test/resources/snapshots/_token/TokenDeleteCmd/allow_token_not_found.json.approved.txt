@@ -9,8 +9,8 @@ stdout:   "data" : {
 stdout:     "wasDeleted" : false
 stdout:   },
 stdout:   "nextSteps" : [ {
-stdout:     "command" : "astra token list",
-stdout:     "comment" : "See all available tokens:"
+stdout:     "comment" : "See all available tokens:",
+stdout:     "command" : "astra token list"
 stdout:   } ]
 stdout: }
 ---- end ----

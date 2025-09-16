@@ -10,10 +10,10 @@ import java.nio.file.Path;
 
 public class AstraHome {
     public final Path DIR;
-    public final Dirs Dirs ;
+    public final Dirs Dirs;
 
-    public AstraHome(FileSystem fs, boolean isWindows) {
-        DIR = resolveDefaultAstraHomeFolder(fs, isWindows);
+    public AstraHome(Path DIR) {
+        this.DIR = DIR;
         Dirs = new Dirs();
     }
 
@@ -70,11 +70,7 @@ public class AstraHome {
         }
     }
 
-    public boolean exists() {
-        return Files.exists(DIR);
-    }
-
-    private Path resolveDefaultAstraHomeFolder(FileSystem fs, boolean isWindows) {
+    public static Path resolveDefaultAstraHomeFolder(FileSystem fs, boolean isWindows) {
         return fs.getPath(CliProperties.defaultHomeFolder(isWindows));
     }
 }

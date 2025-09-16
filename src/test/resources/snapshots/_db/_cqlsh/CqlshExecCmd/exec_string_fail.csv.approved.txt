@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db cqlsh exec two_regions_db 'DESC CARS' -o csv
+exit_code: 0
+comments: 
+ | Can't really test human output since we don't capture cqlsh output for human outputs
+ | But at least we can verify the command runs and the exit code is correct
+ | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
+---- output ----
+stdout: code,message,data.exitCode,data.stdout,data.stderr
+stdout: OK,"Cqlsh executed with exit code 2, with 1 lines in stdout and 1 lines in stderr.",2,,<stdin>:1:'cars' not found in keyspaces
+---- end ----

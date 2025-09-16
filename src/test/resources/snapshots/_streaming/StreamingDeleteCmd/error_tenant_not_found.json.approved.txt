@@ -1,0 +1,17 @@
+---- meta ----
+command: astra streaming delete tenant1 -o json
+exit_code: 2
+---- output ----
+stdout: {
+stdout:   "code" : "TENANT_NOT_FOUND",
+stdout:   "message" : "Error: Tenant 'tenant1' could not be found.\n\nTo ignore this error, you can use the '--if-exists' option to avoid failing if the tenant does not exist.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "Example fix:",
+stdout:     "command" : "astra streaming delete tenant1 -o json --if-exists"
+stdout:   }, {
+stdout:     "comment" : "See your existing tenants:",
+stdout:     "command" : "astra streaming list"
+stdout:   } ]
+stdout: }
+---- end ----

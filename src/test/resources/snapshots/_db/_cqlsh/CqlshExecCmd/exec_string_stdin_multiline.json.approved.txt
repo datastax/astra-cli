@@ -1,0 +1,21 @@
+---- meta ----
+command: astra db cqlsh exec two_regions_db -o json
+exit_code: 0
+comments: 
+ | Can't really test human output since we don't capture cqlsh output for human outputs
+ | But at least we can verify the command runs and the exit code is correct
+ | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
+---- output ----
+stderr: [INFO] Reading CQL statements from stdin...
+stderr: [INFO] Use backslashes for multi-line statements
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Cqlsh executed with exit code 0, with 37 lines in stdout and 0 lines in stderr.",
+stdout:   "data" : {
+stdout:     "exitCode" : 0,
+stdout:     "stdout" : "\ndatastax_sla   system              default_keyspace  system_virtual_schema\nsystem_auth    system_traces       other_keyspace  \nsystem_schema  data_endpoint_auth  system_views    \n\n[cqlsh 6.8.0 | Cassandra 4.0.0.6816 | CQL spec 3.4.5 | Native protocol v4]\n\nShell command help topics:\n==========================\nCAPTURE  CLS          COPY     EXIT    HELP   PAGING  SHOW    TIMING   UNICODE\nCLEAR    CONSISTENCY  EXECUTE  EXPAND  LOGIN  SERIAL  SOURCE  TRACING\n\nFull documentation for shell commands:\n  https://docs.datastax.com/en/dse/6.8/cql/cql/cql_reference/cqlsh_commands/cqlshCommandsTOC.html\n\nCQL command help topics:\n========================\nALTER_KEYSPACE             CREATE_ROLE           GRANT               \nALTER_MATERIALIZED_VIEW    CREATE_SEARCH_INDEX   INSERT              \nALTER_ROLE                 CREATE_TABLE          LIST_PERMISSIONS    \nALTER_SEARCH_INDEX_CONFIG  CREATE_TYPE           LIST_ROLES          \nALTER_SEARCH_INDEX_SCHEMA  CREATE_USER           LIST_USERS          \nALTER_TABLE                DELETE                REBUILD_SEARCH_INDEX\nALTER_TYPE                 DROP_AGGREGATE        RELOAD_SEARCH_INDEX \nALTER_USER                 DROP_FUNCTION         RESTRICT            \nBATCH                      DROP_INDEX            RESTRICT_ROWS       \nCOMMIT_SEARCH_INDEX        DROP_KEYSPACE         REVOKE              \nCREATE_AGGREGATE           DROP_MATIALIZED_VIEW  SELECT              \nCREATE_CUSTOM_INDEX        DROP_ROLE             TRUNCATE            \nCREATE_FUNCTION            DROP_SEARCH_INDEX     UNRESTRICT          \nCREATE_INDEX               DROP_TABLE            UNRESTRICT_ROWS     \nCREATE_KEYSPACE            DROP_TYPE             UPDATE              \nCREATE_MATERIALIZED_VIEW   DROP_USER             USE                 \n\nFull documentation for CQL commands:\n  https://docs.datastax.com/en/dse/6.8/cql/cql/cql_reference/cql_commands/cqlCommandsTOC.html\n",
+stdout:     "stderr" : ""
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

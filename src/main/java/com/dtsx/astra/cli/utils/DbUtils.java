@@ -8,6 +8,7 @@ import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 @UtilityClass
@@ -16,6 +17,7 @@ public class DbUtils {
         val regionName = maybeRegionName.orElse(RegionName.mkUnsafe(db.getInfo().getRegion()));
 
         return db.getInfo().getDatacenters().stream()
+            .sorted(Comparator.comparing(Datacenter::getId))
             .filter(dc -> dc.getRegion().equalsIgnoreCase(regionName.unwrap()))
             .findFirst()
             .orElseThrow(() -> new RegionNotFoundException(DbRef.fromNameUnsafe(db.getInfo().getName()), regionName));

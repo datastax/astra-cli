@@ -1,0 +1,2 @@
+com.dtsx.astra.cli.testlib.extensions.binaries.ExternalBinariesExtension
+com.dtsx.astra.cli.testlib.extensions.context.CliContextExtension

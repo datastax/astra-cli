@@ -11,13 +11,13 @@ public sealed interface Either<L, R> {
         return new Left<>(value);
     }
 
-    static <L, R> Either<L, R> right(R value) {
+    static <L, R> Either<L, R> pure(R value) {
         return new Right<>(value);
     }
 
     static <L, R> Either<L, R> tryCatch(Callable<R> supplier, Function<Exception, L> exceptionHandler) {
         try {
-            return right(supplier.call());
+            return pure(supplier.call());
         } catch (Exception e) {
             return left(exceptionHandler.apply(e));
         }

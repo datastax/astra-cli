@@ -9,7 +9,7 @@ public class RoleCompletionsCache extends CompletionsCache {
     }
 
     @Override
-    protected String useCacheFile() {
+    protected String useCacheFileName() {
         return "role_names";
     }
 }

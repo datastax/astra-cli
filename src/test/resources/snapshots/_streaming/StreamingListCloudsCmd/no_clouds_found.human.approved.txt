@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming list-clouds
+exit_code: 0
+---- output ----
+stdout: +-----------------+
+stdout: | Cloud Provider  |
+stdout: +-----------------+
+stdout: +-----------------+
+---- end ----

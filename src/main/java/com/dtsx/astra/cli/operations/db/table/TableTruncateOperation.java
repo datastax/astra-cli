@@ -28,5 +28,4 @@ public class TableTruncateOperation implements Operation<TableTruncateResult> {
             case DeletionStatus.NotFound<?> _ -> new TableNotFound();
         };
     }
-
 }

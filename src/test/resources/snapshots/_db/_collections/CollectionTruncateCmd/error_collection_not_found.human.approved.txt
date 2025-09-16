@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db truncate-collection two_regions_db -c test_coll
+exit_code: 2
+---- output ----
+stderr: Error: Collection 'test_coll' does not exist in keyspace 'default_keyspace' of database 'two_regions_db'.
+stderr: 
+stderr: # See all existing collections in the database:
+stderr: $ astra db list-collections two_regions_db --all
+---- end ----

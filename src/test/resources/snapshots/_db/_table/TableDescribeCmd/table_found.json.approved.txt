@@ -1,0 +1,108 @@
+---- meta ----
+command: astra db describe-table two_regions_db -t test_table -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "columns" : {
+stdout:       "text" : {
+stdout:         "type" : "TEXT"
+stdout:       },
+stdout:       "int" : {
+stdout:         "type" : "INT"
+stdout:       },
+stdout:       "ascii" : {
+stdout:         "type" : "ASCII"
+stdout:       },
+stdout:       "bigint" : {
+stdout:         "type" : "BIGINT"
+stdout:       },
+stdout:       "blob" : {
+stdout:         "type" : "BLOB"
+stdout:       },
+stdout:       "boolean" : {
+stdout:         "type" : "BOOLEAN"
+stdout:       },
+stdout:       "date" : {
+stdout:         "type" : "DATE"
+stdout:       },
+stdout:       "decimal" : {
+stdout:         "type" : "DECIMAL"
+stdout:       },
+stdout:       "double" : {
+stdout:         "type" : "DOUBLE"
+stdout:       },
+stdout:       "duration" : {
+stdout:         "type" : "DURATION"
+stdout:       },
+stdout:       "float" : {
+stdout:         "type" : "FLOAT"
+stdout:       },
+stdout:       "inet" : {
+stdout:         "type" : "INET"
+stdout:       },
+stdout:       "list" : {
+stdout:         "type" : "LIST",
+stdout:         "apiSupport" : {
+stdout:           "createTable" : true,
+stdout:           "insert" : true,
+stdout:           "read" : true,
+stdout:           "cqlDefinition" : "list<uuid>"
+stdout:         }
+stdout:       },
+stdout:       "map" : {
+stdout:         "type" : "MAP",
+stdout:         "apiSupport" : {
+stdout:           "createTable" : true,
+stdout:           "insert" : true,
+stdout:           "read" : true,
+stdout:           "cqlDefinition" : "map<text, uuid>"
+stdout:         }
+stdout:       },
+stdout:       "set" : {
+stdout:         "type" : "SET",
+stdout:         "apiSupport" : {
+stdout:           "createTable" : true,
+stdout:           "insert" : true,
+stdout:           "read" : true,
+stdout:           "cqlDefinition" : "set<uuid>"
+stdout:         }
+stdout:       },
+stdout:       "smallint" : {
+stdout:         "type" : "SMALLINT"
+stdout:       },
+stdout:       "time" : {
+stdout:         "type" : "TIME"
+stdout:       },
+stdout:       "timestamp" : {
+stdout:         "type" : "TIMESTAMP"
+stdout:       },
+stdout:       "tinyint" : {
+stdout:         "type" : "TINYINT"
+stdout:       },
+stdout:       "uuid" : {
+stdout:         "type" : "UUID"
+stdout:       },
+stdout:       "varint" : {
+stdout:         "type" : "VARINT"
+stdout:       },
+stdout:       "vector" : {
+stdout:         "type" : "VECTOR",
+stdout:         "apiSupport" : {
+stdout:           "createTable" : true,
+stdout:           "insert" : true,
+stdout:           "read" : true,
+stdout:           "cqlDefinition" : "VECTOR<float,5>"
+stdout:         }
+stdout:       }
+stdout:     },
+stdout:     "primaryKey" : {
+stdout:       "partitionBy" : [ "text" ],
+stdout:       "partitionSort" : {
+stdout:         "int" : 1
+stdout:       }
+stdout:     }
+stdout:   }
+stdout: }
+---- end ----

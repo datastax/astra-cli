@@ -1,0 +1,9 @@
+---- meta ----
+command: astra user invite alice@example.bob --roles 'R/W Svc Acct' --if-not-exists
+exit_code: 0
+---- output ----
+stdout: User 'alice@example.bob' already exists; nothing to invite.
+stdout: 
+stdout: # See all existing users:
+stdout: $ astra user list
+---- end ----

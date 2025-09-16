@@ -15,14 +15,14 @@ public class Utils {
         if (value.isBlank()) {
             return Either.left(thing + " should not be blank or empty");
         }
-        return Either.right(value);
+        return Either.pure(value);
     }
 
     public static Either<String, String> validateNotPlaceholder(String thing, @NonNull String value) {
         if (value.startsWith("<") && value.endsWith(">")) {
             return Either.left(thing + " should not be enclosed in angle brackets... did you forget to replace a placeholder?");
         }
-        return Either.right(value);
+        return Either.pure(value);
     }
 
     public static Either<String, String> validateBasics(String thing, @NonNull String value) {

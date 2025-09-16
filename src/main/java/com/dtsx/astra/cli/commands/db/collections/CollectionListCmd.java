@@ -11,7 +11,6 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -48,15 +47,15 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
         validateParams();
 
         if ($all) {
-            return OutputJson.serializeValue(result.get().toList().getFirst().collections());
+            return OutputJson.serializeValue(result.get()
+                .map((res) -> sequencedMapOf(
+                    "keyspace", res.keyspace(),
+                    "collections", res.collections()
+                ))
+                .toList());
         }
 
-        return OutputJson.serializeValue(result.get()
-            .map((res) -> sequencedMapOf(
-                "keyspace", res.keyspace(),
-                "collections", res.collections()
-            ))
-            .toList());
+        return OutputJson.serializeValue(result.get().toList().getFirst().collections());
     }
 
     @Override

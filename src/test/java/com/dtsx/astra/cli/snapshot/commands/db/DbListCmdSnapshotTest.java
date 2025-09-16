@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.snapshot.commands.db;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
+import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifier;
 import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 import com.dtsx.astra.sdk.db.domain.Database;

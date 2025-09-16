@@ -130,7 +130,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         public boolean nonVector;
     }
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "360")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
     }

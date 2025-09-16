@@ -1,0 +1,6 @@
+---- meta ----
+command: astra user list -o csv
+exit_code: 0
+---- output ----
+stdout: User Id,User Email,Status
+---- end ----

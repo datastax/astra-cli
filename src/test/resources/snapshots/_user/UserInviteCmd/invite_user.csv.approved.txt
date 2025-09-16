@@ -1,0 +1,7 @@
+---- meta ----
+command: astra user invite alice@example.bob --roles 'R/W Svc Acct' -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,data.wasInvited,data.roleIds
+stdout: OK,User 'alice@example.bob' has been invited with role 'R/W Svc Acct'.,true,b4ed0e9e-67e8-47b6-8b58-c6629be961a9
+---- end ----

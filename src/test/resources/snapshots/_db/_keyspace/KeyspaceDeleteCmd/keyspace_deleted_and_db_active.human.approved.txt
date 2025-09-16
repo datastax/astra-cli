@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db delete-keyspace two_regions_db -k default_keyspace
+exit_code: 0
+---- output ----
+stdout: Keyspace 'default_keyspace' has been deleted from database 'two_regions_db'. The database is now active after waiting 9 seconds.
+---- end ----

@@ -29,7 +29,7 @@ public class StreamingListRegionsOperation implements Operation<Stream<FoundRegi
     ) {}
 
     @Override
-    public Stream<FoundRegion> execute() {
+    public Stream<FoundRegion> execute() { // TODO: raw json version
         val regions = streamingGateway.findAllRegions();
         
         return regions.entrySet().stream()

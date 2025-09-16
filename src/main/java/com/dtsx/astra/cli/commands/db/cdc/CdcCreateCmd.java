@@ -32,15 +32,15 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 )
 @Example(
     comment = "Create a CDC",
-    command = "${cli.name} db create-cdc my_db -t my_table --tenant my_tenant"
+    command = "${cli.name} db create-cdc my_db --table my_table --tenant my_tenant"
 )
 @Example(
     comment = "Create a CDC with a specific keyspace and topic partitions",
-    command = "${cli.name} db create-cdc my_db -k my_keyspace -t my_table --tenant my_tenant --topic-partitions 5"
+    command = "${cli.name} db create-cdc my_db -k my_keyspace --table my_table --tenant my_tenant --topic-partitions 5"
 )
 @Example(
     comment = "Create a CDC without failing if it already exists",
-    command = "${cli.name} db create-cdc my_db -t my_table --tenant my_tenant --if-not-exists"
+    command = "${cli.name} db create-cdc my_db --table my_table --tenant my_tenant --if-not-exists"
 )
 public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     @Option(

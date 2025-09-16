@@ -1,0 +1,26 @@
+---- meta ----
+command: astra streaming get tenant1 -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "tenantName" : "tenant1",
+stdout:     "clusterName" : "pulsar-aws-useast2",
+stdout:     "webServiceUrl" : "https://pulsar-aws-useast2.api.streaming.datastax.com",
+stdout:     "brokerServiceUrl" : "pulsar+ssl://pulsar-aws-useast2.streaming.datastax.com:6651",
+stdout:     "websocketUrl" : "wss://pulsar-aws-useast2.streaming.datastax.com:8001/ws/v2",
+stdout:     "websocketQueryParamUrl" : "wss://pulsar-aws-useast2.streaming.datastax.com:8964/ws/v2",
+stdout:     "pulsarToken" : "vbDQEXZ2b8Vo6f3vZ2fcdxsxK7yw12GMI7Qq.rOc9dTqJ8ZaOKQ3a72ZQH91VvLMcNKk1wkskWRgaYOeaPYYIT0BL2OEr7IuAFZKJ3gqKNy4ZB3t5vKnYtkIbTxCWVuVliNqA1EMVCD8KX9QsZMtVIHZCFZaGLt1HPP0L3WWKoY2av5BozTnSclYTV5pYqHd6CvztY2v9UXM0GJKzYI.zvBtNLRbWDnZJ2ITRSLq4A9P-YjksWcjq5X_NJTZhVwS_i0JVu5XqZcIR2aM8HKXHUX0ld9HJ9qDCvF7I8lgKkdkxxhJdwleXvErY8bcJ3AX2c2MLoG6dtUuP8mBA3BxiKiDSFdfsfF-SDFdsFddsDF-SDFdfsdsdsghyjgreweihfiowefdsjfkdfiejfwioe_fdsjewofjewfnlda43lhfsdjfhwjkefhdafodioewohQ7XRq3c4gg3qg3y3y2l7y1BXL97yJSz3280unds44fsdfvsSDFFLDSFd32d3jd3HTZuhxlrAOUmdNCAEtQWlSDF4f3fsefWESsafsacF",
+stdout:     "plan" : "payg",
+stdout:     "planCode" : 1,
+stdout:     "cloudRegion" : "useast2",
+stdout:     "cloudProvider" : "aws",
+stdout:     "cloudProviderCode" : 1,
+stdout:     "status" : "active",
+stdout:     "jvmVersion" : "JDK11",
+stdout:     "pulsarVersion" : "3.1",
+stdout:     "astraOrgGUID" : "c8dab4b4-ea25-46bf-827b-979643e5f6ef"
+stdout:   }
+stdout: }
+---- end ----

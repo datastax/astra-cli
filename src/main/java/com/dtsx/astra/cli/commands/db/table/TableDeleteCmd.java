@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.TABLE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.table.TableDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
@@ -24,15 +24,15 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 )
 @Example(
     comment = "Delete a table",
-    command = "${cli.name} db delete-table my_db -c my_table"
+    command = "${cli.name} db delete-table my_db -t my_table"
 )
 @Example(
     comment = "Delete a table from a non-default keyspace",
-    command = "${cli.name} db delete-table my_db -k my_keyspace -c my_table"
+    command = "${cli.name} db delete-table my_db -k my_keyspace -t my_table"
 )
 @Example(
     comment = "Delete a table without failing if it doesn't exist",
-    command = "${cli.name} db delete-table my_db -c my_table --if-exists"
+    command = "${cli.name} db delete-table my_db -t my_table --if-exists"
 )
 public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> {
     @Option(
@@ -79,7 +79,7 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
     }
 
     private <T> T throwTableNotFound() {
-        throw new AstraCliException(COLLECTION_NOT_FOUND, """
+        throw new AstraCliException(TABLE_NOT_FOUND, """
           @|bold,red Error: Table %s does not exist in keyspace %s.|@
   
           To ignore this error, provide the @!--if-exists!@ flag to skip this error if the table doesn't exist.

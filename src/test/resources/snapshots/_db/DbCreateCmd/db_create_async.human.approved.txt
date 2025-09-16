@@ -1,0 +1,12 @@
+---- meta ----
+command: astra db create two_regions_db -r us-east-1 --async
+exit_code: 0
+---- output ----
+stdout: Database 'two_regions_db' has been created with id '822b0fff-6a73-4322-a8ec-09832b075287', and currently has status 'ACTIVE'.
+stdout: 
+stdout: # Poll the database's status:
+stdout: $ astra db status two_regions_db
+stdout: 
+stdout: # Get more information about the new database:
+stdout: $ astra db get two_regions_db
+---- end ----

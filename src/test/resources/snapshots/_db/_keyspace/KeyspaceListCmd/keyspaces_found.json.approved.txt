@@ -1,0 +1,18 @@
+---- meta ----
+command: astra db list-keyspaces 822b0fff-6a73-4322-a8ec-09832b075287 -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "isDefault" : false,
+stdout:     "name" : "car"
+stdout:   }, {
+stdout:     "isDefault" : false,
+stdout:     "name" : "truck"
+stdout:   }, {
+stdout:     "isDefault" : true,
+stdout:     "name" : "default"
+stdout:   } ]
+stdout: }
+---- end ----

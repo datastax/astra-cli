@@ -14,6 +14,6 @@ public class DbDsbulkVersionOperation extends AbstractDsbulkExeOperation<Void> {
 
     @Override
     protected Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        return Either.right(List.of("--version"));
+        return Either.pure(List.of("--version"));
     }
 }

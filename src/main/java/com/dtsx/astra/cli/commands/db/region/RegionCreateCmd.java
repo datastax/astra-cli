@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.region.RegionCreateOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -45,13 +46,13 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
     )
     public boolean $ifNotExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "800")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
-    protected RegionCreateOperation mkOperation() {
+    protected Operation<RegionCreateResult> mkOperation() {
         return new RegionCreateOperation(regionGateway, dbGateway, new RegionCreateRequest($dbRef, $region, $ifNotExists, lrMixin.options()));
     }
 

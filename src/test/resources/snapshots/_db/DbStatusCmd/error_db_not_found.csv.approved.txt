@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db status *nonexistent* -o csv
+exit_code: 2
+---- output ----
+stdout: code,message
+stdout: DATABASE_NOT_FOUND,"Error: A database named '*nonexistent*' could not be found.
+stdout: 
+stdout: Please ensure that:
+stdout:   - You are using the correct token/organization.
+stdout:   - You are using the correct database name."
+---- end ----

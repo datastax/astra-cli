@@ -27,7 +27,7 @@ public abstract class DynamicCompletion implements Iterable<String> {
     private final String bash;
 
     public static String marker(DynamicCompletion instance) {
-        return "!$!this-is-a-dynamic-completion!$!:" + instance.getClass().getName();
+        return "!$!dynamic-completion!$!:" + instance.getClass().getName();
     }
 
     @Override

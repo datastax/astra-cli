@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import lombok.val;
 
@@ -22,7 +21,7 @@ public class LoadingSpinner {
     private final AtomicInteger lastLineLength = new AtomicInteger(0);
     private Thread spinnerThread;
     private volatile CountDownLatch pauseLatch;
-    
+
     public LoadingSpinner(String initialMessage, CliContext ctx) {
         this.ctx = ctx;
         this.SPINNER_FRAMES = PlatformChars.spinnerFrames(ctx.isWindows());

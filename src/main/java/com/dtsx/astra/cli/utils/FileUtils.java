@@ -23,6 +23,7 @@ import java.nio.file.Path;
 public class FileUtils {
     public void createFileIfNotExists(Path path, @Nullable String extra) {
         try {
+            Files.createDirectories(path.getParent());
             Files.createFile(path);
         } catch (FileAlreadyExistsException _) {
            // whatever

@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -46,13 +47,13 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
     )
     public boolean $ifNotExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
+    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "60")
     public void setTimeout(int timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
-    protected KeyspaceCreateOperation mkOperation() {
+    protected Operation<KeyspaceCreateResult> mkOperation() {
         return new KeyspaceCreateOperation(keyspaceGateway, dbGateway, new KeyspaceCreateRequest($keyspaceRef, $ifNotExists, lrMixin.options()));
     }
 

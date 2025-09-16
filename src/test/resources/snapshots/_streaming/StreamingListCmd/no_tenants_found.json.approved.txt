@@ -1,0 +1,9 @@
+---- meta ----
+command: astra streaming list -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ ]
+stdout: }
+---- end ----

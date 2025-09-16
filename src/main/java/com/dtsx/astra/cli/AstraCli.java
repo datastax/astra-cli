@@ -17,6 +17,7 @@ import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
+import com.dtsx.astra.cli.core.exceptions.ExitCodeException;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
 import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
 import com.dtsx.astra.cli.core.help.Example;
@@ -43,6 +44,7 @@ import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IFactory;
 
 import java.nio.file.FileSystems;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -89,6 +91,8 @@ public class AstraCli extends AbstractCmd<Void> {
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
 
+        Duration.parse()
+
         return OutputHuman.response(sj);
     }
 
@@ -104,14 +108,15 @@ public class AstraCli extends AbstractCmd<Void> {
             CliEnvironment.unsafeIsTty(),
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
-            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty()),
+            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), true),
             new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), null, getCtx, false),
-            new AstraHome(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows()),
+            new AstraHome(AstraHome.resolveDefaultAstraHomeFolder(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows())),
             FileSystems.getDefault(),
-            new GatewayProviderImpl()
+            new GatewayProviderImpl(),
+            Optional.empty()
         ));
 
-        exit(run(ctxRef, args));
+        System.exit(run(ctxRef, args));
     }
 
     @Getter
@@ -177,7 +182,6 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     public static <T> T exit(int exitCode) {
-        System.exit(exitCode);
-        return null;
+        throw new ExitCodeException(exitCode);
     }
 }

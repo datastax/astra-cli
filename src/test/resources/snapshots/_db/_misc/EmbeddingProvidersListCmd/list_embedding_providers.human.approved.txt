@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db list-embedding-providers two_regions_db
+exit_code: 0
+---- output ----
+stdout: +----------------------+---------------------------+---------+-------------+--------------+--------------+
+stdout: | Key                  | Display Name              | Models  | Parameters  | Auth Header  | Auth Secret  |
+stdout: +----------------------+---------------------------+---------+-------------+--------------+--------------+
+stdout: | cohere               | Cohere                    | 3       | 0           | ■            | ■            |
+stdout: | openai               | OpenAI                    | 3       | 2           | ■            | ■            |
+stdout: | huggingfaceDedicated | Hugging Face - Dedicated  | 1       | 3           | ■            | ■            |
+stdout: | azureOpenAI          | Azure OpenAI              | 3       | 2           | ■            | ■            |
+stdout: | bedrock              | Amazon Bedrock            | 2       | 1           | ■            | ■            |
+stdout: | jinaAI               | Jina AI                   | 6       | 0           | ■            | ■            |
+stdout: | voyageAI             | Voyage AI                 | 7       | 1           | ■            | ■            |
+stdout: | upstageAI            | Upstage                   | 1       | 0           | ■            | ■            |
+stdout: | huggingface          | Hugging Face - Serverless | 6       | 0           | ■            | ■            |
+stdout: | nvidia               | Nvidia                    | 2       | 0           |              |              |
+stdout: | mistral              | Mistral AI                | 1       | 0           | ■            | ■            |
+stdout: +----------------------+---------------------------+---------+-------------+--------------+--------------+
+---- end ----

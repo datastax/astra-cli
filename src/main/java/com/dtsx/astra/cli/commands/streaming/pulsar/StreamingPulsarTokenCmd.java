@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 public class StreamingPulsarTokenCmd extends AbstractStreamingTenantSpecificCmd<String> {
     @Override
     protected final OutputAll execute(Supplier<String> token) {
-        return OutputAll.serializeValue(token);
+        return OutputAll.serializeValue(token.get());
     }
 
     @Override

@@ -47,7 +47,7 @@ public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathRespo
 
     @Override
     protected Operation<PulsarPathResponse> mkOperation() {
-        return new StreamingPulsarPathOperation(ctx.gateways().mkDownloadsGateway(profile().token(), profile().env(), ctx), !$ifExists);
+        return new StreamingPulsarPathOperation(ctx.gateways().mkDownloadsGateway(ctx), !$ifExists);
     }
 
     @Override

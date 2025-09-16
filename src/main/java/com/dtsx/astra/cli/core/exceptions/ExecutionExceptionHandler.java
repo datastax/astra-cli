@@ -32,8 +32,12 @@ public class ExecutionExceptionHandler implements IExecutionExceptionHandler {
             .<Exception>map(m -> m.mapException(unmappedE, cmd, parseResult, ctxRef.get()))
             .orElse(unmappedE);
 
-        if (e instanceof AstraCliException cliErr) {
-            return ExceptionHandlerUtils.handleAstraCliException(cliErr, cmd, ctxRef.get());
+        if (e instanceof AstraCliException err) {
+            return ExceptionHandlerUtils.handleAstraCliException(err, cmd, ctxRef.get());
+        }
+
+        if (e instanceof ExitCodeException err) {
+            return err.exitCode();
         }
 
         return ExceptionHandlerUtils.handleUncaughtException(unmappedE, ctxRef.get());

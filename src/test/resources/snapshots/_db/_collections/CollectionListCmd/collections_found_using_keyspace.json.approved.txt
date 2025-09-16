@@ -1,0 +1,36 @@
+---- meta ----
+command: astra db list-collections two_regions_db -k default_keyspace -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "name" : "test_coll",
+stdout:     "options" : {
+stdout:       "vector" : {
+stdout:         "dimension" : 5,
+stdout:         "metric" : "cosine"
+stdout:       },
+stdout:       "lexical" : {
+stdout:         "enabled" : false
+stdout:       },
+stdout:       "rerank" : {
+stdout:         "enabled" : false
+stdout:       }
+stdout:     }
+stdout:   }, {
+stdout:     "name" : "other_coll",
+stdout:     "options" : {
+stdout:       "defaultId" : {
+stdout:         "type" : "UUIDV6"
+stdout:       },
+stdout:       "lexical" : {
+stdout:         "enabled" : false
+stdout:       },
+stdout:       "rerank" : {
+stdout:         "enabled" : false
+stdout:       }
+stdout:     }
+stdout:   } ]
+stdout: }
+---- end ----

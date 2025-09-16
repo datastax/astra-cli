@@ -52,9 +52,9 @@ public class DbGetOperation implements Operation<DbInfo> {
             case status -> database.getStatus();
             case cloud -> database.getInfo().getCloudProvider();
             case keyspace -> database.getInfo().getKeyspace();
-            case keyspaces -> database.getInfo().getKeyspaces().stream().toList();
+            case keyspaces -> database.getInfo().getKeyspaces().stream().sorted().toList();
             case region -> database.getInfo().getRegion();
-            case regions -> database.getInfo().getDatacenters().stream().map(Datacenter::getRegion).toList();
+            case regions -> database.getInfo().getDatacenters().stream().map(Datacenter::getRegion).sorted().toList();
             case creation_time -> database.getCreationTime();
             case vector -> database.getInfo().getDbType().equals("vector");
         };

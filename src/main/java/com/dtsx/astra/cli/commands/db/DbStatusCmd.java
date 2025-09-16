@@ -32,7 +32,7 @@ public class DbStatusCmd extends AbstractPromptForDbCmd<DatabaseStatusType> {
 
     @Override
     protected final OutputAll execute(Supplier<DatabaseStatusType> result) {
-        return OutputAll.serializeValue(result);
+        return OutputAll.serializeValue(result.get());
     }
 
     @Override

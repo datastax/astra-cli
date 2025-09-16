@@ -1,0 +1,17 @@
+---- meta ----
+command: astra db describe-collection two_regions_db -c test_coll -o json
+exit_code: 2
+---- output ----
+stdout: {
+stdout:   "code" : "COLLECTION_NOT_FOUND",
+stdout:   "message" : "Error: Collection 'test_coll' does not exist in keyspace 'default_keyspace' of database 'two_regions_db'.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "List existing collections:",
+stdout:     "command" : "astra db list-collections two_regions_db -k default_keyspace"
+stdout:   }, {
+stdout:     "comment" : "Create the collection:",
+stdout:     "command" : "astra db create-collection two_regions_db -k default_keyspace -c test_coll [...options]"
+stdout:   } ]
+stdout: }
+---- end ----

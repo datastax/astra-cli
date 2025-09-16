@@ -1,12 +1,14 @@
 package com.dtsx.astra.cli.core.completions;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dtsx.astra.cli.utils.FileUtils;
+import com.dtsx.astra.cli.utils.JsonUtils;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,15 +28,9 @@ public abstract class CompletionsCache {
 
     private @Nullable Set<String> cachedCandidates;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     @SneakyThrows
     public void update(Function<Set<String>, Set<String>> mkCandidates) {
-        if (!ctx.home().exists()) {
-            return;
-        }
-
-        val cacheFile = useCacheDir().map(dir -> dir.resolve(useCacheFile()));
+        val cacheFile = resolveCacheFile();
 
         if (cacheFile.isEmpty()) {
             return;
@@ -43,6 +39,8 @@ public abstract class CompletionsCache {
         var currentCandidates = Set.<String>of();
 
         try {
+            FileUtils.createFileIfNotExists(cacheFile.get(), "Error creating completions cache file");
+
             currentCandidates = Files.readAllLines(cacheFile.get()).stream().map(this::readJsonString).collect(Collectors.toSet());
         } catch (Exception e) {
             ctx.log().exception("An error occurred reading cache file '%s'".formatted(cacheFile), e);
@@ -63,16 +61,19 @@ public abstract class CompletionsCache {
                 return;
             }
 
-            Files.createDirectories(cacheFile.get().getParent());
-
             @Cleanup val writer = Files.newBufferedWriter(cacheFile.get());
             writer.write(String.join(NL, candidates.stream().map(this::writeJsonString).toList()));
         } catch (Exception e) {
             try {
-                Files.deleteIfExists(cacheFile.get());
                 ctx.log().exception("An error occurred updating cache file '%s'".formatted(cacheFile), e);
+                Files.deleteIfExists(cacheFile.get());
             } catch (Exception _) {}
         }
+    }
+
+    @VisibleForTesting
+    public Optional<Path> resolveCacheFile() {
+        return useCacheDir().map(dir -> dir.resolve(useCacheFileName()));
     }
 
     public void setCache(List<String> completions) {
@@ -87,7 +88,7 @@ public abstract class CompletionsCache {
         update((s) -> setAdd(s, completion));
     }
 
-    protected abstract String useCacheFile();
+    protected abstract String useCacheFileName();
 
     protected Optional<Path> useCacheDir() {
         return Optional.of(ctx.home().Dirs.useCompletionsCache());
@@ -95,11 +96,11 @@ public abstract class CompletionsCache {
 
     @SneakyThrows
     private String readJsonString(String value) {
-        return MAPPER.readValue(value, String.class);
+        return JsonUtils.readValue(value, String.class); // easy way to unescape strings
     }
 
     @SneakyThrows
     protected String writeJsonString(String value) {
-        return MAPPER.writeValueAsString(value);
+        return JsonUtils.writeValue(value); // easy way to escape strings
     }
 }

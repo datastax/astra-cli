@@ -4,7 +4,6 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +20,15 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class DownloadsGatewayImpl implements DownloadsGateway {
     private final CliContext ctx;
-    private final APIProvider api;
 
     @Override
     public Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters) {
-        val dbOpsClient = api.dbOpsClient(ref);
         val result = new ArrayList<Path>();
 
         for (val datacenter : datacenters) {
             try {
                 ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
-                    val scbName = dbOpsClient.buildScbFileName(dbName, datacenter.getRegion());
+                    val scbName = "scb_%s_%s.zip".formatted(dbName, datacenter.getRegion());
                     val scbPath = ctx.home().Dirs.useScb().resolve(scbName);
 
                     if (Files.notExists(scbPath)) {
@@ -48,7 +45,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             }
         }
 
-        return Either.right(result);
+        return Either.pure(result);
     }
 
     @Override
@@ -101,11 +98,17 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         val tarFile = installDir.getParent().resolve(exe + "-download.tar.gz");
         val exeFile = installDir.resolve("bin/" + exe);
 
-        if (!PathUtils.isEmptyDirectory(tarFile)) {
-            return Either.right(exeFile);
+        if (PathUtils.isRegularFile(exeFile) && !PathUtils.isEmptyFile(exeFile)) {
+            return Either.pure(exeFile);
         }
 
-        Files.deleteIfExists(tarFile);
+        try {
+            PathUtils.cleanDirectory(installDir);
+            Files.deleteIfExists(tarFile);
+        } catch (Exception e) {
+            ctx.log().exception(e);
+            return Either.left("Failed to clean existing " + exe + " installation in %s: '%s'".formatted(installDir, e.getMessage()));
+        }
 
         try {
             ctx.log().loading("Downloading " + exe + ", please wait", (_) -> {
@@ -113,6 +116,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
                 return null;
             });
         } catch (Exception e) {
+            ctx.log().exception(e);
             return Either.left("Failed to download " + exe + " archive from %s: '%s'".formatted(url, e.getMessage()));
         }
 
@@ -127,17 +131,23 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
-            Files.setPosixFilePermissions(exeFile, Set.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_EXECUTE));
+            Files.setPosixFilePermissions(exeFile, Set.of(
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OWNER_READ, PosixFilePermission.GROUP_READ,
+                PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_EXECUTE
+            ));
         } catch (Exception e) {
+            ctx.log().exception(e);
             return Either.left("Failed to set execute permissions on %s: '%s'".formatted(exeFile, e.getMessage()));
         }
 
         try {
             Files.delete(tarFile);
         } catch (Exception e) {
+            ctx.log().exception(e);
             return Either.left("Failed to delete temporary " + exe + " archive %s: '%s'".formatted(tarFile, e.getMessage()));
         }
 
-        return Either.right(exeFile);
+        return Either.pure(exeFile);
     }
 }

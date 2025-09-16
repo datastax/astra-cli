@@ -1,0 +1,11 @@
+---- meta ----
+command: astra streaming list-regions --cloud gcp
+exit_code: 0
+---- output ----
+stdout: +-----------------+-------------+----------------+
+stdout: | Cloud Provider  | Region      | Display Name   |
+stdout: +-----------------+-------------+----------------+
+stdout: | gcp             | us-central1 | Iowa           |
+stdout: | gcp (premium)   | us-east1    | South Carolina |
+stdout: +-----------------+-------------+----------------+
+---- end ----

@@ -1,0 +1,9 @@
+---- meta ----
+command: astra user get nonexistent@example.com -o csv
+exit_code: 2
+---- output ----
+stdout: code,message
+stdout: USER_NOT_FOUND,"Error: User 'nonexistent@example.com' not found.
+stdout: 
+stdout: Use 'astra user list' to see all available users."
+---- end ----

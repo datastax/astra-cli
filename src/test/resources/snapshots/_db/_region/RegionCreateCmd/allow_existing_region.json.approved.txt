@@ -1,0 +1,17 @@
+---- meta ----
+command: astra db create-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2 --if-not-exists --async -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Region 'us-east-2' already exists in database '822b0fff-6a73-4322-a8ec-09832b075287'.",
+stdout:   "data" : {
+stdout:     "wasCreated" : false,
+stdout:     "waitedSeconds" : null
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "List existing regions:",
+stdout:     "command" : "astra db list-regions 822b0fff-6a73-4322-a8ec-09832b075287"
+stdout:   } ]
+stdout: }
+---- end ----

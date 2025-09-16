@@ -12,7 +12,7 @@ public class TenantCompletionsCache extends ProfileLinkedCompletionsCache {
     }
 
     @Override
-    protected String useCacheFile() {
+    protected String useCacheFileName() {
         return "tenant_names";
     }
 }

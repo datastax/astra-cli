@@ -10,8 +10,8 @@ stdout:     "wasDeleted" : false,
 stdout:     "waitedSeconds" : null
 stdout:   },
 stdout:   "nextSteps" : [ {
-stdout:     "command" : "astra db list",
-stdout:     "comment" : "See your existing databases:"
+stdout:     "comment" : "See your existing databases:",
+stdout:     "command" : "astra db list"
 stdout:   } ]
 stdout: }
 ---- end ----

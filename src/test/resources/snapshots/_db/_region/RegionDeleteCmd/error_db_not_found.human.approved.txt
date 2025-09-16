@@ -1,0 +1,16 @@
+---- meta ----
+command: astra db delete-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2
+exit_code: 2
+---- output ----
+stderr: Error: A database with ID '822b0fff-6a73-4322-a8ec-09832b075287' could not be found.
+stderr: 
+stderr: Please ensure that:
+stderr:   - You are using the correct token/organization.
+stderr:   - You are using the correct database id.
+stderr: 
+stderr: # List all dbs in your current org
+stderr: $ astra db list
+stderr: 
+stderr: # Check your credentials
+stderr: $ astra config get <profile>
+---- end ----

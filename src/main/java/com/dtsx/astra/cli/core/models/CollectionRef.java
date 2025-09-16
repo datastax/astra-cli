@@ -17,6 +17,10 @@ public class CollectionRef implements Highlightable {
             .map((trimmed) -> new CollectionRef(trimmed, keyspace));
     }
 
+    public static CollectionRef mkUnsafe(@NonNull KeyspaceRef keyspace, @NonNull String name) {
+        return new CollectionRef(name, keyspace);
+    }
+
     @JsonValue
     public String name() {
         return name;

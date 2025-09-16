@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.streaming.role.TenantNotFoundException;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.APIProvider;
@@ -29,7 +30,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
     @Override
     public Tenant findOne(TenantName tenantName) {
         return ctx.log().loading("Fetching streaming tenant " + tenantName, (_) -> {
-            return apiProvider.astraOpsClient().streaming().get(tenantName.unwrap());
+            return apiProvider.astraOpsClient().streaming().find(tenantName.unwrap()).orElseThrow(() -> new TenantNotFoundException(tenantName));
         });
     }
 

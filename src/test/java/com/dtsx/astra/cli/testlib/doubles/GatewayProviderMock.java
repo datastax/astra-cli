@@ -25,6 +25,8 @@ import lombok.val;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.mockito.Mockito.*;
+
 @NoArgsConstructor
 @AllArgsConstructor
 public class GatewayProviderMock implements GatewayProvider {
@@ -134,7 +136,7 @@ public class GatewayProviderMock implements GatewayProvider {
     }
 
     @Override
-    public DownloadsGateway mkDownloadsGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
+    public DownloadsGateway mkDownloadsGateway(CliContext ctx) {
         return downloadsGateway();
     }
 
@@ -178,8 +180,8 @@ public class GatewayProviderMock implements GatewayProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T returnIfEnabled(Class<?> clazz) {
-        return (T) Optional.ofNullable(instances.get(clazz)).orElseThrow(() -> new IllegalStateException(clazz.getSimpleName() + " was not enabled in the test"));
+    private <T> T returnIfEnabled(Class<? extends SomeGateway> clazz) {
+        return (T) Optional.ofNullable(instances.get(clazz)).orElseGet(() -> mock(clazz, withSettings().defaultAnswer(RETURNS_SMART_NULLS)));
     }
 
     private Stream<Class<?>> recursivelyFindAllInterfaces(Class<?> clazz) {

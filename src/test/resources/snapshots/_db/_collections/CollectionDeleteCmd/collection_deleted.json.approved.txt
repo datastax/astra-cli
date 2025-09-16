@@ -1,0 +1,13 @@
+---- meta ----
+command: astra db delete-collection two_regions_db -c test_coll -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Collection 'test_coll' has been deleted from keyspace 'default_keyspace' in database 'two_regions_db'.",
+stdout:   "data" : {
+stdout:     "wasDeleted" : true
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

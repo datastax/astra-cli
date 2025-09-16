@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
+import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifier;
 import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures.Roles;
 

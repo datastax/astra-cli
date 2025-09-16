@@ -1,0 +1,6 @@
+---- meta ----
+command: astra streaming delete tenant1
+exit_code: 0
+---- output ----
+stdout: Tenant 'tenant1' has been deleted.
+---- end ----

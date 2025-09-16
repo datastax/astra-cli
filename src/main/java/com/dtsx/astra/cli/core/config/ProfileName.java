@@ -18,7 +18,7 @@ public class ProfileName implements Highlightable {
             if (trimmed.contains("\n")) {
                 return Either.left("Profile name cannot contain newlines");
             }
-            return Either.right(ProfileName.mkUnsafe(trimmed));
+            return Either.pure(ProfileName.mkUnsafe(trimmed));
         });
     }
 

@@ -28,5 +28,4 @@ public class CollectionTruncateOperation implements Operation<CollectionTruncate
             case DeletionStatus.NotFound<?> _ -> new CollectionNotFound();
         };
     }
-
 }

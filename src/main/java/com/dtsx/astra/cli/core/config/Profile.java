@@ -10,7 +10,7 @@ public record Profile(Optional<ProfileName> name, AstraToken token, AstraEnviron
         return name.map(ProfileName::isDefault).orElse(false);
     }
 
-    public boolean isArgsProvided() {
+    public boolean isReconstructedFromCreds() {
         return name.isEmpty();
     }
 

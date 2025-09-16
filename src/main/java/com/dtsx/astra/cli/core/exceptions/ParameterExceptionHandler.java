@@ -13,8 +13,12 @@ public class ParameterExceptionHandler implements IParameterExceptionHandler {
 
     @Override
     public int handleParseException(ParameterException ex, String[] args) throws Exception {
-        if (ex.getCause() instanceof AstraCliException cliErr) {
-            return ExceptionHandlerUtils.handleAstraCliException(cliErr, ex.getCommandLine(), ctxRef.get());
+        if (ex.getCause() instanceof AstraCliException err) {
+            return ExceptionHandlerUtils.handleAstraCliException(err, ex.getCommandLine(), ctxRef.get());
+        }
+
+        if (ex.getCause() instanceof ExitCodeException err) {
+            return err.exitCode();
         }
 
         return defaultHandler.handleParseException(ex, args);

@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db create-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2
+exit_code: 2
+---- output ----
+stderr: Error: Region us-east-2 already exists in database 822b0fff-6a73-4322-a8ec-09832b075287.
+stderr: 
+stderr: To ignore this error, provide the '--if-not-exists' flag to skip this error if the region already exists.
+stderr: 
+stderr: # Example fix:
+stderr: $ astra db create-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2 --if-not-exists
+stderr: 
+stderr: # List existing regions:
+stderr: $ astra db list-regions 822b0fff-6a73-4322-a8ec-09832b075287
+---- end ----

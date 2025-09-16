@@ -63,7 +63,7 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
     }
 
     private OutputAll handleUserDeleted() {
-        val message = "User %s has been deleted (async operation).".formatted(ctx.highlight($user));
+        val message = "User %s has been deleted.".formatted(ctx.highlight($user));
 
         return OutputAll.response(message, mkData(true));
     }

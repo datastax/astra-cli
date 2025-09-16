@@ -12,7 +12,7 @@ public class UserCompletionsCache extends ProfileLinkedCompletionsCache {
     }
 
     @Override
-    protected String useCacheFile() {
+    protected String useCacheFileName() {
         return "user_emails";
     }
 }

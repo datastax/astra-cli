@@ -5,7 +5,7 @@ import lombok.val;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 enum CollectionSerializer implements OutputSerializer<Collection<?>> {
     INSTANCE;
@@ -17,11 +17,15 @@ enum CollectionSerializer implements OutputSerializer<Collection<?>> {
 
     @Override
     public String serializeAsHumanInternal(Collection<?> values) {
+        if (values.isEmpty()) {
+            return "<none>";
+        }
+
         val counter = new int[1];
 
         return values.stream()
             .map((s) -> (
-                "[" + counter[0]++ + "] " + OutputSerializer.serializeAsHuman(s)
+                "[" + counter[0]++ + "] " + withIndent(OutputSerializer.serializeAsHuman(s), 4).substring(4)
             ))
             .collect(Collectors.joining(NL));
     }

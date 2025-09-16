@@ -1,0 +1,19 @@
+---- meta ----
+command: astra db create two_regions_db -r us-east-1
+exit_code: 2
+---- output ----
+stderr: Error: Database two_regions_db already exists with id 822b0fff-6a73-4322-a8ec-09832b075287, and has status ACTIVE.
+stderr: 
+stderr: To ignore this error, either:
+stderr: - Provide the '--if-not-exists' flag to skip this error if the database already exists.
+stderr: - Provide the '--allow-duplicate-names' flag to create the database even if another with the same name already exists.
+stderr: 
+stderr: # Example fix:
+stderr: $ astra db create two_regions_db -r us-east-1 --if-not-exists
+stderr: 
+stderr: # Example fix:
+stderr: $ astra db create two_regions_db -r us-east-1 --allow-duplicate-names
+stderr: 
+stderr: # Get information about the existing database:
+stderr: $ astra db get two_regions_db
+---- end ----

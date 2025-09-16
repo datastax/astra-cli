@@ -1,0 +1,6 @@
+---- meta ----
+command: astra user delete alice@example.bob
+exit_code: 0
+---- output ----
+stdout: User 'alice@example.bob' has been deleted.
+---- end ----

@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db delete-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2 --async -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Region 'us-east-2' has been deleted from database '822b0fff-6a73-4322-a8ec-09832b075287' (database may not be active yet).",
+stdout:   "data" : {
+stdout:     "wasDeleted" : true,
+stdout:     "waitedSeconds" : null
+stdout:   },
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "Poll the database's status:",
+stdout:     "command" : "astra db status 822b0fff-6a73-4322-a8ec-09832b075287"
+stdout:   }, {
+stdout:     "comment" : "List remaining regions in the database:",
+stdout:     "command" : "astra db list-regions 822b0fff-6a73-4322-a8ec-09832b075287"
+stdout:   } ]
+stdout: }
+---- end ----

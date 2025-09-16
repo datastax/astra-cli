@@ -11,11 +11,14 @@
       <item index="2" class="java.lang.String" itemvalue="picocli.CommandLine.Option" />
     </list>
     <writeAnnotations>
+      <writeAnnotation name="com.dtsx.astra.cli.testlib.extensions.UseTestCtx" />
+      <writeAnnotation name="com.dtsx.astra.cli.testlib.extensions.binaries.MockInstall" />
       <writeAnnotation name="picocli.CommandLine.ArgGroup" />
       <writeAnnotation name="picocli.CommandLine.Mixin" />
       <writeAnnotation name="picocli.CommandLine.Option" />
       <writeAnnotation name="picocli.CommandLine.Parameters" />
       <writeAnnotation name="picocli.CommandLine.Spec" />
+      <writeAnnotation name="uk.org.webcompere.systemstubs.jupiter.SystemStub" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />

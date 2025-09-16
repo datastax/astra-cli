@@ -91,7 +91,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
             genConfFileContents(writer, tenant);
             writer.flush();
             writer.close();
-            return Either.right(confFile);
+            return Either.pure(confFile);
         } catch (IOException e1) {
             return Either.left(new ConfFileCreationFailed("Failed to write to Pulsar configuration file %s: %s".formatted(confFile, e1.getMessage())));
         }
