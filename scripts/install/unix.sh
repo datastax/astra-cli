@@ -4,7 +4,7 @@ set -eu
 IFS=$(printf '\n\t')
 
 # Constants
-ASTRA_CLI_VERSION="1.0.0-beta.1"
+ASTRA_CLI_VERSION="1.0.0-alpha.2"
 
 if [ -n "${ASTRA_HOME:-}" ]; then
   ASTRA_CLI_DIR_RESOLVER="custom"
@@ -106,7 +106,7 @@ case $(uname -m) in
     error "\nError: Unsupported architecture. This installation script supports only x86_64 and arm64 architectures.";;
 esac
 
-install_url="https://github.com/toptobes/astra-cli-pico/releases/download/v1.0.0-alpha.1/astra-$os-$arch.tar.gz"
+install_url="https://github.com/toptobes/astra-cli-pico/releases/download/$ASTRA_CLI_VERSION/astra-$os-$arch.tar.gz"
 
 # Verify installation path
 echo ""

@@ -5,45 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.envrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.zshrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/dev-alias.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/install/unix.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/install/win.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shell.nix" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/ShellEnvCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/TypeConverters.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/TypeConverters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/ProfileName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/ProfileName.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/cli/CongratsYouFoundABugException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/cli/CongratsYouFoundABugException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/AstraToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/AstraToken.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CdcId.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CdcId.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CollectionRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/CollectionRef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/DbRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/DbRef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/KeyspaceRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/KeyspaceRef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RegionName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RegionName.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RoleRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/RoleRef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TableRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TableRef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TenantName.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/TenantName.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/UserRef.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/UserRef.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/ModelUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraColors.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraColors.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraLogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/JansiUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/JansiUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/MiscUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/MiscUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/native-image/resource-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/META-INF/native-image/resource-config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/static.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/static.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/dev-alias.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/dev-alias.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/install/unix.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/install/unix.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -520,7 +485,7 @@
       <workItem from="1757108501819" duration="16000" />
       <workItem from="1757108576615" duration="117167000" />
       <workItem from="1757961318974" duration="2127000" />
-      <workItem from="1758218580137" duration="20878000" />
+      <workItem from="1758218580137" duration="21104000" />
     </task>
     <servers />
   </component>
