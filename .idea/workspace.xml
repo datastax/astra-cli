@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/dev-alias.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/dev-alias.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/install/unix.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/install/unix.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -485,7 +483,7 @@
       <workItem from="1757108501819" duration="16000" />
       <workItem from="1757108576615" duration="117167000" />
       <workItem from="1757961318974" duration="2127000" />
-      <workItem from="1758218580137" duration="21104000" />
+      <workItem from="1758218580137" duration="21915000" />
     </task>
     <servers />
   </component>

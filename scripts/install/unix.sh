@@ -106,7 +106,7 @@ case $(uname -m) in
     error "\nError: Unsupported architecture. This installation script supports only x86_64 and arm64 architectures.";;
 esac
 
-install_url="https://github.com/toptobes/astra-cli-pico/releases/download/$ASTRA_CLI_VERSION/astra-$os-$arch.tar.gz"
+install_url="https://github.com/toptobes/astra-cli-pico/releases/download/v$ASTRA_CLI_VERSION/astra-$os-$arch.tar.gz"
 
 # Verify installation path
 echo ""
@@ -153,12 +153,14 @@ if curl -fL --progress-bar "$install_url" > "$ASTRA_CLI_DIR/astra.tar.gz"; then
   for _ in $(seq 1 3); do tput cuu1 && tput el; done
   checklist "Archive downloaded."
 else
+  rm "$ASTRA_CLI_DIR/astra.tar.gz" 2>/dev/null || true
   error "\nError: Failed to download the archive to $(tput smul)${ASTRA_CLI_DIR}$(tput rmul). Please check your internet connection, verify write permissions, and try again."
 fi
 
 if tar -xzf "$ASTRA_CLI_DIR/astra.tar.gz" -C "$ASTRA_CLI_DIR" && rm "$ASTRA_CLI_DIR/astra.tar.gz"; then
   checklist "Archive verified and extracted."
 else
+  rm "$ASTRA_CLI_DIR/astra.tar.gz" "$ASTRA_CLI_DIR/astra" 2>/dev/null || true
   error "\nError: Failed to extract the archive at $(tput smul)${ASTRA_CLI_DIR}$(tput rmul)."
 fi
 
