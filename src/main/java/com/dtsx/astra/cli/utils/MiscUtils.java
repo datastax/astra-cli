@@ -5,10 +5,7 @@ import lombok.val;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,5 +57,11 @@ public class MiscUtils {
             }
         }
         return Charset.defaultCharset();
+    }
+
+    public static String captureStackTrace(Throwable t) {
+        val sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 }

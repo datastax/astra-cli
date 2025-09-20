@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class Utils {
+public class ModelUtils {
     public static String trim(@NonNull String value) {
         return StringUtils.removeQuotesIfAny(value.trim());
     }

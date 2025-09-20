@@ -48,3 +48,4 @@ bin/
 /.cli_tests_temp
 /*fake*
 /.env
+/.direnv

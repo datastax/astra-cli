@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.utils.MiscUtils;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
@@ -10,8 +11,6 @@ import lombok.val;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -214,9 +213,7 @@ public class AstraLogger {
     }
 
     public <E extends Throwable> E exception(E e) {
-        val sw = new StringWriter();
-        e.printStackTrace(new PrintWriter(sw));
-        exception(sw.toString());
+        exception(MiscUtils.captureStackTrace(e));
         return e;
     }
 

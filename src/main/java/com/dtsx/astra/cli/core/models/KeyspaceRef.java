@@ -16,7 +16,7 @@ public class KeyspaceRef implements Highlightable {
     private final DbRef dbRef;
 
     public static Either<String, KeyspaceRef> parse(@NonNull DbRef dbRef, @NonNull String name) {
-        return Utils.trimAndValidateBasics("Keyspace name", name)
+        return ModelUtils.trimAndValidateBasics("Keyspace name", name)
             .map((trimmed) -> mkUnsafe(dbRef, trimmed));
     }
 

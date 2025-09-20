@@ -13,7 +13,7 @@ public class CollectionRef implements Highlightable {
     private final KeyspaceRef ksRef;
 
     public static Either<String, CollectionRef> parse(@NonNull KeyspaceRef keyspace, @NonNull String name) {
-        return Utils.trimAndValidateBasics("Collection name", name)
+        return ModelUtils.trimAndValidateBasics("Collection name", name)
             .map((trimmed) -> new CollectionRef(trimmed, keyspace));
     }
 

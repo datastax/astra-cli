@@ -26,10 +26,18 @@ public class AstraColors {
         private final int red;
         private final int green;
         private final int blue;
+        private final int colorCode256;
+
+        public AstraColor(int r, int g, int b) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+            this.colorCode256 = rgbToAnsi256(r, g, b);
+        }
 
         @Override
         public String on() {
-            return ansi.enabled() ? (CSI + "38;2;" + (red & 255) + ";" + (green & 255) + ";" + (blue & 255) + "m") : "";
+            return ansi.enabled() ? (CSI + "38;5;" + colorCode256 + "m") : "";
         }
 
         @Override
@@ -43,6 +51,73 @@ public class AstraColors {
 
         public String useOrQuote(String string) {
             return ansi.enabled() ? (on() + string + off()) : "'" + string + "'";
+        }
+
+        // NOTICE: THE FOLLOWING HAS BEEN TEMPORARILY AI GENERATED
+        // TO ATTEMPT TO MAKE THE COLORING WORK PROPERLY ON MAC BY MANUALLY CONVERTING
+        // RGB TO ANSI 256 COLOR CODES.
+        //
+        // THIS WILL BE REPLACED LATER WITH A MORE ROBUST SOLUTION.
+        // (LIKELY HARDCODING THE 256 COLOR CODES ONCE THEY'VE BEEN VERIFIED)
+        private static final int[][] ANSI_256_RGB_TABLE = new int[256][3];
+
+        static {
+            int idx = 0;
+
+            int[] baseColors = {
+                0x000000, 0x800000, 0x008000, 0x808000,
+                0x000080, 0x800080, 0x008080, 0xc0c0c0,
+                0x808080, 0xff0000, 0x00ff00, 0xffff00,
+                0x0000ff, 0xff00ff, 0x00ffff, 0xffffff
+            };
+
+            for (int color : baseColors) {
+                ANSI_256_RGB_TABLE[idx][0] = (color >> 16) & 0xFF;
+                ANSI_256_RGB_TABLE[idx][1] = (color >> 8) & 0xFF;
+                ANSI_256_RGB_TABLE[idx][2] = color & 0xFF;
+                idx++;
+            }
+
+            int[] steps = { 0, 95, 135, 175, 215, 255 };
+            for (int r : steps)
+                for (int g : steps)
+                    for (int b : steps) {
+                        ANSI_256_RGB_TABLE[idx][0] = r;
+                        ANSI_256_RGB_TABLE[idx][1] = g;
+                        ANSI_256_RGB_TABLE[idx][2] = b;
+                        idx++;
+                    }
+
+            for (int i = 0; i < 24; i++) {
+                int gray = 8 + i * 10;
+                ANSI_256_RGB_TABLE[idx][0] = gray;
+                ANSI_256_RGB_TABLE[idx][1] = gray;
+                ANSI_256_RGB_TABLE[idx][2] = gray;
+                idx++;
+            }
+        }
+
+        private static int rgbToAnsi256(int r, int g, int b) {
+            int bestIndex = 0;
+            double bestDistance = Double.MAX_VALUE;
+
+            for (int i = 0; i < 256; i++) {
+                int[] rgb = ANSI_256_RGB_TABLE[i];
+                double distance = colorDistance(r, g, b, rgb[0], rgb[1], rgb[2]);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestIndex = i;
+                }
+            }
+
+            return bestIndex;
+        }
+
+        private static double colorDistance(int r1, int g1, int b1, int r2, int g2, int b2) {
+            int dr = r1 - r2;
+            int dg = g1 - g2;
+            int db = b1 - b2;
+            return dr * dr + dg * dg + db * db;
         }
     }
 

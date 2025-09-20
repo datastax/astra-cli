@@ -21,7 +21,7 @@ public class CliProperties implements IVersionProvider {
                 @Cleanup val stream = CliProperties.class.getClassLoader().getResourceAsStream(file);
 
                 if (stream == null) {
-                    throw new CongratsYouFoundABugException("Could not find resource '" + file + "'' in classpath.");
+                    throw new CongratsYouFoundABugException("Could not find resource '" + file + "' in classpath.");
                 }
 
                 System.getProperties().load(stream);

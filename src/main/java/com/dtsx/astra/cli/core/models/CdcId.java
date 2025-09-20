@@ -12,7 +12,7 @@ public class CdcId implements Highlightable {
     private final String id;
 
     public static Either<String, CdcId> parse(@NonNull String id) {
-        return Utils.trimAndValidateBasics("Cdc ID", id).map(CdcId::new);
+        return ModelUtils.trimAndValidateBasics("Cdc ID", id).map(CdcId::new);
     }
 
     @JsonValue

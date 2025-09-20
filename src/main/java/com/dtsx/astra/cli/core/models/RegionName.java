@@ -12,10 +12,10 @@ public class RegionName implements Highlightable {
     private final String name;
 
     public static Either<String, RegionName> parse(@NonNull String name) {
-        if (Utils.trim(name).isBlank()) {
+        if (ModelUtils.trim(name).isBlank()) {
             return Either.left("Region should not be blank or empty. Use one of the `${cli.name} db list-regions-*` commands to see available regions.");
         }
-        return Utils.trimAndValidateBasics("Region", name).map(RegionName::mkUnsafe);
+        return ModelUtils.trimAndValidateBasics("Region", name).map(RegionName::mkUnsafe);
     }
 
     public static RegionName mkUnsafe(@NonNull String name) {

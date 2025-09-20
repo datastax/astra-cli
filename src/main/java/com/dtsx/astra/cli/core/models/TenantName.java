@@ -12,7 +12,7 @@ public class TenantName implements Highlightable {
     private final String name;
 
     public static Either<String, TenantName> parse(@NonNull String name) {
-        return Utils.trimAndValidateBasics("Tenant name", name).map(TenantName::mkUnsafe);
+        return ModelUtils.trimAndValidateBasics("Tenant name", name).map(TenantName::mkUnsafe);
     }
 
     public static TenantName mkUnsafe(@NonNull String name) {

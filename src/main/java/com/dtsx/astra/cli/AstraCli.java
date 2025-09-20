@@ -1,9 +1,6 @@
 package com.dtsx.astra.cli;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.commands.CompletionsCmd;
-import com.dtsx.astra.cli.commands.NukeCmd;
-import com.dtsx.astra.cli.commands.SetupCmd;
+import com.dtsx.astra.cli.commands.*;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.commands.org.OrgCmd;
@@ -44,7 +41,6 @@ import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IFactory;
 
 import java.nio.file.FileSystems;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -66,6 +62,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         UserCmd.class,
         CompletionsCmd.class,
         NukeCmd.class,
+        ShellEnvCmd.class,
     }
 )
 @Example(
@@ -90,8 +87,6 @@ public class AstraCli extends AbstractCmd<Void> {
         sj.add("Documentation: @!https://awesome-astra.github.io/docs/pages/astra/astra-cli/!@");
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
-
-        Duration.parse()
 
         return OutputHuman.response(sj);
     }

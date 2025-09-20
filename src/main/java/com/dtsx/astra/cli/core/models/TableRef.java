@@ -13,7 +13,7 @@ public class TableRef implements Highlightable {
     private final KeyspaceRef ksRef;
 
     public static Either<String, TableRef> parse(@NonNull KeyspaceRef keyspace, @NonNull String name) {
-        return Utils.trimAndValidateBasics("Table name", name)
+        return ModelUtils.trimAndValidateBasics("Table name", name)
             .map((trimmed) -> new TableRef(trimmed, keyspace));
     }
 

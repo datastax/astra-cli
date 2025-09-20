@@ -107,6 +107,7 @@ graalvmNative {
         buildArgs.add("--enable-http")
         buildArgs.add("--enable-https")
         buildArgs.add("--enable-native-access=ALL-UNNAMED")
+        buildArgs.add("-H:-CheckToolchain")
         
         if (project.hasProperty("prod")) {
             buildArgs.add("-Os")
@@ -267,7 +268,7 @@ tasks.register("includeJansiNativeLibResources") {
 
     val osPattern = when (os) {
         "windows" -> "Windows"
-        "macos" -> "MacOS"
+        "macos" -> "Mac"
         "linux" -> "Linux"
         else -> ".*"
     }
@@ -356,6 +357,8 @@ fun getOsArch(): String {
 
 tasks.register<Jar>("fatJar") {
     dependsOn(configurations.runtimeClasspath)
+    dependsOn("createDynamicProperties")
+
     archiveBaseName.set("fat")
     archiveVersion.set(project.version.toString())
 

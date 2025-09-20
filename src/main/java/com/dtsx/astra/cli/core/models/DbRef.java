@@ -18,7 +18,7 @@ public class DbRef implements Highlightable {
     private final Either<UUID, String> ref;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
-        return Utils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
+        return ModelUtils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
             try {
                 return Either.pure(new DbRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {

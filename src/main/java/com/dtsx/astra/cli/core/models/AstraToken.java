@@ -15,7 +15,7 @@ public class AstraToken implements Highlightable {
     private final String token;
 
     public static Either<String, AstraToken> parse(@NonNull String token) {
-        return Utils.trimAndValidateBasics("Astra token", token).flatMap((t) -> {
+        return ModelUtils.trimAndValidateBasics("Astra token", token).flatMap((t) -> {
             if (JsonUtils.isValidJson(token)) {
                 return Either.left("Astra token should not be passed as JSON; it should be a plain string");
             }

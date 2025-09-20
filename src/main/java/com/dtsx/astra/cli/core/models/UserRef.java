@@ -21,7 +21,7 @@ public class UserRef implements Highlightable {
     private final Either<UUID, String> ref;
 
     public static Either<String, UserRef> parse(@NonNull String ref) {
-        return Utils.trimAndValidateBasics("User email/id", ref).flatMap(trimmed -> {
+        return ModelUtils.trimAndValidateBasics("User email/id", ref).flatMap(trimmed -> {
             try {
                 return Either.pure(new UserRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {
