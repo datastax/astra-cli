@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.core.config;
 
+import com.dtsx.astra.cli.core.CliEnvironment.OS;
+import com.dtsx.astra.cli.core.CliEnvironment.Platform;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.val;
@@ -70,7 +72,7 @@ public class AstraHome {
         }
     }
 
-    public static Path resolveDefaultAstraHomeFolder(FileSystem fs, boolean isWindows) {
-        return fs.getPath(CliProperties.defaultHomeFolder(isWindows));
+    public static Path resolveDefaultAstraHomeFolder(FileSystem fs, Platform platform) {
+        return fs.getPath(CliProperties.defaultHomeFolder(platform.os() == OS.WINDOWS));
     }
 }

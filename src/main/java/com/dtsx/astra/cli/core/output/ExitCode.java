@@ -32,4 +32,6 @@ public enum ExitCode {
     NO_ANSWER,
     UNSUPPORTED_EXECUTION,
     ROLE_NOT_FOUND,
+    RELEASE_NOT_FOUND,
+    PLATFORM_ISSUE,
 }

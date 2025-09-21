@@ -6,13 +6,17 @@ import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.val;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.file.FileAlreadyExistsException;
@@ -56,16 +60,30 @@ public class FileUtils {
     }
 
     @SneakyThrows
-    public static void extractTarArchiveInPlace(Path tarFile, CliContext ctx) {
+    public static void extractTarGzArchiveInPlace(Path tarFile, CliContext ctx) {
+        extractArchiveInPlace(tarFile, ctx, (is) -> new TarArchiveInputStream(new GzipCompressorInputStream(is)));
+    }
+
+    @SneakyThrows
+    public static void extractZipArchiveInPlace(Path zipFile, CliContext ctx) {
+        extractArchiveInPlace(zipFile, ctx, ZipArchiveInputStream::new);
+    }
+
+    @FunctionalInterface
+    private interface MkArchiveInputStream<IS extends ArchiveInputStream<?>> {
+        IS apply(InputStream is) throws IOException;
+    }
+
+    @SneakyThrows
+    private static <A extends ArchiveEntry, IS extends ArchiveInputStream<A>> void extractArchiveInPlace(Path tarFile, CliContext ctx, MkArchiveInputStream<IS> mkArchiveInputStream) {
         val outputDir = tarFile.getParent();
 
         @Cleanup val fis = Files.newInputStream(tarFile);
-        @Cleanup val gzIn = new GzipCompressorInputStream(fis);
-        @Cleanup val tis = new TarArchiveInputStream(gzIn);
+        @Cleanup val ais = mkArchiveInputStream.apply(fis);
 
-        TarArchiveEntry tarEntry;
+        A tarEntry;
 
-        while ((tarEntry = tis.getNextEntry()) != null) {
+        while ((tarEntry = ais.getNextEntry()) != null) {
             val entryPath = outputDir.resolve(tarEntry.getName()).normalize();
 
             if (tarEntry.isDirectory()) {
@@ -82,7 +100,7 @@ public class FileUtils {
                 }
 
                 try (val fos = Files.newOutputStream(entryPath)) {
-                    IOUtils.copy(tis, fos);
+                    IOUtils.copy(ais, fos);
                 }
             }
         }

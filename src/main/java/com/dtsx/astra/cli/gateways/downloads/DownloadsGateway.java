@@ -20,6 +20,8 @@ public interface DownloadsGateway extends SomeGateway {
 
     Either<String, Path> downloadPulsarShell(ExternalSoftware pulsar);
 
+    Either<String, Path> downloadAstra(ExternalSoftware astra);
+
     Optional<Path> cqlshPath(ExternalSoftware cqlsh);
 
     Optional<Path> dsbulkPath(ExternalSoftware dsbulk);

@@ -48,7 +48,7 @@ public abstract class CliConstants {
         public static final String LONG = "--config-file";
         public static final String SHORT = "-cf";
         public static final String LABEL = "PATH";
-        public static final String DEFAULT_DESC = DEFAULT_START + "${cli.rc-file-path}" + DEFAULT_END;
+        public static final String DEFAULT_DESC = DEFAULT_START + "${cli.rc-file.path}" + DEFAULT_END;
     }
 
     public static class $Profile {

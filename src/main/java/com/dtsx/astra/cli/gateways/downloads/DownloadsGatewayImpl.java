@@ -64,6 +64,16 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @Override
+    public Either<String, Path> downloadAstra(ExternalSoftware astra) {
+        try {
+            val tmpDir = Files.createTempDirectory(ctx.path(System.getProperty("java.io.tmpdir")), "astra-cli-upgrade-");
+            return installGenericArchive(tmpDir, astra.url(), "astra", ctx);
+        } catch (Exception e) {
+            return Either.left("Failed to create temporary directory in %s: '%s'".formatted(System.getProperty("java.io.tmpdir"), e.getMessage()));
+        }
+    }
+
+    @Override
     public Optional<Path> cqlshPath(ExternalSoftware cqlsh) {
         return getPath(ctx.home().Dirs::cqlshExists, ctx.home().Dirs::useCqlsh, "cqlsh");
     }
@@ -95,7 +105,9 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
         }
 
-        val tarFile = installDir.getParent().resolve(exe + "-download.tar.gz");
+        val suffix = (ctx.isWindows()) ? ".zip" : ".tar.gz";
+
+        val archiveFile = installDir.getParent().resolve(exe + "-download" + suffix);
         val exeFile = installDir.resolve("bin/" + exe);
 
         if (PathUtils.isRegularFile(exeFile) && !PathUtils.isEmptyFile(exeFile)) {
@@ -104,7 +116,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         try {
             PathUtils.cleanDirectory(installDir);
-            Files.deleteIfExists(tarFile);
+            Files.deleteIfExists(archiveFile);
         } catch (Exception e) {
             ctx.log().exception(e);
             return Either.left("Failed to clean existing " + exe + " installation in %s: '%s'".formatted(installDir, e.getMessage()));
@@ -112,7 +124,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         try {
             ctx.log().loading("Downloading " + exe + ", please wait", (_) -> {
-                FileUtils.downloadFile(url, tarFile);
+                FileUtils.downloadFile(url, archiveFile);
                 return null;
             });
         } catch (Exception e) {
@@ -122,12 +134,16 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         try {
             ctx.log().loading("Extracting " + exe + " archive, please wait", (_) -> {
-                FileUtils.extractTarArchiveInPlace(tarFile, ctx);
+                if (archiveFile.endsWith(".zip")) {
+                    FileUtils.extractZipArchiveInPlace(archiveFile, ctx);
+                } else {
+                    FileUtils.extractTarGzArchiveInPlace(archiveFile, ctx);
+                }
                 return null;
             });
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to extract " + exe + " archive %s: '%s'".formatted(tarFile, e.getMessage()));
+            return Either.left("Failed to extract " + exe + " archive %s: '%s'".formatted(archiveFile, e.getMessage()));
         }
 
         try {
@@ -136,16 +152,18 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
                 PosixFilePermission.OWNER_READ, PosixFilePermission.GROUP_READ,
                 PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.GROUP_EXECUTE
             ));
+        } catch (UnsupportedOperationException _) {
+            // at least we can die happy, knowing that we tried...
         } catch (Exception e) {
             ctx.log().exception(e);
             return Either.left("Failed to set execute permissions on %s: '%s'".formatted(exeFile, e.getMessage()));
         }
 
         try {
-            Files.delete(tarFile);
+            Files.delete(archiveFile);
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to delete temporary " + exe + " archive %s: '%s'".formatted(tarFile, e.getMessage()));
+            return Either.left("Failed to delete temporary " + exe + " archive %s: '%s'".formatted(archiveFile, e.getMessage()));
         }
 
         return Either.pure(exeFile);

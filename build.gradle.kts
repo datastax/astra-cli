@@ -96,8 +96,8 @@ val isProd = project.hasProperty("prod")
 
 val cliSystemProperties = mapOf(
     "cli.version" to project.version.toString(),
-    "cli.rc-file-name" to if (isProd) ".astrarc" else ".astrarc-dev",
-    "cli.home-folder-name" to if (isProd) "astra" else "astra-dev",
+    "cli.rc-file.name" to if (isProd) ".astrarc" else ".astrarc-dev",
+    "cli.home-folder.name" to if (isProd) "astra" else "astra-dev",
 )
 
 graalvmNative {
@@ -142,6 +142,7 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
         archiveClassifier.set(getOsArch())
         destinationDirectory.set(file("${layout.buildDirectory.get()}/distributions"))
         otherConfiguration()
+        into("bin")
     }
 }
 

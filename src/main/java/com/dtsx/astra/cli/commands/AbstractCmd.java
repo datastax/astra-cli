@@ -46,6 +46,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     // in a perfect world (*cough*, kotlin) `ctx` would be a something like `val ctx get() = ctxRef.get()`
     // so that their lifecycle is tied together, but alas, we are in Java land, and I'd rather do `ctx` than `ctx()` here
+    //
+    // (actually, in an even more perfect world (*cough*, haskell) context could just be inherently lazy, but I digress)
     protected CliContext ctx;
     private Ref<CliContext> ctxRef;
 
@@ -130,7 +132,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 : ctx.logLevel();
 
         run(new CliContext(
-            ctx.isWindows(),
+            ctx.platform(),
             ctx.isTty(),
             outputTypeMixin.requested(),
             new AstraColors(ansi),

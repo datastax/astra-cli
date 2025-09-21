@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core;
 
+import com.dtsx.astra.cli.core.CliEnvironment.OS;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import lombok.Cleanup;
 import lombok.val;
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.dtsx.astra.cli.core.CliEnvironment.unsafeIsWindows;
+import static com.dtsx.astra.cli.core.CliEnvironment.unsafeResolvePlatform;
 
 public class CliProperties implements IVersionProvider {
     static {
@@ -30,8 +31,8 @@ public class CliProperties implements IVersionProvider {
             }
         }
         cliName(); // load cli.name into system properties
-        defaultRcFile(unsafeIsWindows());
-        defaultHomeFolder(unsafeIsWindows());
+        defaultRcFile(unsafeResolvePlatform().os() == OS.WINDOWS);
+        defaultHomeFolder(unsafeResolvePlatform().os() == OS.WINDOWS);
     }
 
     public record ExternalSoftware(String url, String version) {}
@@ -53,14 +54,24 @@ public class CliProperties implements IVersionProvider {
     }
 
     public static String rcFileName() {
-        return prop("cli.rc-file-name");
+        return prop("cli.rc-file.name");
     }
 
     public static String homeFolderName(boolean useDotPrefix) {
-        return ((useDotPrefix) ? "." : "") + prop("cli.home-folder-name");
+        return ((useDotPrefix) ? "." : "") + prop("cli.home-folder.name");
+    }
+
+    public static String cliGithubRepo() {
+        return prop("cli.github.repo");
     }
 
     private static @Nullable String cachedRcFile = null;
+
+    public static class FileResolvers {
+        public static final String CUSTOM = "custom";
+        public static final String XDG = "xdg";
+        public static final String HOME = "home";
+    }
 
     public static String defaultRcFile(boolean isWindows) {
         if (cachedRcFile != null) {
@@ -68,21 +79,25 @@ public class CliProperties implements IVersionProvider {
         }
 
         val customPath = System.getenv(CliProperties.rcEnvVar());
+        val xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
 
-        if (customPath != null) {
-            System.setProperty("cli.rc-file-path", customPath);
+        if (customPath != null && !customPath.isBlank()) {
+            System.setProperty("cli.rc-file.path", customPath);
+            System.setProperty("cli.rc-file.resolver", FileResolvers.CUSTOM);
             cachedRcFile = customPath;
         }
-        else if (System.getenv("XDG_CONFIG_HOME") != null) { // TODO - should we do this?
+        else if (xdgConfigHome != null && !xdgConfigHome.isBlank()) { // TODO - should we do this?
             val path = File.separator + CliProperties.homeFolderName(false) + File.separator + CliProperties.rcFileName();
 
-            System.setProperty("cli.rc-file-path", (isWindows ? "%XDG_CONFIG_HOME%" : "$XDG_CONFIG_HOME") + path);
-            cachedRcFile = System.getenv("XDG_CONFIG_HOME") + path;
+            System.setProperty("cli.rc-file.path", (isWindows ? "%XDG_CONFIG_HOME%" : "$XDG_CONFIG_HOME") + path);
+            System.setProperty("cli.rc-file.resolver", FileResolvers.XDG);
+            cachedRcFile = xdgConfigHome + path;
         }
         else {
             val path = File.separator + CliProperties.rcFileName();
 
-            System.setProperty("cli.rc-file-path", (isWindows ? "%USERPROFILE%" : "~") + path);
+            System.setProperty("cli.rc-file.path", (isWindows ? "%USERPROFILE%" : "~") + path);
+            System.setProperty("cli.rc-file.resolver", FileResolvers.HOME);
             cachedRcFile = System.getProperty("user.home") + path;
         }
 
@@ -97,16 +112,19 @@ public class CliProperties implements IVersionProvider {
         }
 
         val customPath = System.getenv(CliProperties.homeEnvVar());
+        val xdgDataHome = System.getenv("XDG_DATA_HOME");
 
-        if (customPath != null) {
-            System.setProperty("cli.home-folder-path", customPath);
+        if (customPath != null && !customPath.isBlank()) {
+            System.setProperty("cli.home-folder.path", customPath);
+            System.setProperty("cli.home-folder.resolver", FileResolvers.CUSTOM);
             cachedHomeFolder = customPath;
         }
-        else if (System.getenv("XDG_DATA_HOME") != null) { // TODO - should we do this?
+        else if (xdgDataHome != null && !xdgDataHome.isBlank()) { // TODO - should we do this?
             val path = File.separator + CliProperties.homeFolderName(false);
 
-            System.setProperty("cli.home-folder-path", (isWindows ? "%XDG_DATA_HOME%" : "$XDG_DATA_HOME") + path);
-            cachedHomeFolder = System.getenv("XDG_DATA_HOME") + path;
+            System.setProperty("cli.home-folder.path", (isWindows ? "%XDG_DATA_HOME%" : "$XDG_DATA_HOME") + path);
+            System.setProperty("cli.home-folder.resolver", FileResolvers.XDG);
+            cachedHomeFolder = xdgDataHome + path;
         }
         else {
             val base = (isWindows)
@@ -115,7 +133,8 @@ public class CliProperties implements IVersionProvider {
 
             val path = File.separator + CliProperties.homeFolderName(true);
 
-            System.setProperty("cli.home-folder-path", (isWindows ? "%LOCALAPPDATA%" : "~") + path);
+            System.setProperty("cli.home-folder.path", (isWindows ? "%LOCALAPPDATA%" : "~") + path);
+            System.setProperty("cli.home-folder.resolver", FileResolvers.HOME);
             cachedHomeFolder = base + path;
         }
 
@@ -143,11 +162,11 @@ public class CliProperties implements IVersionProvider {
     }
 
     public static String rcEnvVar() {
-        return prop("cli.env-vars.rc-file");
+        return prop("cli.rc-file.env-var");
     }
 
     public static String homeEnvVar() {
-        return prop("cli.env-vars.home-folder");
+        return prop("cli.home-folder.env-var");
     }
 
     @Override

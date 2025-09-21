@@ -123,7 +123,7 @@ public class AstraLogger {
 
         @Option(
             names = { "--dump-logs" },
-            description = { "Write all logs to an optionally specified file", DEFAULT_START + "${cli.home-folder-path}/logs/<file>.log" + DEFAULT_END },
+            description = { "Write all logs to an optionally specified file", DEFAULT_START + "${cli.home-folder.path}/logs/<file>.log" + DEFAULT_END },
             fallbackValue = "__fallback__",
             paramLabel = "FILE",
             arity = "0..1"

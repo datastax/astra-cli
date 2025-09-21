@@ -61,6 +61,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         TokenCmd.class,
         UserCmd.class,
         CompletionsCmd.class,
+        UpgradeCmd.class,
         NukeCmd.class,
         ShellEnvCmd.class,
     }
@@ -99,13 +100,13 @@ public class AstraCli extends AbstractCmd<Void> {
     @SneakyThrows
     public static void main(String... args) {
         val ctxRef = new Ref<CliContext>((getCtx) -> new CliContext(
-            CliEnvironment.unsafeIsWindows(),
+            CliEnvironment.unsafeResolvePlatform(),
             CliEnvironment.unsafeIsTty(),
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
             new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), true),
             new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), null, getCtx, false),
-            new AstraHome(AstraHome.resolveDefaultAstraHomeFolder(FileSystems.getDefault(), CliEnvironment.unsafeIsWindows())),
+            new AstraHome(AstraHome.resolveDefaultAstraHomeFolder(FileSystems.getDefault(), CliEnvironment.unsafeResolvePlatform())),
             FileSystems.getDefault(),
             new GatewayProviderImpl(),
             Optional.empty()

@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.core;
 
+import com.dtsx.astra.cli.core.CliEnvironment.OS;
+import com.dtsx.astra.cli.core.CliEnvironment.Platform;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.output.AstraColors;
@@ -26,7 +28,7 @@ import java.util.UUID;
 @Value
 @Accessors(fluent = true)
 public class CliContext {
-    boolean isWindows;
+    Platform platform;
     boolean isTty;
     OutputType outputType;
     AstraColors colors;
@@ -55,8 +57,12 @@ public class CliContext {
         return !isTty;
     }
 
+    public boolean isWindows() {
+        return platform.os() == OS.WINDOWS;
+    }
+
     public boolean isNotWindows() {
-        return !isWindows;
+        return !isWindows();
     }
 
     public boolean outputIsHuman() {

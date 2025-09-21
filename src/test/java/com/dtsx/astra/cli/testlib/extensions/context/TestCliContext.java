@@ -55,10 +55,10 @@ public class TestCliContext implements AutoCloseable {
 
         val homeDirPath = options.homeDir()
             .map(fn -> fn.apply(options.fs()))
-            .orElseGet(() -> AstraHome.resolveDefaultAstraHomeFolder(options.fs(), CliEnvironment.unsafeIsWindows()));
+            .orElseGet(() -> AstraHome.resolveDefaultAstraHomeFolder(options.fs(), CliEnvironment.unsafeResolvePlatform()));
 
         this.ref = new Ref<>((getCtx) -> new CliContext(
-            CliEnvironment.unsafeIsWindows(),
+            CliEnvironment.unsafeResolvePlatform(),
             true,
             options.outputType(),
             new AstraColors(Ansi.OFF),

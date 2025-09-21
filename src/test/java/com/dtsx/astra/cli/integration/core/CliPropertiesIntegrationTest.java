@@ -101,7 +101,7 @@ public class CliPropertiesIntegrationTest {
         @Test
         public void rc_file_name(SystemProperties systemProps) {
             systemProps.set(
-                "cli.rc-file-name", ".astrarc"
+                "cli.rc-file.name", ".astrarc"
             );
             assertThat(CliProperties.rcFileName()).isEqualTo(".astrarc");
         }
@@ -109,7 +109,7 @@ public class CliPropertiesIntegrationTest {
         @Test
         public void home_folder_name(SystemProperties systemProps) {
             systemProps.set(
-                "cli.home-folder-name", "astra"
+                "cli.home-folder.name", "astra"
             );
             assertThat(CliProperties.homeFolderName(false)).isEqualTo("astra");
             assertThat(CliProperties.homeFolderName(true)).isEqualTo("." + CliProperties.homeFolderName(false));
@@ -120,26 +120,26 @@ public class CliPropertiesIntegrationTest {
     public class env_vars {
         @Test
         public void rc_env_var() {
-            assertThat(CliProperties.rcEnvVar()).isEqualTo("ASTRARC_PATH");
+            assertThat(CliProperties.rcEnvVar()).isEqualTo("ASTRARC");
         }
 
         @Test
         public void home_env_var() {
-            assertThat(CliProperties.homeEnvVar()).isEqualTo("ASTRA_HOME_PATH");
+            assertThat(CliProperties.homeEnvVar()).isEqualTo("ASTRA_HOME");
         }
     }
 
     @Nested
     public class file_paths { // unfortunately can't use jqwik b/c it doesn't work w/. system-stubs
         private final BiFunction<SystemProperties, EnvironmentVariables, Steps> mkRcFileSteps = (sys, env) -> new Steps(
-            (path) -> { sys.set("cli.env-vars.rc-file", "CUSTOM_RC_PATH"); env.set(CliProperties.rcEnvVar(), path); },
+            (path) -> { sys.set("cli.rc-file.env-var", "CUSTOM_RC_PATH"); env.set(CliProperties.rcEnvVar(), path); },
             (path) -> env.set("XDG_CONFIG_HOME", path),
             (path) -> sys.set("user.home", path),
             (path) -> sys.set("user.home", path)
         );
 
         private final BiFunction<SystemProperties, EnvironmentVariables, Steps> mkHomeFolderSteps = (sys, env) -> new Steps(
-            (path) -> { sys.set("cli.env-vars.home-folder", "CUSTOM_HOME_PATH"); env.set(CliProperties.homeEnvVar(), path); },
+            (path) -> { sys.set("cli.home-folder.env-var", "CUSTOM_HOME_PATH"); env.set(CliProperties.homeEnvVar(), path); },
             (path) -> env.set("XDG_DATA_HOME", path),
             (path) -> env.set("LOCALAPPDATA", path),
             (path) -> sys.set("user.home", path)
@@ -153,10 +153,10 @@ public class CliPropertiesIntegrationTest {
 
                 // whether it's windows should not matter here
                 assertThat(CliProperties.defaultRcFile(true)).isEqualTo(customPath);
-                assertThat(System.getProperty("cli.rc-file-path")).isEqualTo(customPath);
+                assertThat(System.getProperty("cli.rc-file.path")).isEqualTo(customPath);
 
                 assertThat(CliProperties.defaultRcFile(false)).isEqualTo(customPath);
-                assertThat(System.getProperty("cli.rc-file-path")).isEqualTo(customPath);
+                assertThat(System.getProperty("cli.rc-file.path")).isEqualTo(customPath);
             }
 
             @Test
@@ -168,25 +168,25 @@ public class CliPropertiesIntegrationTest {
 
                 // returned path should not depend on the os; the display path should depend on the os though
                 assertThat(CliProperties.defaultRcFile(true)).isEqualTo(xdgPath + expectedSubpath);
-                assertThat(System.getProperty("cli.rc-file-path")).isEqualTo("%XDG_CONFIG_HOME%" + expectedSubpath);
+                assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("%XDG_CONFIG_HOME%" + expectedSubpath);
 
                 assertThat(CliProperties.defaultRcFile(false)).isEqualTo(xdgPath + expectedSubpath);
-                assertThat(System.getProperty("cli.rc-file-path")).isEqualTo("$XDG_CONFIG_HOME" + expectedSubpath);
+                assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("$XDG_CONFIG_HOME" + expectedSubpath);
             }
 
             @Test
             public void defaults_to_user_home_if_no_path_specified(SystemProperties sys, EnvironmentVariables env) {
                 val defaultPath = mkRcFileSteps.apply(sys, env).applyBothDefaults();
 
-                sys.set("cli.rc-file-name", "custom-rc-file");
+                sys.set("cli.rc-file.name", "custom-rc-file");
                 val expectedSubpath = File.separator + "custom-rc-file";
 
                 // returned path should not depend on the os; the display path should depend on the os though
                 assertThat(CliProperties.defaultRcFile(true)).isEqualTo(defaultPath + expectedSubpath);
-                assertThat(System.getProperty("cli.rc-file-path")).isEqualTo("%USERPROFILE%" + expectedSubpath);
+                assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("%USERPROFILE%" + expectedSubpath);
 
                 assertThat(CliProperties.defaultRcFile(false)).isEqualTo(defaultPath + expectedSubpath);
-                assertThat(System.getProperty("cli.rc-file-path")).isEqualTo("~" + expectedSubpath);
+                assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("~" + expectedSubpath);
             }
         }
 
@@ -197,47 +197,47 @@ public class CliPropertiesIntegrationTest {
                 val customPath = mkHomeFolderSteps.apply(sys, env).applyAll();
 
                 assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(customPath);
-                assertThat(System.getProperty("cli.home-folder-path")).isEqualTo(customPath);
+                assertThat(System.getProperty("cli.home-folder.path")).isEqualTo(customPath);
 
                 assertThat(CliProperties.defaultHomeFolder(false)).isEqualTo(customPath);
-                assertThat(System.getProperty("cli.home-folder-path")).isEqualTo(customPath);
+                assertThat(System.getProperty("cli.home-folder.path")).isEqualTo(customPath);
             }
 
             @Test
             public void uses_xdg_if_no_custom_path(SystemProperties sys, EnvironmentVariables env) {
                 val xdgPath = mkHomeFolderSteps.apply(sys, env).applyXdgAndDefaults();
 
-                sys.set("cli.home-folder-name", "custom-home-folder");
+                sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + "custom-home-folder";
 
                 // returned path should not depend on the os; the display path should depend on the os though
                 assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(xdgPath + expectedSubpath);
-                assertThat(System.getProperty("cli.home-folder-path")).isEqualTo("%XDG_DATA_HOME%" + expectedSubpath);
+                assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%XDG_DATA_HOME%" + expectedSubpath);
 
                 assertThat(CliProperties.defaultHomeFolder(false)).isEqualTo(xdgPath + expectedSubpath);
-                assertThat(System.getProperty("cli.home-folder-path")).isEqualTo("$XDG_DATA_HOME" + expectedSubpath);
+                assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("$XDG_DATA_HOME" + expectedSubpath);
             }
 
             @Test
             public void defaults_to_user_home_if_no_path_specified_on_unix(SystemProperties sys, EnvironmentVariables env) {
                 val defaultPath = mkHomeFolderSteps.apply(sys, env).applyUnixDefault();
 
-                sys.set("cli.home-folder-name", "custom-home-folder");
+                sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + ".custom-home-folder";
 
                 assertThat(CliProperties.defaultHomeFolder(false)).isEqualTo(defaultPath + expectedSubpath);
-                assertThat(System.getProperty("cli.home-folder-path")).isEqualTo("~" + expectedSubpath);
+                assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("~" + expectedSubpath);
             }
 
             @Test
             public void defaults_to_localappdata_if_no_path_specified_on_windows(SystemProperties sys, EnvironmentVariables env) {
                 val defaultPath = mkHomeFolderSteps.apply(sys, env).applyWindowsDefault();
 
-                sys.set("cli.home-folder-name", "custom-home-folder");
+                sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + "custom-home-folder";
 
                 assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(defaultPath + expectedSubpath);
-                assertThat(System.getProperty("cli.home-folder-path")).isEqualTo("%LOCALAPPDATA%" + expectedSubpath);
+                assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%LOCALAPPDATA%" + expectedSubpath);
             }
         }
 

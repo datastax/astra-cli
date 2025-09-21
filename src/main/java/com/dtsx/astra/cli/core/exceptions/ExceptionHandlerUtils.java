@@ -35,7 +35,7 @@ public class ExceptionHandlerUtils {
 
     public int handleUncaughtException(Throwable err, CliContext ctx) {
         val message = """
-          @|bold,red An unexpected error occurred during the execution of the command:|@
+          @|bold,red An unexpected error occurred during the execution of the command (%s):|@
         
         %s
         
@@ -43,6 +43,7 @@ public class ExceptionHandlerUtils {
   
           A full debug log was generated at @|underline @!%s!@|@
         """.formatted(
+            err.getClass().getSimpleName(),
             withIndent(err.getMessage(), "  @!>!@ "),
             ctx.log().useSessionLogFilePath()
         );

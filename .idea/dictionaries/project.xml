@@ -17,6 +17,7 @@
       <w>pkgs</w>
       <w>readln</w>
       <w>shellenv</w>
+      <w>tildify</w>
     </words>
   </dictionary>
 </component>
