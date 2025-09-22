@@ -79,7 +79,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Create a vector database",
-    command = "${cli.name} db create demo -r us-east1 --vector"
+    command = "${cli.name} db create demo -r us-east1"
 )
 public class AstraCli extends AbstractCmd<Void> {
     @Option(
@@ -99,7 +99,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
         val sj = new StringJoiner(NL);
 
-        sj.add("Documentation: @!https://awesome-astra.github.io/docs/pages/astra/astra-cli/!@");
+        sj.add("Documentation: @!https://docs.datastax.com/en/astra-cli!@");
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
 

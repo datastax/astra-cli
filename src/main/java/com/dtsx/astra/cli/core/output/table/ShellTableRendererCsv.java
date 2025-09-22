@@ -21,6 +21,7 @@ public record ShellTableRendererCsv(RenderableShellTable table) implements Outpu
         return String.join(",", columns);
     }
 
+    // TODO how to format csv in the shell table case?
     private String buildValues(List<? extends Map<String, ?>> raw, List<String> columns) {
         return raw.stream()
             .map((row) -> {

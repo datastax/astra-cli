@@ -7,8 +7,6 @@ import com.dtsx.astra.cli.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
-import java.util.stream.Stream;
-
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraToken implements Highlightable {
@@ -20,7 +18,7 @@ public class AstraToken implements Highlightable {
                 return Either.left("Astra token should not be passed as JSON; it should be a plain string");
             }
 
-            if (Stream.of(".txt", ".json", ".yaml", ".yml", ".env", ".csv").anyMatch(token::endsWith)) {
+            if (token.matches(".*\\.\\w+")) {
                 return Either.left("Astra token looks like a file name; please use the @file syntax to pass the token from a file, where the file contains only the token as a plain string (e.g. `--token @token.txt`)");
             }
 

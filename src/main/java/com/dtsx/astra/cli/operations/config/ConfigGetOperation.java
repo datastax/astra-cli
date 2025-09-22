@@ -15,6 +15,8 @@ import lombok.val;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
+
 @RequiredArgsConstructor
 public class ConfigGetOperation implements Operation<GetConfigResult> {
     private final AstraConfig config;
@@ -38,7 +40,7 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
             val candidates = NEList.parse(config.profiles());
 
             if (candidates.isEmpty()) {
-                throw new AstraCliException("""
+                throw new AstraCliException(PROFILE_NOT_FOUND, """
                   @|bold,red No profiles found to select from|@
                 """);
             }

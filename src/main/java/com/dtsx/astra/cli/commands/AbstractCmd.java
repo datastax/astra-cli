@@ -128,8 +128,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
         val level =
             (loggerMixin.quiet())
-                ? Level.QUIET
-            : (loggerMixin.verbose())
+                ? Level.QUIET :
+            (loggerMixin.verbose())
                 ? Level.VERBOSE
                 : ctx.logLevel();
 

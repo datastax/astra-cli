@@ -15,10 +15,6 @@ public class AstraCliException extends RuntimeException {
     private final @Nullable List<Hint> nextSteps;
     private final ExitCode code;
 
-    public AstraCliException(String message) {
-        this(null, message, null, null);
-    }
-
     public AstraCliException(ExitCode code, String message) {
         this(code, message, null, null);
     }

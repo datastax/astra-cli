@@ -23,7 +23,7 @@ public class TextSelectionStrategy<T> implements SelectionStrategy<T> {
     public static class Meta implements SelectionStrategy.Meta.Open {
         @Override
         public boolean isSupported(CliContext ctx) {
-            return ctx.outputIsHuman() && ctx.isTty();
+            return ctx.isTty();
         }
 
         @Override
@@ -59,19 +59,19 @@ public class TextSelectionStrategy<T> implements SelectionStrategy<T> {
 
     private void clearPrompt() {
         for (int i = 0; i < req.prompt().split("\n").length + 1; i++) {
-            ctx.console().print(MOVE_UP_CLEAR);
+            ctx.console().error(MOVE_UP_CLEAR);
         }
     }
 
     private void cleanupOutput(Optional<String> result) {
         if (req.echoOff() && result.isPresent() && ctx.ansiEnabled()) {
-            ctx.console().print(MOVE_UP_CLEAR);
-            ctx.console().println("@!>!@ " + req.displayContentWhenDone().apply(result.get()));
+            ctx.console().error(MOVE_UP_CLEAR);
+            ctx.console().errorln("@!>!@ " + req.displayContentWhenDone().apply(result.get()));
         }
         else if (result.isEmpty() && req.defaultOption().isPresent()) {
-            ctx.console().print(MOVE_UP_CLEAR);
-            ctx.console().println("@!>!@ " + req.defaultOption().get());
+            ctx.console().error(MOVE_UP_CLEAR);
+            ctx.console().errorln("@!>!@ " + req.defaultOption().get());
         }
-        ctx.console().println();
+        ctx.console().errorln();
     }
 }

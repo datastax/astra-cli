@@ -41,6 +41,7 @@ public class AstraConsole {
     private final boolean noInput;
 
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
+    private static final Pattern HIGHLIGHT_OR_QUOTE_PATTERN = Pattern.compile("@'!(.*?)!@");
 
     @Getter @Setter
     private @Nullable Console console = System.console();
@@ -79,6 +80,10 @@ public class AstraConsole {
 
     public void error(Object... items) {
         write(getErr(), items);
+    }
+
+    public void errorf(@PrintFormat String format, Object... items) {
+        write(getErr(), format.formatted(items));
     }
 
     public void errorln(Object... items) {
@@ -120,8 +125,13 @@ public class AstraConsole {
                 sb.append(color.on());
                 colorUsed = true;
             } else if (item instanceof String str) {
-                val processedStr = HIGHLIGHT_PATTERN.matcher(str.replace("${cli.name}", CliProperties.cliName())).replaceAll((match) ->
-                    ctx().highlight(match.group(1)));
+                var processedStr = str.replace("${cli.name}", CliProperties.cliName());
+
+                processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
+                    .replaceAll((match) -> ctx().highlight(match.group(1), false));
+
+                processedStr = HIGHLIGHT_OR_QUOTE_PATTERN.matcher(processedStr)
+                    .replaceAll((match) -> ctx().highlight(match.group(1), true));
 
                 sb.append(ctx().colors().ansi().new Text(processedStr, ctx().colorScheme()));
             } else {

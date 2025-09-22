@@ -29,7 +29,7 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
     public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
         public boolean isSupported(CliContext ctx) {
-            return ctx.outputIsHuman() && ctx.isTty();
+            return ctx.isTty();
         }
 
         @Override
@@ -50,32 +50,32 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
             clearPrompt();
             clearOptionsAndFooter();
         } else {
-            ctx.console().println();
+            ctx.console().errorln();
         }
 
         return result;
     }
 
     private void drawPrompt() {
-        ctx.console().println(req.prompt());
+        ctx.console().errorln(req.prompt());
     }
 
     private void drawOptions() {
         for (var i = sliceStart; i < sliceStart + PAGE_SIZE && i < req.options().size(); i++) {
-            ctx.console().printf("@!%d)!@ %s%n", i + 1, req.options().get(i));
+            ctx.console().errorf("@!%d)!@ %s%n", i + 1, req.options().get(i));
         }
     }
 
     private void drawFooter() {
-        ctx.console().printf("%n");
+        ctx.console().errorf("%n");
 
         if (paginationEnabled()) {
-            ctx.console().printf("[@!n!@]ext page, [@!p!@]revious page, [@!1-%d!@] to select (showing @!%d-%d!@):%n", req.options().size(), sliceStart + 1, sliceEnd());
+            ctx.console().errorf("[@!n!@]ext page, [@!p!@]revious page, [@!1-%d!@] to select (showing @!%d-%d!@):%n", req.options().size(), sliceStart + 1, sliceEnd());
         } else {
-            ctx.console().printf("[@!1-%d!@] to select:%n", req.options().size());
+            ctx.console().errorf("[@!1-%d!@] to select:%n", req.options().size());
         }
 
-        ctx.console().printf("@!> !@");
+        ctx.console().errorf("@!> !@");
     }
 
     private Optional<T> handleInput() {
@@ -89,7 +89,7 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
                 handlePreviousPage();
             }
             else if (input.isEmpty()) {
-                ctx.console().print(CLEAR_MOVE_UP);
+                ctx.console().error(CLEAR_MOVE_UP);
             }
             else if (isPositiveInteger(input)) {
                 return Optional.of(req.mapper().apply(req.options().get(Integer.parseInt(input) - 1)));
@@ -130,13 +130,13 @@ public class NumberedSelectionStrategy<T> implements SelectionStrategy<T> {
 
     private void clearOptionsAndFooter() {
         for (int i = 0; i < (sliceEnd() - sliceStart) + 3; i++) {
-            ctx.console().print(MOVE_UP_CLEAR);
+            ctx.console().error(MOVE_UP_CLEAR);
         }
     }
 
     private void clearPrompt() {
         for (int i = 0; i < req.prompt().split("\n").length + 1; i++) {
-            ctx.console().print(MOVE_UP_CLEAR);
+            ctx.console().error(MOVE_UP_CLEAR);
         }
     }
 

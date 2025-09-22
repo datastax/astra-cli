@@ -126,13 +126,14 @@ public class CLIPrompter {
             """.formatted(fallback), List.of(hint));
         }
 
-        if (ctx.outputIsNotHuman()) {
-            throw new AstraCliException(UNSUPPORTED_EXECUTION, """
-              @|bold,red Error: Can not interactively select an option when the output type is not 'human'|@
-            
-              Please programmatically pass an option using the %s, or use the 'human' output format instead.
-            """.formatted(fallback), List.of(hint));
-        }
+//        TODO: actually, is it fine if we prompt in non-human mode? probably tbh, since we have the --no-input flag + tty check anyways
+//        if (ctx.outputIsNotHuman()) {
+//            throw new AstraCliException(UNSUPPORTED_EXECUTION, """
+//              @|bold,red Error: Can not interactively select an option when the output type is not 'human'|@
+//
+//              Please programmatically pass an option using the %s, or use the 'human' output format instead.
+//            """.formatted(fallback), List.of(hint));
+//        }
     }
 
     private AstraCliException noAnswerGiven(String fallback, Pair<? extends Iterable<String>, String> fix) {

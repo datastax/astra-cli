@@ -33,7 +33,7 @@ import picocli.CommandLine.Command;
         DbStatusCmd.class,
         CqlshCmd.class,
         DbDsbulkCmd.class,
-        DbCreateDotEnv.class,
+        DbCreateDotEnvCmd.class,
         DbDownloadScbCmd.class,
         DbResumeCmd.class,
         KeyspaceListCmd.class,

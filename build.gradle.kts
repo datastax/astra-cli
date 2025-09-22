@@ -142,7 +142,7 @@ inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, 
         archiveClassifier.set(getOsArch())
         destinationDirectory.set(file("${layout.buildDirectory.get()}/distributions"))
         otherConfiguration()
-        into("bin")
+        into("astra/bin")
     }
 }
 

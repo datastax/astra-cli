@@ -12,6 +12,8 @@ import picocli.CommandLine.Parameters;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
+
 public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes> {
     @Parameters(
         arity = "0..1",
@@ -34,7 +36,7 @@ public abstract class AbstractPromptForDbCmd<OpRes> extends AbstractDbCmd<OpRes>
     protected abstract String dbRefPrompt();
 
     private DbRef promptForDbRef(String prompt) {
-        val dbs = NEList.parse(dbGateway.findAll().toList()).orElseThrow(() -> new AstraCliException("@|bold,red No databases found to select from|@"));
+        val dbs = NEList.parse(dbGateway.findAll().toList()).orElseThrow(() -> new AstraCliException(DATABASE_NOT_FOUND, "@|bold,red No databases found to select from|@"));
 
         val namesAreUnique = dbs.stream()
             .map(db -> db.getInfo().getName())

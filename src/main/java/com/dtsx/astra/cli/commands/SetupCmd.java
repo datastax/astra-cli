@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledExcepti
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.SetupOperation;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
+import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
@@ -64,6 +66,19 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             case ProfileCreated pc -> handleProfileCreated(pc);
             case InvalidToken(var hint) -> throwInvalidToken(hint);
         };
+    }
+
+    @Override
+    protected final OutputAll execute(Supplier<SetupResult> result) {
+        throw new AstraCliException(UNSUPPORTED_EXECUTION, """
+          @|bold,red Error: This operation does not support outputting in the '|@@|bold,red,italic %s|@@|bold,red ' format.|@
+        
+          The @!astra setup!@ command is an interactive setup command, meant to help guide you through the setup process.
+        
+          Use the @!astra config create!@ command to programmatically create profiles instead.
+        """, List.of(
+            new Hint("Programmatically create profiles", "${cli.name} config create [name] --token <token> [--env <env>] [--default]")
+        ));
     }
 
     private OutputHuman handleProfileCreated(ProfileCreated result) {
@@ -125,7 +140,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         ctx.log().banner();
 
         if (ctx.isNotTty()) {
-            throw new AstraCliException("""
+            throw new AstraCliException(UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Cannot run setup in non-interactive mode.|@
             
               The setup process requires user interaction, but no console is available.

@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 
 @RequiredArgsConstructor
@@ -94,7 +95,7 @@ public class DbGatewayImpl implements DbGateway {
         val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("X-Cassandra-Token", token.unsafeUnwrap()));
 
         if (response.statusCode() >= 400) {
-            throw new AstraCliException("""
+            throw new AstraCliException(IO_ISSUE, """
               @|bold,red An error occurred while attempting to resume database %s|@
             
               The server returned the following response:

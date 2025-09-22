@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.exceptions.internal.cli;
 
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.utils.MiscUtils;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +15,7 @@ public class CongratsYouFoundABugException extends AstraCliException {
     }
 
     public CongratsYouFoundABugException(String msg, @Nullable Throwable cause) {
-        super(mkErrorMsg(msg, cause));
+        super(ExitCode.BUG, mkErrorMsg(msg, cause));
 
         if (cause != null && AstraCli.unsafeGlobalCliContext() != null) {
             AstraCli.unsafeGlobalCliContext().get().log().exception(cause);

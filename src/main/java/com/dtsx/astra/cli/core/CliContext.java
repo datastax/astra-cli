@@ -80,7 +80,11 @@ public class CliContext {
     }
 
     public String highlight(String s) {
-        return colors.BLUE_300.useOrQuote(s);
+        return highlight(s, true);
+    }
+
+    public String highlight(String s, boolean orQuote) {
+        return (orQuote) ? colors.BLUE_300.useOrQuote(s) : colors.BLUE_300.use(s);
     }
 
     public String highlight(Path p) {

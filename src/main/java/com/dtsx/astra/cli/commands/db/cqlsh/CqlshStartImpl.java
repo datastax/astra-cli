@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
@@ -91,7 +92,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
         } catch (IOException e) {
             ctx.log().exception(e);
 
-            throw new AstraCliException("""
+            throw new AstraCliException(IO_ISSUE, """
               @|bold,red Error: Attempted to read from standard input, but something went wrong:|@
             
               "%s"

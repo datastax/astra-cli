@@ -60,7 +60,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     comment = "Specify the file to create/update",
     command = "${cli.name} db create-dotenv -f .env.local"
 )
-public class DbCreateDotEnv extends AbstractPromptForDbCmd<CreateDotEnvResult> {
+public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     @Option(
         names = { "--print" },
         description = { "Output the .env file to stdout instead of saving it to the .env file.", DEFAULT_VALUE },

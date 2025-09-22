@@ -6,9 +6,11 @@ import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 
 import java.util.List;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.STATUS_ISSUE;
+
 public class UnexpectedDbStatusException extends AstraCliException {
     public UnexpectedDbStatusException(DbRef ref, DatabaseStatusType got, List<DatabaseStatusType> expected) {
-        super("""
+        super(STATUS_ISSUE, """
             @|bold,red Database %s has unexpected status '%s'.|@
             
             Expected one of: %s

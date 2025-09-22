@@ -51,7 +51,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     public static class Meta implements SelectionStrategy.Meta.Closed {
         @Override
         public boolean isSupported(CliContext ctx) {
-            return ctx.outputIsHuman() && ctx.isTty() && ctx.isNotWindows() && ctx.ansiEnabled();
+            return ctx.isTty() && ctx.isNotWindows() && ctx.ansiEnabled();
         }
         
         @Override
@@ -82,22 +82,22 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private void showPromptAndStartSelector() {
-        ctx.console().println(fixedPrompt);
-        ctx.console().print(HIDE_CURSOR);
+        ctx.console().errorln(fixedPrompt);
+        ctx.console().error(HIDE_CURSOR);
         redraw();
     }
     
     private void redraw() {
         if (filteredOptions.isEmpty()) {
-            ctx.console().printf("\r%s%s%n", ctx.colors().NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
-            ctx.console().printf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
+            ctx.console().errorf("\r%s%s%n", ctx.colors().NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
+            ctx.console().errorf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
         } else {
             val defaultIndex = req.defaultOption().map(filteredOptions::indexOf);
 
             for (int i = 0; i < filteredOptions.size(); i++) {
                 drawOption(i, defaultIndex.isPresent() && defaultIndex.get() == i);
             }
-            ctx.console().printf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
+            ctx.console().errorf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
         }
     }
     
@@ -114,7 +114,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
             ? ctx.colors().PURPLE_300.use(" (default)")
             : "";
 
-        ctx.console().printf("\r%s %s%s%n", prefix, optionStr, isDefaultStr);
+        ctx.console().errorf("\r%s %s%s%n", prefix, optionStr, isDefaultStr);
     }
     
     private String highlightMatch(String option) {
@@ -214,7 +214,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
             clearSelector();
 
             if (!req.clearAfterSelection()) {
-                ctx.console().printf("@!> %s!@\r\n\r\n", selected);
+                ctx.console().errorf("@!> %s!@\r\n\r\n", selected);
             }
             
             return Optional.of(req.mapper().apply(selected));
@@ -259,13 +259,13 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
         val lastDrawnLines = Math.max(filteredOptions.size(), 1) + 2;
 
         for (int i = 0; i < lastDrawnLines; i++) {
-            ctx.console().print(MOVE_UP_CLEAR);
+            ctx.console().error(MOVE_UP_CLEAR);
         }
     }
     
     private void clearPrompt() {
         for (int i = 0; i < fixedPrompt.split("\n").length; i++) {
-            ctx.console().print(MOVE_UP_CLEAR);
+            ctx.console().error(MOVE_UP_CLEAR);
         }
     }
     
@@ -306,7 +306,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private void cleanup(Thread shutdownHook) {
-        ctx.console().print(SHOW_CURSOR);
+        ctx.console().error(SHOW_CURSOR);
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
         disableRawMode();
     }

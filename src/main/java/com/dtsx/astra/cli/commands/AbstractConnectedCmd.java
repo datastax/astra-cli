@@ -20,6 +20,7 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,7 +88,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             return cachedProfile = new Profile(Optional.empty(), $credsProvider.$creds.$token, $credsProvider.$creds.$env.orElse(AstraEnvironment.PROD));
         }
 
-        val profileName = ($credsProvider != null && $credsProvider.$config != null && $credsProvider.$config.$profileName.isPresent())
+        val targetProfileName = ($credsProvider != null && $credsProvider.$config != null && $credsProvider.$config.$profileName.isPresent())
             ? $credsProvider.$config.$profileName.get()
             : ProfileName.DEFAULT;
 
@@ -95,7 +96,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             ? AstraConfig.readAstraConfigFile(ctx, $credsProvider.$config.$configFile.orElse(null), false)
             : AstraConfig.readAstraConfigFile(ctx, null, false);
 
-        val profile = config.lookupProfile(profileName);
+        val profile = config.lookupProfile(targetProfileName);
 
         if (profile.isEmpty()) {
             val filePath = config.backingFile();
@@ -121,7 +122,28 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 ), hints);
             }
 
-            if (profileName.isDefault()) {
+            if (targetProfileName.isDefault()) {
+                val MAX_PROFILES_IN_HINT = 3;
+
+                var profileNames = config.getValidatedProfiles().stream()
+                    .filter(p -> p.name().isPresent())
+                    .map(p -> p.name().get().unwrap())
+                    .limit(MAX_PROFILES_IN_HINT)
+                    .toList();
+
+                if (config.getValidatedProfiles().size() > MAX_PROFILES_IN_HINT) {
+                    profileNames = new ArrayList<>(profileNames);
+                    profileNames.add("...");
+                }
+
+                val profileNamesHint = profileNames.stream()
+                    .reduce((a, b) -> a + "|" + b)
+                    .orElse("<name>");
+
+                val useProfileNameHint = (profileNames.size() == 1)
+                    ? " " + profileNamesHint
+                    : "";
+
                 throw new AstraCliException(PROFILE_NOT_FOUND, """
                   @|bold,red Error: No default profile exists in your .astrarc file.|@
           
@@ -129,8 +151,8 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 """.formatted(
                     ctx.highlight(filePath)
                 ), List.of(
-                    new Hint("Set a profile as default:", "${cli.name} config use" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile())),
-                    new Hint("Specify a profile to use:", originalArgs(), "--profile <name>")
+                    new Hint("Set a profile as default:", "${cli.name} config use" + useProfileNameHint + (isDefaultConfigFile ? "" : " -cf " + config.backingFile())),
+                    new Hint("Specify a profile to use:", originalArgs(), "--profile " + profileNamesHint)
                 ));
             } else {
                 throw new AstraCliException(PROFILE_NOT_FOUND, """
@@ -138,7 +160,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                
                   > Using configuration file at %s
                 """.formatted(
-                    profileName.unwrap(),
+                    targetProfileName.unwrap(),
                     ctx.highlight(filePath)
                 ), List.of(
                     new Hint("List available profiles:", "${cli.name} config list" + (isDefaultConfigFile ? "" : " -cf " + config.backingFile()))

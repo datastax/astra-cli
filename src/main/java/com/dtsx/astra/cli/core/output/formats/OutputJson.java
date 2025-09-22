@@ -31,7 +31,7 @@ public interface OutputJson {
             Fields.CODE, code,
             Fields.MESSAGE, trimIndent(message.toString()),
             Fields.DATA, Optional.ofNullable(data).map(OutputSerializer::serializeAsJson),
-            Fields.NEXT_STEPS, Optional.ofNullable(nextSteps)
+            Fields.NEXT_STEPS, Optional.ofNullable(nextSteps).filter(l -> !l.isEmpty())
         ));
     }
 

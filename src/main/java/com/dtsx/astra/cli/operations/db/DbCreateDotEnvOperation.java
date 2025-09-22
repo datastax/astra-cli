@@ -36,6 +36,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.PARSE_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.CreateDotEnvResult;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.EnvKey.*;
 
@@ -306,7 +307,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
     public static class EnvParseExceptionWrapper extends AstraCliException {
         public EnvParseExceptionWrapper(EnvParseException e, Path file) {
-            super("@|bold,red An error occurred parsing the .env file '%s':|@%n%n%s".formatted(file, e.getMessage()));
+            super(PARSE_ISSUE, "@|bold,red An error occurred parsing the .env file '%s':|@%n%n%s".formatted(file, e.getMessage()));
         }
     }
 }
