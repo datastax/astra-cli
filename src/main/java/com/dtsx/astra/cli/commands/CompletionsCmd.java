@@ -1,9 +1,11 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.completions.DynamicCompletion;
+import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
@@ -18,12 +20,14 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 @Command(
     name = "completions",
     aliases = { "compgen" },
-    mixinStandardHelpOptions = true,
     hidden = true
 )
 public class CompletionsCmd implements Runnable {
     @Spec
     private CommandSpec spec;
+
+    @Mixin
+    private HelpMixin helpMixin;
 
     @Option(
         names = { "-n", "--cli-name" },

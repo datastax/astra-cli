@@ -6,9 +6,13 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledExcepti
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.UpgradeOperation;
+import com.dtsx.astra.cli.operations.UpgradeOperation.LatestVersion;
+import com.dtsx.astra.cli.operations.UpgradeOperation.SpecificVersion;
 import com.dtsx.astra.cli.operations.UpgradeOperation.UpgradeRequest;
+import com.dtsx.astra.cli.operations.UpgradeOperation.VersionType;
 import lombok.SneakyThrows;
 import lombok.val;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -22,11 +26,23 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     description = "Upgrade your Astra CLI installation"
 )
 public class UpgradeCmd extends AbstractCmd<Unit> {
-    @Option(
-        names = { "-t", "--tag" },
-        description = "Version to upgrade to (default: latest)"
-    )
-    public Optional<String> $version;
+    @ArgGroup
+    public VersionMod $versionMod;
+
+    public static class VersionMod {
+        @Option(
+            names = { "-V", "--version" },
+            description = "Version to upgrade to (default: latest)",
+            paramLabel = "TAG"
+        )
+        public Optional<String> $specificVersion;
+
+        @Option(
+            names = { "--pre", "--prerelease" },
+            description = "Include pre-releases when looking for the latest version"
+        )
+        public boolean $includePreReleases;
+    }
 
     @Option(
         names = { "-y", "--yes" },
@@ -56,28 +72,38 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
             renderComment(ctx.colors(), "The current executable will be replaced by the new one,"),
             renderComment(ctx.colors(), "But in the case the move fails, you can manually run the following:"),
             renderCommand(ctx.colors(), moveCommand),
-            renderComment(ctx.colors(), "Check if the installation was successful by running (should be v" + version + "):"),
+            renderComment(ctx.colors(), "Check if the installation was successful by running the follwing:"),
             renderCommand(ctx.colors(), "astra --version")
         );
 
         ctx.console().println(trimIndent(infoMsg));
 
-        if (!$yes) {
-            val proceed = ctx.console().confirm(NL + NL + "Do you want to proceed?")
-                .defaultYes()
-                .fallbackFlag("--yes")
-                .fix(originalArgs(), "--yes")
-                .clearAfterSelection();
+        if ($yes) {
+            return;
+        }
 
-            if (!proceed) {
-                throw new ExecutionCancelledException();
-            }
+        val proceed = ctx.console().confirm(NL + NL + "Do you want to proceed?")
+            .defaultYes()
+            .fallbackFlag("--yes")
+            .fix(originalArgs(), "--yes")
+            .clearAfterSelection();
+
+        if (!proceed) {
+            throw new ExecutionCancelledException();
         }
     }
 
     @Override
     protected Operation<Unit> mkOperation() {
         val downloadsGateway = ctx.gateways().mkDownloadsGateway(ctx);
-        return new UpgradeOperation(ctx, downloadsGateway, new UpgradeRequest($version, this::confirmUpgrade));
+
+        final VersionType versionType =
+            ($versionMod == null)
+                ? new LatestVersion(false) :
+            ($versionMod.$specificVersion != null && $versionMod.$specificVersion.isPresent())
+                ? new SpecificVersion($versionMod.$specificVersion.get())
+                : new LatestVersion($versionMod.$includePreReleases);
+
+        return new UpgradeOperation(ctx, downloadsGateway, new UpgradeRequest(versionType, this::confirmUpgrade));
     }
 }

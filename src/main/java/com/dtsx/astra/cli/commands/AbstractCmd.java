@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -30,8 +31,6 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 
 @Command(
-    versionProvider = CliProperties.class,
-    mixinStandardHelpOptions = true,
     commandListHeading = "%nCommands:%n",
     descriptionHeading = "%n",
     footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
@@ -40,6 +39,9 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     public static final String DEFAULT_START = "  @|faint (default: |@@|faint,italic ";
     public static final String DEFAULT_END = "|@@|faint )|@";
     public static final String DEFAULT_VALUE = DEFAULT_START + "${DEFAULT-VALUE}" + DEFAULT_END;
+
+    @Mixin
+    private HelpMixin helpMixin;
 
     @Spec
     protected CommandSpec spec;

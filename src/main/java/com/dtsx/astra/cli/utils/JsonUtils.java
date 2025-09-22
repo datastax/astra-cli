@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.utils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -44,6 +45,11 @@ public class JsonUtils {
     @SneakyThrows
     public static <T> T readValue(String body, Class<T> ref) {
         return objectMapper().readValue(body, ref);
+    }
+
+    @SneakyThrows
+    public static JsonNode readTree(String body) {
+        return objectMapper().readTree(body);
     }
 
     @SneakyThrows

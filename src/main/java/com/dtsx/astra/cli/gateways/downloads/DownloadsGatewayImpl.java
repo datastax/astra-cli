@@ -50,24 +50,24 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) {
-        return installGenericArchive(ctx.home().Dirs.useCqlsh(), cqlsh.url(), "cqlsh", ctx);
+        return installGenericArchive(ctx.home().Dirs.useCqlsh(), cqlsh.url(), cqlsh.version(), "cqlsh", ctx);
     }
 
     @Override
     public Either<String, Path> downloadDsbulk(ExternalSoftware dsbulk) {
-        return installGenericArchive(ctx.home().Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), "dsbulk", ctx);
+        return installGenericArchive(ctx.home().Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), dsbulk.version(), "dsbulk", ctx);
     }
 
     @Override
     public Either<String, Path> downloadPulsarShell(ExternalSoftware pulsar) {
-        return installGenericArchive(ctx.home().Dirs.usePulsar(pulsar.version()), pulsar.url(), "pulsar-shell", ctx);
+        return installGenericArchive(ctx.home().Dirs.usePulsar(pulsar.version()), pulsar.url(), pulsar.version(), "pulsar-shell", ctx);
     }
 
     @Override
     public Either<String, Path> downloadAstra(ExternalSoftware astra) {
         try {
             val tmpDir = Files.createTempDirectory(ctx.path(System.getProperty("java.io.tmpdir")), "astra-cli-upgrade-");
-            return installGenericArchive(tmpDir, astra.url(), "astra", ctx);
+            return installGenericArchive(tmpDir, astra.url(), astra.version(), "astra", ctx);
         } catch (Exception e) {
             return Either.left("Failed to create temporary directory in %s: '%s'".formatted(System.getProperty("java.io.tmpdir"), e.getMessage()));
         }
@@ -100,7 +100,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @SneakyThrows
-    private Either<String, Path> installGenericArchive(Path installDir, String url, String exe, CliContext ctx) {
+    private Either<String, Path> installGenericArchive(Path installDir, String url, String version, String exe, CliContext ctx) {
         if (Files.isRegularFile(installDir)) {
             return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
         }
@@ -123,7 +123,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
-            ctx.log().loading("Downloading @!" + exe + "!@, please wait", (_) -> {
+            ctx.log().loading("Downloading @!" + exe + " v" + version + "!@, please wait", (_) -> {
                 FileUtils.downloadFile(url, archiveFile);
                 return null;
             });
@@ -133,7 +133,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
-            ctx.log().loading("Extracting @!" + exe + "!@ archive, please wait", (_) -> {
+            ctx.log().loading("Extracting @!" + exe  + " v" + version+ "!@, please wait", (_) -> {
                 if (archiveFile.endsWith(".zip")) {
                     FileUtils.extractZipArchiveInPlace(archiveFile, ctx);
                 } else {

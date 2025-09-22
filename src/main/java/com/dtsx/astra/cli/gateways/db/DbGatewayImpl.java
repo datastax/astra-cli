@@ -12,18 +12,13 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
+import com.dtsx.astra.cli.utils.HttpUtils;
 import com.dtsx.astra.sdk.db.domain.*;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.val;
 import org.graalvm.collections.Pair;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map.Entry;
@@ -93,36 +88,18 @@ public class DbGatewayImpl implements DbGateway {
         };
     }
 
-    @SneakyThrows
     private void resumeDbInternal(DbRef ref) {
-        try {
-            val endpoint = api.restApiEndpoint(ref, env) + "/v2/schemas/keyspace";
+        val endpoint = api.restApiEndpoint(ref, env) + "/v2/schemas/keyspace";
 
-            @Cleanup val client = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .connectTimeout(Duration.ofSeconds(20))
-                .build();
+        val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("X-Cassandra-Token", token.unsafeUnwrap()));
 
-            val request = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
-                .timeout(Duration.ofSeconds(20))
-                .header("Content-Type", "application/json")
-                .header("X-Cassandra-Token", token.unsafeUnwrap())
-                .GET()
-                .build();
-
-            val response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 500) {
-                throw new AstraCliException("""
-                  @|bold,red An error occurred while attempting to resume database %s|@
-                
-                  The server returned the following response:
-                  %s
-                """.formatted(ref, response.body()));
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        if (response.statusCode() >= 400) {
+            throw new AstraCliException("""
+              @|bold,red An error occurred while attempting to resume database %s|@
+            
+              The server returned the following response:
+              %s
+            """.formatted(ref, response.body()));
         }
     }
 

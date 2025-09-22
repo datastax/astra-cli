@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliEnvironment;
+import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Ref;
@@ -24,6 +25,7 @@ import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.JansiUtils;
+import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
@@ -39,6 +41,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IFactory;
+import picocli.CommandLine.Option;
 
 import java.nio.file.FileSystems;
 import java.util.Optional;
@@ -79,8 +82,19 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "${cli.name} db create demo -r us-east1 --vector"
 )
 public class AstraCli extends AbstractCmd<Void> {
+    @Option(
+        names = { "-V", "--version" },
+        description = "Print version information and exit.",
+        versionHelp = true
+    )
+    private boolean versionRequested;
+
     @Override
     public final OutputHuman executeHuman(Supplier<Void> v) {
+        if (versionRequested) {
+            return OutputHuman.response(CliProperties.version());
+        }
+
         ctx.log().banner();
 
         val sj = new StringJoiner(NL);
@@ -90,6 +104,14 @@ public class AstraCli extends AbstractCmd<Void> {
         sj.add(spec.commandLine().getUsageMessage());
 
         return OutputHuman.response(sj);
+    }
+
+    @Override
+    protected OutputAll execute(Supplier<Void> v) {
+        if (versionRequested) {
+            return OutputAll.response(CliProperties.version());
+        }
+        return super.execute(v);
     }
 
     @Override
