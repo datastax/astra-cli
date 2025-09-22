@@ -107,7 +107,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         val suffix = (ctx.isWindows()) ? ".zip" : ".tar.gz";
 
-        val archiveFile = installDir.getParent().resolve(exe + "-download" + suffix);
+        val archiveFile = installDir.resolve(exe + "-download" + suffix);
         val exeFile = installDir.resolve("bin/" + exe);
 
         if (PathUtils.isRegularFile(exeFile) && !PathUtils.isEmptyFile(exeFile)) {
@@ -119,21 +119,21 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             Files.deleteIfExists(archiveFile);
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to clean existing " + exe + " installation in %s: '%s'".formatted(installDir, e.getMessage()));
+            return Either.left("Failed to clean existing " + exe + " installation in %s (%s): '%s'".formatted(installDir, e.getClass().getSimpleName(), e.getMessage()));
         }
 
         try {
-            ctx.log().loading("Downloading " + exe + ", please wait", (_) -> {
+            ctx.log().loading("Downloading @!" + exe + "!@, please wait", (_) -> {
                 FileUtils.downloadFile(url, archiveFile);
                 return null;
             });
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to download " + exe + " archive from %s: '%s'".formatted(url, e.getMessage()));
+            return Either.left("Failed to download " + exe + " archive from %s (%s): '%s'".formatted(url, e.getClass().getSimpleName(), e.getMessage()));
         }
 
         try {
-            ctx.log().loading("Extracting " + exe + " archive, please wait", (_) -> {
+            ctx.log().loading("Extracting @!" + exe + "!@ archive, please wait", (_) -> {
                 if (archiveFile.endsWith(".zip")) {
                     FileUtils.extractZipArchiveInPlace(archiveFile, ctx);
                 } else {
@@ -143,7 +143,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             });
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to extract " + exe + " archive %s: '%s'".formatted(archiveFile, e.getMessage()));
+            return Either.left("Failed to extract " + exe + " archive %s (%s): '%s'".formatted(archiveFile, e.getClass().getSimpleName(), e.getMessage()));
         }
 
         try {
@@ -156,14 +156,14 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             // at least we can die happy, knowing that we tried...
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to set execute permissions on %s: '%s'".formatted(exeFile, e.getMessage()));
+            return Either.left("Failed to set execute permissions on %s (%s): '%s'".formatted(exeFile, e.getClass().getSimpleName(), e.getMessage()));
         }
 
         try {
             Files.delete(archiveFile);
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to delete temporary " + exe + " archive %s: '%s'".formatted(archiveFile, e.getMessage()));
+            return Either.left("Failed to delete temporary " + exe + " archive %s (%s): '%s'".formatted(archiveFile, e.getClass().getSimpleName(), e.getMessage()));
         }
 
         return Either.pure(exeFile);

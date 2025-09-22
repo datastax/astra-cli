@@ -5,36 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigPathCmd.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/home/ConfigHomeCmd.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/home/ConfigHomePathCmd.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/config/ConfigPathOperation.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/config/home/ConfigHomePathOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/datatypes/Unit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/dev-alias.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/dev-alias.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/install/unix.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/install/unix.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliConstants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraHome.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/ExceptionHandlerUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/ExceptionHandlerUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraColors.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraColors.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraLogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/ExitCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/ExitCode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGateway.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGatewayImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/FileUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/FileUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/integration/core/CliPropertiesIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/integration/core/CliPropertiesIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/extensions/context/TestCliContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/extensions/context/TestCliContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/static.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/static.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -511,7 +491,7 @@
       <workItem from="1757108501819" duration="16000" />
       <workItem from="1757108576615" duration="117167000" />
       <workItem from="1757961318974" duration="2127000" />
-      <workItem from="1758218580137" duration="43740000" />
+      <workItem from="1758218580137" duration="47826000" />
     </task>
     <servers />
   </component>

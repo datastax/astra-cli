@@ -127,7 +127,7 @@ public class AstraColors {
     public final AstraColor YELLOW_300 = new AstraColor(223, 161, 67);
     public final AstraColor YELLOW_500 = new AstraColor(162, 91, 39);
 
-    public final AstraColor GREEN_300 = new AstraColor(128, 189, 244);
+    public final AstraColor GREEN_300 = new AstraColor(31, 201, 28);
     public final AstraColor GREEN_500 = new AstraColor(61, 126, 64);
 
     public final AstraColor BLUE_300 = new AstraColor(129, 163, 231);

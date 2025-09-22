@@ -110,7 +110,7 @@ public class AstraLogger {
             names = { "--spinner" },
             description = "Enable/disable the loading spinner",
             negatable = true,
-            defaultValue = "${cli.output.spinner.default:true}",
+            defaultValue = "${cli.output.spinner.default}",
             fallbackValue = "true"
         )
         private boolean enableSpinner;

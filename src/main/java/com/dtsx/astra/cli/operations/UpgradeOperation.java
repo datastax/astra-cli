@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
+import com.dtsx.astra.cli.core.datatypes.Unit;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -23,8 +24,10 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import static com.dtsx.astra.cli.core.datatypes.Unit.Unit;
+
 @RequiredArgsConstructor
-public class UpgradeOperation implements Operation<Void> {
+public class UpgradeOperation implements Operation<Unit> {
     private final CliContext ctx;
     private final DownloadsGateway downloadsGateway;
     private final UpgradeRequest request;
@@ -35,7 +38,7 @@ public class UpgradeOperation implements Operation<Void> {
     ) {}
 
     @Override
-    public Void execute() {
+    public Unit execute() {
         val currentExePath = resolveCurrentExePath();
 
         if (!Files.isWritable(currentExePath)) {
@@ -45,27 +48,25 @@ public class UpgradeOperation implements Operation<Void> {
         }
 
         val version = ctx.log().loading("Resolving the version to download", (_) -> (
-            "v" + resolveReleaseVersion(request.version()).replaceFirst("^[vV]", "")
+            resolveReleaseVersion(request.version()).replaceFirst("^[vV]", "").trim()
         ));
 
         val platform = resolveCurrentPlatform();
 
-        val newExePath = ctx.log().loading("Downloading astra-cli " + version, (_) -> (
-            downloadsGateway.downloadAstra(new ExternalSoftware(
-                "api.github.com/repos/" + CliProperties.cliGithubRepo() + "/releases/download/v" + version + "/" + CliProperties.cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
-                version
-            ))
+        val newExePath = downloadsGateway.downloadAstra(new ExternalSoftware(
+            "https://github.com/" + CliProperties.cliGithubRepo() + "/releases/download/v" + version + "/" + CliProperties.cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
+            version
         ));
 
         if (newExePath.isLeft()) {
             throw new AstraCliException(ExitCode.DOWNLOAD_ISSUE, """
-              @|bold,red An error occurred while downloading the new version of Astra CLI (%s): %s|@
-            """.formatted(version, newExePath));
+              @|bold,red An error occurred while downloading the new version of Astra CLI (v%s): %s|@
+            """.formatted(version, newExePath.getLeft()));
         }
 
         val backupMvCmd = ctx.isWindows()
-            ? "rename %s %s.bak".formatted(currentExePath, newExePath)
-            : "mv %s %s.bak".formatted(currentExePath, newExePath);
+            ? "rename %s %s.bak".formatted(newExePath.getRight(), currentExePath)
+            : "mv %s %s.bak".formatted(newExePath.getRight(), currentExePath);
 
         request.confirmUpgrade().accept(version, backupMvCmd);
 
@@ -75,7 +76,7 @@ public class UpgradeOperation implements Operation<Void> {
     }
 
     @SneakyThrows
-    private Void upgradeWindowsExe(Path exePath) {
+    private Unit upgradeWindowsExe(Path exePath) {
         val pid = ProcessHandle.current().pid();
 
         new ProcessBuilder("cmd.exe", "/c", """
@@ -87,11 +88,11 @@ public class UpgradeOperation implements Operation<Void> {
             resolveCurrentExePath()
         )).start();
 
-        return null;
+        return Unit;
     }
 
     @SneakyThrows
-    private Void upgradeUnixBinary(Path exePath) {
+    private Unit upgradeUnixBinary(Path exePath) {
         new ProcessBuilder("sh", "-c", """
           mv -f "%s" "%s" && chmod +x "%s"
         """.formatted(
@@ -100,7 +101,7 @@ public class UpgradeOperation implements Operation<Void> {
             resolveCurrentExePath()
         )).start();
 
-        return null;
+        return Unit;
     }
 
     private Path resolveCurrentExePath() {
@@ -116,9 +117,9 @@ public class UpgradeOperation implements Operation<Void> {
     }
 
     private String resolveReleaseVersion(Optional<String> requestedVersion) {
-        return requestedVersion.filter(v -> v.trim().equalsIgnoreCase("latest")).orElseGet(() -> {
+        return requestedVersion.filter(v -> !v.trim().equalsIgnoreCase("latest")).orElseGet(() -> {
             try {
-                val endpoint = "api.github.com/repos/" + CliProperties.cliGithubRepo() + "/releases/latest";
+                val endpoint = "https://api.github.com/repos/" + CliProperties.cliGithubRepo() + "/releases/latest";
 
                 @Cleanup val client = HttpClient.newBuilder()
                     .version(HttpClient.Version.HTTP_2)
@@ -135,11 +136,21 @@ public class UpgradeOperation implements Operation<Void> {
                 val response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
                 if (response.statusCode() == 404) {
-                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, "Cannot find latest release from " + endpoint);
+                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
+                      @|bold,red Error: Cannot find latest release from @|underline %s|@|@
+                    """.formatted(endpoint));
                 }
 
                 if (response.statusCode() != 200) {
-                    throw new AstraCliException(ExitCode.UNCAUGHT, "Error when fetching latest version from " + endpoint + ", status=" + response.statusCode() + ", body=" + response.body());
+                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
+                      @|bold,red An error occurred while fetching the latest release from %s|@
+                    
+                      Status:
+                      @!%d!@
+                    
+                      Body:
+                      %s
+                    """.formatted(endpoint, response.statusCode(), response.body()));
                 }
 
                 val json = JsonUtils.objectMapper().readTree(response.body());
