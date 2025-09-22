@@ -86,8 +86,9 @@ if [ -n "$existing_install_path" ] && [ -f "$existing_install_path/astra" ]; the
   echo ""
   echo "If you want to update the existing installation, please do one of the following:"
   echo "${BLUE}→ ${LIGHT_GRAY}(< astra-cli 1.x)${RESET} Remove the existing installation manually and re-run this installer."
-  echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra update${RESET} to automatically update to the latest version."
+  echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra upgrade${RESET} to automatically update to the latest version."
   echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra nuke${RESET} to completely remove the CLI and then re-run this installer."
+  echo ""
   exit 1
 else
   checklist "No existing installation found."
@@ -172,9 +173,6 @@ else
   rm "$TAR_PATH" "$EXE_PATH" 2>/dev/null || true
   error "\nError: Failed to extract the archive at $(underline "$(tildify "$TAR_PATH")"))."
 fi
-
-# Add to path
-# TODO
 
 # Postlude
 echo ""
