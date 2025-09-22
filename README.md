@@ -32,10 +32,10 @@ The preferred installation method is via the installation script:
 
 ```bash
 # Unix
-curl -sSL https://github.com/toptones/astra-cli-pico/scripts/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.sh | sh
 
 # Windows
-powershell -c "irm https://github.com/toptones/astra-cli-pico/scripts/install.ps1 | iex"
+powershell -c "irm https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.ps1 | iex"
 ```
 
 The CLI can also be downloaded directly from the [releases page](https://github.com/toptobes/astra-cli-pico/releases).
@@ -193,6 +193,12 @@ astra db list --dump-logs /path/to/your/logfile.log
 
 ## What's new
 
+> [!NOTE]
+> This section focuses on what is strictly *new* in the 1.0.0 version of the CLI; any *changed* behavior is documented in the ["What's changed" section](#whats-changed).
+
 ## What's changed
+
+> [!NOTE]
+> This section focuses on what has strictly *changed* in the 1.0.0 version of the CLI; any *new* behavior is documented in the ["What's new" section](#whats-new).
 
 ## Troubleshooting
