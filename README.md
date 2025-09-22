@@ -11,17 +11,27 @@ Astra CLI provides a command line interface in a terminal to operate DataStax As
 
 - [Installation](#installation)
     - [Upgrading](#upgrading)
-    - [MacOS warning](#macos-warning)
+    - [MacOS warning](#-macos-warning)
     - [Uninstalling](#uninstalling)
 - [Setup](#setup)
     - [Using the CLI without a credentials file](#using-the-cli-without-a-credentials-file)
 - [Customization](#customization)
     - [Home folder location](#home-folder-location)
-    - [`.astrarc` location](#.astrarc-location)
+    - [`.astrarc` location](#astrarc-location)
     - [Response format](#response-format)
     - [Output level](#output-level)
 - [What's new](#whats-new)
+    - [Windows support](#windows-support)
+    - [Improved output and interactivity](#improved-output-and-interactivity)
+    - [New commands](#new-commands)
+    - [Extended completions](#extended-completions)
 - [What's changed](#whats-changed)
+    - [Output format + exit code changes](#output-format--exit-code-changes)
+    - [Consistent flag names and behavior](#consistent-flag-names-and-behavior)
+    - [Stricter input + flag validation](#stricter-input--flag-validation)
+    - [Minor command rearrangements](#minor-command-rearrangements)
+    - [XDG spec compliance](#xdg-spec-compliance)
+    - [Misc changes + bug fixes](#misc-changes--bug-fixes)
 - [Troubleshooting](#troubleshooting)
 
 ## Installation
@@ -211,7 +221,7 @@ The CLI now has a much more user-friendly output style, with colors, spinners, p
 <details>
   <summary><strong>Prompting</strong></summary>
 
-  Rather than fail on missing required input, or going ahead and performing destructive actions without your confirmation, the CLI will try to prompt you for information whenever necessary.
+  Rather than fail on missing information, or going ahead and performing destructive actions without your confirmation, the CLI will try to prompt you for information whenever necessary.
 
   If you are using non-human output formats, or have disabled prompts via the `--no-input` flag, then any required input must be provided via flags, or the command will error out.
   - Fortunately, the CLI will tell you exactly what needs to be done!
@@ -451,13 +461,29 @@ Some commands, namely the ones that build on `cqlsh`, `dsbulk`, and `pulsar-shel
     astra db cqlsh exec mydb -k my_keyspace "SELECT * FROM my_table"
     astra db cqlsh exec mydb -k my_keyspace -f ./my_script.cql
     ```
-  - `astra db cqlsh path` (new feature) – Prints the path to the `cqlsh` script that is used by the CLI, which may be useful for advanced use cases involving using `cqlsh` directly.
+  - `astra db cqlsh version` – Prints the version of `cqlsh` that is used by the CLI.
     ```bash
-    $(astra db cqlsh path) --version
+    # v0.x
+    astra db cqlsh --version
+    
+    # v1.x
+    astra db cqlsh version
     ```
-  - `astra db cqlsh version` – Prints the version of `cqlsh` that is used by the CLI, replacing `astra db cqlsh --version`.
+  - `astra db cqlsh path` (new feature) – Prints the path to the `cqlsh` script that is used by the CLI, installing it if necessary.
     ```bash
-    astra
+    # v0.x
+    ls ~/.astra
+    ls ~/.astra/cqlsh-atra # oops, typo
+    ls ~/.astra/cqlsh-astra
+    ls ~/.astra/cqlsh-astra/bin
+    clear
+    ~/.astra/cqlsh/bin/cqlsh --help # oh shoot was that not the path??
+    ls ~/.astra/cqlsh-astra/bin
+    clear
+    ~/.astra/cqlsh-astra/bin/cqlsh --help # if only there was an easier way...
+    
+    # v1.x
+    $(astra db cqlsh path) --help
     ```
 
 </details>
@@ -465,13 +491,47 @@ Some commands, namely the ones that build on `cqlsh`, `dsbulk`, and `pulsar-shel
 <details>
   <summary><strong>dsbulk</strong></summary>
 
+  The `astra db (count|load|unload)` commands have been moved under `astra db dsbulk` subcommand.
 
+  The commands themselves are otherwise unchanged, but now are part of the family of `dsbulk` commands, including:
+  - `astra db dsbulk count`
+       ```bash
+    # v0.x
+    astra db count mydb [...options]
+    
+    # v1.x
+    astra db dsbulk count mydb [...options]
+    ```
+  - `astra db dsbulk load`
+    ```bash
+    # v0.x
+    astra db load mydb [...options]
+    
+    # v1.x
+    astra db dsbulk load mydb [...options]
+    ```
+  - `astra db dsbulk unload`
+    ```bash
+    # v0.x
+    astra db unload mydb [...options]
+    
+    # v1.x
+    astra db dsbulk unload mydb [...options]
+    ```
+  - `astra db dsbulk version` (new feature) – Prints the version of `dsbulk` that is used by the CLI.
+    ```bash
+    # Not available in v0.x
+    astra db dsbulk version
+    ```
+  - `astra db dsbulk path` (new feature) – Prints the path to the `dsbulk` binary that is used by the CLI, installing it if necessary.
+    ```bash
+    # Not available in v0.x
+    $(astra db dsbulk path) --help
+    ```
 </details>
 
 <details>
   <summary><strong>pulsar-shell</strong></summary>
-
-
 </details>
 
 ### XDG spec compliance
