@@ -75,7 +75,7 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbInfo> {
             put("Cloud Provider", dbInfo.getInfo().getCloudProvider());
             put("Region", dbInfo.getInfo().getRegion());
             put("Status", dbInfo.getStatus());
-            put("Vector", dbInfo.getInfo().getDbType().equals("vector") ? "Enabled" : "Disabled");
+            put("Vector", Optional.ofNullable(dbInfo.getInfo().getDbType()).orElse("").equals("vector") ? "Enabled" : "Disabled");
             put("Default Keyspace", dbInfo.getInfo().getKeyspace());
             put("Creation Time", dbInfo.getCreationTime());
             put("Keyspaces", dbInfo.getInfo().getKeyspaces().stream().sorted().toList());

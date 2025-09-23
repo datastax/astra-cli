@@ -35,6 +35,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -83,15 +84,15 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 public class AstraCli extends AbstractCmd<Void> {
     @Option(
-        names = { "-V", "--version" },
+        names = { "-v", "--version" },
         description = "Print version information and exit.",
         versionHelp = true
     )
-    private boolean versionRequested;
+    private boolean $versionRequested;
 
     @Override
     public final OutputHuman executeHuman(Supplier<Void> v) {
-        if (versionRequested) {
+        if ($versionRequested) {
             return OutputHuman.response(CliProperties.version());
         }
 
@@ -108,7 +109,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @Override
     protected OutputAll execute(Supplier<Void> v) {
-        if (versionRequested) {
+        if ($versionRequested) {
             return OutputAll.response(CliProperties.version());
         }
         return super.execute(v);
@@ -139,7 +140,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @Getter
     @Accessors(fluent = true)
-    private static Supplier<CliContext> unsafeGlobalCliContext;
+    private static @Nullable Supplier<CliContext> unsafeGlobalCliContext;
 
     @SneakyThrows
     @VisibleForTesting
@@ -187,11 +188,11 @@ public class AstraCli extends AbstractCmd<Void> {
             private final IFactory defaultFactory = CommandLine.defaultFactory();
 
             @Override
-            public <K> K create(Class<K> cls) throws Exception {
+            public <K> K create(Class<K> cls) throws Exception { // I miss having proper rank2 type support
                 val created = defaultFactory.create(cls);
 
-                if (created instanceof AbstractCmd<?> acmd) {
-                    acmd.initCtx(ctxRef);
+                if (created instanceof AbstractCmd<?> cmd) {
+                    cmd.initCtx(ctxRef);
                 }
 
                 return created;

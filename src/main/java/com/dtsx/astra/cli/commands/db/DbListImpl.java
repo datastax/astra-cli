@@ -18,7 +18,7 @@ import static com.dtsx.astra.cli.operations.db.DbListOperation.DbListRequest;
 import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
-    @Option(names = { "--vector" }, description = "Only show vector-enabled databases")
+    @Option(names = { "-v", "--vector" }, description = "Only show vector-enabled databases")
     public boolean $vectorOnly;
 
     @Override

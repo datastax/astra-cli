@@ -93,7 +93,7 @@ public class AstraLogger {
     public static class Mixin {
         @Getter
         @Option(
-            names = { "-v", "--verbose" },
+            names = { "-V", "--verbose" },
             description = "Enable verbose logging output"
         )
         private boolean verbose;

@@ -42,7 +42,7 @@ The preferred installation method is via the installation script:
 
 ```bash
 # Unix
-curl -sSL https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.sh | sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.sh)"
 
 # Windows
 powershell -c "irm https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.ps1 | iex"

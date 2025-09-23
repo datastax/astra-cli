@@ -31,7 +31,7 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
 
     public static class VersionMod {
         @Option(
-            names = { "-V", "--version" },
+            names = { "-v", "--version" },
             description = "Version to upgrade to (default: latest)",
             paramLabel = "TAG"
         )
