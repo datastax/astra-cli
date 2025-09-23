@@ -148,7 +148,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
         throw new AstraCliException(TENANT_ALREADY_EXISTS, """
           @|bold,red Error: Tenant %s already exists and has status %s.|@
         
-          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the tenant already exists.
+          To ignore this error, provide the @'!--if-not-exists!@ flag to skip this error if the tenant already exists.
         """.formatted(
             tenantName,
             currStatus

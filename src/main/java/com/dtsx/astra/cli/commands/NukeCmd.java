@@ -16,8 +16,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
-import static com.dtsx.astra.cli.utils.StringUtils.capitalize;
+import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "nuke",
@@ -69,17 +68,21 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             ? """
               To complete the uninstallation, please run the following command in your terminal:
               
-              @|faint # If not installed via a package manager|@
-              @!%s!@
+              %s
+              %s
               
-              @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
-              """.formatted(res.finalDeleteCmd().get())
+              @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!Nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
+              """.formatted(
+                renderComment(ctx.colors(), "If not installed via a package manager"),
+                renderCommand(ctx.colors(), res.finalDeleteCmd().get())
+              )
             : """
               To complete the uninstallation, manually delete the Astra CLI binary from your system.
               
               @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
               """;
 
+        // TODO update astra files location dynamically
         if (res.deletedFiles().isEmpty() && res.updatedFiles().isEmpty() && res.skipped().values().stream().allMatch(r -> r instanceof SkipReason.NotFound)) {
             return OutputAll.response("""
             @|bold Nothing to nuke; no trace of Astra CLI was found.|@
@@ -149,7 +152,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         throw new AstraCliException(EXECUTION_CANCELLED, """
           @|bold,red Error: Could not resolve the CLI's name.|@
         
-          Please provide it using the @!--cli-name|-n!@ option.
+          Please provide it using the @'!--cli-name|-n!@ option.
         """, List.of(
             new Hint("Example", "astra-cli nuke -n astra-cli")
         ));
@@ -173,7 +176,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             : "Your credentials @!may be lost!@ if you do. A backup is recommended.";
 
         val prompt = """
-          Do you also want to delete the @!.astrarc!@ file located at @|underline @!%s!@|@?
+          Do you also want to delete the @!.astrarc!@ file located at @|underline @'!%s!@|@?
         
           %s
         """.formatted(file, secondLine);

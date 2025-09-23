@@ -41,7 +41,7 @@ public class ExceptionHandlerUtils {
         
           If necessary, file an issue here: @!https://github.com/datastax/astra-cli/issues/new?template=bug_report.md!@
   
-          A full debug log was generated at @|underline @!%s!@|@
+          A full debug log was generated at @|underline @'!%s!@|@
         """.formatted(
             err.getClass().getSimpleName(),
             withIndent(err.getMessage(), "  @!>!@ "),

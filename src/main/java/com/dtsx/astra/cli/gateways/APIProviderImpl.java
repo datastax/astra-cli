@@ -109,7 +109,7 @@ public class APIProviderImpl implements APIProvider {
                     throw new AstraCliException(UNIQUENESS_ISSUE, """
                       @|bold,red Multiple databases with same name '%s' were found.|@
                     
-                      Please use the target database's ID to resolve the conflict. Use @!${cli.name} db list!@ to see each database's ID.
+                      Please use the target database's ID to resolve the conflict. Use @'!${cli.name} db list!@ to see each database's ID.
                     
                       Alternatively, if the command supports it, you can interactively select the target database by not passing a database identifier at all.
                     """.formatted(name), List.of(

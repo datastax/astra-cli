@@ -80,7 +80,7 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
         throw new AstraCliException(USER_NOT_FOUND, """
           @|bold,red Error: User '%s' does not exist in this organization.|@
 
-          This may be expected, but to avoid this error, pass the @!--if-exists!@ flag to skip this error if the user doesn't exist.
+          This may be expected, but to avoid this error, pass the @'!--if-exists!@ flag to skip this error if the user doesn't exist.
         """.formatted(
             $user
         ), List.of(

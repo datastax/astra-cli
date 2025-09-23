@@ -73,7 +73,7 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
         throw new AstraCliException(TENANT_NOT_FOUND, """
           @|bold,red Error: Tenant '%s' could not be found.|@
         
-          To ignore this error, you can use the @!--if-exists!@ option to avoid failing if the tenant does not exist.
+          To ignore this error, you can use the @'!--if-exists!@ option to avoid failing if the tenant does not exist.
         """.formatted(
             $tenantName
         ), List.of(

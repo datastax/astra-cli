@@ -129,8 +129,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             .toList();
 
         val mainMsg = (wasFailIfExists)
-            ? "The @!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
-            : "To overwrite it, either interactively respond @!yes@! to the prompt, or use the @!--overwrite!@ option to proceed without confirmation.";
+            ? "The @'!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
+            : "To overwrite it, either interactively respond @'!yes@! to the prompt, or use the @'!--overwrite!@ option to proceed without confirmation.";
 
         throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists in the configuration file.|@
@@ -158,8 +158,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
           @|bold,red Error: Cannot set the default profile directly.|@
 
           Please create the profile using a different name, then:
-          - Pass the @!--default!@ flag while creating the profile, or
-          - Create the profile, then run @!${cli.name} config use <profile>!@ to set it as default.
+          - Pass the @'!--default!@ flag while creating the profile, or
+          - Create the profile, then run @'!${cli.name} config use <profile>!@ to set it as default.
         """, List.of(
             new Hint("Example fix (replacing <new_name>):", originalArgsWithoutDefault, defaultFlag)
         ));
@@ -175,7 +175,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         
           The token is not a valid Astra token for the given Astra environment.%s
         
-          If you are targeting a different environment, ensure that the right environment is set with the @!--env!@ option.
+          If you are targeting a different environment, ensure that the right environment is set with the @'!--env!@ option.
         """.formatted(hintStr));
     }
 
@@ -193,7 +193,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     private void assertCanOverwriteProfile(ProfileName profileName) {
         val msg = trimIndent("""
-          A profile under the name @!%s!@ already exists in the given configuration file.
+          A profile under the name @'!%s!@ already exists in the given configuration file.
 
           Do you wish to overwrite it?
         """).formatted(profileName);
@@ -211,7 +211,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     private String mkHint() {
         return (ctx.outputIsHuman() && ctx.isTty())
-            ? NL + NL + "(Hint: Use @!${cli.name} setup!@ for an interactive profile creation experience!)"
+            ? NL + NL + "(Hint: Use @'!${cli.name} setup!@ for an interactive profile creation experience!)"
             : null;
     }
 

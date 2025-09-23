@@ -197,8 +197,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
           @|bold,red Error: Database %s already exists with id %s, and has status %s.|@
         
           To ignore this error, either:
-          - Provide the @!--if-not-exists!@ flag to skip this error if the database already exists.
-          - Provide the @!--allow-duplicate-names!@ flag to create the database even if another with the same name already exists.
+          - Provide the @'!--if-not-exists!@ flag to skip this error if the database already exists.
+          - Provide the @'!--allow-duplicate-names!@ flag to create the database even if another with the same name already exists.
         """.formatted(
             $dbRef,
             dbId,

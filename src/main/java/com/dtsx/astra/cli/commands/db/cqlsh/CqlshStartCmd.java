@@ -60,7 +60,7 @@ public class CqlshStartCmd extends CqlshStartImpl {
             );
 
         if (ret.isPresent()) {
-            ctx.log().warn("The @!---execute!@ and @!--file!@ options are @!deprecated!@ and will be removed in future versions.");
+            ctx.log().warn("The @'!---execute!@ and @'!--file!@ options are @!deprecated!@ and will be removed in future versions.");
             ctx.log().warn("Please use the " + ctx.highlight("${cli.name} db cqlsh exec") + " command instead.");
         }
 

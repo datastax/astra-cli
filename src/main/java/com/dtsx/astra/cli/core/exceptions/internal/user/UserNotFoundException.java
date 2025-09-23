@@ -10,7 +10,7 @@ public class UserNotFoundException extends AstraCliException {
         super(USER_NOT_FOUND, """
           @|bold,red Error: User '%s' not found.|@
         
-          Use @!${cli.name} user list!@ to see all available users.
+          Use @'!${cli.name} user list!@ to see all available users.
         """.formatted(role));
     }
 }

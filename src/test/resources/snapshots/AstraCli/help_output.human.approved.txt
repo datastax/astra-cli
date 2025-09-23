@@ -10,8 +10,8 @@ stderr:   /    |    \\___ \  |  |  |  | \ //__ \_
 stderr:   \____|__  /____  > |__|  |__|  (____  /
 stderr:           \/     \/                   \/
 stderr: 
-stderr:                        Version: 1.0.0-alpha.0
-stdout: Documentation: 'https://awesome-astra.github.io/docs/pages/astra/astra-cli/'
+stderr:                        Version: 1.0.0-alpha.5
+stdout: Documentation: https://docs.datastax.com/en/astra-cli
 stdout: 
 stdout: Usage: astra [-hqvV] [--[no-]color] [--no-input] [--[no-]spinner] [--dump-logs
 stdout:              [=FILE]] [-o=FORMAT] [COMMAND]
@@ -25,8 +25,8 @@ stdout:       --no-input           Never ask for user input (e.g. confirmation p
 stdout:   -o, --output=FORMAT      One of: human, json, csv
 stdout:   -q, --quiet              Suppress informational output
 stdout:       --[no-]spinner       Enable/disable the loading spinner
-stdout:   -v, --verbose            Enable verbose logging output
-stdout:   -V, --version            Print version information and exit.
+stdout:   -v, --version            Print version information and exit.
+stdout:   -V, --verbose            Enable verbose logging output
 stdout: 
 stdout: Commands:
 stdout:   setup      Interactively set up the Astra CLI and create profiles
@@ -37,6 +37,7 @@ stdout:   role       Discover Astra roles
 stdout:   streaming  Manage Astra streaming tenants
 stdout:   token      Manage your Astra tokens
 stdout:   user       Manage users in your organization
+stdout:   upgrade    Upgrade your Astra CLI installation
 stdout:   nuke       Entirely delete Astra CLI from your system
 stdout: 
 stdout: Examples:

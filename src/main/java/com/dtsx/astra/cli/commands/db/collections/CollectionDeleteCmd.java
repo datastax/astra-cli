@@ -82,7 +82,7 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
         throw new AstraCliException(COLLECTION_NOT_FOUND, """
           @|bold,red Error: Collection '%s' does not exist in keyspace '%s' of database '%s'.|@
         
-          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the collection doesn't exist.
+          To ignore this error, provide the @'!--if-exists!@ flag to skip this error if the collection doesn't exist.
         """.formatted(
             $collRef.name(),
             $keyspaceRef.name(),

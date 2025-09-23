@@ -133,7 +133,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
-            ctx.log().loading("Extracting @!" + exe  + " v" + version+ "!@, please wait", (_) -> {
+            ctx.log().loading("Extracting @!" + exe  + " v" + version + "!@, please wait", (_) -> {
                 if (archiveFile.endsWith(".zip")) {
                     FileUtils.extractZipArchiveInPlace(archiveFile, ctx);
                 } else {

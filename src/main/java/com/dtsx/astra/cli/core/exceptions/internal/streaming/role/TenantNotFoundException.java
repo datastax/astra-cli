@@ -10,7 +10,7 @@ public class TenantNotFoundException extends AstraCliException {
         super(TENANT_NOT_FOUND, """
           @|bold,red Error: Tenant '%s' not found.|@
         
-          Use @!${cli.name} streaming list!@ to see all available tenants.
+          Use @'!${cli.name} streaming list!@ to see all available tenants.
         """.formatted(tenant));
     }
 }

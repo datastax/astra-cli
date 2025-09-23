@@ -107,7 +107,7 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
         throw new AstraCliException(KEYSPACE_ALREADY_EXISTS, """
           @|bold,red Error: Keyspace '%s' already exists in database '%s'.|@
         
-          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the keyspace already exists.
+          To ignore this error, provide the @'!--if-not-exists!@ flag to skip this error if the keyspace already exists.
         """.formatted(
             $keyspaceRef.name(),
             $keyspaceRef.db()

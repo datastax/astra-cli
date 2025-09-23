@@ -108,7 +108,7 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
         throw new AstraCliException(KEYSPACE_NOT_FOUND, """
           @|bold,red Error: Keyspace '%s' does not exist in database '%s'.|@
 
-          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the keyspace doesn't exist.
+          To ignore this error, provide the @'!--if-exists!@ flag to skip this error if the keyspace doesn't exist.
         """.formatted(
             $keyspaceRef.name(),
             $keyspaceRef.db()

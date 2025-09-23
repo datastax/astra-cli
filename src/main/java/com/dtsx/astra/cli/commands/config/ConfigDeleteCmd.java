@@ -75,7 +75,7 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
         throw new AstraCliException(PROFILE_NOT_FOUND, """
           @|bold,red Error: A profile with the name '%s' could not be found.|@
 
-          To ignore this error, you can use the @!--if-exists!@ option to avoid failing if the profile does not exist.
+          To ignore this error, you can use the @'!--if-exists!@ option to avoid failing if the profile does not exist.
         """.formatted(
             $profileName
         ), List.of(

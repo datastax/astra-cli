@@ -129,7 +129,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         throw new AstraCliException(CDC_ALREADY_EXISTS, """
           @|bold,red Error: CDC already exists for table '%s' with tenant '%s' in database '%s'.|@
 
-          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the CDC already exists.
+          To ignore this error, provide the @'!--if-not-exists!@ flag to skip this error if the CDC already exists.
         """.formatted(
             tableRef.toString(),
             $tenant,

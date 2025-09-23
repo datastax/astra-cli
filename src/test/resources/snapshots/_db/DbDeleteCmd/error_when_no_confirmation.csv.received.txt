@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db delete two_regions_db -o csv
+exit_code: 2
+---- output ----
+stdout: You are about to permanently delete database two_regions_db (822b0fff-6a73-4322-a8ec-09832b075287).
+stdout: 
+stdout: To confirm, type the name below or press Ctrl+C to cancel.
+stdout: >☐
+stderr: 
+stdout: code,message
+stdout: UNSUPPORTED_EXECUTION,"Error: No input provided and no default option is available
+stdout: 
+stdout: Please interactively answer the question, or programmatically pass an option using the '--yes' flag."
+---- end ----

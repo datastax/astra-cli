@@ -108,7 +108,7 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
         throw new AstraCliException(REGION_ALREADY_EXISTS, """
           @|bold,red Error: Region %s already exists in database %s.|@
       
-          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the region already exists.
+          To ignore this error, provide the @'!--if-not-exists!@ flag to skip this error if the region already exists.
         """.formatted(
             $region,
             $dbRef

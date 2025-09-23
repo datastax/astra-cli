@@ -112,7 +112,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
         throw new AstraCliException(REGION_NOT_FOUND, """
           @|bold,red Error: Region %s does not exist in database %s.|@
     
-          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the region doesn't exist.
+          To ignore this error, provide the @'!--if-exists!@ flag to skip this error if the region doesn't exist.
         """.formatted(
             $region,
             $dbRef

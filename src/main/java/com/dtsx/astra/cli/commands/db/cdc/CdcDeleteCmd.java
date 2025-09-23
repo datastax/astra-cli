@@ -138,7 +138,7 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
         throw new AstraCliException(CDC_NOT_FOUND, """
           @|bold,red Error: CDC '%s' does not exist in database '%s'.|@
 
-          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the CDC doesn't exist.
+          To ignore this error, provide the @'!--if-exists!@ flag to skip this error if the CDC doesn't exist.
         """.formatted(
             cdcRef(),
             $dbRef

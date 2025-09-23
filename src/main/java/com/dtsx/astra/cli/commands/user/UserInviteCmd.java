@@ -111,7 +111,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
         throw new AstraCliException(USER_ALREADY_INVITED, """
           @|bold,red Error: User '%s' already exists in this organization.|@
 
-          This may be expected, but to avoid this error, pass the @!--if-not-exists!@ flag to skip this error if the user already exists.
+          This may be expected, but to avoid this error, pass the @'!--if-not-exists!@ flag to skip this error if the user already exists.
         """.formatted(
             $user
         ), List.of(

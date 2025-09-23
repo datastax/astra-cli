@@ -82,7 +82,7 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
         throw new AstraCliException(TABLE_NOT_FOUND, """
           @|bold,red Error: Table %s does not exist in keyspace %s.|@
   
-          To ignore this error, provide the @!--if-exists!@ flag to skip this error if the table doesn't exist.
+          To ignore this error, provide the @'!--if-exists!@ flag to skip this error if the table doesn't exist.
         """.formatted(
             $tableRef.name(),
             $keyspaceRef

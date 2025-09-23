@@ -63,7 +63,7 @@ public class ConfigHomePathCmd extends AbstractCmd<ConfigPathResult> {
             ? (NL + NL + "The folder does not actually exist yet, but will be created when a command may need it.")
             : "";
 
-        val msg = "%s @|underline @!%s!@|@ %s.%s".formatted(foundAtMsg, res.get().path(), usingMsg, existsMsg);
+        val msg = "%s @|underline @'!%s!@|@ %s.%s".formatted(foundAtMsg, res.get().path(), usingMsg, existsMsg);
 
         return OutputAll.response(msg, data);
     }

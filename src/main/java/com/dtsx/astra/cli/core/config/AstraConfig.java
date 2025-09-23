@@ -72,9 +72,9 @@ public class AstraConfig {
                 throw new AstraCliException(FILE_ISSUE, """
                   @|bold,red Error: The default configuration file (%s) does not exist.|@
                 
-                  Please run @!${cli.name} setup!@ to create the default configuration file, and set up your Astra credentials.
+                  Please run @'!${cli.name} setup!@ to create the default configuration file, and set up your Astra credentials.
                 
-                  Alternatively, you can specify credentials via the @!--config-file!@ or @!--token!@ options.
+                  Alternatively, you can specify credentials via the @'!--config-file!@ or @'!--token!@ options.
                 """.formatted(path), List.of(
                     new Hint("Interactively set up your configuration file", "${cli.name} setup"),
                     new Hint("Programmatically set up your configuration file", "${cli.name} config create [name] --token <token> [--env <env>]"),
@@ -158,11 +158,11 @@ public class AstraConfig {
 
         if (matching.size() > 1) {
             throw new AstraConfigFileException(trimIndent("""
-              Multiple profiles were found for name @!%s!@. Please ensure profile names are unique.
+              Multiple profiles were found for name @'!%s!@. Please ensure profile names are unique.
  
               You can fix this by either
               - Manually editing the configuration file to remove duplicates, or
-              - Running @!%s!@ to delete all profiles with this name, then re-create the profile correctly.
+              - Running @'!%s!@ to delete all profiles with this name, then re-create the profile correctly.
             """.formatted(
                 profileName,
                 "${cli.name} config delete '" + profileName.unwrap() + "'"

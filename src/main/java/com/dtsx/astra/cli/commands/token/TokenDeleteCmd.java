@@ -78,7 +78,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
         throw new AstraCliException(TOKEN_NOT_FOUND, """
           @|bold,red Error: Token '%s' not found.|@
 
-          The specified token does not exist. To avoid this error, pass the @!--if-exists!@ flag to skip this error if the token doesn't exist.
+          The specified token does not exist. To avoid this error, pass the @'!--if-exists!@ flag to skip this error if the token doesn't exist.
         """.formatted(
             $tokenId
         ), List.of(

@@ -60,10 +60,10 @@ public class ConfigPathCmd extends AbstractCmd<ConfigPathResult> {
         };
 
         val existsMsg = (!res.get().exists())
-            ? (NL + NL + "The file does not actually exist yet, but may be created with @!astra setup!@ or @!astra config create!@.")
+            ? (NL + NL + "The file does not actually exist yet, but may be created with @'!astra setup!@ or @'!astra config create!@.")
             : "";
 
-        val msg = "%s @|underline @!%s!@|@ %s.%s".formatted(foundAtMsg, res.get().path(), usingMsg, existsMsg);
+        val msg = "%s @|underline @'!%s!@|@ %s.%s".formatted(foundAtMsg, res.get().path(), usingMsg, existsMsg);
 
         return OutputAll.response(msg, data);
     }

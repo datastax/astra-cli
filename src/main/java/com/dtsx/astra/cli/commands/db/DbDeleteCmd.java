@@ -121,7 +121,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
         throw new AstraCliException(DATABASE_NOT_FOUND, """
           @|bold,red Error: Database '%s' could not be found.|@
         
-          To ignore this error, you can use the @!--if-exists!@ option to avoid failing if the database does not exist.
+          To ignore this error, you can use the @'!--if-exists!@ option to avoid failing if the database does not exist.
         """.formatted(
             dbRef
         ), List.of(

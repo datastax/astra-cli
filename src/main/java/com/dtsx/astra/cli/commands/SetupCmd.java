@@ -73,9 +73,9 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         throw new AstraCliException(UNSUPPORTED_EXECUTION, """
           @|bold,red Error: This operation does not support outputting in the '|@@|bold,red,italic %s|@@|bold,red ' format.|@
         
-          The @!astra setup!@ command is an interactive setup command, meant to help guide you through the setup process.
+          The @'!astra setup!@ command is an interactive setup command, meant to help guide you through the setup process.
         
-          Use the @!astra config create!@ command to programmatically create profiles instead.
+          Use the @'!astra config create!@ command to programmatically create profiles instead.
         """, List.of(
             new Hint("Programmatically create profiles", "${cli.name} config create [name] --token <token> [--env <env>] [--default]")
         ));
@@ -110,7 +110,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           The token is not a valid Astra token for the given Astra environment.%s
         
-          If you are targeting a different environment, ensure that the right environment is set with the @!--env!@ option.
+          If you are targeting a different environment, ensure that the right environment is set with the @'!--env!@ option.
         """.formatted(hintStr));
     }
 
@@ -145,7 +145,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             
               The setup process requires user interaction, but no console is available.
             
-              Please use @!${cli.name} config create!@ to programmatically create profiles instead.
+              Please use @'!${cli.name} config create!@ to programmatically create profiles instead.
             """);
         } else {
             assert ctx.console().getConsole() != null; // not necessary, just makes the linter shut up
@@ -157,8 +157,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           @|faint A configuration file with your profile will be created at|@ @|faint,italic %s|@
         
           If you'd prefer to provide credentials on a per-command basis rather than storing them in a file, you can either:
-          - Use the per-command @!--token!@ flag to pass your existing @!AstraCS!@ token directly.
-          - Use the per-command @!--config-file!@ flag to specify an existing @!.astrarc!@ file.
+          - Use the per-command @'!--token!@ flag to pass your existing @!AstraCS!@ token directly.
+          - Use the per-command @'!--config-file!@ flag to specify an existing @!.astrarc!@ file.
         
           %s
           %s
@@ -182,7 +182,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         
           @|faint Your config file already exists at|@ @|faint,italic %s|@
         
-          Hint: You can use the @!${cli.name} config!@ commands to manage your profiles.
+          Hint: You can use the @'!${cli.name} config!@ commands to manage your profiles.
        
           %s
           %s
@@ -209,7 +209,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         val prompt = """
           @|bold A profile with this name already exists with token|@ %s @|bold for environment|@ %s@|bold .|@
         
-          You can use @!${cli.name} config get %s!@ to get more information about the existing profile.
+          You can use @'!${cli.name} config get %s!@ to get more information about the existing profile.
         
           Do you wish to overwrite it?
         """.formatted(

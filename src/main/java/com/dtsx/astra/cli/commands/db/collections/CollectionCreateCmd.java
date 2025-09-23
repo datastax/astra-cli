@@ -157,7 +157,7 @@ public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<Collectio
         throw new AstraCliException(COLLECTION_ALREADY_EXISTS, """
           @|bold,red Error: Collection '%s' already exists in keyspace '%s' of database '%s'.|@
 
-          To ignore this error, provide the @!--if-not-exists!@ flag to skip this error if the collection already exists.
+          To ignore this error, provide the @'!--if-not-exists!@ flag to skip this error if the collection already exists.
         """.formatted(
             $collRef.name(),
             $keyspaceRef.name(),
