@@ -20,7 +20,7 @@
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 		<astra-sdk.version>1.2.9</astra-sdk.version>
-		<astra-db-java.version>2.0.0-PREVIEW</astra-db-java.version>
+		<astra-db-java.version>2.1.0</astra-db-java.version>
 		<jansi.version>2.4.1</jansi.version>
 		<airline.version>3.0.0</airline.version>
 		<slf4j.version>2.0.17</slf4j.version>
