@@ -5,41 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/build.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/build.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigPathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigPathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/home/ConfigHomePathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/home/ConfigHomePathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/DbDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/CdcCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/CdcCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/CdcDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cdc/CdcDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cqlsh/CqlshStartCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cqlsh/CqlshStartCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/KeyspaceCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/KeyspaceCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/KeyspaceDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/KeyspaceDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/RegionCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/RegionCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/RegionDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/region/RegionDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/TableDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/TableDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingCreateCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserDeleteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserInviteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/user/UserInviteCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/ExceptionHandlerUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/ExceptionHandlerUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/external/AuthenticationExceptionMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/external/AuthenticationExceptionMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/role/RoleNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/role/RoleNotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/streaming/role/TenantNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/streaming/role/TenantNotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/user/UserNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/exceptions/internal/user/UserNotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/parsers/ini/IniParseException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/parsers/ini/IniParseException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/APIProviderImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/APIProviderImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGatewayImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_invalid_confirmation.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/error_when_invalid_confirmation.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +80,7 @@
     &quot;accountId&quot;: &quot;700a40a4-03f4-4a34-a40f-ba9cc01c83ef&quot;
   }
 }</component>
-  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-8.14-bin/38aieal9i53h9rfe7vjup95b9/gradle-8.14" javaHome="/nix/store/jiv5r4l347h7s5gkplszkkji3si9cys3-graalvm-ce-24.0.1" gradleVersion="8.14" />
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.1.0-bin/9agqghryom9wkf8r80qlhnts3/gradle-9.1.0" javaHome="/nix/store/jiv5r4l347h7s5gkplszkkji3si9cys3-graalvm-ce-24.0.1" gradleVersion="9.1.0" />
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -259,7 +231,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
+    "project.structure.proportion": "0.15039062",
     "project.structure.side.proportion": "0.2",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "preferences.sourceCode.JAVA",
