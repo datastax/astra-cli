@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraColors.AstraColor;
+import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import lombok.val;
 import org.jetbrains.annotations.VisibleForTesting;
 
@@ -85,7 +86,7 @@ public class UpgradeNotifier {
     }
 
     private static boolean isAppropriateEnvToAnnoyUser(CliContext ctx) {
-        return ctx.isTty();
+        return ctx.isTty() && !ctx.log().level().equals(Level.QUIET);
     }
 
     private static boolean timeToCheckForUpdate(UpgradeStatus status) {

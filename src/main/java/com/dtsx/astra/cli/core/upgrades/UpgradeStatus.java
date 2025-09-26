@@ -81,7 +81,8 @@ public record UpgradeStatus(
             Files.createDirectories(path.getParent());
 
             properties.setProperty(LATEST_VERSION_KEY, "");
-            properties.setProperty(LAST_CHECKED_KEY, Instant.EPOCH.toString());
+            properties.setProperty(LAST_CHECKED_KEY, String.valueOf(Instant.EPOCH.toEpochMilli()));
+            properties.setProperty(LAST_NOTIFIED_KEY, String.valueOf(Instant.EPOCH.toEpochMilli()));
 
             try (val os = Files.newOutputStream(path)) {
                 properties.store(os, null);

@@ -29,6 +29,8 @@ public class UpdateStatusKeeper {
        }
     }
 
+    // I know this is prone to race conditions,
+    // but the issue is, I just don't care.
     public static String runUnix(UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
         var script = """
           # just return if `curl` is not available
@@ -48,8 +50,12 @@ public class UpdateStatusKeeper {
             script += """
               # get latest release from github api
               latest_release=$(curl -s "%s/releases/latest")
-              latest_version=$(echo "$latest_release" | sed -n 's/.*"tag_name":\\s*"\\([^"]*\\)".*/\\1/p')
-              last_checked=%d
+              maybe_latest_version=$(echo "$latest_release" | sed -n 's/.*"tag_name":\\s*"\\([^"]*\\)".*/\\1/p')
+            
+              if [ -n "$maybe_latest_version" ]; then
+                latest_version="$maybe_latest_version"
+                last_checked=%d
+              fi
             """.formatted(CliProperties.cliGithubApiReposUrl(), Instant.now().toEpochMilli());
         }
 
@@ -62,14 +68,10 @@ public class UpdateStatusKeeper {
 
         script += """
           # update properties file
-          echo "LATEST_VERSION=$latest_version" > "%s"
-          echo "LAST_CHECKED=$last_checked" >> "%s"
-          echo "LAST_NOTIFIED=$last_notified" >> "%s"
-        """.formatted(
-            path.toAbsolutePath(),
-            path.toAbsolutePath(),
-            path.toAbsolutePath()
-        );
+          echo "LATEST_VERSION=$latest_version
+          LAST_CHECKED=$last_checked
+          LAST_NOTIFIED=$last_notified" > "$(printf %%q '%s')"
+        """.formatted(path.toAbsolutePath().toString().replace("\"", "\\\""));
 
         return script;
     }
