@@ -93,7 +93,7 @@ public class AstraCli extends AbstractCmd<Void> {
     @Override
     public final OutputHuman executeHuman(Supplier<Void> v) {
         if ($versionRequested) {
-            return OutputHuman.response(CliProperties.version());
+            return OutputHuman.response("v" + CliProperties.version());
         }
 
         ctx.log().banner();
@@ -110,7 +110,7 @@ public class AstraCli extends AbstractCmd<Void> {
     @Override
     protected OutputAll execute(Supplier<Void> v) {
         if ($versionRequested) {
-            return OutputAll.response(CliProperties.version());
+            return OutputAll.response("v" + CliProperties.version());
         }
         return super.execute(v);
     }

@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.datatypes.Unit;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.UpgradeOperation;
@@ -35,7 +36,7 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
             description = "Version to upgrade to (default: latest)",
             paramLabel = "TAG"
         )
-        public Optional<String> $specificVersion;
+        public Optional<Version> $specificVersion;
 
         @Option(
             names = { "--pre", "--prerelease" },
@@ -50,6 +51,13 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
     )
     public boolean $yes;
 
+    @Option(
+        names = { "--allow-same-version" },
+        description = "Allow re-installing the same version for testing purposes",
+        hidden = true
+    )
+    public boolean $allowSameVersion;
+
     @Override
     @SneakyThrows
     protected OutputHuman executeHuman(Supplier<Unit> u) {
@@ -57,7 +65,7 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
         return AstraCli.exit(0);
     }
 
-    protected void confirmUpgrade(String version, String moveCommand) {
+    protected void confirmUpgrade(Version version, String moveCommand) {
         val infoMsg = """
           %s
         
@@ -72,7 +80,7 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
             renderComment(ctx.colors(), "The current executable will be replaced by the new one,"),
             renderComment(ctx.colors(), "But in the case the move fails, you can manually run the following:"),
             renderCommand(ctx.colors(), moveCommand),
-            renderComment(ctx.colors(), "Check if the installation was successful by running the follwing:"),
+            renderComment(ctx.colors(), "Check if the installation was successful by running the following:"),
             renderCommand(ctx.colors(), "astra --version")
         );
 
@@ -96,6 +104,7 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
     @Override
     protected Operation<Unit> mkOperation() {
         val downloadsGateway = ctx.gateways().mkDownloadsGateway(ctx);
+        val upgradeGateway = ctx.gateways().mkUpgradeGateway(ctx);
 
         final VersionType versionType =
             ($versionMod == null)
@@ -104,6 +113,6 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
                 ? new SpecificVersion($versionMod.$specificVersion.get())
                 : new LatestVersion($versionMod.$includePreReleases);
 
-        return new UpgradeOperation(ctx, downloadsGateway, new UpgradeRequest(versionType, this::confirmUpgrade));
+        return new UpgradeOperation(ctx, downloadsGateway, upgradeGateway, new UpgradeRequest(versionType, $allowSameVersion, this::confirmUpgrade));
     }
 }

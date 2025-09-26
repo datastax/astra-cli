@@ -77,11 +77,11 @@ dependencies {
     compileOnly("org.jetbrains:annotations:26.0.2")
     testCompileOnly("org.jetbrains:annotations:26.0.2")
 
-    compileOnly("org.projectlombok:lombok:1.18.38")
-    testCompileOnly("org.projectlombok:lombok:1.18.38")
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.38")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 }
 
 tasks.compileJava {
@@ -287,6 +287,8 @@ tasks.register("includeJansiNativeLibResources") {
 // Can't get graal-compiled binary to recognize system properties set at runtime,
 // so we're doing this fun workaround of generating a properties file at build time instead.
 tasks.register("createDynamicProperties") {
+    notCompatibleWithConfigurationCache("idk it just errors if I try to cache this lol")
+
     val outputFile = layout.buildDirectory.file("resources/main/dynamic.properties").get().asFile
 
     inputs.property("cliSystemProperties", providers.provider { cliSystemProperties })

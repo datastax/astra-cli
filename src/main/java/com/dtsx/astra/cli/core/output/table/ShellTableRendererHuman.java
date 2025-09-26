@@ -28,12 +28,10 @@ public final class ShellTableRendererHuman implements OutputHuman {
         val serialized = serialize(table.raw());
         val colSizes = computeColumnWidths(serialized, table.columns());
 
-        val fullWidthLine = buildFullWidthTableLine(table.columns(), colSizes);
-
         val joiner = new StringJoiner(NL)
-            .add(fullWidthLine)
+            .add(buildFullWidthTableLine(table.columns(), colSizes, "┌", "┬", "┐"))
             .add(buildTableHeader(table.columns(), colSizes))
-            .add(fullWidthLine);
+            .add(buildFullWidthTableLine(table.columns(), colSizes, "├", "┼", "┤"));
 
         val tableData = buildTableData(serialized, table.columns(), colSizes);
 
@@ -41,7 +39,7 @@ public final class ShellTableRendererHuman implements OutputHuman {
             joiner.add(tableData);
         }
 
-        return joiner.add(fullWidthLine) + NL;
+        return joiner.add(buildFullWidthTableLine(table.columns(), colSizes, "└", "┴", "┘")).toString();
     }
 
     private List<Map<String, List<String>>> serialize(List<? extends Map<String, ?>> raw) {
@@ -76,18 +74,18 @@ public final class ShellTableRendererHuman implements OutputHuman {
         return text.stream().map(AstraColors::stripAnsi).mapToInt(String::length).max().orElse(0);
     }
 
-    private String buildFullWidthTableLine(List<String> columns, Map<String, Integer> colSizes) {
-        val lineJoiner = new StringJoiner("+", "+", "+");
+    private String buildFullWidthTableLine(List<String> columns, Map<String, Integer> colSizes, String l, String m, String r) {
+        val lineJoiner = new StringJoiner(m, l, r);
 
         for (val col : columns) {
-            lineJoiner.add("-".repeat(colSizes.get(col) + 2));
+            lineJoiner.add("─".repeat(colSizes.get(col) + 2));
         }
 
         return TABLE_COLOR.use(lineJoiner.toString());
     }
 
     private String buildTableHeader(List<String> columns, Map<String, Integer> colSizes) {
-        val headerJoiner = new StringJoiner(" | ", "| ", " |");
+        val headerJoiner = new StringJoiner(" │ ", "│ ", " │");
 
         for (val col : columns) {
             headerJoiner.add(col + " ".repeat(colSizes.get(col) - AstraColors.stripAnsi(col).length()));
@@ -110,7 +108,7 @@ public final class ShellTableRendererHuman implements OutputHuman {
                 .orElse(0);
 
             for (int i = 0; i < maxLinesInRow; i++) {
-                val rowJoiner = new StringJoiner(TABLE_COLOR.use(" | "), TABLE_COLOR.use("| "), TABLE_COLOR.use(" |"));
+                val rowJoiner = new StringJoiner(TABLE_COLOR.use(" │ "), TABLE_COLOR.use("│ "), TABLE_COLOR.use(" │"));
 
                 for (val column : columns) {
                     val lines = row.get(column);

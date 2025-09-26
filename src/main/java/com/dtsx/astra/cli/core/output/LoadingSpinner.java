@@ -31,8 +31,7 @@ public class LoadingSpinner {
     public void start() {
         if (isRunning.compareAndSet(false, true)) {
             if (ctx.isTty() && ctx.outputIsHuman()) {
-                spinnerThread = new Thread(this::runSpinner);
-                spinnerThread.start();
+                spinnerThread = Thread.ofVirtual().start(this::runSpinner);
             }
         }
     }

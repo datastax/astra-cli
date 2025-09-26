@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
@@ -100,7 +101,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @SneakyThrows
-    private Either<String, Path> installGenericArchive(Path installDir, String url, String version, String exe, CliContext ctx) {
+    private Either<String, Path> installGenericArchive(Path installDir, String url, Version version, String exe, CliContext ctx) {
         if (Files.isRegularFile(installDir)) {
             return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
         }

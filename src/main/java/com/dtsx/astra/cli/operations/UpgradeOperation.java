@@ -5,10 +5,10 @@ import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Unit;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
-import com.dtsx.astra.cli.utils.HttpUtils;
-import com.dtsx.astra.cli.utils.JsonUtils;
+import com.dtsx.astra.cli.gateways.upgrade.UpgradeGateway;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -23,37 +23,28 @@ import static com.dtsx.astra.cli.core.datatypes.Unit.Unit;
 public class UpgradeOperation implements Operation<Unit> {
     private final CliContext ctx;
     private final DownloadsGateway downloadsGateway;
+    private final UpgradeGateway upgradeGateway;
     private final UpgradeRequest request;
 
     public sealed interface VersionType {}
-    public record SpecificVersion(String version) implements VersionType {}
+    public record SpecificVersion(Version version) implements VersionType {}
     public record LatestVersion(boolean includePreReleases) implements VersionType {}
 
     public record UpgradeRequest(
         VersionType versionType,
-        BiConsumer<String, String> confirmUpgrade
+        boolean allowSameVersion,
+        BiConsumer<Version, String> confirmUpgrade
     ) {}
 
     @Override
     public Unit execute() {
         val currentExePath = resolveCurrentExePath();
-
-        if (!Files.isWritable(currentExePath)) {
-            throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
-              @|bold,red No write permissions to update the current process @|faint,italic (%s)|@|@
-            
-              Is the binary managed by a package manager (e.g. nix), or are you not running Astra CLI as a binary?
-            """.formatted(currentExePath));
-        }
-
-        val version = ctx.log().loading("Resolving the version to download", (_) -> (
-            resolveReleaseVersion(request.versionType()).replaceFirst("^[vV]", "").trim()
-        ));
+        val version = resolveReleaseVersion(request.versionType);
 
         val platform = resolveCurrentPlatform();
 
         val newExePath = downloadsGateway.downloadAstra(new ExternalSoftware(
-            "https://github.com/" + CliProperties.cliGithubRepo() + "/releases/download/v" + version + "/" + CliProperties.cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
+            CliProperties.cliGithubRepoUrl() + "/releases/download/v" + version + "/" + CliProperties.cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
             version
         ));
 
@@ -70,12 +61,12 @@ public class UpgradeOperation implements Operation<Unit> {
         request.confirmUpgrade().accept(version, backupMvCmd);
 
         return (ctx.isWindows())
-            ? upgradeWindowsExe(newExePath.getRight())
-            : upgradeUnixBinary(newExePath.getRight());
+            ? upgradeWindowsExe(currentExePath, newExePath.getRight())
+            : upgradeUnixBinary(currentExePath, newExePath.getRight());
     }
 
     @SneakyThrows
-    private Unit upgradeWindowsExe(Path exePath) {
+    private Unit upgradeWindowsExe(Path currentExePath, Path newExePath) {
         val pid = ProcessHandle.current().pid();
 
         new ProcessBuilder("cmd.exe", "/c", """
@@ -83,21 +74,21 @@ public class UpgradeOperation implements Operation<Unit> {
         """.formatted(
             pid,
             pid,
-            exePath,
-            resolveCurrentExePath()
+            newExePath,
+            currentExePath
         )).start();
 
         return Unit;
     }
 
     @SneakyThrows
-    private Unit upgradeUnixBinary(Path exePath) {
+    private Unit upgradeUnixBinary(Path currentExePath, Path newExePath) {
         new ProcessBuilder("sh", "-c", """
           mv -f "%s" "%s" && chmod +x "%s"
         """.formatted(
-            exePath,
-            resolveCurrentExePath(),
-            resolveCurrentExePath()
+            newExePath,
+            currentExePath,
+            currentExePath
         )).start();
 
         return Unit;
@@ -112,88 +103,47 @@ public class UpgradeOperation implements Operation<Unit> {
             """);
         }
 
+        if (!Files.isWritable(currentExePath.get())) {
+            throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
+              @|bold,red No write permissions to update the current process @|faint,italic (%s)|@|@
+            
+              Is the binary managed by a package manager (e.g. nix), or are you not running Astra CLI as a binary?
+            """.formatted(currentExePath));
+        }
+
         return currentExePath.get();
     }
 
-    private String resolveReleaseVersion(VersionType versionType) {
+    private Version resolveReleaseVersion(VersionType versionType) {
         return switch (versionType) {
-            case SpecificVersion(var version) -> (version.trim().equalsIgnoreCase("latest"))
-                ? fetchLatestFullRelease()
-                : version.trim();
+            case SpecificVersion(var version) -> {
+                if (version.major() < 1) {
+                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
+                      @|bold,red Error: Can not downgrade to a version prior to 1.0.0 (you asked for v%s)|@
+                    """.formatted(version));
+                }
 
-            case LatestVersion(var includePreReleases) -> (includePreReleases)
-                ? fetchLatestIncPreRelease()
-                : fetchLatestFullRelease();
+                if (version.equals(CliProperties.version()) && !request.allowSameVersion()) {
+                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
+                      @|bold,red Error: You are already using Astra CLI v%s|@
+                    """.formatted(version));
+                }
+
+                yield version;
+            }
+
+            case LatestVersion(var includePreReleases) -> {
+                val latest = upgradeGateway.latestVersion(includePreReleases);
+
+                if (latest.compareTo(CliProperties.version()) < 1) {
+                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
+                      @|bold,red Error: No newer version available (latest is v%s, you have v%s)|@
+                    """.formatted(latest, CliProperties.version()));
+                }
+
+                yield latest;
+            }
         };
-    }
-
-    private String fetchLatestFullRelease() {
-        return ctx.log().loading("Resolving latest full release of @!astra!@", (_) -> {
-            val endpoint = "https://api.github.com/repos/" + CliProperties.cliGithubRepo() + "/releases/latest";
-
-            val response = HttpUtils.GET(endpoint, c -> c, r -> r);
-
-            if (response.statusCode() == 404) {
-                throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
-                  @|bold,red Error: Cannot find latest release from @|underline %s|@|@
-                """.formatted(endpoint));
-            }
-
-            if (response.statusCode() >= 400) {
-                throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
-                  @|bold,red An error occurred while fetching the latest release from %s|@
-                
-                  Status:
-                  @!%d!@
-                
-                  Body:
-                  %s
-                """.formatted(endpoint, response.statusCode(), response.body()));
-            }
-
-            val json = JsonUtils.readTree(response.body());
-
-            return json.get("tag_name").asText();
-        });
-    }
-
-    private String fetchLatestIncPreRelease() {
-        return ctx.log().loading("Resolving latest release of @!astra!@", (updateMsg) -> {
-            var attempt = 1;
-
-            while (true) {
-                val endpoint = "https://api.github.com/repos/" + CliProperties.cliGithubRepo() + "/releases?per_page=1";
-
-                val response = HttpUtils.GET(endpoint, c -> c, r -> r);
-
-                if (response.statusCode() >= 400 && response.statusCode() != 404) {
-                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
-                      @|bold,red An error occurred while fetching the latest release from %s|@
-                    
-                      Status:
-                      @!%d!@
-                    
-                      Body:
-                      %s
-                    """.formatted(endpoint, response.statusCode(), response.body()));
-                }
-
-                val json = JsonUtils.readTree(response.body());
-
-                if (response.statusCode() == 404 || json.isEmpty()) {
-                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
-                      @|bold,red Error: Cannot find latest release from @|underline %s|@|@
-                    """.formatted(endpoint));
-                }
-
-                if (json.isArray() && json.get(0).get("draft").asBoolean()) {
-                    updateMsg.accept("Resolving latest release of @!astra!@ (attempt %d)".formatted(++attempt));
-                    continue;
-                }
-
-                return json.get(0).get("tag_name").asText();
-            }
-        });
     }
 
     private String resolveCurrentPlatform() {

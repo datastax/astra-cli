@@ -29,6 +29,8 @@ import com.dtsx.astra.cli.gateways.streaming.StreamingGatewayCompletionsCacheWra
 import com.dtsx.astra.cli.gateways.streaming.StreamingGatewayImpl;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
 import com.dtsx.astra.cli.gateways.token.TokenGatewayImpl;
+import com.dtsx.astra.cli.gateways.upgrade.UpgradeGateway;
+import com.dtsx.astra.cli.gateways.upgrade.UpgradeGatewayImpl;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
 import com.dtsx.astra.cli.gateways.user.UserGatewayCompletionsCacheWrapper;
 import com.dtsx.astra.cli.gateways.user.UserGatewayImpl;
@@ -98,5 +100,10 @@ public class GatewayProviderImpl implements GatewayProvider {
     @Override
     public UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx) {
         return new UserGatewayCompletionsCacheWrapper(new UserGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx))), userCompletionsCache);
+    }
+
+    @Override
+    public UpgradeGateway mkUpgradeGateway(CliContext ctx) {
+        return new UpgradeGatewayImpl(ctx);
     }
 }

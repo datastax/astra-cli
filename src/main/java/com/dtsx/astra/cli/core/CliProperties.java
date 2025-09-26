@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core;
 
 import com.dtsx.astra.cli.core.CliEnvironment.OS;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.models.Version;
 import lombok.Cleanup;
 import lombok.val;
 import org.graalvm.nativeimage.ImageInfo;
@@ -35,22 +36,22 @@ public class CliProperties implements IVersionProvider {
         defaultHomeFolder(unsafeResolvePlatform().os() == OS.WINDOWS);
     }
 
-    public record ExternalSoftware(String url, String version) {}
+    public record ExternalSoftware(String url, Version version) {}
 
     public static ExternalSoftware cqlsh() {
-        return new ExternalSoftware(prop("cqlsh.url"), prop("cqlsh.version"));
+        return new ExternalSoftware(prop("cqlsh.url"), Version.mkUnsafe(prop("cqlsh.version")));
     }
 
     public static ExternalSoftware dsbulk() {
-        return new ExternalSoftware(prop("dsbulk.url"), prop("dsbulk.version"));
+        return new ExternalSoftware(prop("dsbulk.url"), Version.mkUnsafe(prop("dsbulk.version")));
     }
 
     public static ExternalSoftware pulsar() {
-        return new ExternalSoftware(prop("pulsar-shell.url"), prop("pulsar-shell.version"));
+        return new ExternalSoftware(prop("pulsar-shell.url"), Version.mkUnsafe(prop("pulsar-shell.version")));
     }
 
-    public static String version() {
-        return prop("cli.version");
+    public static Version version() {
+        return Version.mkUnsafe(prop("cli.version"));
     }
 
     public static String rcFileName() {
@@ -61,8 +62,12 @@ public class CliProperties implements IVersionProvider {
         return ((useDotPrefix) ? "." : "") + prop("cli.home-folder.name");
     }
 
-    public static String cliGithubRepo() {
-        return prop("cli.github.repo");
+    public static String cliGithubRepoUrl() {
+        return prop("cli.github.urls.repo=");
+    }
+
+    public static String cliGithubApiReposUrl() {
+        return prop("cli.github.urls.api.repos");
     }
 
     private static @Nullable String cachedRcFile = null;
@@ -171,7 +176,7 @@ public class CliProperties implements IVersionProvider {
 
     @Override
     public String[] getVersion() {
-        return new String[]{ version() };
+        return new String[]{ version().toString() };
     }
 
     private static String prop(String string) {

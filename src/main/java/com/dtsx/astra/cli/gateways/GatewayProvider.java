@@ -14,6 +14,7 @@ import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
+import com.dtsx.astra.cli.gateways.upgrade.UpgradeGateway;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
@@ -41,6 +42,8 @@ public interface GatewayProvider {
     TableGateway mkTableGateway(AstraToken token, AstraEnvironment env, CliContext ctx);
     
     TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CliContext ctx);
-    
+
     UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx);
+
+    UpgradeGateway mkUpgradeGateway(CliContext ctx);
 }

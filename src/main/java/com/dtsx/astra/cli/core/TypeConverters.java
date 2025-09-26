@@ -26,6 +26,7 @@ public abstract class TypeConverters {
             new ContextlessTypeConverter(TenantName.class, TenantName::parse),
             new ContextlessTypeConverter(UserRef.class, UserRef::parse),
             new ContextlessTypeConverter(ProfileName.class, ProfileName::parse),
+            new ContextlessTypeConverter(Version.class, Version::parse),
             new ContextlessTypeConverter(Duration.class, Misc::parseDuration),
             new ContextualTypeConverter(Path.class, Misc::parsePath, ctxRef)
         );

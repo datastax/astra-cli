@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.core.config;
 import com.dtsx.astra.cli.core.CliEnvironment.OS;
 import com.dtsx.astra.cli.core.CliEnvironment.Platform;
 import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.val;
 
@@ -19,6 +20,11 @@ public class AstraHome {
         Dirs = new Dirs();
     }
 
+    public Path useDir() {
+        FileUtils.createDirIfNotExists(DIR, null);
+        return DIR;
+    }
+
     public class Dirs {
         private final Path SCB = DIR.resolve("scb");
         private final Path COMPLETIONS_CACHE =  DIR.resolve("completions-cache");
@@ -26,34 +32,34 @@ public class AstraHome {
         private final Path CQLSH = DIR.resolve("cqlsh-astra");
 
         public Path useScb() {
-            FileUtils.createDirIfNotExists(SCB, "");
+            FileUtils.createDirIfNotExists(SCB, null);
             return SCB;
         }
 
         public Path useCompletionsCache() {
-            FileUtils.createDirIfNotExists(COMPLETIONS_CACHE, "");
+            FileUtils.createDirIfNotExists(COMPLETIONS_CACHE, null);
             return COMPLETIONS_CACHE;
         }
 
         public Path useLogs() {
-            FileUtils.createDirIfNotExists(LOGS, "");
+            FileUtils.createDirIfNotExists(LOGS, null);
             return LOGS;
         }
 
         public Path useCqlsh() {
-            FileUtils.createDirIfNotExists(CQLSH, "");
+            FileUtils.createDirIfNotExists(CQLSH, null);
             return CQLSH;
         }
 
-        public Path useDsbulk(String version) {
+        public Path useDsbulk(Version version) {
             val path = DIR.resolve("dsbulk-" + version);
-            FileUtils.createDirIfNotExists(path, "");
+            FileUtils.createDirIfNotExists(path, null);
             return path;
         }
 
-        public Path usePulsar(String version) {
+        public Path usePulsar(Version version) {
             val path = DIR.resolve("lunastreaming-shell-" + version);
-            FileUtils.createDirIfNotExists(path, "");
+            FileUtils.createDirIfNotExists(path, null);
             return path;
         }
 
@@ -61,12 +67,12 @@ public class AstraHome {
             return Files.exists(CQLSH);
         }
 
-        public boolean dsbulkExists(String version) {
+        public boolean dsbulkExists(Version version) {
             val path = DIR.resolve("dsbulk-" + version);
             return Files.exists(path);
         }
 
-        public boolean pulsarExists(String version) {
+        public boolean pulsarExists(Version version) {
             val path = DIR.resolve("lunastreaming-shell-" + version);
             return Files.exists(path);
         }
