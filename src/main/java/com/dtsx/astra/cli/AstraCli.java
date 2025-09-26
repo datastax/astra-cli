@@ -85,8 +85,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class AstraCli extends AbstractCmd<Void> {
     @Option(
         names = { "-v", "--version" },
-        description = "Print version information and exit.",
-        versionHelp = true
+        description = "Print version information and exit."
     )
     private boolean $versionRequested;
 

@@ -30,7 +30,7 @@ renderCommand() {
 }
 
 # Constants
-ASTRA_CLI_VERSION="1.0.0-alpha.7"
+ASTRA_CLI_VERSION="1.0.0-alpha.8"
 
 if [ -n "${ASTRA_HOME:-}" ]; then
   ASTRA_CLI_DIR_RESOLVER="custom"
