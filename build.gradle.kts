@@ -287,8 +287,6 @@ tasks.register("includeJansiNativeLibResources") {
 // Can't get graal-compiled binary to recognize system properties set at runtime,
 // so we're doing this fun workaround of generating a properties file at build time instead.
 tasks.register("createDynamicProperties") {
-    notCompatibleWithConfigurationCache("idk it just errors if I try to cache this lol")
-
     val outputFile = layout.buildDirectory.file("resources/main/dynamic.properties").get().asFile
 
     inputs.property("cliSystemProperties", providers.provider { cliSystemProperties })
