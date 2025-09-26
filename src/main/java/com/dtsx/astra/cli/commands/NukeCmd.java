@@ -205,4 +205,9 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             throw new ExecutionCancelledException();
         }
     }
+
+    @Override
+    protected boolean disableUpgradeNotifier() {
+        return true; // who wants to be told there's a new update when they're trying to get rid of the damn thing
+    }
 }

@@ -14,20 +14,22 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class UpgradeNotifier {
     public static final int PADDING = 3;
 
-    private static final long CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000 * 2; // 48 hours
-    private static final long NOTIFY_INTERVAL_MS = 24 * 60 * 60 * 1000 * 2; // 48 hours
-
     public static void run(CliContext ctx) {
         val path = ctx.home().useDir().resolve("upgrade-notifier.properties");
 
+        // every 10 minutes for pre-releases, every 48 hours for actual releases
+        val INTERVAL_MS = (CliProperties.version().isPreRelease())
+            ? 1000 * 60 * 5
+            : 24 * 60 * 60 * 1000 * 2;
+
         UpgradeStatus.load(ctx, path).ifPresent((status) -> {
-            val shouldAnnoyUser = updateAvailable(status) && haventAnnoyedUserInAWhile(status) && isAppropriateEnvToAnnoyUser(ctx);
+            val shouldAnnoyUser = updateAvailable(status) && haventAnnoyedUserInAWhile(status, INTERVAL_MS) && isAppropriateEnvToAnnoyUser(ctx);
 
             if (shouldAnnoyUser) {
                 annoyUser(ctx, status);
             }
 
-            UpdateStatusKeeper.runIfNecessary(ctx, path, status, timeToCheckForUpdate(status), shouldAnnoyUser);
+            UpdateStatusKeeper.runIfNecessary(ctx, path, status, timeToCheckForUpdate(status, INTERVAL_MS), shouldAnnoyUser);
         });
     }
 
@@ -81,15 +83,15 @@ public class UpgradeNotifier {
             .orElse(false);
     }
 
-    private static boolean haventAnnoyedUserInAWhile(UpgradeStatus status) {
-        return (status.currentTime().toEpochMilli() - status.lastNotified().toEpochMilli()) > NOTIFY_INTERVAL_MS;
+    private static boolean haventAnnoyedUserInAWhile(UpgradeStatus status, long interval) {
+        return (status.currentTime().toEpochMilli() - status.lastNotified().toEpochMilli()) > interval;
     }
 
     private static boolean isAppropriateEnvToAnnoyUser(CliContext ctx) {
         return ctx.isTty() && !ctx.log().level().equals(Level.QUIET);
     }
 
-    private static boolean timeToCheckForUpdate(UpgradeStatus status) {
-        return (status.currentTime().toEpochMilli() - status.lastChecked().toEpochMilli()) > CHECK_INTERVAL_MS;
+    private static boolean timeToCheckForUpdate(UpgradeStatus status, long interval) {
+        return (status.currentTime().toEpochMilli() - status.lastChecked().toEpochMilli()) > interval;
     }
 }

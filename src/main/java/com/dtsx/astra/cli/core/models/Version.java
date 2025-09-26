@@ -46,6 +46,10 @@ public class Version implements Highlightable, Comparable<Version> {
         return parse(version).getRight();
     }
 
+    public boolean isPreRelease() {
+        return label.isPresent();
+    }
+
     enum KnownPreRelease { ALPHA, BETA, RC }
 
     @Override

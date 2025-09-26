@@ -36,6 +36,7 @@ public class CompletionsCmd implements Runnable {
     )
     public String $cliName;
 
+    @Override
     public void run() {
         val script = AutoComplete.bash(
             $cliName,

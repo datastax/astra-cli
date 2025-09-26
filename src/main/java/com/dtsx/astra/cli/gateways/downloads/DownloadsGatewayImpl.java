@@ -67,7 +67,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     @Override
     public Either<String, Path> downloadAstra(ExternalSoftware astra) {
         try {
-            val tmpDir = Files.createTempDirectory(ctx.path(System.getProperty("java.io.tmpdir")), "astra-cli-upgrade-");
+            val tmpDir = Files.createTempDirectory(ctx.path(System.getProperty("java.io.tmpdir")), "astra-cli-upgrade-").resolve("astra");
             return installGenericArchive(tmpDir, astra.url(), astra.version(), "astra", ctx);
         } catch (Exception e) {
             return Either.left("Failed to create temporary directory in %s: '%s'".formatted(System.getProperty("java.io.tmpdir"), e.getMessage()));
@@ -116,6 +116,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
+            FileUtils.createDirIfNotExists(installDir, null);
             PathUtils.cleanDirectory(installDir);
             Files.deleteIfExists(archiveFile);
         } catch (Exception e) {

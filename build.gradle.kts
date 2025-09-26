@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.0.0-alpha.5"
+version = "1.0.0-alpha.7"
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
@@ -93,12 +93,6 @@ application {
 }
 
 val isProd = project.hasProperty("prod")
-
-val cliSystemProperties = mapOf(
-    "cli.version" to project.version.toString(),
-    "cli.rc-file.name" to if (isProd) ".astrarc" else ".astrarc-dev",
-    "cli.home-folder.name" to if (isProd) "astra" else "astra-dev",
-)
 
 graalvmNative {
     binaries.all {
@@ -289,11 +283,19 @@ tasks.register("includeJansiNativeLibResources") {
 tasks.register("createDynamicProperties") {
     val outputFile = layout.buildDirectory.file("resources/main/dynamic.properties").get().asFile
 
-    inputs.property("cliSystemProperties", providers.provider { cliSystemProperties })
+    val cliSystemProperties = providers.provider {
+        mapOf(
+            "cli.version" to project.version.toString(),
+            "cli.rc-file.name" to if (isProd) ".astrarc" else ".astrarc-dev",
+            "cli.home-folder.name" to if (isProd) "astra" else "astra-dev",
+        )
+    }
+
+    inputs.property("cliSystemProperties", cliSystemProperties)
     outputs.file(outputFile)
 
     doLast {
-        val output = cliSystemProperties.map { (key, value) -> "$key=$value" }.joinToString("\n")
+        val output = cliSystemProperties.get().map { (key, value) -> "$key=$value" }.joinToString("\n")
 
         outputFile.parentFile.mkdirs()
         outputFile.writeText(output)

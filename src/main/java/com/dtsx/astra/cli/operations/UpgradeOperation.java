@@ -106,7 +106,7 @@ public class UpgradeOperation implements Operation<Unit> {
         if (!Files.isWritable(currentExePath.get())) {
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
               @|bold,red No write permissions to update the current process @|faint,italic (%s)|@|@
-            
+
               Is the binary managed by a package manager (e.g. nix), or are you not running Astra CLI as a binary?
             """.formatted(currentExePath));
         }

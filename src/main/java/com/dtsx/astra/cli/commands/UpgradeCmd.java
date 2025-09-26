@@ -115,4 +115,9 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
 
         return new UpgradeOperation(ctx, downloadsGateway, upgradeGateway, new UpgradeRequest(versionType, $allowSameVersion, this::confirmUpgrade));
     }
+
+    @Override
+    protected boolean disableUpgradeNotifier() {
+        return true; // disabled for obvious reasons
+    }
 }

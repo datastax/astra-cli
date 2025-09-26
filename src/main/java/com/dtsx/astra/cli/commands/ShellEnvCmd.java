@@ -1,23 +1,27 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.output.formats.OutputHuman;
-import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Spec;
 
-import java.util.function.Supplier;
+import java.nio.file.Path;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "shellenv",
     hidden = true
 )
-public class ShellEnvCmd extends AbstractCmd<Void> {
+public class ShellEnvCmd implements Runnable {
+    @Spec
+    private CommandSpec spec;
+
     @Override
-    protected OutputHuman executeHuman(Supplier<Void> v) {
-        val file = ProcessHandle.current().info().command().map(ctx::path);
+    public void run() {
+        val file = ProcessHandle.current().info().command().map(Path::of);
 
         if (file.isEmpty()) {
             throw new AstraCliException(ILLEGAL_OPERATION, """
@@ -25,14 +29,12 @@ public class ShellEnvCmd extends AbstractCmd<Void> {
             """);
         }
 
-        return OutputHuman.response("""
+        spec.commandLine().getOut().println(trimIndent("""
           export PATH=%s:$PATH
           source <(%s compgen)
-        """.formatted(file.get().getParent(), file.get()));
-    }
-
-    @Override
-    protected Operation<Void> mkOperation() {
-        return null;
+        """.formatted(
+            file.get().getParent(),
+            file.get()
+        )));
     }
 }

@@ -158,7 +158,9 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     @MustBeInvokedByOverriders
     protected void prelude() {
-        UpgradeNotifier.run(ctx);
+        if (!disableUpgradeNotifier()) {
+            UpgradeNotifier.run(ctx);
+        }
         spec.commandLine().setColorScheme(ctx.colorScheme());
     }
 
@@ -171,6 +173,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         if (ctx.log().shouldDumpLogs()) {
             ctx.log().dumpLogsToFile();
         }
+    }
+
+    protected boolean disableUpgradeNotifier() {
+        return false;
     }
 
     private String evokeProperExecuteFunction(CliContext ctx) {

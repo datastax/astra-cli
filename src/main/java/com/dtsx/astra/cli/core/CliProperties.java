@@ -63,7 +63,7 @@ public class CliProperties implements IVersionProvider {
     }
 
     public static String cliGithubRepoUrl() {
-        return prop("cli.github.urls.repo=");
+        return prop("cli.github.urls.repo");
     }
 
     public static String cliGithubApiReposUrl() {
