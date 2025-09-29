@@ -8,7 +8,9 @@ import lombok.val;
 import java.nio.file.Path;
 import java.time.Instant;
 
-public class UpdateStatusKeeper {
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+
+public class UpgradeStatusKeeper {
     public static void runIfNecessary(CliContext ctx, Path path, UpgradeStatus status, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
         if (!shouldCheckForUpdate && !userWasAnnoyed) {
             return;
@@ -32,15 +34,40 @@ public class UpdateStatusKeeper {
     // I know this is prone to race conditions,
     // but the issue is, I just don't care.
     public static String runUnix(UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
+        val pathStr = path.toAbsolutePath().toString().replace("\"", "\\\"");
+
         var script = """
           # just return if `curl` is not available
           command -v curl >/dev/null 2>&1 || { exit 0; }
-        
+
+          LOCKDIR="%s.lock"
+
+          # not perfect but doesn't matter if minor race condition occurs
+          if ! mkdir "$LOCKDIR" 2>/dev/null; then
+            if [ -d "$LOCKDIR" ]; then
+              # backup protection against a stale lock
+              if stat --version >/dev/null 2>&1; then
+                lock_age=$(($(date +%%s) - $(stat -c %%Y "$LOCKDIR")))
+              else
+                lock_age=$(($(date +%%s) - $(stat -f %%m "$LOCKDIR")))
+              fi
+
+              if [ "$lock_age" -gt 300 ]; then
+                rm -rf "$LOCKDIR"
+              fi
+            else
+              exit 0
+            fi
+          fi
+
+          trap 'rmdir "$LOCKDIR"' 0
+
           # set initial variables to update as needed
           latest_version="%s"
           last_checked=%d
           last_notified=%d
         """.formatted(
+            pathStr,
             status.latestVersion().map(Version::toString).orElse(""),
             status.lastChecked().toEpochMilli(),
             status.lastNotified().toEpochMilli()
@@ -48,14 +75,14 @@ public class UpdateStatusKeeper {
 
         if (shouldCheckForUpdate) {
             script += """
-              # get latest release from github api
-              latest_release=$(curl -s "%s/releases/latest")
-              maybe_latest_version=$(echo "$latest_release" | sed -n 's/.*"tag_name":\\s*"\\([^"]*\\)".*/\\1/p')
-            
-              if [ -n "$maybe_latest_version" ]; then
-                latest_version="$maybe_latest_version"
-                last_checked=%d
-              fi
+               # get latest release from github api
+               latest_release=$(curl -s "%s/releases/latest")
+               maybe_latest_version=$(echo "$latest_release" | sed -n 's/.*"tag_name":\\s*"\\([^"]*\\)".*/\\1/p')
+
+               if [ -n "$maybe_latest_version" ]; then
+                 latest_version="$maybe_latest_version"
+                 last_checked=%d
+               fi
             """.formatted(CliProperties.cliGithubApiReposUrl(), Instant.now().toEpochMilli());
         }
 
@@ -66,12 +93,12 @@ public class UpdateStatusKeeper {
             """.formatted(Instant.now().toEpochMilli());
         }
 
-        script += """
+        script += trimIndent("""
           # update properties file
           echo "LATEST_VERSION=$latest_version
           LAST_CHECKED=$last_checked
           LAST_NOTIFIED=$last_notified" > "$(printf %%q '%s')"
-        """.formatted(path.toAbsolutePath().toString().replace("\"", "\\\""));
+        """).formatted(pathStr);
 
         return script;
     }

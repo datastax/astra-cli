@@ -29,7 +29,7 @@ public class UpgradeNotifier {
                 annoyUser(ctx, status);
             }
 
-            UpdateStatusKeeper.runIfNecessary(ctx, path, status, timeToCheckForUpdate(status, INTERVAL_MS), shouldAnnoyUser);
+            UpgradeStatusKeeper.runIfNecessary(ctx, path, status, timeToCheckForUpdate(status, INTERVAL_MS), shouldAnnoyUser);
         });
     }
 
