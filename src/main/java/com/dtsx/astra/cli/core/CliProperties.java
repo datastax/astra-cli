@@ -176,7 +176,7 @@ public class CliProperties implements IVersionProvider {
 
     @Override
     public String[] getVersion() {
-        return new String[]{ version().toString() };
+        return new String[]{ "v" + version().toString() };
     }
 
     private static String prop(String string) {

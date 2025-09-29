@@ -50,9 +50,9 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public Optional<Database> tryFindOne(DbRef ref) {
-        return ctx.log().loading("Fetching info for database " + ctx.highlight(ref), (_) ->
-            api.dbOpsClient(ref).find()
-        );
+        return ctx.log().loading("Fetching info for database " + ctx.highlight(ref), (_) -> (
+            api.tryResolveDb(ref)
+        ));
     }
 
     @Override

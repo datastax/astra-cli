@@ -19,7 +19,7 @@ public class UpgradeNotifier {
 
         // every 10 minutes for pre-releases, every 48 hours for actual releases
         val INTERVAL_MS = (CliProperties.version().isPreRelease())
-            ? 1000 * 60 * 5
+            ? 1000 * 60 * 10
             : 24 * 60 * 60 * 1000 * 2;
 
         UpgradeStatus.load(ctx, path).ifPresent((status) -> {

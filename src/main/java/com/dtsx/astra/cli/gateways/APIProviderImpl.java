@@ -95,6 +95,7 @@ public class APIProviderImpl implements APIProvider {
             ));
     }
 
+    @Override
     public Optional<com.dtsx.astra.sdk.db.domain.Database> tryResolveDb(@NotNull DbRef ref) {
         val cachedRef = dbCache.convertDbNameToIdIfCached(ref);
 

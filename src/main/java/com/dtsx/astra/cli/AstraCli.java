@@ -54,6 +54,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "${cli.name}",
+    versionProvider = CliProperties.class,
     subcommands = {
         CommandLine.HelpCommand.class,
         SetupCmd.class,
@@ -85,16 +86,13 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class AstraCli extends AbstractCmd<Void> {
     @Option(
         names = { "-v", "--version" },
-        description = "Print version information and exit."
+        description = "Print version information and exit.",
+        versionHelp = true
     )
     private boolean $versionRequested;
 
     @Override
     public final OutputHuman executeHuman(Supplier<Void> v) {
-        if ($versionRequested) {
-            return OutputHuman.response("v" + CliProperties.version());
-        }
-
         ctx.log().banner();
 
         val sj = new StringJoiner(NL);
