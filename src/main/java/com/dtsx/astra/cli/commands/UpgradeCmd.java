@@ -61,6 +61,7 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
     @Override
     @SneakyThrows
     protected OutputHuman executeHuman(Supplier<Unit> u) {
+        ctx.log().banner();
         u.get(); // need to get the supplier to execute the operation as it's lazy
         return AstraCli.exit(0);
     }

@@ -76,8 +76,8 @@ public class UpgradeStatusKeeper {
         if (shouldCheckForUpdate) {
             script += """
                # get latest release from github api
-               latest_release=$(curl -s "%s/releases/latest")
-               maybe_latest_version=$(echo "$latest_release" | sed -n 's/.*"tag_name":\\s*"\\([^"]*\\)".*/\\1/p')
+               latest_release=$(curl -fsSL "%s/releases/latest")
+               maybe_latest_version=$(echo "$latest_release" | sed -n 's/.*"tag_name".*:.*"\\(.*\\)".*/\\1/p')
 
                if [ -n "$maybe_latest_version" ]; then
                  latest_version="$maybe_latest_version"

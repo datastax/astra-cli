@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Ref;
+import com.dtsx.astra.cli.core.datatypes.Thunk;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.mixins.HelpMixin;
@@ -25,7 +26,6 @@ import picocli.CommandLine.Spec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
@@ -180,25 +180,16 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     private String evokeProperExecuteFunction(CliContext ctx) {
-        val cachedResult = new Object() {
-            Optional<OpRes> ref = Optional.empty();
-        };
-
-        final Supplier<OpRes> resultFn = () -> {
-            if (cachedResult.ref.isEmpty()) {
-                cachedResult.ref = Optional.of(mkOperation().execute());
-            }
-            return cachedResult.ref.get();
-        };
+        val thunk = new Thunk<>(() -> mkOperation().execute());
 
         try {
             return switch (ctx.outputType()) {
-                case HUMAN -> executeHuman(resultFn).renderAsHuman(ctx);
-                case JSON -> executeJson(resultFn).renderAsJson();
-                case CSV -> executeCsv(resultFn).renderAsCsv();
+                case HUMAN -> executeHuman(thunk).renderAsHuman(ctx);
+                case JSON -> executeJson(thunk).renderAsJson();
+                case CSV -> executeCsv(thunk).renderAsCsv();
             };
         } catch (UnsupportedOperationException e) {
-            return execute(resultFn).render(ctx);
+            return execute(thunk).render(ctx);
         }
     }
 

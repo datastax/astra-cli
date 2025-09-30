@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 
-import static com.dtsx.astra.cli.core.datatypes.Unit.Unit;
+import static com.dtsx.astra.cli.core.datatypes.Unit.INSTANCE;
 
 @RequiredArgsConstructor
 public class UpgradeOperation implements Operation<Unit> {
@@ -78,7 +78,7 @@ public class UpgradeOperation implements Operation<Unit> {
             currentExePath
         )).start();
 
-        return Unit;
+        return INSTANCE;
     }
 
     @SneakyThrows
@@ -91,7 +91,7 @@ public class UpgradeOperation implements Operation<Unit> {
             currentExePath
         )).start();
 
-        return Unit;
+        return INSTANCE;
     }
 
     private Path resolveCurrentExePath() {
