@@ -2,11 +2,11 @@
 command: astra streaming list-regions --filter east
 exit_code: 0
 ---- output ----
-stdout: +-----------------+-----------+-----------------------+
-stdout: | Cloud Provider  | Region    | Display Name          |
-stdout: +-----------------+-----------+-----------------------+
-stdout: | gcp (premium)   | us-east1  | South Carolina        |
-stdout: | azure           | eastus    | East US               |
-stdout: | aws             | us-east-1 | US East (N. Virginia) |
-stdout: +-----------------+-----------+-----------------------+
+stdout: ┌─────────────────┬───────────┬───────────────────────┐
+stdout: │ Cloud Provider  │ Region    │ Display Name          │
+stdout: ├─────────────────┼───────────┼───────────────────────┤
+stdout: │ gcp (premium)   │ us-east1  │ South Carolina        │
+stdout: │ azure           │ eastus    │ East US               │
+stdout: │ aws             │ us-east-1 │ US East (N. Virginia) │
+stdout: └─────────────────┴───────────┴───────────────────────┘
 ---- end ----

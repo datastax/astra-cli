@@ -10,10 +10,10 @@ stderr: [INFO] Reading CQL statements from stdin...
 stderr: [INFO] Use backslashes for multi-line statements
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Cqlsh executed with exit code 0, with 5 lines in stdout and 0 lines in stderr.",
+stdout:   "message" : "Cqlsh executed with exit code 0, with 1 lines in stdout and 0 lines in stderr.",
 stdout:   "data" : {
 stdout:     "exitCode" : 0,
-stdout:     "stdout" : "\ndatastax_sla   system              default_keyspace  system_virtual_schema\nsystem_auth    system_traces       other_keyspace  \nsystem_schema  data_endpoint_auth  system_views    \n",
+stdout:     "stdout" : "Current consistency level is LOCAL_QUORUM.",
 stdout:     "stderr" : ""
 stdout:   },
 stdout:   "nextSteps" : null

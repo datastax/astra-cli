@@ -2,19 +2,19 @@
 command: astra db get two_regions_db
 exit_code: 0
 ---- output ----
-stdout: +------------------+--------------------------------------+
-stdout: | Attribute        | Value                                |
-stdout: +------------------+--------------------------------------+
-stdout: | Name             | two_regions_db                       |
-stdout: | ID               | 822b0fff-6a73-4322-a8ec-09832b075287 |
-stdout: | Cloud Provider   | AWS                                  |
-stdout: | Region           | us-east-2                            |
-stdout: | Status           | ACTIVE                               |
-stdout: | Vector           | Enabled                              |
-stdout: | Default Keyspace | default_keyspace                     |
-stdout: | Creation Time    | 2025-08-21T20:26:03Z                 |
-stdout: | Keyspaces        | [0] default_keyspace                 |
-stdout: | Regions          | [0] ap-south-1                       |
-stdout: |                  | [1] us-east-2                        |
-stdout: +------------------+--------------------------------------+
+stdout: ┌──────────────────┬──────────────────────────────────────┐
+stdout: │ Attribute        │ Value                                │
+stdout: ├──────────────────┼──────────────────────────────────────┤
+stdout: │ Name             │ two_regions_db                       │
+stdout: │ ID               │ 822b0fff-6a73-4322-a8ec-09832b075287 │
+stdout: │ Cloud Provider   │ AWS                                  │
+stdout: │ Region           │ us-east-2                            │
+stdout: │ Status           │ ACTIVE                               │
+stdout: │ Vector           │ Enabled                              │
+stdout: │ Default Keyspace │ default_keyspace                     │
+stdout: │ Creation Time    │ 2025-08-21T20:26:03Z                 │
+stdout: │ Keyspaces        │ [0] default_keyspace                 │
+stdout: │ Regions          │ [0] ap-south-1                       │
+stdout: │                  │ [1] us-east-2                        │
+stdout: └──────────────────┴──────────────────────────────────────┘
 ---- end ----

@@ -23,6 +23,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @With
 @Value
@@ -37,9 +38,10 @@ public class CliContext {
     AstraHome home;
     FileSystem fs;
     GatewayProvider gateways;
+    Consumer<CliContext> upgradeNotifier;
 
     // necessary for testing purpose only
-    Optional<Profile> forceProfile;
+    Optional<Profile> forceUseProfile;
 
     public Path path(String first, String... more) {
         return fs.getPath(first, more);

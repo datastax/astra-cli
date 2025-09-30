@@ -7,6 +7,7 @@ import lombok.Cleanup;
 import lombok.val;
 import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine.IVersionProvider;
 
 import java.io.File;
@@ -17,6 +18,8 @@ import java.util.List;
 import static com.dtsx.astra.cli.core.CliEnvironment.unsafeResolvePlatform;
 
 public class CliProperties implements IVersionProvider {
+    private static boolean cachingEnabled = true;
+
     static {
         for (val file : List.of("static.properties", "dynamic.properties")) {
             try {
@@ -34,6 +37,11 @@ public class CliProperties implements IVersionProvider {
         cliName(); // load cli.name into system properties
         defaultRcFile(unsafeResolvePlatform().os() == OS.WINDOWS);
         defaultHomeFolder(unsafeResolvePlatform().os() == OS.WINDOWS);
+    }
+
+    @VisibleForTesting
+    public static void disableCaching() {
+        cachingEnabled = false;
     }
 
     public record ExternalSoftware(String url, Version version) {}
@@ -79,7 +87,7 @@ public class CliProperties implements IVersionProvider {
     }
 
     public static String defaultRcFile(boolean isWindows) {
-        if (cachedRcFile != null) {
+        if (cachedRcFile != null && cachingEnabled) {
             return cachedRcFile;
         }
 
@@ -112,7 +120,7 @@ public class CliProperties implements IVersionProvider {
     private static @Nullable String cachedHomeFolder = null;
 
     public static String defaultHomeFolder(boolean isWindows) {
-        if (cachedHomeFolder != null) {
+        if (cachedHomeFolder != null && cachingEnabled) {
             return cachedHomeFolder;
         }
 
@@ -149,7 +157,7 @@ public class CliProperties implements IVersionProvider {
     private static @Nullable String cachedCliName = null;
 
     public static String cliName() {
-        if (cachedCliName != null) {
+        if (cachedCliName != null && cachingEnabled) {
             return cachedCliName;
         }
 

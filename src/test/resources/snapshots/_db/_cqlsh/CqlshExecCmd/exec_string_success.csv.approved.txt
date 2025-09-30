@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db 'DESC KEYSPACES' -o csv
+command: astra db cqlsh exec two_regions_db CONSISTENCY -o csv
 exit_code: 0
 comments: 
  | Can't really test human output since we don't capture cqlsh output for human outputs
@@ -7,9 +7,5 @@ comments:
  | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
 ---- output ----
 stdout: code,message,data.exitCode,data.stdout,data.stderr
-stdout: OK,"Cqlsh executed with exit code 0, with 5 lines in stdout and 0 lines in stderr.",0,"
-stdout: datastax_sla   system              default_keyspace  system_virtual_schema
-stdout: system_auth    system_traces       other_keyspace☐☐
-stdout: system_schema  data_endpoint_auth  system_views☐☐☐☐
-stdout: ",
+stdout: OK,"Cqlsh executed with exit code 0, with 1 lines in stdout and 0 lines in stderr.",0,Current consistency level is LOCAL_QUORUM.,
 ---- end ----

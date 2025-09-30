@@ -59,7 +59,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
             val startedProcess = ctx.log().loading("Starting cqlsh", (_) -> {
                 try {
                     val res = startProcess(commandLine);
-                    Thread.sleep(500); // cqlsh doesn't print anything immediately, so let spinner run a bit longer
+                    Thread.sleep(100); // cqlsh doesn't print anything immediately, so let spinner run a bit longer
                     return res;
                 } catch (Exception e) {
                     throw new RuntimeException(e);

@@ -28,6 +28,7 @@ import com.dtsx.astra.cli.core.output.JansiUtils;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
+import com.dtsx.astra.cli.core.upgrades.UpgradeNotifier;
 import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.Cleanup;
@@ -129,6 +130,7 @@ public class AstraCli extends AbstractCmd<Void> {
             new AstraHome(AstraHome.resolveDefaultAstraHomeFolder(FileSystems.getDefault(), CliEnvironment.unsafeResolvePlatform())),
             FileSystems.getDefault(),
             new GatewayProviderImpl(),
+            UpgradeNotifier::run,
             Optional.empty()
         ));
 

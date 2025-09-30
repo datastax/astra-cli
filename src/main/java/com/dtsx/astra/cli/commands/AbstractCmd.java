@@ -12,7 +12,6 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.*;
-import com.dtsx.astra.cli.core.upgrades.UpgradeNotifier;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -144,7 +143,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.home(),
             ctx.fs(),
             ctx.gateways(),
-            ctx.forceProfile()
+            ctx.upgradeNotifier(),
+            ctx.forceUseProfile()
         ));
     }
 
@@ -159,7 +159,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     @MustBeInvokedByOverriders
     protected void prelude() {
         if (!disableUpgradeNotifier()) {
-            UpgradeNotifier.run(ctx);
+            ctx.upgradeNotifier().accept(ctx);
         }
         spec.commandLine().setColorScheme(ctx.colorScheme());
     }

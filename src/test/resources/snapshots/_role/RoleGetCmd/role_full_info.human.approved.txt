@@ -2,25 +2,25 @@
 command: astra role get 'R/W Svc Acct'
 exit_code: 0
 ---- output ----
-stdout: +-------------+------------------------------------------------------+
-stdout: | Attribute   | Value                                                |
-stdout: +-------------+------------------------------------------------------+
-stdout: | Identifier  | b4ed0e9e-67e8-47b6-8b58-c6629be961a9                 |
-stdout: | Name        | R/W Svc Acct                                         |
-stdout: | Description | R/W Svc Acct                                         |
-stdout: | Effect      | allow                                                |
-stdout: | Resources   | [0] drn:astra:org:__ORG_ID__                         |
-stdout: |             | [1] drn:astra:org:__ORG_ID__:db:*                    |
-stdout: |             | [2] drn:astra:org:__ORG_ID__:db:*:keyspace:*         |
-stdout: |             | [3] drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:* |
-stdout: | Actions     | [0] accesslist-read                                  |
-stdout: |             | [1] db-all-keyspace-describe                         |
-stdout: |             | [2] db-keyspace-describe                             |
-stdout: |             | [3] db-table-select                                  |
-stdout: |             | [4] db-table-modify                                  |
-stdout: |             | [5] db-table-describe                                |
-stdout: |             | [6] db-graphql                                       |
-stdout: |             | [7] db-rest                                          |
-stdout: |             | [8] db-cql                                           |
-stdout: +-------------+------------------------------------------------------+
+stdout: ┌─────────────┬──────────────────────────────────────────────────────┐
+stdout: │ Attribute   │ Value                                                │
+stdout: ├─────────────┼──────────────────────────────────────────────────────┤
+stdout: │ Identifier  │ b4ed0e9e-67e8-47b6-8b58-c6629be961a9                 │
+stdout: │ Name        │ R/W Svc Acct                                         │
+stdout: │ Description │ R/W Svc Acct                                         │
+stdout: │ Effect      │ allow                                                │
+stdout: │ Resources   │ [0] drn:astra:org:__ORG_ID__                         │
+stdout: │             │ [1] drn:astra:org:__ORG_ID__:db:*                    │
+stdout: │             │ [2] drn:astra:org:__ORG_ID__:db:*:keyspace:*         │
+stdout: │             │ [3] drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:* │
+stdout: │ Actions     │ [0] accesslist-read                                  │
+stdout: │             │ [1] db-all-keyspace-describe                         │
+stdout: │             │ [2] db-keyspace-describe                             │
+stdout: │             │ [3] db-table-select                                  │
+stdout: │             │ [4] db-table-modify                                  │
+stdout: │             │ [5] db-table-describe                                │
+stdout: │             │ [6] db-graphql                                       │
+stdout: │             │ [7] db-rest                                          │
+stdout: │             │ [8] db-cql                                           │
+stdout: └─────────────┴──────────────────────────────────────────────────────┘
 ---- end ----

@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db delete two_regions_db --timeout 36 -o json
+exit_code: 0
+---- output ----
+stderr: You are about to permanently delete database two_regions_db (822b0fff-6a73-4322-a8ec-09832b075287).
+stderr: 
+stderr: To confirm, type the name below or press Ctrl+C to cancel.
+stderr: >☐
+readln: two_regions_db
+stderr: 
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Database 'two_regions_db' has been deleted and fully terminated (waited 6s for termination).",
+stdout:   "data" : {
+stdout:     "wasDeleted" : true,
+stdout:     "waitedSeconds" : 6
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

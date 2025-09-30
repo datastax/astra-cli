@@ -67,14 +67,14 @@ public class TestCliContext implements AutoCloseable {
             new AstraHome(homeDirPath),
             options.fs(),
             options.gateways(),
+            (_) -> { /* no upgrade notifier in tests for obvious reasons */ },
             options.forceProfile()
         ));
     }
 
     private @NotNull AstraConsole mkConsole(InputStream inputStream, List<OutputLine> outputLines, Supplier<CliContext> getCtx) {
-        val readLineImpl = (Function<String, String>) (prompt) -> {
+        val readLineImpl = (Supplier<String>) () -> {
             try {
-                Arrays.stream(prompt.split("\\R")).map(StdoutLine::new).forEach(outputLines::add);
                 val read = new Scanner(inputStream).nextLine();
                 outputLines.add(new StdinLine(read));
                 return read;

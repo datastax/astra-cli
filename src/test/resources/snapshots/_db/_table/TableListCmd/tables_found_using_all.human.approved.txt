@@ -2,12 +2,12 @@
 command: astra db list-tables two_regions_db --all
 exit_code: 0
 ---- output ----
-stdout: +-----------+-------------+
-stdout: | Keyspace  | Name        |
-stdout: +-----------+-------------+
-stdout: | ks1       | test_table  |
-stdout: | ks1       | small_table |
-stdout: | ks2       | test_table  |
-stdout: | ks2       | small_table |
-stdout: +-----------+-------------+
+stdout: ┌───────────┬─────────────┐
+stdout: │ Keyspace  │ Name        │
+stdout: ├───────────┼─────────────┤
+stdout: │ ks1       │ test_table  │
+stdout: │ ks1       │ small_table │
+stdout: │ ks2       │ test_table  │
+stdout: │ ks2       │ small_table │
+stdout: └───────────┴─────────────┘
 ---- end ----

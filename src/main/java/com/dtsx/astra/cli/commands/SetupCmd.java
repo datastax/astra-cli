@@ -14,10 +14,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.SetupOperation;
-import com.dtsx.astra.cli.operations.SetupOperation.InvalidToken;
-import com.dtsx.astra.cli.operations.SetupOperation.ProfileCreated;
-import com.dtsx.astra.cli.operations.SetupOperation.SetupRequest;
-import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
+import com.dtsx.astra.cli.operations.SetupOperation.*;
 import com.dtsx.astra.cli.utils.StringUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
@@ -64,6 +61,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     protected final OutputHuman executeHuman(Supplier<SetupResult> result) {
         return switch (result.get()) {
             case ProfileCreated pc -> handleProfileCreated(pc);
+            case SameProfileAlreadyExists pe -> handleSameProfileAlreadyExists(pe);
             case InvalidToken(var hint) -> throwInvalidToken(hint);
         };
     }
@@ -100,6 +98,17 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         ));
     }
 
+    private OutputHuman handleSameProfileAlreadyExists(SameProfileAlreadyExists result) {
+        return OutputHuman.response("""
+          @|bold Profile|@ %s @|bold already exists with the same token and environment.|@
+        
+          No changes were made to your configuration.
+        """.formatted(ctx.highlight(result.profileName())), List.of(
+            new Hint("Manage your profiles", "${cli.name} config list"),
+            new Hint("Get more information about this profile", "${cli.name} config get " + result.profileName())
+        ));
+    }
+
     private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
         val hintStr = hint
             .map((env) -> " It is, however, valid for @!" + env.name().toLowerCase() + "!@.")
@@ -128,7 +137,6 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
                 this::assertShouldContinueIfAlreadySetup,
                 this::assertShouldOverwriteExistingProfile,
                 this::promptForToken,
-                this::promptForGuessedEnvConfirmation,
                 this::promptForEnv,
                 this::promptForName,
                 this::promptShouldSetDefault
@@ -239,18 +247,6 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             .fallbackFlag("--token")
             .fix(originalArgs(), "--token <your_token>")
             .dontClearAfterSelection();
-    }
-
-    private boolean promptForGuessedEnvConfirmation(AstraEnvironment env) {
-        val prompt = """
-          It looks like your token is valid for the @!%s!@ environment. Do you want to use this environment?
-        """.formatted(env.name().toLowerCase());
-
-        return ctx.console().confirm(prompt)
-            .defaultYes()
-            .fallbackFlag("")
-            .fix(List.of(), "")
-            .clearAfterSelection();
     }
 
     private AstraEnvironment promptForEnv(AstraEnvironment defaultEnv) {

@@ -19,7 +19,6 @@ import picocli.CommandLine.Option;
 import java.io.Console;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -35,7 +34,7 @@ public class AstraConsole {
     private final PrintWriter err;
 
     @Getter
-    private final @Nullable Function<String, String> readLineImpl;
+    private final @Nullable Supplier<String> readLineImpl;
 
     private final Supplier<CliContext> ctxSupplier;
     private final boolean noInput;
@@ -103,17 +102,19 @@ public class AstraConsole {
     }
 
     public String unsafeReadLine(@Nullable String prompt, boolean echoOff) {
-        if (readLineImpl != null) {
-            return readLineImpl.apply(prompt);
-        }
-
         if (console == null) {
             throw new CongratsYouFoundABugException("System.console() is null, unable to read input"); // should only be used internally in prompters
         }
 
+        error(prompt != null ? prompt : "");
+
+        if (readLineImpl != null) {
+            return readLineImpl.get();
+        }
+
         return (echoOff)
-            ? String.valueOf(console.readPassword(prompt != null ? prompt : ""))
-            : console.readLine(prompt != null ? prompt : "");
+            ? String.valueOf(console.readPassword())
+            : console.readLine();
     }
 
     public String format(Object... args) {

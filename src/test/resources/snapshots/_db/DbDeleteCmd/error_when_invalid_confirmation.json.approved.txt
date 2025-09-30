@@ -1,0 +1,20 @@
+---- meta ----
+command: astra db delete two_regions_db --timeout 36 -o json
+exit_code: 2
+---- output ----
+stderr: You are about to permanently delete database two_regions_db (822b0fff-6a73-4322-a8ec-09832b075287).
+stderr: 
+stderr: To confirm, type the name below or press Ctrl+C to cancel.
+stderr: >☐
+readln: *invalid*
+stderr: 
+stdout: {
+stdout:   "code" : "EXECUTION_CANCELLED",
+stdout:   "message" : "Error: User input did not match database name.\n\nDatabase two_regions_db was not deleted.",
+stdout:   "data" : null,
+stdout:   "nextSteps" : [ {
+stdout:     "comment" : "Skip confirmation prompt:",
+stdout:     "command" : "astra db delete two_regions_db --timeout 36 -o json --yes"
+stdout:   } ]
+stdout: }
+---- end ----

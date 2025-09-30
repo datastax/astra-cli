@@ -21,12 +21,12 @@ public class CqlshExecCmdSnapshotTest extends BaseCqlshExecCmd {
 
     @TestForDifferentOutputs
     public void error_db_not_found(OutputType outputType) {
-        verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}", "DESC KEYSPACES"), outputType, dbNotFoundOpts);
+        verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}", "CONSISTENCY"), outputType, dbNotFoundOpts);
     }
 
     @TestForAllOutputs
     public void exec_string_success(OutputType outputType) {
-        verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}", "DESC KEYSPACES"), outputType, dbFoundOpts.andThen(disclaimerComments));
+        verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}", "CONSISTENCY"), outputType, dbFoundOpts.andThen(disclaimerComments));
     }
 
     @TestForAllOutputs
@@ -37,18 +37,18 @@ public class CqlshExecCmdSnapshotTest extends BaseCqlshExecCmd {
     @TestForAllOutputs
     public void exec_string_stdin_implied(OutputType outputType) {
         verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}"), outputType, o -> o.use(dbFoundOpts).use(disclaimerComments)
-            .stdin("DESC KEYSPACES;"));
+            .stdin("CONSISTENCY;"));
     }
 
     @TestForAllOutputs
     public void exec_string_stdin_explicit(OutputType outputType) {
         verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}", "-"), outputType, o -> o.use(dbFoundOpts).use(disclaimerComments)
-            .stdin("DESC KEYSPACES;"));
+            .stdin("CONSISTENCY;"));
     }
 
     @TestForDifferentOutputs
     public void exec_string_stdin_multiline(OutputType outputType) {
         verifyRun(escape("db", "cqlsh", "exec", "${DatabaseName}"), outputType, o -> o.use(dbFoundOpts).use(disclaimerComments)
-            .stdin("DESC KEYSPACES;\\\nSHOW VERSION;\\\nHELP"));
+            .stdin("CONSISTENCY;\\\nSHOW VERSION;\\\nHELP"));
     }
 }

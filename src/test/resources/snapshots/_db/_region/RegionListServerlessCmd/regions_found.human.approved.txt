@@ -2,14 +2,14 @@
 command: astra db list-regions-serverless
 exit_code: 0
 ---- output ----
-stdout: +-----------------+-------------+-----------------------+---------------+
-stdout: | Cloud Provider  | Region      | Display Name          | Zone          |
-stdout: +-----------------+-------------+-----------------------+---------------+
-stdout: | aws             | us-east-1   | US East (N. Virginia) | North America |
-stdout: | aws (free)      | us-west-2   | US West (Oregon)      | North America |
-stdout: | azure           | eastus      | East US               | North America |
-stdout: | azure (free)    | westus2     | West US 2             | Europe        |
-stdout: | gcp             | us-central1 | Iowa                  | North America |
-stdout: | gcp (free)      | us-east1    | South Carolina        | Europe        |
-stdout: +-----------------+-------------+-----------------------+---------------+
+stdout: ┌─────────────────┬─────────────┬───────────────────────┬───────────────┐
+stdout: │ Cloud Provider  │ Region      │ Display Name          │ Zone          │
+stdout: ├─────────────────┼─────────────┼───────────────────────┼───────────────┤
+stdout: │ aws             │ us-east-1   │ US East (N. Virginia) │ North America │
+stdout: │ aws (free)      │ us-west-2   │ US West (Oregon)      │ North America │
+stdout: │ azure           │ eastus      │ East US               │ North America │
+stdout: │ azure (free)    │ westus2     │ West US 2             │ Europe        │
+stdout: │ gcp             │ us-central1 │ Iowa                  │ North America │
+stdout: │ gcp (free)      │ us-east1    │ South Carolina        │ Europe        │
+stdout: └─────────────────┴─────────────┴───────────────────────┴───────────────┘
 ---- end ----

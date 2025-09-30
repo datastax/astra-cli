@@ -2,36 +2,36 @@
 command: astra db describe-table two_regions_db -t test_table
 exit_code: 0
 ---- output ----
-stdout: +--------------------+-----------------+
-stdout: | Attribute          | Value           |
-stdout: +--------------------+-----------------+
-stdout: | Name               | test_table      |
-stdout: |                    |                 |
-stdout: | 'COLUMNS'          |                 |
-stdout: | date               | DATE            |
-stdout: | varint             | VARINT          |
-stdout: | set                | SET<UUID>       |
-stdout: | inet               | INET            |
-stdout: | double             | DOUBLE          |
-stdout: | tinyint            | TINYINT         |
-stdout: | float              | FLOAT           |
-stdout: | list               | LIST<UUID>      |
-stdout: | uuid               | UUID            |
-stdout: | int                | INT             |
-stdout: | duration           | DURATION        |
-stdout: | smallint           | SMALLINT        |
-stdout: | blob               | BLOB            |
-stdout: | boolean            | BOOLEAN         |
-stdout: | vector             | VECTOR<FLOAT,5> |
-stdout: | text               | TEXT            |
-stdout: | time               | TIME            |
-stdout: | decimal            | DECIMAL         |
-stdout: | ascii              | ASCII           |
-stdout: | bigint             | BIGINT          |
-stdout: | map                | MAP<TEXT, UUID> |
-stdout: | timestamp          | TIMESTAMP       |
-stdout: | 'PRIMARY KEY'      |                 |
-stdout: | Partition Key      | text            |
-stdout: | Clustering Columns | int(ASC)        |
-stdout: +--------------------+-----------------+
+stdout: ┌────────────────────┬─────────────────┐
+stdout: │ Attribute          │ Value           │
+stdout: ├────────────────────┼─────────────────┤
+stdout: │ Name               │ test_table      │
+stdout: │                    │                 │
+stdout: │ 'COLUMNS'          │                 │
+stdout: │ date               │ DATE            │
+stdout: │ varint             │ VARINT          │
+stdout: │ set                │ SET<UUID>       │
+stdout: │ inet               │ INET            │
+stdout: │ double             │ DOUBLE          │
+stdout: │ tinyint            │ TINYINT         │
+stdout: │ float              │ FLOAT           │
+stdout: │ list               │ LIST<UUID>      │
+stdout: │ uuid               │ UUID            │
+stdout: │ int                │ INT             │
+stdout: │ duration           │ DURATION        │
+stdout: │ smallint           │ SMALLINT        │
+stdout: │ blob               │ BLOB            │
+stdout: │ boolean            │ BOOLEAN         │
+stdout: │ vector             │ VECTOR<FLOAT,5> │
+stdout: │ text               │ TEXT            │
+stdout: │ time               │ TIME            │
+stdout: │ decimal            │ DECIMAL         │
+stdout: │ ascii              │ ASCII           │
+stdout: │ bigint             │ BIGINT          │
+stdout: │ map                │ MAP<TEXT, UUID> │
+stdout: │ timestamp          │ TIMESTAMP       │
+stdout: │ 'PRIMARY KEY'      │                 │
+stdout: │ Partition Key      │ text            │
+stdout: │ Clustering Columns │ int(ASC)        │
+stdout: └────────────────────┴─────────────────┘
 ---- end ----

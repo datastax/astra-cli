@@ -1,8 +1,10 @@
 package com.dtsx.astra.cli.integration.core;
 
 import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.models.Version;
 import lombok.val;
 import net.jqwik.api.Arbitraries;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Execution(ExecutionMode.SAME_THREAD)
 @ExtendWith(SystemStubsExtension.class)
 public class CliPropertiesIntegrationTest {
-    static {
-        CliProperties props = null; // force class loading since it uses a static initializer
+    @BeforeAll
+    public static void setup() {
+        CliProperties.disableCaching(); // disable caching to test different cases + force class loading since it uses a static initializer
     }
 
     @Nested
@@ -33,39 +36,39 @@ public class CliPropertiesIntegrationTest {
         public void cqlsh(SystemProperties systemProps) {
             systemProps.set(
                 "cqlsh.url", "<cqlsh_url>",
-                "cqlsh.version", "<cqlsh_version>"
+                "cqlsh.version", "v3.2.1"
             );
 
             val cqlsh = CliProperties.cqlsh();
 
             assertThat(cqlsh.url()).isEqualTo("<cqlsh_url>");
-            assertThat(cqlsh.version()).isEqualTo("<cqlsh_version>");
+            assertThat(cqlsh.version()).isEqualTo(Version.mkUnsafe("v3.2.1"));
         }
 
         @Test
         public void dsbulk(SystemProperties systemProps) {
             systemProps.set(
                 "dsbulk.url", "<dsbulk_url>",
-                "dsbulk.version", "<dsbulk_version>"
+                "dsbulk.version", "v6.5.4"
             );
 
             val dsbulk = CliProperties.dsbulk();
 
             assertThat(dsbulk.url()).isEqualTo("<dsbulk_url>");
-            assertThat(dsbulk.version()).isEqualTo("<dsbulk_version>");
+            assertThat(dsbulk.version()).isEqualTo(Version.mkUnsafe("6.5.4"));
         }
 
         @Test
         public void pulsar(SystemProperties systemProps) {
             systemProps.set(
                 "pulsar-shell.url", "<pulsar_url>",
-                "pulsar-shell.version", "<pulsar_version>"
+                "pulsar-shell.version", "9.8.7"
             );
 
             val pulsar = CliProperties.pulsar();
 
             assertThat(pulsar.url()).isEqualTo("<pulsar_url>");
-            assertThat(pulsar.version()).isEqualTo("<pulsar_version>");
+            assertThat(pulsar.version()).isEqualTo(Version.mkUnsafe("9.8.7"));
         }
     }
 
@@ -74,25 +77,17 @@ public class CliPropertiesIntegrationTest {
         @Test
         public void static_version(SystemProperties systemProps) {
             systemProps.set(
-                "cli.version", "<cli_version>"
+                "cli.version", "v3.3.3"
             );
-            assertThat(CliProperties.version()).isEqualTo("<cli_version>");
+            assertThat(CliProperties.version()).isEqualTo(Version.mkUnsafe("3.3.3"));
         }
 
         @Test
         public void instance_version(SystemProperties systemProps) {
             systemProps.set(
-                "cli.version", "<cli_version>"
+                "cli.version", "v6.6.6"
             );
-            assertThat(new CliProperties().getVersion()).containsExactly("<cli_version>");
-        }
-
-        @Test
-        public void static_and_instance_version_are_always_equal(SystemProperties systemProps) {
-            systemProps.set(
-                "cli.version", String.valueOf(Math.random())
-            );
-            assertThat(new CliProperties().getVersion()).containsExactly(CliProperties.version());
+            assertThat(new CliProperties().getVersion()).containsExactly("v" + Version.mkUnsafe("6.6.6"));
         }
     }
 
@@ -119,13 +114,20 @@ public class CliPropertiesIntegrationTest {
     @Nested
     public class env_vars {
         @Test
-        public void rc_env_var() {
-            assertThat(CliProperties.rcEnvVar()).isEqualTo("ASTRARC");
+        public void rc_env_var(SystemProperties systemProps) {
+            systemProps.set(
+                "cli.rc-file.env-var", "CUSTOM_ASTRARC_ENV_VAR"
+            );
+            System.out.println(System.getProperty("cli.rc-file.env-var") + "1");
+            assertThat(CliProperties.rcEnvVar()).isEqualTo("CUSTOM_ASTRARC_ENV_VAR");
         }
 
         @Test
-        public void home_env_var() {
-            assertThat(CliProperties.homeEnvVar()).isEqualTo("ASTRA_HOME");
+        public void home_env_var(SystemProperties systemProps) {
+            systemProps.set(
+                "cli.home-folder.env-var", "CUSTOM_ASTRA_HOME_ENV_VAR"
+            );
+            assertThat(CliProperties.homeEnvVar()).isEqualTo("CUSTOM_ASTRA_HOME_ENV_VAR");
         }
     }
 
@@ -161,10 +163,10 @@ public class CliPropertiesIntegrationTest {
 
             @Test
             public void uses_xdg_if_no_custom_path(SystemProperties sys, EnvironmentVariables env) {
+                sys.set("cli.home-folder.name", "<home_folder_name>");
                 val xdgPath = mkRcFileSteps.apply(sys, env).applyXdgAndDefaults();
-                val homePath = mkHomeFolderSteps.apply(sys, env).applyAll();
 
-                val expectedSubpath = File.separator + homePath + File.separator + CliProperties.rcFileName();
+                val expectedSubpath = File.separator + "<home_folder_name>" + File.separator + CliProperties.rcFileName();
 
                 // returned path should not depend on the os; the display path should depend on the os though
                 assertThat(CliProperties.defaultRcFile(true)).isEqualTo(xdgPath + expectedSubpath);
@@ -234,7 +236,7 @@ public class CliPropertiesIntegrationTest {
                 val defaultPath = mkHomeFolderSteps.apply(sys, env).applyWindowsDefault();
 
                 sys.set("cli.home-folder.name", "custom-home-folder");
-                val expectedSubpath = File.separator + "custom-home-folder";
+                val expectedSubpath = File.separator + ".custom-home-folder";
 
                 assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(defaultPath + expectedSubpath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%LOCALAPPDATA%" + expectedSubpath);
@@ -253,6 +255,7 @@ public class CliPropertiesIntegrationTest {
 
             public String applyXdgAndDefaults() {
                 val xdgStr = "xdg_rand('" + randStr() + "')";
+                this.custom.accept("");
                 this.xdg.accept(xdgStr);
                 this.defaultWindows.accept("*unexpected_windows*");
                 this.defaultUnix.accept("*unexpected_unix*");
@@ -261,6 +264,8 @@ public class CliPropertiesIntegrationTest {
 
             public String applyBothDefaults() {
                 val fallbackStr = "default_rand('" + randStr() + "')";
+                this.custom.accept("");
+                this.xdg.accept("");
                 this.defaultUnix.accept(fallbackStr);
                 this.defaultWindows.accept(fallbackStr);
                 return fallbackStr;
@@ -268,6 +273,8 @@ public class CliPropertiesIntegrationTest {
 
             public String applyWindowsDefault() {
                 val fallbackStr = "windows_rand('" + randStr() + "')";
+                this.custom.accept("");
+                this.xdg.accept("");
                 this.defaultWindows.accept(fallbackStr);
                 this.defaultUnix.accept("*unexpected_unix*");
                 return fallbackStr;
@@ -275,6 +282,8 @@ public class CliPropertiesIntegrationTest {
 
             public String applyUnixDefault() {
                 val fallbackStr = "unix_rand('" + randStr() + "')";
+                this.custom.accept("");
+                this.xdg.accept("");
                 this.defaultUnix.accept(fallbackStr);
                 this.defaultWindows.accept("*unexpected_windows*");
                 return fallbackStr;

@@ -2,12 +2,12 @@
 command: astra db describe-collection two_regions_db -c test_coll
 exit_code: 0
 ---- output ----
-stdout: +-------------------+-----------+
-stdout: | Attribute         | Value     |
-stdout: +-------------------+-----------+
-stdout: | Name              | test_coll |
-stdout: | Estimated Count   | 12345     |
-stdout: | Vector Dimension  | 5         |
-stdout: | Similarity Metric | cosine    |
-stdout: +-------------------+-----------+
+stdout: ┌───────────────────┬───────────┐
+stdout: │ Attribute         │ Value     │
+stdout: ├───────────────────┼───────────┤
+stdout: │ Name              │ test_coll │
+stdout: │ Estimated Count   │ 12345     │
+stdout: │ Vector Dimension  │ 5         │
+stdout: │ Similarity Metric │ cosine    │
+stdout: └───────────────────┴───────────┘
 ---- end ----

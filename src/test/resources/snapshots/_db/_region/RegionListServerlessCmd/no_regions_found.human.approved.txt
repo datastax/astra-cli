@@ -2,8 +2,8 @@
 command: astra db list-regions-serverless
 exit_code: 0
 ---- output ----
-stdout: +-----------------+---------+---------------+-------+
-stdout: | Cloud Provider  | Region  | Display Name  | Zone  |
-stdout: +-----------------+---------+---------------+-------+
-stdout: +-----------------+---------+---------------+-------+
+stdout: ┌─────────────────┬─────────┬───────────────┬───────┐
+stdout: │ Cloud Provider  │ Region  │ Display Name  │ Zone  │
+stdout: ├─────────────────┼─────────┼───────────────┼───────┤
+stdout: └─────────────────┴─────────┴───────────────┴───────┘
 ---- end ----

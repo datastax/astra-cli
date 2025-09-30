@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db 'DESC KEYSPACES' -o json
+command: astra db cqlsh exec two_regions_db CONSISTENCY -o json
 exit_code: 2
 ---- output ----
 stdout: {

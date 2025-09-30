@@ -80,8 +80,8 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             return cachedProfile;
         }
 
-        if (ctx.forceProfile().isPresent()) {
-            return cachedProfile = ctx.forceProfile().get();
+        if (ctx.forceUseProfile().isPresent()) {
+            return cachedProfile = ctx.forceUseProfile().get();
         }
 
         if ($credsProvider != null && $credsProvider.$creds != null) {

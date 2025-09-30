@@ -2,14 +2,14 @@
 command: astra streaming list-regions
 exit_code: 0
 ---- output ----
-stdout: +-----------------+-------------+-----------------------+
-stdout: | Cloud Provider  | Region      | Display Name          |
-stdout: +-----------------+-------------+-----------------------+
-stdout: | gcp             | us-central1 | Iowa                  |
-stdout: | gcp (premium)   | us-east1    | South Carolina        |
-stdout: | azure           | eastus      | East US               |
-stdout: | azure (premium) | westus2     | West US 2             |
-stdout: | aws             | us-east-1   | US East (N. Virginia) |
-stdout: | aws (premium)   | us-west-2   | US West (Oregon)      |
-stdout: +-----------------+-------------+-----------------------+
+stdout: ┌─────────────────┬─────────────┬───────────────────────┐
+stdout: │ Cloud Provider  │ Region      │ Display Name          │
+stdout: ├─────────────────┼─────────────┼───────────────────────┤
+stdout: │ gcp             │ us-central1 │ Iowa                  │
+stdout: │ gcp (premium)   │ us-east1    │ South Carolina        │
+stdout: │ azure           │ eastus      │ East US               │
+stdout: │ azure (premium) │ westus2     │ West US 2             │
+stdout: │ aws             │ us-east-1   │ US East (N. Virginia) │
+stdout: │ aws (premium)   │ us-west-2   │ US West (Oregon)      │
+stdout: └─────────────────┴─────────────┴───────────────────────┘
 ---- end ----

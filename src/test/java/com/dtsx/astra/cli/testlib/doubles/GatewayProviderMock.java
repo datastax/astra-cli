@@ -16,6 +16,7 @@ import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
+import com.dtsx.astra.cli.gateways.upgrade.UpgradeGateway;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AllArgsConstructor;
@@ -100,6 +101,10 @@ public class GatewayProviderMock implements GatewayProvider {
         return returnIfEnabled(UserGateway.class);
     }
 
+    public UpgradeGateway upgradeGateway() {
+        return returnIfEnabled(UpgradeGateway.class);
+    }
+
     @Override
     public DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache, CliContext ctx) {
         return dbGateway();
@@ -163,6 +168,11 @@ public class GatewayProviderMock implements GatewayProvider {
     @Override
     public UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx) {
         return userGateway();
+    }
+
+    @Override
+    public UpgradeGateway mkUpgradeGateway(CliContext ctx) {
+        return upgradeGateway();
     }
 
     public GatewayProviderMock withInstance(SomeGateway instance) {

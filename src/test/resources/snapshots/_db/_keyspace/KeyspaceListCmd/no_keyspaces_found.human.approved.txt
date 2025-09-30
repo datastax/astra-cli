@@ -2,8 +2,8 @@
 command: astra db list-keyspaces 822b0fff-6a73-4322-a8ec-09832b075287
 exit_code: 0
 ---- output ----
-stdout: +-------+
-stdout: | Name  |
-stdout: +-------+
-stdout: +-------+
+stdout: ┌───────┐
+stdout: │ Name  │
+stdout: ├───────┤
+stdout: └───────┘
 ---- end ----

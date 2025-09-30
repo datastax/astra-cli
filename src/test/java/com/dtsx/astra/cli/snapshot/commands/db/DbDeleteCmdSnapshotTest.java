@@ -68,7 +68,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
             }));
     }
 
-    @TestForHumanOutput
+    @TestForAllOutputs
     public void delete_db_with_confirmation(OutputType outputType) {
         verifyRun("db delete ${DatabaseName} --timeout 36", outputType, o -> o.use(deleteDbOpts)
             .stdin(Databases.NameRef.toString())
@@ -81,7 +81,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
             }));
     }
 
-    @TestForHumanOutput
+    @TestForDifferentOutputs
     public void error_when_invalid_confirmation(OutputType outputType) {
         verifyRun("db delete ${DatabaseName} --timeout 36", outputType, o -> o.use(deleteDbOpts)
             .stdin("*invalid*")

@@ -39,13 +39,13 @@ public class SetupOperation implements Operation<SetupResult> {
         Consumer<Path> assertShouldContinueIfAlreadySetup,
         Consumer<Profile> assertShouldOverwriteExistingProfile,
         Supplier<AstraToken> promptForToken,
-        Function<AstraEnvironment, Boolean> promptForGuessedEnvConfirmation,
         Function<AstraEnvironment, AstraEnvironment> promptForEnv,
         Function<String, ProfileName> promptForName,
         Supplier<Boolean> promptShouldSetDefault
     ) {}
 
     public sealed interface SetupResult {}
+    public record SameProfileAlreadyExists(ProfileName profileName) implements SetupResult {}
     public record ProfileCreated(ProfileName profileName, boolean overwritten, boolean isDefault) implements SetupResult {}
     public record InvalidToken(Optional<AstraEnvironment> hint) implements SetupResult {}
 
@@ -61,7 +61,20 @@ public class SetupOperation implements Operation<SetupResult> {
 
         return resolveProfileDetails(request).map((details) -> {
             if (Files.exists(configFile)) {
-                config().lookupProfile(details.profileName).ifPresent(request.assertShouldOverwriteExistingProfile);
+                val existingProfile = config().lookupProfile(details.profileName);
+
+                if (existingProfile.isPresent()) {
+                    val existingProfileIsSame =
+                        existingProfile.get().name().equals(Optional.ofNullable(details.profileName)) &&
+                        existingProfile.get().token().equals(details.token) &&
+                        existingProfile.get().env().equals(details.env);
+
+                    if (existingProfileIsSame) {
+                        return new SameProfileAlreadyExists(details.profileName);
+                    } else {
+                        request.assertShouldOverwriteExistingProfile.accept(existingProfile.get());
+                    }
+                }
             }
 
             val shouldSetDefault = (ifConfigExistsAnd(c -> c.profileExists(ProfileName.DEFAULT)))
@@ -111,10 +124,6 @@ public class SetupOperation implements Operation<SetupResult> {
             val guessed = statelessOrgGateway.resolveOrganizationEnvironment(token);
 
             if (guessed.isPresent()) {
-                guessedEnv = Optional.of(guessed.get().getLeft());
-            }
-
-            if (guessed.isPresent() && request.promptForGuessedEnvConfirmation.apply(guessed.get().getLeft())) {
                 return Either.pure(guessed.get());
             }
         }
@@ -124,7 +133,7 @@ public class SetupOperation implements Operation<SetupResult> {
         val orgGateway = createOrgGateway.apply(token, env, ctx);
         val org = validateTokenAndFetchOrg(orgGateway);
 
-        return org.isPresent()
+        return (org.isPresent())
             ? Either.pure(Pair.create(env, org.get()))
             : Either.left(guessedEnv);
     }

@@ -2,8 +2,8 @@
 command: astra token list
 exit_code: 0
 ---- output ----
-stdout: +---------------+------------+--------+
-stdout: | Generated On  | Client Id  | Roles  |
-stdout: +---------------+------------+--------+
-stdout: +---------------+------------+--------+
+stdout: ┌───────────────┬────────────┬────────┐
+stdout: │ Generated On  │ Client Id  │ Roles  │
+stdout: ├───────────────┼────────────┼────────┤
+stdout: └───────────────┴────────────┴────────┘
 ---- end ----

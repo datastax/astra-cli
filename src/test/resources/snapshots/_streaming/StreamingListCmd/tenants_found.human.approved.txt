@@ -2,10 +2,10 @@
 command: astra streaming
 exit_code: 0
 ---- output ----
-stdout: +---------+--------+---------+----------+
-stdout: | name    | cloud  | region  | status   |
-stdout: +---------+--------+---------+----------+
-stdout: | tenant1 | AWS    | useast2 | 'active' |
-stdout: | tenant2 | AWS    | uswest3 | 'active' |
-stdout: +---------+--------+---------+----------+
+stdout: ┌─────────┬────────┬─────────┬──────────┐
+stdout: │ name    │ cloud  │ region  │ status   │
+stdout: ├─────────┼────────┼─────────┼──────────┤
+stdout: │ tenant1 │ AWS    │ useast2 │ 'active' │
+stdout: │ tenant2 │ AWS    │ uswest3 │ 'active' │
+stdout: └─────────┴────────┴─────────┴──────────┘
 ---- end ----
