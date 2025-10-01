@@ -1,16 +1,21 @@
 package com.dtsx.astra.cli.testlib.extensions.context;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliEnvironment;
 import com.dtsx.astra.cli.core.config.AstraHome;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
+import com.dtsx.astra.cli.core.properties.CliEnvironment;
+import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliProperties;
+import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import com.dtsx.astra.cli.testlib.doubles.GatewayProviderMock;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContextOptions.TestCliContextOptionsBuilder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
@@ -22,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -53,23 +59,65 @@ public class TestCliContext implements AutoCloseable {
         this.inputStream = mkFakeInput(options.stdin());
         this.rawOutput = Collections.synchronizedList(new ArrayList<>());
 
-        val homeDirPath = options.homeDir()
-            .map(fn -> fn.apply(options.fs()))
-            .orElseGet(() -> AstraHome.resolveDefaultAstraHomeFolder(options.fs(), CliEnvironment.unsafeResolvePlatform()));
+        val cliEnv = mkEnvironment();
+
+        val cliProperties = mkProperties(cliEnv, options.homeDir().map((fn) -> fn.apply(options.fs())));
 
         this.ref = new Ref<>((getCtx) -> new CliContext(
-            CliEnvironment.unsafeResolvePlatform(),
-            true,
+            cliEnv,
+            cliProperties,
             options.outputType(),
             new AstraColors(Ansi.OFF),
             new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), true),
             mkConsole(inputStream, rawOutput, getCtx),
-            new AstraHome(homeDirPath),
+            new AstraHome(getCtx),
             options.fs(),
             options.gateways(),
             (_) -> { /* no upgrade notifier in tests for obvious reasons */ },
             options.forceProfile()
         ));
+    }
+
+    @RequiredArgsConstructor
+    private static class FakeCliProperties implements CliProperties {
+        @Delegate(excludes = Exclude.class)
+        private final CliProperties delegate;
+
+        private final Optional<Path> homeDirPath;
+
+        @Override
+        public PathLocations homeFolderLocations(boolean isWindows) {
+            if (homeDirPath.isEmpty()) {
+                return delegate.homeFolderLocations(isWindows);
+            }
+
+            val pathStr = homeDirPath.get().toString();
+
+            return new PathLocations(
+                pathStr,
+                NEList.of(new PathLocation(pathStr, PathLocationResolver.CUSTOM))
+            );
+        }
+
+        private interface Exclude {
+            PathLocations defaultHomeFolder(boolean isWindows);
+        }
+    }
+
+    private CliEnvironment mkEnvironment() {
+        return new CliEnvironmentImpl() {
+            @Override
+            public boolean isTty() {
+                return true;
+            }
+        };
+    }
+
+    private CliProperties mkProperties(CliEnvironment cliEnv, Optional<Path> homeDir) {
+        return new FakeCliProperties(
+            CliPropertiesImpl.mkAndLoadSysProps(cliEnv),
+            homeDir
+        );
     }
 
     private @NotNull AstraConsole mkConsole(InputStream inputStream, List<OutputLine> outputLines, Supplier<CliContext> getCtx) {

@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.commands.config.home;
 
 import com.dtsx.astra.cli.commands.AbstractCmd;
-import com.dtsx.astra.cli.core.CliProperties.FileResolvers;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.properties.CliProperties.PathLocationResolver;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.home.ConfigHomePathOperation;
 import com.dtsx.astra.cli.operations.config.home.ConfigHomePathOperation.ConfigPathResult;
@@ -52,11 +51,10 @@ public class ConfigHomePathCmd extends AbstractCmd<ConfigPathResult> {
             ? "Home folder found at"
             : "Your home folder would be at";
 
-        val usingMsg = switch (res.get().resolver()) {
-            case FileResolvers.CUSTOM -> "using the ASTRA_HOME environment variable";
-            case FileResolvers.XDG -> "following the XDG spec ($XDG_DATA_HOME)";
-            case FileResolvers.HOME -> "using the default location of the user's home directory";
-            default -> throw new CongratsYouFoundABugException("Unknown resolver: " + res.get().resolver());
+        val usingMsg = switch (PathLocationResolver.valueOf(res.get().resolver())) {
+            case PathLocationResolver.CUSTOM -> "using the ASTRA_HOME environment variable";
+            case PathLocationResolver.XDG -> "following the XDG spec ($XDG_DATA_HOME)";
+            case PathLocationResolver.HOME -> "using the default location of the user's home directory";
         };
 
         val existsMsg = (!res.get().exists())

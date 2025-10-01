@@ -9,8 +9,6 @@ import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliEnvironment;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Ref;
@@ -28,6 +26,9 @@ import com.dtsx.astra.cli.core.output.JansiUtils;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
+import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
+import com.dtsx.astra.cli.core.properties.MemoizedCliProperties;
 import com.dtsx.astra.cli.core.upgrades.UpgradeNotifier;
 import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
 import com.dtsx.astra.cli.operations.Operation;
@@ -55,7 +56,6 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "${cli.name}",
-    versionProvider = CliProperties.class,
     subcommands = {
         CommandLine.HelpCommand.class,
         SetupCmd.class,
@@ -88,12 +88,16 @@ public class AstraCli extends AbstractCmd<Void> {
     @Option(
         names = { "-v", "--version" },
         description = "Print version information and exit.",
-        versionHelp = true
+        help = true
     )
     private boolean $versionRequested;
 
     @Override
     public final OutputHuman executeHuman(Supplier<Void> v) {
+        if ($versionRequested) {
+            return OutputHuman.response("v" + ctx.properties().version());
+        }
+
         ctx.log().banner();
 
         val sj = new StringJoiner(NL);
@@ -108,7 +112,7 @@ public class AstraCli extends AbstractCmd<Void> {
     @Override
     protected OutputAll execute(Supplier<Void> v) {
         if ($versionRequested) {
-            return OutputAll.response("v" + CliProperties.version());
+            return OutputAll.response("v" + ctx.properties().version());
         }
         return super.execute(v);
     }
@@ -120,14 +124,16 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     public static void main(String... args) {
+        val cliEnv = new CliEnvironmentImpl();
+
         val ctxRef = new Ref<CliContext>((getCtx) -> new CliContext(
-            CliEnvironment.unsafeResolvePlatform(),
-            CliEnvironment.unsafeIsTty(),
+            cliEnv,
+            CliPropertiesImpl.mkAndLoadSysProps(cliEnv, MemoizedCliProperties::new),
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
             new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), true),
             new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), null, getCtx, false),
-            new AstraHome(AstraHome.resolveDefaultAstraHomeFolder(FileSystems.getDefault(), CliEnvironment.unsafeResolvePlatform())),
+            new AstraHome(getCtx),
             FileSystems.getDefault(),
             new GatewayProviderImpl(),
             UpgradeNotifier::run,
@@ -146,14 +152,15 @@ public class AstraCli extends AbstractCmd<Void> {
     public static int run(Ref<CliContext> ctxRef, String... args) {
         @Cleanup val jansi = JansiUtils.installIfNecessary();
 
-        val cli = new AstraCli();
-        val cmd = new CommandLine(cli, mkFactory(ctxRef));
-
-        cli.initCtx(ctxRef); // top-level command needs to be initialized manually since picocli doesn't use the factory for it
-
         // should only be used in dire cases where it doesn't super matter if the context is wrong,
         // and it won't affect testability.
         unsafeGlobalCliContext = ctxRef::get;
+
+        val cli = new AstraCli();
+        val cmd = new CommandLine(cli, mkFactory(ctxRef));
+
+        // top-level command needs to be initialized manually since picocli doesn't use the factory for it
+        cli.initCtx(ctxRef);
 
         cmd
             .setColorScheme(AstraColors.DEFAULT_COLOR_SCHEME)
@@ -174,7 +181,7 @@ public class AstraCli extends AbstractCmd<Void> {
         }
 
         cmd.setHelpFactory((spec, cs) -> {
-            ExamplesRenderer.installRenderer(spec.commandLine(), args);
+            ExamplesRenderer.installRenderer(spec.commandLine(), args, ctxRef);
             DescriptionNewlineRenderer.installRenderer(spec.commandLine());
             return new Help(spec, cs);
         });

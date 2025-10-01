@@ -14,7 +14,6 @@ public abstract class BaseOutputSerializerTest {
     public abstract Object serialize(Object o);
 
     public abstract Object emptyValue();
-//    Optional.class, Supplier.class, Enum.class
     public abstract Class<?>[] specialClasses();
 
     @Group

@@ -1,8 +1,10 @@
 package com.dtsx.astra.cli.testlib.extensions.binaries;
 
-import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliProperties;
 import com.dtsx.astra.cli.core.completions.impls.NoopCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -15,7 +17,6 @@ import com.dtsx.astra.cli.utils.DbUtils;
 import lombok.Cleanup;
 import lombok.val;
 import org.graalvm.collections.Pair;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
@@ -63,22 +64,22 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
         @Cleanup val _lock = LOCKS.get(asBinaryName).use();
 
         val binary = getFromJunitStore(asBinaryName, ec).orElseGet(() -> {
-            val downloaded = downloadBinary(asBinaryName);
+            val downloaded = downloadBinary(asBinaryName, ec);
             return addToJunitStore(Pair.create(downloaded, asBinaryName), ec);
         });
 
         return switch (asBinaryName) {
             case CQLSH -> (mock) -> {
-                when(mock.cqlshPath(CliProperties.cqlsh())).thenReturn(Optional.of(binary));
-                doReturn(Either.pure(binary)).when(mock).downloadCqlsh(CliProperties.cqlsh());
+                when(mock.cqlshPath(cliProps(ec).cqlsh())).thenReturn(Optional.of(binary));
+                doReturn(Either.pure(binary)).when(mock).downloadCqlsh(cliProps(ec).cqlsh());
             };
             case DSBULK -> (mock) -> {
-                when(mock.dsbulkPath(CliProperties.dsbulk())).thenReturn(Optional.of(binary));
-                doReturn(Either.pure(binary)).when(mock).downloadDsbulk(CliProperties.dsbulk());
+                when(mock.dsbulkPath(cliProps(ec).dsbulk())).thenReturn(Optional.of(binary));
+                doReturn(Either.pure(binary)).when(mock).downloadDsbulk(cliProps(ec).dsbulk());
             };
             case PULSAR -> (mock) -> {
-                when(mock.pulsarShellPath(CliProperties.pulsar())).thenReturn(Optional.of(binary));
-                doReturn(Either.pure(binary)).when(mock).downloadPulsarShell(CliProperties.pulsar());
+                when(mock.pulsarShellPath(cliProps(ec).pulsar())).thenReturn(Optional.of(binary));
+                doReturn(Either.pure(binary)).when(mock).downloadPulsarShell(cliProps(ec).pulsar());
             };
             case SCB -> (mock) -> {
                 for (val ref : List.of(Databases.NameRef, Databases.IdRef)) {
@@ -88,14 +89,14 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
         };
     }
 
-    private Path downloadBinary(BinaryName name) {
+    private Path downloadBinary(BinaryName name, ExtensionContext ec) {
         val result = switch (name) {
-            case CQLSH -> getDownloadsGateway().downloadCqlsh(CliProperties.cqlsh());
-            case DSBULK -> getDownloadsGateway().downloadDsbulk(CliProperties.dsbulk());
-            case PULSAR -> getDownloadsGateway().downloadPulsarShell(CliProperties.pulsar());
+            case CQLSH -> downloadsGateway(ec).downloadCqlsh(cliProps(ec).cqlsh());
+            case DSBULK -> downloadsGateway(ec).downloadDsbulk(cliProps(ec).dsbulk());
+            case PULSAR -> downloadsGateway(ec).downloadPulsarShell(cliProps(ec).pulsar());
             case SCB -> {
-                val db = getDbGateway().findOne(TestConfig.dbId());
-                val paths = getDownloadsGateway().downloadCloudSecureBundles(TestConfig.dbId(), db.getInfo().getName(), Set.of(DbUtils.resolveDatacenter(db, Optional.of(TestConfig.dbRegion()))));
+                val db = dbGateway(ec).findOne(TestConfig.dbId());
+                val paths = downloadsGateway(ec).downloadCloudSecureBundles(TestConfig.dbId(), db.getInfo().getName(), Set.of(DbUtils.resolveDatacenter(db, Optional.of(TestConfig.dbRegion()))));
                 yield paths.map(List::getFirst);
             }
         };
@@ -121,26 +122,27 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
         return Optional.ofNullable(gotten);
     }
 
-    private @Nullable DbGateway cachedDbGateway;
-    private @Nullable DownloadsGateway cachedDownloadsGateway;
+    private final Namespace StaticExternalBinariesExtensionNamespace = Namespace.create(ExternalBinariesExtension.class);
 
-    private DbGateway getDbGateway() {
-        if (cachedDbGateway != null) {
-            return cachedDbGateway;
-        }
-
-        try (val ctx = new TestCliContext(emptyTestCliContextOptionsBuilder().useRealFs())) {
-            return cachedDbGateway = new GatewayProviderImpl().mkDbGateway(TestConfig.token(), TestConfig.env(), NoopCompletionsCache.INSTANCE, ctx.get());
-        }
+    private CliProperties cliProps(ExtensionContext ec) {
+        return ec.getRoot().getStore(StaticExternalBinariesExtensionNamespace).getOrComputeIfAbsent(CliProperties.class, (_) -> {
+            return CliPropertiesImpl.mkAndLoadSysProps(new CliEnvironmentImpl());
+        }, CliProperties.class);
     }
 
-    private DownloadsGateway getDownloadsGateway() {
-        if (cachedDownloadsGateway != null) {
-            return cachedDownloadsGateway;
-        }
+    private DbGateway dbGateway(ExtensionContext ec) {
+        return ec.getRoot().getStore(StaticExternalBinariesExtensionNamespace).getOrComputeIfAbsent(DbGateway.class, (_) -> {
+            try (val ctx = new TestCliContext(emptyTestCliContextOptionsBuilder().useRealFs())) {
+                return new GatewayProviderImpl().mkDbGateway(TestConfig.token(), TestConfig.env(), NoopCompletionsCache.INSTANCE, ctx.get());
+            }
+        }, DbGateway.class);
+    }
 
-        try (val ctx = new TestCliContext(emptyTestCliContextOptionsBuilder().useRealFs())) {
-            return cachedDownloadsGateway = new GatewayProviderImpl().mkDownloadsGateway(ctx.get());
-        }
+    private DownloadsGateway downloadsGateway(ExtensionContext ec) {
+        return ec.getRoot().getStore(StaticExternalBinariesExtensionNamespace).getOrComputeIfAbsent(DownloadsGateway.class, (_) -> {
+            try (val ctx = new TestCliContext(emptyTestCliContextOptionsBuilder().useRealFs())) {
+                return new GatewayProviderImpl().mkDownloadsGateway(ctx.get());
+            }
+        }, DownloadsGateway.class);
     }
 }

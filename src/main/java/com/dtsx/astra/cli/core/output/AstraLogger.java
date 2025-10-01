@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.utils.MiscUtils;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -57,7 +56,7 @@ public class AstraLogger {
             this.sessionLogFile = () -> {
                 if (cachedLogFile.ref == null) {
                     val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(ZoneId.systemDefault()));
-                    cachedLogFile.ref = ctx().home().Dirs.useLogs().resolve(timestamp + ".astra.log");
+                    cachedLogFile.ref = ctx().home().dirs().useLogs().resolve(timestamp + ".astra.log");
                 }
                 return cachedLogFile.ref;
             };
@@ -78,7 +77,7 @@ public class AstraLogger {
                   \\/     \\/                   \\/
         
                                Version: %s
-        """.stripIndent().formatted(CliProperties.version()));
+        """.stripIndent().formatted(ctx().properties().version()));
 
         log(NL + banner, Level.REGULAR, false);
     }
@@ -247,7 +246,7 @@ public class AstraLogger {
         }
         logsDumped = true;
 
-        deleteOldLogs(ctx().home().Dirs.useLogs());
+        deleteOldLogs(ctx().home().dirs().useLogs());
 
         try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
             for (String line : accumulated) {

@@ -1,12 +1,11 @@
 package com.dtsx.astra.cli.operations;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
-import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Unit;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.ExitCode;
+import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.gateways.upgrade.UpgradeGateway;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,7 @@ public class UpgradeOperation implements Operation<Unit> {
         val platform = resolveCurrentPlatform();
 
         val newExePath = downloadsGateway.downloadAstra(new ExternalSoftware(
-            CliProperties.cliGithubRepoUrl() + "/releases/download/v" + version + "/" + CliProperties.cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
+            ctx.properties().cliGithubRepoUrl() + "/releases/download/v" + version + "/" + ctx.properties().cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
             version
         ));
 
@@ -123,7 +122,7 @@ public class UpgradeOperation implements Operation<Unit> {
                     """.formatted(version));
                 }
 
-                if (version.equals(CliProperties.version()) && !request.allowSameVersion()) {
+                if (version.equals(ctx.properties().version()) && !request.allowSameVersion()) {
                     throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
                       @|bold,red Error: You are already using Astra CLI v%s|@
                     """.formatted(version));
@@ -135,10 +134,10 @@ public class UpgradeOperation implements Operation<Unit> {
             case LatestVersion(var includePreReleases) -> {
                 val latest = upgradeGateway.latestVersion(includePreReleases);
 
-                if (latest.compareTo(CliProperties.version()) < 1) {
+                if (latest.compareTo(ctx.properties().version()) < 1) {
                     throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
                       @|bold,red Error: No newer version available (latest is v%s, you have v%s)|@
-                    """.formatted(latest, CliProperties.version()));
+                    """.formatted(latest, ctx.properties().version()));
                 }
 
                 yield latest;
@@ -147,7 +146,7 @@ public class UpgradeOperation implements Operation<Unit> {
     }
 
     private String resolveCurrentPlatform() {
-        val platform = ctx.platform();
+        val platform = ctx.env().platform();
 
         val osStr = switch (platform.os()) {
             case LINUX -> "linux";

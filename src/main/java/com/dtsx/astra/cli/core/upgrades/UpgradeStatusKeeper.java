@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.core.upgrades;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.models.Version;
 import lombok.val;
 
@@ -17,8 +16,8 @@ public class UpgradeStatusKeeper {
         }
 
         val script = ctx.isWindows()
-            ? runWindows(status, path, shouldCheckForUpdate, userWasAnnoyed)
-            : runUnix(status, path, shouldCheckForUpdate, userWasAnnoyed);
+            ? runWindows(ctx, status, path, shouldCheckForUpdate, userWasAnnoyed)
+            : runUnix(ctx, status, path, shouldCheckForUpdate, userWasAnnoyed);
 
        try {
            new ProcessBuilder()
@@ -33,7 +32,7 @@ public class UpgradeStatusKeeper {
 
     // I know this is prone to race conditions,
     // but the issue is, I just don't care.
-    public static String runUnix(UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
+    public static String runUnix(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
         val pathStr = path.toAbsolutePath().toString().replace("\"", "\\\"");
 
         var script = """
@@ -83,7 +82,7 @@ public class UpgradeStatusKeeper {
                  latest_version="$maybe_latest_version"
                  last_checked=%d
                fi
-            """.formatted(CliProperties.cliGithubApiReposUrl(), Instant.now().toEpochMilli());
+            """.formatted(ctx.properties().cliGithubApiReposUrl(), Instant.now().toEpochMilli());
         }
 
         if (userWasAnnoyed) {
@@ -103,7 +102,7 @@ public class UpgradeStatusKeeper {
         return script;
     }
 
-    public static String runWindows(UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
+    public static String runWindows(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
         // TODO
         return "";
     }

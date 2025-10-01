@@ -1,11 +1,10 @@
 package com.dtsx.astra.cli.commands;
 
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
-import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.NukeOperation;
 import com.dtsx.astra.cli.operations.NukeOperation.*;
+import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.NeedsSudo;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import picocli.CommandLine.Command;
@@ -15,7 +14,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
@@ -39,13 +37,6 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
     public Optional<Boolean> $preserveAstrarc;
 
     @Option(
-        names = { "--cli-name", "-n" },
-        description = { "The CLI's name", DEFAULT_START + "${cli.name}" + DEFAULT_END },
-        paramLabel = "NAME"
-    )
-    public Optional<String> $cliName;
-
-    @Option(
         names = { "--yes", "-y" },
         description = { "Whether to nuke without confirmation (if not a dry run)", DEFAULT_VALUE },
         defaultValue = "false",
@@ -54,42 +45,17 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
     public boolean $yes;
 
     @Override
-    protected final OutputAll execute(Supplier<NukeResult> result) {
+    protected final OutputAll execute(Supplier<NukeResult> res) {
         ctx.log().banner();
-
-        return switch (result.get()) {
-            case CouldNotResolveCliName _ -> throwCouldNotResolveCliName();
-            case Nuked res -> handleNuked(res);
-        };
+        return handleNuked(res.get());
     }
 
-    private OutputAll handleNuked(Nuked res) {
-        val completeUninstallationMsg = (res.finalDeleteCmd().isPresent())
-            ? """
-              To complete the uninstallation, please run the following command in your terminal:
-              
-              %s
-              %s
-              
-              @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!Nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
-              """.formatted(
-                renderComment(ctx.colors(), "If not installed via a package manager"),
-                renderCommand(ctx.colors(), res.finalDeleteCmd().get())
-              )
-            : """
-              To complete the uninstallation, manually delete the Astra CLI binary from your system.
-              
-              @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
-              """;
+    private OutputAll handleNuked(NukeResult res) {
+        val completeUninstallationMsg = buildCompleteUninstallationMsg(res.binaryDeleteResult());
 
-        // TODO update astra files location dynamically
-        if (res.deletedFiles().isEmpty() && res.updatedFiles().isEmpty() && res.skipped().values().stream().allMatch(r -> r instanceof SkipReason.NotFound)) {
+        if (res.deletedFiles().isEmpty() && res.shellRcFilesToUpdate().isEmpty() && res.skipped().isEmpty()) {
             return OutputAll.response("""
             @|bold Nothing to nuke; no trace of Astra CLI was found.|@
-            
-            If you believe this is an error, please manually:
-            - Delete the @!.astra!@ directory in your home folder
-            - Delete the @!.astrarc!@ file in your home folder @|faint (if you wish)|@
             
             %s
             """.formatted(completeUninstallationMsg));
@@ -98,29 +64,27 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         val summary = new StringBuilder();
         val nothingToReport = new ArrayList<String>();
 
-        appendToSummary(summary, nothingToReport, "Deleted files", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "Updated files", res.updatedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "Skipped files", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
+        appendToSummary(summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "needing updates", res.shellRcFilesToUpdate().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
 
         switch (nothingToReport.size()) {
-            case 3 -> summary.append("@|faint No files were deleted, updated, or skipped.|@").append(NL);
-            case 2 -> summary.append("@|faint No files ").append(nothingToReport.get(0)).append(" or ").append(nothingToReport.get(1)).append(".|@").append(NL);
-            case 1 -> summary.append("@|faint No files ").append(nothingToReport.get(0)).append(".|@").append(NL);
+            case 3 -> summary.append(NL).append("@|faint No files were deleted, updated, or skipped.|@").append(NL);
+            case 2 -> summary.append(NL).append("@|faint No files ").append(nothingToReport.get(0)).append(" or ").append(nothingToReport.get(1)).append(".|@").append(NL);
+            case 1 -> summary.append(NL).append("@|faint No files ").append(nothingToReport.get(0)).append(".|@").append(NL);
         }
 
-        if (res.skipped().values().stream().anyMatch(s -> s instanceof SkipReason.NeedsSudo)) {
+        if (res.skipped().values().stream().anyMatch(s -> s instanceof NeedsSudo)) {
             summary.append(NL).append("""
             @|yellow Warning: Some files were skipped because higher permissions are required to delete them.|@
-            - You may need to rerun the nuke operation with elevated permissions (for example, using @!sudo!@ on Unix-based systems).
-            - If any files are managed by another program, e.g. Nix, please update those files using that program’s idiomatic methods.
-            """);
+            @|yellow - You may need to rerun the nuke operation with elevated permissions (for example, using sudo on Unix-based systems).|@
+            @|yellow - If any files are managed by another program, e.g. Nix, please update those files using that program’s idiomatic methods.|@
+            """).append(NL);
         }
 
         return OutputAll.response("""
         @|bold Astra CLI Nuke Summary|@%s
-        
-        %s
-        %s
+        %s%s
         """.formatted(
             ($dryRun ? " @|faint (dry run)|@" : ""),
             summary,
@@ -128,11 +92,37 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         ));
     }
 
-    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String operation, Map<Path, Optional<SkipReason>> files) {
+    private String buildCompleteUninstallationMsg(BinaryDeleteResult res) {
+        val str = switch (res) {
+            case BinaryDeleted() -> """
+              @|green Astra CLI binary has been successfully deleted from your system.|@
+            """;
+            case BinaryMustBeDeleted(var deleteCommand) -> """
+              To complete the uninstallation, please run the following command in your terminal:
+            
+              %s
+              %s
+        
+              @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!Nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
+            """.formatted(
+              renderComment(ctx.colors(), "If not installed via a package manager"),
+              renderCommand(ctx.colors(), deleteCommand)
+            );
+            case BinaryNotWritable(var path) -> """
+              To complete the uninstallation, manually delete @|underline @'!%s!@|@.
+              
+              @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
+              """.formatted(path);
+        };
+
+        return trimIndent(str);
+    }
+
+    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String header, Map<Path, Optional<SkipDeleteReason>> files) {
         if (files.isEmpty()) {
-            nothingToReport.add(operation);
+            nothingToReport.add(header);
         } else {
-            sb.append(capitalize(operation)).append(" files").append(":").append(NL);
+            sb.append(NL).append("Files ").append(header).append(":").append(NL);
 
             for (val file : files.entrySet()) {
                 sb.append("→ ").append(ctx.highlight(file.getKey()));
@@ -143,19 +133,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
                 sb.append(NL);
             }
-
-            sb.append(NL);
         }
-    }
-
-    private <T> T throwCouldNotResolveCliName() {
-        throw new AstraCliException(EXECUTION_CANCELLED, """
-          @|bold,red Error: Could not resolve the CLI's name.|@
-        
-          Please provide it using the @'!--cli-name|-n!@ option.
-        """, List.of(
-            new Hint("Example", "astra-cli nuke -n astra-cli")
-        ));
     }
 
     @Override
@@ -163,23 +141,28 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         return new NukeOperation(ctx, new NukeRequest(
             $dryRun,
             $preserveAstrarc,
-            $cliName,
             $yes,
             this::promptShouldDeleteAstrarc,
             this::assertShouldNuke
         ));
     }
 
-    private boolean promptShouldDeleteAstrarc(Path file, boolean isDryRun) {
+    private boolean promptShouldDeleteAstrarc(List<Path> files, boolean isDryRun) {
         val secondLine = (isDryRun)
-            ? "This is a dry-run, so the file @|underline @!will not actually be deleted!@|@."
+            ? "@|faint This is a dry-run, so the file @|underline will not actually be deleted|@.|@"
             : "Your credentials @!may be lost!@ if you do. A backup is recommended.";
 
+        val filesStr = new StringJoiner(" and ");
+
+        for (val fileLocation : files) {
+            filesStr.add("@|underline @'!" + fileLocation + "!@|@");
+        }
+
         val prompt = """
-          Do you also want to delete the @!.astrarc!@ file located at @|underline @'!%s!@|@?
+          Do you also want to delete the @!.astrarc!@ file%s located at %s?
         
           %s
-        """.formatted(file, secondLine);
+        """.formatted((files.size() > 1) ? "s" : "", filesStr, secondLine);
 
         return ctx.console().confirm(prompt)
             .defaultNo()
@@ -209,5 +192,10 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
     @Override
     protected boolean disableUpgradeNotifier() {
         return true; // who wants to be told there's a new update when they're trying to get rid of the damn thing
+    }
+
+    @Override
+    protected boolean disableDuplicateFilesCheck() {
+        return true; // the deletion algorithm handles this itself
     }
 }

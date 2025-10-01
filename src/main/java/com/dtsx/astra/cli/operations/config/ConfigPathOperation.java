@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigPathOperation.ConfigPathResult;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class ConfigPathOperation implements Operation<ConfigPathResult> {
 
     @Override
     public ConfigPathResult execute() {
-        val path = ctx.path(CliProperties.defaultRcFile(ctx.isWindows()));
+        val path = ctx.path(ctx.properties().rcFileLocations(ctx.isWindows()).preferred());
 
         return new ConfigPathResult(
             System.getProperty("cli.rc-file.path"), // this is a more user-readable path meant more for help messages and such

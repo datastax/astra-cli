@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.AstraColors.AstraColor;
 import com.dtsx.astra.cli.core.output.prompters.builders.ConfirmerBuilder;
@@ -126,7 +125,7 @@ public class AstraConsole {
                 sb.append(color.on());
                 colorUsed = true;
             } else if (item instanceof String str) {
-                var processedStr = str.replace("${cli.name}", CliProperties.cliName());
+                var processedStr = str.replace("${cli.name}", ctx().properties().cliName());
 
                 processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
                     .replaceAll((match) -> ctx().highlight(match.group(1), false));

@@ -46,7 +46,7 @@ public class CqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
 
     @Override
     protected Operation<CqlPathResponse> mkOperation() {
-        return new DbCqlshPathOperation(ctx.gateways().mkDownloadsGateway(ctx), !$ifExists);
+        return new DbCqlshPathOperation(ctx, ctx.gateways().mkDownloadsGateway(ctx), !$ifExists);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class CqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
           Please install @!cqlsh!@ by running any cqlsh command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize cqlsh installations done outside of astra.|@
-        """.formatted(ctx.home().DIR), List.of(
+        """.formatted(ctx.home().getDir()), List.of(
             new Hint("Example command to install cqlsh (no --if-exists flag):", "${cli.name} db cqlsh path")
         ));
     }

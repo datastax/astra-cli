@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.core.config;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -142,7 +141,7 @@ public class AstraConfig {
     }
 
     public static Path resolveDefaultAstraConfigFile(CliContext ctx) {
-        return ctx.path(CliProperties.defaultRcFile(ctx.isWindows()));
+        return ctx.path(ctx.properties().rcFileLocations(ctx.isWindows()).preferred());
     }
 
     public boolean profileExists(ProfileName profileName) {

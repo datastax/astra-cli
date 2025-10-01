@@ -46,7 +46,7 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
 
     @Override
     protected Operation<DsbulkPathResponse> mkOperation() {
-        return new DbDsbulkPathOperation(ctx.gateways().mkDownloadsGateway(ctx), !$ifExists);
+        return new DbDsbulkPathOperation(ctx, ctx.gateways().mkDownloadsGateway(ctx), !$ifExists);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
           Please install @!dsbulk!@ by running any dsbulk command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize dsbulk installations done outside of astra.|@
-        """.formatted(ctx.home().DIR), List.of(
+        """.formatted(ctx.home().getDir()), List.of(
             new Hint("Example command to install dsbulk (no --if-exists flag):", "${cli.name} db dsbulk path")
         ));
     }

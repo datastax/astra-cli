@@ -121,4 +121,9 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
     protected boolean disableUpgradeNotifier() {
         return true; // disabled for obvious reasons
     }
+
+    @Override
+    protected boolean disableDuplicateFilesCheck() {
+        return true; // we don't care about this rn
+    }
 }

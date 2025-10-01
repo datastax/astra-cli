@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.datatypes.Thunk;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -134,8 +133,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 : ctx.logLevel();
 
         run(new CliContext(
-            ctx.platform(),
-            ctx.isTty(),
+            ctx.env(),
+            ctx.properties(),
             outputTypeMixin.requested(),
             new AstraColors(ansi),
             new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo(), loggerMixin.enableSpinner()),
@@ -158,10 +157,15 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     @MustBeInvokedByOverriders
     protected void prelude() {
+        spec.commandLine().setColorScheme(ctx.colorScheme());
+
         if (!disableUpgradeNotifier()) {
             ctx.upgradeNotifier().accept(ctx);
         }
-        spec.commandLine().setColorScheme(ctx.colorScheme());
+
+        if (!disableDuplicateFilesCheck()) {
+            ctx.properties().detectDuplicateFileLocations(ctx);
+        }
     }
 
     @MustBeInvokedByOverriders
@@ -176,6 +180,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected boolean disableUpgradeNotifier() {
+        return false;
+    }
+
+    protected boolean disableDuplicateFilesCheck() {
         return false;
     }
 
@@ -194,6 +202,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected final List<String> originalArgs() {
-        return new ArrayList<>() {{ add(CliProperties.cliName()); addAll(spec.commandLine().getParseResult().originalArgs()); }};
+        return new ArrayList<>() {{ add(ctx.properties().cliName()); addAll(spec.commandLine().getParseResult().originalArgs()); }};
     }
 }

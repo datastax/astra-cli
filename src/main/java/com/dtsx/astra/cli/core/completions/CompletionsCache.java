@@ -91,7 +91,7 @@ public abstract class CompletionsCache {
     protected abstract String useCacheFileName();
 
     protected Optional<Path> useCacheDir() {
-        return Optional.of(ctx.home().Dirs.useCompletionsCache());
+        return Optional.of(ctx.home().dirs().useCompletionsCache());
     }
 
     @SneakyThrows

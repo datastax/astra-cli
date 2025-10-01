@@ -1,14 +1,11 @@
 package com.dtsx.astra.cli.operations;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.config.AstraConfig;
-import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
-import lombok.Cleanup;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
+import lombok.*;
+import lombok.experimental.Accessors;
 import org.apache.commons.io.file.PathUtils;
-import org.graalvm.collections.Pair;
 import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +18,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
+
 @RequiredArgsConstructor
 public class NukeOperation implements Operation<NukeResult> {
     private final CliContext ctx;
@@ -29,37 +28,44 @@ public class NukeOperation implements Operation<NukeResult> {
     public record NukeRequest(
         boolean dryRun,
         Optional<Boolean> preserveAstrarc,
-        Optional<String> cliName,
         boolean yes,
-        BiFunction<Path, Boolean, Boolean> promptShouldDeleteAstrarc,
+        BiFunction<List<Path>, Boolean, Boolean> promptShouldDeleteAstrarc,
         Runnable assertShouldNuke
     ) {}
 
-    public sealed interface NukeResult {}
-    public record Nuked(Set<Path> deletedFiles, Set<Path> updatedFiles, Map<Path, SkipReason> skipped, Optional<String> finalDeleteCmd) implements NukeResult {}
-    public record CouldNotResolveCliName() implements NukeResult {}
+    public sealed interface BinaryDeleteResult {}
+    public record BinaryMustBeDeleted(String deleteCommand) implements BinaryDeleteResult {}
+    public record BinaryNotWritable(Path path) implements BinaryDeleteResult {}
+    public record BinaryDeleted() implements BinaryDeleteResult {}
 
-    public sealed interface SkipReason {
+    @Data
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    public static class NukeResult {
+        private Set<Path> deletedFiles;
+        private Set<Path> shellRcFilesToUpdate;
+        private Map<Path, SkipDeleteReason> skipped;
+        private BinaryDeleteResult binaryDeleteResult;
+    }
+
+    public sealed interface SkipDeleteReason {
         String reason();
 
-        record NeedsSudo(String operation) implements SkipReason {
-            @Override
+        record UserChoseToKeep() implements SkipDeleteReason {
             public String reason() {
-                return "Needs higher permissions to " + operation;
+                return "User chose to keep the file";
             }
         }
 
-        record NotFound(String operation) implements SkipReason {
-            @Override
+        record NeedsSudo() implements SkipDeleteReason {
             public String reason() {
-                return "Could not find file to " + operation;
+                return "Needs higher permissions to delete the file";
             }
         }
 
-        record JustCouldNot(String operation, String reason) implements SkipReason {
-            @Override
+        record JustCouldNot(String details) implements SkipDeleteReason {
             public String reason() {
-                return "Could not " + operation + " file: " + reason;
+                return "Could not delete the file: " + details;
             }
         }
     }
@@ -70,126 +76,96 @@ public class NukeOperation implements Operation<NukeResult> {
             request.assertShouldNuke.run();
         }
 
-        val cliBinary = resolveCliBinary();
+        val cliBinaryPath = Resolve.cliBinaryPath(ctx);
+        val cliName = Resolve.cliName(cliBinaryPath);
 
-        val cliName = cliBinary
-            .map(PathUtils::getFileNameString)
-            .or(() -> request.cliName);
+        val astraHomes = Resolve.astraHomes(ctx);
+        val astraRcs = Resolve.astraRcs(ctx);
+        val shellRcFiles = Resolve.shellRcFilesWithAutocomplete(ctx, cliName);
 
-        if (cliName.isEmpty()) {
-            return new CouldNotResolveCliName();
-        }
-
-        val astraHome = resolveAstraHome();
-        val astraRc = resolveAstraRc();
-        val rcFiles = resolveRcFilesWithAutocomplete(cliName.get());
-
-        val processRunningFromInsideAstraHome = cliBinary.isPresent() && cliBinary.get().startsWith(astraHome);
-
-        val shouldPreserveAstrarcAstraRc = request.preserveAstrarc.orElseGet(() -> {
-            if (!Files.exists(astraRc)) {
+        val shouldPreserveAstraRcs = request.preserveAstrarc.orElseGet(() -> {
+            if (astraRcs.isEmpty()) {
                 return false;
             }
-            return !request.promptShouldDeleteAstrarc.apply(astraRc, request.dryRun);
+            return !request.promptShouldDeleteAstrarc.apply(astraRcs, request.dryRun);
         });
 
-        val res = mkResult(cliBinary, processRunningFromInsideAstraHome, astraHome);
+        val res = mkResult(shellRcFiles);
 
-        if (!shouldPreserveAstrarcAstraRc) {
-            delete(astraRc, res);
-        }
-
-        try {
-            @Cleanup val astraHomeFiles = Files.list(astraHome);
-
-            if (Files.exists(astraHome)) {
-                if (processRunningFromInsideAstraHome) {
-                    astraHomeFiles.filter(f -> f.endsWith("/cli")).forEach((f) -> delete(f, res));
-                } else {
-                    delete(astraHome, res);
-                }
-            } else {
-                res.skipped().put(astraHome, new SkipReason.NotFound("delete"));
-            }
-        } catch (IOException e) {
-            res.skipped().put(astraHome, new SkipReason.JustCouldNot("delete", e.getMessage()));
-        }
-
-        rcFiles.forEach((pair) -> {
-            update(pair.getLeft(), pair.getRight(), res);
-        });
+        deleteAstraRcs(astraRcs, shouldPreserveAstraRcs, res);
+        deleteHomesAndBinary(cliBinaryPath, astraHomes, res);
 
         return res;
     }
 
-    private @NotNull Nuked mkResult(Optional<Path> maybeBinaryFile, boolean processRunningFromInsideAstraHome, Path astraHome) {
-        val finalDeleteCmd = maybeBinaryFile.map((binaryFile) -> (
-            (!ctx.isWindows())
-                ? (processRunningFromInsideAstraHome)
-                    ? "rm -rf " + astraHome
-                    : "rm " + binaryFile
-                : (processRunningFromInsideAstraHome)
-                    ? "rmdir /s /q " + astraHome
-                    : "del " + binaryFile
-        ));
-
-        return new Nuked(new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashMap<>(), finalDeleteCmd);
+    private @NotNull NukeResult mkResult(Set<Path> shellRcFiles) {
+        return new NukeResult(new LinkedHashSet<>(), shellRcFiles, new LinkedHashMap<>(), null);
     }
 
-    private Optional<Path> resolveCliBinary() {
-        val file = ProcessHandle.current()
-            .info()
-            .command()
-            .map(ctx::path);
+    private void deleteAstraRcs(List<Path> astraRcs, Boolean shouldPreserveAstraRcs, NukeResult res) {
+        astraRcs.forEach((path) -> {
+            if (shouldPreserveAstraRcs) {
+                res.skipped().put(path, new SkipDeleteReason.UserChoseToKeep());
+            } else {
+                delete(path, res);
+            }
+        });
+    }
 
-        if (file.isEmpty() || !ImageInfo.inImageCode()) {
-            return Optional.empty();
+    private void deleteHomesAndBinary(Path cliBinaryPath, List<Path> homePaths, NukeResult res) {
+        val binDesRes = (ctx.isWindows())
+            ? deleteHomesAndBinaryWindows(homePaths, cliBinaryPath, res)
+            : deleteHomesAndBinaryUnix(homePaths, cliBinaryPath, res);
+
+        res.binaryDeleteResult(binDesRes);
+    }
+
+    public BinaryDeleteResult deleteHomesAndBinaryUnix(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
+        for (val path : homePaths) {
+            delete(path, res);
         }
 
-        return file;
-    }
-
-    private Path resolveAstraHome() {
-        return ctx.home().DIR;
-    }
-
-    private Path resolveAstraRc() {
-        return AstraConfig.resolveDefaultAstraConfigFile(ctx);
-    }
-
-    private Set<Pair<Path, String>> resolveRcFilesWithAutocomplete(String cliName) {
-        if (ctx.isWindows()) {
-            return new HashSet<>();
+        if (homePaths.stream().noneMatch(cliBinaryPath::startsWith)) {
+            delete(cliBinaryPath, res);
         }
 
-        val autocompletePattern = Pattern.compile(
-            "^.*(?:source|\\.)\\s+<\\(\\s*" + cliName + "\\s+compgen(?:\\s+[^)]*)?\\s*\\)\\s*$",
-            Pattern.MULTILINE
+        return (needsSudo(cliBinaryPath))
+            ? new BinaryNotWritable(cliBinaryPath)
+            : new BinaryDeleted();
+    }
+
+    public BinaryDeleteResult deleteHomesAndBinaryWindows(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
+        val homeFolderWhichAstraIsRunningInside = homePaths.stream()
+            .filter(cliBinaryPath::startsWith)
+            .findFirst();
+
+        for (val folder : homePaths) {
+            try {
+                if (homeFolderWhichAstraIsRunningInside.equals(Optional.of(folder))) {
+                    @Cleanup val astraHomeFiles = Files.list(folder);
+                    astraHomeFiles.filter(f -> f.endsWith("/cli")).forEach((f) -> delete(f, res));
+                } else {
+                    delete(folder, res);
+                }
+            } catch (IOException e) {
+                res.skipped().put(folder, new SkipDeleteReason.JustCouldNot(e.getMessage()));
+            }
+        }
+
+        if (homeFolderWhichAstraIsRunningInside.isEmpty()) {
+            delete(cliBinaryPath, res);
+        }
+
+        return new BinaryMustBeDeleted(
+            (homeFolderWhichAstraIsRunningInside)
+                .map((folder) -> "rmdir /s /q " + folder)
+                .orElse("del " + cliBinaryPath)
         );
-
-        return Stream.of(".bashrc", ".zshrc", ".profile", ".bash_profile", ".zprofile")
-            .map(name -> ctx.path(System.getProperty("user.home"), name))
-            .filter(Files::exists)
-            .flatMap((f) -> {
-                return Either
-                    .tryCatch(() -> Files.readString(f), (e) -> {
-                        ctx.log().warn("Could not read file '", f.toString(), "' to check for any astra-cli autocomplete entries: ", e.getMessage());
-                        return null;
-                    })
-                    .map((content) -> {
-                        val matcher = autocompletePattern.matcher(content);
-
-                        return (matcher.find())
-                            ? Stream.of(Pair.create(f, matcher.replaceAll("")))
-                            : Stream.<Pair<Path, String>>of();
-                    })
-                    .fold(_ -> Stream.of(), r -> r);
-            })
-            .collect(Collectors.toSet());
     }
 
-    private void delete(Path path, Nuked res) {
-        if (failsPreliminaryChecks(path, res, "delete")) {
+    private void delete(Path path, NukeResult res) {
+        if (needsSudo(path)) {
+            res.skipped().put(path, new SkipDeleteReason.NeedsSudo());
             return;
         }
 
@@ -203,45 +179,90 @@ public class NukeOperation implements Operation<NukeResult> {
             }
             res.deletedFiles().add(path);
         } catch (Exception e) {
-            res.skipped().put(path, new SkipReason.JustCouldNot("delete", e.getMessage()));
+            res.skipped().put(path, new SkipDeleteReason.JustCouldNot(e.getMessage()));
         }
-    }
-
-    private void update(Path path, String newContent, Nuked res) {
-        if (failsPreliminaryChecks(path, res, "update")) {
-            return;
-        }
-
-        try {
-            if (!request.dryRun) {
-                Files.writeString(path, newContent);
-            }
-            res.updatedFiles().add(path);
-        } catch (IOException e) {
-            res.skipped().put(path, new SkipReason.JustCouldNot("update", e.getMessage()));
-        }
-    }
-
-    private boolean failsPreliminaryChecks(Path path, Nuked res, String operation) {
-        if (!Files.exists(path)) {
-            res.skipped().put(path, new SkipReason.NotFound(operation));
-            return true;
-        }
-
-        if (needsSudo(path)) {
-            res.skipped().put(path, new SkipReason.NeedsSudo(operation));
-            return true;
-        }
-
-        return false;
     }
 
     private boolean needsSudo(Path path) {
         try {
             return !Files.isWritable(path);
         } catch (Exception e) {
-            ctx.log().warn("Could not determine if file '", path.toString(), "' needs sudo: ", e.getMessage());
+            ctx.log().warn("Could not determine if file '", path.toString(), "' is writable: ", e.getMessage());
             return false;
+        }
+    }
+
+    private static class Resolve {
+        private static Path cliBinaryPath(CliContext ctx) {
+            return ctx.log().loading("Resolving the binary's own path", (_) -> {
+                val file = ProcessHandle.current()
+                    .info()
+                    .command()
+                    .map(ctx::path);
+
+                if (file.isEmpty() || !ImageInfo.inImageCode()) {
+                    throw new AstraCliException(UNSUPPORTED_EXECUTION, """
+                      @|bold,red Error: can not nuke the CLI when not running as a native image.|@
+                    """);
+                }
+
+                return file.get();
+            });
+        }
+
+        private static String cliName(Path cliBinaryPath) {
+            return PathUtils.getFileNameString(cliBinaryPath);
+        }
+
+        private static List<Path> astraHomes(CliContext ctx) {
+            return ctx.log().loading("Resolving all possible astra home locations", (_) -> {
+                return ctx.properties().homeFolderLocations(ctx.isWindows()).all().stream()
+                    .map((loc) -> ctx.path(loc.path()))
+                    .filter(Files::exists)
+                    .toList();
+            });
+        }
+
+        private static List<Path> astraRcs(CliContext ctx) {
+            return ctx.log().loading("Resolving all possible astrarc locations", (_) -> {
+                return ctx.properties().rcFileLocations(ctx.isWindows()).all().stream()
+                    .map((loc) -> ctx.path(loc.path()))
+                    .filter(Files::exists)
+                    .toList();
+            });
+        }
+
+        private static Set<Path> shellRcFilesWithAutocomplete(CliContext ctx, String cliName) {
+            return ctx.log().loading("Resolving any shell files which may contain astra-related statements", (_) -> {
+                if (ctx.isWindows()) {
+                    return new HashSet<>();
+                }
+
+                val autocompletePatterns = List.of(
+                    Pattern.compile(
+                        "^.*(?:source|\\.).*" + Pattern.quote(cliName) + "\\s+(compgen|shellenv).*$",
+                        Pattern.MULTILINE
+                    ),
+                    Pattern.compile(
+                        "^.*export\\s+ ASTRA.*=.*$",
+                        Pattern.MULTILINE
+                    )
+                );
+
+                return Stream.of(".bashrc", ".zshrc", ".profile", ".bash_profile", ".zprofile")
+                    .map(name -> ctx.path(System.getProperty("user.home"), name))
+                    .filter(Files::exists)
+                    .filter((f) -> {
+                        try {
+                            val content = Files.readString(f);
+                            return autocompletePatterns.stream().anyMatch((p) -> p.matcher(content).find());
+                        } catch (Exception e) {
+                            ctx.log().warn("Could not read file '", f.toString(), "' to check for any astra-cli autocomplete entries: ", e.getMessage());
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toSet());
+            });
         }
     }
 }

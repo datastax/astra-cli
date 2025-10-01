@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.help;
 
-import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import lombok.experimental.UtilityClass;
 import lombok.val;
@@ -18,7 +19,7 @@ public class ExamplesRenderer {
     private final String SECTION_DETAILS_KEY = "examples";
 
     // loosely based on https://github.com/remkop/picocli/blob/main/picocli-examples/src/main/java/picocli/examples/customhelp/EnvironmentVariablesSection.java#L54
-    public void installRenderer(CommandLine cmd, String[] args) {
+    public void installRenderer(CommandLine cmd, String[] args, Ref<CliContext> ctxRef) {
         val examples = cmd.getCommandSpec().userObject().getClass().getAnnotationsByType(Example.class);
 
         if (examples.length == 0) {
@@ -30,13 +31,13 @@ public class ExamplesRenderer {
         });
 
         cmd.getHelpSectionMap().put(SECTION_DETAILS_KEY, (_) -> {
-            return renderExamples(examples, args);
+            return renderExamples(examples, args, ctxRef);
         });
 
         cmd.setHelpSectionKeys(insertSectionKeys(cmd.getHelpSectionKeys()));
     }
 
-    private String renderExamples(Example[] examples, String[] args) {
+    private String renderExamples(Example[] examples, String[] args, Ref<CliContext> ctxRef) {
         val sb = new StringBuilder();
 
         val colors = new AstraColors(resolveAnsi(args));
@@ -46,7 +47,7 @@ public class ExamplesRenderer {
                 sb.append("  ").append(renderComment(colors, comment)).append(NL);
             }
 
-            sb.append("  ").append(renderCommand(colors, example.command().replace("${cli.name}", CliProperties.cliName()))).append(NL);
+            sb.append("  ").append(renderCommand(colors, example.command().replace("${cli.name}", ctxRef.get().properties().cliName()))).append(NL);
 
             for (val output : example.output()) {
                 sb.append("  ").append(output).append(NL);

@@ -1,7 +1,5 @@
 package com.dtsx.astra.cli.core;
 
-import com.dtsx.astra.cli.core.CliEnvironment.OS;
-import com.dtsx.astra.cli.core.CliEnvironment.Platform;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.output.AstraColors;
@@ -10,6 +8,9 @@ import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
+import com.dtsx.astra.cli.core.properties.CliEnvironment;
+import com.dtsx.astra.cli.core.properties.CliEnvironment.OS;
+import com.dtsx.astra.cli.core.properties.CliProperties;
 import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.Value;
@@ -29,8 +30,8 @@ import java.util.function.Consumer;
 @Value
 @Accessors(fluent = true)
 public class CliContext {
-    Platform platform;
-    boolean isTty;
+    CliEnvironment env;
+    CliProperties properties;
     OutputType outputType;
     AstraColors colors;
     AstraLogger log;
@@ -55,12 +56,16 @@ public class CliContext {
         return log.level();
     }
 
+    public boolean isTty() {
+        return env.isTty();
+    }
+
     public boolean isNotTty() {
-        return !isTty;
+        return !isTty();
     }
 
     public boolean isWindows() {
-        return platform.os() == OS.WINDOWS;
+        return env().platform().os() == OS.WINDOWS;
     }
 
     public boolean isNotWindows() {

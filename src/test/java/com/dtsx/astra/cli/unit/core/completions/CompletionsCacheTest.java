@@ -54,7 +54,7 @@ public class CompletionsCacheTest {
             assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
                 assertThat(path).isNotEmptyFile(); // this also checks that the file exists and is a regular file
                 assertThat(path).hasFileName("cache-file");
-                assertThat(path).hasParent(ctx.get().home().Dirs.useCompletionsCache());
+                assertThat(path).hasParent(ctx.get().home().dirs().useCompletionsCache());
             });
         }
 

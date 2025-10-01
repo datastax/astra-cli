@@ -1,10 +1,13 @@
 package com.dtsx.astra.cli.integration.core;
 
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.models.Version;
+import com.dtsx.astra.cli.core.properties.CliEnvironment;
+import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliProperties;
+import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import lombok.val;
 import net.jqwik.api.Arbitraries;
-import org.junit.jupiter.api.BeforeAll;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,10 +27,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Isolated
 @Execution(ExecutionMode.SAME_THREAD)
 @ExtendWith(SystemStubsExtension.class)
-public class CliPropertiesIntegrationTest {
-    @BeforeAll
-    public static void setup() {
-        CliProperties.disableCaching(); // disable caching to test different cases + force class loading since it uses a static initializer
+public class CliPropertiesImplIntegrationTest {
+    private final CliEnvironment cliEnv = new CliEnvironmentImpl();
+
+    private @Nullable CliProperties cachedProps = null;
+
+    private CliProperties cliProps() {
+        if (cachedProps == null) {
+            cachedProps = CliPropertiesImpl.mkAndLoadSysProps(cliEnv);
+        }
+        return cachedProps;
     }
 
     @Nested
@@ -39,7 +48,7 @@ public class CliPropertiesIntegrationTest {
                 "cqlsh.version", "v3.2.1"
             );
 
-            val cqlsh = CliProperties.cqlsh();
+            val cqlsh = cliProps().cqlsh();
 
             assertThat(cqlsh.url()).isEqualTo("<cqlsh_url>");
             assertThat(cqlsh.version()).isEqualTo(Version.mkUnsafe("v3.2.1"));
@@ -52,7 +61,7 @@ public class CliPropertiesIntegrationTest {
                 "dsbulk.version", "v6.5.4"
             );
 
-            val dsbulk = CliProperties.dsbulk();
+            val dsbulk = cliProps().dsbulk();
 
             assertThat(dsbulk.url()).isEqualTo("<dsbulk_url>");
             assertThat(dsbulk.version()).isEqualTo(Version.mkUnsafe("6.5.4"));
@@ -65,7 +74,7 @@ public class CliPropertiesIntegrationTest {
                 "pulsar-shell.version", "9.8.7"
             );
 
-            val pulsar = CliProperties.pulsar();
+            val pulsar = cliProps().pulsar();
 
             assertThat(pulsar.url()).isEqualTo("<pulsar_url>");
             assertThat(pulsar.version()).isEqualTo(Version.mkUnsafe("9.8.7"));
@@ -79,15 +88,7 @@ public class CliPropertiesIntegrationTest {
             systemProps.set(
                 "cli.version", "v3.3.3"
             );
-            assertThat(CliProperties.version()).isEqualTo(Version.mkUnsafe("3.3.3"));
-        }
-
-        @Test
-        public void instance_version(SystemProperties systemProps) {
-            systemProps.set(
-                "cli.version", "v6.6.6"
-            );
-            assertThat(new CliProperties().getVersion()).containsExactly("v" + Version.mkUnsafe("6.6.6"));
+            assertThat(cliProps().version()).isEqualTo(Version.mkUnsafe("3.3.3"));
         }
     }
 
@@ -98,7 +99,7 @@ public class CliPropertiesIntegrationTest {
             systemProps.set(
                 "cli.rc-file.name", ".astrarc"
             );
-            assertThat(CliProperties.rcFileName()).isEqualTo(".astrarc");
+            assertThat(cliProps().rcFileName()).isEqualTo(".astrarc");
         }
 
         @Test
@@ -106,8 +107,8 @@ public class CliPropertiesIntegrationTest {
             systemProps.set(
                 "cli.home-folder.name", "astra"
             );
-            assertThat(CliProperties.homeFolderName(false)).isEqualTo("astra");
-            assertThat(CliProperties.homeFolderName(true)).isEqualTo("." + CliProperties.homeFolderName(false));
+            assertThat(cliProps().homeFolderName(false)).isEqualTo("astra");
+            assertThat(cliProps().homeFolderName(true)).isEqualTo("." + cliProps().homeFolderName(false));
         }
     }
 
@@ -119,7 +120,7 @@ public class CliPropertiesIntegrationTest {
                 "cli.rc-file.env-var", "CUSTOM_ASTRARC_ENV_VAR"
             );
             System.out.println(System.getProperty("cli.rc-file.env-var") + "1");
-            assertThat(CliProperties.rcEnvVar()).isEqualTo("CUSTOM_ASTRARC_ENV_VAR");
+            assertThat(cliProps().rcEnvVar()).isEqualTo("CUSTOM_ASTRARC_ENV_VAR");
         }
 
         @Test
@@ -127,21 +128,21 @@ public class CliPropertiesIntegrationTest {
             systemProps.set(
                 "cli.home-folder.env-var", "CUSTOM_ASTRA_HOME_ENV_VAR"
             );
-            assertThat(CliProperties.homeEnvVar()).isEqualTo("CUSTOM_ASTRA_HOME_ENV_VAR");
+            assertThat(cliProps().homeEnvVar()).isEqualTo("CUSTOM_ASTRA_HOME_ENV_VAR");
         }
     }
 
     @Nested
     public class file_paths { // unfortunately can't use jqwik b/c it doesn't work w/. system-stubs
         private final BiFunction<SystemProperties, EnvironmentVariables, Steps> mkRcFileSteps = (sys, env) -> new Steps(
-            (path) -> { sys.set("cli.rc-file.env-var", "CUSTOM_RC_PATH"); env.set(CliProperties.rcEnvVar(), path); },
+            (path) -> { sys.set("cli.rc-file.env-var", "CUSTOM_RC_PATH"); env.set(cliProps().rcEnvVar(), path); },
             (path) -> env.set("XDG_CONFIG_HOME", path),
             (path) -> sys.set("user.home", path),
             (path) -> sys.set("user.home", path)
         );
 
         private final BiFunction<SystemProperties, EnvironmentVariables, Steps> mkHomeFolderSteps = (sys, env) -> new Steps(
-            (path) -> { sys.set("cli.home-folder.env-var", "CUSTOM_HOME_PATH"); env.set(CliProperties.homeEnvVar(), path); },
+            (path) -> { sys.set("cli.home-folder.env-var", "CUSTOM_HOME_PATH"); env.set(cliProps().homeEnvVar(), path); },
             (path) -> env.set("XDG_DATA_HOME", path),
             (path) -> env.set("LOCALAPPDATA", path),
             (path) -> sys.set("user.home", path)
@@ -154,10 +155,10 @@ public class CliPropertiesIntegrationTest {
                 val customPath = mkRcFileSteps.apply(sys, env).applyAll();
 
                 // whether it's windows should not matter here
-                assertThat(CliProperties.defaultRcFile(true)).isEqualTo(customPath);
+                assertThat(cliProps().rcFileLocations(true)).isEqualTo(customPath);
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo(customPath);
 
-                assertThat(CliProperties.defaultRcFile(false)).isEqualTo(customPath);
+                assertThat(cliProps().rcFileLocations(false)).isEqualTo(customPath);
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo(customPath);
             }
 
@@ -166,13 +167,13 @@ public class CliPropertiesIntegrationTest {
                 sys.set("cli.home-folder.name", "<home_folder_name>");
                 val xdgPath = mkRcFileSteps.apply(sys, env).applyXdgAndDefaults();
 
-                val expectedSubpath = File.separator + "<home_folder_name>" + File.separator + CliProperties.rcFileName();
+                val expectedSubpath = File.separator + "<home_folder_name>" + File.separator + cliProps().rcFileName();
 
                 // returned path should not depend on the os; the display path should depend on the os though
-                assertThat(CliProperties.defaultRcFile(true)).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps().rcFileLocations(true)).isEqualTo(xdgPath + expectedSubpath);
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("%XDG_CONFIG_HOME%" + expectedSubpath);
 
-                assertThat(CliProperties.defaultRcFile(false)).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps().rcFileLocations(false)).isEqualTo(xdgPath + expectedSubpath);
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("$XDG_CONFIG_HOME" + expectedSubpath);
             }
 
@@ -184,10 +185,10 @@ public class CliPropertiesIntegrationTest {
                 val expectedSubpath = File.separator + "custom-rc-file";
 
                 // returned path should not depend on the os; the display path should depend on the os though
-                assertThat(CliProperties.defaultRcFile(true)).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps().rcFileLocations(true)).isEqualTo(defaultPath + expectedSubpath);
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("%USERPROFILE%" + expectedSubpath);
 
-                assertThat(CliProperties.defaultRcFile(false)).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps().rcFileLocations(false)).isEqualTo(defaultPath + expectedSubpath);
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("~" + expectedSubpath);
             }
         }
@@ -198,10 +199,10 @@ public class CliPropertiesIntegrationTest {
             public void prioritizes_custom_path(SystemProperties sys, EnvironmentVariables env) {
                 val customPath = mkHomeFolderSteps.apply(sys, env).applyAll();
 
-                assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(customPath);
+                assertThat(cliProps().homeFolderLocations(true)).isEqualTo(customPath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo(customPath);
 
-                assertThat(CliProperties.defaultHomeFolder(false)).isEqualTo(customPath);
+                assertThat(cliProps().homeFolderLocations(false)).isEqualTo(customPath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo(customPath);
             }
 
@@ -213,10 +214,10 @@ public class CliPropertiesIntegrationTest {
                 val expectedSubpath = File.separator + "custom-home-folder";
 
                 // returned path should not depend on the os; the display path should depend on the os though
-                assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps().homeFolderLocations(true)).isEqualTo(xdgPath + expectedSubpath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%XDG_DATA_HOME%" + expectedSubpath);
 
-                assertThat(CliProperties.defaultHomeFolder(false)).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps().homeFolderLocations(false)).isEqualTo(xdgPath + expectedSubpath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("$XDG_DATA_HOME" + expectedSubpath);
             }
 
@@ -227,7 +228,7 @@ public class CliPropertiesIntegrationTest {
                 sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + ".custom-home-folder";
 
-                assertThat(CliProperties.defaultHomeFolder(false)).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps().homeFolderLocations(false)).isEqualTo(defaultPath + expectedSubpath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("~" + expectedSubpath);
             }
 
@@ -238,7 +239,7 @@ public class CliPropertiesIntegrationTest {
                 sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + ".custom-home-folder";
 
-                assertThat(CliProperties.defaultHomeFolder(true)).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps().homeFolderLocations(true)).isEqualTo(defaultPath + expectedSubpath);
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%LOCALAPPDATA%" + expectedSubpath);
             }
         }

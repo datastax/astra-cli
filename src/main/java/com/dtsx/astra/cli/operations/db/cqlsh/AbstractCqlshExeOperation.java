@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.operations.db.cqlsh;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -102,7 +101,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
     }
 
     private Either<CqlshExecResult, Path> downloadCqlsh() {
-        val downloadResult = downloadsGateway.downloadCqlsh(CliProperties.cqlsh());
+        val downloadResult = downloadsGateway.downloadCqlsh(ctx.properties().cqlsh());
 
         return downloadResult.bimap(
             CqlshInstallFailed::new,

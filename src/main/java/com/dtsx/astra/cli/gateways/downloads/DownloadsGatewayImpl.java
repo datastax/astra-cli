@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties.ExternalSoftware;
+import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.Version;
@@ -30,7 +30,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             try {
                 ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
                     val scbName = "scb_%s_%s.zip".formatted(dbName, datacenter.getRegion());
-                    val scbPath = ctx.home().Dirs.useScb().resolve(scbName);
+                    val scbPath = ctx.home().dirs().useScb().resolve(scbName);
 
                     if (Files.notExists(scbPath)) {
                         FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath);
@@ -51,17 +51,17 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) {
-        return installGenericArchive(ctx.home().Dirs.useCqlsh(), cqlsh.url(), cqlsh.version(), "cqlsh", ctx);
+        return installGenericArchive(ctx.home().dirs().useCqlsh(), cqlsh.url(), cqlsh.version(), "cqlsh", ctx);
     }
 
     @Override
     public Either<String, Path> downloadDsbulk(ExternalSoftware dsbulk) {
-        return installGenericArchive(ctx.home().Dirs.useDsbulk(dsbulk.version()), dsbulk.url(), dsbulk.version(), "dsbulk", ctx);
+        return installGenericArchive(ctx.home().dirs().useDsbulk(dsbulk.version()), dsbulk.url(), dsbulk.version(), "dsbulk", ctx);
     }
 
     @Override
     public Either<String, Path> downloadPulsarShell(ExternalSoftware pulsar) {
-        return installGenericArchive(ctx.home().Dirs.usePulsar(pulsar.version()), pulsar.url(), pulsar.version(), "pulsar-shell", ctx);
+        return installGenericArchive(ctx.home().dirs().usePulsar(pulsar.version()), pulsar.url(), pulsar.version(), "pulsar-shell", ctx);
     }
 
     @Override
@@ -76,17 +76,17 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Optional<Path> cqlshPath(ExternalSoftware cqlsh) {
-        return getPath(ctx.home().Dirs::cqlshExists, ctx.home().Dirs::useCqlsh, "cqlsh");
+        return getPath(ctx.home().dirs()::cqlshExists, ctx.home().dirs()::useCqlsh, "cqlsh");
     }
 
     @Override
     public Optional<Path> dsbulkPath(ExternalSoftware dsbulk) {
-        return getPath(() -> ctx.home().Dirs.dsbulkExists(dsbulk.version()), () -> ctx.home().Dirs.useDsbulk(dsbulk.version()), "dsbulk");
+        return getPath(() -> ctx.home().dirs().dsbulkExists(dsbulk.version()), () -> ctx.home().dirs().useDsbulk(dsbulk.version()), "dsbulk");
     }
 
     @Override
     public Optional<Path> pulsarShellPath(ExternalSoftware pulsar) {
-        return getPath(() -> ctx.home().Dirs.pulsarExists(pulsar.version()), () -> ctx.home().Dirs.usePulsar(pulsar.version()), "pulsar-shell");
+        return getPath(() -> ctx.home().dirs().pulsarExists(pulsar.version()), () -> ctx.home().dirs().usePulsar(pulsar.version()), "pulsar-shell");
     }
 
     private Optional<Path> getPath(Supplier<Boolean> dirExists, Supplier<Path> getDir, String exe) {

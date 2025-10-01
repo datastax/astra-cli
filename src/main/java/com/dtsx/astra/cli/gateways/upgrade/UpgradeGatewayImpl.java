@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.gateways.upgrade;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.ExitCode;
@@ -25,7 +24,7 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
 
     private Version fetchLatestFullRelease() {
         return ctx.log().loading("Resolving latest full release of @!astra!@", (_) -> {
-            val endpoint = CliProperties.cliGithubApiReposUrl() + "/releases/latest";
+            val endpoint = ctx.properties().cliGithubApiReposUrl() + "/releases/latest";
 
             val response = HttpUtils.GET(endpoint, c -> c, r -> r);
 
@@ -58,7 +57,7 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
             var attempt = 1;
 
             while (true) {
-                val endpoint = CliProperties.cliGithubApiReposUrl() + "/releases?per_page=1";
+                val endpoint = ctx.properties().cliGithubApiReposUrl() + "/releases?per_page=1";
 
                 val response = HttpUtils.GET(endpoint, c -> c, r -> r);
 

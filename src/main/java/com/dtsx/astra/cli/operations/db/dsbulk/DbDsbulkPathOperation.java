@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
-import com.dtsx.astra.cli.core.CliProperties;
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkPathOperation.DsbulkPathResponse;
@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class DbDsbulkPathOperation implements Operation<DsbulkPathResponse> {
+    private final CliContext ctx;
     private final DownloadsGateway downloadsGateway;
     private final boolean shouldInstall;
 
@@ -21,14 +22,14 @@ public class DbDsbulkPathOperation implements Operation<DsbulkPathResponse> {
 
     @Override
     public DsbulkPathResponse execute() {
-        val existingPath = downloadsGateway.dsbulkPath(CliProperties.dsbulk());
+        val existingPath = downloadsGateway.dsbulkPath(ctx.properties().dsbulk());
         
         if (existingPath.isPresent()) {
             return new ExePathFound(existingPath.get());
         }
         
         if (shouldInstall) {
-            val installResult = downloadsGateway.downloadDsbulk(CliProperties.dsbulk());
+            val installResult = downloadsGateway.downloadDsbulk(ctx.properties().dsbulk());
 
             if (installResult.isRight()) {
                 return new ExePathFound(installResult.getRight());

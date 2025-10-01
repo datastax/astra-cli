@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.operations.config.home;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.CliProperties;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.home.ConfigHomePathOperation.ConfigPathResult;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class ConfigHomePathOperation implements Operation<ConfigPathResult> {
 
     @Override
     public ConfigPathResult execute() {
-        val path = ctx.path(CliProperties.defaultHomeFolder(ctx.isWindows()));
+        val path = ctx.path(ctx.properties().homeFolderLocations(ctx.isWindows()).preferred());
 
         return new ConfigPathResult(
             System.getProperty("cli.home-folder.path"), // this is a more user-readable path meant more for help messages and such
