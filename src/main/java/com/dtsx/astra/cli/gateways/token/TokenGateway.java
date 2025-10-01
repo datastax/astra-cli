@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.token;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
@@ -17,4 +18,6 @@ public interface TokenGateway extends SomeGateway {
     CreateTokenResponse create(RoleRef role, Optional<String> description);
 
     DeletionStatus<Void> delete(String clientId);
+
+    void validate(AstraToken token);
 }

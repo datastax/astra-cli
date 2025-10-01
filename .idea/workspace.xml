@@ -5,52 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/CliEnvironment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/CliEnvironmentImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/CliProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/MemoizedCliProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/AbstractCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/ShellEnvCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/ShellEnvCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigPathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/ConfigPathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/home/ConfigHomePathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/config/home/ConfigHomePathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cqlsh/CqlshPathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/cqlsh/CqlshPathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/dsbulk/DbDsbulkPathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/dsbulk/DbDsbulkPathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/StreamingPulsarPathCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/StreamingPulsarPathCmd.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliEnvironment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/CliProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/CliPropertiesImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/completions/CompletionsCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/completions/CompletionsCache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/completions/impls/AvailableProfilesCompletion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/completions/impls/AvailableProfilesCompletion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraHome.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/config/AstraHome.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/help/ExamplesRenderer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/help/ExamplesRenderer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraConsole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraConsole.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraLogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/upgrades/UpgradeNotifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/upgrades/UpgradeNotifier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/upgrades/UpgradeStatusKeeper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/upgrades/UpgradeStatusKeeper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGateway.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/downloads/DownloadsGatewayImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/upgrade/UpgradeGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/upgrade/UpgradeGatewayImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/config/ConfigPathOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/config/ConfigPathOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/config/home/ConfigHomePathOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/config/home/ConfigHomePathOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/AbstractCqlshExeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/AbstractCqlshExeOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/DbCqlshPathOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/DbCqlshPathOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/dsbulk/AbstractDsbulkExeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/dsbulk/AbstractDsbulkExeOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/dsbulk/DbDsbulkPathOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/dsbulk/DbDsbulkPathOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/streaming/pulsar/AbstractPulsarExeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/streaming/pulsar/AbstractPulsarExeOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/streaming/pulsar/StreamingPulsarPathOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/streaming/pulsar/StreamingPulsarPathOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/integration/core/CliPropertiesIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/integration/core/CliPropertiesImplIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/extensions/binaries/ExternalBinariesExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/extensions/binaries/ExternalBinariesExtension.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/extensions/context/TestCliContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/extensions/context/TestCliContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/core/completions/CompletionsCacheTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/core/completions/CompletionsCacheTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/core/output/serializers/BaseOutputSerializerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/core/output/serializers/BaseOutputSerializerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenGetImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenGetImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/GatewayProviderImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/GatewayProviderImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGatewayImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/token/TokenGetOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/token/TokenGetOperation.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -279,7 +241,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
+    "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15039062",
     "project.structure.side.proportion": "0.2",
     "run.code.analysis.last.selected.profile": "pProject Default",

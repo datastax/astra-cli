@@ -94,7 +94,7 @@ public class GatewayProviderImpl implements GatewayProvider {
 
     @Override
     public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new TokenGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), mkRoleGateway(token, env, new RoleCompletionsCache(ctx), ctx));
+        return new TokenGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), mkRoleGateway(token, env, new RoleCompletionsCache(ctx), ctx), mkOrgGatewayStateless(ctx));
     }
 
     @Override

@@ -2,10 +2,14 @@ package com.dtsx.astra.cli.gateways.token;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
+import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
+import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.utils.JsonUtils;
+import com.dtsx.astra.sdk.exception.AuthenticationException;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ public class TokenGatewayImpl implements TokenGateway {
     private final CliContext ctx;
     private final APIProvider apiProvider;
     private final RoleGateway roleGateway;
+    private final OrgGateway.Stateless statelessOrgGateway;
 
     @Override
     public Stream<IamToken> findAll() {
@@ -67,5 +72,16 @@ public class TokenGatewayImpl implements TokenGateway {
         });
         
         return DeletionStatus.deleted(null);
+    }
+
+    @Override
+    public void validate(AstraToken token) {
+        ctx.log().loading("Validating your Astra token", (_) -> {
+            try {
+                return statelessOrgGateway.resolveOrganizationEnvironment(token);
+            } catch (AuthenticationException e) {
+                throw new InvalidTokenException("could not authenticate with the provided token");
+            }
+        });
     }
 }

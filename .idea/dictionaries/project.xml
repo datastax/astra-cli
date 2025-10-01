@@ -17,10 +17,12 @@
       <w>lunastreaming</w>
       <w>mixee</w>
       <w>orbstack</w>
+      <w>pbcopy</w>
       <w>pkgs</w>
       <w>readln</w>
       <w>shellenv</w>
       <w>tildify</w>
+      <w>xsel</w>
     </words>
   </dictionary>
 </component>
