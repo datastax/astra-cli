@@ -23,7 +23,7 @@ function Tildify($Path) {
 }
 
 # Constants
-$ASTRA_CLI_VERSION = "1.0.0-alpha.11"
+$ASTRA_CLI_VERSION = "1.0.0-alpha.12"
 
 if ($env:ASTRA_HOME) {
     $ASTRA_CLI_DIR_RESOLVER = "custom"

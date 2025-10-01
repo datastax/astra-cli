@@ -64,9 +64,9 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         val summary = new StringBuilder();
         val nothingToReport = new ArrayList<String>();
 
-        appendToSummary(summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary(summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.of(" @|faint (contained binary)|@").filter((_) -> res.cliBinaryPath().startsWith(v))), Map::putAll));
         appendToSummary(summary, nothingToReport, "needing updates", res.shellRcFilesToUpdate().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(v.getValue())), Map::putAll));
+        appendToSummary(summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(" - " + v.getValue().reason())), Map::putAll));
 
         switch (nothingToReport.size()) {
             case 3 -> summary.append(NL).append("@|faint No files were deleted, updated, or skipped.|@").append(NL);
@@ -84,7 +84,8 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
         return OutputAll.response("""
         @|bold Astra CLI Nuke Summary|@%s
-        %s%s
+        %s
+        %s
         """.formatted(
             ($dryRun ? " @|faint (dry run)|@" : ""),
             summary,
@@ -118,7 +119,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         return trimIndent(str);
     }
 
-    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String header, Map<Path, Optional<SkipDeleteReason>> files) {
+    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String header, Map<Path, Optional<String>> files) {
         if (files.isEmpty()) {
             nothingToReport.add(header);
         } else {
@@ -128,7 +129,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
                 sb.append("→ ").append(ctx.highlight(file.getKey()));
 
                 if (file.getValue().isPresent()) {
-                    sb.append(" - ").append(file.getValue().get().reason());
+                    sb.append(file.getValue().get());
                 }
 
                 sb.append(NL);

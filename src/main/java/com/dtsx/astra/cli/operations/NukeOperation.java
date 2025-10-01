@@ -46,6 +46,7 @@ public class NukeOperation implements Operation<NukeResult> {
         private Set<Path> shellRcFilesToUpdate;
         private Map<Path, SkipDeleteReason> skipped;
         private BinaryDeleteResult binaryDeleteResult;
+        private Path cliBinaryPath;
     }
 
     public sealed interface SkipDeleteReason {
@@ -90,7 +91,7 @@ public class NukeOperation implements Operation<NukeResult> {
             return !request.promptShouldDeleteAstrarc.apply(astraRcs, request.dryRun);
         });
 
-        val res = mkResult(shellRcFiles);
+        val res = mkResult(cliBinaryPath, shellRcFiles);
 
         deleteAstraRcs(astraRcs, shouldPreserveAstraRcs, res);
         deleteHomesAndBinary(cliBinaryPath, astraHomes, res);
@@ -98,8 +99,8 @@ public class NukeOperation implements Operation<NukeResult> {
         return res;
     }
 
-    private @NotNull NukeResult mkResult(Set<Path> shellRcFiles) {
-        return new NukeResult(new LinkedHashSet<>(), shellRcFiles, new LinkedHashMap<>(), null);
+    private @NotNull NukeResult mkResult(Path cliBinaryPath, Set<Path> shellRcFiles) {
+        return new NukeResult(new LinkedHashSet<>(), shellRcFiles, new LinkedHashMap<>(), null, cliBinaryPath);
     }
 
     private void deleteAstraRcs(List<Path> astraRcs, Boolean shouldPreserveAstraRcs, NukeResult res) {

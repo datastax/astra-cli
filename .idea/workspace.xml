@@ -5,14 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenGetImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/token/TokenGetImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/GatewayProviderImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/GatewayProviderImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGateway.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGatewayImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/gateways/token/TokenGatewayImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/token/TokenGetOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/token/TokenGetOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/install.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/install.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/install.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/install.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
