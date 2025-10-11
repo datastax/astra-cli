@@ -151,10 +151,6 @@ tasks.test {
     )
 }
 
-tasks.named<JavaCompile>("compileTestJava") {
-    options.compilerArgs.add("-parameters")
-}
-
 val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
 
 tasks.register<JavaExec>("generateJniConfig") {
@@ -335,7 +331,13 @@ tasks.jar {
     dependsOn("generateJniConfig")
 }
 
-tasks.named<JavaExec>("run") {
+tasks.compileTestJava {
+    dependsOn("generateGraalReflectionConfig")
+    dependsOn("generateGraalResourceConfig")
+    options.compilerArgs.add("-parameters")
+}
+
+tasks.run {
     dependsOn("createDynamicProperties")
     standardInput = System.`in`
 }

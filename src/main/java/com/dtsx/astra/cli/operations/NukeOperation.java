@@ -2,11 +2,11 @@ package com.dtsx.astra.cli.operations;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.properties.CliProperties.SupportedPackageManager;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.io.file.PathUtils;
-import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -34,6 +34,7 @@ public class NukeOperation implements Operation<NukeResult> {
     ) {}
 
     public sealed interface BinaryDeleteResult {}
+    public record BinaryOwnedByPackageManager(SupportedPackageManager packageManager) implements BinaryDeleteResult {}
     public record BinaryMustBeDeleted(String deleteCommand) implements BinaryDeleteResult {}
     public record BinaryNotWritable(Path path) implements BinaryDeleteResult {}
     public record BinaryDeleted() implements BinaryDeleteResult {}
@@ -118,7 +119,11 @@ public class NukeOperation implements Operation<NukeResult> {
             ? deleteHomesAndBinaryWindows(homePaths, cliBinaryPath, res)
             : deleteHomesAndBinaryUnix(homePaths, cliBinaryPath, res);
 
-        res.binaryDeleteResult(binDesRes);
+        res.binaryDeleteResult(
+            (ctx.properties().owningPackageManager().isPresent())
+                ? new BinaryOwnedByPackageManager(ctx.properties().owningPackageManager().get())
+                : binDesRes
+        );
     }
 
     public BinaryDeleteResult deleteHomesAndBinaryUnix(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
@@ -196,18 +201,15 @@ public class NukeOperation implements Operation<NukeResult> {
     private static class Resolve {
         private static Path cliBinaryPath(CliContext ctx) {
             return ctx.log().loading("Resolving the binary's own path", (_) -> {
-                val file = ProcessHandle.current()
-                    .info()
-                    .command()
-                    .map(ctx::path);
+                val binaryPath = ctx.properties().binaryPath();
 
-                if (file.isEmpty() || !ImageInfo.inImageCode()) {
+                if (binaryPath.isEmpty()) {
                     throw new AstraCliException(UNSUPPORTED_EXECUTION, """
                       @|bold,red Error: can not nuke the CLI when not running as a native image.|@
                     """);
                 }
 
-                return file.get();
+                return binaryPath.get();
             });
         }
 

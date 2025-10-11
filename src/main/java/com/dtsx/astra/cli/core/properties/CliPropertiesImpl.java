@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.properties.CliEnvironment.OS;
+import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.AccessLevel;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -179,10 +181,7 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public String cliName() {
-        val path = ProcessHandle.current()
-            .info()
-            .command()
-            .map(Path::of);
+        val path = binaryPath();
 
         val cliName = (path.isPresent() && ImageInfo.inImageCode())
             ? path.get().getFileName().toString()
@@ -200,6 +199,24 @@ public class CliPropertiesImpl implements CliProperties {
     @Override
     public String homeEnvVar() {
         return prop("cli.home-folder.env-var");
+    }
+
+    @Override
+    public Optional<Path> binaryPath() {
+        return FileUtils.getCurrentBinaryPath();
+    }
+
+    @Override
+    public Optional<SupportedPackageManager> owningPackageManager() {
+        return binaryPath().flatMap((binaryPath) -> {
+            if (binaryPath.startsWith("/nix/store/")) {
+                return Optional.of(SupportedPackageManager.NIX);
+            }
+            if (binaryPath.startsWith("/usr/local/") || binaryPath.startsWith("/opt/homebrew/")) {
+                return Optional.of(SupportedPackageManager.BREW);
+            }
+            return Optional.empty();
+        });
     }
 
     protected final String prop(String string) {

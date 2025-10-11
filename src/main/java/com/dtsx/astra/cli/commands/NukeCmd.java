@@ -109,11 +109,14 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
               renderComment(ctx.colors(), "If not installed via a package manager"),
               renderCommand(ctx.colors(), deleteCommand)
             );
+            case BinaryOwnedByPackageManager(var pm) -> """
+               To complete the uninstallation, please use @|underline %s|@ to uninstall the Astra CLI binary.
+            """.formatted(pm.displayName());
             case BinaryNotWritable(var path) -> """
               To complete the uninstallation, manually delete @|underline @'!%s!@|@.
-              
+            
               @|bold @!Important:!@|@ if you installed @!astra!@ using a package manager (e.g., @!Homebrew!@, @!nix!@, etc.), @|underline please use the same package manager to uninstall the binary properly|@.
-              """.formatted(path);
+            """.formatted(path);
         };
 
         return trimIndent(str);

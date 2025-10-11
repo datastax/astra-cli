@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.utils;
 
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.CannotCreateFileException;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -12,6 +13,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
+import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
@@ -22,9 +24,33 @@ import java.net.URI;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
+
+import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 
 @UtilityClass
 public class FileUtils {
+    public Optional<Path> getCurrentBinaryPath() {
+        return ProcessHandle.current().info().command()
+            .filter((_) -> ImageInfo.inImageCode())
+            .map(Path::of)
+            .map(FileUtils::toRealPath);
+    }
+
+    public Path toRealPath(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            throw new AstraCliException(FILE_ISSUE, """
+              @|bold,red Failed to resolve the canonical path for @|underline %s|@.|@
+            
+              This might be due to missing files, permission issues, or symbolic link problems.
+            
+              Error: '%s'
+            """.formatted(path, e.getMessage()));
+        }
+    }
+
     public void createFileIfNotExists(Path path, @Nullable String extra) {
         try {
             Files.createDirectories(path.getParent());

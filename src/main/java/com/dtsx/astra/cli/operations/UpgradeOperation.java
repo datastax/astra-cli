@@ -16,8 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 
-import static com.dtsx.astra.cli.core.datatypes.Unit.INSTANCE;
-
 @RequiredArgsConstructor
 public class UpgradeOperation implements Operation<Unit> {
     private final CliContext ctx;
@@ -77,7 +75,7 @@ public class UpgradeOperation implements Operation<Unit> {
             currentExePath
         )).start();
 
-        return INSTANCE;
+        return Unit.INSTANCE;
     }
 
     @SneakyThrows
@@ -90,27 +88,35 @@ public class UpgradeOperation implements Operation<Unit> {
             currentExePath
         )).start();
 
-        return INSTANCE;
+        return Unit.INSTANCE;
     }
 
     private Path resolveCurrentExePath() {
-        val currentExePath = ProcessHandle.current().info().command().map(ctx::path);
+        val binaryPath = ctx.properties().binaryPath();
 
-        if (currentExePath.isEmpty()) {
+        if (binaryPath.isEmpty()) {
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
-              @|bold,red Cannot resolve current executable path, are you running Astra CLI as a binary?|@
+              @|bold,red Error: Cannot run this command when Astra CLI is not being run as a binary|@
             """);
         }
 
-        if (!Files.isWritable(currentExePath.get())) {
+        ctx.properties().owningPackageManager().ifPresent((pm) -> {
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
-              @|bold,red No write permissions to update the current process @|faint,italic (%s)|@|@
+              @|bold,red Error: Cannot self-update when Astra CLI is managed by a package manager (%s)|@
+
+              Please use the package manager to update Astra CLI.
+            """.formatted(pm.displayName()));
+        });
+
+        if (!Files.isWritable(binaryPath.get())) {
+            throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
+              @|bold,red Error: No write permissions to update the current process @|faint,italic (%s)|@|@
 
               Is the binary managed by a package manager (e.g. nix), or are you not running Astra CLI as a binary?
-            """.formatted(currentExePath));
+            """.formatted(binaryPath));
         }
 
-        return currentExePath.get();
+        return binaryPath.get();
     }
 
     private Version resolveReleaseVersion(VersionType versionType) {

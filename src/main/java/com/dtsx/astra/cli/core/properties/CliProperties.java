@@ -3,10 +3,14 @@ package com.dtsx.astra.cli.core.properties;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.Version;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public interface CliProperties {
@@ -26,6 +30,15 @@ public interface CliProperties {
         String preferred,
         NEList<PathLocation> all
     ) {}
+
+    @Getter
+    @Accessors(fluent = true)
+    @RequiredArgsConstructor
+    enum SupportedPackageManager {
+        BREW("Homebrew"),
+        NIX("Nix");
+        private final String displayName;
+    }
 
     ExternalSoftware cqlsh();
 
@@ -52,6 +65,10 @@ public interface CliProperties {
     String rcEnvVar();
 
     String homeEnvVar();
+
+    Optional<Path> binaryPath();
+
+    Optional<SupportedPackageManager> owningPackageManager();
 
     default void detectDuplicateFileLocations(CliContext ctx) {
         val ignoreMultiplePaths = Optional.ofNullable(System.getenv("ASTRA_IGNORE_MULTIPLE_PATHS")).orElse("false");

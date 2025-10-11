@@ -32,7 +32,7 @@ public class UpgradeStatusKeeper {
 
     // I know this is prone to race conditions,
     // but the issue is, I just don't care.
-    public static String runUnix(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
+    private static String runUnix(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
         val pathStr = path.toAbsolutePath().toString().replace("\"", "\\\"");
 
         var script = """
@@ -102,7 +102,7 @@ public class UpgradeStatusKeeper {
         return script;
     }
 
-    public static String runWindows(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
+    private static String runWindows(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
         // TODO
         return "";
     }

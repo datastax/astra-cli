@@ -116,7 +116,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 throw new AstraCliException(PROFILE_NOT_FOUND, """
                   @|bold,red Error: No profiles exist in your .astrarc file.|@
                 
-                  > Using configuration file at %s
+                  > Using configuration file at @'!%s!@
                 """.formatted(
                     ctx.highlight(filePath)
                 ), hints);
