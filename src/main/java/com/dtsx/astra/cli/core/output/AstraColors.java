@@ -8,9 +8,6 @@ import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Help.Ansi.IStyle;
 import picocli.CommandLine.Help.ColorScheme;
-import picocli.CommandLine.Option;
-
-import java.util.Optional;
 
 @Accessors(fluent = true)
 @RequiredArgsConstructor
@@ -23,15 +20,9 @@ public class AstraColors {
 
     @RequiredArgsConstructor
     public class AstraColor implements IStyle {
-        private final int red;
-        private final int green;
-        private final int blue;
         private final int colorCode256;
 
         public AstraColor(int r, int g, int b) {
-            this.red = r;
-            this.green = g;
-            this.blue = b;
             this.colorCode256 = rgbToAnsi256(r, g, b);
         }
 
@@ -169,21 +160,5 @@ public class AstraColors {
 
     public static String stripAnsi(String str) {
         return str.replaceAll("\\u001B\\[[;\\d]*m", "");
-    }
-
-    @Accessors(fluent = true)
-    public static class Mixin {
-        @Getter
-        private Optional<Ansi> ansi = Optional.empty();
-
-        enum ColorMode { auto, never, always }
-
-        @Option(names = "--color", description = "Force colored output")
-        private void setAnsi(ColorMode mode) {
-            switch (mode) {
-                case always -> this.ansi = Optional.of(Ansi.ON); // auto is handled by Optional.empty() here, not Ansi.AUTO
-                case never -> this.ansi = Optional.of(Ansi.OFF);
-            };
-        }
     }
 }

@@ -13,7 +13,6 @@ import lombok.experimental.Accessors;
 import lombok.val;
 import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.Option;
 
 import java.io.Console;
 import java.io.InputStream;
@@ -43,13 +42,6 @@ public class AstraConsole {
 
     @Getter @Setter
     private @Nullable Console console = System.console();
-
-    @Accessors(fluent = true)
-    public static class Mixin {
-        @Getter
-        @Option(names = "--no-input", description = "Never ask for user input (e.g. confirmation prompts)")
-        private boolean noInput;
-    }
 
     public void print(Object... items) {
         if (ctx().outputIsNotHuman()) {

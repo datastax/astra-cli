@@ -60,7 +60,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
     command = "${cli.name} db list-regions-vector"
 )
 public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implements WithSetTimeout {
-    @ArgGroup(heading = "%nWhat to do if the database already exists:%n")
+    @ArgGroup
     public @Nullable ExistingBehavior $existingBehavior;
 
     public static class ExistingBehavior {

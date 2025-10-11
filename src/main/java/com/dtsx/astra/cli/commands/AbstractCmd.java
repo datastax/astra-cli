@@ -5,7 +5,6 @@ import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.datatypes.Thunk;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -16,9 +15,9 @@ import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.VisibleForTesting;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
 
@@ -53,20 +52,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         ctxRef.onUpdate((ctx) -> this.ctx = ctx);
     }
 
-    @Mixin
-    private HelpMixin helpMixin;
-
-    @Mixin
-    private AstraColors.Mixin csMixin;
-
-    @Mixin
-    private OutputType.Mixin outputTypeMixin;
-
-    @Mixin
-    private AstraLogger.Mixin loggerMixin;
-
-    @Mixin
-    private AstraConsole.Mixin consoleMixin;
+    @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)
+    public CommonOptions common = new CommonOptions();
 
     protected OutputAll execute(Supplier<OpRes> _result) {
         val otherTypes = Arrays.stream(OutputType.values()).filter(o -> o != ctx.outputType()).map(o -> o.name().toLowerCase()).toList();
@@ -117,26 +104,26 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             throw new CongratsYouFoundABugException("initCtx(...) was not called before run()");
         }
 
-        val ansi = csMixin.ansi().orElse(
-            (outputTypeMixin.requested().isHuman())
+        val ansi = common.ansi().orElse(
+            (common.outputType().isHuman())
                 ? ctx.colors().ansi()
                 : Ansi.OFF
         );
 
         val level =
-            (loggerMixin.quiet())
+            (common.quiet())
                 ? Level.QUIET :
-            (loggerMixin.verbose())
+            (common.verbose())
                 ? Level.VERBOSE
                 : ctx.logLevel();
 
         run(new CliContext(
             ctx.env(),
             ctx.properties(),
-            outputTypeMixin.requested(),
+            common.outputType(),
             new AstraColors(ansi),
-            new AstraLogger(level, () -> ctx, loggerMixin.shouldDumpLogs(), loggerMixin.dumpLogsTo(), loggerMixin.enableSpinner()),
-            new AstraConsole(ctx.console().getIn(), ctx.console().getOut(), ctx.console().getErr(), ctx.console().getReadLineImpl(), () -> ctx, consoleMixin.noInput()),
+            new AstraLogger(level, () -> ctx, common.shouldDumpLogs(), common.dumpLogsTo(), common.enableSpinner()),
+            new AstraConsole(ctx.console().getIn(), ctx.console().getOut(), ctx.console().getErr(), ctx.console().getReadLineImpl(), () -> ctx, common.noInput()),
             ctx.home(),
             ctx.fs(),
             ctx.gateways(),

@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.val;
-import picocli.CommandLine.Help.Visibility;
-import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +19,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Accessors(fluent = true)
@@ -86,71 +83,6 @@ public class AstraLogger {
         QUIET,
         REGULAR,
         VERBOSE,
-    }
-
-    @Accessors(fluent = true)
-    public static class Mixin {
-        @Getter
-        @Option(
-            names = { "-V", "--verbose" },
-            description = "Enable verbose logging output",
-            showDefaultValue = Visibility.NEVER
-        )
-        private boolean verbose;
-
-        @Getter
-        @Option(
-            names = { "-q", "--quiet" },
-            description = "Suppress informational output",
-            showDefaultValue = Visibility.NEVER
-        )
-        private boolean quiet;
-
-        @Getter
-        @Option(
-            names = { "--spinner" },
-            description = "Enable/disable the loading spinner",
-            negatable = true,
-            defaultValue = "${cli.output.spinner.default}",
-            showDefaultValue = Visibility.NEVER,
-            fallbackValue = "true"
-        )
-        private boolean enableSpinner;
-
-        @Getter
-        private boolean shouldDumpLogs = false;
-
-        @Getter
-        private Optional<Path> dumpLogsTo = Optional.empty();
-
-        @Option(
-            names = { "--dump-logs" },
-            description = { "Write all logs to an optionally specified file", SHOW_CUSTOM_DEFAULT + "${cli.home-folder.path}/logs/<file>.log" },
-            fallbackValue = "__fallback__",
-            paramLabel = "FILE",
-            arity = "0..1"
-        )
-        private void setDumpLogs(Optional<Path> dest) {
-            dest.ifPresent((path) -> {
-                if (path.toString().equalsIgnoreCase("false")) {
-                    shouldDumpLogs = false;
-                    dumpLogsTo = Optional.empty();
-                } else {
-                    shouldDumpLogs = true;
-
-                    if (!path.toString().equalsIgnoreCase("__fallback__")) {
-                        dumpLogsTo = Optional.of(path);
-                    }
-                }
-            });
-        }
-
-        @Option(names = { "--no-dump-logs" }, hidden = true)
-        private void setDumpLogs(boolean noDumpLogs) {
-            if (noDumpLogs) {
-                shouldDumpLogs = false;
-            }
-        }
     }
 
     public void debug(String... msg) {
