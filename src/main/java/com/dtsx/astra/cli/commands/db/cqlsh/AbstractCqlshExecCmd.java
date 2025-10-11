@@ -39,7 +39,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
 
     @Option(
         names = { "--connect-timeout" },
-        description = { "Connection timeout in seconds", DEFAULT_VALUE },
+        description = "Connection timeout in seconds",
         paramLabel = "TIMEOUT",
         defaultValue = "10"
     )

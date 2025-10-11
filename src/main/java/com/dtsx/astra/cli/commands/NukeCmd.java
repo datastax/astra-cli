@@ -23,7 +23,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 public class NukeCmd extends AbstractCmd<NukeResult> {
     @Option(
         names = { "--dry-run" },
-        description = { "Simulate the nuke operation without deleting any files", DEFAULT_VALUE },
+        description = "Simulate the nuke operation without deleting any files",
         defaultValue = "false"
     )
     public boolean $dryRun;
@@ -38,7 +38,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     @Option(
         names = { "--yes", "-y" },
-        description = { "Whether to nuke without confirmation (if not a dry run)", DEFAULT_VALUE },
+        description = "Whether to nuke without confirmation (if not a dry run)",
         defaultValue = "false",
         fallbackValue = "false"
     )

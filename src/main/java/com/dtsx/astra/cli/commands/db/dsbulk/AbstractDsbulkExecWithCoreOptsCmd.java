@@ -43,7 +43,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
 
     @Option(
         names = { "--encoding" },
-        description = { "The file name format to use when writing. This setting is ignored when reading and for non-file URLs", DEFAULT_VALUE },
+        description = "The file name format to use when writing. This setting is ignored when reading and for non-file URLs",
         paramLabel = "ENCODING",
         defaultValue = "UTF-8"
     )
@@ -51,7 +51,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
     
     @Option(
         names = { "--max-concurrent-queries" },
-        description = { "The maximum number of concurrent queries that should be carried in parallel", DEFAULT_VALUE },
+        description = "The maximum number of concurrent queries that should be carried in parallel",
         paramLabel = "QUERIES",
         defaultValue = "AUTO"
     )
@@ -59,7 +59,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
       
     @Option(
         names = { "--log-dir" },
-        description = { "Log directory for dsbulk operations", DEFAULT_VALUE },
+        description = "Log directory for dsbulk operations",
         paramLabel = "DIRECTORY",
         defaultValue = "./logs"
     )

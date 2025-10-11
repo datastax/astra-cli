@@ -35,12 +35,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
     footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
 )
 public abstract class AbstractCmd<OpRes> implements Runnable {
-    public static final String DEFAULT_START = "  @|faint (default: |@@|faint,italic ";
-    public static final String DEFAULT_END = "|@@|faint )|@";
-    public static final String DEFAULT_VALUE = DEFAULT_START + "${DEFAULT-VALUE}" + DEFAULT_END;
-
-    @Mixin
-    private HelpMixin helpMixin;
+    public static final String SHOW_CUSTOM_DEFAULT = "__show_custom_default__:";
 
     @Spec
     protected CommandSpec spec;
@@ -57,6 +52,9 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         this.ctx = ctxRef.get();
         ctxRef.onUpdate((ctx) -> this.ctx = ctx);
     }
+
+    @Mixin
+    private HelpMixin helpMixin;
 
     @Mixin
     private AstraColors.Mixin csMixin;

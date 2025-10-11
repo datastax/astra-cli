@@ -49,7 +49,7 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
     static class CdcIdentifier {
         @Option(
             names = { "--cdc-id" },
-            description = { "The CDC ID to delete", DEFAULT_VALUE },
+            description = "The CDC ID to delete",
             paramLabel = "CDC_ID",
             required = true
         )
@@ -88,7 +88,7 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
 
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if CDC does not exist", DEFAULT_VALUE },
+        description = "Do not fail if CDC does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;

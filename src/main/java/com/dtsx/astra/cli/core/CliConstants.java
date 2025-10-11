@@ -1,8 +1,5 @@
 package com.dtsx.astra.cli.core;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_END;
-import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_START;
-
 public abstract class CliConstants {
     public static class $Db {
         public static final String LABEL = "DB";
@@ -48,7 +45,6 @@ public abstract class CliConstants {
         public static final String LONG = "--config-file";
         public static final String SHORT = "-cf";
         public static final String LABEL = "PATH";
-        public static final String DEFAULT_DESC = DEFAULT_START + "${cli.rc-file.path}" + DEFAULT_END;
     }
 
     public static class $Profile {

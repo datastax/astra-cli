@@ -66,13 +66,13 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
     public static class ExistingBehavior {
         @Option(
             names = { "--if-not-exists" },
-            description = { "Don't error if the database already exists", DEFAULT_VALUE }
+            description = "Don't error if the database already exists"
         )
         public boolean $ifNotExists;
 
         @Option(
             names = { "--allow-duplicate-names" },
-            description = { "Allow multiple databases with the same name", DEFAULT_VALUE }
+            description = "Allow multiple databases with the same name"
         )
         public boolean $allowDuplicateNames;
     }
@@ -100,7 +100,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
         @Option(
             names = { $Keyspace.LONG, $Keyspace.SHORT },
-            description = { "Default keyspace for the database", DEFAULT_VALUE },
+            description = "Default keyspace for the database",
             defaultValue = $Keyspace.DEFAULT,
             paramLabel = $Keyspace.LABEL
         )
@@ -109,7 +109,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         @Option(
             names = { "--tier" },
             paramLabel = "TIER",
-            description = { "Tier to create the database in", DEFAULT_VALUE },
+            description = "Tier to create the database in",
             defaultValue = "serverless"
         )
         public String tier;
@@ -117,14 +117,14 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         @Option(
             names = { "--capacity-units" },
             paramLabel = "CAPACITY UNITS",
-            description = { "Capacity units to create the database with", DEFAULT_VALUE },
+            description = "Capacity units to create the database with",
             defaultValue = "1"
         )
         public Integer capacityUnits;
 
         @Option(
             names = { "--non-vector" },
-            description = { "Create a classic non-vector database", DEFAULT_VALUE },
+            description = "Create a classic non-vector database",
             defaultValue = "false"
         )
         public boolean nonVector;

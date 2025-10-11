@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.graalvm.nativeimage.ImageInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -181,14 +180,11 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public String cliName() {
-        val path = binaryPath();
+        binaryPath().ifPresent((path) -> {
+            System.setProperty("cli.name", path.getFileName().toString());
+        });
 
-        val cliName = (path.isPresent() && ImageInfo.inImageCode())
-            ? path.get().getFileName().toString()
-            : "astra";
-
-        System.setProperty("cli.name", cliName);
-        return cliName;
+        return System.getProperty("cli.name", "astra");
     }
 
     @Override

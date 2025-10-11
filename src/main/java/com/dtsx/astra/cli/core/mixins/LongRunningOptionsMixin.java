@@ -8,7 +8,6 @@ import picocli.CommandLine.Spec;
 
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.DEFAULT_VALUE;
 import static picocli.CommandLine.Spec.Target.MIXEE;
 
 public final class LongRunningOptionsMixin {
@@ -19,14 +18,14 @@ public final class LongRunningOptionsMixin {
     }
 
     public static final String LR_OPTS_TIMEOUT_NAME = "--timeout";
-    public static final String LR_OPTS_TIMEOUT_DESC = "How long the command should wait for the database to become active%n" + DEFAULT_VALUE;
+    public static final String LR_OPTS_TIMEOUT_DESC = "How long the command should wait for the database to become active";
 
     @Spec(MIXEE)
     private CommandSpec mixeeSpec;
 
     @Option(
         names = "--async",
-        description = { "Do not wait for the database to become active", DEFAULT_VALUE },
+        description = "Do not wait for the database to become active",
         negatable = true
     )
     private boolean dontWait;

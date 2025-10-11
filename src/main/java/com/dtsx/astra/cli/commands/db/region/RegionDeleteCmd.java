@@ -42,7 +42,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<RegionDeleteResult> {
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if region does not exist", DEFAULT_VALUE }
+        description = "Do not fail if region does not exist"
     )
     public boolean $ifExists;
 

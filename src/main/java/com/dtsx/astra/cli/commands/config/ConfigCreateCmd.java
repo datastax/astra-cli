@@ -10,7 +10,6 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation;
 import com.dtsx.astra.cli.operations.config.ConfigCreateOperation.*;
@@ -57,7 +56,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(
         arity = "0..1",
-        description = { "Profile name", DEFAULT_START + "organization name" + DEFAULT_END },
+        description = { "Profile name", SHOW_CUSTOM_DEFAULT + "organization name" },
         paramLabel = $Profile.LABEL
     )
     public Optional<ProfileName> $profileName;
@@ -72,7 +71,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = { "Astra environment to connect to", DEFAULT_VALUE },
+        description = "Astra environment to connect to",
         completionCandidates = AstraEnvCompletion.class,
         defaultValue = $Env.DEFAULT,
         paramLabel = $Env.LABEL
@@ -81,7 +80,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { "-d", "--default" },
-        description = { "Set the created profile as the default profile", DEFAULT_VALUE }
+        description = "Set the created profile as the default profile"
     )
     public boolean $setDefault;
 

@@ -37,7 +37,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<CollectionDeleteResult> {
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if collection does not exist", DEFAULT_VALUE },
+        description = "Do not fail if collection does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;

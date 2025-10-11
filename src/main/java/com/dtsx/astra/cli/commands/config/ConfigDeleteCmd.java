@@ -44,7 +44,7 @@ public class ConfigDeleteCmd extends AbstractConfigCmd<ConfigDeleteResult> {
 
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if the profile does not exist", DEFAULT_VALUE }
+        description = "Do not fail if the profile does not exist"
     )
     public boolean $ifExists;
 

@@ -43,7 +43,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<CollectionCreateResult> {
     @Option(
         names = { "--if-not-exists" },
-        description = { "Will create a new collection only if none with same name", DEFAULT_VALUE },
+        description = "Will create a new collection only if none with same name",
         defaultValue = "false"
     )
     public boolean $ifNotExists;

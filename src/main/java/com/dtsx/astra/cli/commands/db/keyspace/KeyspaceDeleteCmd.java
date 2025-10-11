@@ -41,7 +41,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceDeleteResult> {
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if keyspace does not exist", DEFAULT_VALUE },
+        description = "Do not fail if keyspace does not exist",
         defaultValue = "false"
     )
     public boolean ifExists;

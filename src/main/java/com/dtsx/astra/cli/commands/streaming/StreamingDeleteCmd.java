@@ -33,7 +33,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<StreamingDeleteResult> {
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if tenant does not exist", DEFAULT_VALUE },
+        description = "Do not fail if tenant does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;

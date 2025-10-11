@@ -176,13 +176,14 @@ public class AstraColors {
         @Getter
         private Optional<Ansi> ansi = Optional.empty();
 
-        @Option(names = "--color", negatable = true, description = "Force colored output")
-        private void setAnsi(boolean ansi) {
-            if (ansi) {
-                this.ansi = Optional.of(Ansi.ON);
-            } else {
-                this.ansi = Optional.of(Ansi.OFF);
-            }
+        enum ColorMode { auto, never, always }
+
+        @Option(names = "--color", description = "Force colored output")
+        private void setAnsi(ColorMode mode) {
+            switch (mode) {
+                case always -> this.ansi = Optional.of(Ansi.ON); // auto is handled by Optional.empty() here, not Ansi.AUTO
+                case never -> this.ansi = Optional.of(Ansi.OFF);
+            };
         }
     }
 }

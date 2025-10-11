@@ -52,14 +52,14 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implements WithSetTimeout {
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if database does not exist", DEFAULT_VALUE },
+        description = "Do not fail if database does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;
 
     @Option(
         names = { "--yes" },
-        description = { "Force deletion of database without prompting", DEFAULT_VALUE },
+        description = "Force deletion of database without prompting",
         defaultValue = "false"
     )
     public boolean $forceDelete;

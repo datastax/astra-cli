@@ -22,7 +22,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--delimiter" },
-        description = { "Character(s) use as field delimiter", DEFAULT_VALUE },
+        description = "Character(s) use as field delimiter",
         paramLabel = "DELIMITER",
         defaultValue = ","
     )
@@ -37,7 +37,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--header" },
-        description = { "Read, Write Header in input file", DEFAULT_VALUE },
+        description = "Read, Write Header in input file",
         defaultValue = "true",
         fallbackValue = "true"
     )
@@ -45,7 +45,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--skip-records" },
-        description = { "Lines to skip before reading", DEFAULT_VALUE },
+        description = "Lines to skip before reading",
         paramLabel = "COUNT",
         defaultValue = "0"
     )
@@ -53,7 +53,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--max-errors" },
-        description = { "Maximum number of errors before aborting the operation", DEFAULT_VALUE },
+        description = "Maximum number of errors before aborting the operation",
         paramLabel = "COUNT",
         defaultValue = "100"
     )
@@ -61,13 +61,13 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--dry-run" },
-        description = { "Enable or disable dry-run mode", DEFAULT_VALUE }
+        description = "Enable or disable dry-run mode"
     )
     public boolean $dryRun;
 
     @Option(
         names = { "--allow-missing-fields" },
-        description = { "Ease the mapping", DEFAULT_VALUE }
+        description = "Ease the mapping"
     )
     public boolean $allowMissingFields;
 

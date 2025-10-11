@@ -37,7 +37,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> {
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if table does not exist", DEFAULT_VALUE },
+        description = "Do not fail if table does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;

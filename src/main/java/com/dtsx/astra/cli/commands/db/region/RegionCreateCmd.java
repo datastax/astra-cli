@@ -42,7 +42,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<RegionCreateResult> {
     @Option(
         names = { "--if-not-exists" },
-        description = { "Do not fail if the region already exists", DEFAULT_VALUE }
+        description = "Do not fail if the region already exists"
     )
     public boolean $ifNotExists;
 

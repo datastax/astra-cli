@@ -53,7 +53,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
 
     @Option(
         names = { "-r", "--roles" },
-        description = { "List of roles to assign the user", DEFAULT_VALUE },
+        description = "List of roles to assign the user",
         defaultValue = "Database Administrator",
         split = ","
     )
@@ -61,7 +61,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
 
     @Option(
         names = { "--if-not-exists" },
-        description = { "Do not fail if user already exists", DEFAULT_VALUE },
+        description = "Do not fail if user already exists",
         defaultValue = "false"
     )
     public boolean $ifNotExists;

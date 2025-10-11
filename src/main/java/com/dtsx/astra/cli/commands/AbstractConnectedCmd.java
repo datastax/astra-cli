@@ -59,7 +59,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     public static class ConfigSpec {
         @Option(
             names = { $ConfigFile.LONG, $ConfigFile.SHORT },
-            description = { "The astrarc file to use", $ConfigFile.DEFAULT_DESC },
+            description = { "The astrarc file to use", SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" },
             paramLabel = $ConfigFile.LABEL
         )
         private Optional<Path> $configFile;

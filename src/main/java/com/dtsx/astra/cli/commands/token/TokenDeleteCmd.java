@@ -42,7 +42,7 @@ public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
 
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if token does not exist", DEFAULT_VALUE },
+        description = "Do not fail if token does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;

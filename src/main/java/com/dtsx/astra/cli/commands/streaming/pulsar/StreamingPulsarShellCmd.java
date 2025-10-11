@@ -54,7 +54,7 @@ public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
 
     @Option(
         names = { "-F", "--fail-on-error" },
-        description = { "Interrupt the shell if a command throws an exception", DEFAULT_VALUE }
+        description = "Interrupt the shell if a command throws an exception"
     )
     public boolean $failOnError;
 

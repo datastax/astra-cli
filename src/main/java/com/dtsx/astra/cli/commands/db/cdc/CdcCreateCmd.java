@@ -45,7 +45,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     @Option(
         names = { $Keyspace.LONG, $Keyspace.SHORT },
-        description = { "Keyspace where the table resides", DEFAULT_VALUE },
+        description = "Keyspace where the table resides",
         defaultValue = $Keyspace.DEFAULT,
         paramLabel = $Keyspace.LABEL
     )
@@ -69,7 +69,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
 
     @Option(
         names = { "--topic-partitions" },
-        description = { "Number of topic partitions", DEFAULT_VALUE },
+        description = "Number of topic partitions",
         paramLabel = "PARTITIONS",
         defaultValue = "3"
     )
@@ -77,7 +77,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
 
     @Option(
         names = { "--if-not-exists" },
-        description = { "Will create a new CDC only if none exists", DEFAULT_VALUE },
+        description = "Will create a new CDC only if none exists",
         defaultValue = "false"
     )
     public boolean $ifNotExists;

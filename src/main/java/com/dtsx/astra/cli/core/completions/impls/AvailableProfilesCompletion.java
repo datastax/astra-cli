@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.core.completions.impls;
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.completions.DynamicCompletion;
 
-import java.util.Objects;
+import java.util.Optional;
 
 public class AvailableProfilesCompletion extends DynamicCompletion {
     static {
@@ -14,7 +14,7 @@ public class AvailableProfilesCompletion extends DynamicCompletion {
         super("""
           OUT=( $(grep '^\\[.*\\]$' '%s' | tr -d '[]') )
         """.formatted(
-           Objects.requireNonNull(AstraCli.unsafeGlobalCliContext()).get().properties().rcFileLocations(false).preferred()
+            Optional.ofNullable(AstraCli.unsafeGlobalCliContext()).map((ctx) -> ctx.get().properties().rcFileLocations(false).preferred()).orElse("~/.astrarc")
         ));
     }
 }

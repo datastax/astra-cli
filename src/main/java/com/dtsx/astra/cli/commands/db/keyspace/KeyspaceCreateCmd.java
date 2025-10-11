@@ -42,7 +42,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceCreateResult> {
     @Option(
         names = { "--if-not-exists" },
-        description = { "Don't error if a keyspace with the same name already exists", DEFAULT_VALUE },
+        description = "Don't error if a keyspace with the same name already exists",
         defaultValue = "false"
     )
     public boolean $ifNotExists;

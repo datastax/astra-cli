@@ -40,7 +40,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathResponse> {
     @Option(
         names = { "--if-exists" },
-        description = { "Only return path if pulsar exists, don't install automatically", DEFAULT_VALUE },
+        description = "Only return path if pulsar exists, don't install automatically",
         defaultValue = "false"
     )
     public boolean $ifExists;

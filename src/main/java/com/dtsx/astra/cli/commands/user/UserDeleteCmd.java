@@ -43,7 +43,7 @@ public class UserDeleteCmd extends AbstractUserCmd<UserDeleteResult> {
 
     @Option(
         names = { "--if-exists" },
-        description = { "Do not fail if user does not exist", DEFAULT_VALUE },
+        description = "Do not fail if user does not exist",
         defaultValue = "false"
     )
     public boolean $ifExists;

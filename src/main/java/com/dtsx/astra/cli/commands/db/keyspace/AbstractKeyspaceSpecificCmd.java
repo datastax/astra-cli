@@ -11,7 +11,7 @@ public abstract class AbstractKeyspaceSpecificCmd<OpRes> extends AbstractKeyspac
 
     @Option(
         names = { $Keyspace.LONG, $Keyspace.SHORT },
-        description = { "The keyspace to use", DEFAULT_VALUE },
+        description = "The keyspace to use",
         defaultValue = $Keyspace.DEFAULT,
         paramLabel = $Keyspace.LABEL
     )

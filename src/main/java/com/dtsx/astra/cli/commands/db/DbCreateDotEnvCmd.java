@@ -63,7 +63,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult> {
     @Option(
         names = { "--print" },
-        description = { "Output the .env file to stdout instead of saving it to the .env file.", DEFAULT_VALUE },
+        description = "Output the .env file to stdout instead of saving it to the .env file.",
         paramLabel = "PRINT",
         defaultValue = "false"
     )
@@ -71,7 +71,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
     @Option(
         names = { "--overwrite" },
-        description = { "Whether to existing duplicate keys in the .env file. If false, the command will attempt to prompt the user before overwriting any existing keys, or fail if it can't.", DEFAULT_VALUE },
+        description = "Whether to existing duplicate keys in the .env file. If false, the command will attempt to prompt the user before overwriting any existing keys, or fail if it can't.",
         paramLabel = "PRINT",
         negatable = true
     )

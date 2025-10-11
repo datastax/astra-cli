@@ -41,7 +41,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
 
     @Option(
         names = { "--request-timeout" },
-        description = { "Request timeout in seconds", DEFAULT_VALUE },
+        description = "Request timeout in seconds",
         paramLabel = "TIMEOUT",
         defaultValue = "20"
     )

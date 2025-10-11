@@ -15,6 +15,7 @@ import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ExitCodeException;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
+import com.dtsx.astra.cli.core.help.DefaultsRenderer;
 import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.help.ExamplesRenderer;
@@ -41,7 +42,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IFactory;
 import picocli.CommandLine.Option;
@@ -55,7 +55,8 @@ import static com.dtsx.astra.cli.utils.MiscUtils.mkPrintWriter;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
-    name = "${cli.name}",
+    name = "${cli.name:-astra}",
+    descriptionHeading = " ", // normally the description heading is "%n", but we don't want that here since we have no description
     subcommands = {
         CommandLine.HelpCommand.class,
         SetupCmd.class,
@@ -183,7 +184,7 @@ public class AstraCli extends AbstractCmd<Void> {
         cmd.setHelpFactory((spec, cs) -> {
             ExamplesRenderer.installRenderer(spec.commandLine(), args, ctxRef);
             DescriptionNewlineRenderer.installRenderer(spec.commandLine());
-            return new Help(spec, cs);
+            return DefaultsRenderer.helpWithOverriddenDefaultsRendering(spec, cs);
         });
 
         return cmd.execute(args);

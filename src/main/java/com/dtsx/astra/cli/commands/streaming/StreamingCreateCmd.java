@@ -52,7 +52,7 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<StreamingCreateResult> {
     @Option(
         names = { "--if-not-exists" },
-        description = { "Don't error if the tenant already exists", DEFAULT_VALUE },
+        description = "Don't error if the tenant already exists",
         defaultValue = "false"
     )
     public boolean $ifNotExists;
@@ -64,7 +64,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<Strea
         @Option(
             names = { "--plan" },
             paramLabel = "PLAN",
-            description = { "Plan for the tenant", DEFAULT_VALUE },
+            description = "Plan for the tenant",
             defaultValue = "serverless"
         )
         public String $plan;

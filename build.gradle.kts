@@ -1,3 +1,4 @@
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.net.URLClassLoader
 
 buildscript {
@@ -13,6 +14,7 @@ plugins {
     java
     application
     id("org.graalvm.buildtools.native") version "0.10.6"
+    id("org.asciidoctor.jvm.convert") version "4.0.2"
 }
 
 group = "com.dtsx.astra.cli"
@@ -332,8 +334,7 @@ tasks.jar {
 }
 
 tasks.compileTestJava {
-    dependsOn("generateGraalReflectionConfig")
-    dependsOn("generateGraalResourceConfig")
+    dependsOn("createDynamicProperties")
     options.compilerArgs.add("-parameters")
 }
 
@@ -378,4 +379,26 @@ tasks.register<Jar>("fatJar") {
     from({
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
+}
+
+tasks.register<JavaExec>("genDocsAsiidoc") {
+    dependsOn("classes")
+    group = "documentation"
+    classpath = configurations.compileClasspath.get() + configurations.annotationProcessor.get() + sourceSets.main.get().runtimeClasspath
+    mainClass.set("picocli.codegen.docgen.manpage.ManPageGenerator")
+    args = listOf("com.dtsx.astra.cli.AstraCli", "--outdir", "${layout.buildDirectory.get()}/docs/asiidoc")
+    jvmArgs = listOf(
+        "--enable-native-access=ALL-UNNAMED"
+    )
+}
+
+tasks.register<AsciidoctorTask>("genDocsHtml") {
+    dependsOn("genDocsAsiidoc")
+
+    setSourceDir(layout.buildDirectory.dir("docs/asiidoc"))
+    setOutputDir(layout.buildDirectory.dir("docs/html"))
+
+    outputOptions {
+        backends("html5")
+    }
 }

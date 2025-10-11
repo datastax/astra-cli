@@ -14,7 +14,7 @@ import picocli.CommandLine.Option;
 public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(
         names = { "--url" },
-        description = { "The URL or path of the resource(s) to read from or write to", DEFAULT_VALUE },
+        description = "The URL or path of the resource(s) to read from or write to",
         paramLabel = "URL",
         defaultValue = "./data"
     )
@@ -22,7 +22,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--delimiter" },
-        description = { "Character(s) use as field delimiter", DEFAULT_VALUE },
+        description = "Character(s) use as field delimiter",
         paramLabel = "DELIMITER",
         defaultValue = ","
     )
@@ -37,7 +37,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--header" },
-        description = { "Enable or disable whether the files begin with a header line", DEFAULT_VALUE },
+        description = "Enable or disable whether the files begin with a header line",
         defaultValue = "true",
         fallbackValue = "true"
     )
@@ -45,7 +45,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--skip-records" },
-        description = { "Number of records to skip from each input file before parsing", DEFAULT_VALUE },
+        description = "Number of records to skip from each input file before parsing",
         paramLabel = "COUNT",
         defaultValue = "0"
     )
@@ -53,7 +53,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
 
     @Option(
         names = { "--max-errors" },
-        description = { "Maximum number of errors to tolerate before aborting the operation", DEFAULT_VALUE },
+        description = "Maximum number of errors to tolerate before aborting the operation",
         paramLabel = "COUNT",
         defaultValue = "100"
     )
