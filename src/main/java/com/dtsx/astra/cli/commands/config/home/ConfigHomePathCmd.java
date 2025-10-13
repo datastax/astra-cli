@@ -35,7 +35,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 public class ConfigHomePathCmd extends AbstractCmd<ConfigPathResult> {
     @Option(
         names = { "-p", "--path-only" },
-        description = "Display only the expected path to the home folder, without any additional text."
+        description = "Display only the expected path to the home folder, without any additional synopsis."
     )
     public boolean pathOnly;
 

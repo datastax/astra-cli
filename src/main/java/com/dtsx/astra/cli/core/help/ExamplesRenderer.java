@@ -43,15 +43,9 @@ public class ExamplesRenderer {
         val colors = new AstraColors(resolveAnsi(args));
 
         for (val example : examples) {
-            for (val comment : example.comment()) {
-                sb.append("  ").append(renderComment(colors, comment)).append(NL);
-            }
+            sb.append("  ").append(renderComment(colors, example.comment())).append(NL);
 
             sb.append("  ").append(renderCommand(colors, example.command().replace("${cli.name}", ctxRef.get().properties().cliName()))).append(NL);
-
-            for (val output : example.output()) {
-                sb.append("  ").append(output).append(NL);
-            }
 
             if (example != examples[examples.length - 1]) {
                 sb.append(NL);

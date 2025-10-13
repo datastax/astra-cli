@@ -27,7 +27,7 @@ import java.util.Optional;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
-    @ArgGroup(heading = "%nConnection options:%n", order = 100)
+    @ArgGroup(heading = "%nConnection Options:%n", order = 100)
     private @Nullable CredsProvider $credsProvider;
 
     public static class CredsProvider {

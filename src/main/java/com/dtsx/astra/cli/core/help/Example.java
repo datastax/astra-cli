@@ -6,7 +6,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Repeatable(Examples.class)
 public @interface Example {
-    String[] comment();
+    String comment();
     String command();
-    String[] output() default {};
 }

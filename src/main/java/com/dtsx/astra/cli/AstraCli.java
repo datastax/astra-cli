@@ -55,7 +55,7 @@ import static com.dtsx.astra.cli.utils.MiscUtils.mkPrintWriter;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
-    name = "${cli.name:-astra}",
+    name = "astra",
     descriptionHeading = " ", // normally the description heading is "%n", but we don't want that here since we have no description
     subcommands = {
         CommandLine.HelpCommand.class,
@@ -71,6 +71,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         UpgradeCmd.class,
         NukeCmd.class,
         ShellEnvCmd.class,
+        DocsCmd.class
     }
 )
 @Example(
