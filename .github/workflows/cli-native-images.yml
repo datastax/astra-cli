@@ -35,7 +35,7 @@ jobs:
         run: 'mvn package -Dmaven.test.skip=true'
 
       - name: Temporarily save package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: java-binary
           path: |
@@ -71,7 +71,7 @@ jobs:
         run: native-image --enable-url-protocols=https -H:+ReportExceptionStackTraces -jar astra-cli-*.jar astra-cli-windows.exe
         if: runner.os == 'Windows'
       - name: Temporarily save package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: astra-cli-${{ matrix.os }}-java-${{ matrix.jdk-version }}
           path: |
