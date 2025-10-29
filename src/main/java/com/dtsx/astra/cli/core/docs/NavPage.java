@@ -2,11 +2,11 @@ package com.dtsx.astra.cli.core.docs;
 
 import lombok.val;
 
-import java.util.LinkedHashMap;
+import java.util.List;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
-public record NavPage(LinkedHashMap<String, DocsPage> sections) implements Page {
+public record NavPage(List<DocsPage> topLevelSubcommand) implements Page {
     @Override
     public String fileName() {
         return "partial-nav.adoc";
@@ -21,23 +21,19 @@ public record NavPage(LinkedHashMap<String, DocsPage> sections) implements Page 
     public String render() {
         val sb = new StringBuilder();
 
-        for (var entry : sections.entrySet()) {
-            val title = entry.getKey();
-            val page = entry.getValue();
+        sb.append(NL).append(".Commands").append(NL);
 
-            sb.append(NL).append('.').append(title).append(NL);
-            mkNavItems(sb, page, 0);
+        for (val subcommand : topLevelSubcommand) {
+            mkNavItems(sb, subcommand, 0);
         }
 
-        return sb.append(NL).toString();
+        return sb.append(NL).append(NL).toString();
     }
 
     private void mkNavItems(StringBuilder sb, DocsPage page, int depth) {
-        if (depth > 0) {
-            sb.append("*".repeat(depth)).append(" xref:reference:").append(page.fileName()).append("[]\n");
-        }
+        sb.append("*".repeat(depth + 1)).append(" xref:").append(DocsPage.DIRECTORY).append(":").append(page.fileName()).append("[]").append(NL);
 
-        for (DocsPage sub : page.subcommands()) {
+        for (val sub : page.subcommands()) {
             mkNavItems(sb, sub, depth + 1);
         }
     }

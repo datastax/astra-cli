@@ -1,0 +1,15 @@
+{
+  "collapsibleOptionGroups" : [
+    "Command Options",
+    "Connection Options"
+  ],
+  "hideCommands": [
+    "help",
+    "docs"
+  ],
+  "seeAlsoLinks": {
+    "upgrade": [
+      "xref:installation.adoc[]"
+    ]
+  }
+}

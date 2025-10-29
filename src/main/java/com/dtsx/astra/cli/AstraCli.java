@@ -12,6 +12,8 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Ref;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ExitCodeException;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
@@ -86,6 +88,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     comment = "Create a vector database",
     command = "${cli.name} db create demo -r us-east1"
 )
+@AliasForSubcommand(None.class)
 public class AstraCli extends AbstractCmd<Void> {
     @Option(
         names = { "-v", "--version" },

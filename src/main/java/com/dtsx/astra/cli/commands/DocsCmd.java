@@ -1,21 +1,27 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.docs.AsciidocGenerator;
+import com.dtsx.astra.cli.core.docs.ExternalDocsSpec;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.utils.JsonUtils;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.io.file.PathUtils;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Help.Ansi.IStyle;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.stripAnsi;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
 
 @Command(
     name = "docs",
@@ -30,18 +36,27 @@ public class DocsCmd extends AbstractCmd<Void> {
     )
     public Path outputDir;
 
+    @Option(
+        names = { "--spec", "-s" },
+        description = "Path to the documentation specification file",
+        defaultValue = "docs_spec.json"
+    )
+    public Path specFile;
+
     @Override
+    @SneakyThrows
     protected OutputHuman executeHuman(Supplier<Void> v) {
+        if (!Files.exists(specFile)) {
+            throw new OptionValidationException("spec file", "Specified path does not exist: " + specFile);
+        }
+
+        val docsSpec = JsonUtils.objectMapper().readValue(
+            specFile.toFile(),
+            ExternalDocsSpec.class
+        );
+
         val generated = ctx.log().loading("Generating documentation tree", (_) -> {
-            return new AsciidocGenerator(spec.root(), sequencedMapOf(
-                "CLI configuration", "config",
-                "Manage your Databases", "db",
-                "Manage Astra Streaming", "streaming",
-                "Work with your organization", "org",
-                "Work with your tokens", "token",
-                "Work with users", "user",
-                "Work with roles", "role"
-            )).generate();
+            return new AsciidocGenerator(ctx.properties().cliName(), spec.root(), docsSpec).generate();
         });
 
         ctx.log().loading("Writing documentation to " + outputDir, (_) -> {
@@ -49,10 +64,12 @@ public class DocsCmd extends AbstractCmd<Void> {
                 Files.createDirectories(outputDir);
                 PathUtils.cleanDirectory(outputDir);
 
+                val colors = mkModifiedColors();
+
                 for (val doc : generated) {
                     val filePath = outputDir.resolve(doc.filePath());
                     Files.createDirectories(filePath.getParent());
-                    Files.writeString(filePath, stripAnsi(ctx.console().format(doc.render())));
+                    Files.writeString(filePath, stripAnsi(colors.format(doc.render())));
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -61,6 +78,34 @@ public class DocsCmd extends AbstractCmd<Void> {
         });
 
         return OutputAll.response("Wrote @!" + generated.size() + "!@ files to @'!" + outputDir + "!@");
+    }
+
+    private AstraColors mkModifiedColors() {
+        return new AstraColors(ctx.colors().ansi(), (b) -> {
+            val markupMap = new HashMap<>(b.customMarkupMap());
+
+            markupMap.put("code", new IStyle() {
+                public String on() { return "``"; }
+                public String off() { return "``"; }
+            });
+
+            markupMap.put("bold", new IStyle() {
+                public String on() { return "**"; }
+                public String off() { return "**"; }
+            });
+
+            markupMap.put("italic", new IStyle() {
+                public String on() { return "__"; }
+                public String off() { return "__"; }
+            });
+
+            markupMap.put("underline", new IStyle() {
+                public String on() { return "[.underline]#"; }
+                public String off() { return "#"; }
+            });
+
+            return b.customMarkupMap(markupMap);
+        });
     }
 
     @Override

@@ -50,7 +50,7 @@ public class TextSelectionStrategy<T> implements SelectionStrategy<T> {
     }
 
     private String mkPrompt() {
-        return ctx.console().format(req.prompt() + NL + "@!>!@ " + (req.echoOff() ? ctx.colors().NEUTRAL_500.use("@|faint input hidden for security |@") : ""));
+        return ctx.colors().format(req.prompt() + NL + "@!>!@ " + (req.echoOff() ? ctx.colors().NEUTRAL_500.use("@|faint input hidden for security |@") : ""));
     }
 
     private Optional<String> readAnswer(String prompt) {

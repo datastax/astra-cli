@@ -17,8 +17,6 @@ import lombok.Value;
 import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.val;
-import picocli.CommandLine.Help;
-import picocli.CommandLine.Help.ColorScheme;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -80,18 +78,12 @@ public class CliContext {
         return outputType.isNotHuman();
     }
 
-    public ColorScheme colorScheme() {
-        return new Help.ColorScheme.Builder(AstraColors.DEFAULT_COLOR_SCHEME)
-            .ansi(colors.ansi())
-            .build();
-    }
-
     public String highlight(String s) {
         return highlight(s, true);
     }
 
     public String highlight(String s, boolean orQuote) {
-        return (orQuote) ? colors.BLUE_300.useOrQuote(s) : colors.BLUE_300.use(s);
+        return colors.highlight(s, orQuote);
     }
 
     public String highlight(Path p) {

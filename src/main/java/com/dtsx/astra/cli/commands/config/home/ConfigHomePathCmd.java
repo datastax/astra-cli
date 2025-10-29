@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     name = "path",
     description = {
         "Prints the expected path of the astra home folder, even if does not exist.",
-        "Checks ASTRA_HOME @|faint,italic (ASTRA_HOME=~/my_folder)|@ -> XDG_DATA_HOME @|faint,italic ($XDG_DATA_HOME/astra)|@ -> HOME @|faint,italic (~/.astra)|@.",
+        "Checks @|code ASTRA_HOME|@ @|faint,italic (ASTRA_HOME=~/my_folder)|@ -> @|code XDG_DATA_HOME|@ @|faint,italic ($XDG_DATA_HOME/astra)|@ -> @|code HOME|@ @|faint,italic (~/.astra)|@.",
     }
 )
 @Example(

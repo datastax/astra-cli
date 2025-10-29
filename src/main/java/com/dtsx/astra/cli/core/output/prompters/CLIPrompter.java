@@ -99,7 +99,7 @@ public class CLIPrompter {
 
         for (val meta : strategies) {
             if (meta.isSupported(ctx)) {
-                val updatedPrompt = ctx.console().format(trimIndent(prompt));
+                val updatedPrompt = ctx.colors().format(trimIndent(prompt));
                 return run.apply(meta, updatedPrompt).orElseThrow(() -> noAnswerGiven(fallback, fix));
             }
         }

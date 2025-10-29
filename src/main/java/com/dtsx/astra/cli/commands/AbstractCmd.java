@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
+import static com.dtsx.astra.cli.utils.MiscUtils.listAdd;
 
 @Command(
     commandListHeading = "%nCommands:%n",
@@ -142,7 +143,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     @MustBeInvokedByOverriders
     protected void prelude() {
-        spec.commandLine().setColorScheme(ctx.colorScheme());
+        spec.commandLine().setColorScheme(ctx.colors().colorScheme());
 
         if (!disableUpgradeNotifier()) {
             ctx.upgradeNotifier().accept(ctx);
@@ -187,6 +188,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected final List<String> originalArgs() {
-        return new ArrayList<>() {{ add(ctx.properties().cliName()); addAll(spec.commandLine().getParseResult().originalArgs()); }};
+        return listAdd(ctx.properties().cliName(), spec.commandLine().getParseResult().originalArgs());
     }
 }

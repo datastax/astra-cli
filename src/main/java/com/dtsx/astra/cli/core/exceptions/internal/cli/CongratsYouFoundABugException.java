@@ -8,6 +8,7 @@ import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 public class CongratsYouFoundABugException extends AstraCliException {
     public CongratsYouFoundABugException(String error) {
@@ -33,7 +34,7 @@ public class CongratsYouFoundABugException extends AstraCliException {
             ? NL + NL + MiscUtils.captureStackTrace(cause)
             : "";
 
-        return """
+        return trimIndent("""
           @|bold,red Error: "%s"|@
         
           @|bold Congratulations, you have found a bug in the Astra CLI.|@
@@ -49,8 +50,8 @@ public class CongratsYouFoundABugException extends AstraCliException {
             - Any other relevant information that can help us reproduce the issue
        
           Thank you for your help in making Astra CLI better!%s
-        """.formatted(
-            msg.replace("\n", "//"),
+        """).formatted(
+            msg,
             debugLogMsg,
             stacktraceMsg
         );

@@ -14,7 +14,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 @UtilityClass
 public class ExceptionHandlerUtils {
     public int handleAstraCliException(AstraCliException err, CommandLine cmd, CliContext ctx) {
-        val response = OutputAll.response(ctx.console().format(err.getMessage()), err.getMetadata(), err.getNextSteps(), err.getCode());
+        val response = OutputAll.response(ctx.colors().format(err.getMessage()), err.getMetadata(), err.getNextSteps(), err.getCode());
 
         val message = renderMessage(response, ctx);
 

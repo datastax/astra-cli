@@ -178,7 +178,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
         ctx.console().println(trimIndent(prompt));
         ctx.console().println();
-        ctx.console().unsafeReadLine(ctx.console().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "), false);
+        ctx.console().unsafeReadLine(ctx.colors().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "), false);
         ctx.console().println();
     }
 

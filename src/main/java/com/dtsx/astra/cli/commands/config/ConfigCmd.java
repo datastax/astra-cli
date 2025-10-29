@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.commands.config.home.ConfigHomeCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -25,4 +26,5 @@ import picocli.CommandLine.Command;
     command = "${cli.name} config create --token @token.txt --name prod",
     comment = "Create a new Astra CLI profile."
 )
+@AliasForSubcommand(ConfigListCmd.class)
 public final class ConfigCmd extends ConfigListImpl {}

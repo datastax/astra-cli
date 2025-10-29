@@ -28,7 +28,7 @@ public class ShellEnvCmd implements Runnable {
     private HelpMixin helpMixin;
 
     @Option(
-        names = { "--ignore-multiple-paths "},
+        names = { "--ignore-multiple-paths" },
         description = "Ignore warnings about multiple home folders or astrarc files being present"
     )
     public boolean $ignoreMultiplePaths;

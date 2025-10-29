@@ -2,15 +2,12 @@ package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.core.output.AstraColors.AstraColor;
 import com.dtsx.astra.cli.core.output.prompters.builders.ConfirmerBuilder;
 import com.dtsx.astra.cli.core.output.prompters.builders.PrompterBuilder;
 import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.val;
 import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +15,6 @@ import java.io.Console;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class AstraConsole {
@@ -36,9 +32,6 @@ public class AstraConsole {
 
     private final Supplier<CliContext> ctxSupplier;
     private final boolean noInput;
-
-    private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
-    private static final Pattern HIGHLIGHT_OR_QUOTE_PATTERN = Pattern.compile("@'!(.*?)!@");
 
     @Getter @Setter
     private @Nullable Console console = System.console();
@@ -108,43 +101,13 @@ public class AstraConsole {
             : console.readLine();
     }
 
-    public String format(Object... args) {
-        val sb = new StringBuilder();
-        var colorUsed = false;
-
-        for (val item : args) {
-            if (item instanceof AstraColor color) {
-                sb.append(color.on());
-                colorUsed = true;
-            } else if (item instanceof String str) {
-                var processedStr = str.replace("${cli.name}", ctx().properties().cliName());
-
-                processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
-                    .replaceAll((match) -> ctx().highlight(match.group(1), false));
-
-                processedStr = HIGHLIGHT_OR_QUOTE_PATTERN.matcher(processedStr)
-                    .replaceAll((match) -> ctx().highlight(match.group(1), true));
-
-                sb.append(ctx().colors().ansi().new Text(processedStr, ctx().colorScheme()));
-            } else {
-                sb.append(item);
-            }
-        }
-
-        if (colorUsed) {
-            sb.append(ctx().colors().reset());
-        }
-
-        return sb.toString();
-    }
-
     private void write(PrintWriter ps, Object... items) {
-        ps.print(format(items));
+        ps.print(ctx().colors().format(items));
         ps.flush();
     }
 
     private void writeln(PrintWriter ps, Object... items) {
-        ps.println(format(items));
+        ps.println(ctx().colors().format(items));
     }
 
     private CliContext ctx() {

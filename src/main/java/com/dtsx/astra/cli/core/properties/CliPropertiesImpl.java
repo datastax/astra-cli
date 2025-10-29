@@ -127,7 +127,7 @@ public class CliPropertiesImpl implements CliProperties {
         }
 
         return new PathLocations(locations.getLast().path(), NEList.parse(locations).orElseThrow(() ->
-            new CongratsYouFoundABugException("@|bold,red Error: No .astrarc file locations could be determined|@")
+            new CongratsYouFoundABugException("No .astrarc file locations could be determined")
         ));
     }
 
@@ -174,7 +174,7 @@ public class CliPropertiesImpl implements CliProperties {
         }
 
         return new PathLocations(locations.getLast().path(), NEList.parse(locations).orElseThrow(() ->
-            new CongratsYouFoundABugException("@|bold,red Error: No astra home folder locations could be determined|@")
+            new CongratsYouFoundABugException("No astra home folder locations could be determined")
         ));
     }
 

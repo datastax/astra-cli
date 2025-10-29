@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.token;
 
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -17,4 +18,5 @@ import picocli.CommandLine.Command;
     comment = "Show your current token",
     command = "${cli.name} token"
 )
+@AliasForSubcommand(TokenGetCmd.class)
 public final class TokenCmd extends TokenGetImpl {}

@@ -185,7 +185,7 @@ public class AstraLogger {
 
         try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
             for (String line : accumulated) {
-                writer.write(AstraColors.stripAnsi(ctx().console().format(line)));
+                writer.write(AstraColors.stripAnsi(ctx().colors().format(line)));
                 writer.write(System.lineSeparator());
             }
         } catch (Exception _) {}

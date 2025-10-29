@@ -19,6 +19,7 @@ import com.dtsx.astra.cli.commands.db.table.TableDeleteCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDescribeCmd;
 import com.dtsx.astra.cli.commands.db.table.TableListCmd;
 import com.dtsx.astra.cli.commands.db.table.TableTruncateCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -72,4 +73,5 @@ import picocli.CommandLine.Command;
     comment = "List only vector-enabled Astra databases",
     command = "${cli.name} db --vector"
 )
+@AliasForSubcommand(DbListCmd.class)
 public final class DbCmd extends DbListImpl {}

@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     name = "path",
     description = {
         "Prints the expected path of the .astrarc file, even if does not exist.",
-        "Checks ASTRARC @|faint,italic (ASTRARC=~/my_folder/.my_rc)|@ -> XDG_CONFIG_HOME @|faint,italic ($XDG_CONFIG_HOME/astra/.astrarc)|@ -> HOME @|faint,italic (~/.astrarc)|@.",
+        "Checks @|code ASTRARC|@ @|faint,italic (ASTRARC=~/my_folder/.my_rc)|@ -> @|code XDG_CONFIG_HOME|@ @|faint,italic ($XDG_CONFIG_HOME/astra/.astrarc)|@ -> @|code HOME|@ @|faint,italic (~/.astrarc)|@.",
     }
 )
 @Example(

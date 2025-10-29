@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.docs;
 
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.help.Example;
 import lombok.val;
 import picocli.CommandLine.Model.ArgGroupSpec;
@@ -7,20 +8,22 @@ import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Model.PositionalParamSpec;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
+import static com.dtsx.astra.cli.utils.MiscUtils.listConcat;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public record DocsPage(List<String> command, DocsPageSections sections, List<DocsPage> subcommands) implements Page {
-    public static final String DIRECTORY = "reference";
+    public static final String DIRECTORY = "commands";
 
     @Override
     public String fileName() {
-        return "astra-" + String.join("-", command) + ".adoc";
+        return String.join("-", command) + ".adoc";
     }
 
     @Override
@@ -30,20 +33,35 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
 
     @Override
     public String render() {
-        return
-            sections.name.render() + NL + NL +
-            sections.synopsis.render() + NL + NL +
-            sections.description.render() + NL + NL +
-            sections.options.render() + NL + NL +
-            sections.examples.render();
+        val sj = new StringJoiner(NL + NL);
+
+        val allSections = List.of(
+            sections.name,
+            sections.synopsis,
+            sections.description,
+            sections.aliasing,
+            sections.subcommands,
+            sections.options,
+            sections.examples,
+            sections.seeAlso
+        );
+
+        for (val section : allSections) {
+            sj.add(section.render());
+        }
+
+        return sj.toString();
     }
 
     public record DocsPageSections(
         CommandName name,
         CommandSynopsis synopsis,
         CommandDescription description,
+        CommandAliasingInformation aliasing,
+        CommandSubcommands subcommands,
         CommandOptions options,
-        CommandExamples examples
+        CommandExamples examples,
+        CommandSeeAlso seeAlso
     ) {}
 
     interface DocsPageSection {
@@ -53,7 +71,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
     public record CommandName(List<String> parts) implements DocsPageSection {
         @Override
         public String render() {
-            return "= astra " + String.join(" ", parts);
+            return "= " + String.join(" ", parts);
         }
     }
 
@@ -73,6 +91,55 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
         @Override
         public String render() {
             return Arrays.stream(desc).filter(d -> !d.isBlank()).collect(Collectors.joining(NL + NL));
+        }
+    }
+
+    public interface CommandAliasingInformation extends DocsPageSection {}
+
+    public record NoAliasingInformation() implements CommandAliasingInformation {
+        @Override
+        public String render() {
+            return "";
+        }
+    }
+
+    public record HasAliases(NEList<List<String>> aliases) implements CommandAliasingInformation {
+        @Override
+        public String render() {
+            return """
+            == Aliases
+            
+            %s
+            """.formatted(
+                aliases.stream().map(a -> "`" + String.join(" ", a) + "`").collect(Collectors.joining(", "))
+            );
+        }
+    }
+
+    public record IsAliasOf(List<String> targetCommand) implements CommandAliasingInformation {
+        @Override
+        public String render() {
+            return """
+            
+            **Alias of `%s`**
+            """.formatted(String.join(" ", targetCommand));
+        }
+    }
+
+    public record CommandSubcommands(List<DocsPage> subcommands) implements DocsPageSection {
+        @Override
+        public String render() {
+            if (subcommands.isEmpty()) {
+                return "";
+            }
+
+            val sb = new StringBuilder("== Subcommands").append(NL).append(NL);
+
+            for (val subcommand : subcommands) {
+                sb.append("* xref:").append(subcommand.fileName()).append("[").append(String.join(" ", subcommand.command())).append("]").append(NL);
+            }
+
+            return sb.toString();
         }
     }
 
@@ -113,23 +180,26 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
         }
 
         private void renderArg(StringBuilder sb, ArgSpec arg) {
+            if (arg.hidden()) {
+                return;
+            }
+
             val name = (arg instanceof OptionSpec os)
-                ? Arrays.stream(os.names()).map((s) -> "`" + s + "`").collect(Collectors.joining(", "))
+                ? Arrays.stream(os.names()).sorted(Comparator.comparing(String::length)).map((s) -> "`" + s + "`").collect(Collectors.joining(", "))
                 : "`" + arg.paramLabel() + "`";
 
             val desc = Arrays.stream(arg.description())
                 .filter(s -> !s.startsWith(SHOW_CUSTOM_DEFAULT))
-                .map(s -> NL + "+" + NL + "    " + s)
                 .collect(Collectors.joining());
 
-            sb.append("* ").append(name).append(desc).append(NL);
+            sb.append(name).append(":: ").append(desc).append(NL);
         }
 
         private List<ArgSpec> allNestedArgs(ArgGroupSpec group) {
-            return new ArrayList<>() {{
-                addAll(group.allPositionalParametersNested());
-                addAll(group.allOptionsNested());
-            }};
+            return listConcat(
+                group.allPositionalParametersNested(),
+                group.allOptionsNested()
+            );
         }
     }
 
@@ -147,6 +217,21 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
                     .map((e) -> "# " + e.comment() + NL + "$ " + e.command() )
                     .collect(Collectors.joining(NL + NL))
             );
+        }
+    }
+
+    public record CommandSeeAlso(List<String> seeAlsoLinks) implements DocsPageSection {
+        @Override
+        public String render() {
+            if (seeAlsoLinks.isEmpty()) {
+                return "";
+            }
+
+            val sb = new StringBuilder("== See Also").append(NL).append(NL);
+            for (val link : seeAlsoLinks) {
+                sb.append("* ").append(link).append(NL);
+            }
+            return sb.toString();
         }
     }
 }

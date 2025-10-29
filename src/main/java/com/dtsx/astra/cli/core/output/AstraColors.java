@@ -4,10 +4,17 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Help.Ansi.IStyle;
+import picocli.CommandLine.Help.Ansi.Style;
 import picocli.CommandLine.Help.ColorScheme;
+import picocli.CommandLine.Help.ColorScheme.Builder;
+
+import java.util.HashMap;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 @Accessors(fluent = true)
 @RequiredArgsConstructor
@@ -17,6 +24,12 @@ public class AstraColors {
 
     @Getter
     private final Ansi ansi;
+
+    private final Function<Builder, Builder> colorSchemeCustomizer;
+
+    public AstraColors(Ansi ansi) {
+        this(ansi, Function.identity());
+    }
 
     @RequiredArgsConstructor
     public class AstraColor implements IStyle {
@@ -146,12 +159,77 @@ public class AstraColors {
     public static final ColorScheme DEFAULT_COLOR_SCHEME;
 
     static {
-        val colors = new AstraColors(Ansi.AUTO);
+        val colors = new AstraColors(Ansi.ON);
+
+        // TODO add AstraColors to this
+        val markupMap = new HashMap<String, IStyle>();
+
+        for (val style : Style.values()) {
+            markupMap.put(style.name(), style);
+
+            if (style.name().startsWith("fg_")) {
+                markupMap.put(style.name().replace("fg_", ""), style);
+            }
+        }
+
+        // overridden in `docgen` to render backticks
+        markupMap.put("code", Style.italic);
 
         DEFAULT_COLOR_SCHEME = new ColorScheme.Builder(Help.defaultColorScheme(Ansi.AUTO))
             .options(colors.BLUE_300)
             .parameters(colors.BLUE_300)
+            .customMarkupMap(markupMap)
             .build();
+    }
+
+    private @Nullable ColorScheme cachedColorScheme = null;
+
+    private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("@!(.*?)!@");
+    private static final Pattern HIGHLIGHT_OR_QUOTE_PATTERN = Pattern.compile("@'!(.*?)!@");
+
+    public ColorScheme colorScheme() {
+        if (cachedColorScheme != null) {
+            return cachedColorScheme;
+        }
+
+        return cachedColorScheme = colorSchemeCustomizer.apply(
+            new Help.ColorScheme.Builder(AstraColors.DEFAULT_COLOR_SCHEME)
+                .ansi(ansi)
+        ).build();
+    }
+
+    public String format(Object... args) {
+        val sb = new StringBuilder();
+        var colorUsed = false;
+
+        for (val item : args) {
+            if (item instanceof AstraColor color) {
+                sb.append(color.on());
+                colorUsed = true;
+            } else if (item instanceof String str) {
+                var processedStr = str.replace("${cli.name}", System.getProperty("cli.name"));
+
+                processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
+                    .replaceAll((match) -> highlight(match.group(1), false));
+
+                processedStr = HIGHLIGHT_OR_QUOTE_PATTERN.matcher(processedStr)
+                    .replaceAll((match) -> highlight(match.group(1), true));
+
+                sb.append(ansi.new Text(processedStr, colorScheme()));
+            } else {
+                sb.append(item);
+            }
+        }
+
+        if (colorUsed) {
+            sb.append(reset());
+        }
+
+        return sb.toString();
+    }
+
+    public String highlight(String s, boolean orQuote) {
+        return (orQuote) ? BLUE_300.useOrQuote(s) : BLUE_300.use(s);
     }
 
     public String reset() {
