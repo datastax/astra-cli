@@ -11,6 +11,6 @@ public abstract class AbstractKeyspaceCmd<OpRes> extends AbstractDbRequiredCmd<O
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        keyspaceGateway = ctx.gateways().mkKeyspaceGateway(profile().token(), profile().env(), ctx);
+        keyspaceGateway = ctx.gateways().mkKeyspaceGateway(profile().token(), profile().env());
     }
 }

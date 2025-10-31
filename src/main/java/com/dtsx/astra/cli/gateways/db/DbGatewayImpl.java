@@ -62,13 +62,14 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout) {
-        val currentStatus = ctx.log().loading("Fetching current currStatus of db " + ctx.highlight(ref), (_) -> findOne(ref))
+        val currentStatus = ctx.log().loading("Fetching current status of db " + ctx.highlight(ref), (_) -> findOne(ref))
             .getStatus();
 
         val expectedStatuses = Arrays.stream(DatabaseStatusType.values())
             .filter(status -> status != ACTIVE && status != HIBERNATED && status != MAINTENANCE && status != INITIALIZING && status != PENDING)
             .toList();
 
+        // TODO astra-sdk-devops needs to add ASSOCIATING
         return switch (currentStatus) {
             case ACTIVE -> {
                 yield Pair.create(currentStatus, Duration.ZERO);

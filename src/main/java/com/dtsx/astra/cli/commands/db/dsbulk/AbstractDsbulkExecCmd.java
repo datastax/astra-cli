@@ -26,7 +26,7 @@ public abstract class AbstractDsbulkExecCmd extends AbstractDbCmd<DsbulkExecResu
     protected void prelude() {
         WindowsUnsupportedException.throwIfWindows(ctx);
         super.prelude();
-        downloadsGateway = ctx.gateways().mkDownloadsGateway(ctx);
+        downloadsGateway = ctx.gateways().mkDownloadsGateway();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.org;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.APIProvider;
+import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.exception.AuthenticationException;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -44,8 +45,7 @@ public class OrgGatewayImpl implements OrgGateway {
                     try {
                         updateMsg.accept(baseMsg + " (trying @!" + env.name().toLowerCase() + "!@)");
 
-                        var apiProvider = APIProvider.mkDefault(token, env, ctx);
-                        var org = apiProvider.astraOpsClient().getOrganization();
+                        var org = new AstraOpsClient(token.unsafeUnwrap(), env).getOrganization();
                         return Optional.of(Pair.create(env, org));
                     } catch (AuthenticationException _) {
                         // whatever

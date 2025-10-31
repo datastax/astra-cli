@@ -42,8 +42,8 @@ public class RoleRef implements Highlightable {
     @JsonValue
     public Map<String, Object> toJson() {
         return ref.fold(
-            id -> sequencedMapOf("type", "id", "unwrap", id.toString()),
-            name -> sequencedMapOf("type", "name", "unwrap", name)
+            id -> sequencedMapOf("type", "id", "value", id.toString()),
+            name -> sequencedMapOf("type", "name", "value", name)
         );
     }
 

@@ -5,7 +5,6 @@ import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.datatypes.TriFunction;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
@@ -20,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class SetupOperation implements Operation<SetupResult> {
     private final CliContext ctx;
-    private final TriFunction<AstraToken, AstraEnvironment, CliContext, OrgGateway> createOrgGateway;
+    private final BiFunction<AstraToken, AstraEnvironment, OrgGateway> createOrgGateway;
     private final OrgGateway.Stateless statelessOrgGateway;
     private final SetupRequest request;
 
@@ -130,7 +130,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
         val env = request.env().orElseGet(() -> request.promptForEnv.apply(AstraEnvironment.PROD));
 
-        val orgGateway = createOrgGateway.apply(token, env, ctx);
+        val orgGateway = createOrgGateway.apply(token, env);
         val org = validateTokenAndFetchOrg(orgGateway);
 
         return (org.isPresent())

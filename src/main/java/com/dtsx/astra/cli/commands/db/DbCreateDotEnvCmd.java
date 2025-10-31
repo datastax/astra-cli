@@ -190,8 +190,8 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
             Function.identity()
         ));
 
-        val downloadsGateway = ctx.gateways().mkDownloadsGateway(ctx);
-        val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env(), ctx);
+        val downloadsGateway = ctx.gateways().mkDownloadsGateway();
+        val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
 
         return new DbCreateDotEnvOperation(ctx, dbGateway, orgGateway, downloadsGateway, new CreateDotEnvRequest(
             profile(),

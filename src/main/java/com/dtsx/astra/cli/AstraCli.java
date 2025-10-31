@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.commands.*;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.commands.org.OrgCmd;
+import com.dtsx.astra.cli.commands.pcu.PcuCmd;
 import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
@@ -64,6 +65,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         SetupCmd.class,
         ConfigCmd.class,
         DbCmd.class,
+        PcuCmd.class,
         OrgCmd.class,
         RoleCmd.class,
         StreamingCmd.class,
@@ -140,7 +142,7 @@ public class AstraCli extends AbstractCmd<Void> {
             new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), null, getCtx, false),
             new AstraHome(getCtx),
             FileSystems.getDefault(),
-            new GatewayProviderImpl(),
+            new GatewayProviderImpl(getCtx),
             UpgradeNotifier::run,
             Optional.empty()
         ));

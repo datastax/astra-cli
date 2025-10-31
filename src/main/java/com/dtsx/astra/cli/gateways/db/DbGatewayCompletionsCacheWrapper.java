@@ -90,6 +90,11 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
         return status;
     }
 
+    @Override
+    public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
+        return delegate.findEmbeddingProviders(dbRef);
+    }
+
     private void addRefToCache(DbRef ref) {
         ref.fold(
             _ -> null,
@@ -102,10 +107,5 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
             _ -> null,
             toFn((name) -> cache.update((s) -> setDel(s, name)))
         );
-    }
-
-    @Override
-    public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
-        return delegate.findEmbeddingProviders(dbRef);
     }
 }

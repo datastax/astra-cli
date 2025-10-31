@@ -1,4 +1,4 @@
-package com.dtsx.astra.cli.core.completions.impls;
+package com.dtsx.astra.cli.core.completions.caches;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;

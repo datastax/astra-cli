@@ -21,6 +21,11 @@ import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGatewayImpl;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.gateways.org.OrgGatewayImpl;
+import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
+import com.dtsx.astra.cli.gateways.pcu.PcuGatewayCompletionsCacheWrapper;
+import com.dtsx.astra.cli.gateways.pcu.PcuGatewayImpl;
+import com.dtsx.astra.cli.gateways.pcu.associations.PcuAssociationsGateway;
+import com.dtsx.astra.cli.gateways.pcu.associations.PcuAssociationsGatewayImpl;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.role.RoleGatewayCompletionsCacheWrapper;
 import com.dtsx.astra.cli.gateways.role.RoleGatewayImpl;
@@ -35,75 +40,99 @@ import com.dtsx.astra.cli.gateways.user.UserGateway;
 import com.dtsx.astra.cli.gateways.user.UserGatewayCompletionsCacheWrapper;
 import com.dtsx.astra.cli.gateways.user.UserGatewayImpl;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import lombok.RequiredArgsConstructor;
 
+import java.util.function.Supplier;
+
+@RequiredArgsConstructor
 public class GatewayProviderImpl implements GatewayProvider {
+    private final Supplier<CliContext> ctxSupplier;
+
     @Override
-    public DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache, CliContext ctx) {
-        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), token, env, GlobalInfoCache.INSTANCE, mkRegionGateway(token, env, ctx)), dbCompletionsCache);
+    public DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
+        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(ctx(), apiProvider(token, env), token, env, GlobalInfoCache.INSTANCE, mkRegionGateway(token, env)), dbCompletionsCache);
     }
 
     @Override
-    public OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new OrgGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public PcuGateway mkPcuGateway(AstraToken token, AstraEnvironment env, CompletionsCache pcuCompletionsCache) {
+        return new PcuGatewayCompletionsCacheWrapper(new PcuGatewayImpl(ctx(), apiProvider(token, env)), pcuCompletionsCache);
     }
 
     @Override
-    public OrgGateway.Stateless mkOrgGatewayStateless(CliContext ctx) {
-        return new OrgGatewayImpl.StatelessImpl(ctx);
+    public PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env, PcuGateway pcuGateway) {
+        return new PcuAssociationsGatewayImpl(ctx(), apiProvider(token, env), pcuGateway);
     }
 
     @Override
-    public CollectionGateway mkCollectionGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new CollectionGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env) {
+        return new OrgGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override
-    public KeyspaceGateway mkKeyspaceGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new KeyspaceGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public OrgGateway.Stateless mkOrgGatewayStateless() {
+        return new OrgGatewayImpl.StatelessImpl(ctx());
     }
 
     @Override
-    public CdcGateway mkCdcGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new CdcGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public CollectionGateway mkCollectionGateway(AstraToken token, AstraEnvironment env) {
+        return new CollectionGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override
-    public RegionGateway mkRegionGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new RegionGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public KeyspaceGateway mkKeyspaceGateway(AstraToken token, AstraEnvironment env) {
+        return new KeyspaceGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override
-    public DownloadsGateway mkDownloadsGateway(CliContext ctx) {
-        return new DownloadsGatewayImpl(ctx);
+    public CdcGateway mkCdcGateway(AstraToken token, AstraEnvironment env) {
+        return new CdcGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override
-    public StreamingGateway mkStreamingGateway(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache, CliContext ctx) {
-        return new StreamingGatewayCompletionsCacheWrapper(new StreamingGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx)), tenantCompletionsCache);
+    public RegionGateway mkRegionGateway(AstraToken token, AstraEnvironment env) {
+        return new RegionGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override
-    public RoleGateway mkRoleGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache, CliContext ctx) {
-        return new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx)), roleCompletionsCache);
+    public DownloadsGateway mkDownloadsGateway() {
+        return new DownloadsGatewayImpl(ctx());
     }
 
     @Override
-    public TableGateway mkTableGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new TableGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx));
+    public StreamingGateway mkStreamingGateway(AstraToken token, AstraEnvironment env, CompletionsCache tenantCompletionsCache) {
+        return new StreamingGatewayCompletionsCacheWrapper(new StreamingGatewayImpl(ctx(), apiProvider(token, env)), tenantCompletionsCache);
     }
 
     @Override
-    public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CliContext ctx) {
-        return new TokenGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), mkRoleGateway(token, env, new RoleCompletionsCache(ctx), ctx), mkOrgGatewayStateless(ctx));
+    public RoleGateway mkRoleGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache) {
+        return new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(ctx(), apiProvider(token, env)), roleCompletionsCache);
     }
 
     @Override
-    public UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache, CliContext ctx) {
-        return new UserGatewayCompletionsCacheWrapper(new UserGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx), new RoleGatewayImpl(ctx, APIProvider.mkDefault(token, env, ctx))), userCompletionsCache);
+    public TableGateway mkTableGateway(AstraToken token, AstraEnvironment env) {
+        return new TableGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override
-    public UpgradeGateway mkUpgradeGateway(CliContext ctx) {
-        return new UpgradeGatewayImpl(ctx);
+    public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env) {
+        return new TokenGatewayImpl(ctx(), apiProvider(token, env), mkRoleGateway(token, env, new RoleCompletionsCache(ctx())), mkOrgGatewayStateless());
+    }
+
+    @Override
+    public UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache) {
+        return new UserGatewayCompletionsCacheWrapper(new UserGatewayImpl(ctx(), apiProvider(token, env), new RoleGatewayImpl(ctx(), apiProvider(token, env))), userCompletionsCache);
+    }
+
+    @Override
+    public UpgradeGateway mkUpgradeGateway() {
+        return new UpgradeGatewayImpl(ctx());
+    }
+
+    private APIProvider apiProvider(AstraToken token, AstraEnvironment env) {
+        return APIProvider.mkDefault(ctx(), token, env);
+    }
+
+    private CliContext ctx() {
+        return ctxSupplier.get();
     }
 }

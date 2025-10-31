@@ -51,8 +51,8 @@ public class CdcRef implements Highlightable {
     @JsonValue
     public Map<String, Object> toJson() {
         return ref.fold(
-            id -> sequencedMapOf("type", "id", "unwrap", id.toString()),
-            ref -> sequencedMapOf("type", "ref", "unwrap", sequencedMapOf("table", ref.getLeft(), "tenant", ref.getRight()))
+            id -> sequencedMapOf("type", "id", "value", id.toString()),
+            ref -> sequencedMapOf("type", "ref", "value", sequencedMapOf("table", ref.getLeft(), "tenant", ref.getRight()))
         );
     }
 

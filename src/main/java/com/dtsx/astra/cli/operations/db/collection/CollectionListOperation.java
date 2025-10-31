@@ -18,12 +18,12 @@ public class CollectionListOperation implements Operation<Stream<CollectionListR
     private final KeyspaceGateway ksGateway;
     private final CollectionListRequest request;
 
+    public record CollectionListRequest(KeyspaceRef keyspaceRef, boolean all) {}
+
     public record CollectionListResult(
         String keyspace,
         List<CollectionDescriptor> collections
     ) {}
-
-    public record CollectionListRequest(KeyspaceRef keyspaceRef, boolean all) {}
 
     @Override
     public Stream<CollectionListResult> execute() {

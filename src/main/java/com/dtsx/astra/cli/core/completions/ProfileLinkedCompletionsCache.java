@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.completions;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
+import com.dtsx.astra.cli.core.completions.caches.PcuGroupsCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.TenantCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;
 import com.dtsx.astra.cli.core.config.ProfileName;
@@ -22,7 +23,8 @@ public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
         return List.of(
             new DbCompletionsCache(ctx, Optional.of(profileName)),
             new UserCompletionsCache(ctx, Optional.of(profileName)),
-            new TenantCompletionsCache(ctx, Optional.of(profileName))
+            new TenantCompletionsCache(ctx, Optional.of(profileName)),
+            new PcuGroupsCompletionsCache(ctx, Optional.of(profileName))
         );
     }
 

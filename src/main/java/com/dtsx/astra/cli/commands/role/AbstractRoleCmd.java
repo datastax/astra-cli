@@ -12,6 +12,6 @@ public abstract class AbstractRoleCmd<OpRes> extends AbstractConnectedCmd<OpRes>
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        roleGateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx), ctx);
+        roleGateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx));
     }
 }

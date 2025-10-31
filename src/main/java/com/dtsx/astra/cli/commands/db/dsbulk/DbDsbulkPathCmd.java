@@ -46,7 +46,7 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
 
     @Override
     protected Operation<DsbulkPathResponse> mkOperation() {
-        return new DbDsbulkPathOperation(ctx, ctx.gateways().mkDownloadsGateway(ctx), !$ifExists);
+        return new DbDsbulkPathOperation(ctx, ctx.gateways().mkDownloadsGateway(), !$ifExists);
     }
 
     @Override

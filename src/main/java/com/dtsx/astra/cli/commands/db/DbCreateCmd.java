@@ -142,8 +142,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             name -> name
         );
 
-        if ($databaseCreationOptions == null) {
-            throw new ParameterException(spec.commandLine(), "Must provide a region (via --region) when creating a new database");
+        if ($databaseCreationOptions == null || $databaseCreationOptions.region == null) {
+            throw new ParameterException(spec.commandLine(), "Must provide a region (via --region) when creating a new database. Use the `${cli.name} db list-regions-*` commands to see available regions.");
         }
 
         val existingBehavior =

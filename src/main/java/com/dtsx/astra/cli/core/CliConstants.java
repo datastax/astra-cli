@@ -5,6 +5,10 @@ public abstract class CliConstants {
         public static final String LABEL = "DB";
     }
 
+    public static class $Pcu {
+        public static final String LABEL = "GROUP";
+    }
+
     public static class $Keyspace {
         public static final String LONG = "--keyspace";
         public static final String SHORT = "-k";

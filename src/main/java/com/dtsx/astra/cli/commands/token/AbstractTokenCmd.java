@@ -11,6 +11,6 @@ public abstract class AbstractTokenCmd<OpRes> extends AbstractConnectedCmd<OpRes
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        tokenGateway = ctx.gateways().mkTokenGateway(profile().token(), profile().env(), ctx);
+        tokenGateway = ctx.gateways().mkTokenGateway(profile().token(), profile().env());
     }
 }

@@ -180,7 +180,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
-        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway($token, $env, ctx), ctx.gateways().mkOrgGatewayStateless(ctx), new CreateConfigRequest(
+        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway($token, $env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
             $profileName,
             $token,
             $env,

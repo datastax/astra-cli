@@ -11,6 +11,6 @@ public abstract class AbstractRegionCmd<OpRes> extends AbstractConnectedCmd<OpRe
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        regionGateway = ctx.gateways().mkRegionGateway(profile().token(), profile().env(), ctx);
+        regionGateway = ctx.gateways().mkRegionGateway(profile().token(), profile().env());
     }
 }

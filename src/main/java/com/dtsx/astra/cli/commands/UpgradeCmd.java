@@ -104,8 +104,8 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
 
     @Override
     protected Operation<Unit> mkOperation() {
-        val downloadsGateway = ctx.gateways().mkDownloadsGateway(ctx);
-        val upgradeGateway = ctx.gateways().mkUpgradeGateway(ctx);
+        val downloadsGateway = ctx.gateways().mkDownloadsGateway();
+        val upgradeGateway = ctx.gateways().mkUpgradeGateway();
 
         final VersionType versionType =
             ($versionMod == null)

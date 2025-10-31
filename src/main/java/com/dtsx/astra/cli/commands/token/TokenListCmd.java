@@ -50,7 +50,7 @@ public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
 
     @Override
     protected Operation<Stream<TokenInfo>> mkOperation() {
-        val roleGateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx), ctx);
+        val roleGateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx));
         return new TokenListOperation(tokenGateway, roleGateway);
     }
 }

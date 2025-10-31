@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.testlib.extensions.binaries;
 
 import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
 import com.dtsx.astra.cli.core.properties.CliProperties;
-import com.dtsx.astra.cli.core.completions.impls.NoopCompletionsCache;
+import com.dtsx.astra.cli.core.completions.caches.NoopCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import com.dtsx.astra.cli.gateways.GatewayProviderImpl;
@@ -133,7 +133,7 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
     private DbGateway dbGateway(ExtensionContext ec) {
         return ec.getRoot().getStore(StaticExternalBinariesExtensionNamespace).getOrComputeIfAbsent(DbGateway.class, (_) -> {
             try (val ctx = new TestCliContext(emptyTestCliContextOptionsBuilder().useRealFs())) {
-                return new GatewayProviderImpl().mkDbGateway(TestConfig.token(), TestConfig.env(), NoopCompletionsCache.INSTANCE, ctx.get());
+                return new GatewayProviderImpl(ctx::get).mkDbGateway(TestConfig.token(), TestConfig.env(), NoopCompletionsCache.INSTANCE);
             }
         }, DbGateway.class);
     }
@@ -141,7 +141,7 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
     private DownloadsGateway downloadsGateway(ExtensionContext ec) {
         return ec.getRoot().getStore(StaticExternalBinariesExtensionNamespace).getOrComputeIfAbsent(DownloadsGateway.class, (_) -> {
             try (val ctx = new TestCliContext(emptyTestCliContextOptionsBuilder().useRealFs())) {
-                return new GatewayProviderImpl().mkDownloadsGateway(ctx.get());
+                return new GatewayProviderImpl(ctx::get).mkDownloadsGateway();
             }
         }, DownloadsGateway.class);
     }

@@ -23,14 +23,8 @@ public class DbGetOperation implements Operation<DbInfo> {
     ) {}
 
     public sealed interface DbInfo {}
-
-    public record DbInfoFull(
-        Database database
-    ) implements DbInfo {}
-
-    public record DbInfoValue(
-        Object value
-    ) implements DbInfo {}
+    public record DbInfoFull(Database database) implements DbInfo {}
+    public record DbInfoValue(Object value) implements DbInfo {}
 
     @Override
     public DbInfo execute() {

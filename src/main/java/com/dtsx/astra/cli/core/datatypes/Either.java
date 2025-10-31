@@ -63,6 +63,10 @@ public sealed interface Either<L, R> {
         return bimap(left -> left, rightMapper);
     }
 
+    default <L2> Either<L2, R> mapLeft(Function<L, L2> leftMapper) {
+        return bimap(leftMapper, right -> right);
+    }
+
     default boolean isLeft() {
         return this instanceof Left<?, ?>;
     }
@@ -75,6 +79,13 @@ public sealed interface Either<L, R> {
         return switch (this) {
             case Left<L, R> left -> new Left<>(left.unwrap);
             case Right<L, R> right -> mapper.apply(right.unwrap);
+        };
+    }
+
+    default <L2> Either<L2, R> flatMapLeft(Function<L, Either<L2, R>> mapper) {
+        return switch (this) {
+            case Left<L, R> left -> mapper.apply(left.unwrap);
+            case Right<L, R> right -> new Right<>(right.unwrap);
         };
     }
 }

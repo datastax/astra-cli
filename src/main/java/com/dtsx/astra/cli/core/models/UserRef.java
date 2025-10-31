@@ -41,8 +41,8 @@ public class UserRef implements Highlightable {
     @JsonValue
     public Map<String, Object> toJson() {
         return ref.fold(
-            id -> sequencedMapOf("type", "id", "unwrap", id.toString()),
-            email -> sequencedMapOf("type", "email", "unwrap", email)
+            id -> sequencedMapOf("type", "id", "value", id.toString()),
+            email -> sequencedMapOf("type", "email", "value", email)
         );
     }
 

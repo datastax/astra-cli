@@ -21,7 +21,10 @@ public abstract class TypeConverters {
         return List.of(
             new ContextlessTypeConverter(AstraToken.class, AstraToken::parse),
             new ContextlessTypeConverter(DbRef.class, DbRef::parse),
+            new ContextlessTypeConverter(PcuRef.class, PcuRef::parse),
             new ContextlessTypeConverter(RegionName.class, RegionName::parse),
+            new ContextlessTypeConverter(DatacenterId.class, DatacenterId::parse),
+            new ContextlessTypeConverter(PcuAssocTarget.class, PcuAssocTarget::parse),
             new ContextlessTypeConverter(RoleRef.class, RoleRef::parse),
             new ContextlessTypeConverter(TenantName.class, TenantName::parse),
             new ContextlessTypeConverter(UserRef.class, UserRef::parse),
