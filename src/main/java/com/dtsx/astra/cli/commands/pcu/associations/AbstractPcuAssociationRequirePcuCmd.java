@@ -15,6 +15,6 @@ public abstract class AbstractPcuAssociationRequirePcuCmd<OpRes> extends Abstrac
     protected void prelude() {
         super.prelude();
         dbGateway =  ctx.gateways().mkDbGateway(profile().token(), profile().env(), new DbCompletionsCache(ctx, profile().name()));
-        associationsGateway = ctx.gateways().mkPcuAssociationsGateway(profile().token(), profile().env(), pcuGateway);
+        associationsGateway = ctx.gateways().mkPcuAssociationsGateway(profile().token(), profile().env());
     }
 }

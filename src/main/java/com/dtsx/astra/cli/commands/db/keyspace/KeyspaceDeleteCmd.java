@@ -20,7 +20,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "delete-keyspace",
@@ -46,14 +46,18 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
     )
     public boolean ifExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "60")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "1m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
     protected KeyspaceDeleteOperation mkOperation() {
-        return new KeyspaceDeleteOperation(keyspaceGateway, dbGateway, new KeyspaceDeleteRequest($keyspaceRef, ifExists, lrMixin.options()));
+        return new KeyspaceDeleteOperation(keyspaceGateway, dbGateway, new KeyspaceDeleteRequest($keyspaceRef, ifExists, lrMixin.options(ctx)));
     }
 
     @Override

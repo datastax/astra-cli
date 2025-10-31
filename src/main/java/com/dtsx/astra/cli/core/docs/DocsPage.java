@@ -15,7 +15,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
-import static com.dtsx.astra.cli.utils.MiscUtils.listConcat;
+import static com.dtsx.astra.cli.utils.Collectionutils.listConcat;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public record DocsPage(List<String> command, DocsPageSections sections, List<DocsPage> subcommands) implements Page {

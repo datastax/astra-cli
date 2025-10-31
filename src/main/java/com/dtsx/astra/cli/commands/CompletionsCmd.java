@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.completions.DynamicCompletion;
 import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine.Command;
@@ -62,8 +64,12 @@ public class CompletionsCmd implements Runnable {
         }
         i++;
 
+        val homeFolder = CliPropertiesImpl.mkAndLoadSysProps(new CliEnvironmentImpl())
+            .homeFolderLocations(false)
+            .preferred();
+
         sb.append("function get_profile(){ for ((i=0;i<${#COMP_WORDS[@]};i++));do [[ ${COMP_WORDS[i]} == --profile ]]&&((i+1<${#COMP_WORDS[@]}))&&echo ${COMP_WORDS[i+1]}&&return;done; echo default;};").append(NL).append(NL);
-        sb.append("function get_astra_dir(){ echo ~/.astra;};").append(NL).append(NL);
+        sb.append("function get_astra_dir(){ echo \"").append(homeFolder).append("\"};").append(NL).append(NL);
         return i;
     }
 

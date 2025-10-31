@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.unit.utils;
 
 import com.dtsx.astra.cli.testlib.laws.Idempotent;
-import com.dtsx.astra.cli.utils.MiscUtils;
+import com.dtsx.astra.cli.utils.Collectionutils;
 import lombok.val;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Group;
@@ -18,20 +18,20 @@ public class MiscUtilsTest {
     class setAdd implements Idempotent<Set<Object>> {
         @Property
         public <T> void adds_elem_to_returned_set(@ForAll Set<T> set, @ForAll T elem) {
-            val newSet = MiscUtils.setAdd(set, elem);
+            val newSet = Collectionutils.setAdd(set, elem);
             assertThat(newSet).hasSameElementsAs(new HashSet<>() {{ addAll(set); add(elem); }});
         }
 
         @Property
         public <T> void does_not_modify_original_set(@ForAll Set<T> set, @ForAll T elem) {
             val originalSet = new HashSet<>(set);
-            MiscUtils.setAdd(set, elem);
+            Collectionutils.setAdd(set, elem);
             assertThat(set).hasSameElementsAs(originalSet);
         }
 
         @Override
         public Idempotent.Params<Set<Object>> idempotency() {
-            return Idempotent.mkFn((init) -> (set) -> MiscUtils.setAdd(set, init));
+            return Idempotent.mkFn((init) -> (set) -> Collectionutils.setAdd(set, init));
         }
     }
 
@@ -39,20 +39,20 @@ public class MiscUtilsTest {
     class setDelete implements Idempotent<Set<Object>> {
         @Property
         public <T> void removes_elem_from_returned_set(@ForAll Set<T> set, @ForAll T elem) {
-            val newSet = MiscUtils.setDel(set, elem);
+            val newSet = Collectionutils.setDel(set, elem);
             assertThat(newSet).hasSameElementsAs(new HashSet<>() {{ addAll(set); remove(elem); }});
         }
 
         @Property
         public <T> void does_not_modify_original_set(@ForAll Set<T> set, @ForAll T elem) {
             val originalSet = new HashSet<>(set);
-            MiscUtils.setDel(set, elem);
+            Collectionutils.setDel(set, elem);
             assertThat(set).hasSameElementsAs(originalSet);
         }
 
         @Override
         public Idempotent.Params<Set<Object>> idempotency() {
-            return Idempotent.mkFn((init) -> (set) -> MiscUtils.setDel(set, init));
+            return Idempotent.mkFn((init) -> (set) -> Collectionutils.setDel(set, init));
         }
     }
 }

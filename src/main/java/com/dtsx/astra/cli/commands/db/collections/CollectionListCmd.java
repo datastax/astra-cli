@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperation.CollectionListRequest;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionListOperation.CollectionListResult;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "list-collections",

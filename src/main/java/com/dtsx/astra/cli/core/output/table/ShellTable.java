@@ -5,7 +5,7 @@ import lombok.val;
 
 import java.util.*;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 public record ShellTable(List<? extends Map<String, ?>> raw) {
     public static RenderableShellTable forAttributes(LinkedHashMap<String, Object> attributes) {

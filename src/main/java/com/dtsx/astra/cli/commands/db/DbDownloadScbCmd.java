@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(

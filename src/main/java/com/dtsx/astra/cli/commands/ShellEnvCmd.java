@@ -52,7 +52,7 @@ public class ShellEnvCmd implements Runnable {
         val sb = new StringBuilder();
 
         sb.append("export PATH=").append(binaryPath.get().getParent()).append(":$PATH").append(NL);
-        sb.append("source <(").append(binaryPath.get()).append(" compgen)").append(NL);
+        sb.append("givenSource <(").append(binaryPath.get()).append(" compgen)").append(NL);
 
         if ($ignoreMultiplePaths) {
             sb.append("export ASTRA_IGNORE_MULTIPLE_PATHS=true").append(NL);

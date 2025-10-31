@@ -11,6 +11,7 @@ import lombok.val;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -109,7 +110,9 @@ public class AstraLogger {
         log("@|green [DONE]|@ " + String.join("", msg), Level.VERBOSE, true);
     }
 
-    public <T> T loading(@NonNull String initialMsg, Function<Consumer<String>, T> supplier) {
+    public <T> T loading(@NonNull String rawInitialMsg, Function<Consumer<String>, T> supplier) {
+        val initialMsg = ctx().colors().format(rawInitialMsg);
+
         started(initialMsg);
 
         val isFirstLoading = globalSpinner.isEmpty();
@@ -196,13 +199,13 @@ public class AstraLogger {
             @Cleanup val logFiles = Files.list(logsDir);
 
             logFiles
-                .sorted(Comparator.comparing((path) -> {
+                .sorted(Comparator.<Path, FileTime>comparing((path) -> {
                     try {
                         return Files.getLastModifiedTime(path);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }))
+                }).reversed())
                 .skip(25)
                 .forEach((f) -> {
                     try {

@@ -9,4 +9,6 @@ import lombok.Data;
 public class PcuGroupDatacenterAssociation {
     private String pcuGroupUUID;
     private String datacenterUUID;
+    private String clusterName;
+    private String clusterUUID;
 }

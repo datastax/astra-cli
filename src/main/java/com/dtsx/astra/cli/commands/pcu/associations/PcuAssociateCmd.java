@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.ASSOCIATION_ALREADY_EXISTS;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "associate",

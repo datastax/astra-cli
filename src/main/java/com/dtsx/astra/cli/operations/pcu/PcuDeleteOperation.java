@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuDeleteOperation.PcuDeleteResult;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -25,7 +26,7 @@ public class PcuDeleteOperation implements Operation<PcuDeleteResult> {
         PcuRef pcuRef,
         boolean ifExists,
         boolean forceDelete,
-        BiConsumer<String, UUID> assertShouldDelete
+        BiConsumer<@Nullable String, UUID> assertShouldDelete
     ) {}
 
     @Override

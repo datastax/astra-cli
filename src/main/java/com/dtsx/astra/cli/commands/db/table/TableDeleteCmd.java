@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TABLE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.table.TableDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "delete-table",

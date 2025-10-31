@@ -93,10 +93,10 @@ public abstract class TypeConverters {
                         case "m" -> Either.pure(Duration.ofMinutes(number));
                         case "h" -> Either.pure(Duration.ofHours(number));
                         case "d" -> Either.left("Are you sure you want to wait days...? If so, please use ISO-8601 format instead, and pat yourself on your back for your patience.");
-                        default -> Either.left("Invalid duration unit: " + unit + "; expected one of [ms|s|m|h] (or none for seconds)");
+                        default -> Either.left("Invalid duration unit: " + unit + "; expected one of (ms|s|m|h) (or none for seconds)");
                     };
                 } else {
-                    return Either.left("Expected duration to be of the form <number>[ms|s|m|h] or ISO-8601 format");
+                    return Either.left("Expected duration to be of the form <number><ms|s|m|h> or ISO-8601 format");
                 }
             });
         }

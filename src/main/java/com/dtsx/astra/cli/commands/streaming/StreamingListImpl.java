@@ -8,11 +8,10 @@ import com.dtsx.astra.cli.operations.streaming.StreamingListOperation;
 import com.dtsx.astra.cli.operations.streaming.StreamingListOperation.TenantInfo;
 import lombok.val;
 
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> {
     @Override

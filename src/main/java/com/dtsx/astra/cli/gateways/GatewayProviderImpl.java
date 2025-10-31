@@ -59,8 +59,8 @@ public class GatewayProviderImpl implements GatewayProvider {
     }
 
     @Override
-    public PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env, PcuGateway pcuGateway) {
-        return new PcuAssociationsGatewayImpl(ctx(), apiProvider(token, env), pcuGateway);
+    public PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env) {
+        return new PcuAssociationsGatewayImpl(ctx(), apiProvider(token, env));
     }
 
     @Override

@@ -29,7 +29,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "create",
@@ -130,8 +130,12 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         public boolean nonVector;
     }
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "360")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "10m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
@@ -162,7 +166,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             $databaseCreationOptions.capacityUnits,
             $databaseCreationOptions.nonVector,
             existingBehavior,
-            lrMixin.options()
+            lrMixin.options(ctx)
         ));
     }
 

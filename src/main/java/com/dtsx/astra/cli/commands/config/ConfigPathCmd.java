@@ -14,7 +14,7 @@ import picocli.CommandLine.Option;
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(

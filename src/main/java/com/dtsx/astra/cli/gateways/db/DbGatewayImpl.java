@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.awaitGenericStatus;
 import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 
@@ -61,7 +61,7 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout) {
+    public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Duration> timeout) {
         val currentStatus = ctx.log().loading("Fetching current status of db " + ctx.highlight(ref), (_) -> findOne(ref))
             .getStatus();
 
@@ -106,57 +106,15 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout) {
-        val timeoutDuration = Duration.ofSeconds(timeout);
-        val startTime = System.currentTimeMillis();
-
-        var status = new AtomicReference<>(
-            ctx.log().loading("Fetching initial status of database %s".formatted(ctx.highlight(ref)), (_) -> findOne(ref).getStatus())
+    public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, Duration timeout) {
+        return awaitGenericStatus(
+            ctx,
+            "database %s".formatted(ctx.highlight(ref)),
+            target,
+            () -> findOne(ref).getStatus(),
+            ctx::highlight,
+            timeout
         );
-
-        if (status.get().equals(target)) {
-            return Duration.ZERO;
-        }
-
-        val initialMessage = "Waiting for database %s to become %s (currently %s)"
-            .formatted(ctx.highlight(ref), ctx.highlight(target), ctx.highlight(status.get()));
-
-        return ctx.log().loading(initialMessage, (updateMsg) -> {
-            var cycles = 0;
-
-            while (!status.get().equals(target)) {
-                val elapsed = Duration.ofMillis(System.currentTimeMillis() - startTime);
-                
-                if (timeout > 0 && elapsed.compareTo(timeoutDuration) >= 0) {
-                    break;
-                }
-
-                try {
-                    updateMsg.accept(
-                        "Waiting for database %s to become %s (currently %s, elapsed: %ds)"
-                            .formatted(ctx.highlight(ref), ctx.highlight(target), ctx.highlight(status.get()), elapsed.toSeconds())
-                    );
-
-                    if (cycles % 5 == 0) {
-                        updateMsg.accept(
-                            "Checking if database %s is status %s (currently %s, elapsed: %ds)"
-                                .formatted(ctx.highlight(ref), ctx.highlight(target), ctx.highlight(status.get()), elapsed.toSeconds())
-                        );
-
-                        status.set(findOne(ref).getStatus());
-                    }
-
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-
-                cycles++;
-            }
-
-            return Duration.ofMillis(System.currentTimeMillis() - startTime);
-        });
     }
 
     @Override

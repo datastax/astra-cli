@@ -27,7 +27,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "delete",
@@ -67,8 +67,12 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     @Mixin
     protected LongRunningOptionsMixin lrMixin;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "800")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "15m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
@@ -136,7 +140,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             $dbRef,
             $ifExists,
             $forceDelete,
-            lrMixin.options(),
+            lrMixin.options(ctx),
             this::assertShouldDelete
         ));
     }

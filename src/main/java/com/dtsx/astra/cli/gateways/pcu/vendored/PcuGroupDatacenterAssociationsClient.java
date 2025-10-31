@@ -59,15 +59,16 @@ public class PcuGroupDatacenterAssociationsClient extends AbstractApiClient {
     public Stream<PcuGroupDatacenterAssociation> findAll() {
         val res = GET(getEndpointPcuAssociations() + "/" + pcuGroupId, getOperationName("findAll"));
 
-        return unmarshallOrThrow(res, PCU_GROUP_DB_ASSOCIATIONS, 200, "get pcu group db associations").stream();
+        return unmarshallOrThrow(res, PCU_GROUP_DB_ASSOCIATIONS, "get pcu group db associations").stream();
     }
 
-    public PcuGroupDatacenterAssociation associate(@NonNull String datacenterId) {
+    // TODO do associate and disassociate REALLY return values??
+    public void associate(@NonNull String datacenterId) {
 //        Assert.isDatacenterID(datacenterId, "datacenter id");
 
         val res = POST(getEndpointPcuAssociations() + "/" + pcuGroupId + "/" + datacenterId, getOperationName("associate"));
 
-        return unmarshallOrThrow(res, new TypeReference<>() {}, 201, "associate db to pcu group");
+//        return unmarshallOrThrow(res, new TypeReference<List<PcuGroupDatacenterAssociation>>() {}, "associate db to pcu group").getFirst();
     }
 
     private record TransferReqBody(String fromPCUGroupUUID, String toPCUGroupUUID, String datacenterUUID) {}
@@ -77,9 +78,10 @@ public class PcuGroupDatacenterAssociationsClient extends AbstractApiClient {
 //        Assert.isDatacenterID(datacenterId, "datacenter id");
 
         val reqBody = JsonUtils.marshall(new TransferReqBody(this.pcuGroupId, toPcuGroup, datacenterId));
+
         val res = POST(getEndpointPcuAssociations() + "/transfer/" + pcuGroupId, reqBody, getOperationName("transfer"));
 
-        return unmarshallOrThrow(res, new TypeReference<>() {}, 200, "transfer db to pcu group");
+        return unmarshallOrThrow(res, new TypeReference<List<PcuGroupDatacenterAssociation>>() {}, "transfer db to pcu group").getFirst();
     }
 
     public void dissociate(@NonNull String datacenterId) {
@@ -95,7 +97,7 @@ public class PcuGroupDatacenterAssociationsClient extends AbstractApiClient {
         return ApiLocator.getApiDevopsEndpoint(environment) + "/pcus/association";
     }
 
-    private <T> T unmarshallOrThrow(ApiResponseHttp res, TypeReference<T> clazz, int expectedCode, String operation) {
+    private <T> T unmarshallOrThrow(ApiResponseHttp res, TypeReference<T> clazz, String operation) {
         try {
             return JsonUtils.unmarshallType(res.getBody(), clazz);
         } catch (Exception e) {
@@ -111,7 +113,7 @@ public class PcuGroupDatacenterAssociationsClient extends AbstractApiClient {
                 }
             }
 
-            throw new IllegalStateException("Expected code " + expectedCode + " to " + operation + " but got " + res.getCode() + "body=" + res.getBody());
+            throw new IllegalStateException("Expected code 2xx to " + operation + " but got " + res.getCode() + "body=" + res.getBody());
         }
     }
 }

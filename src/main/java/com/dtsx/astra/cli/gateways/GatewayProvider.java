@@ -24,7 +24,7 @@ public interface GatewayProvider {
 
     PcuGateway mkPcuGateway(AstraToken token, AstraEnvironment env, CompletionsCache pcuCompletionsCache);
 
-    PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env, PcuGateway pcuGateway);
+    PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env);
 
     OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env);
     

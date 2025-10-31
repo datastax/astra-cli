@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.REGION_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.db.region.RegionDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "delete-region",
@@ -46,14 +46,18 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
     )
     public boolean $ifExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "15m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
     protected Operation<RegionDeleteResult> mkOperation() {
-        return new RegionDeleteOperation(regionGateway, dbGateway, new RegionDeleteRequest($dbRef, $region, $ifExists, lrMixin.options()));
+        return new RegionDeleteOperation(regionGateway, dbGateway, new RegionDeleteRequest($dbRef, $region, $ifExists, lrMixin.options(ctx)));
     }
 
     @Override

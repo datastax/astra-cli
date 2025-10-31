@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProviderResult;
 import static com.dtsx.astra.cli.operations.db.misc.EmbeddingProvidersListOperation.EmbeddingProvidersListRequest;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "list-embedding-providers",

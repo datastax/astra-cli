@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.operations.pcu.PcuGetOperation.PcuInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class PcuGetOperation implements Operation<PcuInfo> {
 
     private PcuInfo mkPcuInfoValue(PcuGetKeys key, PcuGroup pcuGroup) {
         val value = switch (key) {
-            case title -> pcuGroup.getTitle();
+            case title -> Objects.requireNonNullElse(pcuGroup.getTitle(), "n/a");
             case description -> pcuGroup.getDescription();
             case id -> pcuGroup.getId();
             case status -> pcuGroup.getStatus();

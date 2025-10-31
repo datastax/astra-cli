@@ -8,11 +8,10 @@ import com.dtsx.astra.cli.operations.user.UserListOperation;
 import com.dtsx.astra.cli.operations.user.UserListOperation.UserInfo;
 import lombok.val;
 
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 public abstract class UserListImpl extends AbstractUserCmd<Stream<UserInfo>> {
     @Override

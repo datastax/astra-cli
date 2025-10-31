@@ -12,6 +12,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -69,7 +70,7 @@ public class PcuGetCmd extends AbstractPromptForPcuCmd<PcuInfo> {
 
     private RenderableShellTable mkTable(PcuGroup pcuInfo) {
         return ShellTable.forAttributes(new LinkedHashMap<>() {{
-            put("Title", pcuInfo.getTitle());
+            put("Title", Objects.requireNonNullElse(pcuInfo.getTitle(), "n/a"));
             put("ID", pcuInfo.getId());
             put("Cloud Provider", pcuInfo.getCloudProvider());
             put("Region", pcuInfo.getRegion());

@@ -7,10 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -18,37 +14,6 @@ import java.util.function.Function;
 
 @UtilityClass
 public class MiscUtils {
-    public static <A> Set<A> setAdd(Set<? extends A> init, A a) {
-        val newSet = new HashSet<A>(init);
-        newSet.add(a);
-        return newSet;
-    }
-
-    public static <A> Set<A> setDel(Set<? extends A> init, A a) {
-        val newSet = new HashSet<A>(init);
-        newSet.remove(a);
-        return newSet;
-    }
-
-    public static <A> List<A> listAdd(A a, List<? extends A> init) {
-        val newList = new ArrayList<A>();
-        newList.add(a);
-        newList.addAll(init);
-        return newList;
-    }
-
-    public static <A> List<A> listAdd(List<? extends A> init, A a) {
-        val newList = new ArrayList<A>(init);
-        newList.add(a);
-        return newList;
-    }
-
-    public static <A> List<A> listConcat(List<? extends A> list1, List<? extends A> list2) {
-        val newList = new ArrayList<A>(list1);
-        newList.addAll(list2);
-        return newList;
-    }
-
     public static <T, R> Function<T, R> toFn(Consumer<T> r) {
         return t -> {
             r.accept(t);

@@ -53,7 +53,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
             .instanceType(request.instanceType)
             .provisionType(request.provisionType)
             .cloudProvider(request.cloud)
-            .region(request.region.unwrap())
+//            .region(request.region.unwrap())
             .min(request.min)
             .max(request.max)
             .reserved(request.reserved)

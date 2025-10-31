@@ -13,7 +13,7 @@ import picocli.CommandLine.Command;
 import java.util.SortedSet;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "list-clouds",

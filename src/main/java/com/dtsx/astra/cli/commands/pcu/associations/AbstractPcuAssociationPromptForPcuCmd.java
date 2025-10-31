@@ -11,6 +11,6 @@ public abstract class AbstractPcuAssociationPromptForPcuCmd<OpRes> extends Abstr
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        associationsGateway = ctx.gateways().mkPcuAssociationsGateway(profile().token(), profile().env(), pcuGateway);
+        associationsGateway = ctx.gateways().mkPcuAssociationsGateway(profile().token(), profile().env());
     }
 }

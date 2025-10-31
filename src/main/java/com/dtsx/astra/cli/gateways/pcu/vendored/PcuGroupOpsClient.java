@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,16 +78,16 @@ public class PcuGroupOpsClient extends AbstractApiClient {
     public void park() {
         val res = POST(getEndpointPcus() + "/park/" + pcuGroupId, getOperationName("park"));
 
-        if (HttpURLConnection.HTTP_ACCEPTED != res.getCode()) {
-            throw new IllegalStateException("Expected code 202 to park pcu group but got " + res.getCode() + "body=" + res.getBody());
+        if (res.getCode() >= 300) {
+            throw new IllegalStateException("Expected code 200 to park pcu group but got " + res.getCode() + "body=" + res.getBody());
         }
     }
 
     public void unpark() {
         val res = POST(getEndpointPcus() + "/unpark/" + pcuGroupId, getOperationName("unpark"));
 
-        if (HttpURLConnection.HTTP_ACCEPTED != res.getCode()) {
-            throw new IllegalStateException("Expected code 202 to unpark pcu group but got " + res.getCode() + "body=" + res.getBody());
+        if (res.getCode() >= 300) {
+            throw new IllegalStateException("Expected code 200 to unpark pcu group but got " + res.getCode() + "body=" + res.getBody());
         }
     }
 

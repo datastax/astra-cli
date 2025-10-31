@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 
 @Command(
@@ -39,8 +39,12 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
     command = "${cli.name} db resume my_db --async"
 )
 public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implements WithSetTimeout {
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "10m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
@@ -54,7 +58,7 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
 
     @Override
     protected DbResumeOperation mkOperation() {
-        return new DbResumeOperation(dbGateway, new DbResumeRequest($dbRef, lrMixin.options()));
+        return new DbResumeOperation(dbGateway, new DbResumeRequest($dbRef, lrMixin.options(ctx)));
     }
 
     @Override

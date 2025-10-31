@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TENANT_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "create",

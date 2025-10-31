@@ -25,7 +25,6 @@ import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEY_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(

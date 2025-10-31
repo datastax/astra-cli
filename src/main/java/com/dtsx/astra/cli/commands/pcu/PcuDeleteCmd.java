@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.pcu.PcuDeleteOperation;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.pcu.PcuDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "delete",
@@ -102,20 +103,31 @@ public class PcuDeleteCmd extends AbstractPromptForPcuCmd<PcuDeleteResult> {
         ));
     }
 
-    private void assertShouldDelete(String pcuName, UUID id) {
-        val prompt = """
-          You are about to permanently delete PCU group @!%s!@ @|faint (%s)|@.
-        
-          To confirm, type the name below or press @!Ctrl+C!@ to cancel.
-        """.formatted(pcuName, id);
+    private void assertShouldDelete(@Nullable String pcuName, UUID id) {
+        val displayId = (pcuName != null)
+            ? "@!%s!@ @|faint (%s)|@".formatted(pcuName, id)
+            : "@!%s!@".formatted(id);
 
-        val shouldDelete = ctx.console().prompt(prompt)
+        val whatToType = (pcuName != null)
+            ? "the name"
+            : "@'!confirm!@";
+
+        val prompt = """
+          You are about to permanently delete PCU group %s.
+        
+          To confirm, type %s below or press @!Ctrl+C!@ to cancel.
+        """.formatted(displayId, whatToType);
+
+        val resp = ctx.console().prompt(prompt)
             .mapper(Function.identity())
             .requireAnswer()
             .fallbackFlag("--yes")
             .fix(originalArgs(), "--yes")
-            .clearAfterSelection()
-            .equals(pcuName);
+            .clearAfterSelection();
+
+        val shouldDelete = (pcuName != null)
+            ? resp.equals(pcuName)
+            : resp.equals("confirm");
 
         if (!shouldDelete) {
             throw new AstraCliException(EXECUTION_CANCELLED, """

@@ -12,15 +12,15 @@ import org.jetbrains.annotations.VisibleForTesting;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.setAdd;
+import static com.dtsx.astra.cli.utils.Collectionutils.setAdd;
+import static com.dtsx.astra.cli.utils.Collectionutils.setDel;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
 public abstract class CompletionsCache {
@@ -29,7 +29,7 @@ public abstract class CompletionsCache {
     private @Nullable Set<String> cachedCandidates;
 
     @SneakyThrows
-    public void update(Function<Set<String>, Set<String>> mkCandidates) {
+    private void update(Function<Set<String>, Set<String>> mkCandidates) {
         val cacheFile = resolveCacheFile();
 
         if (cacheFile.isEmpty()) {
@@ -41,7 +41,7 @@ public abstract class CompletionsCache {
         try {
             FileUtils.createFileIfNotExists(cacheFile.get(), "Error creating completions cache file");
 
-            currentCandidates = Files.readAllLines(cacheFile.get()).stream().map(this::readJsonString).collect(Collectors.toSet());
+            currentCandidates = Files.readAllLines(cacheFile.get()).stream().map(this::readJsonString).collect(toSet());
         } catch (Exception e) {
             ctx.log().exception("An error occurred reading cache file '%s'".formatted(cacheFile), e);
             return;
@@ -77,15 +77,21 @@ public abstract class CompletionsCache {
     }
 
     public void setCache(List<String> completions) {
-        update((_) -> new HashSet<>(completions));
+        update((_) -> completions.stream().filter(c -> c != null && !c.isBlank()).collect(toSet()));
     }
 
     public void addToCache(String completion) {
+        if (completion == null || completion.isBlank()) {
+            return;
+        }
         update((s) -> setAdd(s, completion));
     }
 
     public void removeFromCache(String completion) {
-        update((s) -> setAdd(s, completion));
+        if (completion == null || completion.isBlank()) {
+            return;
+        }
+        update((s) -> setDel(s, completion));
     }
 
     protected abstract String useCacheFileName();

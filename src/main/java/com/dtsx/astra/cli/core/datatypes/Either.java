@@ -1,7 +1,9 @@
 package com.dtsx.astra.cli.core.datatypes;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public sealed interface Either<L, R> {
     record Left<L, R>(L unwrap) implements Either<L, R> {}
@@ -21,6 +23,12 @@ public sealed interface Either<L, R> {
         } catch (Exception e) {
             return left(exceptionHandler.apply(e));
         }
+    }
+
+    static <L, R> Either<L, R> fromOptional(Optional<R> optional, Supplier<L> leftSupplier) {
+        return optional
+            .<Either<L, R>>map(Either::pure)
+            .orElseGet(() -> left(leftSupplier.get()));
     }
 
     default <U> U fold(Function<L, U> leftMapper, Function<R, U> rightMapper) {

@@ -6,10 +6,8 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DatacenterId;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupDatacenterAssociation;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -19,7 +17,6 @@ import java.util.stream.Stream;
 public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     private final CliContext ctx;
     private final APIProvider api;
-    private final PcuGateway pcuGateway;
 
     private Optional<PcuGroupDatacenterAssociation> tryFindOne(PcuRef group, DatacenterId dcId) {
         return ctx.log().loading("Finding association of @!%s!@ with @!%s!@".formatted(group, dcId), (_) ->
@@ -27,6 +24,11 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
                 .filter((assoc) -> assoc.getDatacenterUUID().equals(dcId.unwrap()))
                 .findFirst()
         );
+    }
+
+    @Override
+    public Optional<PcuGroupDatacenterAssociation> tryFindByDatacenter(DatacenterId datacenter) {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
@@ -44,18 +46,17 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     }
 
     @Override
-    public CreationStatus<PcuGroupDatacenterAssociation> create(PcuRef group, DatacenterId dcId) {
-        val existing = tryFindOne(group, dcId);
-
-        if (existing.isPresent()) {
-            return CreationStatus.alreadyExists(existing.get());
+    public CreationStatus<Void> create(PcuRef group, DatacenterId dcId) {
+        if (exists(group, dcId)) {
+            return CreationStatus.alreadyExists(null);
         }
 
-        val assoc = ctx.log().loading("Associating @!%s!@ with @!%s!@".formatted(group, dcId), (_) ->
-            api.pcuGroupOpsClient(group).datacenterAssociations().associate(dcId.unwrap())
-        );
+        ctx.log().loading("Associating @!%s!@ with @!%s!@".formatted(group, dcId), (_) -> {
+            api.pcuGroupOpsClient(group).datacenterAssociations().associate(dcId.unwrap());
+            return null;
+        });
 
-        return CreationStatus.created(assoc);
+        return CreationStatus.created(null);
     }
 
     @Override
@@ -73,11 +74,9 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     }
 
     @Override
-    public DeletionStatus<PcuGroupDatacenterAssociation> transfer(UUID from, UUID to, DatacenterId dcId) {
-        val assoc = ctx.log().loading("Transferring association of @!%s!@ from @!%s!@ to @!%s!@".formatted(dcId, from, to), (_) -> {
-            return api.pcuGroupOpsClient(PcuRef.fromId(to)).datacenterAssociations().transfer(to.toString(), dcId.unwrap());
+    public PcuGroupDatacenterAssociation transfer(UUID from, UUID to, DatacenterId dcId) {
+        return ctx.log().loading("Transferring association of @!%s!@ from @!%s!@ to @!%s!@".formatted(dcId, from, to), (_) -> {
+            return api.pcuGroupOpsClient(PcuRef.fromId(from)).datacenterAssociations().transfer(to.toString(), dcId.unwrap());
         });
-
-        return DeletionStatus.deleted(assoc);
     }
 }

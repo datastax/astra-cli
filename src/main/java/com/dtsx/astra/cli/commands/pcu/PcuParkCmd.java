@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_NOT_FOUND;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "park",
@@ -38,8 +38,12 @@ import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
     command = "${cli.name} pcu park my_pcu"
 )
 public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implements WithSetTimeout {
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "600")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "30m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
@@ -99,7 +103,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
     protected Operation<PcuParkResult> mkOperation() {
         return new PcuParkOperation(pcuGateway, new PcuParkRequest(
             $pcuRef,
-            lrMixin.options()
+            lrMixin.options(ctx)
         ));
     }
 

@@ -12,10 +12,11 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "list-associations",
@@ -49,9 +50,10 @@ public class PcuAssociationListCmd extends AbstractPcuAssociationPromptForPcuCmd
             .flatMap((res) ->
                 res.associations()
                     .map((assoc) -> sequencedMapOf(
-                        "PCU Group", res.pcuGroup().getTitle(),
+                        "PCU Group", Objects.requireNonNullElse(res.pcuGroup().getTitle(), "n/a"),
                         "PCU Group ID", res.pcuGroup().getId(),
-                        "Target", "Datacenter",
+//                        "Type", "DC", // maybe need to add if streaming PCUs later
+                        "Target", assoc.getClusterName(),
                         "Target ID", assoc.getDatacenterUUID()
                     ))
             )

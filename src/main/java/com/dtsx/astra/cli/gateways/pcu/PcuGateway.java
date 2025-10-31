@@ -29,7 +29,7 @@ public interface PcuGateway extends SomeGateway {
 
     void unpark(PcuRef ref);
 
-    Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, int timeout);
+    Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, Duration timeout);
 
     CreationStatus<PcuGroup> create(String title, PcuGroupCreationRequest req, boolean allowDuplicate);
 

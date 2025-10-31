@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.CreatePcuRequest;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "create",
@@ -93,7 +93,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             names = { "--instance-type", "-it" },
             paramLabel = "TYPE",
             description = "Cache type for the PCU group",
-            defaultValue = "shared"
+            defaultValue = "standard"
         )
         public String instanceType;
 

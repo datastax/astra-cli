@@ -59,7 +59,7 @@ public class PcuGroupsClient extends AbstractApiClient {
     }
 
     public Stream<PcuGroup> findByTitle(String title) {
-        return findAll().filter(pg -> pg.getTitle().equals(title));
+        return findAll().filter(pg -> title.equals(pg.getTitle())); // order is important here since pg.title is nullable
     }
 
     public Optional<PcuGroup> findFirstByTitle(String title) {

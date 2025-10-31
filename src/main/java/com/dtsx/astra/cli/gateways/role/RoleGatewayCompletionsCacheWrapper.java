@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.gateways.role;
 
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.models.RoleRef;
+import com.dtsx.astra.cli.utils.Collectionutils;
 import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -39,7 +40,7 @@ public class RoleGatewayCompletionsCacheWrapper implements RoleGateway {
     private void removeRefFromCache(RoleRef ref) {
         ref.fold(
             _ -> null,
-            toFn((name) -> cache.update((s) -> setDel(s, name)))
+            toFn(cache::removeFromCache)
         );
     }
 }

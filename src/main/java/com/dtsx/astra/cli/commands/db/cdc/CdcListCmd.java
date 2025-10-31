@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.CdcInfo;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcListOperation.CdcListRequest;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "list-cdcs",

@@ -17,7 +17,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.*;
+import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
 
 @RequiredArgsConstructor
 public class DbGatewayCompletionsCacheWrapper implements DbGateway {
@@ -58,14 +58,14 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout) {
+    public Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Duration> timeout) {
         val res = delegate.resume(ref, timeout);
         addRefToCache(ref);
         return res;
     }
 
     @Override
-    public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout) {
+    public Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, Duration timeout) {
         val duration = delegate.waitUntilDbStatus(ref, target, timeout);
         addRefToCache(ref);
         return duration;
@@ -98,14 +98,14 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     private void addRefToCache(DbRef ref) {
         ref.fold(
             _ -> null,
-            toFn((name) -> cache.update((s) -> setAdd(s, name)))
+            toFn(cache::addToCache)
         );
     }
 
     private void removeRefFromCache(DbRef ref) {
         ref.fold(
             _ -> null,
-            toFn((name) -> cache.update((s) -> setDel(s, name)))
+            toFn(cache::removeFromCache)
         );
     }
 }

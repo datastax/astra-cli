@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
+import com.dtsx.astra.cli.utils.Collectionutils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -66,7 +67,7 @@ public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     }
 
     @Override
-    public Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, int timeout) {
+    public Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, Duration timeout) {
         val duration = delegate.waitUntilPcuStatus(ref, target, timeout);
         addRefToCache(ref);
         return duration;
@@ -96,14 +97,14 @@ public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     private void addRefToCache(PcuRef ref) {
         ref.fold(
             _ -> null,
-            toFn((name) -> cache.update((s) -> setAdd(s, name)))
+            toFn(cache::addToCache)
         );
     }
 
     private void removeRefFromCache(PcuRef ref) {
         ref.fold(
             _ -> null,
-            toFn((name) -> cache.update((s) -> setDel(s, name)))
+            toFn(cache::removeFromCache)
         );
     }
 }

@@ -3,12 +3,10 @@ package com.dtsx.astra.cli.gateways.pcu.vendored.domain;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@ToString
 @SuperBuilder
 public sealed abstract class PcuGroupCreateUpdateRequest permits PcuGroupCreationRequest, PcuGroupUpdateRequest {
     protected String title;

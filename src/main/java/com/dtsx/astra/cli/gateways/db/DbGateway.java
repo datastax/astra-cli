@@ -27,9 +27,9 @@ public interface DbGateway extends SomeGateway {
 
     boolean exists(DbRef ref);
 
-    Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Integer> timeout);
+    Pair<DatabaseStatusType, Duration> resume(DbRef ref, Optional<Duration> timeout);
 
-    Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, int timeout);
+    Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, Duration timeout);
 
     CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly);
 

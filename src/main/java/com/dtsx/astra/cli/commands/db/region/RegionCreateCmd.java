@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.REGION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.region.RegionCreateOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "create-region",
@@ -46,14 +46,18 @@ public class RegionCreateCmd extends AbstractLongRunningRegionRequiredCmd<Region
     )
     public boolean $ifNotExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "800")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "15m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
     protected Operation<RegionCreateResult> mkOperation() {
-        return new RegionCreateOperation(regionGateway, dbGateway, new RegionCreateRequest($dbRef, $region, $ifNotExists, lrMixin.options()));
+        return new RegionCreateOperation(regionGateway, dbGateway, new RegionCreateRequest($dbRef, $region, $ifNotExists, lrMixin.options(ctx)));
     }
 
     @Override

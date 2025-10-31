@@ -3,10 +3,10 @@ package com.dtsx.astra.cli.utils;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 
 @UtilityClass
-public class MapUtils {
+public class Collectionutils {
     public static <K, V> LinkedHashMap<K, V> sequencedMapOf() {
         return new LinkedHashMap<>();
     }
@@ -85,5 +85,36 @@ public class MapUtils {
         map.put(k7, v7);
         map.put(k8, v8);
         return map;
+    }
+
+    public static <A> Set<A> setAdd(Set<? extends A> init, A a) {
+        val newSet = new HashSet<A>(init);
+        newSet.add(a);
+        return newSet;
+    }
+
+    public static <A> Set<A> setDel(Set<? extends A> init, A a) {
+        val newSet = new HashSet<A>(init);
+        newSet.remove(a);
+        return newSet;
+    }
+
+    public static <A> List<A> listAdd(A a, List<? extends A> init) {
+        val newList = new ArrayList<A>();
+        newList.add(a);
+        newList.addAll(init);
+        return newList;
+    }
+
+    public static <A> List<A> listAdd(List<? extends A> init, A a) {
+        val newList = new ArrayList<A>(init);
+        newList.add(a);
+        return newList;
+    }
+
+    public static <A> List<A> listConcat(List<? extends A> list1, List<? extends A> list2) {
+        val newList = new ArrayList<A>(list1);
+        newList.addAll(list2);
+        return newList;
     }
 }

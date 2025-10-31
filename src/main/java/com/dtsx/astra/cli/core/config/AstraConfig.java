@@ -205,7 +205,7 @@ public class AstraConfig {
         public void deleteProfile(ProfileName profileName) {
             profiles.removeIf(isProfileName(profileName));
             backingIniFile.deleteSection(profileName.unwrap());
-            ProfileLinkedCompletionsCache.mkInstances(ctx, profileName).forEach((c) -> c.update((_) -> Set.of()));
+            ProfileLinkedCompletionsCache.mkInstances(ctx, profileName).forEach((c) -> c.setCache(List.of()));
         }
     }
 

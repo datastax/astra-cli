@@ -13,7 +13,7 @@ import picocli.CommandLine.Model.CommandSpec;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.listAdd;
+import static com.dtsx.astra.cli.utils.Collectionutils.listAdd;
 
 @UtilityClass
 public class AliasUtils {

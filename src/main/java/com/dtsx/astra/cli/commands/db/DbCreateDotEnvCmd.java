@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(

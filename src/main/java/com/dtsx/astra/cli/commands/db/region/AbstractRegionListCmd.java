@@ -11,11 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<FoundRegion>> {
     @Option(

@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 

@@ -9,11 +9,10 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import picocli.CommandLine.Command;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     description = "Lists your Astra CLI profiles (configurations), highlighting the one currently in use. Multiple profiles may be highlighted if they share the same credentials."

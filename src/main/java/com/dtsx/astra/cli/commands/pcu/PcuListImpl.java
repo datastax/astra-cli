@@ -8,10 +8,11 @@ import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
 import com.dtsx.astra.cli.operations.pcu.PcuListOperation;
 import lombok.val;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 public abstract class PcuListImpl extends AbstractPcuCmd<Stream<PcuGroup>> {
     @Override
@@ -36,7 +37,7 @@ public abstract class PcuListImpl extends AbstractPcuCmd<Stream<PcuGroup>> {
     }
 
     private String title(PcuGroup pcu) {
-        return pcu.getTitle();
+        return Objects.requireNonNullElse(pcu.getTitle(), "n/a");
     }
 
     private String id(PcuGroup pcu) {

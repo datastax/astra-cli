@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
+import com.dtsx.astra.cli.utils.Collectionutils;
 import com.dtsx.astra.sdk.org.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -51,14 +52,14 @@ public class UserGatewayCompletionsCacheWrapper implements UserGateway {
     private void addRefToCache(UserRef ref) {
         ref.fold(
             _ -> null,
-            toFn((email) -> cache.update((s) -> setAdd(s, email)))
+            toFn(cache::addToCache)
         );
     }
 
     private void removeRefFromCache(UserRef ref) {
         ref.fold(
             _ -> null,
-            toFn((email) -> cache.update((s) -> setDel(s, email)))
+            toFn(cache::removeFromCache)
         );
     }
 }

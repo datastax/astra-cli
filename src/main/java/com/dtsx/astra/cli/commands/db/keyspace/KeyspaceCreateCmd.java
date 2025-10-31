@@ -21,7 +21,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.*;
-import static com.dtsx.astra.cli.utils.MapUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 
 @Command(
     name = "create-keyspace",
@@ -47,14 +47,18 @@ public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
     )
     public boolean $ifNotExists;
 
-    @Option(names = LR_OPTS_TIMEOUT_NAME, description = LR_OPTS_TIMEOUT_DESC, defaultValue = "60")
-    public void setTimeout(int timeout) {
+    @Option(
+        names = LR_OPTS_TIMEOUT_NAME,
+        description = LR_OPTS_TIMEOUT_DESC,
+        defaultValue = "1m"
+    )
+    public void setTimeout(Duration timeout) {
         lrMixin.setTimeout(timeout);
     }
 
     @Override
     protected Operation<KeyspaceCreateResult> mkOperation() {
-        return new KeyspaceCreateOperation(keyspaceGateway, dbGateway, new KeyspaceCreateRequest($keyspaceRef, $ifNotExists, lrMixin.options()));
+        return new KeyspaceCreateOperation(keyspaceGateway, dbGateway, new KeyspaceCreateRequest($keyspaceRef, $ifNotExists, lrMixin.options(ctx)));
     }
 
     @Override
