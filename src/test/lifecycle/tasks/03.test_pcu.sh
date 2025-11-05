@@ -20,3 +20,9 @@ until res=$(astra pcu status "$PCU") && echo "$res" | grep -q "ACTIVE"; do
   echo "Waiting for $PCU to become ACTIVE... (currently $(echo "$res" | jq -r '.data'))"
   sleep 15
 done
+
+read_step "$PCU" "astra pcu list-associations $PCU" \
+  "$PCU" "$ASTRA_CLOUD" "$ASTRA_REGION" " 1 " " 1 " "ACTIVE"
+
+delete_step "$PCU" "astra pcu delete $PCU --yes" \
+  "$PCU" "has been deleted"

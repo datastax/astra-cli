@@ -1,15 +1,11 @@
 FROM registry.access.redhat.com/ubi9/ubi-minimal:9.2
 
-WORKDIR /work/
+WORKDIR /work
 
-RUN chown 1001 /work \
-    && chmod "g+rwX" /work \
-    && chown 1001:root /work
+RUN chown 1001:root /work && chmod g+rwX /work
 
-COPY --chown=1001:root build/native/nativeCompile/astra /work/application
+COPY --chown=1001:root build/native/nativeCompile/astra /work/cli
 
-EXPOSE 8080
 USER 1001
 
-ENTRYPOINT ["./application"]
-CMD ["./application"]
+ENTRYPOINT ["./cli"]

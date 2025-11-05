@@ -49,7 +49,7 @@ echo "│                                                          │"
 echo "│   > $(tput setaf 6)sh -c \"\$(curl -fsSL ibm.biz/get-astra-cli)\"$(tput setaf 3)          │"
 echo "│                                                          │"
 echo "└──────────────────────────────────────────────────────────┘"
-echo "$(tput sgr0)"
+echo "$(tput sgr0) "
 
 echo "Installing Astra Cli$(tput setaf 6) $ASTRA_CLI_VERSION $(tput setaf 7)please wait...      "
 

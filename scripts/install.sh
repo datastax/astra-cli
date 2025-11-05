@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+# TODO detect if you are migrating from v0.x
+
 set -eu
 IFS=$(printf '\n\t')
 
