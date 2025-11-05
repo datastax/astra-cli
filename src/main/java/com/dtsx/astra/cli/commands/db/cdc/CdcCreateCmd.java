@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.ExitCode.CDC_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcCreateOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "create-cdc",

@@ -102,7 +102,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             val filePath = config.backingFile();
             val isDefaultConfigFile = filePath.equals(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
-            if (config.getValidatedProfiles().isEmpty()) {
+            if (config.profilesValidated().isEmpty()) {
                 val hints = (isDefaultConfigFile)
                     ? List.of(
                         new Hint("Interactively create a new profile", "${cli.name} setup"),
@@ -125,13 +125,13 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             if (targetProfileName.isDefault()) {
                 val MAX_PROFILES_IN_HINT = 3;
 
-                var profileNames = config.getValidatedProfiles().stream()
+                var profileNames = config.profilesValidated().stream()
                     .filter(p -> p.name().isPresent())
                     .map(p -> p.name().get().unwrap())
                     .limit(MAX_PROFILES_IN_HINT)
                     .toList();
 
-                if (config.getValidatedProfiles().size() > MAX_PROFILES_IN_HINT) {
+                if (config.profilesValidated().size() > MAX_PROFILES_IN_HINT) {
                     profileNames = new ArrayList<>(profileNames);
                     profileNames.add("...");
                 }

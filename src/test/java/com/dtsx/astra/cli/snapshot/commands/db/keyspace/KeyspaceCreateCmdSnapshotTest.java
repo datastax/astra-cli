@@ -6,7 +6,8 @@ import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
-import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifier;import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
+import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifier;
+import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.snapshot.annotations.TestForHumanOutput;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 
@@ -15,7 +16,6 @@ import java.util.function.Function;
 
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class KeyspaceCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
@@ -25,7 +25,7 @@ public class KeyspaceCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
                 doReturn(lift.apply(Databases.Keyspace)).when(mock).create(any());
             })
             .gateway(DbGateway.class, (mock) -> {
-                when(mock.waitUntilDbStatus(any(), any(), anyInt())).thenReturn(Duration.ofMillis(9876));
+                when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(9876));
             })
             .verify((mocks) -> {
                 mocks.keyspaceGateway().create(Databases.Keyspace);
@@ -36,7 +36,7 @@ public class KeyspaceCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void keyspace_created_and_db_active(OutputType outputType) {
         verifyRun("db create-keyspace ${DatabaseName} -k ${Keyspace}", outputType, o -> o.use(opts(CreationStatus::created))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.NameRef, ACTIVE, 60);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.NameRef, ACTIVE, Duration.ofSeconds(60));
             }));
     }
 
@@ -44,7 +44,7 @@ public class KeyspaceCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void keyspace_created_async(OutputType outputType) {
         verifyRun("db create-keyspace ${DatabaseName} -k ${Keyspace} --async", outputType, o -> o.use(opts(CreationStatus::created))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -52,7 +52,7 @@ public class KeyspaceCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void error_keyspace_exists(OutputType outputType) {
         verifyRun("db create-keyspace ${DatabaseName} -k ${Keyspace}", outputType, o -> o.use(opts(CreationStatus::alreadyExists))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -60,7 +60,7 @@ public class KeyspaceCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void allow_keyspace_exists(OutputType outputType) {
         verifyRun("db create-keyspace ${DatabaseName} -k ${Keyspace} --if-not-exists", outputType, o -> o.use(opts(CreationStatus::alreadyExists))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 }

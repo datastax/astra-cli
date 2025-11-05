@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_NOT_FOUND;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "unpark",

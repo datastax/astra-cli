@@ -54,7 +54,7 @@ public class TestConfig {
     }
 
     public static String astraHome() {
-        return env("ASTRA_HOME", ".cli_tests_temp");
+        return env("ASTRA_HOME", ".cli_tests_temp/java");
     }
 
     public static Path astraHome(FileSystem fs) {

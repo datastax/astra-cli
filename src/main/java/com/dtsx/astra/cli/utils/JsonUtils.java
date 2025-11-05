@@ -1,10 +1,7 @@
 package com.dtsx.astra.cli.utils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.SneakyThrows;
@@ -34,6 +31,9 @@ public class JsonUtils {
 
         objectMapper.registerModule(module);
         objectMapper.registerModule(new Jdk8Module());
+
+        //noinspection deprecation
+        objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
 
         return OBJECT_MAPPER = objectMapper;
     }

@@ -24,7 +24,7 @@ import picocli.CommandLine.Parameters;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "transfer-association",

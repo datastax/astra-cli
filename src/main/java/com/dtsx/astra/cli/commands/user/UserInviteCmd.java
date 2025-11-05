@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.USER_ALREADY_INVITED;
 import static com.dtsx.astra.cli.operations.user.UserInviteOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Example(
     comment = "Invite a user with default \"Database Administrator\" role",

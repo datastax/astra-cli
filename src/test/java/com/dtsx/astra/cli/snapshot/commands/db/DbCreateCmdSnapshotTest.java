@@ -30,7 +30,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
 
                 doReturn(lift.apply(Databases.One)).when(mock).create(any(), any(), any(), any(), any(), anyInt(), anyBoolean(), anyBoolean());
 
-                when(mock.waitUntilDbStatus(any(), any(), anyInt())).thenReturn(Duration.ofMillis(6789));
+                when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(6789));
 
                 when(mock.resume(any(), any())).thenReturn(Pair.create(ACTIVE, Duration.ZERO));
             })
@@ -45,7 +45,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_create(OutputType outputType) {
         verifyRun("db create ${DatabaseName} -r us-east-1", outputType, o -> o.use(opts(CreationStatus::created, false))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, 360);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, Duration.ofSeconds(600));
             }));
     }
 
@@ -53,7 +53,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_create_allowing_duplicates(OutputType outputType) {
         verifyRun("db create ${DatabaseName} -r us-east-1 --allow-duplicate-names", outputType, o -> o.use(opts(CreationStatus::created, true))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, 360);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, Duration.ofSeconds(600));
             }));
     }
 
@@ -61,7 +61,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_create_async(OutputType outputType) {
         verifyRun("db create ${DatabaseName} -r us-east-1 --async", outputType, o -> o.use(opts(CreationStatus::created, false))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
                 verify(mocks.dbGateway(), never()).resume(any(), any());
             }));
     }
@@ -70,7 +70,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void error_db_already_exists(OutputType outputType) {
         verifyRun("db create ${DatabaseName} -r us-east-1", outputType, o -> o.use(opts(CreationStatus::alreadyExists, false))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
                 verify(mocks.dbGateway(), never()).resume(any(), any());
             }));
     }
@@ -79,7 +79,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void connect_to_existing_db(OutputType outputType) {
         verifyRun("db create ${DatabaseName} -r us-east-1 --if-not-exists", outputType, o -> o.use(opts(CreationStatus::alreadyExists, false))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).resume(Databases.IdRef, Optional.of(360));
+                verify(mocks.dbGateway()).resume(Databases.IdRef, Optional.of(Duration.ofSeconds(600)));
             }));
     }
 
@@ -87,7 +87,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void allow_existing_db_async(OutputType outputType) {
         verifyRun("db create ${DatabaseName} -r us-east-1 --if-not-exists --async", outputType, o -> o.use(opts(CreationStatus::alreadyExists, false))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
                 verify(mocks.dbGateway(), never()).resume(any(), any());
             }));
     }

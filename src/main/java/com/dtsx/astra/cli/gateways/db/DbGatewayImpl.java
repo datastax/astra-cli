@@ -66,7 +66,7 @@ public class DbGatewayImpl implements DbGateway {
             .getStatus();
 
         val expectedStatuses = Arrays.stream(DatabaseStatusType.values())
-            .filter(status -> status != ACTIVE && status != HIBERNATED && status != MAINTENANCE && status != INITIALIZING && status != PENDING)
+            .filter(status -> status != ACTIVE && status != HIBERNATED && status != MAINTENANCE && status != INITIALIZING && status != PENDING && status != ASSOCIATING && status != RESUMING && status != UNPARKING)
             .toList();
 
         // TODO astra-sdk-devops needs to add ASSOCIATING
@@ -81,7 +81,7 @@ public class DbGatewayImpl implements DbGateway {
                 });
                 yield Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
             }
-            case MAINTENANCE, INITIALIZING, PENDING -> {
+            case MAINTENANCE, INITIALIZING, PENDING, ASSOCIATING, RESUMING, UNPARKING -> {
                 yield Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
             }
             default -> {

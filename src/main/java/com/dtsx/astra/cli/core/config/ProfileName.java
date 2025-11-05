@@ -14,10 +14,7 @@ public class ProfileName implements Highlightable {
     String name;
 
     public static Either<String, ProfileName> parse(String name) {
-        return ModelUtils.trimAndValidateBasics("Profile name", name).flatMap(trimmed -> {
-            if (trimmed.contains("\n")) {
-                return Either.left("Profile name cannot contain newlines");
-            }
+        return ModelUtils.trimAndValidateBasics("Profile name", name).flatMap((trimmed) -> {
             return Either.pure(ProfileName.mkUnsafe(trimmed));
         });
     }

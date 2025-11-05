@@ -26,7 +26,7 @@ public class DbResumeCmdSnapshotTest extends BaseCmdSnapshotTest {
                 when(mock.resume(any(), any())).thenReturn(Pair.create(initialStatus, waitedTime));
             })
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).resume(Databases.NameRef, Optional.of(600));
+                verify(mocks.dbGateway()).resume(Databases.NameRef, Optional.of(Duration.ofSeconds(600)));
             });
     }
 

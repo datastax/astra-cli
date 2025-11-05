@@ -9,7 +9,7 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuProvisionType;
+import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuCreateResult;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.CreatePcuRequest;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "create",
@@ -103,7 +103,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             description = "Provision type for the PCU group",
             defaultValue = "shared"
         )
-        public PcuProvisionType provisionType;
+        public PcuGroupProvisionType provisionType;
 
         @Option(
             names = { "--min" },

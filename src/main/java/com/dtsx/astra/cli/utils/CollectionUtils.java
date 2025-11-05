@@ -6,7 +6,7 @@ import lombok.val;
 import java.util.*;
 
 @UtilityClass
-public class Collectionutils {
+public class CollectionUtils {
     public static <K, V> LinkedHashMap<K, V> sequencedMapOf() {
         return new LinkedHashMap<>();
     }

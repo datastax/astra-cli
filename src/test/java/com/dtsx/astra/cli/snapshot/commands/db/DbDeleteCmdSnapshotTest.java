@@ -24,7 +24,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
 
             doReturn(DeletionStatus.deleted(Databases.NameRef)).when(mock).delete(any()); // can't use when...then because of sealed interface
 
-            when(mock.waitUntilDbStatus(any(), any(), anyInt())).thenReturn(Duration.ofMillis(6789));
+            when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(6789));
         });
 
     private final SnapshotTestOptionsModifier dbNotFound = (o) -> o
@@ -42,7 +42,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
 
                 verify(mocks.dbGateway()).delete(Databases.NameRef);
 
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.NameRef, TERMINATED, 800);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.NameRef, TERMINATED, Duration.ofSeconds(900));
             }));
     }
 
@@ -54,7 +54,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
 
                 verify(mocks.dbGateway()).delete(Databases.NameRef);
 
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -77,7 +77,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
 
                 verify(mocks.dbGateway()).delete(Databases.NameRef);
 
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.NameRef, TERMINATED, 36);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.NameRef, TERMINATED, Duration.ofSeconds(36));
             }));
     }
 

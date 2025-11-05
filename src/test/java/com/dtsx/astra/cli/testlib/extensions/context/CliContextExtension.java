@@ -39,6 +39,7 @@ public class CliContextExtension implements ParameterResolver, TestInstancePostP
         }
     }
 
+    @Override // resolves class field usages for jqwik
     public @NotNull TryExecutionResult aroundTry(TryLifecycleContext context, @NotNull TryExecutor aTry, @NotNull List<Object> parameters) throws Throwable {
         for (val instance : context.testInstances()) {
             for (val field : ExtensionUtils.getAllFields(instance)) {

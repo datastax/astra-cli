@@ -11,13 +11,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class ConfigListOperation implements Operation<ListConfigResult> {
     private final AstraConfig config;
 
     public record ListConfigResult(
-        List<ProfileInfo> profiles
+        List<ProfileInfo> profiles,
+        Optional<ProfileInfo> defaultProfile
     ) {}
 
     public record ProfileInfo(
@@ -34,8 +36,7 @@ public class ConfigListOperation implements Operation<ListConfigResult> {
             .map(Profile::token)
             .orElse(null);
 
-        val profiles = config.getValidatedProfiles().stream()
-            .filter(p -> !p.isDefault())
+        val profiles = config.profilesValidated().stream()
             .map(p -> new ProfileInfo(
                 p.nameOrDefault().unwrap(),
                 p.token(),
@@ -44,6 +45,11 @@ public class ConfigListOperation implements Operation<ListConfigResult> {
             ))
             .toList();
 
-        return new ListConfigResult(profiles);
+        return new ListConfigResult(
+            profiles,
+            profiles.stream()
+                .filter(p -> p.name().equals("default"))
+                .findFirst()
+        );
     }
 }

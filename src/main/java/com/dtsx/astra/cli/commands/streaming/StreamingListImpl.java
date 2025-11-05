@@ -11,7 +11,7 @@ import lombok.val;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 public class StreamingListImpl extends AbstractStreamingCmd<Stream<TenantInfo>> {
     @Override

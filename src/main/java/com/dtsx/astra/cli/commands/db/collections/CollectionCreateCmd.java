@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.COLLECTION_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.collection.CollectionCreateOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "create-collection",

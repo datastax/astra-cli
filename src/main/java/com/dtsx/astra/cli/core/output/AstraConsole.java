@@ -36,7 +36,7 @@ public class AstraConsole {
     @Getter @Setter
     private @Nullable Console console = System.console();
 
-    public void print(Object... items) {
+    public void print(String... items) {
         if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
@@ -50,18 +50,18 @@ public class AstraConsole {
         write(getOut(), format.formatted(items));
     }
 
-    public void println(Object... items) {
+    public void println(String... items) {
         if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.println() when the output format is not 'human'");
         }
         writeln(getOut(), items);
     }
 
-    public void unsafePrintln(Object... items) {
+    public void unsafePrintln(String... items) {
         writeln(getOut(), items); // no check on output format
     }
 
-    public void error(Object... items) {
+    public void error(String... items) {
         write(getErr(), items);
     }
 
@@ -69,7 +69,7 @@ public class AstraConsole {
         write(getErr(), format.formatted(items));
     }
 
-    public void errorln(Object... items) {
+    public void errorln(String... items) {
         writeln(getErr(), items);
     }
 
@@ -101,12 +101,12 @@ public class AstraConsole {
             : console.readLine();
     }
 
-    private void write(PrintWriter ps, Object... items) {
+    private void write(PrintWriter ps, String... items) {
         ps.print(ctx().colors().format(items));
         ps.flush();
     }
 
-    private void writeln(PrintWriter ps, Object... items) {
+    private void writeln(PrintWriter ps, String... items) {
         ps.println(ctx().colors().format(items));
     }
 

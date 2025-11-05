@@ -32,7 +32,7 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
     @Override
     public ConfigUseResult execute() {
         val targetProfileName = request.profileName.orElseGet(() -> {
-            val profiles = NEList.parse(config.getValidatedProfiles().stream().filter(p -> !p.isDefault()).toList());
+            val profiles = NEList.parse(config.profilesValidated().stream().filter(p -> !p.isDefault()).toList());
 
             if (profiles.isEmpty()) {
                 throw new AstraCliException(PROFILE_NOT_FOUND, """

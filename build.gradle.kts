@@ -1,4 +1,3 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.net.URLClassLoader
 
 buildscript {
@@ -14,7 +13,6 @@ plugins {
     java
     application
     id("org.graalvm.buildtools.native") version "0.10.6"
-    id("org.asciidoctor.jvm.convert") version "4.0.2"
 }
 
 group = "com.dtsx.astra.cli"
@@ -154,9 +152,21 @@ tasks.test {
     )
 }
 
+tasks.register<Exec>("lifecycleTest") {
+    group = "verification"
+
+    dependsOn("nativeCompile")
+
+    commandLine("bash", "src/test/lifecycle/test.sh")
+
+    isIgnoreExitValue = false
+}
+
 val nativeImageGeneratedDir = layout.buildDirectory.dir("classes/java/main/META-INF/native-image/astra-cli-generated/${project.group}/${project.name}").get().asFile
 
 tasks.register<JavaExec>("generateJniConfig") {
+    group = "build"
+
     val outputFile = file("${nativeImageGeneratedDir}/jni-config.json")
 
     doFirst {
@@ -183,6 +193,8 @@ tasks.register<JavaExec>("generateJniConfig") {
 }
 
 tasks.register("generateGraalReflectionConfig") {
+    group = "build"
+
     val inputFile = file("reflected.txt")
 
     val outputFile = file("${nativeImageGeneratedDir}/reflect-config.json")
@@ -258,6 +270,8 @@ tasks.register("generateGraalReflectionConfig") {
 val resourcePatterns = mutableListOf<String>()
 
 tasks.register("includeJansiNativeLibResources") {
+    group = "build"
+
     val (os, arch) = getOsArch().split("-")
 
     val osPattern = when (os) {
@@ -280,6 +294,8 @@ tasks.register("includeJansiNativeLibResources") {
 // Can't get graal-compiled binary to recognize system properties set at runtime,
 // so we're doing this fun workaround of generating a properties file at build time instead.
 tasks.register("createDynamicProperties") {
+    group = "build"
+
     val outputFile = layout.buildDirectory.file("resources/main/dynamic.properties").get().asFile
 
     val cliSystemProperties = providers.provider {
@@ -380,26 +396,4 @@ tasks.register<Jar>("fatJar") {
     from({
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
-}
-
-tasks.register<JavaExec>("genDocsAsiidoc") {
-    dependsOn("classes")
-    group = "documentation"
-    classpath = configurations.compileClasspath.get() + configurations.annotationProcessor.get() + sourceSets.main.get().runtimeClasspath
-    mainClass.set("picocli.codegen.docgen.manpage.ManPageGenerator")
-    args = listOf("com.dtsx.astra.cli.AstraCli", "--outdir", "${layout.buildDirectory.get()}/docs/asiidoc")
-    jvmArgs = listOf(
-        "--enable-native-access=ALL-UNNAMED"
-    )
-}
-
-tasks.register<AsciidoctorTask>("genDocsHtml") {
-    dependsOn("genDocsAsiidoc")
-
-    setSourceDir(layout.buildDirectory.dir("docs/asiidoc"))
-    setOutputDir(layout.buildDirectory.dir("docs/html"))
-
-    outputOptions {
-        backends("html5")
-    }
 }

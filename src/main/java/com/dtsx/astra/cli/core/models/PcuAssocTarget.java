@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

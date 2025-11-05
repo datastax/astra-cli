@@ -1,16 +1,18 @@
 package com.dtsx.astra.cli.gateways.pcu.vendored.domain;
 
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PcuGroup {
-    @JsonProperty("uuid")
+    @Setter(onMethod = @__(@JsonSetter("uuid")))
+    @Getter(onMethod = @__(@JsonGetter("uuid")))
     private String id;
     private String orgId;
 
@@ -21,7 +23,7 @@ public class PcuGroup {
     private String region;
 
     private String instanceType;
-    private PcuProvisionType provisionType;
+    private PcuGroupProvisionType provisionType;
 
     private int min;
     private int max;

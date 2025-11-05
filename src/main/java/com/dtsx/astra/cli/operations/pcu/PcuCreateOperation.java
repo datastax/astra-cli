@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuProvisionType;
+import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
         CloudProviderType cloud,
         RegionName region,
         String instanceType,
-        PcuProvisionType provisionType,
+        PcuGroupProvisionType provisionType,
         Integer min,
         Integer max,
         Integer reserved,
@@ -53,7 +53,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
             .instanceType(request.instanceType)
             .provisionType(request.provisionType)
             .cloudProvider(request.cloud)
-//            .region(request.region.unwrap())
+            .region(request.region.unwrap())
             .min(request.min)
             .max(request.max)
             .reserved(request.reserved)

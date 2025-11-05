@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.FoundRegions;
 import static com.dtsx.astra.cli.operations.db.region.RegionListOperation.RegionListRequest;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "list-regions",

@@ -201,7 +201,7 @@ public class AstraCli extends AbstractCmd<Void> {
             private final IFactory defaultFactory = CommandLine.defaultFactory();
 
             @Override
-            public <K> K create(Class<K> cls) throws Exception { // I miss having proper rank2 type support
+            public <K> K create(Class<K> cls) throws Exception { // I miss having proper rank2 type support for lambdas
                 val created = defaultFactory.create(cls);
 
                 if (created instanceof AbstractCmd<?> cmd) {

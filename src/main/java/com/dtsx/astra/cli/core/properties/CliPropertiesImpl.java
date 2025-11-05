@@ -50,42 +50,42 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public ExternalSoftware cqlsh() {
-        return new ExternalSoftware(prop("cqlsh.url"), Version.mkUnsafe(prop("cqlsh.version")));
+        return new ExternalSoftware(requireProperty("cqlsh.url"), Version.mkUnsafe(requireProperty("cqlsh.version")));
     }
 
     @Override
     public ExternalSoftware dsbulk() {
-        return new ExternalSoftware(prop("dsbulk.url"), Version.mkUnsafe(prop("dsbulk.version")));
+        return new ExternalSoftware(requireProperty("dsbulk.url"), Version.mkUnsafe(requireProperty("dsbulk.version")));
     }
 
     @Override
     public ExternalSoftware pulsar() {
-        return new ExternalSoftware(prop("pulsar-shell.url"), Version.mkUnsafe(prop("pulsar-shell.version")));
+        return new ExternalSoftware(requireProperty("pulsar-shell.url"), Version.mkUnsafe(requireProperty("pulsar-shell.version")));
     }
 
     @Override
     public Version version() {
-        return Version.mkUnsafe(prop("cli.version"));
+        return Version.mkUnsafe(requireProperty("cli.version"));
     }
 
     @Override
     public String rcFileName() {
-        return prop("cli.rc-file.name");
+        return requireProperty("cli.rc-file.name");
     }
 
     @Override
     public String homeFolderName(boolean useDotPrefix) {
-        return ((useDotPrefix) ? "." : "") + prop("cli.home-folder.name");
+        return ((useDotPrefix) ? "." : "") + requireProperty("cli.home-folder.name");
     }
 
     @Override
     public String cliGithubRepoUrl() {
-        return prop("cli.github.urls.repo");
+        return requireProperty("cli.github.urls.repo");
     }
 
     @Override
     public String cliGithubApiReposUrl() {
-        return prop("cli.github.urls.api.repos");
+        return requireProperty("cli.github.urls.api.repos");
     }
 
     @Override
@@ -189,12 +189,17 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public String rcEnvVar() {
-        return prop("cli.rc-file.env-var");
+        return requireProperty("cli.rc-file.env-var");
     }
 
     @Override
     public String homeEnvVar() {
-        return prop("cli.home-folder.env-var");
+        return requireProperty("cli.home-folder.env-var");
+    }
+
+    @Override
+    public boolean disableBetaWarnings() {
+        return System.getenv(System.getProperty("cli.nowarn-beta.env-var", "ASTRA_IGNORE_BETA_WARNINGS")) != null;
     }
 
     @Override
@@ -215,7 +220,7 @@ public class CliPropertiesImpl implements CliProperties {
         });
     }
 
-    protected final String prop(String string) {
+    protected final String requireProperty(String string) {
         val value = System.getProperty(string);
 
         if (value == null) {

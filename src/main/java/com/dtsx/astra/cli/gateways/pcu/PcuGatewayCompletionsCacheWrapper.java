@@ -8,7 +8,6 @@ import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
-import com.dtsx.astra.cli.utils.Collectionutils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 

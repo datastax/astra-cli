@@ -5,7 +5,6 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
-import com.dtsx.astra.cli.utils.Collectionutils;
 import com.dtsx.astra.sdk.org.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

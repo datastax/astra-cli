@@ -18,7 +18,6 @@ import java.util.function.Function;
 
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
@@ -36,7 +35,7 @@ public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
                 doReturn(lift.apply(Regions.NAME)).when(mock).delete(any(), any());
             })
             .gateway(DbGateway.class, (mock) -> {
-                when(mock.waitUntilDbStatus(any(), any(), anyInt())).thenReturn(Duration.ofMillis(6789));
+                when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(6789));
             })
             .verify((mocks) -> {
                 verify(mocks.regionGateway()).delete(Databases.IdRef, Regions.NAME);
@@ -47,7 +46,7 @@ public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void region_deleted(OutputType outputType) {
         verifyRun("db delete-region ${DatabaseId} -r ${RegionName}", outputType, o -> o.use(deleteRegion(DeletionStatus::deleted))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, 600);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, Duration.ofSeconds(900));
             }));
     }
 
@@ -55,7 +54,7 @@ public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void region_delete_async(OutputType outputType) {
         verifyRun("db delete-region ${DatabaseId} -r ${RegionName} --async", outputType, o -> o.use(deleteRegion(DeletionStatus::deleted))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -68,7 +67,7 @@ public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void error_region_not_found(OutputType outputType) {
         verifyRun("db delete-region ${DatabaseId} -r ${RegionName}", outputType, o -> o.use(deleteRegion(DeletionStatus::notFound))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -76,7 +75,7 @@ public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void allow_missing_region(OutputType outputType) {
         verifyRun("db delete-region ${DatabaseId} -r ${RegionName} --if-exists --async", outputType, o -> o.use(deleteRegion(DeletionStatus::notFound))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 }

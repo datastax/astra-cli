@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEY_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.config.ConfigGetOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(

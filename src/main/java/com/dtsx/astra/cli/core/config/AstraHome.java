@@ -34,13 +34,17 @@ public class AstraHome {
         return dir.get();
     }
 
+    public Path dir() {
+        return dir.get();
+    }
+
     public Dirs dirs() {
         return dirs.get();
     }
 
     public class Dirs {
         private final Path SCB = dir.get().resolve("scb");
-        private final Path COMPLETIONS_CACHE =  dir.get().resolve("completions-cache");
+        private final Path COMPLETIONS_CACHE = dir.get().resolve("completions-cache");
         private final Path LOGS = dir.get().resolve("logs");
         private final Path CQLSH = dir.get().resolve("cqlsh-astra");
 

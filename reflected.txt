@@ -27,6 +27,10 @@ com.datastax.astra.client.tables.definition.rows.Row
 com.datastax.astra.client.tables.definition.columns.*
 com.datastax.astra.client.tables.definition.*
 
+# Pcu gateways (TODO replace w/ SDK paths when available)
+com.dtsx.astra.cli.gateways.pcu.vendored.domain.*
+com.dtsx.astra.sdk.pcu.domain.*
+
 # Other misc Data API stuff
 com.datastax.astra.internal.api.[DataAPI.+]
 com.datastax.astra.client.core.vectorize.VectorServiceOptions

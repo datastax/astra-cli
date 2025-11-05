@@ -66,6 +66,8 @@ public interface CliProperties {
 
     String homeEnvVar();
 
+    boolean disableBetaWarnings();
+
     Optional<Path> binaryPath();
 
     Optional<SupportedPackageManager> owningPackageManager();

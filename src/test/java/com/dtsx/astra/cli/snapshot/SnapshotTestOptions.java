@@ -1,12 +1,10 @@
 package com.dtsx.astra.cli.snapshot;
 
 import com.dtsx.astra.cli.core.config.Profile;
-import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.doubles.GatewayProviderMock;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContextOptions;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 
 import java.nio.file.FileSystem;

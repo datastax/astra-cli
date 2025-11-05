@@ -48,7 +48,7 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
             return request.promptProfileName.apply(candidates.get());
         });
 
-        val section = config.getProfileSection(profileName);
+        val section = config.lookupSection(profileName);
 
         if (section.isEmpty()) {
             return new ProfileNotFound(profileName);

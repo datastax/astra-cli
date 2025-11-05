@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
 import static com.dtsx.astra.cli.operations.token.TokenDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "delete", 

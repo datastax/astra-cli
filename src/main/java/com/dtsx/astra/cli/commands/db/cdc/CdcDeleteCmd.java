@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.core.output.ExitCode.CDC_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.operations.db.cdc.CdcDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "delete-cdc",

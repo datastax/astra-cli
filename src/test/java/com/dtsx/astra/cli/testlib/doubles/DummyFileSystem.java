@@ -4,7 +4,6 @@ import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
@@ -60,11 +59,22 @@ public class DummyFileSystem extends FileSystem {
 
         private interface Exclude {
             FileSystem getFileSystem();
+            Path resolve(Path other);
         }
 
         @Override
         public @NotNull FileSystem getFileSystem() {
             return DummyFileSystem.this;
+        }
+
+        @Override
+        public Path resolve(String other) {
+            return new DummyPath();
+        }
+
+        @Override
+        public Path resolve(Path other) {
+            return new DummyPath();
         }
     }
 
@@ -84,7 +94,7 @@ public class DummyFileSystem extends FileSystem {
     }
 
     @Override
-    public WatchService newWatchService() throws IOException {
+    public WatchService newWatchService() {
         return shouldNotHaveCalledMethod();
     }
 

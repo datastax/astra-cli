@@ -18,7 +18,6 @@ import java.util.function.Function;
 
 import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
@@ -35,7 +34,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
             .gateway(DbGateway.class, (mock) -> {
                 when(mock.findOne(any())).thenReturn(Databases.One);
 
-                when(mock.waitUntilDbStatus(any(), any(), anyInt())).thenReturn(Duration.ofMillis(6789));
+                when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(6789));
             })
             .gateway(RegionGateway.class, (mock) -> {
                 doReturn(lift.apply(Regions.NAME)).when(mock).create(any(), any(), any(), any());
@@ -50,7 +49,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void region_created(OutputType outputType) {
         verifyRun("db create-region ${DatabaseId} -r ${RegionName}", outputType, o -> o.use(mkRegion(CreationStatus::created))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, 800);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, Duration.ofSeconds(900));
             }));
     }
 
@@ -58,7 +57,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void region_created_with_custom_timeout(OutputType outputType) {
         verifyRun("db create-region ${DatabaseId} -r ${RegionName} --timeout 123123", outputType, o -> o.use(mkRegion(CreationStatus::created))
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, 123123);
+                verify(mocks.dbGateway()).waitUntilDbStatus(Databases.IdRef, ACTIVE, Duration.ofSeconds(123123));
             }));
     }
 
@@ -66,7 +65,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void region_create_async(OutputType outputType) {
         verifyRun("db create-region ${DatabaseId} -r ${RegionName} --async", outputType, o -> o.use(mkRegion(CreationStatus::created))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -79,7 +78,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void error_region_already_exists(OutputType outputType) {
         verifyRun("db create-region ${DatabaseId} -r ${RegionName}", outputType, o -> o.use(mkRegion(CreationStatus::alreadyExists))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 
@@ -87,7 +86,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void allow_existing_region(OutputType outputType) {
         verifyRun("db create-region ${DatabaseId} -r ${RegionName} --if-not-exists --async", outputType, o -> o.use(mkRegion(CreationStatus::alreadyExists))
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), anyInt());
+                verify(mocks.dbGateway(), never()).waitUntilDbStatus(any(), any(), any());
             }));
     }
 }

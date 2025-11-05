@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
@@ -211,7 +211,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     private String mkHint() {
         return (ctx.outputIsHuman() && ctx.isTty())
             ? NL + NL + "(Hint: Use @'!${cli.name} setup!@ for an interactive profile creation experience!)"
-            : null;
+            : "";
     }
 
     private LinkedHashMap<String, Object> mkData(ProfileName profileName, Boolean isDefault, Boolean wasOverwritten) {

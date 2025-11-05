@@ -187,7 +187,7 @@ public class AstraLogger {
         deleteOldLogs(ctx().home().dirs().useLogs());
 
         try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
-            for (String line : accumulated) {
+            for (val line : accumulated) {
                 writer.write(AstraColors.stripAnsi(ctx().colors().format(line)));
                 writer.write(System.lineSeparator());
             }

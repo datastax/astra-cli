@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.docs.AliasUtils.resolveAliasingInformation;
-import static com.dtsx.astra.cli.utils.Collectionutils.listAdd;
+import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
 
 @RequiredArgsConstructor
 public class AsciidocGenerator {

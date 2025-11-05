@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
-import static com.dtsx.astra.cli.utils.Collectionutils.listAdd;
+import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
 
 @Command(
     commandListHeading = "%nCommands:%n",

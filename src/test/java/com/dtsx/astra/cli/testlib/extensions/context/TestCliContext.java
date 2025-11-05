@@ -21,6 +21,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import picocli.CommandLine.Help.Ansi;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

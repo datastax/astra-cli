@@ -198,15 +198,15 @@ public class AstraColors {
         ).build();
     }
 
-    public String format(Object... args) {
+    public String format(String... args) {
         val sb = new StringBuilder();
         var colorUsed = false;
 
-        for (val item : args) {
-            if (item instanceof AstraColor color) {
-                sb.append(color.on());
-                colorUsed = true;
-            } else if (item instanceof String str) {
+        for (val str : args) {
+//            if (item instanceof AstraColor color) {
+//                sb.append(color.on());
+//                colorUsed = true;
+//            } else if (item instanceof String str) {
                 var processedStr = str.replace("${cli.name}", System.getProperty("cli.name"));
 
                 processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
@@ -216,9 +216,9 @@ public class AstraColors {
                     .replaceAll((match) -> highlight(match.group(1), true));
 
                 sb.append(ansi.new Text(processedStr, colorScheme()));
-            } else {
-                sb.append(item);
-            }
+//            } else {
+//                sb.append(item);
+//            }
         }
 
         if (colorUsed) {

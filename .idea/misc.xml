@@ -13,6 +13,7 @@
     <writeAnnotations>
       <writeAnnotation name="com.dtsx.astra.cli.testlib.extensions.UseTestCtx" />
       <writeAnnotation name="com.dtsx.astra.cli.testlib.extensions.binaries.MockInstall" />
+      <writeAnnotation name="com.dtsx.astra.cli.testlib.extensions.context.UseTestCtx" />
       <writeAnnotation name="picocli.CommandLine.ArgGroup" />
       <writeAnnotation name="picocli.CommandLine.Mixin" />
       <writeAnnotation name="picocli.CommandLine.Option" />

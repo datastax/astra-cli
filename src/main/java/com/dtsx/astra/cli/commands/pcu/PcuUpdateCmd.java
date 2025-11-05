@@ -7,8 +7,8 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuProvisionType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuGroupAlreadyExistsIllegallyWithStatus;
@@ -91,7 +91,7 @@ public class PcuUpdateCmd extends AbstractPromptForPcuCmd<PcuUpdateResult> {
             description = "Provision type for the PCU group",
             defaultValue = "shared"
         )
-        public Optional<PcuProvisionType> provisionType;
+        public Optional<PcuGroupProvisionType> provisionType;
 
         @Option(
             names = { "--min" },

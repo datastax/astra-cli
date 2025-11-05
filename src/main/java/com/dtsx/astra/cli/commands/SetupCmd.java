@@ -30,6 +30,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.utils.StringUtils.*;
 
+// TODO mention how to setup autocomplete
 @Command(
     name = "setup",
     description = "Interactively set up the Astra CLI and create profiles"

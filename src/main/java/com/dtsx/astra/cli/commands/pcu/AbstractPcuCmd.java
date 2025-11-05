@@ -12,7 +12,9 @@ public abstract class AbstractPcuCmd<OpRes> extends AbstractConnectedCmd<OpRes> 
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        ctx.log().warn("PCU operations are still in beta and may change without notice.");
+        if (!ctx.properties().disableBetaWarnings()) {
+            ctx.log().warn("PCU operations are still in beta and may change without notice.");
+        }
         pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profile().name()));
     }
 }

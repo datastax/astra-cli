@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Accessors(fluent = true)
 @RequiredArgsConstructor
-public enum PcuProvisionType {
+public enum PcuGroupProvisionType {
     SHARED("shared"),
     DEDICATED("dedicated");
 

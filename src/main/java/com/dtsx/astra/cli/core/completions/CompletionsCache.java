@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.utils.Collectionutils.setAdd;
-import static com.dtsx.astra.cli.utils.Collectionutils.setDel;
+import static com.dtsx.astra.cli.utils.CollectionUtils.setAdd;
+import static com.dtsx.astra.cli.utils.CollectionUtils.setDel;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static java.util.stream.Collectors.toSet;
 

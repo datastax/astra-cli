@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation;
+import com.dtsx.astra.cli.operations.config.ConfigListOperation.ProfileInfo;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import picocli.CommandLine.Command;
@@ -12,7 +13,8 @@ import picocli.CommandLine.Command;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     description = "Lists your Astra CLI profiles (configurations), highlighting the one currently in use. Multiple profiles may be highlighted if they share the same credentials."
@@ -20,14 +22,30 @@ import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
 public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult> {
     @Override
     public final OutputHuman executeHuman(Supplier<ListConfigResult> result) {
-        val cells = result.get().profiles().stream()
+        val res = result.get();
+
+        val profilesWithoutDefault = res.profiles().stream()
+            .filter(p -> !p.name().equals("default"))
+            .toList();
+
+        var cells = profilesWithoutDefault.stream()
             .map((p) -> sequencedMapOf(
                 "configuration", mkConfigDisplayName(p.name(), p.isInUse()),
                 "env", p.env().name()
             ))
             .toList();
 
-        val allProdEnv = result.get().profiles().stream()
+        val defaultInUse = profilesWithoutDefault.stream()
+            .anyMatch(ProfileInfo::isInUse);
+
+        if (!defaultInUse && res.defaultProfile().isPresent()) {
+            cells = listAdd(cells, sequencedMapOf(
+                "configuration", "default",
+                "env", res.defaultProfile().get().env().name()
+            ));
+        }
+
+        val allProdEnv = res.profiles().stream()
             .allMatch(p -> p.env() == AstraEnvironment.PROD);
 
         val table = new ShellTable(cells);

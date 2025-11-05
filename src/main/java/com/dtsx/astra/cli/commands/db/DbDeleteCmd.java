@@ -27,7 +27,7 @@ import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIM
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
-import static com.dtsx.astra.cli.utils.Collectionutils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "delete",
@@ -83,6 +83,8 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             case DatabaseDeleted() -> handleDbDeleted($dbRef);
             case DatabaseDeletedAndTerminated(var waitTime) -> handleDbDeletedAndTerminated($dbRef, waitTime);
             case DatabaseIllegallyNotFound() -> throwDbNotFound($dbRef);
+            case DatabaseAlreadyDeleting() -> handleDbAlreadyDeleting($dbRef);
+            case DatabaseAlreadyDeletingAndTerminated(var waitTime) -> handleDbAlreadyDeletingAndTerminated($dbRef, waitTime);
         };
     }
 
@@ -111,7 +113,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     }
 
     private OutputAll handleDbDeletedAndTerminated(DbRef dbRef, Duration waitTime) {
-        val message = "Database %s has been deleted and fully terminated (waited %ds for termination).".formatted(
+        val message = "Database %s has been deleted and fully terminated after %d seconds.".formatted(
             ctx.highlight(dbRef),
             waitTime.toSeconds()
         );
@@ -132,6 +134,29 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             new Hint("Example fix:", originalArgs(), "--if-exists"),
             new Hint("See your existing databases:", "${cli.name} db list")
         ));
+    }
+
+    private OutputAll handleDbAlreadyDeleting(DbRef dbRef) {
+        val message = "Database %s is already being deleted (it may not be fully terminated yet).".formatted(
+            ctx.highlight(dbRef)
+        );
+
+        val data = mkData(true, null);
+
+        return OutputAll.response(message, data, List.of(
+            new Hint("Poll its status with:", "${cli.name} db status " + dbRef)
+        ));
+    }
+
+    private OutputAll handleDbAlreadyDeletingAndTerminated(DbRef dbRef, Duration waitTime) {
+        val message = "Database %s had already been deleting, and is now fully terminated after %d seconds.".formatted(
+            ctx.highlight(dbRef),
+            waitTime.toSeconds()
+        );
+
+        val data = mkData(true, waitTime);
+
+        return OutputAll.response(message, data);
     }
 
     @Override
@@ -171,6 +196,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
         }
     }
 
+    // TODO add currentStatus
     private LinkedHashMap<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
         return sequencedMapOf(
             "wasDeleted", wasDeleted,

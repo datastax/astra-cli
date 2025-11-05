@@ -50,4 +50,9 @@ public class MiscUtils {
         t.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
+
+    public static <T> T also(T obj, Consumer<T> consumer) {
+        consumer.accept(obj);
+        return obj;
+    }
 }

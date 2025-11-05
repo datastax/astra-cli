@@ -21,7 +21,7 @@ public record IniSection(String name, List<IniKVPair> pairs) implements TopLevel
             sj.add(pair.render(colors));
         }
 
-        return sj.toString();
+        return sj + NL;
     }
 
     public Optional<String> lookupKey(String key) {
