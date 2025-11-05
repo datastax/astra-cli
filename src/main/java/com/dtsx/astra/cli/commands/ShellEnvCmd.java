@@ -1,7 +1,9 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.val;
 import picocli.CommandLine.Command;
@@ -13,12 +15,27 @@ import picocli.CommandLine.Spec;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "shellenv",
-    hidden = true
+    description = {
+        "Completions, configuration, and more",
+        "",
+        "Eval-ing the output of this command will:",
+        " @|110 *|@ Add the binary to your PATH",
+        " @|110 *|@ Enable shell completions",
+        " @|110 *|@ Optionally set any other configuration environment variables.",
+        "",
+        "Intended to be added to your shell profile (@|code .zshrc|@, @|code .zprofile|@, @|code .bashrc|@, etc.)"
+    },
+    descriptionHeading = "%n"
+)
+@Example(
+    comment = "Put this in your shell profile to generate completions and set PATH on shell startup",
+    command = "eval \"$(${cli.path} shellenv)\""
 )
 public class ShellEnvCmd implements Runnable {
     @Spec
@@ -28,16 +45,22 @@ public class ShellEnvCmd implements Runnable {
     private HelpMixin helpMixin;
 
     @Option(
+        names = { "--home" },
+        description = { "Sets the @|code ASTRA_HOME|@ env var. See @|code astra config home path -h|@ for how this is resolved.", SHOW_CUSTOM_DEFAULT + "${cli.home-folder.path}" }
+    )
+    public Optional<Path> $home;
+
+    @Option(
         names = { "--ignore-multiple-paths" },
-        description = "Ignore warnings about multiple home folders or astrarc files being present"
+        description = "Ignore warnings about multiple home folders or astrarc files being present. Sets @|code " + ConstEnvVars.IGNORE_MULTIPLE_PATHS + "=true|@ under the hood."
     )
     public boolean $ignoreMultiplePaths;
 
     @Option(
-        names = { "--home" },
-        description = "Sets the ASTRA_HOME variable"
+        names = { "--no-update-notifier" },
+        description = "Disables background update checks notifications. Sets @|code " + ConstEnvVars.NO_UPDATE_NOTIFIER + "=true|@ under the hood."
     )
-    public Optional<Path> $home;
+    public boolean $noUpdateNotifier;
 
     @Override
     public void run() {
@@ -52,10 +75,14 @@ public class ShellEnvCmd implements Runnable {
         val sb = new StringBuilder();
 
         sb.append("export PATH=").append(binaryPath.get().getParent()).append(":$PATH").append(NL);
-        sb.append("givenSource <(").append(binaryPath.get()).append(" compgen)").append(NL);
+        sb.append("source <(").append(binaryPath.get()).append(" compgen)").append(NL);
 
         if ($ignoreMultiplePaths) {
-            sb.append("export ASTRA_IGNORE_MULTIPLE_PATHS=true").append(NL);
+            sb.append("export ").append(ConstEnvVars.IGNORE_MULTIPLE_PATHS).append("=true").append(NL);
+        }
+
+        if ($noUpdateNotifier) {
+            sb.append("export ").append(ConstEnvVars.NO_UPDATE_NOTIFIER).append("=true").append(NL);
         }
 
         $home.ifPresent((path) -> {

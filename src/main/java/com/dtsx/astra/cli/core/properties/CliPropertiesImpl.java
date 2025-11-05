@@ -199,7 +199,13 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public boolean disableBetaWarnings() {
-        return System.getenv(System.getProperty("cli.nowarn-beta.env-var", "ASTRA_IGNORE_BETA_WARNINGS")) != null;
+        return System.getenv(ConstEnvVars.IGNORE_BETA_WARNINGS) != null;
+    }
+
+    @Override
+    public boolean noUpgradeNotifications() {
+        // latter is for compatibility w/ https://github.com/sindresorhus/update-notifier?tab=readme-ov-file#user-settings
+        return System.getenv(ConstEnvVars.NO_UPDATE_NOTIFIER) != null || System.getenv("NO_UPDATE_NOTIFIER") != null;
     }
 
     @Override

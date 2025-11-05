@@ -7,7 +7,7 @@ import picocli.CommandLine.Command;
 
 @Command(
     name = "config",
-    description = "Manage your Astra CLI configuration profiles.",
+    description = "Manage your Astra CLI configuration profiles",
     subcommands = {
         ConfigListCmd.class,
         ConfigCreateCmd.class,
@@ -19,12 +19,20 @@ import picocli.CommandLine.Command;
     }
 )
 @Example(
-    command = "${cli.name} config",
-    comment = "List your Astra CLI profiles."
+    comment = "List your configuration profiles",
+    command = "${cli.name} config"
 )
 @Example(
-    command = "${cli.name} config create --token @token.txt --name prod",
-    comment = "Create a new Astra CLI profile."
+    comment = "Interactively create a new configuration profile",
+    command = "${cli.name} config setup"
+)
+@Example(
+    comment = "Programmatically create a new configuration profile",
+    command = "${cli.name} config create my_profile --token @token.txt"
+)
+@Example(
+    comment = "Set an existing configuration profile as default",
+    command = "${cli.name} config use my_profile"
 )
 @AliasForSubcommand(ConfigListCmd.class)
 public final class ConfigCmd extends ConfigListImpl {}

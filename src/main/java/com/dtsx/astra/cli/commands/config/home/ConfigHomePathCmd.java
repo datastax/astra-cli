@@ -29,13 +29,13 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "${cli.name} config home path"
 )
 @Example(
-    comment = "Get only the path to the astra home folder",
+    comment = "Print only the path to the home folder, without additional information",
     command = "${cli.name} config home path -p"
 )
 public class ConfigHomePathCmd extends AbstractCmd<ConfigPathResult> {
     @Option(
-        names = { "-p", "--path-only" },
-        description = "Display only the expected path to the home folder, without any additional synopsis."
+        names = { "-p", "--plain" },
+        description = "Print only the path to the home folder, without additional information"
     )
     public boolean pathOnly;
 

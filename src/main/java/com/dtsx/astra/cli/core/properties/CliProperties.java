@@ -14,6 +14,12 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public interface CliProperties {
+    class ConstEnvVars {
+        public static final String IGNORE_MULTIPLE_PATHS = "ASTRA_IGNORE_MULTIPLE_PATHS";
+        public static final String IGNORE_BETA_WARNINGS = "ASTRA_IGNORE_BETA_WARNINGS";
+        public static final String NO_UPDATE_NOTIFIER = "ASTRA_NO_UPDATE_NOTIFIER";
+    }
+
     record ExternalSoftware(
         String url,
         Version version
@@ -68,12 +74,14 @@ public interface CliProperties {
 
     boolean disableBetaWarnings();
 
+    boolean noUpgradeNotifications();
+
     Optional<Path> binaryPath();
 
     Optional<SupportedPackageManager> owningPackageManager();
 
     default void detectDuplicateFileLocations(CliContext ctx) {
-        val ignoreMultiplePaths = Optional.ofNullable(System.getenv("ASTRA_IGNORE_MULTIPLE_PATHS")).orElse("false");
+        val ignoreMultiplePaths = Optional.ofNullable(System.getenv(ConstEnvVars.IGNORE_MULTIPLE_PATHS)).orElse("false");
 
         if (!ignoreMultiplePaths.equalsIgnoreCase("false")) {
             return;

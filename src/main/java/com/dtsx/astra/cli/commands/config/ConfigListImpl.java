@@ -1,15 +1,20 @@
 package com.dtsx.astra.cli.commands.config;
 
+import com.dtsx.astra.cli.core.CliConstants.$Env;
+import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation;
+import com.dtsx.astra.cli.operations.config.ConfigListOperation.CreateListRequest;
 import com.dtsx.astra.cli.operations.config.ConfigListOperation.ProfileInfo;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.config.ConfigListOperation.ListConfigResult;
@@ -17,9 +22,20 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
-    description = "Lists your Astra CLI profiles (configurations), highlighting the one currently in use. Multiple profiles may be highlighted if they share the same credentials."
+    description = {
+        "Lists your Astra CLI profiles (configurations), highlighting the one currently in use.",
+        "Multiple profiles may be highlighted if they share the same credentials.",
+    }
 )
 public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult> {
+    @Option(
+        names = { $Env.LONG, $Env.SHORT },
+        description = "Filter by Astra environment",
+        completionCandidates = AstraEnvCompletion.class,
+        paramLabel = $Env.LABEL
+    )
+    public Optional<AstraEnvironment> $env;
+
     @Override
     public final OutputHuman executeHuman(Supplier<ListConfigResult> result) {
         val res = result.get();
@@ -73,7 +89,7 @@ public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult>
 
     @Override
     protected Operation<ListConfigResult> mkOperation() {
-        return new ConfigListOperation(config(false));
+        return new ConfigListOperation(config(false), new CreateListRequest($env));
     }
 
     private String mkConfigDisplayName(String name, boolean isInUse) {

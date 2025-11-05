@@ -8,6 +8,7 @@ import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Help.Ansi;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,10 @@ public class ExamplesRenderer {
         for (val example : examples) {
             sb.append("  ").append(renderComment(colors, example.comment())).append(NL);
 
-            sb.append("  ").append(renderCommand(colors, example.command().replace("${cli.name}", ctxRef.get().properties().cliName()))).append(NL);
+            sb.append("  ").append(renderCommand(colors, example.command()
+                .replace("${cli.name}", ctxRef.get().properties().cliName())
+                .replace("${cli.path}", ctxRef.get().properties().binaryPath().map(Path::toString).orElse("/path/to/cli"))
+            )).append(NL);
 
             if (example != examples[examples.length - 1]) {
                 sb.append(NL);

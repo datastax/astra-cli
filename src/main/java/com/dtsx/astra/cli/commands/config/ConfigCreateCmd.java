@@ -31,19 +31,22 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @Command(
     name = "create",
-    description = "Create a new configuration profile, to store your Astra credentials. Use the `--token @<file>` syntax to securely read the token from a file, without leaking the token to your shell history."
+    description = {
+        "Create a new configuration profile to store your Astra credentials.",
+        "Use the `--token @<file>` syntax to securely read the token from a file, without leaking the token to your shell history, where the file contains only the token as plain text or a JSON string."
+    }
 )
 @Example(
     comment = "(Recommended) Interactively create a new profile",
     command = "${cli.name} setup"
 )
 @Example(
-    comment = "Programmatically create a new profile",
-    command = "${cli.name} config create my_profile -t AstraCS:..."
-)
-@Example(
     comment = "(Recommended) Securely create a new profile with the token provided from a file",
     command = "${cli.name} config create my_profile -t @token.txt"
+)
+@Example(
+    comment = "Programmatically create a new profile",
+    command = "${cli.name} config create my_profile -t AstraCS:..."
 )
 @Example(
     comment = "Create a new profile with the default name (organization name)",
@@ -56,14 +59,14 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Parameters(
         arity = "0..1",
-        description = { "Profile name", SHOW_CUSTOM_DEFAULT + "organization name" },
+        description = { "Unique name for the profile", SHOW_CUSTOM_DEFAULT + "organization name" },
         paramLabel = $Profile.LABEL
     )
     public Optional<ProfileName> $profileName;
 
     @Option(
         names = { $Token.LONG, $Token.SHORT },
-        description = "Astra authentication token",
+        description = "Astra token (AstraCS:...) or @<file> to read from file",
         paramLabel = $Token.LABEL,
         required = true
     )
@@ -71,7 +74,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = "Astra environment to connect to",
+        description = "Astra environment the token targets",
         completionCandidates = AstraEnvCompletion.class,
         defaultValue = $Env.DEFAULT,
         paramLabel = $Env.LABEL
@@ -80,14 +83,13 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { "-d", "--default" },
-        description = "Set the created profile as the default profile"
+        description = "Set the created profile as the default profile. Same as 'config use <profile>'"
     )
     public boolean $setDefault;
 
     @Option(
         names = { "--overwrite" },
-        description = "Overwrite existing profile(s) with the same name",
-        paramLabel = "PRINT",
+        description = { "Overwrite any existing profile with the same name", SHOW_CUSTOM_DEFAULT + "prompt" },
         negatable = true
     )
     private Optional<Boolean> $overwrite;

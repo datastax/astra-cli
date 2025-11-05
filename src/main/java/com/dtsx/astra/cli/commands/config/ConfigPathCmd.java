@@ -29,13 +29,13 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "${cli.name} config path"
 )
 @Example(
-    comment = "Get only the path to the .astrarc file",
+    comment = "Print only the path to the .astrarc file, without additional information",
     command = "${cli.name} config path -p"
 )
 public class ConfigPathCmd extends AbstractCmd<ConfigPathResult> {
     @Option(
-        names = { "-p", "--path-only" },
-        description = "Display only the expected path to the configuration file, without any additional synopsis."
+        names = { "-p", "--plain" },
+        description = "Print only the path to the .astrarc file, without additional information"
     )
     public boolean pathOnly;
 

@@ -18,7 +18,7 @@ import java.util.TreeSet;
 public class JsonUtils {
     private static @Nullable ObjectMapper OBJECT_MAPPER = null;
 
-    @SuppressWarnings({ "RedundantCast", "unchecked" })
+    @SuppressWarnings({ "RedundantCast", "unchecked", "deprecation" })
     public static ObjectMapper objectMapper() {
         if (OBJECT_MAPPER != null) {
             return OBJECT_MAPPER;
@@ -32,7 +32,6 @@ public class JsonUtils {
         objectMapper.registerModule(module);
         objectMapper.registerModule(new Jdk8Module());
 
-        //noinspection deprecation
         objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
 
         return OBJECT_MAPPER = objectMapper;

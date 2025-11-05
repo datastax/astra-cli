@@ -9,5 +9,5 @@ source "$SCRIPT_DIR/lib.sh"
 source "$SCRIPT_DIR/precheck.sh"
 
 source "$TASKS_DIR/01.setup.sh"
-#source "$TASKS_DIR/02.mk_dbs.sh"
+source "$TASKS_DIR/02.mk_dbs.sh"
 source "$TASKS_DIR/03.test_pcu.sh"

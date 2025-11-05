@@ -13,6 +13,10 @@ public class UpgradeNotifier {
     public static final int PADDING = 3;
 
     public static void run(CliContext ctx) {
+        if (ctx.properties().noUpgradeNotifications()) {
+            return;
+        }
+
         val path = ctx.home().useDir().resolve("upgrade-notifier.properties");
 
         // every 10 minutes for pre-releases, every 48 hours for actual releases

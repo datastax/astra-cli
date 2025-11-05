@@ -16,6 +16,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ConfigListOperation implements Operation<ListConfigResult> {
     private final AstraConfig config;
+    private final CreateListRequest request;
+
+    public record CreateListRequest(
+        Optional<AstraEnvironment> env
+    ) {}
 
     public record ListConfigResult(
         List<ProfileInfo> profiles,
@@ -37,6 +42,7 @@ public class ConfigListOperation implements Operation<ListConfigResult> {
             .orElse(null);
 
         val profiles = config.profilesValidated().stream()
+            .filter(p -> request.env().map(e -> p.env() == e).orElse(true))
             .map(p -> new ProfileInfo(
                 p.nameOrDefault().unwrap(),
                 p.token(),

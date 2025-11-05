@@ -38,24 +38,27 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 @Command(
     name = "get",
     aliases = { "describe" },
-    description = "Get the configuration of a profile or a specific key. Warning: this command may expose your sensitive Astra token."
-)
-@Example(
-    comment = "Get the configuration of the default profile",
-    command = "${cli.name} config get"
+    description = {
+        "Get the configuration of a profile or a specific key.",
+        "@|bold Warning:|@ This command may expose your sensitive Astra token.",
+    }
 )
 @Example(
     comment = "Get the configuration of a specific profile",
     command = "${cli.name} config get my_profile"
 )
 @Example(
-    comment = "Get the unwrap of a specific key",
-    command = "${cli.name} config get my_profile -k ASTRA_DB_APPLICATION_TOKEN"
+    comment = "Prompt for the profile to get the configuration of",
+    command = "${cli.name} config get"
+)
+@Example(
+    comment = "Get the value of a specific key in a profile",
+    command = "${cli.name} config get my_profile --key ASTRA_DB_APPLICATION_TOKEN"
 )
 public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     @Parameters(
         arity = "0..1",
-        description = "Name of the profile to display",
+        description = "Name of the profile to get",
         completionCandidates = AvailableProfilesCompletion.class,
         paramLabel = $Profile.LABEL
     )

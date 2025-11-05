@@ -18,10 +18,7 @@ import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ExitCodeException;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
-import com.dtsx.astra.cli.core.help.DefaultsRenderer;
-import com.dtsx.astra.cli.core.help.DescriptionNewlineRenderer;
-import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.help.ExamplesRenderer;
+import com.dtsx.astra.cli.core.help.*;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -73,8 +70,8 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         UserCmd.class,
         CompletionsCmd.class,
         UpgradeCmd.class,
-        NukeCmd.class,
         ShellEnvCmd.class,
+        NukeCmd.class,
         DocsCmd.class
     }
 )
@@ -190,6 +187,7 @@ public class AstraCli extends AbstractCmd<Void> {
         cmd.setHelpFactory((spec, cs) -> {
             ExamplesRenderer.installRenderer(spec.commandLine(), args, ctxRef);
             DescriptionNewlineRenderer.installRenderer(spec.commandLine());
+            FixedDescriptionRenderer.installRenderer(spec.commandLine());
             return DefaultsRenderer.helpWithOverriddenDefaultsRendering(spec, cs);
         });
 

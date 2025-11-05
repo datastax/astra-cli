@@ -81,7 +81,7 @@ function delete_step() {
   unset "live_components[$1]"
 }
 
-function sweep_step() {
+function sweeper_for() {
   sweep_steps["$1"]="$2"
 }
 

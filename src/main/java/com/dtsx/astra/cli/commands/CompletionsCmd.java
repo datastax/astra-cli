@@ -21,6 +21,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 @Command(
     name = "completions",
     aliases = { "compgen" },
+    descriptionHeading = "%n",
     hidden = true
 )
 public class CompletionsCmd implements Runnable {
