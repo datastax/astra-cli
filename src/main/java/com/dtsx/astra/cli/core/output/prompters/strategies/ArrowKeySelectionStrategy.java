@@ -298,10 +298,10 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
             if (exitCode == 0) {
                 rawModeEnabled = true;
             } else {
-                throw new CongratsYouFoundABugException("TODO1");
+                throw new CongratsYouFoundABugException("Something went wrong enabling raw mode (got exit code " + exitCode + ")");
             }
-        } catch (Exception ignored) {
-            throw new CongratsYouFoundABugException("TODO2");
+        } catch (Exception e) {
+            throw new CongratsYouFoundABugException("Something went wrong enabling raw mode: '" + e.getMessage() + "'");
         }
     }
 
@@ -316,8 +316,8 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
         
         try {
             new ProcessBuilder("/bin/sh", "-c", "stty cooked echo < /dev/tty").start().waitFor();
-        } catch (Exception ignored) {
-            throw new CongratsYouFoundABugException("");
+        } catch (Exception e) {
+            throw new CongratsYouFoundABugException("Something went wrong disabling raw mode: '" + e.getMessage() + "'");
         }
     }
 }

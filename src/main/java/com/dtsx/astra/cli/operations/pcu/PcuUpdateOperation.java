@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
@@ -8,7 +9,6 @@ import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuUpdateResult;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -24,7 +24,7 @@ public class PcuUpdateOperation implements Operation<PcuUpdateResult> {
         PcuRef pcuRef,
         Optional<String> title,
         Optional<String> description,
-        Optional<CloudProviderType> cloud,
+        Optional<CloudProvider> cloud,
         Optional<RegionName> region,
         Optional<Integer> min,
         Optional<Integer> max,
@@ -41,7 +41,7 @@ public class PcuUpdateOperation implements Operation<PcuUpdateResult> {
         val builder = PcuGroupUpdateRequest.builder()
             .title(request.title.orElse(null))
             .description(request.description.orElse(null))
-            .cloudProvider(request.cloud.orElse(null))
+            .cloudProvider(request.cloud.map(CloudProvider::toSdkType).orElse(null))
             .region(request.region.map(RegionName::unwrap).orElse(null))
             .min(request.min.orElse(null))
             .max(request.max.orElse(null))

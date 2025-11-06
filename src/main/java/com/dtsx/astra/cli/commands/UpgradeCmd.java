@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.datatypes.Unit;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
@@ -24,7 +25,29 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "upgrade",
-    description = "Upgrade your Astra CLI installation"
+    description = {
+        "Upgrade your Astra CLI installation",
+        "",
+        "Update notifications may occur periodically when a new version is available.",
+        "",
+        "To opt out of Update notifications, set @|code ASTRA_NO_UPDATE_NOTIFIER=true|@, or, even better, use the @|code --no-update-notifier|@ flag on the @|code ${cli.name} shellenv|@ invocation in your shell profile (if it's set up).",
+    }
+)
+@Example(
+    comment = "Upgrade to the latest stable version",
+    command = "${cli.name} upgrade"
+)
+@Example(
+    comment = "Upgrade to the latest version, including pre-releases",
+    command = "${cli.name} upgrade --pre"
+)
+@Example(
+    comment = "Upgrade (or downgrade!) to a specific version",
+    command = "${cli.name} upgrade --version 1.1.0"
+)
+@Example(
+    comment = "Opt out of upgrade notifications permanently in your shell profile",
+    command = "eval \"$(${cli.path} shellenv --no-update-notifier)\""
 )
 public class UpgradeCmd extends AbstractCmd<Unit> {
     @ArgGroup

@@ -4,9 +4,9 @@ import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvide
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
@@ -72,12 +72,12 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
         return delegate.findCloudForRegion(cloud, region, vectorOnly);
     }
 
     @Override
-    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
         val status = delegate.create(name, keyspace, region, cloud, tier, capacityUnits, vector, allowDuplicate);
         cache.addToCache(name);
         return status;

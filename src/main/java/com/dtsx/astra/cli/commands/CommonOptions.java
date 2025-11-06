@@ -20,9 +20,10 @@ public class CommonOptions {
         names = { "-h", "--help" },
         description = "Show this help message and exit.",
         showDefaultValue = Visibility.NEVER,
-        usageHelp = true
+        usageHelp = true,
+        hidden = true
     )
-    private boolean helpRequested;
+    private boolean helpRequested; // unfortunately mixins not allowed in arg groups :(
 
     @Getter
     private Optional<Ansi> ansi = Optional.empty();
@@ -32,6 +33,7 @@ public class CommonOptions {
     @Option(
         names = "--color",
         description = { "One of: ${COMPLETION-CANDIDATES}", SHOW_CUSTOM_DEFAULT + "auto" },
+        fallbackValue = "always",
         paramLabel = "WHEN"
     )
     private void setAnsi(ColorMode mode) {
@@ -74,7 +76,7 @@ public class CommonOptions {
     @Getter
     @Option(
         names = { "-q", "--quiet" },
-        description = "Suppress informational output",
+        description = "Only output essential information",
         showDefaultValue = Visibility.NEVER
     )
     private boolean quiet;
@@ -82,13 +84,12 @@ public class CommonOptions {
     @Getter
     @Option(
         names = { "--spinner" },
-        description = "Enable/disable the loading spinner",
+        description = { "Enable/disable loading spinners", SHOW_CUSTOM_DEFAULT + "enabled if tty" },
         negatable = true,
-        defaultValue = "${cli.output.spinner.default}",
         showDefaultValue = Visibility.NEVER,
         fallbackValue = "true"
     )
-    private boolean enableSpinner;
+    private Optional<Boolean> enableSpinner;
 
     @Getter
     private boolean shouldDumpLogs = false;
@@ -133,7 +134,7 @@ public class CommonOptions {
     @Getter
     @Option(
         names = "--no-input",
-        description = "Never ask for user input (e.g. confirmation prompts)",
+        description = "Don't ask for user input (e.g. confirmation prompts)",
         showDefaultValue = Visibility.NEVER
     )
     private boolean noInput;

@@ -2,7 +2,7 @@
 command: astra db -o csv
 exit_code: 0
 ---- output ----
-stdout: Name,Id,Regions,Cloud,V,Status
-stdout: hi,8d770448-20c1-47f0-bb76-96d0d1a66b7f,us-east1,gcp,■,'ACTIVE'
-stdout: two_regions_db,822b0fff-6a73-4322-a8ec-09832b075287,"ap-south-1,us-east-2",aws,■,'ACTIVE'
+stdout: code,message,name,id,regions,cloud,vector,status
+stdout: OK,,hi,8d770448-20c1-47f0-bb76-96d0d1a66b7f,us-east1,gcp,■,'ACTIVE'
+stdout: OK,,two_regions_db,822b0fff-6a73-4322-a8ec-09832b075287,"ap-south-1,us-east-2",aws,■,'ACTIVE'
 ---- end ----

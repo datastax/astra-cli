@@ -34,7 +34,7 @@ stdout:   -V, --verbose            Enable verbose logging output
 stdout: 
 stdout: Commands:
 stdout:   setup      Interactively set up the Astra CLI and create profiles
-stdout:   config     Manage your Astra CLI configuration profiles.
+stdout:   config     Manage your Astra CLI configuration profiles
 stdout:   db         Manage your Astra databases
 stdout:   pcu        Manage your PCU groups and associations
 stdout:   org        Show organization information
@@ -43,6 +43,7 @@ stdout:   streaming  Manage Astra streaming tenants
 stdout:   token      Manage your Astra tokens
 stdout:   user       Manage users in your organization
 stdout:   upgrade    Upgrade your Astra CLI installation
+stdout:   shellenv   Completions, configuration, and more
 stdout:   nuke       Entirely delete Astra CLI from your system
 stdout: 
 stdout: Examples:

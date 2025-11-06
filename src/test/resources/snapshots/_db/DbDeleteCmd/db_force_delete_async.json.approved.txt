@@ -7,6 +7,7 @@ stdout:   "code" : "OK",
 stdout:   "message" : "Database 'two_regions_db' is being deleted (it may not be fully terminated yet).",
 stdout:   "data" : {
 stdout:     "wasDeleted" : true,
+stdout:     "currentStatus" : "TERMINATING",
 stdout:     "waitedSeconds" : null
 stdout:   },
 stdout:   "nextSteps" : [ {

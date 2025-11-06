@@ -2,6 +2,6 @@
 command: astra streaming create tenant1 --region us-east-2 --cloud AWS -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,data.tenantName,data.wasCreated,data.currentStatus
+stdout: code,message,tenantName,wasCreated,currentStatus
 stdout: OK,Tenant 'tenant1' has been created.,tenant1,true,active
 ---- end ----

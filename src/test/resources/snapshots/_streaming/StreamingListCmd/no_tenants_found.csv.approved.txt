@@ -2,5 +2,5 @@
 command: astra streaming list -o csv
 exit_code: 0
 ---- output ----
-stdout: name,cloud,region,status
+stdout: code,message,name,cloud,region,status
 ---- end ----

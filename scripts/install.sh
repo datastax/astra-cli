@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-# TODO detect if you are migrating from v0.x
-
 set -eu
 IFS=$(printf '\n\t')
 
@@ -188,9 +186,9 @@ while [ "$AUTO_YES_INSTALL" = 0 ]; do
       echo ""
       echo "${RED}To use a custom installation path, please globally set the ASTRA_HOME environment variable.${RESET}"
       echo ""
-      echo "This variable $(tput bold)must remain in place forever${RESET} (e.g. in your shell profile like $(underline "~/.bashrc"), $(underline "~/.zshrc"), etc.) so that the CLI can always locate its home directory."
+      echo "This variable $(tput bold)must remain in place forever${RESET} (e.g. in your shell profile like $(underline "~/.zprofile"), $(underline "~/.bash_profile"), etc.) so that the CLI can always locate its home directory."
       echo ""
-      echo "After setting it, restart your terminal or run 'source ~/.bashrc' (or the appropriate file) to apply the change."
+      echo "After setting it, restart your terminal or run 'source ~/.zprofile' (or the appropriate file) to apply the change."
       exit 1
       ;;
     [Cc]* )

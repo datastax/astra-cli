@@ -156,7 +156,6 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
             dbRef,
-            db.getInfo().getName(),
             Collections.singleton(DbUtils.resolveDatacenter(db, regionName))
         );
 

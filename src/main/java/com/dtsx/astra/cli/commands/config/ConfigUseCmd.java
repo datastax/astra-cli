@@ -29,7 +29,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 @Command(
     name = "use",
-    description = "Sets an existing profile to be used as the default for all commands. Use the `--default` option when creating a new profile to set it as the default automatically."
+    description = "Sets an existing profile to be used as the default for all commands. Use the @|code --default|@ option when creating a new profile to set it as the default automatically."
 )
 @Example(
     comment = "Set an existing profile as the default",

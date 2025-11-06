@@ -10,10 +10,10 @@ import java.util.function.Supplier;
 
 @Command(
     name = "name",
-    description = "Show organization name"
+    description = "Get your organization's name"
 )
 @Example(
-    comment = "Get your organization name",
+    comment = "Get your organization's name",
     command = "${cli.name} org name"
 )
 public class OrgNameCmd extends AbstractOrgCmd<String> {

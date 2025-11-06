@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.snapshot.commands.streaming;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
@@ -10,7 +11,6 @@ import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.snapshot.annotations.TestForDifferentOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures.Regions;
 import com.dtsx.astra.cli.testlib.Fixtures.Tenants;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import org.graalvm.collections.Pair;
 
@@ -24,14 +24,14 @@ public class StreamingCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     private SnapshotTestOptionsModifier fromCloud(Function<Tenant, CreationStatus<Tenant>> lift) {
         return (o) -> o
             .gateway(StreamingGateway.class, (mock) -> {
-                when(mock.findCloudForRegion(any(), any())).thenReturn(CloudProviderType.AWS);
+                when(mock.findCloudForRegion(any(), any())).thenReturn(CloudProvider.AWS);
 
                 doReturn(lift.apply(Tenants.One)).when(mock).create(any(), any(), any(), any());
             })
             .verify((mocks) -> {
-                verify(mocks.streamingGateway()).findCloudForRegion(Optional.of(CloudProviderType.AWS), Regions.NAME);
+                verify(mocks.streamingGateway()).findCloudForRegion(Optional.of(CloudProvider.AWS), Regions.NAME);
 
-                verify(mocks.streamingGateway()).create(Tenants.Name, Either.pure(Pair.create(CloudProviderType.AWS, Regions.NAME)), "serverless", null);
+                verify(mocks.streamingGateway()).create(Tenants.Name, Either.pure(Pair.create(CloudProvider.AWS, Regions.NAME)), "serverless", null);
             });
     }
 

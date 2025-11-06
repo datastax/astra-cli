@@ -2,8 +2,8 @@
 command: astra db list-keyspaces 822b0fff-6a73-4322-a8ec-09832b075287 -o csv
 exit_code: 0
 ---- output ----
-stdout: name,isDefault
-stdout: car,false
-stdout: truck,false
-stdout: default,true
+stdout: code,message,name,isDefault
+stdout: OK,,car,false
+stdout: OK,,truck,false
+stdout: OK,,default,true
 ---- end ----

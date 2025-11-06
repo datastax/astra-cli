@@ -25,17 +25,29 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         "Completions, configuration, and more",
         "",
         "Eval-ing the output of this command will:",
-        " @|110 *|@ Add the binary to your PATH",
-        " @|110 *|@ Enable shell completions",
-        " @|110 *|@ Optionally set any other configuration environment variables.",
+        " @|blue:300 *|@ Add the binary to your PATH",
+        " @|blue:300 *|@ Enable shell completions",
+        " @|blue:300 *|@ Optionally set any other configuration environment variables.",
         "",
-        "Intended to be added to your shell profile (@|code .zshrc|@, @|code .zprofile|@, @|code .bashrc|@, etc.)"
+        "Intended to be added to your shell profile (@|code .zshrc|@, @|code .zprofile|@, @|code .bashrc|@, etc.)",
     },
     descriptionHeading = "%n"
 )
 @Example(
-    comment = "Put this in your shell profile to generate completions and set PATH on shell startup",
+    comment = "Put this in your shell profile (e.g. @|code ~/.zprofile|@) to generate completions and set your PATH",
     command = "eval \"$(${cli.path} shellenv)\""
+)
+@Example(
+    comment = "Set a custom @|code ASTRA_HOME|@ path",
+    command = "eval \"$(${cli.path} shellenv --home /path/to/astra/home)\""
+)
+@Example(
+    comment = "Disable update notifications",
+    command = "eval \"$(${cli.path} shellenv --no-update-notifier)\""
+)
+@Example(
+    comment = "Ignore warnings about multiple home folders or astrarc files",
+    command = "eval \"$(${cli.path} shellenv --ignore-multiple-paths)\""
 )
 public class ShellEnvCmd implements Runnable {
     @Spec

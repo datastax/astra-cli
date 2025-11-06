@@ -33,7 +33,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
     name = "create",
     description = {
         "Create a new configuration profile to store your Astra credentials.",
-        "Use the `--token @<file>` syntax to securely read the token from a file, without leaking the token to your shell history, where the file contains only the token as plain text or a JSON string."
+        "Use the @|code --token @<file>|@ syntax to securely read the token from a file, without leaking the token to your shell history, where the file contains only the token as plain text or a JSON string."
     }
 )
 @Example(
@@ -66,7 +66,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { $Token.LONG, $Token.SHORT },
-        description = "Astra token (AstraCS:...) or @<file> to read from file",
+        description = "Astra token (@|code AstraCS:...|@) or @|code @<file>|@ to read from file",
         paramLabel = $Token.LABEL,
         required = true
     )

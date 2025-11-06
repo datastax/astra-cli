@@ -151,7 +151,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         try {
             return EnvFile.readFile(envFile);
         } catch (FileNotFoundException e) {
-            return new EnvFile(new ArrayList<>()); // TODO should we be catching here instead of erroring?
+            return new EnvFile(new ArrayList<>());
         } catch (EnvParseException e) {
             throw new EnvParseExceptionWrapper(e, envFile);
         }
@@ -262,7 +262,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         val dbName = db(request).getInfo().getName();
         val datacenter = resolveDatacenter(request);
 
-        return downloadsGateway.downloadCloudSecureBundles(request.dbRef, dbName, List.of(datacenter))
+        return downloadsGateway.downloadCloudSecureBundles(request.dbRef, List.of(datacenter))
             .map(List::getFirst);
     }
 

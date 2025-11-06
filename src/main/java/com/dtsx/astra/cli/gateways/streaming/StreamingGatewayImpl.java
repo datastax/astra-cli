@@ -6,10 +6,10 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.streaming.role.TenantNotFoundException;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
 import com.dtsx.astra.sdk.streaming.domain.StreamingRegion;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
@@ -65,12 +65,12 @@ public class StreamingGatewayImpl implements StreamingGateway {
     }
 
     @Override
-    public SortedMap<CloudProviderType, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions() {
+    public SortedMap<CloudProvider, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions() {
         return ctx.log().loading("Fetching streaming regions", (_) -> (
             apiProvider.astraOpsClient().streaming().regions()
                 .findAllServerless()
                 .collect(Collectors.toMap(
-                    r -> CloudProviderType.valueOf(r.getCloudProvider().toUpperCase()),
+                    r -> CloudProvider.fromString(r.getCloudProvider()),
                     r -> new TreeMap<>() {{
                         put(r.getName(), new StreamingRegionInfo(r.getDisplayName(), r.getClassification().equalsIgnoreCase("premium"), r));
                     }},
@@ -84,18 +84,17 @@ public class StreamingGatewayImpl implements StreamingGateway {
     }
 
     @Override
-    public SortedSet<CloudProviderType> findAvailableClouds() {
+    public SortedSet<CloudProvider> findAvailableClouds() {
         return ctx.log().loading("Finding cloud providers for all available streaming regions", (_) -> (
             apiProvider.astraOpsClient().streaming().regions().findAllServerless()
                 .map(StreamingRegion::getCloudProvider)
-                .map(String::toUpperCase)
-                .map(CloudProviderType::valueOf)
+                .map(CloudProvider::fromString)
                 .collect(Collectors.toCollection(TreeSet::new))
         ));
     }
 
     @Override
-    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region) {
         val cloudRegions = findAllRegions();
 
         if (cloud.isPresent()) {
@@ -124,13 +123,13 @@ public class StreamingGatewayImpl implements StreamingGateway {
                 matchingClouds.getFirst();
             default ->
                 throw new OptionValidationException("region", "Region '%s' is available for multiple cloud providers: %s".formatted(
-                    region, matchingClouds.stream().map(CloudProviderType::name).toList()
+                    region, matchingClouds.stream().map(CloudProvider::name).toList()
                 ));
         };
     }
 
     @Override
-    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProviderType, RegionName>> clusterOrCloud, String plan, String userEmail) {
+    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail) {
         val exists = exists(tenantName);
         
         if (exists) {

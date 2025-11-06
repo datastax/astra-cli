@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
@@ -33,7 +34,15 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 // TODO mention how to setup autocomplete
 @Command(
     name = "setup",
-    description = "Interactively set up the Astra CLI and create profiles"
+    description = {
+        "Interactively set up the Astra CLI and create profiles",
+        "",
+        "See @|code @{cli.name} config create|@ for a programmatic way to create profiles without interaction."
+    }
+)
+@Example(
+    comment = "Start the interactive setup process",
+    command = "${cli.name} setup"
 )
 public class SetupCmd extends AbstractCmd<SetupResult> {
     @Option(

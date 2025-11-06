@@ -2,15 +2,15 @@
 command: astra db get two_regions_db -o csv
 exit_code: 0
 ---- output ----
-stdout: Attribute,Value
-stdout: Name,two_regions_db
-stdout: ID,822b0fff-6a73-4322-a8ec-09832b075287
-stdout: Cloud Provider,AWS
-stdout: Region,us-east-2
-stdout: Status,ACTIVE
-stdout: Vector,Enabled
-stdout: Default Keyspace,default_keyspace
-stdout: Creation Time,2025-08-21T20:26:03Z
-stdout: Keyspaces,default_keyspace
-stdout: Regions,"ap-south-1,us-east-2"
+stdout: code,message,attribute,value
+stdout: OK,,Name,two_regions_db
+stdout: OK,,ID,822b0fff-6a73-4322-a8ec-09832b075287
+stdout: OK,,Cloud Provider,AWS
+stdout: OK,,Region,us-east-2
+stdout: OK,,Status,ACTIVE
+stdout: OK,,Vector,Enabled
+stdout: OK,,Default Keyspace,default_keyspace
+stdout: OK,,Creation Time,2025-08-21T20:26:03Z
+stdout: OK,,Keyspaces,default_keyspace
+stdout: OK,,Regions,"ap-south-1,us-east-2"
 ---- end ----

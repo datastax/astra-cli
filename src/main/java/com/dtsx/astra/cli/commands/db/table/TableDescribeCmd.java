@@ -63,7 +63,7 @@ public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResu
             attrs.put(columnName, columnInfo.cqlDefinition());
         });
 
-        attrs.put("", ""); // todo add empty line for better readability
+        attrs.put(" ", "");
         attrs.put(ctx.highlight("PRIMARY KEY"), "");
         
         if (!info.primaryKey().partitionBy().isEmpty()) {

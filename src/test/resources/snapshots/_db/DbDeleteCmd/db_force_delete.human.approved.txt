@@ -2,5 +2,5 @@
 command: astra db delete two_regions_db --yes
 exit_code: 0
 ---- output ----
-stdout: Database 'two_regions_db' has been deleted and fully terminated (waited 6s for termination).
+stdout: Database 'two_regions_db' has been deleted and fully terminated after 6 seconds.
 ---- end ----

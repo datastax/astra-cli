@@ -10,7 +10,6 @@ import lombok.val;
 @Jacksonized
 @SuperBuilder
 public class PcuGroupUpdateRequest extends PcuGroupCreateUpdateRequest {
-    // TODO once the bug that causes fields to potentially be lost during partial updates is fixed, we can remove the base parameter here
     public PcuGroupCreateUpdateRequest withDefaultsAndValidations(PcuGroup base) {
         val internalRep = new InternalRep(
             builder()

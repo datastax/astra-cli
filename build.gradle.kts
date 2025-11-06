@@ -29,7 +29,7 @@ dependencies {
     implementation("org.slf4j:slf4j-nop:2.0.17")
 
     // for underlying api calls
-    implementation("com.datastax.astra:astra-db-java:2.0.0")
+    implementation("com.datastax.astra:astra-db-java:2.1.0")
 //    implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
     implementation(files("astra-sdk-devops.jar")) // temporary until it's on maven central
 

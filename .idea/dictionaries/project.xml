@@ -3,6 +3,7 @@
     <words>
       <w>arbs</w>
       <w>astrarc</w>
+      <w>colls</w>
       <w>docgen</w>
       <w>dsbulk</w>
       <w>dsulk</w>
@@ -25,6 +26,7 @@
       <w>shellenv</w>
       <w>tildify</w>
       <w>xsel</w>
+      <w>zprofile</w>
     </words>
   </dictionary>
 </component>

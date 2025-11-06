@@ -38,7 +38,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_force_delete(OutputType outputType) {
         verifyRun("db delete ${DatabaseName} --yes", outputType, o -> o.use(deleteDbOpts)
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).tryFindOne(any());
+                verify(mocks.dbGateway()).tryFindOne(Databases.NameRef);
 
                 verify(mocks.dbGateway()).delete(Databases.NameRef);
 
@@ -50,7 +50,7 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_force_delete_async(OutputType outputType) {
         verifyRun("db delete ${DatabaseName} --yes --async", outputType, o -> o.use(deleteDbOpts)
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).tryFindOne(any());
+                verify(mocks.dbGateway()).tryFindOne(Databases.NameRef);
 
                 verify(mocks.dbGateway()).delete(Databases.NameRef);
 
@@ -96,9 +96,9 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void error_db_not_found_with_confirmation(OutputType outputType) {
         verifyRun("db delete *nonexistent* --yes", outputType, o -> o.use(dbNotFound)
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).tryFindOne(any());
+                verify(mocks.dbGateway()).tryFindOne(DbRef.fromNameUnsafe("*nonexistent*"));
 
-                verify(mocks.dbGateway()).delete(DbRef.fromNameUnsafe("*nonexistent*"));
+                verify(mocks.dbGateway(), never()).delete(any());
             }));
     }
 
@@ -116,9 +116,9 @@ public class DbDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void allow_db_not_found(OutputType outputType) {
         verifyRun("db delete *nonexistent* --yes --if-exists", outputType, o -> o.use(dbNotFound)
             .verify((mocks) -> {
-                verify(mocks.dbGateway(), never()).tryFindOne(any());
+                verify(mocks.dbGateway()).tryFindOne(DbRef.fromNameUnsafe("*nonexistent*"));
 
-                verify(mocks.dbGateway()).delete(DbRef.fromNameUnsafe("*nonexistent*"));
+                verify(mocks.dbGateway(), never()).delete(any());
             }));
     }
 }

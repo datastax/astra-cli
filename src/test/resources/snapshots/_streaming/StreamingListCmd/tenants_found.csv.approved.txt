@@ -2,7 +2,7 @@
 command: astra streaming -o csv
 exit_code: 0
 ---- output ----
-stdout: name,cloud,region,status
-stdout: tenant1,AWS,useast2,'active'
-stdout: tenant2,AWS,uswest3,'active'
+stdout: code,message,name,cloud,region,status
+stdout: OK,,tenant1,AWS,useast2,'active'
+stdout: OK,,tenant2,AWS,uswest3,'active'
 ---- end ----

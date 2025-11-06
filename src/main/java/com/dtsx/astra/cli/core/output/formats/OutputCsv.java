@@ -11,8 +11,7 @@ import java.util.Optional;
 import java.util.SequencedMap;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.OK;
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
-import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @FunctionalInterface
 public interface OutputCsv {
@@ -51,7 +50,7 @@ public interface OutputCsv {
 
         for (val e : data.entrySet()) {
             map.put(
-                OutputSerializer.serializeAsCsv("data." + e.getKey()),
+                OutputSerializer.serializeAsCsv(titleToSnakeCase(e.getKey())),
                 OutputSerializer.serializeAsCsv(e.getValue())
             );
         }

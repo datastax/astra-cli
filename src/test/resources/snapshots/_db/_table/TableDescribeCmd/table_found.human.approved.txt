@@ -30,6 +30,7 @@ stdout: │ ascii              │ ASCII           │
 stdout: │ bigint             │ BIGINT          │
 stdout: │ map                │ MAP<TEXT, UUID> │
 stdout: │ timestamp          │ TIMESTAMP       │
+stdout: │                    │                 │
 stdout: │ 'PRIMARY KEY'      │                 │
 stdout: │ Partition Key      │ text            │
 stdout: │ Clustering Columns │ int(ASC)        │

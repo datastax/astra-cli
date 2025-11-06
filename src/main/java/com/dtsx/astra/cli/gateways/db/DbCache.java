@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import java.util.Optional;
 import java.util.UUID;
 
+// TODO cache default keyspace
 public interface DbCache {
     void cacheDbId(String dbName, UUID id);
     void cacheDbRegion(UUID id, RegionName region);

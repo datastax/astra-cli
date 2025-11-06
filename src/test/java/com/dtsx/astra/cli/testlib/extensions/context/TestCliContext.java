@@ -68,7 +68,7 @@ public class TestCliContext implements AutoCloseable {
             cliProperties,
             options.outputType(),
             new AstraColors(Ansi.OFF),
-            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), true),
+            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), Optional.of(false)),
             mkConsole(inputStream, rawOutput, getCtx),
             new AstraHome(getCtx),
             options.fs(),

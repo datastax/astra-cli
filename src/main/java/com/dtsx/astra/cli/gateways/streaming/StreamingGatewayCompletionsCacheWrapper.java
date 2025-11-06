@@ -4,9 +4,9 @@ import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -55,22 +55,22 @@ public class StreamingGatewayCompletionsCacheWrapper implements StreamingGateway
     }
 
     @Override
-    public SortedMap<CloudProviderType, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions() {
+    public SortedMap<CloudProvider, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions() {
         return delegate.findAllRegions();
     }
 
     @Override
-    public SortedSet<CloudProviderType> findAvailableClouds() {
+    public SortedSet<CloudProvider> findAvailableClouds() {
         return delegate.findAvailableClouds();
     }
 
     @Override
-    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region) {
         return delegate.findCloudForRegion(cloud, region);
     }
 
     @Override
-    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProviderType, RegionName>> clusterOrCloud, String plan, String userEmail) {
+    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail) {
         val status = delegate.create(tenantName, clusterOrCloud, plan, userEmail);
         cache.addToCache(tenantName.unwrap());
         return status;

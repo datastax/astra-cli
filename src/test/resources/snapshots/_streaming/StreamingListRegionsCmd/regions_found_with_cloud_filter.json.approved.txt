@@ -5,15 +5,9 @@ exit_code: 0
 stdout: {
 stdout:   "code" : "OK",
 stdout:   "data" : [ {
-stdout:     "cloudProvider" : "gcp",
-stdout:     "region" : "us-central1",
-stdout:     "displayName" : "Iowa",
-stdout:     "isPremium" : false
+stdout:     "raw" : "info:us-central1"
 stdout:   }, {
-stdout:     "cloudProvider" : "gcp",
-stdout:     "region" : "us-east1",
-stdout:     "displayName" : "South Carolina",
-stdout:     "isPremium" : true
+stdout:     "raw" : "info:us-east1"
 stdout:   } ]
 stdout: }
 ---- end ----

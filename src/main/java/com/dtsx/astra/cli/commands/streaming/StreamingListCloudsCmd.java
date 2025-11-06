@@ -1,12 +1,12 @@
 package com.dtsx.astra.cli.commands.streaming;
 
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingListCloudsOperation;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import picocli.CommandLine.Command;
 
@@ -23,9 +23,9 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "List all available cloud providers for streaming tenants",
     command = "${cli.name} streaming list-clouds"
 )
-public class StreamingListCloudsCmd extends AbstractStreamingCmd<SortedSet<CloudProviderType>> {
+public class StreamingListCloudsCmd extends AbstractStreamingCmd<SortedSet<CloudProvider>> {
     @Override
-    protected final OutputJson executeJson(Supplier<SortedSet<CloudProviderType>> clouds) {
+    protected final OutputJson executeJson(Supplier<SortedSet<CloudProvider>> clouds) {
         val data = clouds.get()
             .stream()
             .map((cloud) -> sequencedMapOf("cloudProvider", cloud.name()))
@@ -35,7 +35,7 @@ public class StreamingListCloudsCmd extends AbstractStreamingCmd<SortedSet<Cloud
     }
 
     @Override
-    protected final OutputAll execute(Supplier<SortedSet<CloudProviderType>> clouds) {
+    protected final OutputAll execute(Supplier<SortedSet<CloudProvider>> clouds) {
         val data = clouds.get()
             .stream()
             .map((cloud) -> sequencedMapOf("Cloud Provider", cloud.name().toLowerCase()))
@@ -45,7 +45,7 @@ public class StreamingListCloudsCmd extends AbstractStreamingCmd<SortedSet<Cloud
     }
 
     @Override
-    protected Operation<SortedSet<CloudProviderType>> mkOperation() {
+    protected Operation<SortedSet<CloudProvider>> mkOperation() {
         return new StreamingListCloudsOperation(streamingGateway);
     }
 }

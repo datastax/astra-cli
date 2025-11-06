@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
@@ -28,6 +29,8 @@ import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
 import static com.dtsx.astra.cli.operations.db.DbDeleteOperation.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.TERMINATED;
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.TERMINATING;
 
 @Command(
     name = "delete",
@@ -93,7 +96,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             ctx.highlight(dbRef)
         );
 
-        val data = mkData(false, null);
+        val data = mkData(false, null, null);
 
         return OutputAll.response(message, data, List.of(
             new Hint("See your existing databases:", "${cli.name} db list")
@@ -105,7 +108,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             ctx.highlight(dbRef)
         );
 
-        val data = mkData(true, null);
+        val data = mkData(true, TERMINATING, null);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Poll its status with:", "${cli.name} db status " + dbRef)
@@ -118,7 +121,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             waitTime.toSeconds()
         );
 
-        val data = mkData(true, waitTime);
+        val data = mkData(true, TERMINATED, waitTime);
 
         return OutputAll.response(message, data);
     }
@@ -141,7 +144,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             ctx.highlight(dbRef)
         );
 
-        val data = mkData(true, null);
+        val data = mkData(true, TERMINATING, null);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Poll its status with:", "${cli.name} db status " + dbRef)
@@ -154,7 +157,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
             waitTime.toSeconds()
         );
 
-        val data = mkData(true, waitTime);
+        val data = mkData(true, TERMINATED, waitTime);
 
         return OutputAll.response(message, data);
     }
@@ -196,10 +199,10 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
         }
     }
 
-    // TODO add currentStatus
-    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted, @Nullable Duration waitedDuration) {
+    private LinkedHashMap<String, Object> mkData(Boolean wasDeleted, @Nullable DatabaseStatusType status, @Nullable Duration waitedDuration) {
         return sequencedMapOf(
             "wasDeleted", wasDeleted,
+            "currentStatus", status,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );
     }

@@ -2,9 +2,9 @@
 command: astra user get alice@example.bob -o csv
 exit_code: 0
 ---- output ----
-stdout: Attribute,Value
-stdout: User Id,ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o
-stdout: User Email,alice@example.bob
-stdout: Status,active
-stdout: Roles,R/W Svc Acct
+stdout: code,message,attribute,value
+stdout: OK,,User Id,ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o
+stdout: OK,,User Email,alice@example.bob
+stdout: OK,,Status,active
+stdout: OK,,Roles,R/W Svc Acct
 ---- end ----

@@ -23,23 +23,25 @@ public class Version implements Highlightable, Comparable<Version> {
     private final Optional<Pair<String, Integer>> label;
 
     public static Either<String, Version> parse(String version) {
-        val matcher = VERSION_PATTERN.matcher(version);
+        return ModelUtils.trimAndValidateBasics("Version", version).flatMap((trimmed) -> {
+            val matcher = VERSION_PATTERN.matcher(trimmed);
 
-        if (matcher.matches()) {
-            val major = Integer.parseInt(matcher.group(1));
-            val minor = Integer.parseInt(matcher.group(2));
-            val patch = Integer.parseInt(matcher.group(3));
+            if (matcher.matches()) {
+                val major = Integer.parseInt(matcher.group(1));
+                val minor = Integer.parseInt(matcher.group(2));
+                val patch = Integer.parseInt(matcher.group(3));
 
-            val preRelease = Optional.ofNullable(matcher.group(4))
-                .map((pr) -> {
-                    val parts = pr.split("\\.");
-                    return Pair.create(parts[0].toLowerCase(), Integer.parseInt(parts[1]));
-                });
+                val preRelease = Optional.ofNullable(matcher.group(4))
+                    .map((pr) -> {
+                        val parts = pr.split("\\.");
+                        return Pair.create(parts[0].toLowerCase(), Integer.parseInt(parts[1]));
+                    });
 
-            return Either.pure(new Version(major, minor, patch, preRelease));
-        } else {
-            return Either.left("Invalid version format: " + version + " (expected format: X.Y.Z or X.Y.Z-pre.X)");
-        }
+                return Either.pure(new Version(major, minor, patch, preRelease));
+            } else {
+                return Either.left("Invalid version format: " + trimmed + " (expected format: x.y.z[-<label>.n])");
+            }
+        });
     }
 
     public static Version mkUnsafe(String version) {

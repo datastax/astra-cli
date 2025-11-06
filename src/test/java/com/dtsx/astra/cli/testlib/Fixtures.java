@@ -38,6 +38,8 @@ public abstract class Fixtures {
         public static final DbRef IdRef = DbRef.fromId(UUID.fromString(One.getId()));
 
         public static final KeyspaceRef Keyspace = KeyspaceRef.mkUnsafe(Databases.NameRef, DEFAULT_KEYSPACE);
+
+        public static final CloudProvider Cloud = CloudProvider.fromSdkType(One.getInfo().getCloudProvider());
     }
 
     public static class Tenants {

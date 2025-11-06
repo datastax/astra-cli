@@ -47,7 +47,7 @@ public class APIProviderImpl implements APIProvider {
 
     @Override
     public PcuGroupsClient pcuGroupsClient() {
-        return new PcuGroupsClient(token.unsafeUnwrap(), env); // TODO replace w/ astraOpsClient().pcuGroups() once available
+        return new PcuGroupsClient(token.unsafeUnwrap(), env);
     }
 
     @Override

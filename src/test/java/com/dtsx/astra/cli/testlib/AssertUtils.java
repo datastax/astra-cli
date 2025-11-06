@@ -94,11 +94,11 @@ public abstract class AssertUtils {
         try {
             @Cleanup val parser = CSVParser.parse(asString, CSVFormat.RFC4180.builder().setHeader().setSkipHeaderRecord(true).get());
 
-//            val headersStr = String.join(",", parser.getHeaderNames()); TODO: Figure out the headers naming convention situation
-//
-//            if (!headersStr.matches("code,message(,data(\\.\\S+)?)*")) {
-//                return Assertions.fail("Invalid CSV headers: " + headersStr);
-//            }
+            val headersStr = String.join(",", parser.getHeaderNames());
+
+            if (!headersStr.matches("^code,message(,(?!code$|message$)[a-z0-9_])*$")) {
+                return Assertions.fail("Invalid CSV headers: " + headersStr);
+            }
 
             return cs;
         } catch (Exception e) {

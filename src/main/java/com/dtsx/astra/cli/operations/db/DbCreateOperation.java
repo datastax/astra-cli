@@ -1,11 +1,11 @@
 package com.dtsx.astra.cli.operations.db;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -32,7 +32,7 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
     public record CreateDbRequest(
         String dbName,
         RegionName region,
-        Optional<CloudProviderType> cloud,
+        Optional<CloudProvider> cloud,
         String db,
         String tier,
         Integer capacityUnits,

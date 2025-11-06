@@ -22,14 +22,14 @@ import java.util.function.Supplier;
 public class DownloadsGatewayImpl implements DownloadsGateway {
     private final CliContext ctx;
 
-    @Override //  TODO uSE ID HERE!@#!@#@!!
-    public Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters) {
+    @Override
+    public Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, Collection<Datacenter> datacenters) {
         val result = new ArrayList<Path>();
 
         for (val datacenter : datacenters) {
             try {
                 ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
-                    val scbName = "scb_%s_%s.zip".formatted(dbName, datacenter.getRegion());
+                    val scbName = "scb_%s_%s.zip".formatted(datacenter.getId(), datacenter.getRegion());
                     val scbPath = ctx.home().dirs().useScb().resolve(scbName);
 
                     if (Files.notExists(scbPath)) {
@@ -51,7 +51,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) {
-        return installGenericArchive(ctx.home().dirs().useCqlsh(), cqlsh.url(), cqlsh.version(), "cqlsh", ctx);
+        return installGenericArchive(ctx.home().dirs().useCqlsh(cqlsh.version()), cqlsh.url(), cqlsh.version(), "cqlsh", ctx);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
     @Override
     public Optional<Path> cqlshPath(ExternalSoftware cqlsh) {
-        return getPath(ctx.home().dirs()::cqlshExists, ctx.home().dirs()::useCqlsh, "cqlsh");
+        return getPath(() -> ctx.home().dirs().cqlshExists(cqlsh.version()), () -> ctx.home().dirs().useCqlsh(cqlsh.version()), "cqlsh");
     }
 
     @Override

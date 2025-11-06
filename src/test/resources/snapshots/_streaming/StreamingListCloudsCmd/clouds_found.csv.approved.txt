@@ -2,8 +2,8 @@
 command: astra streaming list-clouds -o csv
 exit_code: 0
 ---- output ----
-stdout: Cloud Provider
-stdout: gcp
-stdout: azure
-stdout: aws
+stdout: code,message,cloudProvider
+stdout: OK,,gcp
+stdout: OK,,azure
+stdout: OK,,aws
 ---- end ----

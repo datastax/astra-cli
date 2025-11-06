@@ -21,6 +21,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 @Command(
     name = "completions",
     aliases = { "compgen" },
+    description = "See the help for the @|code @{cli.name} shellenv!@ command to setup completions in your shell.",
     descriptionHeading = "%n",
     hidden = true
 )

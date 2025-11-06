@@ -70,7 +70,6 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
     private Either<String, Path> downloadSCB(Database db) {
         return downloadsGateway.downloadCloudSecureBundles(
             request.dbRef,
-            db.getInfo().getName(),
             List.of(DbUtils.resolveDatacenter(db, request.region))
         ).map(List::getFirst);
     }

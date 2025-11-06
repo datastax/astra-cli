@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.NukeOperation;
 import com.dtsx.astra.cli.operations.NukeOperation.*;
@@ -18,7 +19,34 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 @Command(
     name = "nuke",
-    description = "Entirely delete Astra CLI from your system"
+    description = {
+        "Entirely delete Astra CLI from your system",
+        "",
+        "This command may be used to delete any files associated with Astra CLI, including:",
+        " @|blue:300 *|@ The home folder,",
+        " @|blue:300 *|@ The @|code .astrarc|@ file,",
+        " @|blue:300 *|@ and the binary itself.",
+        "",
+        "This will also detect any shell rc files which need @|code astra|@-related lines removed.",
+        "",
+        "@|bold Note:|@ Depending on how Astra CLI was installed, the binary itself may need to be deleted manually. In such cases, instructions will be provided in the command output."
+    }
+)
+@Example(
+    comment = "Nuke Astra CLI from your system",
+    command = "astra nuke"
+)
+@Example(
+    comment = "Perform a dry run of the nuke operation",
+    command = "astra nuke --dry-run"
+)
+@Example(
+    comment = "Nuke Astra CLI without confirmation",
+    command = "astra nuke --yes"
+)
+@Example(
+    comment = "Nuke Astra CLI but preserve the @|code .astrarc|@ file",
+    command = "astra nuke --preserve-astrarc"
 )
 public class NukeCmd extends AbstractCmd<NukeResult> {
     @Option(
@@ -30,7 +58,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     @Option(
         names = { "--preserve-astrarc" },
-        description = "Preserve the .astrarc file in your home directory",
+        description = "Preserve the @|code .astrarc|@ file in your home directory",
         paramLabel = "PRESERVE",
         negatable = true
     )
@@ -164,6 +192,8 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
         val prompt = """
           Do you also want to delete the @!.astrarc!@ file%s located at %s?
+        
+          @|faint (You can still Ctrl+C to safely cancel this operation.)|@
         
           %s
         """.formatted((files.size() > 1) ? "s" : "", filesStr, secondLine);

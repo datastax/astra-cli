@@ -62,7 +62,6 @@ public class PcuGroupDatacenterAssociationsClient extends AbstractApiClient {
         return unmarshallOrThrow(res, PCU_GROUP_DB_ASSOCIATIONS, "get pcu group db associations").stream();
     }
 
-    // TODO do associate and disassociate REALLY return values??
     public void associate(@NonNull String datacenterId) {
 //        Assert.isDatacenterID(datacenterId, "datacenter id");
 

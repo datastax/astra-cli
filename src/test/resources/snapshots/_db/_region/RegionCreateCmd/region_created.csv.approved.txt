@@ -2,6 +2,6 @@
 command: astra db create-region 822b0fff-6a73-4322-a8ec-09832b075287 -r us-east-2 -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,data.wasCreated,data.waitedSeconds
+stdout: code,message,wasCreated,waitedSeconds
 stdout: OK,Region 'us-east-2' has been created in database '822b0fff-6a73-4322-a8ec-09832b075287'. The database is now active after waiting 6 seconds.,true,6
 ---- end ----

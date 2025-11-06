@@ -8,11 +8,11 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateOperation;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +96,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             description = "The cloud provider where the db should be created. Inferred from the region if not provided.",
             paramLabel = $Cloud.LABEL
         )
-        public Optional<CloudProviderType> cloud;
+        public Optional<CloudProvider> cloud;
 
         @Option(
             names = { $Keyspace.LONG, $Keyspace.SHORT },

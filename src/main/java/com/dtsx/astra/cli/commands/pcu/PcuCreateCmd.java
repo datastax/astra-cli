@@ -5,18 +5,18 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
+import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuCreateResult;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuGroupAlreadyExistsIllegallyWithStatus;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuGroupAlreadyExistsWithStatus;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuGroupCreated;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
@@ -73,7 +73,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             description = "Cloud provider this PCU will work in",
             paramLabel = $Cloud.LABEL
         )
-        public CloudProviderType cloud;
+        public CloudProvider cloud;
 
         @Option(
             names = { $Regions.LONG, $Regions.SHORT },

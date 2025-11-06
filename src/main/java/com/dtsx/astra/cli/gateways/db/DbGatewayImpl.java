@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.AstraToken;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.APIProvider;
@@ -69,7 +70,6 @@ public class DbGatewayImpl implements DbGateway {
             .filter(status -> status != ACTIVE && status != HIBERNATED && status != MAINTENANCE && status != INITIALIZING && status != PENDING && status != ASSOCIATING && status != RESUMING && status != UNPARKING)
             .toList();
 
-        // TODO astra-sdk-devops needs to add ASSOCIATING
         return switch (currentStatus) {
             case ACTIVE -> {
                 yield Pair.create(currentStatus, Duration.ZERO);
@@ -118,7 +118,7 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region, boolean vectorOnly) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
         val cloudRegions = regionGateway.findAllServerless(vectorOnly);
 
         if (cloud.isPresent()) {
@@ -147,13 +147,13 @@ public class DbGatewayImpl implements DbGateway {
                 matchingClouds.getFirst();
             default ->
                 throw new OptionValidationException("region", "Region '%s' is available for multiple cloud providers: %s".formatted(
-                    region.unwrap(), matchingClouds.stream().map(CloudProviderType::name).toList()
+                    region.unwrap(), matchingClouds.stream().map(CloudProvider::name).toList()
                 ));
         };
     }
 
     @Override
-    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProviderType cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
         if (!allowDuplicate) {
             val existingDb = ctx.log().loading("Checking if database " + ctx.highlight(name) + " already exists", (_) -> (
                 tryFindOne(DbRef.fromNameUnsafe(name))
@@ -169,7 +169,7 @@ public class DbGatewayImpl implements DbGateway {
                 .name(name)
                 .tier(tier)
                 .capacityUnit(capacityUnits)
-                .cloudProvider(cloud)
+                .cloudProvider(cloud.toSdkType())
                 .cloudRegion(region.unwrap())
                 .keyspace(keyspace);
 

@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Cloud;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
@@ -15,7 +16,6 @@ import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuGroupAlreadyExist
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuGroupUpdated;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuUpdateResult;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.UpdatePcuRequest;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
@@ -61,7 +61,7 @@ public class PcuUpdateCmd extends AbstractPromptForPcuCmd<PcuUpdateResult> {
             description = "Cloud provider this PCU will work in",
             paramLabel = $Cloud.LABEL
         )
-        public Optional<CloudProviderType> cloud; // TODO is it even possible to update cloud and region lol (I highly doubt it)
+        public Optional<CloudProvider> cloud;
 
         @Option(
             names = { $Regions.LONG, $Regions.SHORT },

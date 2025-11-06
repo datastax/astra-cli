@@ -4,9 +4,10 @@ exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Database 'two_regions_db' has been deleted and fully terminated (waited 6s for termination).",
+stdout:   "message" : "Database 'two_regions_db' has been deleted and fully terminated after 6 seconds.",
 stdout:   "data" : {
 stdout:     "wasDeleted" : true,
+stdout:     "currentStatus" : "TERMINATED",
 stdout:     "waitedSeconds" : 6
 stdout:   },
 stdout:   "nextSteps" : null

@@ -7,6 +7,5 @@ public enum PcuGroupStatusType {
     ACTIVE,
     PARKED,
     PARKING,
-    UNPARKING,
-    OTHER // TODO make this work with Jackson
+    UNPARKING
 }

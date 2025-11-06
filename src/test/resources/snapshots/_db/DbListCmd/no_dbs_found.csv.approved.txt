@@ -2,5 +2,5 @@
 command: astra db list -o csv
 exit_code: 0
 ---- output ----
-stdout: Name,Id,Regions,Cloud,V,Status
+stdout: code,message,name,id,regions,cloud,vector,status
 ---- end ----

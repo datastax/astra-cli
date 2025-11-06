@@ -2,7 +2,7 @@
 command: astra db list-tables two_regions_db -k default_keyspace -o csv
 exit_code: 0
 ---- output ----
-stdout: Name
-stdout: test_table
-stdout: small_table
+stdout: code,message,name
+stdout: OK,,test_table
+stdout: OK,,small_table
 ---- end ----

@@ -15,19 +15,17 @@ public class UpgradeStatusKeeper {
             return;
         }
 
-        val script = ctx.isWindows()
-            ? runWindows(ctx, status, path, shouldCheckForUpdate, userWasAnnoyed)
-            : runUnix(ctx, status, path, shouldCheckForUpdate, userWasAnnoyed);
+        val script = runUnix(ctx, status, path, shouldCheckForUpdate, userWasAnnoyed);
 
-       try {
-           new ProcessBuilder()
-               .command(ctx.isWindows() ? "cmd.exe" : "sh", ctx.isWindows() ? "/c" : "-c", script)
-               .start();
-       } catch (Exception e) {
-           ctx.log().exception("Unable to update upgrade status file at " + path);
-           ctx.log().exception("Script was:\n" + script);
-           ctx.log().exception(e);
-       }
+        try {
+            new ProcessBuilder()
+                .command("sh", "-c", script)
+                .start();
+        } catch (Exception e) {
+            ctx.log().exception("Unable to update upgrade status file at " + path);
+            ctx.log().exception("Script was:\n" + script);
+            ctx.log().exception(e);
+        }
     }
 
     // I know this is prone to race conditions,
@@ -100,10 +98,5 @@ public class UpgradeStatusKeeper {
         """).formatted(pathStr);
 
         return script;
-    }
-
-    private static String runWindows(CliContext ctx, UpgradeStatus status, Path path, boolean shouldCheckForUpdate, boolean userWasAnnoyed) {
-        // TODO
-        return "";
     }
 }

@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.core.completions;
 
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.DefaultFile;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
 import com.dtsx.astra.cli.core.completions.caches.PcuGroupsCompletionsCache;
@@ -14,17 +16,21 @@ import java.util.Optional;
 public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
     private final Optional<ProfileName> profileName;
 
-    public ProfileLinkedCompletionsCache(CliContext ctx, Optional<ProfileName> profileName) {
+    public ProfileLinkedCompletionsCache(CliContext ctx, ProfileSource profileSource) {
         super(ctx);
-        this.profileName = profileName;
+
+        this.profileName = switch (profileSource) {
+            case DefaultFile(var name) -> Optional.of(name);
+            default -> Optional.empty();
+        };
     }
 
-    public static List<ProfileLinkedCompletionsCache> mkInstances(CliContext ctx, ProfileName profileName) {
+    public static List<ProfileLinkedCompletionsCache> mkInstances(CliContext ctx, ProfileSource profileSource) {
         return List.of(
-            new DbCompletionsCache(ctx, Optional.of(profileName)),
-            new UserCompletionsCache(ctx, Optional.of(profileName)),
-            new TenantCompletionsCache(ctx, Optional.of(profileName)),
-            new PcuGroupsCompletionsCache(ctx, Optional.of(profileName))
+            new DbCompletionsCache(ctx, profileSource),
+            new UserCompletionsCache(ctx, profileSource),
+            new TenantCompletionsCache(ctx, profileSource),
+            new PcuGroupsCompletionsCache(ctx, profileSource)
         );
     }
 

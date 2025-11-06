@@ -121,4 +121,45 @@ public class StringUtils {
         }
         return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
+
+    public static String titleToCamelCase(@NonNull String title) {
+        val parts = title.split(" ");
+        val sb = new StringBuilder();
+
+        for (var i = 0; i < parts.length; i++) {
+            val part = parts[i];
+
+            if (part.isEmpty()) {
+                continue;
+            }
+
+            if (i == 0) {
+                sb.append(Character.toLowerCase(part.charAt(0))).append(part.substring(1));
+            } else {
+                sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static String titleToSnakeCase(@NonNull String title) {
+        val parts = title.split(" ");
+        val sb = new StringBuilder();
+
+        for (var i = 0; i < parts.length; i++) {
+            val part = parts[i];
+
+            if (part.isEmpty()) {
+                continue;
+            }
+
+            if (i > 0) {
+                sb.append("_");
+            }
+            sb.append(part.toLowerCase());
+        }
+
+        return sb.toString();
+    }
 }

@@ -31,18 +31,22 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
 
     @Override
     protected final OutputAll execute(Supplier<Stream<Database>> result) {
+        val vectorKey = ctx.outputIsHuman()
+            ? "V"
+            : "Vector";
+
         val data = result.get()
             .map((db) -> sequencedMapOf(
                 "Name", name(db),
-                "Id", id(db),
+                "ID", id(db),
                 "Regions", regions(db),
                 "Cloud", cloud(db),
-                "V", vector(db),
+                vectorKey, vector(db),
                 "Status", status(db)
             ))
             .toList();
 
-        return new ShellTable(data).withColumns("Name", "Id", "Regions", "Cloud", "V", "Status");
+        return new ShellTable(data).withColumns("Name", "ID", "Regions", "Cloud", vectorKey, "Status");
     }
 
     private String name(Database db) {
@@ -58,7 +62,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     }
 
     private String cloud(Database db) {
-        return db.getInfo().getCloudProvider().name().toLowerCase();
+        return db.getInfo().getCloudProvider().name();
     }
 
     private String vector(Database db) {

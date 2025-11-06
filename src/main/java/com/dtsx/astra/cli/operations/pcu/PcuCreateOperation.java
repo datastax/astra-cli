@@ -1,13 +1,13 @@
 package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
+import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -30,7 +30,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
     public record CreatePcuRequest(
         String title,
         Optional<String> description,
-        CloudProviderType cloud,
+        CloudProvider cloud,
         RegionName region,
         String instanceType,
         PcuGroupProvisionType provisionType,
@@ -52,7 +52,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
             .description(request.description.orElse(null))
             .instanceType(request.instanceType)
             .provisionType(request.provisionType)
-            .cloudProvider(request.cloud)
+            .cloudProvider(request.cloud.toSdkType())
             .region(request.region.unwrap())
             .min(request.min)
             .max(request.max)

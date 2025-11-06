@@ -2,16 +2,16 @@
 command: astra db list-embedding-providers two_regions_db -o csv
 exit_code: 0
 ---- output ----
-stdout: Key,Display Name,Models,Parameters,Auth Header,Auth Secret
-stdout: cohere,Cohere,3,0,■,■
-stdout: openai,OpenAI,3,2,■,■
-stdout: huggingfaceDedicated,Hugging Face - Dedicated,1,3,■,■
-stdout: azureOpenAI,Azure OpenAI,3,2,■,■
-stdout: bedrock,Amazon Bedrock,2,1,■,■
-stdout: jinaAI,Jina AI,6,0,■,■
-stdout: voyageAI,Voyage AI,7,1,■,■
-stdout: upstageAI,Upstage,1,0,■,■
-stdout: huggingface,Hugging Face - Serverless,6,0,■,■
-stdout: nvidia,Nvidia,2,0,,
-stdout: mistral,Mistral AI,1,0,■,■
+stdout: code,message,key,displayName,models,parameters,authHeader,authSecret
+stdout: OK,,cohere,Cohere,3,0,■,■
+stdout: OK,,openai,OpenAI,3,2,■,■
+stdout: OK,,huggingfaceDedicated,Hugging Face - Dedicated,1,3,■,■
+stdout: OK,,azureOpenAI,Azure OpenAI,3,2,■,■
+stdout: OK,,bedrock,Amazon Bedrock,2,1,■,■
+stdout: OK,,jinaAI,Jina AI,6,0,■,■
+stdout: OK,,voyageAI,Voyage AI,7,1,■,■
+stdout: OK,,upstageAI,Upstage,1,0,■,■
+stdout: OK,,huggingface,Hugging Face - Serverless,6,0,■,■
+stdout: OK,,nvidia,Nvidia,2,0,,
+stdout: OK,,mistral,Mistral AI,1,0,■,■
 ---- end ----

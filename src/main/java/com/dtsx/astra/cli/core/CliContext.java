@@ -41,7 +41,7 @@ public class CliContext {
     Consumer<CliContext> upgradeNotifier;
 
     // necessary for testing purpose only
-    Optional<Profile> forceUseProfile;
+    Optional<Profile> forceProfileForTesting;
 
     public Path path(String first, String... more) {
         return fs.getPath(first, more);

@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.datatypes.Thunk;
 import com.dtsx.astra.cli.utils.MiscUtils;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -34,13 +35,19 @@ public class AstraLogger {
     private final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
     private Optional<LoadingSpinner> globalSpinner = Optional.empty();
-    private final boolean enableSpinner;
+    private final Supplier<Boolean> spinnerEnabled;
 
-    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo, boolean enableSpinner) {
+    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo, Optional<Boolean> enableSpinner) {
         this.level = level;
         this.ctxSupplier = ctxSupplier;
         this.shouldDumpLogs = shouldDumpLogs;
-        this.enableSpinner = enableSpinner;
+
+        this.spinnerEnabled = new Thunk<>(() -> enableSpinner.orElseGet(() -> {
+            if (System.getProperty("cli.output.spinner.disable", "").equals("true")) { // for tests
+                return false;
+            }
+            return ctx().isTty() && ctx().logLevel() != Level.QUIET;
+        }));
 
         if (dumpLogsTo.isPresent()) {
             this.sessionLogFile = dumpLogsTo::get;
@@ -117,7 +124,7 @@ public class AstraLogger {
 
         val isFirstLoading = globalSpinner.isEmpty();
 
-        if (isFirstLoading && enableSpinner) {
+        if (isFirstLoading && spinnerEnabled.get()) {
             globalSpinner = Optional.of(new LoadingSpinner(initialMsg, ctx()));
             globalSpinner.get().start();
         } else {

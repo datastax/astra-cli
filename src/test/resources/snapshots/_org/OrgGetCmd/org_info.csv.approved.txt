@@ -2,7 +2,7 @@
 command: astra org -o csv
 exit_code: 0
 ---- output ----
-stdout: Attribute,Value
-stdout: Name,firstname.lastname@email.tld
-stdout: Id,123e4567-e89b-12d3-a456-426614174000
+stdout: code,message,attribute,value
+stdout: OK,,Name,firstname.lastname@email.tld
+stdout: OK,,Id,123e4567-e89b-12d3-a456-426614174000
 ---- end ----

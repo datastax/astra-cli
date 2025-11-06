@@ -2,6 +2,6 @@
 command: astra db create-collection two_regions_db -c test_coll -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,data.wasCreated
+stdout: code,message,wasCreated
 stdout: OK,Collection 'test_coll' has been created in keyspace 'default_keyspace' of database 'two_regions_db'.,true
 ---- end ----

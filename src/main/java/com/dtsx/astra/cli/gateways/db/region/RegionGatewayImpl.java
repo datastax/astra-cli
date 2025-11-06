@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.db.region;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.APIProvider;
@@ -19,14 +20,14 @@ public class RegionGatewayImpl implements RegionGateway {
     private final APIProvider api;
 
     @Override
-    public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector) {
+    public SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector) {
         val regionType = vector ? RegionType.VECTOR : RegionType.ALL;
 
         return ctx.log().loading("Fetching all available " + ((vector) ? "vector" : "serverless") + " regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(regionType)
                 .collect(Collectors.toMap(
-                    r -> CloudProviderType.valueOf(r.getCloudProvider()),
+                    r -> CloudProvider.fromString(r.getCloudProvider()),
                     r -> new TreeMap<>() {{
                         put(r.getName(), new RegionInfo(r.getDisplayName(), !r.isReservedForQualifiedUsers(), r.getZone(), r));
                     }},
@@ -40,12 +41,12 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> findAllClassic() {
+    public SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllClassic() {
         return ctx.log().loading("Fetching all available classic regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAll()
                 .collect(Collectors.toMap(
-                    DatabaseRegion::getCloudProvider,
+                    r -> CloudProvider.fromSdkType(r.getCloudProvider()),
                     (r) -> new TreeMap<>() {{
                         put(
                             r.getRegion(),
@@ -72,18 +73,18 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public SortedSet<CloudProviderType> findAvailableClouds() {
+    public SortedSet<CloudProvider> findAvailableClouds() {
         return ctx.log().loading("Finding cloud providers for all available regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(RegionType.ALL)
                 .map(DatabaseRegionServerless::getCloudProvider)
-                .map(CloudProviderType::valueOf)
+                .map(CloudProvider::fromString)
                 .collect(Collectors.toCollection(TreeSet::new))
         ));
     }
 
     @Override
-    public CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProviderType cp) {
+    public CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProvider cp) {
         val exists = existsInDb(ref, region);
 
         if (exists) {
@@ -91,7 +92,7 @@ public class RegionGatewayImpl implements RegionGateway {
         }
 
         ctx.log().loading("Creating region " + ctx.highlight(region) + " for db " + ctx.highlight(ref), (_) -> {
-            api.dbOpsClient(ref).datacenters().create(tier, cp, region.unwrap());
+            api.dbOpsClient(ref).datacenters().create(tier, cp.toSdkType(), region.unwrap());
             return null;
         });
 

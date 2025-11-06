@@ -5,20 +5,11 @@ exit_code: 0
 stdout: {
 stdout:   "code" : "OK",
 stdout:   "data" : [ {
-stdout:     "cloudProvider" : "gcp",
-stdout:     "region" : "us-east1",
-stdout:     "displayName" : "South Carolina",
-stdout:     "isPremium" : true
+stdout:     "raw" : "info:us-east1"
 stdout:   }, {
-stdout:     "cloudProvider" : "azure",
-stdout:     "region" : "eastus",
-stdout:     "displayName" : "East US",
-stdout:     "isPremium" : false
+stdout:     "raw" : "info:eastus"
 stdout:   }, {
-stdout:     "cloudProvider" : "aws",
-stdout:     "region" : "us-east-1",
-stdout:     "displayName" : "US East (N. Virginia)",
-stdout:     "isPremium" : false
+stdout:     "raw" : "info:us-east-1"
 stdout:   } ]
 stdout: }
 ---- end ----

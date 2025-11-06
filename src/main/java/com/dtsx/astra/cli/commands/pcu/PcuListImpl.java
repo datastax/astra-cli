@@ -22,18 +22,22 @@ public abstract class PcuListImpl extends AbstractPcuCmd<Stream<PcuGroup>> {
 
     @Override
     protected final OutputAll execute(Supplier<Stream<PcuGroup>> result) {
+        val flexibleKey = ctx.outputIsHuman()
+            ? "F"
+            : "Flexible";
+
         val data = result.get()
             .map((pcu) -> sequencedMapOf(
                 "Title", title(pcu),
                 "Id", id(pcu),
                 "Cloud", cloud(pcu),
                 "Region", region(pcu),
-                "F", flexible(pcu),
+                flexibleKey, flexible(pcu),
                 "Status", status(pcu)
             ))
             .toList();
 
-        return new ShellTable(data).withColumns("Title", "Id", "Cloud", "Region", "F", "Status");
+        return new ShellTable(data).withColumns("Title", "Id", "Cloud", "Region", flexibleKey, "Status");
     }
 
     private String title(PcuGroup pcu) {

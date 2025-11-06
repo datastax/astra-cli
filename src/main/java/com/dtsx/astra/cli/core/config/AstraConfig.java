@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.config;
 
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
@@ -23,7 +24,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -218,7 +222,22 @@ public class AstraConfig {
         public void deleteProfile(ProfileName profileName) {
             profiles.removeIf(isProfileName(profileName));
             backingIniFile.deleteSection(profileName.unwrap());
-            ProfileLinkedCompletionsCache.mkInstances(ctx, profileName).forEach((c) -> c.setCache(List.of()));
+
+            final ProfileSource source = (usingDefaultFile())
+                ? new ProfileSource.DefaultFile(profileName)
+                : new ProfileSource.CustomFile(backingFile, profileName);
+
+            ProfileLinkedCompletionsCache.mkInstances(ctx, source)
+                .forEach((c) -> c.setCache(List.of()));
+        }
+    }
+
+    private boolean usingDefaultFile() {
+        try {
+            return backingFile.toRealPath().equals(resolveDefaultAstraConfigFile(ctx).toRealPath());
+        } catch (IOException e) {
+            ctx.log().exception("Error resolving real file paths for checking if config file is default", e);
+            return false;
         }
     }
 

@@ -26,6 +26,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.stripAnsi;
 @Command(
     name = "docs",
     aliases = { "docgen" },
+    description = "Generates asciidoc command reference. Meant for internal use.",
     hidden = true
 )
 public class DocsCmd extends AbstractCmd<Void> {

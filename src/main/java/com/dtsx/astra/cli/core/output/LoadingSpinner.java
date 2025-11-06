@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.output.AstraLogger.Level;
 import lombok.val;
 
 import java.util.ArrayDeque;
@@ -30,9 +29,7 @@ public class LoadingSpinner {
     
     public void start() {
         if (isRunning.compareAndSet(false, true)) {
-            if (ctx.isTty() && ctx.outputIsHuman()) {
-                spinnerThread = Thread.ofVirtual().start(this::runSpinner);
-            }
+            spinnerThread = Thread.ofVirtual().start(this::runSpinner);
         }
     }
     
@@ -78,7 +75,7 @@ public class LoadingSpinner {
     }
     
     public void pause() {
-        if (ctx.isTty() && ctx.outputIsHuman() && spinnerThread != null) {
+        if (spinnerThread != null) {
             pauseLatch = new CountDownLatch(1);
             isPaused.set(true);
             
@@ -91,7 +88,7 @@ public class LoadingSpinner {
     }
     
     public void resume() {
-        if (ctx.isTty() && ctx.outputIsHuman() && spinnerThread != null) {
+        if (spinnerThread != null) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
@@ -103,7 +100,7 @@ public class LoadingSpinner {
     
     private void runSpinner() {
         int frameIndex = 0;
-        
+
         while (isRunning.get()) {
             if (isPaused.get()) {
                 clearLine();
@@ -122,13 +119,11 @@ public class LoadingSpinner {
                 }
                 continue;
             }
-            
-            if (ctx.logLevel() != Level.QUIET && ctx.isTty()) {
-                val currentLine = ctx.colors().BLUE_300.use(SPINNER_FRAMES[frameIndex] + " ") + getCurrentMessage() + "...";
-                val clearLine = "\r" + " ".repeat(lastLineLength.get()) + "\r";
-                ctx.console().error(clearLine + currentLine);
-                lastLineLength.set(AstraColors.stripAnsi(currentLine).length());
-            }
+
+            val currentLine = ctx.colors().BLUE_300.use(SPINNER_FRAMES[frameIndex] + " ") + getCurrentMessage() + "...";
+            val clearLine = "\r" + " ".repeat(lastLineLength.get()) + "\r";
+            ctx.console().error(clearLine + currentLine);
+            lastLineLength.set(AstraColors.stripAnsi(currentLine).length());
             
             frameIndex = (frameIndex + 1) % SPINNER_FRAMES.length;
             
@@ -142,9 +137,7 @@ public class LoadingSpinner {
     }
     
     private void clearLine() {
-        if (ctx.logLevel() != Level.QUIET && ctx.isTty()) {
-            val clearSpaces = Math.max(50, lastLineLength.get());
-            ctx.console().error("\r" + " ".repeat(clearSpaces) + "\r");
-        }
+        val clearSpaces = Math.max(50, lastLineLength.get());
+        ctx.console().error("\r" + " ".repeat(clearSpaces) + "\r");
     }
 }

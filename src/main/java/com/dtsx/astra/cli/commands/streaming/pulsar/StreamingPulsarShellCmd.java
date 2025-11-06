@@ -39,13 +39,13 @@ public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
     public static class Exec {
         @Option(
             names = { "-e", "--execute" },
-            paramLabel = "COMMAND",
-            description = "Execute the statement and quit"
+            description = "Execute the statement and quit",
+            paramLabel = "STATEMENT"
         )
         public Optional<String> $execute;
 
         @Option(
-            names = { "-f", "--filename" },
+            names = { "-f", "--file" },
             description = "Input filename with a list of commands to be executed. Each command must be separated by a newline",
             paramLabel = "FILE"
         )

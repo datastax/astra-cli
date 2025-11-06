@@ -28,7 +28,11 @@ public abstract class ParsedFile {
     @SuppressWarnings("RedundantThrows")
     protected static <F, FileParseException extends Exception> F readFile(Path path, Parser<F, FileParseException> parse) throws FileNotFoundException, FileParseException {
         if (!Files.exists(path)) {
-            throw new FileNotFoundException(path.toString()); // todo catch if file is dir
+            throw new FileNotFoundException(path.toString());
+        }
+
+        if (Files.isDirectory(path)) {
+            throw new FileNotFoundException("Expected a file but found a directory: " + path);
         }
 
         try (val scanner = new Scanner(path)) {

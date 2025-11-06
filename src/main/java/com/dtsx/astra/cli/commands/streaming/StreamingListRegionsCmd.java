@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.streaming;
 
 import com.dtsx.astra.cli.core.CliConstants.$Cloud;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
@@ -9,7 +10,6 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingListRegionsOperation;
 import com.dtsx.astra.cli.operations.streaming.StreamingListRegionsOperation.FoundRegion;
 import com.dtsx.astra.cli.operations.streaming.StreamingListRegionsOperation.RegionListRequest;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
@@ -52,20 +52,11 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
         paramLabel = "FILTER",
         split = ","
     )
-    public @Nullable List<CloudProviderType> $cloudFilter;
+    public @Nullable List<CloudProvider> $cloudFilter;
 
     @Override
-    protected final OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
-        val data = regions.get()
-            .map((r) -> sequencedMapOf(
-                "cloudProvider", r.cloudProvider(),
-                "region", r.regionName(),
-                "displayName", r.displayName(),
-                "isPremium", r.isPremium()
-            ))
-            .toList();
-
-        return OutputJson.serializeValue(data);
+    protected final OutputJson executeJson(Supplier<Stream<FoundRegion>> result) {
+        return OutputJson.serializeValue(result.get().map(FoundRegion::raw));
     }
 
     @Override
@@ -74,7 +65,7 @@ public class StreamingListRegionsCmd extends AbstractStreamingCmd<Stream<FoundRe
             .map((r) -> sequencedMapOf(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.isPremium()),
                 "Region", r.regionName(),
-                "Display Name", r.displayName()
+                "Display Name", r.displayName().isBlank() ? "n/a" : r.displayName()
             ))
             .toList();
 

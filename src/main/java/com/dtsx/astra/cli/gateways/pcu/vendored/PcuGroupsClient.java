@@ -83,7 +83,7 @@ public class PcuGroupsClient extends AbstractApiClient {
     protected Stream<PcuGroup> findAllImpl(List<String> ids, String validationErrorFmtStr, FindAll404Handler on404) {
         if (ids != null) {
             if (ids.isEmpty()) {
-                return Stream.of(); // TODO throw error or just return empty list or return all pcu groups? (devops api does the third)
+                return Stream.of();
             }
 
             for (var i = 0; i < ids.size(); i++) {
@@ -109,7 +109,7 @@ public class PcuGroupsClient extends AbstractApiClient {
             }
 
             if (responseError != null && responseError.getErrors() != null && !responseError.getErrors().isEmpty()) {
-                if (responseError.getErrors().getFirst().getId() == 340018) { // TODO is this the right error code? also why does find all get special treatment for auth errors?
+                if (responseError.getErrors().getFirst().getId() == 340018) {
                     throw new IllegalArgumentException("You have provided an invalid token, please check", e);
                 }
             }

@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.snapshot.commands.db;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -9,7 +10,6 @@ import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifi
 import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.snapshot.annotations.TestForDifferentOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.db.domain.Database;
 import org.graalvm.collections.Pair;
 
@@ -26,7 +26,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     private SnapshotTestOptionsModifier opts(Function<Database, CreationStatus<Database>> lift, boolean allowDuplicates) {
         return (o) -> o
             .gateway(DbGateway.class, (mock) -> {
-                when(mock.findCloudForRegion(any(), any(), anyBoolean())).thenReturn(CloudProviderType.AWS);
+                when(mock.findCloudForRegion(any(), any(), anyBoolean())).thenReturn(CloudProvider.AWS);
 
                 doReturn(lift.apply(Databases.One)).when(mock).create(any(), any(), any(), any(), any(), anyInt(), anyBoolean(), anyBoolean());
 
@@ -37,7 +37,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
             .verify((mocks) -> {
                 verify(mocks.dbGateway()).findCloudForRegion(Optional.empty(), RegionName.mkUnsafe("us-east-1"), true);
 
-                verify(mocks.dbGateway()).create(Databases.NameRef.toString(), "default_keyspace", RegionName.mkUnsafe("us-east-1"), CloudProviderType.AWS, "serverless", 1, true, allowDuplicates);
+                verify(mocks.dbGateway()).create(Databases.NameRef.toString(), "default_keyspace", RegionName.mkUnsafe("us-east-1"), CloudProvider.AWS, "serverless", 1, true, allowDuplicates);
             });
     }
 

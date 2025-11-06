@@ -5,11 +5,11 @@ exit_code: 0
 stdout: {
 stdout:   "code" : "OK",
 stdout:   "data" : [ {
-stdout:     "Cloud Provider" : "gcp"
+stdout:     "cloudProvider" : "gcp"
 stdout:   }, {
-stdout:     "Cloud Provider" : "azure"
+stdout:     "cloudProvider" : "azure"
 stdout:   }, {
-stdout:     "Cloud Provider" : "aws"
+stdout:     "cloudProvider" : "aws"
 stdout:   } ]
 stdout: }
 ---- end ----

@@ -129,7 +129,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.fs(),
             ctx.gateways(),
             ctx.upgradeNotifier(),
-            ctx.forceUseProfile()
+            ctx.forceProfileForTesting()
         ));
     }
 

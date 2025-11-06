@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.dtsx.astra.cli.utils.StringUtils.titleToCamelCase;
+
 public record ShellTableRendererJson(RenderableShellTable table) implements OutputJson {
     @Override
     public String renderAsJson() {
@@ -18,7 +20,7 @@ public record ShellTableRendererJson(RenderableShellTable table) implements Outp
             .map((row) ->
                 row.entrySet().stream()
                     .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        e -> titleToCamelCase(e.getKey()),
                         e -> OutputSerializer.serializeAsJson(e.getValue())
                     )))
             .toList();

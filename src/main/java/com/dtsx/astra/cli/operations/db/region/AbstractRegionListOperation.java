@@ -1,16 +1,17 @@
 package com.dtsx.astra.cli.operations.db.region;
 
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway.RegionInfo;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.FoundRegion;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public abstract class AbstractRegionListOperation implements Operation<Stream<Fo
     protected final RegionListRequest request;
 
     public record FoundRegion(
-        CloudProviderType cloudProvider,
+        CloudProvider cloudProvider,
         String regionName,
         String displayName,
         String zone,
@@ -29,11 +30,11 @@ public abstract class AbstractRegionListOperation implements Operation<Stream<Fo
 
     public record RegionListRequest(
         @Nullable List<String> nameFilter,
-        @Nullable List<CloudProviderType> cloudFilter,
+        @Nullable List<CloudProvider> cloudFilter,
         @Nullable List<String> zoneFilter
     ) {}
 
-    protected abstract SortedMap<CloudProviderType, ? extends SortedMap<String, RegionInfo>> fetchRegions();
+    protected abstract SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> fetchRegions();
 
     @Override
     public Stream<FoundRegion> execute() {
@@ -67,7 +68,7 @@ public abstract class AbstractRegionListOperation implements Operation<Stream<Fo
         );
     }
 
-    private boolean passesCloudFilter(@Nullable List<CloudProviderType> cloudFilter, Entry<CloudProviderType, ? extends SortedMap<String, RegionInfo>> entry) {
+    private boolean passesCloudFilter(@Nullable List<CloudProvider> cloudFilter, Entry<CloudProvider, ? extends SortedMap<String, RegionInfo>> entry) {
         return cloudFilter == null || cloudFilter.contains(entry.getKey());
     }
 

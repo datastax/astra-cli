@@ -18,7 +18,6 @@ public final class PcuGroupCreationRequest extends PcuGroupCreateUpdateRequest {
             this.provisionType = PcuGroupProvisionType.SHARED;
         }
 
-        // TODO do we really want a default for this? (since pcu instance types are changing)
         if (this.instanceType == null || this.instanceType.isBlank()) {
             this.instanceType = "standard";
         }

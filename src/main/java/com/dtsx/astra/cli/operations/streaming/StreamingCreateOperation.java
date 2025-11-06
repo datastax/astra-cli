@@ -2,12 +2,12 @@ package com.dtsx.astra.cli.operations.streaming;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.core.models.TenantStatus;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.Operation;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -27,7 +27,7 @@ public class StreamingCreateOperation implements Operation<StreamingCreateOperat
 
     public record StreamingCreateRequest(
         TenantName tenantName,
-        Either<String, Pair<Optional<CloudProviderType>, RegionName>> clusterOrCloud,
+        Either<String, Pair<Optional<CloudProvider>, RegionName>> clusterOrCloud,
         String plan,
         String userEmail,
         boolean ifNotExists

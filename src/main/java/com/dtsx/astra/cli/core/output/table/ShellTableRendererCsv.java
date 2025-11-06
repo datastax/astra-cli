@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.*;
 
 public record ShellTableRendererCsv(RenderableShellTable table) implements OutputCsv {
     @Override
@@ -18,10 +18,9 @@ public record ShellTableRendererCsv(RenderableShellTable table) implements Outpu
     }
 
     private String buildHeaders(List<String> columns) {
-        return String.join(",", columns);
+        return "code,message" + columns.stream().map(s -> "," + titleToSnakeCase(s)).collect(Collectors.joining(""));
     }
 
-    // TODO how to format csv in the shell table case?
     private String buildValues(List<? extends Map<String, ?>> raw, List<String> columns) {
         return raw.stream()
             .map((row) -> {
@@ -31,7 +30,7 @@ public record ShellTableRendererCsv(RenderableShellTable table) implements Outpu
                     ret.add(OutputSerializer.serializeAsCsv(row.get(col)));
                 }
 
-                return ret.toString();
+                return "OK,," + ret;
             })
             .collect(Collectors.joining(NL));
     }

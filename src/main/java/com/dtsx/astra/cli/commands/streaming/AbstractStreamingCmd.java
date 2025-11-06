@@ -12,6 +12,6 @@ public abstract class AbstractStreamingCmd<OpRes> extends AbstractConnectedCmd<O
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        streamingGateway = ctx.gateways().mkStreamingGateway(profile().token(), profile().env(), new TenantCompletionsCache(ctx, profile().name()));
+        streamingGateway = ctx.gateways().mkStreamingGateway(profile().token(), profile().env(), new TenantCompletionsCache(ctx, profileSource()));
     }
 }

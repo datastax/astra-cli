@@ -1,13 +1,13 @@
 package com.dtsx.astra.cli.operations.streaming;
 
 import com.dtsx.astra.cli.commands.streaming.StreamingGetCmd.StreamingGetKeys;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.core.models.TenantStatus;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingGetOperation.StreamingInfo;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -28,7 +28,7 @@ public class StreamingGetOperation implements Operation<StreamingInfo> {
 
     public record StreamingInfoFull(
         TenantStatus status,
-        CloudProviderType cloud,
+        CloudProvider cloud,
         RegionName region,
         String clusterName,
         String pulsarVersion,
@@ -82,8 +82,8 @@ public class StreamingGetOperation implements Operation<StreamingInfo> {
         return TenantStatus.mkUnsafe(tenant.getStatus());
     }
 
-    private CloudProviderType cloud(Tenant tenant) {
-        return CloudProviderType.valueOf(tenant.getCloudProvider().toUpperCase());
+    private CloudProvider cloud(Tenant tenant) {
+        return CloudProvider.fromString(tenant.getCloudProvider());
     }
 
     private RegionName region(Tenant tenant) {

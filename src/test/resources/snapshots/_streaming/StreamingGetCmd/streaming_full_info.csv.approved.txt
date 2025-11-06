@@ -2,15 +2,15 @@
 command: astra streaming get tenant1 -o csv
 exit_code: 0
 ---- output ----
-stdout: Attribute,Value
-stdout: Name,tenant1
-stdout: Status,active
-stdout: Cloud Provider,aws
-stdout: Cloud Region,useast2
-stdout: Cluster Name,pulsar-aws-useast2
-stdout: Pulsar Version,3.1
-stdout: Jvm Version,JDK11
-stdout: WebServiceUrl,https://pulsar-aws-useast2.api.streaming.datastax.com
-stdout: BrokerServiceUrl,pulsar+ssl://pulsar-aws-useast2.streaming.datastax.com:6651
-stdout: WebSocketUrl,wss://pulsar-aws-useast2.streaming.datastax.com:8001/ws/v2
+stdout: code,message,attribute,value
+stdout: OK,,Name,tenant1
+stdout: OK,,Status,active
+stdout: OK,,Cloud Provider,aws
+stdout: OK,,Cloud Region,useast2
+stdout: OK,,Cluster Name,pulsar-aws-useast2
+stdout: OK,,Pulsar Version,3.1
+stdout: OK,,Jvm Version,JDK11
+stdout: OK,,WebServiceUrl,https://pulsar-aws-useast2.api.streaming.datastax.com
+stdout: OK,,BrokerServiceUrl,pulsar+ssl://pulsar-aws-useast2.streaming.datastax.com:6651
+stdout: OK,,WebSocketUrl,wss://pulsar-aws-useast2.streaming.datastax.com:8001/ws/v2
 ---- end ----

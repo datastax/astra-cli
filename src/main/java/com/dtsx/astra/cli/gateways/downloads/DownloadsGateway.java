@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DownloadsGateway extends SomeGateway {
-    Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, String dbName, Collection<Datacenter> datacenters);
+    Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, Collection<Datacenter> datacenters);
 
     Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh);
 

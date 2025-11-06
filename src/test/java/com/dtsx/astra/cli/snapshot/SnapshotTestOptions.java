@@ -23,8 +23,8 @@ public class SnapshotTestOptions extends TestCliContextOptions {
         super(stdin, gateways, verifyFns, fs, outputType, forceProfile, homeDir, extra);
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> comments() {
-        // noinspection unchecked
         return (List<String>) extra().getOrDefault(EXTRA_COMMENTS_KEY, new ArrayList<String>());
     }
 

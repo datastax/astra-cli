@@ -2,11 +2,11 @@
 command: astra streaming list-regions -o csv
 exit_code: 0
 ---- output ----
-stdout: Cloud Provider,Region,Display Name
-stdout: gcp,us-central1,Iowa
-stdout: gcp (premium),us-east1,South Carolina
-stdout: azure,eastus,East US
-stdout: azure (premium),westus2,West US 2
-stdout: aws,us-east-1,US East (N. Virginia)
-stdout: aws (premium),us-west-2,US West (Oregon)
+stdout: code,message,cloudProvider,region,displayName
+stdout: OK,,gcp,us-central1,Iowa
+stdout: OK,,gcp (premium),us-east1,South Carolina
+stdout: OK,,azure,eastus,East US
+stdout: OK,,azure (premium),westus2,West US 2
+stdout: OK,,aws,us-east-1,US East (N. Virginia)
+stdout: OK,,aws (premium),us-west-2,US West (Oregon)
 ---- end ----

@@ -41,7 +41,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
             })
             .verify((mocks) -> {
                 verify(mocks.dbGateway()).findOne(Databases.IdRef);
-                verify(mocks.regionGateway()).create(Databases.IdRef, Regions.NAME, Databases.One.getInfo().getTier(), Databases.One.getInfo().getCloudProvider());
+                verify(mocks.regionGateway()).create(Databases.IdRef, Regions.NAME, Databases.One.getInfo().getTier(), Databases.Cloud);
             });
     }
 

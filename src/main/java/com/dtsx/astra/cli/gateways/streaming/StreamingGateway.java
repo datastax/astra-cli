@@ -3,10 +3,10 @@ package com.dtsx.astra.cli.gateways.streaming;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.SomeGateway;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import org.graalvm.collections.Pair;
 
@@ -22,15 +22,15 @@ public interface StreamingGateway extends SomeGateway {
 
     boolean exists(TenantName tenantName);
 
-    CloudProviderType findCloudForRegion(Optional<CloudProviderType> cloud, RegionName region);
+    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region);
 
-    CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProviderType, RegionName>> clusterOrCloud, String plan, String userEmail);
+    CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail);
 
     DeletionStatus<TenantName> delete(TenantName tenantName);
 
     record StreamingRegionInfo(String displayName, boolean isPremium, Object raw) {}
 
-    SortedMap<CloudProviderType, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions();
+    SortedMap<CloudProvider, ? extends SortedMap<String, StreamingRegionInfo>> findAllRegions();
 
-    SortedSet<CloudProviderType> findAvailableClouds();
+    SortedSet<CloudProvider> findAvailableClouds();
 }

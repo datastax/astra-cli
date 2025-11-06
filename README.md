@@ -351,7 +351,23 @@ This may unfortunately require some changes to your scripts if you are relying o
 <details>
   <summary><strong>CSV schema changes</strong></summary>
 
-  TODO
+  Previously,the CSV output of commands would be somewhat inconsistent, or even invalid CSV in some cases (bugs).
+
+  Now, every command supporting CSV output will return an RFC-4180-compliant response of exactly this schema:
+
+  ```csv
+  code,message,data_field_1,data_field_2,...
+  ```
+
+  The `code` field will be of type `"OK" | "UNCAUGHT" | "DATABASE_NOT_FOUND" | "..."`, and if no rows are present, an implicit OK code should be assumed.
+ 
+  The `message` field will be a human-friendly message describing the result or error of the command (if applicable), and will be empty if there is nothing to say.
+
+  The remaining fields will be the relevant data fields for the command, and may be empty if there is no data to show.
+
+  The `code` and `message` fields may be repeated for each row of data, to keep the CSV schema consistent.
+
+  Note that values _may_ be wrapped in quotes as necessary to ensure valid CSV output, as per the RFC-4180 specification.
 </details>
 
 ### Consistent flag names and behavior

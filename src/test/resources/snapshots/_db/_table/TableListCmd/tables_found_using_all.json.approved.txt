@@ -52,6 +52,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "list<uuid>"
 stdout:             }
 stdout:           },
@@ -61,6 +62,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "map<text, uuid>"
 stdout:             }
 stdout:           },
@@ -70,6 +72,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "set<uuid>"
 stdout:             }
 stdout:           },
@@ -97,6 +100,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "VECTOR<float,5>"
 stdout:             }
 stdout:           }
@@ -169,6 +173,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "list<uuid>"
 stdout:             }
 stdout:           },
@@ -178,6 +183,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "map<text, uuid>"
 stdout:             }
 stdout:           },
@@ -187,6 +193,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "set<uuid>"
 stdout:             }
 stdout:           },
@@ -214,6 +221,7 @@ stdout:             "apiSupport" : {
 stdout:               "createTable" : true,
 stdout:               "insert" : true,
 stdout:               "read" : true,
+stdout:               "filter" : false,
 stdout:               "cqlDefinition" : "VECTOR<float,5>"
 stdout:             }
 stdout:           }

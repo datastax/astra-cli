@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.operations.streaming;
 
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingListRegionsOperation.FoundRegion;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -20,16 +20,17 @@ public class StreamingListRegionsOperation implements Operation<Stream<FoundRegi
         String cloudProvider,
         String regionName,
         String displayName,
-        boolean isPremium
+        boolean isPremium,
+        Object raw
     ) {}
 
     public record RegionListRequest(
         @Nullable List<String> nameFilter,
-        @Nullable List<CloudProviderType> cloudFilter
+        @Nullable List<CloudProvider> cloudFilter
     ) {}
 
     @Override
-    public Stream<FoundRegion> execute() { // TODO: raw json version
+    public Stream<FoundRegion> execute() {
         val regions = streamingGateway.findAllRegions();
         
         return regions.entrySet().stream()
@@ -44,12 +45,13 @@ public class StreamingListRegionsOperation implements Operation<Stream<FoundRegi
                         cloudProvider.name().toLowerCase(),
                         regionEntry.getKey(),
                         regionEntry.getValue().displayName(),
-                        regionEntry.getValue().isPremium()
+                        regionEntry.getValue().isPremium(),
+                        regionEntry.getValue().raw()
                     ));
             });
     }
 
-    private boolean passesCloudFilter(@Nullable List<CloudProviderType> cloudFilter, CloudProviderType cloudProvider) {
+    private boolean passesCloudFilter(@Nullable List<CloudProvider> cloudFilter, CloudProvider cloudProvider) {
         return cloudFilter == null || cloudFilter.contains(cloudProvider);
     }
 

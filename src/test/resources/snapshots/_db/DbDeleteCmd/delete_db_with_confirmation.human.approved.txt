@@ -8,5 +8,5 @@ stderr: To confirm, type the name below or press Ctrl+C to cancel.
 stderr: >☐
 readln: two_regions_db
 stderr: 
-stdout: Database 'two_regions_db' has been deleted and fully terminated (waited 6s for termination).
+stdout: Database 'two_regions_db' has been deleted and fully terminated after 6 seconds.
 ---- end ----

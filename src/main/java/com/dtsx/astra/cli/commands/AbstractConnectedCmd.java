@@ -1,5 +1,9 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.CustomFile;
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.DefaultFile;
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.Forced;
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.FromArgs;
 import com.dtsx.astra.cli.core.CliConstants.$ConfigFile;
 import com.dtsx.astra.cli.core.CliConstants.$Env;
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
@@ -14,7 +18,6 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -41,7 +44,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     public static class CredsSpec {
         @Option(
             names = { $Token.LONG },
-            description = "Override the default astra token",
+            description = "The astra token to use for this command. Use the @|code --token @file|@ syntax to read the token from a file, to avoid potential leaks.",
             paramLabel = $Token.LABEL,
             required = true
         )
@@ -59,7 +62,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     public static class ConfigSpec {
         @Option(
             names = { $ConfigFile.LONG, $ConfigFile.SHORT },
-            description = { "The astrarc file to use", SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" },
+            description = { "The @|code .astrarc|@ file to use for this command", SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" },
             paramLabel = $ConfigFile.LABEL
         )
         private Optional<Path> $configFile;
@@ -67,34 +70,74 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         @Option(
             names = { $Profile.LONG, $Profile.SHORT },
             completionCandidates = AvailableProfilesCompletion.class,
-            description = "The astrarc profile to use",
+            description = "The @|code .astrarc|@ profile to use for this command",
             paramLabel = $Profile.LABEL
         )
         public Optional<ProfileName> $profileName;
     }
 
+    private @Nullable ProfileSource cachedProfileSource;
     private @Nullable Profile cachedProfile;
+
+    public sealed interface ProfileSource {
+        record Forced(Profile profile) implements ProfileSource {}
+        record FromArgs(AstraToken token, Optional<AstraEnvironment> env) implements ProfileSource {}
+        record CustomFile(Path path, ProfileName profile) implements ProfileSource {}
+        record DefaultFile(ProfileName profile) implements ProfileSource {}
+    }
 
     public final Profile profile() {
         if (cachedProfile != null) {
             return cachedProfile;
         }
 
-        if (ctx.forceUseProfile().isPresent()) {
-            return cachedProfile = ctx.forceUseProfile().get();
+        return cachedProfile = switch (cachedProfileSource = profileSource()) {
+            case Forced(var profile) -> profile;
+            case FromArgs(var token, var env) -> new Profile(Optional.empty(), token, env.orElse(AstraEnvironment.PROD));
+            case CustomFile(var path, var profileName) -> resolveProfileFromConfigFile(path, profileName);
+            case DefaultFile(var profileName) -> resolveProfileFromConfigFile(null, profileName);
+        };
+    }
+
+    public final ProfileSource profileSource() {
+        if (cachedProfileSource != null) {
+            return cachedProfileSource;
+        }
+
+        if (ctx.forceProfileForTesting().isPresent()) {
+            return new Forced(ctx.forceProfileForTesting().get());
         }
 
         if ($credsProvider != null && $credsProvider.$creds != null) {
-            return cachedProfile = new Profile(Optional.empty(), $credsProvider.$creds.$token, $credsProvider.$creds.$env.orElse(AstraEnvironment.PROD));
+            return new FromArgs($credsProvider.$creds.$token, $credsProvider.$creds.$env);
         }
 
-        val targetProfileName = ($credsProvider != null && $credsProvider.$config != null && $credsProvider.$config.$profileName.isPresent())
-            ? $credsProvider.$config.$profileName.get()
-            : ProfileName.DEFAULT;
+        val defaultFilePath = AstraConfig.resolveDefaultAstraConfigFile(ctx);
 
-        val config = ($credsProvider != null && $credsProvider.$config != null)
-            ? AstraConfig.readAstraConfigFile(ctx, $credsProvider.$config.$configFile.orElse(null), false)
-            : AstraConfig.readAstraConfigFile(ctx, null, false);
+        if ($credsProvider != null && $credsProvider.$config != null) {
+            val configFile = $credsProvider.$config.$configFile;
+            val profileName = $credsProvider.$config.$profileName.orElse(ProfileName.DEFAULT);
+
+            // the check for if it's the default file is later used to decide whether to update the completions cache or not
+            if (configFile.isPresent()) {
+                try {
+                    return (configFile.get().toRealPath().equals(defaultFilePath.toRealPath()))
+                        ? new DefaultFile(profileName)
+                        : new CustomFile(configFile.get(), profileName);
+                } catch (Exception e) {
+                    ctx.log().exception("Error resolving real file paths for getting the config file", e);
+                    return new CustomFile(configFile.get(), profileName);
+                }
+            }
+
+            return new DefaultFile(profileName);
+        }
+
+        return new DefaultFile(ProfileName.DEFAULT);
+    }
+
+    private Profile resolveProfileFromConfigFile(@Nullable Path path, ProfileName targetProfileName) {
+        val config = AstraConfig.readAstraConfigFile(ctx, path, false);
 
         val profile = config.lookupProfile(targetProfileName);
 
@@ -146,7 +189,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
                 throw new AstraCliException(PROFILE_NOT_FOUND, """
                   @|bold,red Error: No default profile exists in your .astrarc file.|@
-          
+                
                   > Using configuration file at %s
                 """.formatted(
                     ctx.highlight(filePath)
@@ -157,7 +200,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             } else {
                 throw new AstraCliException(PROFILE_NOT_FOUND, """
                   @|bold,red Error: Profile '%s' does not exist in your .astrarc file.|@
-               
+                
                   > Using configuration file at %s
                 """.formatted(
                     targetProfileName.unwrap(),
@@ -168,12 +211,6 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             }
         }
 
-        return cachedProfile = profile.get();
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    protected void prelude() {
-        super.prelude();
+        return profile.get();
     }
 }

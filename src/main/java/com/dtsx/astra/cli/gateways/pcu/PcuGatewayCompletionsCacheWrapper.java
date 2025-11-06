@@ -20,7 +20,7 @@ import static com.dtsx.astra.cli.utils.MiscUtils.*;
 @RequiredArgsConstructor
 public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     private final PcuGateway delegate;
-    private final CompletionsCache cache; // TODO need to add detection for when to append to (or reset) the completions cache
+    private final CompletionsCache cache;
 
     @Override
     public Stream<PcuGroup> findAll() {

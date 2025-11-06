@@ -1,8 +1,8 @@
 package com.dtsx.astra.cli.operations.db.table;
 
-import com.datastax.astra.client.tables.definition.columns.ColumnDefinition;
-import com.datastax.astra.client.tables.definition.columns.ColumnTypes;
 import com.datastax.astra.client.tables.definition.TableDefinition;
+import com.datastax.astra.client.tables.definition.columns.TableColumnDefinition;
+import com.datastax.astra.client.tables.definition.columns.TableColumnTypes;
 import com.dtsx.astra.cli.core.models.TableRef;
 import com.dtsx.astra.cli.gateways.db.table.TableGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
+import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.TableDescribeResult;
 
 @RequiredArgsConstructor
 public class TableDescribeOperation implements Operation<TableDescribeResult> {
@@ -80,13 +80,13 @@ public class TableDescribeOperation implements Operation<TableDescribeResult> {
             ));
     }
 
-    private String getCqlDefinition(ColumnDefinition columnDef) {
+    private String getCqlDefinition(TableColumnDefinition columnDef) {
         val type = columnDef.getType();
         
-        if (ColumnTypes.LIST.equals(type) ||
-            ColumnTypes.SET.equals(type) ||
-            ColumnTypes.VECTOR.equals(type) ||
-            ColumnTypes.MAP.equals(type)) {
+        if (TableColumnTypes.LIST.equals(type) ||
+            TableColumnTypes.SET.equals(type) ||
+            TableColumnTypes.VECTOR.equals(type) ||
+            TableColumnTypes.MAP.equals(type)) {
             
             if (columnDef.getApiSupport() != null) {
                 return columnDef.getApiSupport().getCqlDefinition().toUpperCase();

@@ -15,6 +15,6 @@ public abstract class AbstractPcuCmd<OpRes> extends AbstractConnectedCmd<OpRes> 
         if (!ctx.properties().disableBetaWarnings()) {
             ctx.log().warn("PCU operations are still in beta and may change without notice.");
         }
-        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profile().name()));
+        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profileSource()));
     }
 }

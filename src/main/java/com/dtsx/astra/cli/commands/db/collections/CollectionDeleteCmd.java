@@ -61,8 +61,7 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
         val data = mkData(false);
 
         return OutputAll.response(message, data, List.of(
-            new Hint("See all existing collections in the database:",
-                "${cli.name} db list-collections %s --all".formatted($keyspaceRef.db()))
+            new Hint("See all existing collections in the database:", "${cli.name} db list-collections %s --all".formatted($keyspaceRef.db()))
         ));
     }
 

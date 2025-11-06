@@ -2,33 +2,34 @@
 command: astra db describe-table two_regions_db -t test_table -o csv
 exit_code: 0
 ---- output ----
-stdout: Attribute,Value
-stdout: Name,test_table
-stdout: ,
-stdout: 'COLUMNS',
-stdout: date,DATE
-stdout: varint,VARINT
-stdout: set,SET<UUID>
-stdout: inet,INET
-stdout: double,DOUBLE
-stdout: tinyint,TINYINT
-stdout: float,FLOAT
-stdout: list,LIST<UUID>
-stdout: uuid,UUID
-stdout: int,INT
-stdout: duration,DURATION
-stdout: smallint,SMALLINT
-stdout: blob,BLOB
-stdout: boolean,BOOLEAN
-stdout: vector,"VECTOR<FLOAT,5>"
-stdout: text,TEXT
-stdout: time,TIME
-stdout: decimal,DECIMAL
-stdout: ascii,ASCII
-stdout: bigint,BIGINT
-stdout: map,"MAP<TEXT, UUID>"
-stdout: timestamp,TIMESTAMP
-stdout: 'PRIMARY KEY',
-stdout: Partition Key,text
-stdout: Clustering Columns,int(ASC)
+stdout: code,message,attribute,value
+stdout: OK,,Name,test_table
+stdout: OK,,,
+stdout: OK,,'COLUMNS',
+stdout: OK,,date,DATE
+stdout: OK,,varint,VARINT
+stdout: OK,,set,SET<UUID>
+stdout: OK,,inet,INET
+stdout: OK,,double,DOUBLE
+stdout: OK,,tinyint,TINYINT
+stdout: OK,,float,FLOAT
+stdout: OK,,list,LIST<UUID>
+stdout: OK,,uuid,UUID
+stdout: OK,,int,INT
+stdout: OK,,duration,DURATION
+stdout: OK,,smallint,SMALLINT
+stdout: OK,,blob,BLOB
+stdout: OK,,boolean,BOOLEAN
+stdout: OK,,vector,"VECTOR<FLOAT,5>"
+stdout: OK,,text,TEXT
+stdout: OK,,time,TIME
+stdout: OK,,decimal,DECIMAL
+stdout: OK,,ascii,ASCII
+stdout: OK,,bigint,BIGINT
+stdout: OK,,map,"MAP<TEXT, UUID>"
+stdout: OK,,timestamp,TIMESTAMP
+stdout: OK,, ,
+stdout: OK,,'PRIMARY KEY',
+stdout: OK,,Partition Key,text
+stdout: OK,,Clustering Columns,int(ASC)
 ---- end ----

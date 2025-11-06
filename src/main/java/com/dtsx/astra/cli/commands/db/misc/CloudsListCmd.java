@@ -2,11 +2,11 @@ package com.dtsx.astra.cli.commands.db.misc;
 
 import com.dtsx.astra.cli.commands.db.region.AbstractRegionCmd;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.misc.CloudsListOperation;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import picocli.CommandLine.Command;
 
@@ -24,14 +24,14 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "List all available cloud providers",
     command = "${cli.name} db list-clouds"
 )
-public class CloudsListCmd extends AbstractRegionCmd<SortedSet<CloudProviderType>> {
+public class CloudsListCmd extends AbstractRegionCmd<SortedSet<CloudProvider>> {
     @Override
-    protected Operation<SortedSet<CloudProviderType>> mkOperation() {
+    protected Operation<SortedSet<CloudProvider>> mkOperation() {
         return new CloudsListOperation(regionGateway);
     }
 
     @Override
-    protected final OutputAll execute(Supplier<SortedSet<CloudProviderType>> result) {
+    protected final OutputAll execute(Supplier<SortedSet<CloudProvider>> result) {
         val set = new TreeSet<>(result.get());
 
         return new ShellTable(

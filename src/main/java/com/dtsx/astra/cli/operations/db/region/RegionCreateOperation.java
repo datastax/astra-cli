@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.operations.db.region;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -38,7 +39,12 @@ public class RegionCreateOperation implements Operation<RegionCreateResult> {
     public RegionCreateResult execute() {
         val dbInfo = dbGateway.findOne(request.dbRef);
 
-        val status = regionGateway.create(request.dbRef, request.region, dbInfo.getInfo().getTier(), dbInfo.getInfo().getCloudProvider());
+        val status = regionGateway.create(
+            request.dbRef,
+            request.region,
+            dbInfo.getInfo().getTier(),
+            CloudProvider.fromSdkType(dbInfo.getInfo().getCloudProvider())
+        );
 
         return switch (status) {
             case CreationStatus.Created<?> _ -> handleRegionCreated(request.dbRef, request.lrOptions);

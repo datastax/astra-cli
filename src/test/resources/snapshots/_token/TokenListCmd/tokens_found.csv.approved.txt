@@ -2,7 +2,7 @@
 command: astra token list -o csv
 exit_code: 0
 ---- output ----
-stdout: Generated On,Client Id,Roles
-stdout: 2025-06-17T02:26:29.846Z,BOjPpMRcaWergiKIyHXEAymP,Organization Administrator
-stdout: 2025-07-14T19:39:06.918Z,aBc123XyZ789LmnOpQrStUvW,Admin User
+stdout: code,message,generatedOn,clientId,roles
+stdout: OK,,2025-06-17T02:26:29.846Z,BOjPpMRcaWergiKIyHXEAymP,Organization Administrator
+stdout: OK,,2025-07-14T19:39:06.918Z,aBc123XyZ789LmnOpQrStUvW,Admin User
 ---- end ----

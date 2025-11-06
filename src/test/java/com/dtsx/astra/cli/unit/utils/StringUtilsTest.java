@@ -10,6 +10,7 @@ import org.graalvm.collections.Pair;
 import picocli.CommandLine.Help.Ansi;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -118,7 +119,7 @@ public class StringUtilsTest {
 
             val result = StringUtils.maskToken(new AstraColors(Ansi.OFF), invalidToken);
 
-            assertThat(result).matches("<invalid_token\\('.{0,4}'\\)>");
+            assertThat(result).matches(Pattern.compile("<invalid_token\\('.{0,4}'\\)>", Pattern.DOTALL));
         }
     }
 

@@ -1,11 +1,11 @@
 package com.dtsx.astra.cli.commands.db.region;
 
 import com.dtsx.astra.cli.core.CliConstants.$Cloud;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.FoundRegion;
-import com.dtsx.astra.sdk.db.domain.CloudProviderType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
@@ -31,7 +31,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
         paramLabel = "FILTER",
         split = ","
     )
-    public @Nullable List<CloudProviderType> $cloudFilter;
+    public @Nullable List<CloudProvider> $cloudFilter;
 
     @Option(
         names = { "-z", "--zone" },
@@ -68,7 +68,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
         return new ShellTable(data).withColumns("Cloud Provider", "Region", "Display Name", "Zone");
     }
 
-    private String formatCloudProviderName(CloudProviderType cloudProvider, boolean hasFreeTier) {
+    private String formatCloudProviderName(CloudProvider cloudProvider, boolean hasFreeTier) {
         val cp = cloudProvider.name().toLowerCase();
 
         if (hasFreeTier) {

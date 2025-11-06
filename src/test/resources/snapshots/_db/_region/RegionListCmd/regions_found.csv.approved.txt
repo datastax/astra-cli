@@ -2,7 +2,7 @@
 command: astra db list-regions two_regions_db -o csv
 exit_code: 0
 ---- output ----
-stdout: Cloud Provider,Region,Tier,Status
-stdout: aws,us-east-2 (default),serverless,
-stdout: aws,ap-south-1,serverless,
+stdout: code,message,cloudProvider,region,tier,status
+stdout: OK,,aws,us-east-2 (default),serverless,
+stdout: OK,,aws,ap-south-1,serverless,
 ---- end ----

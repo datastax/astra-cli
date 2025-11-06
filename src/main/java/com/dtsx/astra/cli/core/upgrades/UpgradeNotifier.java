@@ -13,6 +13,10 @@ public class UpgradeNotifier {
     public static final int PADDING = 3;
 
     public static void run(CliContext ctx) {
+        if (ctx.isWindows()) {
+            return;
+        }
+
         if (ctx.properties().noUpgradeNotifications()) {
             return;
         }
