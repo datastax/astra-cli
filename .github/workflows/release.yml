@@ -15,21 +15,43 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yml
-    
+
   release:
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
+      - name: Verify versions are up to date
+        run: |
+          files=(
+            "scripts/install.ps1"
+            "scripts/install.sh"
+            "build.gradle.kts"
+            "src/test/resources/snapshots/AstraCli/help_output.human.approved.txt"
+          )
+
+          missing_files=()
+          for f in "${files[@]}"; do
+            if ! grep -q "${{ inputs.tag }}" "$f"; then
+              missing_files+=("$f")
+            fi
+          done
+
+          if [ ${#missing_files[@]} -ne 0 ]; then
+            echo "ERROR: Version not found in the following files:"
+            printf '%s\n' "${missing_files[@]}"
+            exit 1
+          fi
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
