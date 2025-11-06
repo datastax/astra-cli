@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -9,6 +11,7 @@ import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
@@ -39,13 +42,16 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Create a new keyspace without waiting for the database to become active",
     command = "${cli.name} db create-keyspace my_db -k my_keyspace --async"
 )
-public class KeyspaceCreateCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceCreateResult> {
+public class KeyspaceCreateCmd extends AbstractKeyspaceRequiredCmd<KeyspaceCreateResult> implements WithSetTimeout {
     @Option(
         names = { "--if-not-exists" },
         description = "Don't error if a keyspace with the same name already exists",
         defaultValue = "false"
     )
     public boolean $ifNotExists;
+
+    @Mixin
+    protected LongRunningOptionsMixin lrMixin;
 
     @Option(
         names = LR_OPTS_TIMEOUT_NAME,

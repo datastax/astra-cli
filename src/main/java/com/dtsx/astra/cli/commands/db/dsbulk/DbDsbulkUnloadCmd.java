@@ -58,6 +58,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
         defaultValue = "100"
     )
     public int $maxErrors;
+
     @Option(
         names = { "-query", "--schema.query" },
         description = "Optional query to unload or count",

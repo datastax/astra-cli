@@ -29,7 +29,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         " @|blue:300 *|@ Enable shell completions",
         " @|blue:300 *|@ Optionally set any other configuration environment variables.",
         "",
-        "Intended to be added to your shell profile (@|code .zshrc|@, @|code .zprofile|@, @|code .bashrc|@, etc.)",
+        "Intended to be added to your shell profile (@|code .zshrc|@, @|code .zprofile|@, @|code .bashrc|@, etc.), but you can technically just eval it in any shell session to get completions and update your PATH for that session.",
     },
     descriptionHeading = "%n"
 )

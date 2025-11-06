@@ -148,12 +148,7 @@ public class APIProviderImpl implements APIProvider {
             }
         );
 
-        dbInfo.ifPresent((info) -> {
-            val id = UUID.fromString(info.getId());
-            dbCache.cacheDbId(info.getInfo().getName(), id);
-            dbCache.cacheDbRegion(id, RegionName.mkUnsafe(info.getInfo().getRegion()));
-        });
-
+        dbInfo.ifPresent(dbCache::cache);
         return dbInfo;
     }
 

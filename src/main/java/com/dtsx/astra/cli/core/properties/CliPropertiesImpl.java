@@ -5,10 +5,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugExcep
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.properties.CliEnvironment.OS;
 import com.dtsx.astra.cli.utils.FileUtils;
-import lombok.AccessLevel;
-import lombok.Cleanup;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
+import lombok.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +17,18 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class CliPropertiesImpl implements CliProperties {
+    private static boolean loaded = false;
+
     public static CliProperties mkAndLoadSysProps(CliEnvironment env) {
         return mkAndLoadSysProps(env, p -> p);
     }
 
     public static CliProperties mkAndLoadSysProps(CliEnvironment env, Function<CliProperties, CliProperties> wrapper) {
         val props = wrapper.apply(new CliPropertiesImpl());
+
+        if (loaded) {
+            return props;
+        }
 
         for (val file : List.of("static.properties", "dynamic.properties")) {
             try {
@@ -45,6 +48,7 @@ public class CliPropertiesImpl implements CliProperties {
         props.rcFileLocations(env.platform().os() == OS.WINDOWS);
         props.homeFolderLocations(env.platform().os() == OS.WINDOWS);
 
+        loaded = true;
         return props;
     }
 

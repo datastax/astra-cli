@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation;
@@ -26,11 +27,12 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     @Parameters(
+        arity = "0..1",
         completionCandidates = DbNamesCompletion.class,
         description = "The name/ID of the Astra database to connect to",
         paramLabel = $Db.LABEL
     )
-    public DbRef $dbRef;
+    public Optional<DbRef> $dbRef;
 
     @Option(
         names = { $Keyspace.LONG, $Keyspace.SHORT },
@@ -59,7 +61,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     @Override
     protected Operation<CqlshExecResult> mkOperation(boolean captureOutput) {
         return new DbCqlshStartOperation(ctx, dbGateway, downloadsGateway, new CqlshRequest(
-            $dbRef,
+            $dbRef.orElseGet(this::promptForDb),
             $debug,
             $encoding,
             $keyspace,
@@ -71,6 +73,10 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
             this::readStdin,
             captureOutput
         ));
+    }
+
+    private DbRef promptForDb() {
+        return DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"));
     }
 
     private String readStdin() {

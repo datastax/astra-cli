@@ -2,12 +2,14 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.keyspace.KeyspaceDeleteOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
@@ -38,13 +40,16 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Delete a keyspace without waiting for the database to become active",
     command = "${cli.name} db delete-keyspace my_db -k my_keyspace --async"
 )
-public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<KeyspaceDeleteResult> {
+public class KeyspaceDeleteCmd extends AbstractPromptForKeyspaceCmd<KeyspaceDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = "Do not fail if keyspace does not exist",
         defaultValue = "false"
     )
     public boolean ifExists;
+
+    @Mixin
+    protected LongRunningOptionsMixin lrMixin;
 
     @Option(
         names = LR_OPTS_TIMEOUT_NAME,
@@ -127,5 +132,15 @@ public class KeyspaceDeleteCmd extends AbstractLongRunningKeyspaceRequiredCmd<Ke
             "wasDeleted", wasDeleted,
             "waitedSeconds", Optional.ofNullable(waitedDuration).map(Duration::getSeconds)
         );
+    }
+
+    @Override
+    protected boolean shouldFindDefaultKeyspace() {
+        return false;
+    }
+
+    @Override
+    protected String keyspacePrompt() {
+        return "Select the keyspace to delete:";
     }
 }

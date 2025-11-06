@@ -31,7 +31,7 @@ import static com.dtsx.astra.cli.operations.db.table.TableDescribeOperation.*;
     comment = "Describe a table in a specific keyspace",
     command = "${cli.name} db describe-table my_db -k my_keyspace -t my_table"
 )
-public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResult> {
+public class TableDescribeCmd extends AbstractPromptForTableCmd<TableDescribeResult> {
     @Override
     protected final OutputJson executeJson(Supplier<TableDescribeResult> result) {
         return switch (result.get()) {
@@ -94,5 +94,10 @@ public class TableDescribeCmd extends AbstractTableSpecificCmd<TableDescribeResu
     @Override
     protected Operation<TableDescribeResult> mkOperation() {
         return new TableDescribeOperation(tableGateway, new TableDescribeRequest($tableRef));
+    }
+
+    @Override
+    protected String tablePrompt() {
+        return "Select the table to describe:";
     }
 }

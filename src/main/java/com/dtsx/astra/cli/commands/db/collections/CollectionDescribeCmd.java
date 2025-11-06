@@ -31,7 +31,7 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionDescribeOper
     comment = "Describe a collection in a specific keyspace",
     command = "${cli.name} db describe-collection my_db -k my_keyspace -c my_collection"
 )
-public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<CollectionDescribeResult> {
+public class CollectionDescribeCmd extends AbstractPromptForCollectionCmd<CollectionDescribeResult> {
     @Override
     protected final OutputJson executeJson(Supplier<CollectionDescribeResult> result) {
             return switch (result.get()) {
@@ -118,5 +118,10 @@ public class CollectionDescribeCmd extends AbstractCollectionSpecificCmd<Collect
     @Override
     protected Operation<CollectionDescribeResult> mkOperation() {
         return new CollectionDescribeOperation(collectionGateway, new CollectionDescribeRequest($collRef));
+    }
+
+    @Override
+    protected String collectionPrompt() {
+        return "Select the collection to describe:";
     }
 }

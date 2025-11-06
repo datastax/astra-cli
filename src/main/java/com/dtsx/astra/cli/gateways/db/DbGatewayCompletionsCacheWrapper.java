@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -41,6 +42,13 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
             removeRefFromCache(ref);
         }
 
+        return res;
+    }
+
+    @Override
+    public Optional<KeyspaceRef> tryFindDefaultKeyspace(DbRef dbRef) {
+        val res = delegate.tryFindDefaultKeyspace(dbRef);
+        res.ifPresent((_) -> addRefToCache(dbRef));
         return res;
     }
 

@@ -10,6 +10,7 @@ import picocli.CommandLine.Help.Ansi;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.dtsx.astra.cli.utils.StringUtils.*;
@@ -43,7 +44,13 @@ public class ExamplesRenderer {
 
         val colors = new AstraColors(resolveAnsi(args));
 
-        for (val example : examples) {
+        val resolved = Arrays.stream(examples)
+            .map(example -> {
+                return Example.ExampleProvider.resolve(example, ctxRef.get());
+            })
+            .toList();
+
+        for (val example : resolved) {
             sb.append("  ").append(renderComment(colors, example.comment())).append(NL);
 
             sb.append("  ").append(renderCommand(colors, example.command()
@@ -51,7 +58,7 @@ public class ExamplesRenderer {
                 .replace("${cli.path}", ctxRef.get().properties().binaryPath().map(Path::toString).orElse("/path/to/cli"))
             )).append(NL);
 
-            if (example != examples[examples.length - 1]) {
+            if (example != resolved.getLast()) {
                 sb.append(NL);
             }
         }

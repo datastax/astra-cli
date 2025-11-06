@@ -7,14 +7,14 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
-import com.dtsx.astra.cli.core.models.AstraToken;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.utils.HttpUtils;
-import com.dtsx.astra.sdk.db.domain.*;
+import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest;
+import com.dtsx.astra.sdk.db.domain.DatabaseFilter;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -54,6 +54,14 @@ public class DbGatewayImpl implements DbGateway {
         return ctx.log().loading("Fetching info for database " + ctx.highlight(ref), (_) -> (
             api.tryResolveDb(ref)
         ));
+    }
+
+    @Override
+    public Optional<KeyspaceRef> tryFindDefaultKeyspace(DbRef dbRef) {
+        if (dbCache.lookupDbDefaultKs(dbRef).isEmpty()) {
+            findOne(dbRef); // populate cache
+        }
+        return dbCache.lookupDbDefaultKs(dbRef).map(ks -> KeyspaceRef.mkUnsafe(dbRef, ks));
     }
 
     @Override
@@ -184,6 +192,7 @@ public class DbGatewayImpl implements DbGateway {
 
         dbCache.cacheDbId(name, id);
         dbCache.cacheDbRegion(id, region);
+        dbCache.cacheDbDefaultKs(id, keyspace);
 
         val newDb = ctx.log().loading("Fetching info for newly created database " + ctx.highlight(name), (_) -> findOne(DbRef.fromId(id)));
 

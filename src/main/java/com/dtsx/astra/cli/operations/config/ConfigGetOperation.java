@@ -1,11 +1,6 @@
 package com.dtsx.astra.cli.operations.config;
 
 import com.dtsx.astra.cli.core.config.AstraConfig;
-import com.dtsx.astra.cli.core.config.InvalidProfile;
-import com.dtsx.astra.cli.core.config.Profile;
-import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.datatypes.NEList;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigGetOperation.GetConfigResult;
@@ -13,9 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.Optional;
-import java.util.function.Function;
-
-import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 @RequiredArgsConstructor
 public class ConfigGetOperation implements Operation<GetConfigResult> {
@@ -29,29 +21,16 @@ public class ConfigGetOperation implements Operation<GetConfigResult> {
     public record ProfileNotFound(String profileName) implements GetConfigResult {}
 
     public record GetConfigRequest(
-        Optional<String> profileName,
-        Optional<String> key,
-        Function<NEList<Either<InvalidProfile, Profile>>, String> promptProfileName
+        String profileName,
+        Optional<String> key
     ) {}
 
     @Override
     public GetConfigResult execute() {
-        val profileName = request.profileName.orElseGet(() -> {
-            val candidates = NEList.parse(config.profiles());
-
-            if (candidates.isEmpty()) {
-                throw new AstraCliException(PROFILE_NOT_FOUND, """
-                  @|bold,red No profiles found to select from|@
-                """);
-            }
-
-            return request.promptProfileName.apply(candidates.get());
-        });
-
-        val section = config.lookupSection(profileName);
+        val section = config.lookupSection(request.profileName);
 
         if (section.isEmpty()) {
-            return new ProfileNotFound(profileName);
+            return new ProfileNotFound(request.profileName);
         }
 
         if (request.key.isPresent()) {

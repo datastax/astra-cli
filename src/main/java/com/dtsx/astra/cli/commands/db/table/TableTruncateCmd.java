@@ -26,7 +26,7 @@ import static com.dtsx.astra.cli.operations.db.table.TableTruncateOperation.*;
     comment = "Truncate a table in a specific keyspace",
     command = "${cli.name} db truncate-table my_db -k my_keyspace -t my_table"
 )
-public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResult> {
+public class TableTruncateCmd extends AbstractPromptForTableCmd<TableTruncateResult> {
     @Override
     public final OutputAll execute(Supplier<TableTruncateResult> result) {
         return switch (result.get()) {
@@ -56,5 +56,10 @@ public class TableTruncateCmd extends AbstractTableSpecificCmd<TableTruncateResu
     @Override
     protected Operation<TableTruncateResult> mkOperation() {
         return new TableTruncateOperation(tableGateway, new TableTruncateRequest($tableRef));
+    }
+
+    @Override
+    protected String tablePrompt() {
+        return "Select the table to truncate:";
     }
 }

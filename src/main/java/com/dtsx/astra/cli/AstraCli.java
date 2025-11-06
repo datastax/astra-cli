@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli;
 
+import com.dtsx.astra.cli.AstraCli.SetupExampleProvider;
 import com.dtsx.astra.cli.commands.*;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
@@ -11,6 +12,7 @@ import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.TypeConverters;
+import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.AstraHome;
 import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
@@ -19,6 +21,7 @@ import com.dtsx.astra.cli.core.exceptions.ExecutionExceptionHandler;
 import com.dtsx.astra.cli.core.exceptions.ExitCodeException;
 import com.dtsx.astra.cli.core.exceptions.ParameterExceptionHandler;
 import com.dtsx.astra.cli.core.help.*;
+import com.dtsx.astra.cli.core.help.Example.ExampleProvider;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
@@ -28,6 +31,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import com.dtsx.astra.cli.core.properties.MemoizedCliProperties;
 import com.dtsx.astra.cli.core.upgrades.UpgradeNotifier;
@@ -38,6 +42,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
@@ -47,6 +52,7 @@ import picocli.CommandLine.IFactory;
 import picocli.CommandLine.Option;
 
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -76,8 +82,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     }
 )
 @Example(
-    comment = "Setup the Astra CLI",
-    command = "${cli.name} setup"
+    exampleProvider = SetupExampleProvider.class
 )
 @Example(
     comment = "List databases",
@@ -213,5 +218,28 @@ public class AstraCli extends AbstractCmd<Void> {
 
     public static <T> T exit(int exitCode) {
         throw new ExitCodeException(exitCode);
+    }
+
+    public static class SetupExampleProvider implements ExampleProvider {
+        @Override
+        public Pair<String, String> get(CliContext ctx) {
+            try {
+                val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
+
+                if (!configFileExists) {
+                    return Pair.create("Setup the Astra CLI", "${cli.name} setup");
+                }
+
+                val autocompleteSetup = System.getenv(ConstEnvVars.COMPLETIONS_SETUP) != null;
+
+                if (!autocompleteSetup && ctx.isNotWindows()) {
+                    return Pair.create("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
+                }
+            } catch (Exception e) {
+                ctx.log().exception("Error resolving main example for AstraCli", e);
+            }
+
+            return Pair.create("Create a new profile", "astra setup");
+        }
     }
 }

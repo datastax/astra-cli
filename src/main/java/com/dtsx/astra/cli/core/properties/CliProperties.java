@@ -18,6 +18,7 @@ public interface CliProperties {
         public static final String IGNORE_MULTIPLE_PATHS = "ASTRA_IGNORE_MULTIPLE_PATHS";
         public static final String IGNORE_BETA_WARNINGS = "ASTRA_IGNORE_BETA_WARNINGS";
         public static final String NO_UPDATE_NOTIFIER = "ASTRA_NO_UPDATE_NOTIFIER";
+        public static final String COMPLETIONS_SETUP = "ASTRA_COMPLETIONS_SETUP";
     }
 
     record ExternalSoftware(

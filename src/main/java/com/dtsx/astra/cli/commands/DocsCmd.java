@@ -57,7 +57,7 @@ public class DocsCmd extends AbstractCmd<Void> {
         );
 
         val generated = ctx.log().loading("Generating documentation tree", (_) -> {
-            return new AsciidocGenerator(ctx.properties().cliName(), spec.root(), docsSpec).generate();
+            return new AsciidocGenerator(ctx, spec.root(), docsSpec).generate();
         });
 
         ctx.log().loading("Writing documentation to " + outputDir, (_) -> {

@@ -26,7 +26,7 @@ import static com.dtsx.astra.cli.operations.db.collection.CollectionTruncateOper
     comment = "Truncate a collection in a specific keyspace",
     command = "${cli.name} db truncate-collection my_db -k my_keyspace -c my_collection"
 )
-public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<CollectionTruncateResult> {
+public class CollectionTruncateCmd extends AbstractPromptForCollectionCmd<CollectionTruncateResult> {
     @Override
     public final OutputAll execute(Supplier<CollectionTruncateResult> result) {
         return switch (result.get()) {
@@ -56,5 +56,10 @@ public class CollectionTruncateCmd extends AbstractCollectionSpecificCmd<Collect
     @Override
     protected Operation<CollectionTruncateResult> mkOperation() {
         return new CollectionTruncateOperation(collectionGateway, new CollectionTruncateRequest($collRef));
+    }
+
+    @Override
+    protected String collectionPrompt() {
+        return "Select the collection to truncate:";
     }
 }

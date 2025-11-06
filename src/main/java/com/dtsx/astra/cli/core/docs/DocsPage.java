@@ -1,7 +1,9 @@
 package com.dtsx.astra.cli.core.docs;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.help.Example.ExampleProvider;
 import lombok.val;
 import picocli.CommandLine.Model.ArgGroupSpec;
 import picocli.CommandLine.Model.ArgSpec;
@@ -203,7 +205,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
         }
     }
 
-    public record CommandExamples(Example[] examples) implements DocsPageSection {
+    public record CommandExamples(Example[] examples, CliContext ctx) implements DocsPageSection {
         @Override
         public String render() {
             return """
@@ -214,6 +216,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
             ----
             """.formatted(
                 Arrays.stream(examples)
+                    .map(e -> ExampleProvider.resolve(e, ctx))
                     .map((e) -> "# " + e.comment() + NL + "$ " + e.command() )
                     .collect(Collectors.joining(NL + NL))
             );

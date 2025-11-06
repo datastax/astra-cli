@@ -8,6 +8,8 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -21,11 +23,12 @@ import static java.util.Collections.emptyMap;
 
 public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkExecCmd {
     @Parameters(
+        arity = "0..1",
         completionCandidates = DbNamesCompletion.class,
         description = "The name or ID of the Astra database to operate on",
         paramLabel = $Db.LABEL
     )
-    protected DbRef $dbRef;
+    private Optional<DbRef> $maybeDbRef;
 
     @Option(
         names = { $Keyspace.LONG, $Keyspace.SHORT },
@@ -89,6 +92,18 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
             paramLabel = "FLAGS"
         )
         public Map<String, String> flags;
+    }
+
+    public DbRef $dbRef;
+
+    @Override
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        super.prelude();
+
+        $dbRef = $maybeDbRef.orElseGet(() -> (
+            DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"))
+        ));
     }
 
     protected Either<Path, Map<String, String>> $configProvider() {

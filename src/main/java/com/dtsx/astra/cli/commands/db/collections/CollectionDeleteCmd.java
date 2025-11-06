@@ -34,7 +34,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Delete a collection without failing if it doesn't exist",
     command = "${cli.name} db delete-collection my_db -c my_collection --if-exists"
 )
-public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<CollectionDeleteResult> {
+public class CollectionDeleteCmd extends AbstractPromptForCollectionCmd<CollectionDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = "Do not fail if collection does not exist",
@@ -101,5 +101,10 @@ public class CollectionDeleteCmd extends AbstractCollectionSpecificCmd<Collectio
     @Override
     protected Operation<CollectionDeleteResult> mkOperation() {
         return new CollectionDeleteOperation(collectionGateway, new CollectionDeleteRequest($collRef, $ifExists));
+    }
+
+    @Override
+    protected String collectionPrompt() {
+        return "Select the collection to delete:";
     }
 }

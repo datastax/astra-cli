@@ -81,9 +81,11 @@ public class CollectionGatewayImpl implements CollectionGateway {
             collDef.vectorize(embeddingProvider.get(), embeddingModel.get(), embeddingKey.get());
         }
 
-        collDef.indexing(new IndexingOptions()
-            .allow(indexingAllow)
-            .deny(indexingDeny));
+        if (!indexingAllow.isEmpty())  {
+            collDef.indexing(new IndexingOptions().allow(indexingAllow));
+        } else if (!indexingDeny.isEmpty()) {
+            collDef.indexing(new IndexingOptions().deny(indexingDeny));
+        }
 
         ctx.log().loading("Creating collection " + ctx.highlight(collRef), (_) -> {
             api.dataApiDatabase(collRef.keyspace()).createCollection(collRef.name(), collDef);

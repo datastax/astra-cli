@@ -34,7 +34,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Delete a table without failing if it doesn't exist",
     command = "${cli.name} db delete-table my_db -t my_table --if-exists"
 )
-public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> {
+public class TableDeleteCmd extends AbstractPromptForTableCmd<TableDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = "Do not fail if table does not exist",
@@ -101,5 +101,10 @@ public class TableDeleteCmd extends AbstractTableSpecificCmd<TableDeleteResult> 
     @Override
     protected Operation<TableDeleteResult> mkOperation() {
         return new TableDeleteOperation(tableGateway, new TableDeleteRequest($tableRef, $ifExists));
+    }
+
+    @Override
+    protected String tablePrompt() {
+        return "Select the table to delete:";
     }
 }

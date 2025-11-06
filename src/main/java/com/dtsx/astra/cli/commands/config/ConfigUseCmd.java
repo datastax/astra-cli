@@ -2,13 +2,14 @@ package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
-import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
+import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.prompters.specific.ProfileNamePrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
@@ -19,11 +20,9 @@ import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
@@ -66,43 +65,33 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
 
     @Override
     protected Operation<ConfigUseResult> mkOperation() {
-        return new ConfigUseOperation(config(false), new UseConfigRequest($profileName, this::promptForProfile));
+        return new ConfigUseOperation(config(false), new UseConfigRequest($profileName.orElseGet(this::promptForProfileName)));
     }
 
-    private Profile promptForProfile(Optional<Profile> defaultProfile, NEList<Profile> candidates) {
-        val maxNameLength = candidates.stream()
-            .map(p -> p.nameOrDefault().unwrap().length())
-            .max(Integer::compareTo)
-            .orElse(0);
+    private ProfileName promptForProfileName() {
+        val selected = ProfileNamePrompter.prompt(ctx, config(false).profiles(), "Select a profile to set as default",
+            (list) -> {
+                val onlyValid = NEList.parse(list.stream().filter(Either::isRight).toList());
 
-        val profileToDisplayMap = candidates.stream()
-            .collect(Collectors.toMap(
-                p -> p,
-                p -> {
-                    val name = p.nameOrDefault().unwrap();
-
-                    val tags = new ArrayList<String>() {{
-                        add(p.env().name().toLowerCase());
-
-                        if (defaultProfile.isPresent() && defaultProfile.get().token().equals(p.token()) && defaultProfile.get().env().equals(p.env())) {
-                            add("already default");
-                        }
-                    }};
-
-                    val tagsAsString = (!tags.isEmpty())
-                        ? ctx.colors().NEUTRAL_500.use(" (" + String.join(", ", tags) + ")")
-                        : "";
-
-                    return name + " ".repeat(maxNameLength - name.length()) + tagsAsString;
+                if (onlyValid.isEmpty()) {
+                    throw new AstraCliException(PROFILE_NOT_FOUND, """
+                      @|bold,red No valid profiles found to select from|@
+                    """);
                 }
-            ));
 
-        return ctx.console().select("Select a profile to set as default")
-            .options(candidates)
-            .requireAnswer()
-            .mapper(profileToDisplayMap::get)
-            .fallbackIndex(0)
-            .fix(originalArgs(), "<profile>")
-            .clearAfterSelection();
+                val notDefault = NEList.parse(onlyValid.get().stream().filter(e -> !e.getRight().isDefault()).toList());
+
+                if (notDefault.isEmpty()) {
+                    throw new AstraCliException(PROFILE_NOT_FOUND, """
+                      @|bold,red No other (non-default) profiles found to select from|@
+                    """);
+                }
+
+                return notDefault.get();
+            },
+            (b) -> b.fallbackIndex(0).fix(originalArgs(), "<profile>")
+        );
+
+        return ProfileName.mkUnsafe(selected);
     }
 }

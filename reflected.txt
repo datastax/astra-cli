@@ -1,4 +1,5 @@
 # CLI basics
+com.dtsx.astra.cli.AstraCli$SetupExampleProvider
 com.dtsx.astra.cli.core.output.Hint
 com.dtsx.astra.cli.core.models.*
 

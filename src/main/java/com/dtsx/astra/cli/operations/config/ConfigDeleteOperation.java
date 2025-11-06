@@ -18,9 +18,9 @@ public class ConfigDeleteOperation implements Operation<ConfigDeleteResult> {
     ) {}
 
     public sealed interface ConfigDeleteResult {}
-    public record ProfileDoesNotExist() implements ConfigDeleteResult {}
-    public record ProfileIllegallyDoesNotExist() implements ConfigDeleteResult {}
-    public record ProfileDeleted() implements ConfigDeleteResult {}
+    public record ProfileDoesNotExist(ProfileName profileName) implements ConfigDeleteResult {}
+    public record ProfileIllegallyDoesNotExist(ProfileName profileName) implements ConfigDeleteResult {}
+    public record ProfileDeleted(ProfileName profileName) implements ConfigDeleteResult {}
 
     @Override
     public ConfigDeleteResult execute() {
@@ -28,13 +28,13 @@ public class ConfigDeleteOperation implements Operation<ConfigDeleteResult> {
 
         if (!profileExists) {
             if (request.ifNotExists) {
-                return new ProfileDoesNotExist();
+                return new ProfileDoesNotExist(request.profileName);
             }
-            return new ProfileIllegallyDoesNotExist();
+            return new ProfileIllegallyDoesNotExist(request.profileName);
         }
 
         config.modify((ctx) -> ctx.deleteProfile(request.profileName));
 
-        return new ProfileDeleted();
+        return new ProfileDeleted(request.profileName);
     }
 }

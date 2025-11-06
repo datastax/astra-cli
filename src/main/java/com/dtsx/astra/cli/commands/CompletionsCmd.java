@@ -1,8 +1,10 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.completions.DynamicCompletion;
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
+import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import lombok.val;
 import picocli.AutoComplete;
@@ -24,6 +26,10 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
     description = "See the help for the @|code @{cli.name} shellenv!@ command to setup completions in your shell.",
     descriptionHeading = "%n",
     hidden = true
+)
+@Example(
+    comment = "Put this in your shell profile (e.g. @|code ~/.zprofile|@) to generate completions and set your PATH",
+    command = "eval \"$(${cli.path} shellenv)\""
 )
 public class CompletionsCmd implements Runnable {
     @Spec
@@ -51,11 +57,12 @@ public class CompletionsCmd implements Runnable {
         val lines = script.split(NL);
         val estimatedSize = script.length() + (instances.size() * 100) + 500;
         val sb = new StringBuilder(estimatedSize);
-        var i = 0;
+        var linesIdx = 0;
 
-        i = appendUtilityFunctions(lines, sb, i);
+        linesIdx = appendUtilityFunctions(lines, sb, linesIdx);
+        appendSetupEnvVrs(sb);
         appendCompletionFunctions(sb, instances);
-        updateCompletions(sb, lines, instances, i);
+        updateCompletions(sb, lines, instances, linesIdx);
 
         spec.commandLine().getOut().println(sb);
     }
@@ -73,6 +80,10 @@ public class CompletionsCmd implements Runnable {
         sb.append("function get_profile(){ for ((i=0;i<${#COMP_WORDS[@]};i++));do [[ ${COMP_WORDS[i]} == --profile ]]&&((i+1<${#COMP_WORDS[@]}))&&echo ${COMP_WORDS[i+1]}&&return;done; echo default;};").append(NL).append(NL);
         sb.append("function get_astra_dir(){ echo \"").append(homeFolder).append("\"};").append(NL).append(NL);
         return i;
+    }
+
+    private void appendSetupEnvVrs(StringBuilder sb) {
+        sb.append("export " + ConstEnvVars.COMPLETIONS_SETUP + "=true").append(NL).append(NL);
     }
 
     private void appendCompletionFunctions(StringBuilder sb, Set<DynamicCompletion> instances) {

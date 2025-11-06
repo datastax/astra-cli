@@ -3,10 +3,6 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
-import com.dtsx.astra.cli.core.config.InvalidProfile;
-import com.dtsx.astra.cli.core.config.Profile;
-import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -14,6 +10,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputCsv;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
+import com.dtsx.astra.cli.core.output.prompters.specific.ProfileNamePrompter;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.operations.Operation;
@@ -157,48 +154,13 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
 
     @Override
     protected Operation<GetConfigResult> mkOperation() {
-        return new ConfigGetOperation(config(false), new GetConfigRequest($profileName, $key, this::promptForProfileName));
+        return new ConfigGetOperation(config(false), new GetConfigRequest($profileName.orElseGet(this::promptForProfileName), $key));
     }
 
-    private String promptForProfileName(NEList<Either<InvalidProfile, Profile>> candidates) {
-        val maxNameLength = candidates.stream()
-            .map(p -> extractProfileName(p).length())
-            .max(Integer::compareTo)
-            .orElse(0);
-
-        val profileToDisplayMap = candidates.stream()
-            .collect(Collectors.toMap(
-                (p) -> p,
-                (p) -> {
-                    val paddedName = extractProfileName(p) + " ".repeat(maxNameLength - extractProfileName(p).length());
-
-                    return p.fold(
-                        (_) -> paddedName + " @|bold,red (invalid)|@",
-                        (profile) -> paddedName + " " + ctx.colors().NEUTRAL_500.use("(" + profile.env().name().toLowerCase() + ")")
-                    );
-                }
-            ));
-
-        val defaultProfile = candidates.stream()
-            .filter(p -> p.isRight() && p.getRight().isDefault())
-            .findFirst()
-            .orElse(null);
-
-        val selected = ctx.console().select("Select a profile to look at")
-            .options(candidates)
-            .defaultOption(defaultProfile)
-            .mapper(profileToDisplayMap::get)
-            .fallbackIndex(0)
-            .fix(originalArgs(), "<profile>")
-            .clearAfterSelection();
-
-        return extractProfileName(selected);
-    }
-
-    private String extractProfileName(Either<InvalidProfile, Profile> profile) {
-        return profile.fold(
-            (invalid) -> invalid.section().name(),
-            (valid) -> valid.nameOrDefault().unwrap()
+    private String promptForProfileName() {
+        return ProfileNamePrompter.prompt(ctx, config(false).profiles(), "Select a profile to look at",
+            (list) -> list,
+            (b) -> b.fallbackIndex(0).fix(originalArgs(), "<profile>")
         );
     }
 }

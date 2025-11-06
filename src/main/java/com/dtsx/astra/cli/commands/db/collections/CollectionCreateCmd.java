@@ -40,7 +40,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Create a collection without failing if it already exists",
     command = "${cli.name} db create-collection my_db -c my_collection --if-not-exists"
 )
-public class CollectionCreateCmd extends AbstractCollectionSpecificCmd<CollectionCreateResult> {
+public class CollectionCreateCmd extends AbstractCollectionRequiredCmd<CollectionCreateResult> {
     @Option(
         names = { "--if-not-exists" },
         description = "Will create a new collection only if none with same name",

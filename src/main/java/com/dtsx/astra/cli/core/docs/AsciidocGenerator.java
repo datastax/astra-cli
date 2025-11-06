@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.docs;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.docs.DocsPage.*;
 import com.dtsx.astra.cli.core.help.Example;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
 
 @RequiredArgsConstructor
 public class AsciidocGenerator {
-    private final String cliName;
+    private final CliContext ctx;
     private final CommandSpec commandSpec;
     private final ExternalDocsSpec docsSpec;
 
@@ -25,7 +26,7 @@ public class AsciidocGenerator {
 
     public List<Page> generate() {
         val topLevelDocsPages = generatePagesForSubcommands(
-            List.of(cliName),
+            List.of(ctx.properties().cliName()),
             subcommandSpecs(commandSpec)
         );
 
@@ -83,7 +84,7 @@ public class AsciidocGenerator {
             resolveAliasingInformation(commandFullName, commandSpec),
             new CommandSubcommands(subcommands),
             resolveCommandOptions(commandSpec),
-            new CommandExamples(commandSpec.userObject().getClass().getAnnotationsByType(Example.class)),
+            new CommandExamples(commandSpec.userObject().getClass().getAnnotationsByType(Example.class), ctx),
             resolveSeeAlsoLinks(commandSpec)
         );
     }
