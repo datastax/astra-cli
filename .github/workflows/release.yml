@@ -34,9 +34,11 @@ jobs:
             "src/test/resources/snapshots/AstraCli/help_output.human.approved.txt"
           )
 
+          tag="${{ inputs.tag }}"
+
           missing_files=()
           for f in "${files[@]}"; do
-            if ! grep -q "${{ inputs.tag }}" "$f"; then
+            if ! grep -q "${tag#v}" "$f"; then
               missing_files+=("$f")
             fi
           done

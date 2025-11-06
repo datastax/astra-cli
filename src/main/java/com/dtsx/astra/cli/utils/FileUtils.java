@@ -34,7 +34,13 @@ public class FileUtils {
         return ProcessHandle.current().info().command()
             .filter((_) -> ImageInfo.inImageCode())
             .map(Path::of)
-            .map(FileUtils::toRealPath);
+            .map((p) -> {
+                try {
+                    return p.toRealPath();
+                } catch (IOException e) {
+                    return p.toAbsolutePath();
+                }
+            });
     }
 
     public Path toRealPath(Path path) {

@@ -3,7 +3,14 @@
 set -eu
 IFS=$(printf '\n\t')
 
-# Utilities
+color() {
+  if command -v tput >/dev/null 2>&1 && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
+    tput "$@"
+  else
+    printf ""
+  fi
+}
+
 error() {
   printf "${RED}%s${RESET}\n" "$(printf "$1")" # `printf $1` to preserve newlines
   exit 1
@@ -14,7 +21,7 @@ checklist() {
 }
 
 underline(){
-  printf "$(tput smul)%s$(tput rmul)" "$(printf "$1")"
+  printf "$(color smul)%s$(color rmul)" "$(printf "$1")"
 }
 
 tildify() {
@@ -47,21 +54,21 @@ EXE_PATH="$ASTRA_CLI_DIR/astra"
 TAR_PATH="$ASTRA_CLI_DIR/astra.tar.gz"
 
 # Colors
-if false; then
-  LIGHT_GRAY=$(tput setaf 245)
-  BLUE=$(tput setaf 110)
-  PURPLE=$(tput setaf 134)
-  RED=$(tput setaf 167)
-  GREEN=$(tput setaf 76)
+if [ "$(color colors)" -ge 256 ]; then
+  LIGHT_GRAY=$(color setaf 245)
+  BLUE=$(color setaf 110)
+  PURPLE=$(color setaf 134)
+  RED=$(color setaf 167)
+  GREEN=$(color setaf 76)
 else
-  LIGHT_GRAY=$(tput setaf 7)
-  BLUE=$(tput setaf 6)
-  PURPLE=$(tput setaf 5)
-  RED=$(tput setaf 1)
-  GREEN=$(tput setaf 2)
+  LIGHT_GRAY=$(color setaf 7)
+  BLUE=$(color setaf 6)
+  PURPLE=$(color setaf 5)
+  RED=$(color setaf 1)
+  GREEN=$(color setaf 2)
 fi
 
-RESET=$(tput sgr0)
+RESET=$(color sgr0)
 
 # Prelude
 echo "$PURPLE"
@@ -74,25 +81,6 @@ echo "         \/     \/                   \/  "
 echo ""
 echo "                    Installer: $ASTRA_CLI_VERSION"
 echo "$RESET"
-
-# Options
-AUTO_YES_INSTALL=0
-
-if [ -t 0 ]; then
-  if [ "${1:-}" = "--yes" ] || [ "${1:-}" = "-y" ]; then
-    AUTO_YES_INSTALL=1
-  fi
-else
-  echo "${RED}Error: Script is running in a non-interactive terminal${RESET}"
-  echo ""
-  echo "Please use the following command instead to run the script interactively:"
-  echo ""
-  renderCommand "sh -c \"\$(curl -fsSL \"https://raw.githubusercontent.com/datastax/astra-cli/main/scripts/install.sh\")\""
-  echo ""
-  echo "If you really want to run this script in a non-interactively, pass the ${BLUE}--yes${RESET} flag to accept installing astra in the following location:"
-  echo "${BLUE}>${RESET} $(underline "$(tildify "$ASTRA_CLI_DIR/")")"
-  exit 1
-fi
 
 # Required tools check
 if ! command -v curl >/dev/null 2>&1; then
@@ -168,36 +156,6 @@ else
   checklist "No existing installation found."
 fi
 
-# Verify installation path
-echo ""
-echo "${GREEN}Ready to install Astra CLI ✅${RESET}"
-echo ""
-echo "Do you want to install Astra CLI to $(underline "$(tildify "$ASTRA_CLI_DIR/")")? ${BLUE}[Y]es/[d]ifferent path/[c]ancel${RESET}"
-
-while [ "$AUTO_YES_INSTALL" = 0 ]; do
-  printf "%s" "${BLUE}> ${RESET}"
-  read -r res
-
-  case ${res:-y} in
-    [Yy]* )
-      for _ in $(seq 1 5); do tput cuu1 && tput el; done
-      break;;
-    [Dd]*)
-      echo ""
-      echo "${RED}To use a custom installation path, please globally set the ASTRA_HOME environment variable.${RESET}"
-      echo ""
-      echo "This variable $(tput bold)must remain in place forever${RESET} (e.g. in your shell profile like $(underline "~/.zprofile"), $(underline "~/.bash_profile"), etc.) so that the CLI can always locate its home directory."
-      echo ""
-      echo "After setting it, restart your terminal or run 'source ~/.zprofile' (or the appropriate file) to apply the change."
-      exit 1
-      ;;
-    [Cc]* )
-      error "\nCancelling installation.";;
-    * )
-      echo "Please answer ${BLUE}yes${RESET}, ${BLUE}no${RESET}, or ${BLUE}cancel${RESET}.";;
-  esac
-done
-
 # Create installation directory
 if mkdir -p "$ASTRA_CLI_DIR"; then
   checklist "Using installation dir $(underline "$(tildify "$ASTRA_CLI_DIR/")")${RESET}${LIGHT_GRAY}."
@@ -210,7 +168,7 @@ echo ""
 echo "Downloading archive..."
 
 if curl -fL --progress-bar "$install_url" > "$TAR_PATH"; then
-  for _ in $(seq 1 3); do tput cuu1 && tput el; done
+  for _ in $(seq 1 3); do color cuu1 && color el; done
   checklist "Archive downloaded."
 else
   rm "$TAR_PATH" 2>/dev/null || true
