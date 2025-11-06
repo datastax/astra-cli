@@ -2,8 +2,8 @@ name: build.yml
 on:
   workflow_call:
   workflow_dispatch:
-#  push:
-#    branches: [ master ]
+  push:
+    branches: [ main ]
 
 jobs:
   build:

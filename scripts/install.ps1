@@ -93,7 +93,7 @@ $arch = if ([Environment]::Is64BitOperatingSystem) {
     Panic "Error: Unsupported architecture. Only x86_64 and arm64 are supported."
 }
 
-$installUrl = "https://github.com/toptobes/astra-cli-pico/releases/download/v$ASTRA_CLI_VERSION/astra-$os-$arch.zip"
+$installUrl = "https://github.com/datastax/astra-cli/releases/download/v$ASTRA_CLI_VERSION/astra-$os-$arch.zip"
 
 # Verify installation path
 Write-Host ""

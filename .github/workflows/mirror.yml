@@ -1,0 +1,12 @@
+name: mirror.yml
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  mirror-to-v1-x:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: zofrex/mirror-branch@v1
+        with:
+          target-branch: v1.x

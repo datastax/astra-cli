@@ -45,10 +45,10 @@ The preferred installation method is via the installation script:
 sh -c "$(curl -fsSL ibm.biz/get-astra-cli)"
 
 # Windows
-powershell -c "irm https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.ps1 | iex"
+powershell -c "irm https://raw.githubusercontent.com/datastax/astra-cli/main/scripts/install.ps1 | iex"
 ```
 
-The CLI can also be downloaded directly from the [releases page](https://github.com/toptobes/astra-cli-pico/releases).
+The CLI can also be downloaded directly from the [releases page](https://github.com/datastax/astra-cli/releases).
 
 Nix, docker, brew, and potentially other installation methods are coming soon. However, the installation script will always be the recommended way to install the Astra CLI.
 
@@ -266,7 +266,7 @@ The CLI now has a much more user-friendly output style, with colors, spinners, p
 
   Further, many commands will provide actionable next steps in their output to help you get started, or to fix your issues.
 
-  And of course, if you ever feel like an example is missing or could be improved, please [open an issue](https://github.com/toptobes/astra-cli-pico/issues) or a [pull request](https://github.com/toptobes/astra-cli-pico/pulls) to let us know!
+  And of course, if you ever feel like an example is missing or could be improved, please [open an issue](https://github.com/datastax/astra-cli/issues) or a [pull request](https://github.com/datastax/astra-cli/pulls) to let us know!
 </details>
 
 ### New commands

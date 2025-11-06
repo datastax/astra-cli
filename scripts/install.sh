@@ -87,7 +87,7 @@ else
   echo ""
   echo "Please use the following command instead to run the script interactively:"
   echo ""
-  renderCommand "sh -c \"\$(curl -fsSL \"https://raw.githubusercontent.com/toptobes/astra-cli-pico/master/scripts/install.sh\")\""
+  renderCommand "sh -c \"\$(curl -fsSL \"https://raw.githubusercontent.com/datastax/astra-cli/main/scripts/install.sh\")\""
   echo ""
   echo "If you really want to run this script in a non-interactively, pass the ${BLUE}--yes${RESET} flag to accept installing astra in the following location:"
   echo "${BLUE}>${RESET} $(underline "$(tildify "$ASTRA_CLI_DIR/")")"
@@ -124,7 +124,7 @@ case $(uname -m) in
     error "\nError: Unsupported architecture. This installation script supports only x86_64 and arm64 architectures.";;
 esac
 
-install_url="https://github.com/toptobes/astra-cli-pico/releases/download/v$ASTRA_CLI_VERSION/astra-$os-$arch.tar.gz"
+install_url="https://github.com/datastax/astra-cli/releases/download/v$ASTRA_CLI_VERSION/astra-$os-$arch.tar.gz"
 
 # Out of order but shh
 print_next_steps() {
