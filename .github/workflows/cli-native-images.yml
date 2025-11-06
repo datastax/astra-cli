@@ -2,13 +2,13 @@ name:  🖥️ CLI Native Image
 on:
   push:
     branches:
-      - main
+      - v0.x
     paths:
       - 'src/**'
       - '.github/workflows/cli-native-images.yml'
   pull_request:
     branches:
-      - main
+      - v0.x
     paths:
       - 'src/**'
       - '.github/workflows/cli-native-images.yml'

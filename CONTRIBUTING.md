@@ -51,7 +51,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
   * Rebase your fork and force push to your GitHub repository (this will update your Pull Request):
 
     ```shell
-    git rebase main -i
+    git rebase v0.x -i
     git push -f
     ```
 
