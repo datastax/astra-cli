@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands.streaming.pulsar;
 
-import com.dtsx.astra.cli.commands.streaming.AbstractStreamingTenantSpecificCmd;
+import com.dtsx.astra.cli.commands.streaming.AbstractStreamingTenantRequiredCmd;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
     comment = "Get the Pulsar token for a tenant",
     command = "${cli.name} streaming pulsar-token my_tenant"
 )
-public class StreamingPulsarTokenCmd extends AbstractStreamingTenantSpecificCmd<String> {
+public class StreamingPulsarTokenCmd extends AbstractStreamingTenantRequiredCmd<String> {
     @Override
     protected final OutputAll execute(Supplier<String> token) {
         return OutputAll.serializeValue(token.get());

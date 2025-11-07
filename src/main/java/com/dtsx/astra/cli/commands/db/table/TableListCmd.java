@@ -11,10 +11,12 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.operations.db.table.TableListOperation.*;
+import static com.dtsx.astra.cli.operations.db.table.TableListOperation.TableListRequest;
+import static com.dtsx.astra.cli.operations.db.table.TableListOperation.TableListResult;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
@@ -42,9 +44,21 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
     public boolean $all;
 
     @Override
-    protected final OutputJson executeJson(Supplier<Stream<TableListResult>> result) {
-        validateParams();
+    protected boolean parseKeyspaceRef() {
+        return !$all;
+    }
 
+    @Override
+    protected void prelude() {
+        super.prelude();
+
+        if ($all && $keyspaceRef != null) {
+            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
+        }
+    }
+
+    @Override
+    protected final OutputJson executeJson(Supplier<Stream<TableListResult>> result) {
         if ($all) {
             return OutputJson.serializeValue(result.get()
                 .map(res -> sequencedMapOf(
@@ -59,8 +73,6 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
 
     @Override
     public final OutputAll execute(Supplier<Stream<TableListResult>> result) {
-        validateParams();
-
         val data = result.get()
             .flatMap((res) -> (
                 res.tables().stream()
@@ -78,14 +90,11 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
         }
     }
 
-    private void validateParams() {
-        if ($all && !$keyspaceRef.isDefaultKeyspace()) {
-            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
-        }
-    }
-
     @Override
     protected Operation<Stream<TableListResult>> mkOperation() {
-        return new TableListOperation(tableGateway, keyspaceGateway, new TableListRequest($keyspaceRef, $all));
+        return new TableListOperation(tableGateway, keyspaceGateway, new TableListRequest(
+            $dbRef,
+            Optional.ofNullable($keyspaceRef)
+        ));
     }
 }

@@ -143,23 +143,16 @@ public class StringUtils {
         return sb.toString();
     }
 
-    public static String titleToSnakeCase(@NonNull String title) {
-        val parts = title.split(" ");
-        val sb = new StringBuilder();
-
-        for (var i = 0; i < parts.length; i++) {
-            val part = parts[i];
-
-            if (part.isEmpty()) {
-                continue;
-            }
-
-            if (i > 0) {
-                sb.append("_");
-            }
-            sb.append(part.toLowerCase());
+    public static String titleToSnakeCase(@NonNull String input) {
+        if (input.isBlank()) {
+            return input;
         }
 
-        return sb.toString();
+        return input.trim()
+            .replaceAll("[\\s-]+", "_")
+            .replaceAll("([a-z0-9])([A-Z])", "$1_$2")
+            .toLowerCase()
+            .replaceAll("_+", "_")
+            .replaceAll("^_+|_+$", "");
     }
 }

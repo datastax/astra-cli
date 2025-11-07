@@ -20,7 +20,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingExistOperation.St
     comment = "Check if a streaming tenant exists",
     command = "${cli.name} streaming exist my_tenant"
 )
-public class StreamingExistCmd extends AbstractStreamingTenantSpecificCmd<Boolean> {
+public class StreamingExistCmd extends AbstractStreamingTenantRequiredCmd<Boolean> {
     @Override
     protected final OutputHuman executeHuman(Supplier<Boolean> exists) {
         if (exists.get()) {

@@ -6,6 +6,6 @@ comments:
  | But at least we can verify the command runs and the exit code is correct
  | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
 ---- output ----
-stdout: code,message,exitCode,stdout,stderr
+stdout: code,message,exit_code,stdout,stderr
 stdout: OK,"Cqlsh executed with exit code 0, with 1 lines in stdout and 0 lines in stderr.",0,Current consistency level is LOCAL_QUORUM.,
 ---- end ----

@@ -86,7 +86,6 @@ public class CommonOptions {
         names = { "--spinner" },
         description = { "Enable/disable loading spinners", SHOW_CUSTOM_DEFAULT + "enabled if tty" },
         negatable = true,
-        showDefaultValue = Visibility.NEVER,
         fallbackValue = "true"
     )
     private Optional<Boolean> enableSpinner;

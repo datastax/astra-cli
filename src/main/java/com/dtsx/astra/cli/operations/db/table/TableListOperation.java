@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.operations.db.table;
 
 import com.datastax.astra.client.tables.definition.TableDescriptor;
+import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.gateways.db.table.TableGateway;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -23,18 +25,16 @@ public class TableListOperation implements Operation<Stream<TableListResult>> {
         List<TableDescriptor> tables
     ) {}
 
-    public record TableListRequest(KeyspaceRef keyspaceRef, boolean all) {}
+    public record TableListRequest(DbRef dbRef, Optional<KeyspaceRef> keyspaceRef) {}
 
     @Override
     public Stream<TableListResult> execute() {
-        val dbRef = request.keyspaceRef.db();
-
-        val keyspaces = (request.all)
-            ? ksGateway.findAll(dbRef).keyspaces().stream()
-            : Stream.of(request.keyspaceRef.name());
+        val keyspaces = (request.keyspaceRef().isEmpty())
+            ? ksGateway.findAll(request.dbRef).keyspaces().stream()
+            : Stream.of(request.keyspaceRef.get().name());
 
         return keyspaces
-            .map(ks -> KeyspaceRef.mkUnsafe(dbRef, ks))
+            .map(ks -> KeyspaceRef.mkUnsafe(request.dbRef, ks))
             .map(ref -> new TableListResult(
                 ref.name(),
                 tableGateway.findAll(ref)

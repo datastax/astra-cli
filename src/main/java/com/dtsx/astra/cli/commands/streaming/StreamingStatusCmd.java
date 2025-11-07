@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.streaming;
 
+import com.dtsx.astra.cli.commands.streaming.pulsar.AbstractStreamingPromptForTenantCmd;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.TenantStatus;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
@@ -20,7 +21,7 @@ import static com.dtsx.astra.cli.operations.streaming.StreamingStatusOperation.S
     comment = "Get the status of a streaming tenant",
     command = "${cli.name} streaming status my_tenant"
 )
-public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<TenantStatus> {
+public class StreamingStatusCmd extends AbstractStreamingPromptForTenantCmd<TenantStatus> {
     @Override
     protected final OutputHuman executeHuman(Supplier<TenantStatus> result) {
         return OutputHuman.response("Tenant %s is %s".formatted(ctx.highlight($tenantName), ctx.highlight(result.get())));
@@ -34,5 +35,10 @@ public class StreamingStatusCmd extends AbstractStreamingTenantSpecificCmd<Tenan
     @Override
     protected Operation<TenantStatus> mkOperation() {
         return new StreamingStatusOperation(ctx, streamingGateway, new StreamingStatusRequest($tenantName));
+    }
+
+    @Override
+    protected String tenantNamePrompt() {
+        return "Select the streaming tenant to get the status for:";
     }
 }

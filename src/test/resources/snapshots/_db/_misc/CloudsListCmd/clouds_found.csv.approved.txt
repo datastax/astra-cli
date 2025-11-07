@@ -2,7 +2,7 @@
 command: astra db list-clouds -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,cloudProvider
+stdout: code,message,cloud_provider
 stdout: OK,,gcp
 stdout: OK,,azure
 stdout: OK,,aws

@@ -223,10 +223,12 @@ public class AstraCli extends AbstractCmd<Void> {
     public static class SetupExampleProvider implements ExampleProvider {
         @Override
         public Pair<String, String> get(CliContext ctx) {
+
             try {
                 val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
-                if (!configFileExists) {
+                // keeps output deterministic for testing
+                if (!configFileExists || System.getProperty("cli.testing") != null) {
                     return Pair.create("Setup the Astra CLI", "${cli.name} setup");
                 }
 

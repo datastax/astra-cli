@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.streaming;
 
+import com.dtsx.astra.cli.commands.streaming.pulsar.AbstractStreamingPromptForTenantCmd;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
@@ -30,7 +31,7 @@ import java.util.function.Supplier;
     comment = "Get a specific attribute of a tenant",
     command = "${cli.name} streaming get my_tenant --key region"
 )
-public class StreamingGetCmd extends AbstractStreamingTenantSpecificCmd<StreamingInfo> {
+public class StreamingGetCmd extends AbstractStreamingPromptForTenantCmd<StreamingInfo> {
     public enum StreamingGetKeys {
         status,
         cloud,
@@ -79,5 +80,10 @@ public class StreamingGetCmd extends AbstractStreamingTenantSpecificCmd<Streamin
     @Override
     protected Operation<StreamingInfo> mkOperation() {
         return new StreamingGetOperation(streamingGateway, new StreamingGetRequest($tenantName, $key));
+    }
+
+    @Override
+    protected String tenantNamePrompt() {
+        return "Select the streaming tenant to get:";
     }
 }

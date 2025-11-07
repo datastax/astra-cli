@@ -28,16 +28,16 @@ public class CollectionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void collection_created(OutputType outputType) {
-        verifyRun("db create-collection ${DatabaseName} -c ${CollectionName}", outputType, createCollection(CreationStatus::created));
+        verifyRun("db create-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, createCollection(CreationStatus::created));
     }
 
     @TestForDifferentOutputs
     public void error_collection_already_exists(OutputType outputType) {
-        verifyRun("db create-collection ${DatabaseName} -c ${CollectionName}", outputType, createCollection(CreationStatus::alreadyExists));
+        verifyRun("db create-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, createCollection(CreationStatus::alreadyExists));
     }
 
     @TestForDifferentOutputs
     public void allow_collection_already_exists(OutputType outputType) {
-        verifyRun("db create-collection ${DatabaseName} -c ${CollectionName} --if-not-exists", outputType, createCollection(CreationStatus::alreadyExists));
+        verifyRun("db create-collection ${DatabaseName} -k default_keyspace -c ${CollectionName} --if-not-exists", outputType, createCollection(CreationStatus::alreadyExists));
     }
 }

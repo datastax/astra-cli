@@ -6,6 +6,6 @@ comments:
  | But at least we can verify the command runs and the exit code is correct
  | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
 ---- output ----
-stdout: code,message,exitCode,stdout,stderr
+stdout: code,message,exit_code,stdout,stderr
 stdout: OK,"Cqlsh executed with exit code 2, with 1 lines in stdout and 1 lines in stderr.",2,,<stdin>:1:'cars' not found in keyspaces
 ---- end ----

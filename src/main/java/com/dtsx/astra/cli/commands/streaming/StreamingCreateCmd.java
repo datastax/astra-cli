@@ -49,7 +49,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Create a tenant if it doesn't already exist",
     command = "${cli.name} streaming create my_tenant --region us-east1 --if-not-exists"
 )
-public class StreamingCreateCmd extends AbstractStreamingTenantSpecificCmd<StreamingCreateResult> {
+public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<StreamingCreateResult> {
     @Option(
         names = { "--if-not-exists" },
         description = "Don't error if the tenant already exists",

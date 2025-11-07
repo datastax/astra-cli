@@ -5,9 +5,134 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1dbf8693-4170-42d0-8c7f-cf009f0690d5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/AbstractStreamingPromptForTenantCmd.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/prompters/specific/TenantPrompter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/core/datatypes/ThunkTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/unit/core/models/AstraTokenTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/install.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/install.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs_spec.json" beforeDir="false" afterPath="$PROJECT_DIR$/docs_spec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/AstraCli.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/CommonOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/CommonOptions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/CompletionsCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/CompletionsCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/NukeCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/SetupCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/UpgradeCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/collections/CollectionListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/AbstractPromptForKeyspaceCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/keyspace/AbstractPromptForKeyspaceCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/TableListCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/db/table/TableListCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/AbstractStreamingTenantSpecificCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/AbstractStreamingTenantRequiredCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingCreateCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingCreateCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingDeleteCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingDeleteCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingExistCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingExistCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingGetCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingGetCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingStatusCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/StreamingStatusCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/StreamingPulsarShellCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/StreamingPulsarShellCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/StreamingPulsarTokenCmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/streaming/pulsar/StreamingPulsarTokenCmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/TypeConverters.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/TypeConverters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/AstraToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/AstraToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/DatacenterId.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/DatacenterId.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/PcuAssocTarget.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/models/PcuAssocTarget.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraColors.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/output/AstraColors.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/CliPropertiesImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/core/properties/CliPropertiesImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/NukeOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/SetupOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/SetupOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/UpgradeOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/collection/CollectionListOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/collection/CollectionListOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/AbstractCqlshExeOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/cqlsh/AbstractCqlshExeOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/table/TableListOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/db/table/TableListOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/FileUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/FileUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/utils/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionCreateCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionCreateCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionDeleteCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionDeleteCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionDescribeCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionDescribeCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionTruncateCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/collections/CollectionTruncateCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/table/TableDeleteCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/table/TableDeleteCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/table/TableDescribeCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/table/TableDescribeCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/table/TableTruncateCmdSnapshotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/snapshot/commands/db/table/TableTruncateCmdSnapshotTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/AssertUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/dtsx/astra/cli/testlib/AssertUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/AstraCli/help_output.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbCreateCmd/db_create.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbCreateCmd/db_create.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbCreateCmd/db_create_async.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbCreateCmd/db_create_async.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/db_force_delete.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/delete_db_with_confirmation.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbDeleteCmd/delete_db_with_confirmation.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbListCmd/dbs_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbListCmd/dbs_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbListCmd/dbs_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbListCmd/dbs_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbListCmd/no_dbs_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbListCmd/no_dbs_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbResumeCmd/resume_creating_db.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbResumeCmd/resume_creating_db.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbResumeCmd/resume_creating_db_async.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/DbResumeCmd/resume_creating_db_async.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/allow_collection_already_exists.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/allow_collection_already_exists.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/allow_collection_already_exists.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/allow_collection_already_exists.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/collection_created.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/collection_created.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/collection_created.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/collection_created.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/collection_created.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/collection_created.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/error_collection_already_exists.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/error_collection_already_exists.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/error_collection_already_exists.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd/error_collection_already_exists.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/allow_collection_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/allow_collection_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/allow_collection_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/allow_collection_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/collection_deleted.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/collection_deleted.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/collection_deleted.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/collection_deleted.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/collection_deleted.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/collection_deleted.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/error_collection_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/error_collection_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/error_collection_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDeleteCmd/error_collection_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/collection_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/collection_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/collection_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/collection_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/collection_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/collection_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/error_collection_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/error_collection_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/error_collection_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionDescribeCmd/error_collection_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/collection_truncated.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/collection_truncated.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/collection_truncated.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/collection_truncated.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/collection_truncated.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/collection_truncated.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/error_collection_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/error_collection_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/error_collection_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionTruncateCmd/error_collection_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_fail.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_fail.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_stdin_explicit.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_stdin_explicit.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_stdin_implied.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_stdin_implied.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_success.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_cqlsh/CqlshExecCmd/exec_string_success.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_keyspace/KeyspaceCreateCmd/keyspace_created_and_db_active.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_keyspace/KeyspaceCreateCmd/keyspace_created_and_db_active.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_keyspace/KeyspaceDeleteCmd/keyspace_deleted_and_db_active.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_keyspace/KeyspaceDeleteCmd/keyspace_deleted_and_db_active.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_keyspace/KeyspaceListCmd/keyspaces_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_keyspace/KeyspaceListCmd/keyspaces_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_misc/CloudsListCmd/clouds_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_misc/CloudsListCmd/clouds_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_misc/EmbeddingProvidersListCmd/list_embedding_providers.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_misc/EmbeddingProvidersListCmd/list_embedding_providers.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionCreateCmd/region_created.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionCreateCmd/region_created.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionDeleteCmd/region_deleted.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionDeleteCmd/region_deleted.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListClassicCmd/regions_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListClassicCmd/regions_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListCmd/regions_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListCmd/regions_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListServerlessCmd/regions_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListServerlessCmd/regions_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListVectorCmd/regions_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_region/RegionListVectorCmd/regions_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/allow_table_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/allow_table_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/allow_table_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/allow_table_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/error_table_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/error_table_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/error_table_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/error_table_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/table_deleted.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/table_deleted.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/table_deleted.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/table_deleted.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/table_deleted.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDeleteCmd/table_deleted.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/error_table_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/error_table_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/error_table_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/error_table_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/table_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/table_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/table_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/table_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/table_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableDescribeCmd/table_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/error_table_not_found.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/error_table_not_found.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/error_table_not_found.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/error_table_not_found.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/table_truncated.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/table_truncated.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/table_truncated.human.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/table_truncated.human.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/table_truncated.json.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_db/_table/TableTruncateCmd/table_truncated.json.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_role/RoleListCmd/roles_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_role/RoleListCmd/roles_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingCreateCmd/streaming_create_from_cloud.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingCreateCmd/streaming_create_from_cloud.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingCreateCmd/streaming_create_from_cluster.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingCreateCmd/streaming_create_from_cluster.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingDeleteCmd/streaming_delete.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingDeleteCmd/streaming_delete.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingListCloudsCmd/clouds_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingListCloudsCmd/clouds_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingListRegionsCmd/regions_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_streaming/StreamingListRegionsCmd/regions_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_token/TokenDeleteCmd/delete_token.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_token/TokenDeleteCmd/delete_token.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_token/TokenListCmd/tokens_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_token/TokenListCmd/tokens_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserDeleteCmd/delete_user.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserDeleteCmd/delete_user.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserInviteCmd/allow_user_already_invited.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserInviteCmd/allow_user_already_invited.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserInviteCmd/invite_user.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserInviteCmd/invite_user.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserListCmd/no_users_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserListCmd/no_users_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserListCmd/users_found.csv.approved.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/snapshots/_user/UserListCmd/users_found.csv.approved.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/static.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/static.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,8 +177,8 @@
         <option value="AnnotationType" />
         <option value="Exception" />
         <option value="Interface" />
-        <option value="Class" />
         <option value="GitHub Workflow" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -103,7 +228,9 @@
     "Gradle.Build astra-cli-pico.executor": "Run",
     "Gradle.CliPropertiesImplIntegrationTest.executor": "Run",
     "Gradle.CliPropertiesIntegrationTest.executor": "Run",
+    "Gradle.CollectionListCmdSnapshotTest.collections_found_using_all.executor": "Run",
     "Gradle.CollectionListCmdSnapshotTest.error_using_keyspace_and_all_together.executor": "Run",
+    "Gradle.CollectionTruncateCmdSnapshotTest.collection_truncated.executor": "Run",
     "Gradle.CollectionUtilsTest.executor": "Run",
     "Gradle.CompletionsCacheTest.creates_cache_file_if_it_does_not_exist.executor": "Run",
     "Gradle.CompletionsCacheTest.executor": "Run",
@@ -167,6 +294,7 @@
     "Gradle.Tests in 'com.dtsx.astra.cli.unit'.executor": "Run",
     "Gradle.Tests in 'com.dtsx.astra.cli.unit.core.output.serializers'.executor": "Run",
     "Gradle.Tests in 'snapshots'.executor": "Run",
+    "Gradle.ThunkTest.executor": "Run",
     "Gradle.TokenCreateCmdSnapshotTest.create_token.executor": "Run",
     "Gradle.TokenCreateCmdSnapshotTest.executor": "Run",
     "Gradle.TokenGetCmdSnapshotTest.executor": "Run",
@@ -254,11 +382,11 @@
     "SHELLCHECK.PATH": "/Users/me/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/Shell Script/shellcheck",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "KG-rc.2-cleanups",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_directory_selection": "/Users/me/work/astra-cli-pico/src/main/java/com/dtsx/astra/cli/gateways/pcu/vendored/domain",
-    "last_opened_file_path": "/Users/me/work/astra-cli-pico/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd",
+    "last_opened_file_path": "/Users/me/work/astra-cli",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -287,11 +415,11 @@
       <recent name="com.dtsx.astra.cli.core.properties" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src/test/resources/snapshots/_db/_collections/CollectionCreateCmd" />
       <recent name="$PROJECT_DIR$/src/test/lifecycle" />
       <recent name="$PROJECT_DIR$/src/test/lifecycle/tasks" />
       <recent name="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/operations/pcu" />
-      <recent name="$PROJECT_DIR$/src/main/java/com/dtsx/astra/cli/commands/pcu" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -330,15 +458,15 @@
       <recent name="com.dtsx.astra.cli.utils" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.dtsx.astra.cli.commands.streaming.pulsar" />
       <recent name="com.dtsx.astra.cli.core.output.prompters.specific" />
       <recent name="com.dtsx.astra.cli.commands.db.keyspace" />
       <recent name="com.dtsx.astra.cli.commands.db.table" />
       <recent name="com.dtsx.astra.cli.commands.db.collections" />
-      <recent name="com.dtsx.astra.cli.core.config" />
     </key>
   </component>
   <component name="RunManager" selected="Gradle.Tests in 'astra-cli-pico.test'">
-    <configuration name="AstraConfigTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="CollectionListCmdSnapshotTest.collections_found_using_all" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="env">
           <map>
@@ -356,7 +484,36 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.unit.core.config.AstraConfigTest&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.db.collections.CollectionListCmdSnapshotTest.collections_found_using_all&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="CollectionTruncateCmdSnapshotTest.collection_truncated" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="env">
+          <map>
+            <entry key="APPROVAL_TESTS_USE_REPORTER" value="QuietReporter" />
+          </map>
+        </option>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;com.dtsx.astra.cli.snapshot.commands.db.collections.CollectionTruncateCmdSnapshotTest.collection_truncated&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -394,7 +551,7 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="VersionTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="ThunkTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="env">
           <map>
@@ -412,7 +569,7 @@
           <list>
             <option value=":test" />
             <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.unit.core.models.VersionTest&quot;" />
+            <option value="&quot;com.dtsx.astra.cli.unit.core.datatypes.ThunkTest&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -452,42 +609,13 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="lifecycle.from_existing_file" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="env">
-          <map>
-            <entry key="APPROVAL_TESTS_USE_REPORTER" value="QuietReporter" />
-          </map>
-        </option>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":test" />
-            <option value="--tests" />
-            <option value="&quot;com.dtsx.astra.cli.unit.core.config.AstraConfigTest$lifecycle.from_existing_file&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.Tests in 'astra-cli-pico.test'" />
+        <item itemvalue="Gradle.CollectionListCmdSnapshotTest.collections_found_using_all" />
+        <item itemvalue="Gradle.CollectionTruncateCmdSnapshotTest.collection_truncated" />
+        <item itemvalue="Gradle.ThunkTest" />
         <item itemvalue="Gradle.comparison.compares_versions_correctly" />
-        <item itemvalue="Gradle.VersionTest" />
-        <item itemvalue="Gradle.AstraConfigTest" />
-        <item itemvalue="Gradle.lifecycle.from_existing_file" />
       </list>
     </recent_temporary>
   </component>

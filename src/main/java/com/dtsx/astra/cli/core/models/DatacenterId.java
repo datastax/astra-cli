@@ -18,7 +18,7 @@ public class DatacenterId implements Highlightable {
     private static final Pattern DCID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-\\d+$");
 
     public static Either<String, DatacenterId> parse(@NonNull String id) {
-        return ModelUtils.trimAndValidateBasics("datacenter id", id).flatMap((trimmed) -> {
+        return ModelUtils.trimAndValidateBasics("Datacenter ID", id).flatMap((trimmed) -> {
             if (!DCID_PATTERN.matcher(trimmed).matches()) {
                 return Either.left("Datacenter ID must be of the format <database-uuid>-<region-index> (e.g., 123e4567-e89b-12d3-a456-426614174000-1)");
             }

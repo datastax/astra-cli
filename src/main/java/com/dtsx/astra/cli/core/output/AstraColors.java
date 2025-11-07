@@ -35,13 +35,6 @@ public class AstraColors {
     public class AstraColor implements IStyle {
         private final int colorCode256;
 
-//        public AstraColor(int colorCode256) {
-//            this.colorCode256 = colorCode256
-//            System.out.println(
-//                "public final AstraColor " + getClass().getSimpleName() + " = new AstraColor(" + colorCode256 + ");"
-//            );
-//        }
-
         @Override
         public String on() {
             return ansi.enabled() ? (CSI + "38;5;" + colorCode256 + "m") : "";
@@ -74,7 +67,7 @@ public class AstraColors {
     public final AstraColor BLUE_500 = new AstraColor(26);
 
     public final AstraColor RED_300 = new AstraColor(174);
-    public final AstraColor RED_500 = new AstraColor(166);
+    public final AstraColor RED_500 = new AstraColor(160);
 
     public final AstraColor MAGENTA_400 = new AstraColor(211);
     public final AstraColor MAGENTA_600 = new AstraColor(131);
@@ -148,7 +141,9 @@ public class AstraColors {
         val sb = new StringBuilder();
 
         for (val str : args) {
-             var processedStr = str.replace("${cli.name}", System.getProperty("cli.name"));
+             var processedStr = str
+                 .replace("${cli.name}", System.getProperty("cli.name"))
+                 .replace("${cli.path}", System.getProperty("cli.path", "/path/to/astra"));
 
              processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
                  .replaceAll((match) -> highlight(match.group(1), false));

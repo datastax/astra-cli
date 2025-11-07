@@ -141,7 +141,11 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
                 replaced.add(updatedLine.index + 1, "# Previous line: `" + updatedLine.content + "`");
 
                 Files.writeString(cqlshExe, String.join(NL, replaced));
-                ctx.log().info("Patched cqlsh script to try known supported Python versions first");
+
+                // keeps output deterministic for testing
+                if (System.getProperty("cli.testing") == null) {
+                    ctx.log().info("Patched cqlsh script to try known supported Python versions first");
+                }
             }
         } catch (Exception e) {
             ctx.log().exception("Error occurred attempting to patch '" + cqlshExe + "'");

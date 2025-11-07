@@ -13,7 +13,7 @@ stderr:
 stderr:                        Version: 1.0.0-rc.1
 stdout: Documentation: https://docs.datastax.com/en/astra-cli
 stdout: 
-stdout: Usage: astra [-hqVv] [--no-input] [--[no-]spinner] [--dump-logs[=FILE]]
+stdout: Usage: astra [-qVv] [--no-input] [--[no-]spinner] [--dump-logs[=FILE]]
 stdout:              [--color=WHEN] [-o=FORMAT] [COMMAND]
 stdout: 
 stdout:   -v, --version            Print version information and exit.
@@ -24,12 +24,12 @@ stdout:       --color=WHEN         One of: auto, never, always
 stdout:                              (default: auto)
 stdout:       --dump-logs[=FILE]   Write all logs to an optionally specified file
 stdout:                              (default: ~/.astra-dev/logs/<file>.log)
-stdout:   -h, --help               Show this help message and exit.
-stdout:       --no-input           Never ask for user input (e.g. confirmation prompts)
+stdout:       --no-input           Don't ask for user input (e.g. confirmation prompts)
 stdout:   -o, --output=FORMAT      One of: human, json, csv
 stdout:                              (default: human)
-stdout:   -q, --quiet              Suppress informational output
-stdout:       --[no-]spinner       Enable/disable the loading spinner
+stdout:   -q, --quiet              Only output essential information
+stdout:       --[no-]spinner       Enable/disable loading spinners
+stdout:                              (default: enabled if tty)
 stdout:   -V, --verbose            Enable verbose logging output
 stdout: 
 stdout: Commands:
@@ -37,7 +37,7 @@ stdout:   setup      Interactively set up the Astra CLI and create profiles
 stdout:   config     Manage your Astra CLI configuration profiles
 stdout:   db         Manage your Astra databases
 stdout:   pcu        Manage your PCU groups and associations
-stdout:   org        Show organization information
+stdout:   org        Get organization information
 stdout:   role       Discover Astra roles
 stdout:   streaming  Manage Astra streaming tenants
 stdout:   token      Manage your Astra tokens
@@ -47,7 +47,7 @@ stdout:   shellenv   Completions, configuration, and more
 stdout:   nuke       Entirely delete Astra CLI from your system
 stdout: 
 stdout: Examples:
-stdout:   # Setup the Astra CLI
+stdout:   # Create a new profile
 stdout:   $ astra setup
 stdout: 
 stdout:   # List databases

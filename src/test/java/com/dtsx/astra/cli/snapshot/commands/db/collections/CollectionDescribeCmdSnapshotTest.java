@@ -35,12 +35,12 @@ public class CollectionDescribeCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void collection_found(OutputType outputType) {
-        verifyRun("db describe-collection ${DatabaseName} -c ${CollectionName}", outputType, collectionFound);
+        verifyRun("db describe-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, collectionFound);
     }
 
     @TestForDifferentOutputs
     public void error_collection_not_found(OutputType outputType) {
-        verifyRun("db describe-collection ${DatabaseName} -c ${CollectionName}", outputType, collectionNotFound);
+        verifyRun("db describe-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, collectionNotFound);
     }
 }
 

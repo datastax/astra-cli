@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.utils;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.CannotCreateFileException;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -26,34 +25,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
-
 @UtilityClass
 public class FileUtils {
     public Optional<Path> getCurrentBinaryPath() {
         return ProcessHandle.current().info().command()
             .filter((_) -> ImageInfo.inImageCode())
             .map(Path::of)
-            .map((p) -> {
-                try {
-                    return p.toRealPath();
-                } catch (IOException e) {
-                    return p.toAbsolutePath();
-                }
-            });
+            .map(FileUtils::tryToRealPath);
     }
 
-    public Path toRealPath(Path path) {
+    public Path tryToRealPath(Path path) {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            throw new AstraCliException(FILE_ISSUE, """
-              @|bold,red Failed to resolve the canonical path for @|underline %s|@.|@
-            
-              This might be due to missing files, permission issues, or symbolic link problems.
-            
-              Error: '%s'
-            """.formatted(path, e.getMessage()));
+            return path.toAbsolutePath();
         }
     }
 

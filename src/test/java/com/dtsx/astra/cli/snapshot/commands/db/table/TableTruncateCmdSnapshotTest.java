@@ -31,11 +31,11 @@ public class TableTruncateCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void table_truncated(OutputType outputType) {
-        verifyRun("db truncate-table ${DatabaseName} -t ${TableName}", outputType, tableTruncated);
+        verifyRun("db truncate-table ${DatabaseName} -k default_keyspace -t ${TableName}", outputType, tableTruncated);
     }
 
     @TestForDifferentOutputs
     public void error_table_not_found(OutputType outputType) {
-        verifyRun("db truncate-table ${DatabaseName} -t ${TableName}", outputType, tableNotFound);
+        verifyRun("db truncate-table ${DatabaseName} -k default_keyspace -t ${TableName}", outputType, tableNotFound);
     }
 }

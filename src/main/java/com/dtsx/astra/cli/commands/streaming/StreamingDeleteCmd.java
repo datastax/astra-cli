@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.streaming;
 
+import com.dtsx.astra.cli.commands.streaming.pulsar.AbstractStreamingPromptForTenantCmd;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -30,7 +31,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Delete an existing streaming tenant without failing if it does not exist",
     command = "${cli.name} streaming delete my_tenant --if-exists"
 )
-public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<StreamingDeleteResult> {
+public class StreamingDeleteCmd extends AbstractStreamingPromptForTenantCmd<StreamingDeleteResult> {
     @Option(
         names = { "--if-exists" },
         description = "Do not fail if tenant does not exist",
@@ -91,5 +92,10 @@ public class StreamingDeleteCmd extends AbstractStreamingTenantSpecificCmd<Strea
     @Override
     protected Operation<StreamingDeleteResult> mkOperation() {
         return new StreamingDeleteOperation(streamingGateway, new StreamingDeleteRequest($tenantName, $ifExists));
+    }
+
+    @Override
+    protected String tenantNamePrompt() {
+        return "Select the streaming tenant to delete";
     }
 }

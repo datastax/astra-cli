@@ -2,7 +2,7 @@
 command: astra user list -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,userId,userEmail,status
+stdout: code,message,user_id,user_email,status
 stdout: OK,,ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o,alice@example.bob,active
 stdout: OK,,b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6,example@bob.alice,invited
 ---- end ----

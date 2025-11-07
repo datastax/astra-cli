@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db delete-table two_regions_db -t test_table -o json
+command: astra db delete-table two_regions_db -k default_keyspace -t test_table -o json
 exit_code: 2
 ---- output ----
 stdout: {
@@ -8,7 +8,7 @@ stdout:   "message" : "Error: Table test_table does not exist in keyspace defaul
 stdout:   "data" : null,
 stdout:   "nextSteps" : [ {
 stdout:     "comment" : "Example fix:",
-stdout:     "command" : "astra db delete-table two_regions_db -t test_table -o json --if-exists"
+stdout:     "command" : "astra db delete-table two_regions_db -k default_keyspace -t test_table -o json --if-exists"
 stdout:   }, {
 stdout:     "comment" : "List existing tables:",
 stdout:     "command" : "astra db list-tables two_regions_db -k default_keyspace"

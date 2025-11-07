@@ -22,6 +22,10 @@ public abstract class AbstractPromptForKeyspaceCmd<OpRes> extends AbstractKeyspa
     protected void prelude() {
         super.prelude();
 
+        if (!parseKeyspaceRef()) {
+            return;
+        }
+
         if (keyspaceName == null) {
             if (shouldFindDefaultKeyspace()) {
                 this.$keyspaceRef = dbGateway.tryFindDefaultKeyspace($dbRef).orElse(null); // it'll be cached most of the time anyway
@@ -40,6 +44,10 @@ public abstract class AbstractPromptForKeyspaceCmd<OpRes> extends AbstractKeyspa
     }
 
     protected boolean shouldFindDefaultKeyspace() {
+        return true;
+    }
+
+    protected boolean parseKeyspaceRef() {
         return true;
     }
 

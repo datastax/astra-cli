@@ -45,6 +45,7 @@ public class CliPropertiesImpl implements CliProperties {
         }
 
         props.cliName();
+        props.binaryPath();
         props.rcFileLocations(env.platform().os() == OS.WINDOWS);
         props.homeFolderLocations(env.platform().os() == OS.WINDOWS);
 
@@ -214,7 +215,9 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public Optional<Path> binaryPath() {
-        return FileUtils.getCurrentBinaryPath();
+        val path = FileUtils.getCurrentBinaryPath();
+        path.ifPresent(value -> System.setProperty("cli.path", value.toString()));
+        return path;
     }
 
     @Override

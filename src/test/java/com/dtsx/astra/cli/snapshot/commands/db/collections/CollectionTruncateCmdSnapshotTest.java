@@ -32,11 +32,11 @@ public class CollectionTruncateCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void collection_truncated(OutputType outputType) {
-        verifyRun("db truncate-collection ${DatabaseName} -c ${CollectionName}", outputType, collectionTruncated);
+        verifyRun("db truncate-collection ${DatabaseName} -k default_keyspace -c ${CollectionName} --verbose", outputType, collectionTruncated);
     }
 
     @TestForDifferentOutputs
     public void error_collection_not_found(OutputType outputType) {
-        verifyRun("db truncate-collection ${DatabaseName} -c ${CollectionName}", outputType, collectionNotFound);
+        verifyRun("db truncate-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, collectionNotFound);
     }
 }
