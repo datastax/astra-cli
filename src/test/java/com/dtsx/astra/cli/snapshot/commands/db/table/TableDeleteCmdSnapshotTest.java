@@ -28,16 +28,16 @@ public class TableDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void table_deleted(OutputType outputType) {
-        verifyRun("db delete-table ${DatabaseName} -t ${TableName}", outputType, deleteTable(DeletionStatus::deleted));
+        verifyRun("db delete-table ${DatabaseName} -k default_keyspace -t ${TableName}", outputType, deleteTable(DeletionStatus::deleted));
     }
 
     @TestForDifferentOutputs
     public void error_table_not_found(OutputType outputType) {
-        verifyRun("db delete-table ${DatabaseName} -t ${TableName}", outputType, deleteTable(DeletionStatus::notFound));
+        verifyRun("db delete-table ${DatabaseName} -k default_keyspace -t ${TableName}", outputType, deleteTable(DeletionStatus::notFound));
     }
 
     @TestForDifferentOutputs
     public void allow_table_not_found(OutputType outputType) {
-        verifyRun("db delete-table ${DatabaseName} -t ${TableName} --if-exists", outputType, deleteTable(DeletionStatus::notFound));
+        verifyRun("db delete-table ${DatabaseName} -k default_keyspace -t ${TableName} --if-exists", outputType, deleteTable(DeletionStatus::notFound));
     }
 }

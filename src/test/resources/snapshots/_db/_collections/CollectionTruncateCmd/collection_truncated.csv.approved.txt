@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db truncate-collection two_regions_db -c test_coll -o csv
+command: astra db truncate-collection two_regions_db -k default_keyspace -c test_coll --verbose -o csv
 exit_code: 0
 ---- output ----
 stdout: code,message

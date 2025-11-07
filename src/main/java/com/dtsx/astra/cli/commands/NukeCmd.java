@@ -92,14 +92,23 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         val summary = new StringBuilder();
         val nothingToReport = new ArrayList<String>();
 
-        appendToSummary(summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.of(" @|faint (contained binary)|@").filter((_) -> res.cliBinaryPath().startsWith(v))), Map::putAll));
-        appendToSummary(summary, nothingToReport, "needing updates", res.shellRcFilesToUpdate().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
-        appendToSummary(summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(" - " + v.getValue().reason())), Map::putAll));
+        appendToSummary("Files deleted", summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.of(" @|faint (contained binary)|@").filter((_) -> res.cliBinaryPath().startsWith(v))), Map::putAll));
+        appendToSummary("Shell profiles containing @!astra!@", summary, nothingToReport, "needing updates", res.shellRcFilesToUpdate().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
+        appendToSummary("Files skipped", summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(" - " + v.getValue().reason())), Map::putAll));
 
         switch (nothingToReport.size()) {
-            case 3 -> summary.append(NL).append("@|faint No files were deleted, updated, or skipped.|@").append(NL);
-            case 2 -> summary.append(NL).append("@|faint No files ").append(nothingToReport.get(0)).append(" or ").append(nothingToReport.get(1)).append(".|@").append(NL);
-            case 1 -> summary.append(NL).append("@|faint No files ").append(nothingToReport.get(0)).append(".|@").append(NL);
+            case 3 -> summary
+                .append(NL)
+                .append("@|faint No files were deleted, needing updates, or skipped.|@")
+                .append(NL);
+            case 2 -> summary
+                .append(NL)
+                .append("@|faint No files ").append(nothingToReport.get(0)).append(" or ").append(nothingToReport.get(1)).append(".|@")
+                .append(NL);
+            case 1 -> summary
+                .append(NL)
+                .append("@|faint No files ").append(nothingToReport.get(0)).append(".|@")
+                .append(NL);
         }
 
         if (res.skipped().values().stream().anyMatch(s -> s instanceof NeedsSudo)) {
@@ -150,11 +159,11 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         return trimIndent(str);
     }
 
-    private void appendToSummary(StringBuilder sb, ArrayList<String> nothingToReport, String header, Map<Path, Optional<String>> files) {
+    private void appendToSummary(String header, StringBuilder sb, ArrayList<String> nothingToReport, String thingToReport, Map<Path, Optional<String>> files) {
         if (files.isEmpty()) {
-            nothingToReport.add(header);
+            nothingToReport.add(thingToReport);
         } else {
-            sb.append(NL).append("Files ").append(header).append(":").append(NL);
+            sb.append(NL).append(header).append(":").append(NL);
 
             for (val file : files.entrySet()) {
                 sb.append("→ ").append(ctx.highlight(file.getKey()));
@@ -181,7 +190,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
 
     private boolean promptShouldDeleteAstrarc(List<Path> files, boolean isDryRun) {
         val secondLine = (isDryRun)
-            ? "@|faint This is a dry-run, so the file @|underline will not actually be deleted|@.|@"
+            ? "@|faint (This is a dry-run, so the file|@ @|faint,underline will not actually be deleted.|@@|faint )|@"
             : "Your credentials @!may be lost!@ if you do. A backup is recommended.";
 
         val filesStr = new StringJoiner(" and ");

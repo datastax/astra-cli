@@ -7,9 +7,5 @@
     "help",
     "docs"
   ],
-  "seeAlsoLinks": {
-    "upgrade": [
-      "xref:installation.adoc[]"
-    ]
-  }
+  "seeAlsoLinks": {}
 }

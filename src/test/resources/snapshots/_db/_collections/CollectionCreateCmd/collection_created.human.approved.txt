@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db create-collection two_regions_db -c test_coll
+command: astra db create-collection two_regions_db -k default_keyspace -c test_coll
 exit_code: 0
 ---- output ----
 stdout: Collection 'test_coll' has been created in keyspace 'default_keyspace' of database 'two_regions_db'.

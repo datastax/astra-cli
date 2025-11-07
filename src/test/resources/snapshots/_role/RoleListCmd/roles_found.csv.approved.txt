@@ -2,7 +2,7 @@
 command: astra role list -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,roleId,roleName
+stdout: code,message,role_id,role_name
 stdout: OK,,b4ed0e9e-67e8-47b6-8b58-c6629be961a9,R/W Svc Acct
 stdout: OK,,43745b73-ad46-46e4-b826-c15d06d2cea0,Admin User
 stdout: OK,,67c4b5dc-dd3f-4b2d-be51-09be12836d57,API Admin User

@@ -66,7 +66,7 @@ public abstract class TypeConverters {
         }
 
         public static Either<String, Duration> parseDuration(String value) {
-            return ModelUtils.trimAndValidateBasics("duration", value).flatMap((duration) -> {
+            return ModelUtils.trimAndValidateBasics("Duration", value).flatMap((duration) -> {
                 if (duration.startsWith("-")) {
                     return Either.left("Duration may not be negative");
                 }

@@ -3,7 +3,7 @@ command: astra db list
 exit_code: 0
 ---- output ----
 stdout: ┌───────┬─────┬──────────┬────────┬────┬─────────┐
-stdout: │ Name  │ Id  │ Regions  │ Cloud  │ V  │ Status  │
+stdout: │ Name  │ ID  │ Regions  │ Cloud  │ V  │ Status  │
 stdout: ├───────┼─────┼──────────┼────────┼────┼─────────┤
 stdout: └───────┴─────┴──────────┴────────┴────┴─────────┘
 ---- end ----

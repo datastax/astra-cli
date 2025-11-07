@@ -32,12 +32,12 @@ public class TableDescribeCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void table_found(OutputType outputType) {
-        verifyRun("db describe-table ${DatabaseName} -t ${TableName}", outputType, tableFound);
+        verifyRun("db describe-table ${DatabaseName} -k default_keyspace -t ${TableName}", outputType, tableFound);
     }
 
     @TestForDifferentOutputs
     public void error_table_not_found(OutputType outputType) {
-        verifyRun("db describe-table ${DatabaseName} -t ${TableName}", outputType, tableNotFound);
+        verifyRun("db describe-table ${DatabaseName} -k default_keyspace -t ${TableName}", outputType, tableNotFound);
     }
 }
 

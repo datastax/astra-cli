@@ -28,16 +28,16 @@ public class CollectionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
 
     @TestForAllOutputs
     public void collection_deleted(OutputType outputType) {
-        verifyRun("db delete-collection ${DatabaseName} -c ${CollectionName}", outputType, deleteCollection(DeletionStatus::deleted));
+        verifyRun("db delete-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, deleteCollection(DeletionStatus::deleted));
     }
 
     @TestForDifferentOutputs
     public void error_collection_not_found(OutputType outputType) {
-        verifyRun("db delete-collection ${DatabaseName} -c ${CollectionName}", outputType, deleteCollection(DeletionStatus::notFound));
+        verifyRun("db delete-collection ${DatabaseName} -k default_keyspace -c ${CollectionName}", outputType, deleteCollection(DeletionStatus::notFound));
     }
 
     @TestForDifferentOutputs
     public void allow_collection_not_found(OutputType outputType) {
-        verifyRun("db delete-collection ${DatabaseName} -c ${CollectionName} --if-exists", outputType, deleteCollection(DeletionStatus::notFound));
+        verifyRun("db delete-collection ${DatabaseName} -k default_keyspace -c ${CollectionName} --if-exists", outputType, deleteCollection(DeletionStatus::notFound));
     }
 }

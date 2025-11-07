@@ -2,6 +2,6 @@
 command: astra db resume two_regions_db -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,wasHibernated,currentStatus,waitedSeconds
+stdout: code,message,was_hibernated,current_status,waited_seconds
 stdout: OK,"Database 'two_regions_db' was not in a state that required resuming, but is now active after waiting 100 seconds.",false,ACTIVE,100
 ---- end ----

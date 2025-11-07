@@ -1,7 +1,7 @@
 ---- meta ----
-command: astra db delete-table two_regions_db -t test_table -o csv
+command: astra db delete-table two_regions_db -k default_keyspace -t test_table -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,wasDeleted
+stdout: code,message,was_deleted
 stdout: OK,Table 'test_table' has been deleted from keyspace 'default_keyspace'.,true
 ---- end ----

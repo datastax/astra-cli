@@ -19,7 +19,7 @@ public class AstraToken implements Highlightable {
             }
 
             if (token.matches(".*\\.\\w+")) {
-                return Either.left("Astra token looks like a file name; please use the @file syntax to pass the token from a file, where the file contains only the token as a plain string (e.g. `--token @token.txt`)");
+                return Either.left("Astra token looks like a file name; use the @file syntax to pass the token from a file, where the file contains only the token as a plain string (e.g. `--token @token.txt`)");
             }
 
             if (!t.startsWith("AstraCS:")) {

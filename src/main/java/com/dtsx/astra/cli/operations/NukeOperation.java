@@ -33,12 +33,6 @@ public class NukeOperation implements Operation<NukeResult> {
         Runnable assertShouldNuke
     ) {}
 
-    public sealed interface BinaryDeleteResult {}
-    public record BinaryOwnedByPackageManager(SupportedPackageManager packageManager) implements BinaryDeleteResult {}
-    public record BinaryMustBeDeleted(String deleteCommand) implements BinaryDeleteResult {}
-    public record BinaryNotWritable(Path path) implements BinaryDeleteResult {}
-    public record BinaryDeleted() implements BinaryDeleteResult {}
-
     @Data
     @AllArgsConstructor
     @Accessors(fluent = true)
@@ -49,6 +43,12 @@ public class NukeOperation implements Operation<NukeResult> {
         private BinaryDeleteResult binaryDeleteResult;
         private Path cliBinaryPath;
     }
+
+    public sealed interface BinaryDeleteResult {}
+    public record BinaryOwnedByPackageManager(SupportedPackageManager packageManager) implements BinaryDeleteResult {}
+    public record BinaryMustBeDeleted(String deleteCommand) implements BinaryDeleteResult {}
+    public record BinaryNotWritable(Path path) implements BinaryDeleteResult {}
+    public record BinaryDeleted() implements BinaryDeleteResult {}
 
     public sealed interface SkipDeleteReason {
         String reason();
@@ -115,39 +115,49 @@ public class NukeOperation implements Operation<NukeResult> {
     }
 
     private void deleteHomesAndBinary(Path cliBinaryPath, List<Path> homePaths, NukeResult res) {
-        val binDesRes = (ctx.isWindows())
-            ? deleteHomesAndBinaryWindows(homePaths, cliBinaryPath, res)
-            : deleteHomesAndBinaryUnix(homePaths, cliBinaryPath, res);
+        if (ctx.isWindows()) {
+            deleteHomesWindows(homePaths, cliBinaryPath, res);
+        } else {
+            deleteHomesUnix(homePaths, res);
+        }
+
+        val pm = ctx.properties().owningPackageManager();
 
         res.binaryDeleteResult(
-            (ctx.properties().owningPackageManager().isPresent())
-                ? new BinaryOwnedByPackageManager(ctx.properties().owningPackageManager().get())
-                : binDesRes
+            (pm.isPresent())
+                ? new BinaryOwnedByPackageManager(pm.get()) :
+            (ctx.isWindows())
+                ? deleteBinaryWindows(homePaths, cliBinaryPath)
+                : deleteBinaryUnix(homePaths, cliBinaryPath, res)
         );
     }
 
-    public BinaryDeleteResult deleteHomesAndBinaryUnix(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
+    public void deleteHomesUnix(List<Path> homePaths, NukeResult res) {
         for (val path : homePaths) {
             delete(path, res);
         }
+    }
 
-        if (homePaths.stream().noneMatch(cliBinaryPath::startsWith)) {
-            delete(cliBinaryPath, res);
+    public BinaryDeleteResult deleteBinaryUnix(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
+        if (!Files.exists(cliBinaryPath)) {
+            return new BinaryDeleted();
         }
 
-        return (needsSudo(cliBinaryPath))
-            ? new BinaryNotWritable(cliBinaryPath)
+        if (needsSudo(cliBinaryPath)) {
+            return new BinaryNotWritable(cliBinaryPath);
+        }
+
+        delete(cliBinaryPath, res);
+
+        return (Files.exists(cliBinaryPath) && !request.dryRun)
+            ? new BinaryMustBeDeleted("rm " + cliBinaryPath)
             : new BinaryDeleted();
     }
 
-    public BinaryDeleteResult deleteHomesAndBinaryWindows(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
-        val homeFolderWhichAstraIsRunningInside = homePaths.stream()
-            .filter(cliBinaryPath::startsWith)
-            .findFirst();
-
+    public void deleteHomesWindows(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
         for (val folder : homePaths) {
             try {
-                if (homeFolderWhichAstraIsRunningInside.equals(Optional.of(folder))) {
+                if (cliBinaryPath.startsWith(folder)) {
                     @Cleanup val astraHomeFiles = Files.list(folder);
                     astraHomeFiles.filter(f -> f.endsWith("/cli")).forEach((f) -> delete(f, res));
                 } else {
@@ -157,10 +167,12 @@ public class NukeOperation implements Operation<NukeResult> {
                 res.skipped().put(folder, new SkipDeleteReason.JustCouldNot(e.getMessage()));
             }
         }
+    }
 
-        if (homeFolderWhichAstraIsRunningInside.isEmpty()) {
-            delete(cliBinaryPath, res);
-        }
+    public BinaryDeleteResult deleteBinaryWindows(List<Path> homePaths, Path cliBinaryPath) {
+        val homeFolderWhichAstraIsRunningInside = homePaths.stream()
+            .filter(cliBinaryPath::startsWith)
+            .findFirst();
 
         return new BinaryMustBeDeleted(
             (homeFolderWhichAstraIsRunningInside)

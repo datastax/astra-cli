@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.completions.impls.TenantNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.TenantName;
+import com.dtsx.astra.cli.core.output.prompters.specific.TenantPrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.pulsar.AbstractPulsarExeOperation.PulsarExecResult;
 import com.dtsx.astra.cli.operations.streaming.pulsar.StreamingPulsarOperation;
@@ -27,11 +28,12 @@ import java.util.Optional;
 )
 public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
     @Parameters(
-        paramLabel = "TENANT",
+        arity = "0..1",
+        completionCandidates = TenantNamesCompletion.class,
         description = "The name of the tenant to connect to",
-        completionCandidates = TenantNamesCompletion.class
+        paramLabel = "TENANT"
     )
-    public TenantName $tenantName;
+    public Optional<TenantName> $tenantName;
 
     @ArgGroup
     public @Nullable Exec $exec;
@@ -67,10 +69,14 @@ public class StreamingPulsarShellCmd extends AbstractPulsarExecCmd {
     @Override
     protected Operation<PulsarExecResult> mkOperation() {
         return new StreamingPulsarOperation(ctx, streamingGateway, downloadsGateway, new PulsarRequest(
-            $tenantName,
+            $tenantName.orElseGet(this::promptForTenantName),
             $failOnError,
             Optional.ofNullable($exec).map(e -> e.$execute.<Either<String, Path>>map(Either::left).orElseGet(() -> Either.pure(e.$commandsFile.orElseThrow()))),
             $noProgress
         ));
+    }
+
+    private TenantName promptForTenantName() {
+        return TenantPrompter.prompt(ctx, streamingGateway, "Select the tenant to connect to:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "<tenant>"));
     }
 }

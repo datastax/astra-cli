@@ -75,11 +75,17 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
     public boolean $yes;
 
     @Option(
-        names = { "--allow-same-version" },
-        description = "Allow re-installing the same version for testing purposes",
-        hidden = true
+        names = { "--allow-reinstall" },
+        description = "Allow re-installing the same version"
     )
     public boolean $allowSameVersion;
+
+    @Option(
+        names = { "--force-unsafe" },
+        description = "Attempt to upgrade even if astra thinks it's unsafe",
+        hidden = true
+    )
+    public boolean $forceUnsafe;
 
     @Override
     @SneakyThrows
@@ -137,7 +143,13 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
                 ? new SpecificVersion($versionMod.$specificVersion.get())
                 : new LatestVersion($versionMod.$includePreReleases);
 
-        return new UpgradeOperation(ctx, downloadsGateway, upgradeGateway, new UpgradeRequest(versionType, $allowSameVersion, this::confirmUpgrade));
+        return new UpgradeOperation(ctx, downloadsGateway, upgradeGateway, new UpgradeRequest(
+            versionType,
+            $allowSameVersion,
+            $forceUnsafe,
+            originalArgs(),
+            this::confirmUpgrade
+        ));
     }
 
     @Override

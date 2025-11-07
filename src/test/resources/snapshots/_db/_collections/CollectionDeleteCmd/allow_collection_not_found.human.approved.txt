@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db delete-collection two_regions_db -c test_coll --if-exists
+command: astra db delete-collection two_regions_db -k default_keyspace -c test_coll --if-exists
 exit_code: 0
 ---- output ----
 stdout: Collection 'test_coll' does not exist in keyspace 'default_keyspace' of database 'two_regions_db'; nothing to delete.

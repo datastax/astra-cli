@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db delete-collection two_regions_db -c test_coll -o json
+command: astra db delete-collection two_regions_db -k default_keyspace -c test_coll -o json
 exit_code: 2
 ---- output ----
 stdout: {
@@ -8,7 +8,7 @@ stdout:   "message" : "Error: Collection 'test_coll' does not exist in keyspace 
 stdout:   "data" : null,
 stdout:   "nextSteps" : [ {
 stdout:     "comment" : "Example fix:",
-stdout:     "command" : "astra db delete-collection two_regions_db -c test_coll -o json --if-exists"
+stdout:     "command" : "astra db delete-collection two_regions_db -k default_keyspace -c test_coll -o json --if-exists"
 stdout:   }, {
 stdout:     "comment" : "See all existing collections in the database:",
 stdout:     "command" : "astra db list-collections two_regions_db --all"

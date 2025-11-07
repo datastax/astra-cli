@@ -8,6 +8,6 @@ comments:
 ---- output ----
 stderr: [INFO] Reading CQL statements from stdin...
 stderr: [INFO] Use backslashes for multi-line statements
-stdout: code,message,exitCode,stdout,stderr
+stdout: code,message,exit_code,stdout,stderr
 stdout: OK,"Cqlsh executed with exit code 0, with 1 lines in stdout and 0 lines in stderr.",0,Current consistency level is LOCAL_QUORUM.,
 ---- end ----

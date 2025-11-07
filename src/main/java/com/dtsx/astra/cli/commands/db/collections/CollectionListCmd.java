@@ -11,6 +11,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -43,9 +44,21 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
     public boolean $all;
 
     @Override
-    protected final OutputJson executeJson(Supplier<Stream<CollectionListResult>> result) {
-        validateParams();
+    protected boolean parseKeyspaceRef() {
+        return !$all;
+    }
 
+    @Override
+    protected void prelude() {
+        super.prelude();
+
+        if ($all && $keyspaceRef != null) {
+            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
+        }
+    }
+
+    @Override
+    protected final OutputJson executeJson(Supplier<Stream<CollectionListResult>> result) {
         if ($all) {
             return OutputJson.serializeValue(result.get()
                 .map((res) -> sequencedMapOf(
@@ -60,8 +73,6 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
 
     @Override
     public final OutputAll execute(Supplier<Stream<CollectionListResult>> result) {
-        validateParams();
-
         val data = result.get()
             .flatMap((res) -> (
                 res.collections().stream()
@@ -79,14 +90,11 @@ public class CollectionListCmd extends AbstractCollectionCmd<Stream<CollectionLi
         }
     }
 
-    private void validateParams() {
-        if ($all && !$keyspaceRef.isDefaultKeyspace()) {
-            throw new ParameterException(spec.commandLine(), "Cannot use --all with a specific keyspace (the -k flag)");
-        }
-    }
-
     @Override
     protected Operation<Stream<CollectionListResult>> mkOperation() {
-        return new CollectionListOperation(collectionGateway, keyspaceGateway, new CollectionListRequest($keyspaceRef, $all));
+        return new CollectionListOperation(collectionGateway, keyspaceGateway, new CollectionListRequest(
+            $dbRef,
+            Optional.ofNullable($keyspaceRef)
+        ));
     }
 }

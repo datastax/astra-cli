@@ -2,7 +2,7 @@
 command: astra db list-embedding-providers two_regions_db -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,key,displayName,models,parameters,authHeader,authSecret
+stdout: code,message,key,display_name,models,parameters,auth_header,auth_secret
 stdout: OK,,cohere,Cohere,3,0,■,■
 stdout: OK,,openai,OpenAI,3,2,■,■
 stdout: OK,,huggingfaceDedicated,Hugging Face - Dedicated,1,3,■,■

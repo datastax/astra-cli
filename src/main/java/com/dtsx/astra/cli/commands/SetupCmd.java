@@ -271,8 +271,12 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             .dontClearAfterSelection();
     }
 
-    private ProfileName promptForName(String defaultName) {
-        val prompt = ctx.colors().PURPLE_300.use("(Optional)") + " Enter a name for your profile (defaults to your org name)";
+    private ProfileName promptForName(String defaultName, AstraEnvironment env) {
+        val envAddendum = (env != AstraEnvironment.PROD)
+            ? " " + ctx.highlight(env.name().toLowerCase())
+            : "";
+
+        val prompt = ctx.colors().PURPLE_300.use("(Optional)") + " Enter a name for your profile (defaults to your" + envAddendum + " org name)";
 
         return ctx.console().prompt(prompt)
             .mapper(ProfileName::mkUnsafe)

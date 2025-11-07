@@ -5,7 +5,9 @@ import com.dtsx.astra.cli.core.datatypes.Unit;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.ExitCode;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
+import com.dtsx.astra.cli.core.properties.CliProperties.SupportedPackageManager;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.gateways.upgrade.UpgradeGateway;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import lombok.val;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 @RequiredArgsConstructor
@@ -30,6 +34,8 @@ public class UpgradeOperation implements Operation<Unit> {
     public record UpgradeRequest(
         VersionType versionType,
         boolean allowSameVersion,
+        boolean force,
+        List<String> originalArgs,
         BiConsumer<Version, String> confirmUpgrade
     ) {}
 
@@ -100,12 +106,25 @@ public class UpgradeOperation implements Operation<Unit> {
             """);
         }
 
+        val hints = new ArrayList<Hint>() {{
+            add(new Hint("(Not recommended) Attempt an update anyways", request.originalArgs(), "--force-unsafe"));
+        }};
+
         ctx.properties().owningPackageManager().ifPresent((pm) -> {
+            if (request.force) {
+                ctx.log().warn("Forcing self-upgrade even though ${cli.name} is managed by package manager (%s)".formatted(pm.displayName()));
+                return;
+            }
+
+            if (pm == SupportedPackageManager.BREW) {
+                hints.addFirst(new Hint("Use Homebrew to update Astra CLI", "brew upgrade ${cli.name}"));
+            }
+
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Cannot self-update when Astra CLI is managed by a package manager (%s)|@
 
               Please use the package manager to update Astra CLI.
-            """.formatted(pm.displayName()));
+            """.formatted(pm.displayName()), hints);
         });
 
         if (!Files.isWritable(binaryPath.get())) {
@@ -113,7 +132,7 @@ public class UpgradeOperation implements Operation<Unit> {
               @|bold,red Error: No write permissions to update the current process @|faint,italic (%s)|@|@
 
               Is the binary managed by a package manager (e.g. nix), or are you not running Astra CLI as a binary?
-            """.formatted(binaryPath));
+            """.formatted(binaryPath), hints);
         }
 
         return binaryPath.get();

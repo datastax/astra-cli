@@ -96,7 +96,7 @@ public abstract class AssertUtils {
 
             val headersStr = String.join(",", parser.getHeaderNames());
 
-            if (!headersStr.matches("^code,message(,(?!code$|message$)[a-z0-9_])*$")) {
+            if (!headersStr.matches("^code,message(,(?!code$|message$)[a-z0-9_]+)*$")) {
                 return Assertions.fail("Invalid CSV headers: " + headersStr);
             }
 

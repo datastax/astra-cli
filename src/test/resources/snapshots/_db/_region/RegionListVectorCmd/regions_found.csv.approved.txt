@@ -2,7 +2,7 @@
 command: astra db list-regions-vector -o csv
 exit_code: 0
 ---- output ----
-stdout: code,message,cloudProvider,region,displayName,zone
+stdout: code,message,cloud_provider,region,display_name,zone
 stdout: OK,,aws,us-east-1,US East (N. Virginia),North America
 stdout: OK,,aws (free),us-west-2,US West (Oregon),North America
 stdout: OK,,azure,eastus,East US,North America
