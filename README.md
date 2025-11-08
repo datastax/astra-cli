@@ -3,7 +3,9 @@
 [![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 ![Latest Release](https://img.shields.io/badge/release-1.0.0.beta-orange)
 
-Astra CLI provides a command line interface in a terminal to operate DataStax Astra. The goal is to offer access to any feature without accessing the user interface.
+Astra CLI provides a terminal interface to operate DataStax Astra. The goal is to offer access to any feature without accessing the user interface.
+
+![Astra CLI MacOS demo](assets/demo.gif)
 
 > This is the README for the new 1.0.0 (beta) version of the Astra CLI. See the README for the previous version [here](https://github.com/datastax/astra-cli/tree/0.x?tab=readme-ov-file#astra-cli).
 
@@ -18,8 +20,8 @@ Astra CLI provides a command line interface in a terminal to operate DataStax As
 - [Customization](#customization)
     - [Home folder location](#home-folder-location)
     - [`.astrarc` location](#astrarc-location)
-    - [Response format](#response-format)
-    - [Output level](#output-level)
+    - [Output format](#output-format)
+    - [Output style](#output-style)
 - [What's new](#whats-new)
     - [Windows support](#windows-support)
     - [Improved output and interactivity](#improved-output-and-interactivity)
@@ -83,7 +85,7 @@ You can also download a specific version, or the latest prerelease version, usin
 
 ```bash
 # Upgrade (or downgrade!) to a specific version
-astra upgrade --version 1.0.0-rc-2
+astra upgrade --version 1.0.0-rc.4
 
 # Upgrade to the latest prerelease version
 astra upgrade --pre
@@ -120,7 +122,7 @@ After installation, run `astra setup` to interactively set up your credentials i
 astra setup
 ```
 
-The `astra config` subcommands can be further used to manager your configuration profiles.
+The `astra config` subcommands can be further used to manage your configuration profiles.
 
 ### Using the CLI without a credentials file
 
@@ -145,18 +147,18 @@ astra db list --token <your_token> [--env <your_env>]
 
 ### Home folder location
 
-The Astra CLI uses a singular home folder to store various data, such as downloaded programs, secure connect bundles, completions caches, etc.
+The Astra CLI uses a single home folder to store various data, such as downloaded programs, secure connect bundles, completions caches, etc.
 
 By default, this folder is located at either `$XDG_DATA_HOME/astra` (if the `XDG_DATA_HOME` environment variable is set), or at `~/.astra` (if not).
 
 You can override this location by setting the `ASTRA_HOME` environment variable to your desired path.
 
 ```bash
-# Possible
-echo 'export ASTRA_HOME=/path/to/your/astra/home' >> ~/.bashrc
+# Option 1: Set the environment variable directly
+echo 'export ASTRA_HOME=/path/to/your/astra/home' >> ~/.bash_profile
 
-# Preferred
-echo 'eval "$(astra shellenv --home "/path/to/your/astra/home")"' >> ~/.bashrc
+# Option 2: Use shellenv (preferred, as it handles shell-specific setup)
+echo 'eval "$(astra shellenv --home "/path/to/your/astra/home")"' >> ~/.bash_profile
 ```
 
 ### `.astrarc` location
@@ -168,11 +170,11 @@ By default, this file is located at either `$XDG_CONFIG_HOME/astra/.astrarc` (if
 You can override this location by setting the `ASTRARC` environment variable to your desired path.
 
 ```bash
-# Possible
-echo 'export ASTRARC=/path/to/your/.astrarc' >> ~/.bashrc
+# Option 1: Set the environment variable directly
+echo 'export ASTRARC=/path/to/your/.astrarc' >> ~/.bash_profile
 
-# Preferred
-echo 'eval "$(astra shellenv --rc "/path/to/your/.astrarc")"' >> ~/.bashrc
+# Option 2: Use shellenv (preferred, as it handles shell-specific setup)
+echo 'eval "$(astra shellenv --rc "/path/to/your/.astrarc")"' >> ~/.bash_profile
 ```
 
 ### Output format
@@ -565,6 +567,14 @@ Some commands, namely the ones that build on `cqlsh`, `dsbulk`, and `pulsar-shel
 
 <details>
   <summary><strong>pulsar-shell</strong></summary>
+
+  Similar to `cqlsh` and `dsbulk`, the pulsar-shell commands have been organized under the `astra streaming pulsar` subcommand.
+
+  The available commands include:
+  - `astra streaming pulsar shell` – Launch an interactive Apache Pulsar shell session for a streaming tenant
+    - Supports `-e <statement>` and `-f <file>` flags for non-interactive execution
+  - `astra streaming pulsar version` – Prints the version of `pulsar-shell` that is used by the CLI
+  - `astra streaming pulsar path` – Prints the path to the `pulsar-shell` binary, installing it if necessary
 </details>
 
 ### XDG spec compliance
@@ -575,18 +585,63 @@ The Astra CLI will now respect the `$XDG_DATA_HOME` and `$XDG_CONFIG_HOME` envir
 
 <details>
   <summary>Other minor changes (not exhaustive)</summary>
-    <li> automatically patch cqlsh script to work on machines with a newer python version as default by testing for older python versions explicitly
-    <li> consistent support of the `--output` flag across all commands–either a format is supported, or the command will error out before doing anything
-    <li> removed `astra-init` script in favor of the `astra compgen` command
-    <li> removed `astra login` since it was just an alias of `astra setup`
-    <li> `setup` command has been completely rewritten and improved to be much more interactive and user-friendly
-    <li> fewer API calls will be made due to better internal caching and logic (commands may be much faster now!)
-    <li> fixed inconsistent shell coloring in places (--no-color now definitively works everywhere)
-    <li> fixed issues with not being able to use IDs in place of names in some places (e.g. `db delete [id]`)
-    <li> timeout durations can now be parsed using iso8601 durations or with simple time units (ms, s, m, h)
-    <li> .astrarc parsing is stricter now
-    <li> improved .env + .ini parsing + printing
-    <li> and more.
+  <ul>
+    <li>automatically patch cqlsh script to work on machines with a newer python version as default by testing for older python versions explicitly</li>
+    <li>consistent support of the `--output` flag across all commands–either a format is supported, or the command will error out before doing anything</li>
+    <li>removed `astra-init` script in favor of the `astra compgen` command</li>
+    <li>removed `astra login` since it was just an alias of `astra setup`</li>
+    <li>`setup` command has been completely rewritten and improved to be much more interactive and user-friendly</li>
+    <li>fewer API calls will be made due to better internal caching and logic (commands may be much faster now!)</li>
+    <li>fixed inconsistent shell coloring in places (--no-color now definitively works everywhere)</li>
+    <li>fixed issues with not being able to use IDs in place of names in some places (e.g. `db delete [id]`)</li>
+    <li>timeout durations can now be parsed using iso8601 durations or with simple time units (ms, s, m, h)</li>
+    <li>.astrarc parsing is stricter now</li>
+    <li>improved .env + .ini parsing + printing</li>
+    <li>and more.</li>
+  </ul>
 </details>
 
 ## Troubleshooting
+
+### Common issues
+
+**MacOS security warnings**
+
+If you get an "unidentified developer" error on macOS, see the [macOS warning section](#-macos-warning) above.
+
+**Authentication failures**
+
+If commands fail with authentication errors:
+- Verify your token is valid and hasn't expired
+- Check that you're using the correct environment (`--env` flag)
+- Run `astra config list` to verify your configuration profile settings
+- Try running `astra setup` again to reconfigure your credentials
+
+**External programs not working (cqlsh, dsbulk, pulsar-shell)**
+
+If external programs fail to download or execute:
+- Check your internet connection
+- Verify you have write permissions to your `ASTRA_HOME` directory
+- Try removing the cached binary and letting the CLI re-download it:
+  ```bash
+  # Find the path first
+  astra db cqlsh path  # (or dsbulk path, or streaming pulsar path)
+  # Then remove the parent directory and try again
+  ```
+
+**Finding your configuration files**
+
+If you're unsure where your `.astrarc` file or home folder is located, or if you're getting warnings about multiple paths:
+- Run `astra config path` to see where your `.astrarc` file is (or would be) located
+- Run `astra config home path` to see where your Astra home folder is located
+- If you see warnings about multiple `.astrarc` files or home folders existing in different locations:
+  - Remove or migrate the lower priority files/folders (priority: custom env var > XDG spec > default home directory)
+  - Or, suppress the warning by setting `ASTRA_IGNORE_MULTIPLE_PATHS=true`
+
+**General debugging**
+
+For any issues:
+- Use the `--verbose` flag to see detailed output
+- Use the `--dump-logs` flag to save logs to a file for later inspection
+- Check the [GitHub issues](https://github.com/datastax/astra-cli/issues) for similar problems
+- Open a new issue if your problem isn't already reported

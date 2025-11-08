@@ -187,7 +187,7 @@ if (-not $existingInstallPath -and (Test-Path (Join-Path $ASTRA_CLI_DIR "astra.e
 if ($existingInstallPath) {
     Write-Host ""
     Write-Host "Error: An existing astra installation was already found." -ForegroundColor Red
-    Write-Host "An existing installation was found at $(Tildify (Split-Path $existingInstallPath))`n"
+    Write-Host "An existing installation was found at $( Tildify (Split-Path $existingInstallPath) )`n"
     Write-MultiColor -Texts @("-> ", "(< astra-cli 1.x)", " Remove the existing installation manually and re-run this installer.") -Colors @("DarkCyan", "DarkGray", "Gray")
     Write-MultiColor -Texts @("-> ", "(> astra-cli 1.x)", " Run ", "astra upgrade", " to automatically update to the latest version.") -Colors @("DarkCyan", "DarkGray", "Gray", "DarkCyan", "Gray")
     Write-MultiColor -Texts @("-> ", "(> astra-cli 1.x)", " Run ", "astra nuke", " to completely remove the CLI and then re-run this installer.") -Colors @("DarkCyan", "DarkGray", "Gray", "DarkCyan", "Gray")
@@ -200,7 +200,7 @@ if ($existingInstallPath) {
 
 # Create installation directory
 New-Item -ItemType Directory -Force -Path $ASTRA_CLI_DIR | Out-Null
-Checklist "Using installation dir $($ASTRA_CLI_DIR + "\")"
+Checklist "Using installation dir $( $ASTRA_CLI_DIR + "\" )"
 
 # Download and extract
 $zipPath = Join-Path $ASTRA_CLI_DIR "astra-tmp.zip"
@@ -224,7 +224,7 @@ catch {
     }
     catch {
         Remove-Item $zipPath -ErrorAction SilentlyContinue
-        Panic "`nError: Failed to download the archive to $(Tildify $zipPath). Check your internet connection and permissions."
+        Panic "`nError: Failed to download the archive to $( Tildify $zipPath ). Check your internet connection and permissions."
     }
 }
 
@@ -244,7 +244,7 @@ try {
     Remove-Item -Recurse -Force $tempDir
 }
 catch {
-    Panic "`nError: Failed to extract the archive at $(Tildify $zipPath)."
+    Panic "`nError: Failed to extract the archive at $( Tildify $zipPath )."
 }
 finally {
     Remove-Item -Force $zipPath -ErrorAction SilentlyContinue

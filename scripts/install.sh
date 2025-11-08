@@ -72,12 +72,12 @@ RESET=$(color sgr0)
 
 # Prelude
 echo "$PURPLE"
-echo "    _____            __                  "
-echo "   /  _  \   _______/  |_____________    "
-echo "  /  /_\  \ /  ___/\   __\_  __ \__  \   "
-echo " /    |    \\___ \  |  |  |  | \// __ \_ "
-echo " \____|__  /____  > |__|  |__|  (____  / "
-echo "         \/     \/                   \/  "
+echo "    _____            __                   "
+echo "   /  _  \   _______/  |_____________     "
+echo "  /  /_\  \ /  ___/\   __\_  __ \__  \    "
+echo " /    |    \\___  \  |  |  |  | \// __ \_ "
+echo " \____|__  /____  > |__|  |__|  (____  /  "
+echo "         \/     \/                   \/   "
 echo ""
 echo "                    Installer: $ASTRA_CLI_VERSION"
 echo "$RESET"
@@ -122,7 +122,7 @@ print_next_steps() {
     echo ""
   fi
 
-  renderComment "Append the following to your shell profile (e.g. $(underline "~/.bashrc"), $(underline "~/.zshrc"), etc.)"
+  renderComment "Append the following to your shell profile (e.g. $(underline "~/.zprofile"), $(underline "~/.bash_profile"), etc.)"
   if [ "$ASTRA_CLI_DIR_RESOLVER" = "custom" ]; then
     renderCommand "eval \"\$($(tildify "$EXE_PATH") shellenv --home \"$(tildify "$ASTRA_HOME")\")\""
   else

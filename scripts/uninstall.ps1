@@ -90,7 +90,7 @@ try {
 } catch {
     # Try a second time
     Stop-Astra
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 3
     try {
         Remove-Item "${PSScriptRoot}\astra.exe" -Force
     } catch {
@@ -125,18 +125,6 @@ if (Test-Path "${AstraHome}") {
         exit 1
     }
 }
-
-# Determine .astrarc location
-if ($env:ASTRARC) {
-    $AstraRc = $env:ASTRARC
-} elseif ($env:XDG_CONFIG_HOME) {
-    $AstraRc = "$env:XDG_CONFIG_HOME\astra\.astrarc"
-} else {
-    $AstraRc = "$HOME\.astrarc"
-}
-
-# Remove .astrarc file (do not fail if it doesn't exist)
-Remove-Item "${AstraRc}" -Force -ErrorAction SilentlyContinue
 
 # Remove Entry from PATH
 try {
