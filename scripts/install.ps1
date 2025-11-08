@@ -36,11 +36,6 @@ function Checklist {
     Write-Host "-> $args" -ForegroundColor DarkGray
 }
 
-function Underline {
-    param([string]$Text)
-    return "$Text"
-}
-
 function Tildify($Path) {
     $userHome = $HOME.TrimEnd('\')
     if ($Path -like "$userHome*") {
@@ -119,7 +114,7 @@ function Get-Env {
 }
 
 # Constants
-$ASTRA_CLI_VERSION = "1.0.0-rc.3"
+$ASTRA_CLI_VERSION = "1.0.0-rc.4"
 
 if ($env:ASTRA_HOME) {
     $ASTRA_CLI_DIR = "$env:ASTRA_HOME\cli"
@@ -192,7 +187,7 @@ if (-not $existingInstallPath -and (Test-Path (Join-Path $ASTRA_CLI_DIR "astra.e
 if ($existingInstallPath) {
     Write-Host ""
     Write-Host "Error: An existing astra installation was already found." -ForegroundColor Red
-    Write-Host "An existing installation was found at $( Underline (Tildify (Split-Path $existingInstallPath)) )`n"
+    Write-Host "An existing installation was found at $(Tildify (Split-Path $existingInstallPath))`n"
     Write-MultiColor -Texts @("-> ", "(< astra-cli 1.x)", " Remove the existing installation manually and re-run this installer.") -Colors @("DarkCyan", "DarkGray", "Gray")
     Write-MultiColor -Texts @("-> ", "(> astra-cli 1.x)", " Run ", "astra upgrade", " to automatically update to the latest version.") -Colors @("DarkCyan", "DarkGray", "Gray", "DarkCyan", "Gray")
     Write-MultiColor -Texts @("-> ", "(> astra-cli 1.x)", " Run ", "astra nuke", " to completely remove the CLI and then re-run this installer.") -Colors @("DarkCyan", "DarkGray", "Gray", "DarkCyan", "Gray")
@@ -202,17 +197,15 @@ if ($existingInstallPath) {
     Print-Next-Steps -PathWasAdded $false
     throw "Existing installation found"
 }
-else {
-    Checklist "No existing installation found."
-}
 
 # Create installation directory
 New-Item -ItemType Directory -Force -Path $ASTRA_CLI_DIR | Out-Null
-Checklist "Using installation dir $( Underline ($ASTRA_CLI_DIR + "\") )"
+Checklist "Using installation dir $($ASTRA_CLI_DIR + "\")"
 
 # Download and extract
 $zipPath = Join-Path $ASTRA_CLI_DIR "astra-tmp.zip"
-$exePath = Join-Path $ASTRA_CLI_DIR "astra.exe"
+$uninstallPath = Join-Path $ASTRA_CLI_DIR "uninstall.ps1"
+$iconPath = Join-Path $ASTRA_CLI_DIR "astra.ico"
 
 Remove-Item -Force $zipPath -ErrorAction SilentlyContinue
 
@@ -221,22 +214,17 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "curl download failed with exit code $LASTEXITCODE"
     }
-    if (-not (Test-Path $zipPath) -or (Get-Item $zipPath).Length -eq 0) {
-        throw "Downloaded file is missing or empty"
-    }
     Checklist "Archive downloaded."
 }
 catch {
     try {
+        Remove-Item $zipPath -ErrorAction SilentlyContinue
         Invoke-RestMethod -Uri $installUrl -OutFile $zipPath
-        if (-not (Test-Path $zipPath) -or (Get-Item $zipPath).Length -eq 0) {
-            throw "Downloaded file is missing or empty"
-        }
         Checklist "Archive downloaded via Invoke-RestMethod."
     }
     catch {
         Remove-Item $zipPath -ErrorAction SilentlyContinue
-        Panic "`nError: Failed to download the archive to $( Underline (Tildify $zipPath) ). Check your internet connection and permissions."
+        Panic "`nError: Failed to download the archive to $(Tildify $zipPath). Check your internet connection and permissions."
     }
 }
 
@@ -249,140 +237,82 @@ try {
     Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
     Checklist "Archive extracted to temp dir."
 
-    $sourceExe = Join-Path $tempDir "astra\bin\astra.exe"
+    # Move all files from archive
+    $sourceBinDir = Join-Path $tempDir "astra\bin"
+    Get-ChildItem -Path $sourceBinDir | Move-Item -Destination $ASTRA_CLI_DIR -Force
 
-    # Verify extracted file exists
-    if (-not (Test-Path $sourceExe)) {
-        Remove-Item -Recurse -Force $tempDir
-        throw "astra.exe not found in archive. Archive may be corrupted."
-    }
-
-    # Check if astra.exe is running before replacing
-    try {
-        Remove-Item -Force $exePath -ErrorAction Stop
-    }
-    catch [System.UnauthorizedAccessException] {
-        $openProcesses = Get-Process -Name astra -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exePath }
-        if ($openProcesses.Count -gt 0) {
-            Remove-Item -Recurse -Force $tempDir
-            Panic "`nError: An existing astra.exe is running. Please close it and try again."
-        }
-        Remove-Item -Recurse -Force $tempDir
-        Panic "`nError: Failed to replace existing astra.exe. Check file permissions."
-    }
-    catch [System.Management.Automation.ItemNotFoundException] {
-        # File doesn't exist, that's fine
-    }
-
-    Move-Item -Force $sourceExe $exePath
     Remove-Item -Recurse -Force $tempDir
-
-    # Verify installation succeeded
-    if (-not (Test-Path $exePath)) {
-        throw "Failed to install astra.exe to final location"
-    }
-
-    Checklist "Archive verified and extracted."
 }
 catch {
-    Panic "`nError: Failed to extract the archive at $( Underline (Tildify $zipPath) )."
+    Panic "`nError: Failed to extract the archive at $(Tildify $zipPath)."
 }
 finally {
     Remove-Item -Force $zipPath -ErrorAction SilentlyContinue
     $global:ProgressPreference = $lastProgressPreference
 }
 
-# Download uninstall script
-$uninstallPath = Join-Path $ASTRA_CLI_DIR "uninstall.ps1"
-$uninstallUrl = "https://raw.githubusercontent.com/datastax/astra-cli/main/scripts/uninstall.ps1"
-$uninstallDownloaded = $false
-
-try {
-    curl.exe "-#sfLo" "$uninstallPath" "$uninstallUrl"
-    if ($LASTEXITCODE -eq 0) {
-        $uninstallDownloaded = $true
-    }
-    else {
-        throw "curl download failed"
-    }
-}
-catch {
-    try {
-        Invoke-RestMethod -Uri $uninstallUrl -OutFile $uninstallPath
-        $uninstallDownloaded = $true
-    }
-    catch {
-        Write-Host "Warning: Failed to download uninstall script." -ForegroundColor Yellow
-    }
+# Verify required files exist
+if (-not (Test-Path (Join-Path $ASTRA_CLI_DIR "astra.exe"))) {
+    Panic "astra.exe not found in archive. Archive may be corrupted."
 }
 
-if ($uninstallDownloaded -and (Test-Path $uninstallPath)) {
-    Checklist "Downloaded uninstall script."
+if (-not (Test-Path $uninstallPath)) {
+    Panic "uninstall.ps1 not found in archive. Archive may be corrupted."
 }
-else {
-    Write-Host "Warning: Uninstaller in Add/Remove Programs will not work." -ForegroundColor Yellow
+
+if (-not (Test-Path $iconPath)) {
+    Panic "astra.ico not found in archive. Archive may be corrupted."
 }
+
+Checklist "Archive extracted."
 
 # Add to PATH automatically
 $pathWasAdded = $false
-try {
-    $currentPath = Get-Env -Key "Path"
-    $Path = if ($null -ne $currentPath) {
-        $currentPath -split ';'
-    }
-    else {
-        @()
-    }
+if (-not $NoPathUpdate) {
+    try {
+        $currentPath = Get-Env -Key "Path"
+        $Path = if ($null -ne $currentPath) {
+            $currentPath -split ';'
+        }
+        else {
+            @()
+        }
 
-    if ($Path -notcontains $ASTRA_CLI_DIR) {
-        if (-not $NoPathUpdate) {
+        if ($Path -notcontains $ASTRA_CLI_DIR) {
             $Path += $ASTRA_CLI_DIR
             Write-Env -Key 'Path' -Value ($Path -join ';')
-            $pathWasAdded = $true
             Checklist "Added to PATH."
         }
-    }
-    else {
-        Checklist "Already in PATH."
+        else {
+            Checklist "Already in PATH."
+        }
         $pathWasAdded = $true
     }
-}
-catch {
-    Write-Host "Warning: Failed to update PATH. You'll need to add it manually." -ForegroundColor Yellow
+    catch {
+        Write-Host "Warning: Failed to update PATH. You'll need to add it manually." -ForegroundColor Yellow
+    }
 }
 
 # Register in Add/Remove Programs
 if (-not $NoRegisterInstallation) {
-    $rootKey = $null
     try {
+        $uninstallPath = Join-Path $ASTRA_CLI_DIR "uninstall.ps1"
+        $iconPath = Join-Path $ASTRA_CLI_DIR "astra.ico"
+
         $RegistryKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\AstraCLI"
-        $rootKey = New-Item -Path $RegistryKey -Force
+        New-Item -Path $RegistryKey -Force | Out-Null
         New-ItemProperty -Path $RegistryKey -Name "DisplayName" -Value "Astra CLI" -PropertyType String -Force | Out-Null
         New-ItemProperty -Path $RegistryKey -Name "DisplayVersion" -Value "$ASTRA_CLI_VERSION" -PropertyType String -Force | Out-Null
         New-ItemProperty -Path $RegistryKey -Name "Publisher" -Value "DataStax" -PropertyType String -Force | Out-Null
         New-ItemProperty -Path $RegistryKey -Name "InstallLocation" -Value "$ASTRA_CLI_DIR" -PropertyType String -Force | Out-Null
-        New-ItemProperty -Path $RegistryKey -Name "DisplayIcon" -Value "$exePath" -PropertyType String -Force | Out-Null
-
-        # Use uninstall script if available, otherwise provide manual instructions
-        if ($uninstallDownloaded -and (Test-Path $uninstallPath)) {
-            New-ItemProperty -Path $RegistryKey -Name "UninstallString" -Value "powershell -ExecutionPolicy Bypass -File `"$uninstallPath`" -PauseOnError" -PropertyType String -Force | Out-Null
-            New-ItemProperty -Path $RegistryKey -Name "QuietUninstallString" -Value "powershell -ExecutionPolicy Bypass -File `"$uninstallPath`"" -PropertyType String -Force | Out-Null
-        }
-        else {
-            # Fallback: Point to a command that provides manual uninstall instructions
-            $fallbackCmd = "powershell -ExecutionPolicy Bypass -Command `"Write-Host 'To uninstall Astra CLI:' -ForegroundColor Yellow; Write-Host '1. Run: astra nuke' -ForegroundColor Cyan; Write-Host '2. Remove from PATH manually' -ForegroundColor Cyan; Write-Host '3. Delete registry key: HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\AstraCLI' -ForegroundColor Cyan; Read-Host 'Press Enter to close'`""
-            New-ItemProperty -Path $RegistryKey -Name "UninstallString" -Value $fallbackCmd -PropertyType String -Force | Out-Null
-        }
-
+        New-ItemProperty -Path $RegistryKey -Name "DisplayIcon" -Value "$iconPath" -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $RegistryKey -Name "UninstallString" -Value "powershell -ExecutionPolicy Bypass -File `"$uninstallPath`" -PauseOnError" -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $RegistryKey -Name "QuietUninstallString" -Value "powershell -ExecutionPolicy Bypass -File `"$uninstallPath`"" -PropertyType String -Force | Out-Null
         New-ItemProperty -Path $RegistryKey -Name "NoModify" -Value 1 -PropertyType DWord -Force | Out-Null
         New-ItemProperty -Path $RegistryKey -Name "NoRepair" -Value 1 -PropertyType DWord -Force | Out-Null
         Checklist "Registered in Add/Remove Programs."
     }
     catch {
-        # Cleanup on failure
-        if ($rootKey -ne $null) {
-            Remove-Item -Path $RegistryKey -Force -ErrorAction SilentlyContinue
-        }
         Write-Host "Warning: Failed to register in Add/Remove Programs." -ForegroundColor Yellow
     }
 }
