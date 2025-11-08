@@ -73,7 +73,7 @@ public class UpgradeOperation implements Operation<Unit> {
         val pid = ProcessHandle.current().pid();
 
         new ProcessBuilder("cmd.exe", "/c", """
-          for /L %%i in (1,1,60) do (tasklist /FI \\"PID eq %d\\" 2>NUL | find /I \\"%d\\" >NUL && (timeout /T 1 /NOBREAK >NUL) || (move /Y \\"%s\\" \\"%s\\" & exit))
+          for /L %%i in (1,1,60) do (tasklist /FI \\"PID eq %d\\" /NH 2>NUL | find \\"%d\\" >NUL && (timeout /T 1 /NOBREAK >NUL) || (move /Y \\"%s\\" \\"%s\\" && exit || exit /B 1))
         """.formatted(
             pid,
             pid,

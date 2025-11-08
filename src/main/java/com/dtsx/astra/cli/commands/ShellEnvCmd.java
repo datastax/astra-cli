@@ -42,6 +42,10 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "eval \"$(${cli.path} shellenv --home /path/to/astra/home)\""
 )
 @Example(
+    comment = "Set a custom @|code ASTRARC|@ path",
+    command = "eval \"$(${cli.path} shellenv --rc /path/to/astrarc)\""
+)
+@Example(
     comment = "Disable update notifications",
     command = "eval \"$(${cli.path} shellenv --no-update-notifier)\""
 )
@@ -61,6 +65,12 @@ public class ShellEnvCmd implements Runnable {
         description = { "Sets the @|code ASTRA_HOME|@ env var. See @|code astra config home path -h|@ for how this is resolved.", SHOW_CUSTOM_DEFAULT + "${cli.home-folder.path}" }
     )
     public Optional<Path> $home;
+
+    @Option(
+        names = { "--rc" },
+        description = { "Sets the @|code ASTRARC|@ env var. See @|code astra config path -h|@ for how this is resolved.", SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" }
+    )
+    public Optional<Path> $rc;
 
     @Option(
         names = { "--ignore-multiple-paths" },
@@ -99,6 +109,10 @@ public class ShellEnvCmd implements Runnable {
 
         $home.ifPresent((path) -> {
             sb.append("export ASTRA_HOME=").append(path.toAbsolutePath()).append(NL);
+        });
+
+        $rc.ifPresent((path) -> {
+            sb.append("export ASTRARC=").append(path.toAbsolutePath()).append(NL);
         });
 
         spec.commandLine().getOut().println(sb);

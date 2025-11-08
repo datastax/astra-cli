@@ -41,8 +41,11 @@ Astra CLI v1.x supports both x64 and arm64 versions of Linux, macOS and Windows.
 The preferred installation method is via the installation script:
 
 ```bash
-# Unix
-sh -c "$(curl -fsSL ibm.biz/get-astra-cli)"
+# Unix (recommended)
+curl -fsSL ibm.biz/get-astra-cli | sh
+
+# Unix (brew)
+brew install datastax/astra-cli/astra
 
 # Windows
 powershell -c "irm https://raw.githubusercontent.com/datastax/astra-cli/main/scripts/install.ps1 | iex"
@@ -50,7 +53,23 @@ powershell -c "irm https://raw.githubusercontent.com/datastax/astra-cli/main/scr
 
 The CLI can also be downloaded directly from the [releases page](https://github.com/datastax/astra-cli/releases).
 
-Nix, docker, brew, and potentially other installation methods are coming soon. However, the installation script will always be the recommended way to install the Astra CLI.
+Nix, docker, and potentially other installation methods are coming soon.
+
+### Migrating from v0.x
+
+If you have previously installed Astra CLI v0.x, it is recommended to uninstall that version before installing v1.x to avoid any potential conflicts.
+
+<details>
+  <summary><strong>Uninstalling v0.x</strong></summary>
+
+  ```bash
+  # Unix (installation script)
+  rm $(which astra)
+  
+  # Unix (brew)
+  brew uninstall astra-cli
+  ```
+</details>
 
 ### Upgrading
 
@@ -64,11 +83,13 @@ You can also download a specific version, or the latest prerelease version, usin
 
 ```bash
 # Upgrade (or downgrade!) to a specific version
-astra upgrade --version 1.0.0-beta.4
+astra upgrade --version 1.0.0-rc-2
 
 # Upgrade to the latest prerelease version
 astra upgrade --pre
 ```
+
+**Note:** If you installed Astra CLI via a package manager (e.g. brew), use that package manager to upgrade instead.
 
 ### ⚠️ MacOS warning
 
@@ -78,10 +99,6 @@ If you are running macOS and run into an error about the app being from an unide
   ```bash
   xattr -d com.apple.quarantine $(which astra)
   ```
-
-> [!NOTE]
-> To avoid running into this issue in the first place, **it is heavily recommended that you use the installation script**, which 
-> will not trigger this issue.
 
 ### Uninstalling
 
@@ -96,7 +113,7 @@ astra nuke
 
 ## Setup
 
-After installation, you can run `astra setup` to configure the CLI. This will interactively guide you through setting up your credentials in a central `.astrarc` file.
+After installation, run `astra setup` to interactively set up your credentials in a central `.astrarc` file.
 
 ```bash
 # You can run the `setup` command any time to add or update your credentials.
@@ -117,8 +134,8 @@ astra db list --token <your_token> [--env <your_env>]
 > It is highly recommended to use the `@file` syntax to avoid exposing your token in your shell history.
 > 
 > ```bash
-> # Have a plain-text file containing just your token (the file can be named anything)
-> echo 'AstraCS:...' > my_token
+> # Create a plain-text file containing just your token (the file can be named anything)
+> vim my_token
 >
 > # Now the token can be passed securely via a file
 > astra db list --token @my_token
@@ -158,7 +175,7 @@ echo 'export ASTRARC=/path/to/your/.astrarc' >> ~/.bashrc
 echo 'eval "$(astra shellenv --rc "/path/to/your/.astrarc")"' >> ~/.bashrc
 ```
 
-### Response format
+### Output format
 
 By default, Astra CLI outputs responses in a human-friendly format. However, you can change this to JSON or CSV if you prefer, via the `--output` (or `-o`) flag.
 
@@ -175,7 +192,7 @@ The vast majority of commands will support all three output formats, but if any 
 > [!TIP]
 > Generally, for GET requests, the JSON response will be the raw response from the server, while the human-friendly and CSV formats will be a simplified version of the data.
 
-### Output level
+### Output style
 
 You can control the verbosity and style of the output via a variety of flags.
 
@@ -552,21 +569,24 @@ Some commands, namely the ones that build on `cqlsh`, `dsbulk`, and `pulsar-shel
 
 ### XDG spec compliance
 
+The Astra CLI will now respect the `$XDG_DATA_HOME` and `$XDG_CONFIG_HOME` environment variables for determining where to store its home folder and `.astrarc` file respectively.
+
 ### Misc changes + bug fixes
 
 <details>
   <summary>Other minor changes (not exhaustive)</summary>
-    automatically patch cqlsh script to work on machines with a newer python version as default by testing for older python versions explicitly
-    consistent support of the `--output` flag across all commands–either a format is supported, or the command will error out before doing anything
-    removed `astra-init` script in favor of the `astra compgen` command
-    removed `astra login` since it was just an alias of `astra setup`
-    `setup` command has been completely rewritten and improved to be much more interactive and user-friendly
-    fewer API calls will be made due to better internal caching and logic (commands may be much faster now!)
-    fixed inconsistent shell coloring in places (--no-color now definitively works everywhere)
-    fixed issues with not being able to use IDs in place of names in some places (e.g. `db delete [id]`)
-    timeout durations can now be parsed using iso8601 durations or with simple time units (ms, s, m, h)
-    .astrarc parsing is stricter now
-    improved .env + .ini parsing + printing
+    <li> automatically patch cqlsh script to work on machines with a newer python version as default by testing for older python versions explicitly
+    <li> consistent support of the `--output` flag across all commands–either a format is supported, or the command will error out before doing anything
+    <li> removed `astra-init` script in favor of the `astra compgen` command
+    <li> removed `astra login` since it was just an alias of `astra setup`
+    <li> `setup` command has been completely rewritten and improved to be much more interactive and user-friendly
+    <li> fewer API calls will be made due to better internal caching and logic (commands may be much faster now!)
+    <li> fixed inconsistent shell coloring in places (--no-color now definitively works everywhere)
+    <li> fixed issues with not being able to use IDs in place of names in some places (e.g. `db delete [id]`)
+    <li> timeout durations can now be parsed using iso8601 durations or with simple time units (ms, s, m, h)
+    <li> .astrarc parsing is stricter now
+    <li> improved .env + .ini parsing + printing
+    <li> and more.
 </details>
 
 ## Troubleshooting

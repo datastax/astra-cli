@@ -22,6 +22,7 @@
       </option>
     </inspection_tool>
     <inspection_tool class="NewClassNamingConvention" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="OptionalIsPresent" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="OptionalUsedAsFieldOrParameterType" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ShellCheck" enabled="true" level="ERROR" enabled_by_default="true">
       <shellcheck_settings value="SC2059" />

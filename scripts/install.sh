@@ -82,25 +82,6 @@ echo ""
 echo "                    Installer: $ASTRA_CLI_VERSION"
 echo "$RESET"
 
-# Options
-AUTO_YES_INSTALL=0
-
-if [ -t 0 ]; then
-  if [ "${1:-}" = "--yes" ] || [ "${1:-}" = "-y" ]; then
-    AUTO_YES_INSTALL=1
-  fi
-else
-  echo "${RED}Error: Script is running in a non-interactive terminal${RESET}"
-  echo ""
-  echo "Please use the following command instead to run the script interactively:"
-  echo ""
-  renderCommand "sh -c \"\$(curl -fsSL \"https://raw.githubusercontent.com/datastax/astra-cli/main/scripts/install.sh\")\""
-  echo ""
-  echo "If you really want to run this script in a non-interactively, pass the ${BLUE}--yes${RESET} flag to accept installing astra in the following location:"
-  echo "${BLUE}>${RESET} $(underline "$(tildify "$ASTRA_CLI_DIR/")")"
-  exit 1
-fi
-
 # Required tools check
 if ! command -v curl >/dev/null 2>&1; then
   error "Error: curl is not installed. Please install curl and try again."
@@ -175,36 +156,6 @@ else
   checklist "No existing installation found."
 fi
 
-# Verify installation path
-echo ""
-echo "${GREEN}Ready to install Astra CLI ✅${RESET}"
-echo ""
-echo "Do you want to install Astra CLI to $(underline "$(tildify "$ASTRA_CLI_DIR/")")? ${BLUE}[Y]es/[d]ifferent path/[c]ancel${RESET}"
-
-while [ "$AUTO_YES_INSTALL" = 0 ]; do
-  printf "%s" "${BLUE}> ${RESET}"
-  read -r res
-
-  case ${res:-y} in
-    [Yy]* )
-      for _ in $(seq 1 5); do color cuu1 && color el; done
-      break;;
-    [Dd]*)
-      echo ""
-      echo "${RED}To use a custom installation path, please globally set the ASTRA_HOME environment variable.${RESET}"
-      echo ""
-      echo "This variable $(color bold)must remain in place forever${RESET} (e.g. in your shell profile like $(underline "~/.zprofile"), $(underline "~/.bash_profile"), etc.) so that the CLI can always locate its home directory."
-      echo ""
-      echo "After setting it, restart your terminal or run 'source ~/.zprofile' (or the appropriate file) to apply the change."
-      exit 1
-      ;;
-    [Cc]* )
-      error "\nCancelling installation.";;
-    * )
-      echo "Please answer ${BLUE}yes${RESET}, ${BLUE}no${RESET}, or ${BLUE}cancel${RESET}.";;
-  esac
-done
-
 # Create installation directory
 if mkdir -p "$ASTRA_CLI_DIR"; then
   checklist "Using installation dir $(underline "$(tildify "$ASTRA_CLI_DIR/")")${RESET}${LIGHT_GRAY}."
@@ -239,5 +190,4 @@ echo "${GREEN}Astra CLI installed successfully! 🎉${RESET}"
 echo ""
 echo "Next steps:"
 echo ""
-
 print_next_steps

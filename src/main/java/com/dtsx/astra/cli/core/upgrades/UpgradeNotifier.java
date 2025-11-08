@@ -49,7 +49,7 @@ public class UpgradeNotifier {
         val latestVersion = status.latestVersion().orElseThrow().toString();
 
         val versionMsg = "Update available! " + ctx.colors().NEUTRAL_400.use(currentVersion) + " -> " + ctx.colors().YELLOW_300.use(latestVersion);
-        val commandMsg = "Run " + ctx.colors().BLUE_300.use("astra upgrade") + " to update";
+        val commandMsg = mkUpgradeCommandMsg(ctx);
 
         val versionMsgLength = stripAnsi(versionMsg).length();
         val commandMsgLength = stripAnsi(commandMsg).length();
@@ -68,6 +68,19 @@ public class UpgradeNotifier {
         appendFillerLine(main, boxWidth, blue, '└', '─', '┘');
 
         return main.toString();
+    }
+
+    private static String mkUpgradeCommandMsg(CliContext ctx) {
+        val pm = ctx.properties().owningPackageManager();
+
+        if (pm.isEmpty()) {
+            return "Run @!astra upgrade!@ to update";
+        }
+
+        return switch (pm.get()) {
+            case BREW -> "Run @!brew upgrade astra!@ to update";
+            case NIX -> "Upgrade @!astra!@ through @!Nix!@";
+        };
     }
 
     private static void appendFillerLine(StringBuilder main, int boxWidth, AstraColor blue, char l, char m, char r) {
