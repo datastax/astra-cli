@@ -136,19 +136,13 @@ if ($env:ASTRARC) {
 }
 
 # Remove .astrarc file (do not fail if it doesn't exist)
-try {
-    Remove-Item "${AstraRc}" -Force -ErrorAction SilentlyContinue
-} catch {
-}
+Remove-Item "${AstraRc}" -Force -ErrorAction SilentlyContinue
 
 # Remove Entry from PATH
 try {
     $currentPath = Get-Env -Key 'Path'
-    if ($null -ne $currentPath) {
-        $Path = $currentPath -split ';'
-        $Path = $Path | Where-Object { $_ -ne "" -and $_ -ne "${PSScriptRoot}" }
-        Write-Env -Key 'Path' -Value ($Path -join ';')
-    }
+    $Path = ($currentPath -split ';') | Where-Object { $_ -ne "" -and $_ -ne "${PSScriptRoot}" }
+    Write-Env -Key 'Path' -Value ($Path -join ';')
 } catch {
     Write-Host "Could not remove ${PSScriptRoot} from PATH."
     Write-Error $_
@@ -160,8 +154,8 @@ try {
 
 # Remove Entry from Windows Installer, if it is owned by this installation.
 try {
-    $item = Get-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\AstraCLI";
-    $location = $item.GetValue("InstallLocation");
+    $item = Get-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\AstraCLI"
+    $location = $item.GetValue("InstallLocation")
     if ($location -eq "${PSScriptRoot}") {
         Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\AstraCLI" -Recurse
     }

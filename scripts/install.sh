@@ -37,7 +37,7 @@ renderCommand() {
 }
 
 # Constants
-ASTRA_CLI_VERSION="1.0.0-rc.3"
+ASTRA_CLI_VERSION="1.0.0-rc.4"
 
 if [ -n "${ASTRA_HOME:-}" ]; then
   ASTRA_CLI_DIR_RESOLVER="custom"
@@ -141,7 +141,7 @@ if [ -f "$existing_install_path" ]; then
   echo ""
   echo "${RED}Error: An existing astra installation was already found.${RESET}"
   echo ""
-  echo "An existing installation was found at $(underline "$(tildify "$existing_install_path/astra")")."
+  echo "An existing installation was found at $(underline "$(tildify "$existing_install_path")")."
   echo ""
   echo "If you want to update the existing installation, please do one of the following:"
   echo "${BLUE}→ ${LIGHT_GRAY}(< astra-cli 1.x)${RESET} Remove the existing installation manually and re-run this installer."

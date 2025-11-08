@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.0.0-rc.3"
+version = "1.0.0-rc.4"
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
@@ -127,6 +127,8 @@ initNativeArchiveTask<Zip>("nativeZip") {
     from(tasks.nativeCompile.get().outputs.files) {
         include("*.exe")
     }
+    from("scripts/uninstall.ps1")
+    from("assets/astra.ico")
 }
 
 inline fun <reified T : AbstractArchiveTask>initNativeArchiveTask(name: String, crossinline otherConfiguration: T.() -> Unit) {
