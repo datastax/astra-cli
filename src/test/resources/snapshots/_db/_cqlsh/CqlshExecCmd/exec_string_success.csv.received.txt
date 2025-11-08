@@ -1,0 +1,80 @@
+---- meta ----
+command: astra db cqlsh exec two_regions_db CONSISTENCY -o csv
+exit_code: 0
+comments: 
+ | Can't really test human output since we don't capture cqlsh output for human outputs
+ | But at least we can verify the command runs and the exit code is correct
+ | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
+---- output ----
+stdout: code,message,exit_code,stdout,stderr
+stdout: OK,"Cqlsh executed with exit code 1, with 0 lines in stdout and 70 lines in stderr.",1,,"Traceback (most recent call last):
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 1348, in do_open
+stdout:     h.request(req.get_method(), req.selector, req.data, headers,
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 1303, in request
+stdout:     self._send_request(method, url, body, headers, encode_chunked)
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 1349, in _send_request
+stdout:     self.endheaders(body, encode_chunked=encode_chunked)
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 1298, in endheaders
+stdout:     self._send_output(message_body, encode_chunked=encode_chunked)
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 1058, in _send_output
+stdout:     self.send(msg)
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 996, in send
+stdout:     self.connect()
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 1468, in connect
+stdout:     super().connect()
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py"", line 962, in connect
+stdout:     self.sock = self._create_connection(
+stdout:                 ^^^^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socket.py"", line 839, in create_connection
+stdout:     for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+stdout:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/socket.py"", line 974, in getaddrinfo
+stdout:     for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+stdout:                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stdout: socket.gaierror: [Errno 8] nodename nor servname provided, or not known
+stdout: 
+stdout: During handling of the above exception, another exception occurred:
+stdout: 
+stdout: Traceback (most recent call last):
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 138, in read_metadata_info
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 216, in urlopen
+stdout:     return opener.open(url, data, timeout)
+stdout:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 519, in open
+stdout:     response = self._open(req, data)
+stdout:                ^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 536, in _open
+stdout:     result = self._call_chain(self.handle_open, protocol, protocol +
+stdout:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 496, in _call_chain
+stdout:     result = func(*args)
+stdout:              ^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 1391, in https_open
+stdout:     return self.do_open(http.client.HTTPSConnection, req,
+stdout:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/urllib/request.py"", line 1351, in do_open
+stdout:     raise URLError(err)
+stdout: urllib.error.URLError: <urlopen error [Errno 8] nodename nor servname provided, or not known>
+stdout: 
+stdout: During handling of the above exception, another exception occurred:
+stdout: 
+stdout: Traceback (most recent call last):
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/dsecqlsh.py"", line 534, in <module>
+stdout:     cqlsh.main(*cqlsh.read_options(sys.argv[1:], os.environ))
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/cqlsh.py"", line 2616, in main
+stdout:     shell = Shell(hostname,
+stdout:             ^^^^^^^^^^^^^^^
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/dsecqlsh.py"", line 367, in __init__
+stdout:     conn = cluster_factory(
+stdout:            ^^^^^^^^^^^^^^^^
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/../pylib/cqlshlib/driver.py"", line 90, in cluster_factory
+stdout:     return _cloud_cluster_factory(whitelist_lbp, **options)
+stdout:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/../pylib/cqlshlib/driver.py"", line 120, in _cloud_cluster_factory
+stdout:     cluster = Cluster(**options)
+stdout:               ^^^^^^^^^^^^^^^^^^
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/cluster.py"", line 1125, in __init__
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 92, in get_cloud_config
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 141, in read_metadata_info
+stdout: cassandra.DriverException: Unable to connect to the metadata service at https://e6856687-40e4-4638-a942-946355c6d711-us-west-2.db.astra-dev.datastax.com:29080/metadata. Check the cluster status in the cloud console. "
+---- end ----
