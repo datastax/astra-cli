@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 public class NoopCompletionsCache extends CompletionsCache {
@@ -14,12 +15,12 @@ public class NoopCompletionsCache extends CompletionsCache {
     }
 
     @Override
-    protected Optional<Path> useCacheDir() {
+    protected Optional<Path> primaryCacheFile() {
         return Optional.empty();
     }
 
     @Override
-    protected String useCacheFileName() {
-        return null;
+    protected List<Path> mirrorCacheFiles() {
+        return List.of();
     }
 }

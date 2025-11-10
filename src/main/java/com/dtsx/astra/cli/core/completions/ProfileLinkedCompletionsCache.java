@@ -3,45 +3,66 @@ package com.dtsx.astra.cli.core.completions;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.DefaultFile;
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.completions.caches.DbCompletionsCache;
-import com.dtsx.astra.cli.core.completions.caches.PcuGroupsCompletionsCache;
-import com.dtsx.astra.cli.core.completions.caches.TenantCompletionsCache;
-import com.dtsx.astra.cli.core.completions.caches.UserCompletionsCache;
+import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
+import lombok.val;
+import org.graalvm.collections.Pair;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
-    private final Optional<ProfileName> profileName;
+    private final Path primaryCacheFile;
+    private final Optional<Path> mirrorCacheFile;
 
-    public ProfileLinkedCompletionsCache(CliContext ctx, ProfileSource profileSource) {
+    public ProfileLinkedCompletionsCache(CliContext ctx, Pair<Profile, ProfileSource> profileAndSource) {
         super(ctx);
 
-        this.profileName = switch (profileSource) {
-            case DefaultFile(var name) -> Optional.of(name);
+        val profile = profileAndSource.getLeft();
+        val source = profileAndSource.getRight();
+
+        this.primaryCacheFile = pathForProfile(ctx, source)
+            .map(p -> p.resolve(useCacheFileName()))
+            .orElse(null);
+
+        this.mirrorCacheFile = profile.sourceForDefault()
+            .flatMap(defaultSource ->
+                pathForProfile(ctx, copySource(source, defaultSource))
+                    .map(p -> p.resolve(useCacheFileName()))
+            );
+    }
+
+    protected abstract String useCacheFileName();
+
+    private ProfileSource copySource(ProfileSource source, ProfileName target) {
+        return switch (source) {
+            case DefaultFile(_) -> new DefaultFile(target);
+            default -> source; // doesn't matter since it won't be used anyway
+        };
+    }
+
+    public static Optional<Path> pathForProfile(CliContext ctx, ProfileSource profileName) {
+        return switch (profileName) {
+            case DefaultFile(var name) -> Optional.of(defaultCacheDir(ctx).resolve(sanitizeFileName(name.unwrap())));
             default -> Optional.empty();
         };
     }
 
-    public static List<ProfileLinkedCompletionsCache> mkInstances(CliContext ctx, ProfileSource profileSource) {
-        return List.of(
-            new DbCompletionsCache(ctx, profileSource),
-            new UserCompletionsCache(ctx, profileSource),
-            new TenantCompletionsCache(ctx, profileSource),
-            new PcuGroupsCompletionsCache(ctx, profileSource)
-        );
+    @Override
+    @VisibleForTesting
+    public Optional<Path> primaryCacheFile() {
+        return Optional.ofNullable(primaryCacheFile);
     }
 
     @Override
-    protected Optional<Path> useCacheDir() {
-        return profileName.flatMap((name) -> (
-            super.useCacheDir().map((dir) -> dir.resolve(sanitizeFileName(name.unwrap()))
-        )));
+    @VisibleForTesting
+    public List<Path> mirrorCacheFiles() {
+        return mirrorCacheFile.map(List::of).orElse(List.of());
     }
 
-    private String sanitizeFileName(String name) {
+    private static String sanitizeFileName(String name) {
         while (name.contains("..")) {
             name = name.replace("..", "__");
         }

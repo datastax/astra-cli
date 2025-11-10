@@ -114,7 +114,8 @@ public abstract class Fixtures {
     public static final Profile Profile = new Profile(
         Optional.of(ProfileName.mkUnsafe("*name*")),
         Fixtures.Token,
-        AstraEnvironment.DEV
+        AstraEnvironment.DEV,
+        Optional.empty()
     );
 
     @SneakyThrows

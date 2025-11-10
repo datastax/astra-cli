@@ -28,7 +28,7 @@ public class CommonOptions {
     @Getter
     private Optional<Ansi> ansi = Optional.empty();
 
-    enum ColorMode { auto, never, always }
+    public enum ColorMode { auto, never, always }
 
     @Option(
         names = "--color",

@@ -30,7 +30,8 @@ public class NukeOperation implements Operation<NukeResult> {
         Optional<Boolean> preserveAstrarc,
         boolean yes,
         BiFunction<List<Path>, Boolean, Boolean> promptShouldDeleteAstrarc,
-        Runnable assertShouldNuke
+        Runnable assertShouldNuke,
+        Runnable assertShouldNotUseWindowsUninstaller
     ) {}
 
     @Data
@@ -76,6 +77,10 @@ public class NukeOperation implements Operation<NukeResult> {
     public NukeResult execute() {
         if (!request.dryRun && !request.yes) {
             request.assertShouldNuke.run();
+        }
+
+        if (!request.yes && Resolve.windowsUninstallerExists(ctx)) {
+            request.assertShouldNotUseWindowsUninstaller.run();
         }
 
         val cliBinaryPath = Resolve.cliBinaryPath(ctx);
@@ -128,7 +133,7 @@ public class NukeOperation implements Operation<NukeResult> {
                 ? new BinaryOwnedByPackageManager(pm.get()) :
             (ctx.isWindows())
                 ? deleteBinaryWindows(homePaths, cliBinaryPath)
-                : deleteBinaryUnix(homePaths, cliBinaryPath, res)
+                : deleteBinaryUnix(cliBinaryPath, res)
         );
     }
 
@@ -138,7 +143,7 @@ public class NukeOperation implements Operation<NukeResult> {
         }
     }
 
-    public BinaryDeleteResult deleteBinaryUnix(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
+    public BinaryDeleteResult deleteBinaryUnix(Path cliBinaryPath, NukeResult res) {
         if (!Files.exists(cliBinaryPath)) {
             return new BinaryDeleted();
         }
@@ -159,13 +164,17 @@ public class NukeOperation implements Operation<NukeResult> {
             try {
                 if (cliBinaryPath.startsWith(folder)) {
                     @Cleanup val astraHomeFiles = Files.list(folder);
-                    astraHomeFiles.filter(f -> f.endsWith("/cli")).forEach((f) -> delete(f, res));
+                    astraHomeFiles.filter(f -> f.endsWith("cli")).forEach((f) -> delete(f, res));
                 } else {
                     delete(folder, res);
                 }
             } catch (IOException e) {
                 res.skipped().put(folder, new SkipDeleteReason.JustCouldNot(e.getMessage()));
             }
+        }
+
+        if (Resolve.windowsUninstallerExists(ctx)) {
+            deleteWindowsRegistryKey(res);
         }
     }
 
@@ -210,6 +219,33 @@ public class NukeOperation implements Operation<NukeResult> {
         }
     }
 
+    private void deleteWindowsRegistryKey(NukeResult res) {
+        val registryKeyPath = Path.of("HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AstraCLI");
+
+        try {
+            if (!request.dryRun) {
+                val process = new ProcessBuilder(
+                    "reg", "delete",
+                    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AstraCLI",
+                    "/f"
+                ).start();
+
+                val exitCode = process.waitFor();
+
+                if (exitCode != 0) {
+                    ctx.log().warn("Could not delete Windows registry key (exit code ", String.valueOf(exitCode), ")");
+                    res.skipped().put(registryKeyPath, new SkipDeleteReason.JustCouldNot("Registry key deletion failed with exit code " + exitCode));
+                    return;
+                }
+            }
+
+            res.deletedFiles().add(registryKeyPath);
+        } catch (Exception e) {
+            ctx.log().warn("Could not delete Windows registry key: ", e.getMessage());
+            res.skipped().put(registryKeyPath, new SkipDeleteReason.JustCouldNot(e.getMessage()));
+        }
+    }
+
     private static class Resolve {
         private static Path cliBinaryPath(CliContext ctx) {
             return ctx.log().loading("Resolving the binary's own path", (_) -> {
@@ -223,6 +259,25 @@ public class NukeOperation implements Operation<NukeResult> {
 
                 return binaryPath.get();
             });
+        }
+
+        private static boolean windowsUninstallerExists(CliContext ctx) {
+            if (!ctx.isWindows()) {
+                return false;
+            }
+
+            try {
+                val process = new ProcessBuilder(
+                    "reg", "query",
+                    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AstraCLI"
+                ).start();
+
+                val exitCode = process.waitFor();
+                return exitCode == 0;
+            } catch (Exception e) {
+                ctx.log().warn("Could not check for Windows uninstaller registry key: ", e.getMessage());
+                return false;
+            }
         }
 
         private static String cliName(Path cliBinaryPath) {

@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.help;
 
+import com.dtsx.astra.cli.commands.CommonOptions.ColorMode;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Ref;
 import com.dtsx.astra.cli.core.output.AstraColors;
@@ -8,7 +9,6 @@ import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Help.Ansi;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,12 +51,9 @@ public class ExamplesRenderer {
             .toList();
 
         for (val example : resolved) {
-            sb.append("  ").append(renderComment(colors, example.comment())).append(NL);
+            sb.append("  ").append(renderComment(colors, colors.format(example.comment()))).append(NL);
 
-            sb.append("  ").append(renderCommand(colors, example.command()
-                .replace("${cli.name}", ctxRef.get().properties().cliName())
-                .replace("${cli.path}", ctxRef.get().properties().binaryPath().map(Path::toString).orElse("/path/to/cli"))
-            )).append(NL);
+            sb.append("  ").append(renderCommand(colors, colors.format(example.command()))).append(NL);
 
             if (example != resolved.getLast()) {
                 sb.append(NL);
@@ -78,8 +75,13 @@ public class ExamplesRenderer {
     // Because --[no-]color is an argument which is not parsed if we are just rendering help,
     // we'll attempt to rudimentarily scan the args to see if color is disabled or not
     private Ansi resolveAnsi(String[] args) {
-        for (val arg : args) {
+        for (int i = 0; i < args.length; i++) {
+            val arg = args[i];
+
             if (arg.equals("--color")) {
+                if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
+                    return parseColorMode(args[i + 1]);
+                }
                 return Ansi.ON;
             }
 
@@ -88,14 +90,22 @@ public class ExamplesRenderer {
             }
 
             if (arg.startsWith("--color=")) {
-                val v = arg.substring("--color=".length());
-
-                return (v.equalsIgnoreCase("false"))
-                    ? Ansi.OFF
-                    : Ansi.ON;
+                return parseColorMode(arg.substring("--color=".length()));
             }
         }
 
         return Ansi.AUTO;
+    }
+
+    private Ansi parseColorMode(String mode) {
+        try {
+            return switch (ColorMode.valueOf(mode.toLowerCase())) {
+                case ColorMode.always -> Ansi.ON;
+                case ColorMode.never -> Ansi.OFF;
+                case ColorMode.auto -> Ansi.AUTO;
+            };
+        } catch (IllegalArgumentException e) {
+            return Ansi.AUTO;
+        }
     }
 }

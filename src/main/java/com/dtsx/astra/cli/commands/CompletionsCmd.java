@@ -23,7 +23,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
 @Command(
     name = "completions",
     aliases = { "compgen" },
-    description = "See the help for the @|code @{cli.name} shellenv|@ command to setup completions in your shell.",
+    description = "See the help for the @|code ${cli.name} shellenv|@ command to setup completions in your shell.",
     descriptionHeading = "%n",
     hidden = true
 )
@@ -73,12 +73,20 @@ public class CompletionsCmd implements Runnable {
         }
         i++;
 
-        val homeFolder = CliPropertiesImpl.mkAndLoadSysProps(new CliEnvironmentImpl())
-            .homeFolderLocations(false)
-            .preferred();
+        val props = CliPropertiesImpl.mkAndLoadSysProps(new CliEnvironmentImpl());
 
-        sb.append("function get_profile(){ for ((i=0;i<${#COMP_WORDS[@]};i++));do [[ ${COMP_WORDS[i]} == --profile ]]&&((i+1<${#COMP_WORDS[@]}))&&echo ${COMP_WORDS[i+1]}&&return;done; echo default;};").append(NL).append(NL);
-        sb.append("function get_astra_dir(){ echo \"").append(homeFolder).append("\"};").append(NL).append(NL);
+        sb.append("""
+          get_profile(){ for ((i=0;i<${#COMP_WORDS[@]};i++));do [[ ${COMP_WORDS[i]} == --profile ]]&&((i+1<${#COMP_WORDS[@]}))&&echo ${COMP_WORDS[i+1]}&&return;done; echo default;};
+        """).append(NL);
+
+        sb.append("""
+          get_astra_dir(){ [ -n "${ASTRA_HOME:-}" ]&&echo "$ASTRA_HOME"||{ [ -n "${XDG_DATA_HOME:-}" ]&&echo "$XDG_DATA_HOME/%s"||echo "$HOME/%s";};}
+        """.formatted(props.homeFolderName(false), props.homeFolderName(true))).append(NL);
+
+        sb.append("""
+          get_astra_rc(){ [ -n "${ASTRARC:-}" ]&&echo "$ASTRARC"||{ [ -n "${XDG_CONFIG_HOME:-}" ]&&echo "$XDG_CONFIG_HOME/%s/%s"||echo "$HOME/%s";};}
+        """.formatted(props.homeFolderName(false), props.rcFileName(), props.rcFileName())).append(NL);
+
         return i;
     }
 

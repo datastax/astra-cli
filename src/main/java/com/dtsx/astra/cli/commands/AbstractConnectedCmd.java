@@ -18,6 +18,7 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -93,13 +94,17 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
         return cachedProfile = switch (cachedProfileSource = profileSource()) {
             case Forced(var profile) -> profile;
-            case FromArgs(var token, var env) -> new Profile(Optional.empty(), token, env.orElse(AstraEnvironment.PROD));
+            case FromArgs(var token, var env) -> new Profile(Optional.empty(), token, env.orElse(AstraEnvironment.PROD), Optional.empty());
             case CustomFile(var path, var profileName) -> resolveProfileFromConfigFile(path, profileName);
             case DefaultFile(var profileName) -> resolveProfileFromConfigFile(null, profileName);
         };
     }
 
-    public final ProfileSource profileSource() {
+    public final Pair<Profile, ProfileSource> profileAndSource() {
+        return Pair.create(profile(), profileSource());
+    }
+
+    private ProfileSource profileSource() {
         if (cachedProfileSource != null) {
             return cachedProfileSource;
         }

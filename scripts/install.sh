@@ -37,7 +37,17 @@ renderCommand() {
 }
 
 # Constants
-ASTRA_CLI_VERSION="1.0.0-rc.4"
+ASTRA_CLI_VERSION="1.0.0-rc.5"
+
+get_astra_dir() {
+  if [ -n "${ASTRA_HOME:-}" ]; then
+    echo "$ASTRA_HOME/cli"
+  elif [ -n "${XDG_DATA_HOME:-}" ]; then
+    echo "$XDG_DATA_HOME/astra/cli"
+  else
+    echo "$HOME/.astra/cli"
+  fi
+}
 
 if [ -n "${ASTRA_HOME:-}" ]; then
   ASTRA_CLI_DIR_RESOLVER="custom"

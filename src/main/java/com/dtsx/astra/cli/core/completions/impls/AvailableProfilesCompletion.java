@@ -1,9 +1,6 @@
 package com.dtsx.astra.cli.core.completions.impls;
 
-import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.completions.DynamicCompletion;
-
-import java.util.Optional;
 
 public class AvailableProfilesCompletion extends DynamicCompletion {
     static {
@@ -12,9 +9,7 @@ public class AvailableProfilesCompletion extends DynamicCompletion {
 
     public AvailableProfilesCompletion() {
         super("""
-          OUT=( $(grep '^\\[.*\\]$' '%s' | tr -d '[]') )
-        """.formatted(
-            Optional.ofNullable(AstraCli.unsafeGlobalCliContext()).map((ctx) -> ctx.get().properties().rcFileLocations(false).preferred()).orElse("~/.astrarc")
-        ));
+          RC_FILE=$(get_astra_rc); [ -f "$RC_FILE" ]&&OUT=( $(grep '^\\[.*\\]$' "$RC_FILE" | tr -d '[]') )||OUT=()
+        """);
     }
 }

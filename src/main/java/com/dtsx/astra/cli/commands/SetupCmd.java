@@ -37,7 +37,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     description = {
         "Interactively set up the Astra CLI and create profiles",
         "",
-        "See @|code @{cli.name} config create|@ for a programmatic way to create profiles without interaction."
+        "See @|code ${cli.name} config create|@ for a programmatic way to create profiles without interaction."
     }
 )
 @Example(

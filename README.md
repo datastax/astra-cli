@@ -13,7 +13,6 @@ Astra CLI provides a terminal interface to operate DataStax Astra. The goal is t
 
 - [Installation](#installation)
     - [Upgrading](#upgrading)
-    - [MacOS warning](#-macos-warning)
     - [Uninstalling](#uninstalling)
 - [Setup](#setup)
     - [Using the CLI without a credentials file](#using-the-cli-without-a-credentials-file)
@@ -85,22 +84,13 @@ You can also download a specific version, or the latest prerelease version, usin
 
 ```bash
 # Upgrade (or downgrade!) to a specific version
-astra upgrade --version 1.0.0-rc.4
+astra upgrade --version 1.0.0-rc.5
 
 # Upgrade to the latest prerelease version
 astra upgrade --pre
 ```
 
 **Note:** If you installed Astra CLI via a package manager (e.g. brew), use that package manager to upgrade instead.
-
-### ⚠️ MacOS warning
-
-If you are running macOS and run into an error about the app being from an unidentified developer, you can either:
-- Allow opening the app in System Preferences > Security & Privacy, or
-- Run the following command in your terminal to de-quarantine the binary:
-  ```bash
-  xattr -d com.apple.quarantine $(which astra)
-  ```
 
 ### Uninstalling
 

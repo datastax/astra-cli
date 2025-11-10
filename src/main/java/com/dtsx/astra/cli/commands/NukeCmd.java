@@ -23,7 +23,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
         "Entirely delete Astra CLI from your system",
         "",
         "This command may be used to delete any files associated with Astra CLI, including:",
-        " @|blue:300 *|@ The home folder,",
+        " @|blue:300 *|@ The @|code .astra|@ home folder,",
         " @|blue:300 *|@ The @|code .astrarc|@ file,",
         " @|blue:300 *|@ and the binary itself.",
         "",
@@ -184,7 +184,8 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             $preserveAstrarc,
             $yes,
             this::promptShouldDeleteAstrarc,
-            this::assertShouldNuke
+            this::assertShouldNuke,
+            this::assertShouldNotUseWindowsUninstaller
         ));
     }
 
@@ -217,7 +218,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
     private void assertShouldNuke() {
         val prompt = """
           Are you sure you want to entirely delete Astra CLI from your system?
-        
+
           This action is @!irreversible!@ and will delete all Astra CLI files from your system.
         """;
 
@@ -228,6 +229,26 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             .clearAfterSelection();
 
         if (!shouldNuke) {
+            throw new ExecutionCancelledException();
+        }
+    }
+
+    private void assertShouldNotUseWindowsUninstaller() {
+        val prompt = """
+          It is @!heavily recommended!@ to uninstall Astra CLI via @|bold Add or Remove Programs|@ in Windows Settings.
+
+          Are you sure you want to use the CLI nuke operation instead?
+        
+          @|faint (You can still Ctrl+C to safely cancel this operation.)|@
+        """;
+
+        val shouldContinue = ctx.console().confirm(prompt)
+            .defaultNo()
+            .fallbackFlag("--yes")
+            .fix(originalArgs(), "--yes")
+            .clearAfterSelection();
+
+        if (!shouldContinue) {
             throw new ExecutionCancelledException();
         }
     }

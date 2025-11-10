@@ -65,7 +65,8 @@ public class CLIPrompter {
                     val promptSuffix = ctx.highlight(
                         defaultOption
                             .map(d -> d ? "[Y/n]" : "[y/N]")
-                            .orElse("[y/n]")
+                            .orElse("[y/n]"),
+                        false
                     );
 
                     yield open.mkInstance(

@@ -96,6 +96,8 @@ public class AstraConfigTest {
                 ctx.copyProfile(config.lookupProfile(ProfileName.mkUnsafe("my-profile")).orElseThrow(), ProfileName.DEFAULT);
             });
 
+            System.out.println(config.profiles());
+
             assertThat(config.profilesValidated()).hasSize(2);
 
             assertThat(config.profilesValidated().getLast())

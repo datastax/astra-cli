@@ -50,7 +50,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "eval \"$(${cli.path} shellenv --no-update-notifier)\""
 )
 @Example(
-    comment = "Ignore warnings about multiple home folders or astrarc files",
+    comment = "Ignore warnings about multiple astra home folders or astrarc files",
     command = "eval \"$(${cli.path} shellenv --ignore-multiple-paths)\""
 )
 public class ShellEnvCmd implements Runnable {
@@ -74,7 +74,7 @@ public class ShellEnvCmd implements Runnable {
 
     @Option(
         names = { "--ignore-multiple-paths" },
-        description = "Ignore warnings about multiple home folders or astrarc files being present. Sets @|code " + ConstEnvVars.IGNORE_MULTIPLE_PATHS + "=true|@ under the hood."
+        description = "Ignore warnings about multiple astra home folders or astrarc files being present. Sets @|code " + ConstEnvVars.IGNORE_MULTIPLE_PATHS + "=true|@ under the hood."
     )
     public boolean $ignoreMultiplePaths;
 

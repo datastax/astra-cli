@@ -3,10 +3,12 @@ package com.dtsx.astra.cli.core.completions.caches;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
+import com.dtsx.astra.cli.core.config.Profile;
+import org.graalvm.collections.Pair;
 
 public class PcuGroupsCompletionsCache extends ProfileLinkedCompletionsCache {
-    public PcuGroupsCompletionsCache(CliContext ctx, ProfileSource profileSource) {
-        super(ctx, profileSource);
+    public PcuGroupsCompletionsCache(CliContext ctx,Pair<Profile, ProfileSource> profileAndSource) {
+        super(ctx, profileAndSource);
     }
 
     @Override

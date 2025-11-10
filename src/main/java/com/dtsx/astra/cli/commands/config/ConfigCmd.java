@@ -13,6 +13,7 @@ import picocli.CommandLine.Command;
         ConfigCreateCmd.class,
         ConfigGetCmd.class,
         ConfigDeleteCmd.class,
+        ConfigRenameCmd.class,
         ConfigUseCmd.class,
         ConfigPathCmd.class,
         ConfigHomeCmd.class,

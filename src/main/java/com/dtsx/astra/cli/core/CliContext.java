@@ -96,7 +96,7 @@ public class CliContext {
     }
 
     public String highlight(long l) {
-        return ansiEnabled() ? colors.BLUE_300.use(String.valueOf(l)) : String.valueOf(l);
+        return highlight(Long.toString(l), false);
     }
 
     public String highlight(Highlightable h) {
@@ -129,7 +129,6 @@ public class CliContext {
             case CREATED, ACTIVE -> colors.GREEN_500;
             case PARKED -> colors.BLUE_500;
             case INITIALIZING, PLACING, PARKING, UNPARKING -> colors.YELLOW_300;
-            default -> colors.NEUTRAL_500;
         };
 
         return color.use(status.name());

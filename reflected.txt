@@ -1,6 +1,7 @@
 # CLI basics
-com.dtsx.astra.cli.AstraCli$SetupExampleProvider
+com.dtsx.astra.cli.AstraCli$SetupExampleProvider = allPublicConstructors
 com.dtsx.astra.cli.core.output.Hint
+com.dtsx.astra.cli.core.output.AstraColors = allPublicFields
 com.dtsx.astra.cli.core.models.*
 
 # Org+User gateways

@@ -107,7 +107,7 @@ public class ArrowKeySelectionStrategy<T> implements SelectionStrategy<T> {
         val option = filteredOptions.get(index);
 
         val optionStr = (isSelected)
-            ? ctx.highlight(highlightMatch(option))
+            ? ctx.highlight(highlightMatch(option), false)
             : highlightMatch(option);
 
         val isDefaultStr = (isDefault && req.labelDefault())

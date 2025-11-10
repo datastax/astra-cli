@@ -223,25 +223,25 @@ public class AstraCli extends AbstractCmd<Void> {
     public static class SetupExampleProvider implements ExampleProvider {
         @Override
         public Pair<String, String> get(CliContext ctx) {
+            if (System.getProperty("cli.testing") == null) { // keeps output deterministic for testing
+                try {
+                    val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
-            try {
-                val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
+                    if (!configFileExists) {
+                        return Pair.create("Setup the Astra CLI", "${cli.name} setup");
+                    }
 
-                // keeps output deterministic for testing
-                if (!configFileExists || System.getProperty("cli.testing") != null) {
-                    return Pair.create("Setup the Astra CLI", "${cli.name} setup");
+                    val autocompleteSetup = System.getenv(ConstEnvVars.COMPLETIONS_SETUP) != null;
+
+                    if (!autocompleteSetup && ctx.isNotWindows()) {
+                        return Pair.create("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
+                    }
+                } catch (Exception e) {
+                    ctx.log().exception("Error resolving main example for AstraCli", e);
                 }
-
-                val autocompleteSetup = System.getenv(ConstEnvVars.COMPLETIONS_SETUP) != null;
-
-                if (!autocompleteSetup && ctx.isNotWindows()) {
-                    return Pair.create("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
-                }
-            } catch (Exception e) {
-                ctx.log().exception("Error resolving main example for AstraCli", e);
             }
 
-            return Pair.create("Create a new profile", "astra setup");
+            return Pair.create("Create a new profile", "${cli.name} setup");
         }
     }
 }

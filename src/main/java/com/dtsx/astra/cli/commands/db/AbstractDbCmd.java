@@ -12,6 +12,6 @@ public abstract class AbstractDbCmd<OpRes> extends AbstractConnectedCmd<OpRes> {
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        dbGateway = ctx.gateways().mkDbGateway(profile().token(), profile().env(), new DbCompletionsCache(ctx, profileSource()));
+        dbGateway = ctx.gateways().mkDbGateway(profile().token(), profile().env(), new DbCompletionsCache(ctx, profileAndSource()));
     }
 }

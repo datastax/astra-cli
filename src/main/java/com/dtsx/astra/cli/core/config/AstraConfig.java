@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.apache.commons.io.file.PathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +41,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
+    public static final String SOURCE_KEY = "PROFILE_SOURCE";
 
     private final CliContext ctx;
 
@@ -129,9 +131,13 @@ public class AstraConfig {
             try {
                 val env = AstraEnvironment.valueOf(rawEnv.toUpperCase());
 
+                val sourceForDefault = section.lookupKey(SOURCE_KEY)
+                    .filter(_ -> profileName.isDefault())
+                    .map(ProfileName::mkUnsafe);
+
                 return AstraToken.parse(token.get()).bimap(
                     (msg) -> new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY) + ": " + msg),
-                    (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env)
+                    (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env, sourceForDefault)
                 );
             } catch (IllegalArgumentException e) {
                 return Either.left(
@@ -189,46 +195,91 @@ public class AstraConfig {
     }
 
     public void modify(Consumer<ProfileModificationCtx> consumer) {
-        consumer.accept(new ProfileModificationCtx());
+        val ctx = new ProfileModificationCtx();
+        consumer.accept(ctx);
+
+        for (val action : ctx.actions()) {
+            action.run();
+        }
+
         backingIniFile.writeToFile(backingFile);
     }
 
     public class ProfileModificationCtx {
+        @Getter
+        @Accessors(fluent = true)
+        private final List<Runnable> actions = new ArrayList<>();
+
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
-            profiles.add(Either.pure(new Profile(Optional.of(name), token, env)));
+            actions.add(() -> {
+                profiles.add(Either.pure(new Profile(Optional.of(name), token, env, Optional.empty())));
 
-            backingIniFile.addSection(name.unwrap(), new TreeMap<>() {{
-                put(TOKEN_KEY, token.unsafeUnwrap());
+                backingIniFile.addSection(name.unwrap(), new TreeMap<>() {{
+                    put(TOKEN_KEY, token.unsafeUnwrap());
 
-                if (env != AstraEnvironment.PROD) {
-                    put(ENV_KEY, env.name());
-                }
-            }});
+                    if (env != AstraEnvironment.PROD) {
+                        put(ENV_KEY, env.name());
+                    }
+                }});
+            });
         }
 
         public void copyProfile(Profile src, ProfileName target) {
-            val srcSection = backingIniFile.getSections().stream()
-                .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
-                .findFirst()
-                .orElseThrow();
+            actions.add(() -> {
+                val srcSection = backingIniFile.getSections().stream()
+                    .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
+                    .findFirst()
+                    .orElseThrow();
 
-            deleteProfile(target); // target deleted after getting src in case they are the same
+                val maybeCompletionsPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(src.nameOrDefault()));
 
-            profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env())));
+                maybeCompletionsPath.filter(Files::exists).ifPresent(((path) -> {
+                    val targetPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(target)).orElseThrow();
 
-            backingIniFile.addSection(target.unwrap(), srcSection);
+                    try {
+                        if (Files.exists(targetPath)) {
+                            PathUtils.delete(targetPath);
+                        }
+                        PathUtils.copyDirectory(path, targetPath);
+                    } catch (IOException e) {
+                        ctx.log().exception("Error copying completion cache from " + path + " to new profile " + target, e);
+                        try {
+                            PathUtils.delete(path);
+                        } catch (IOException ex) {
+                            ctx.log().exception("Error cleaning up completion cache at " + path + " after failed copy for new profile " + target, ex);
+                        }
+                    }
+                }));
+
+                profiles.removeIf(isProfileName(target));
+                backingIniFile.deleteSection(target.unwrap());
+
+                profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name())));
+                backingIniFile.addSection(target.unwrap(), srcSection);
+            });
         }
 
         public void deleteProfile(ProfileName profileName) {
-            profiles.removeIf(isProfileName(profileName));
-            backingIniFile.deleteSection(profileName.unwrap());
+            actions.add(() -> {
+                profiles.removeIf(isProfileName(profileName));
+                backingIniFile.deleteSection(profileName.unwrap());
 
-            final ProfileSource source = (usingDefaultFile())
+                val maybeCompletionsPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(profileName));
+
+                maybeCompletionsPath.ifPresent(((path) -> {
+                    try {
+                        PathUtils.delete(path);
+                    } catch (IOException e) {
+                        ctx.log().exception("Error deleting completion cache at " + path, e);
+                    }
+                }));
+            });
+        }
+
+        private ProfileSource mkSource(ProfileName profileName) {
+            return (usingDefaultFile())
                 ? new ProfileSource.DefaultFile(profileName)
                 : new ProfileSource.CustomFile(backingFile, profileName);
-
-            ProfileLinkedCompletionsCache.mkInstances(ctx, source)
-                .forEach((c) -> c.setCache(List.of()));
         }
     }
 

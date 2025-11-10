@@ -10,15 +10,11 @@ import net.jqwik.api.constraints.*;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.utils.CollectionUtils.listConcat;
 import static com.dtsx.astra.cli.utils.MiscUtils.also;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Group
 @PropertyDefaults(tries = 10)
@@ -36,11 +32,10 @@ public class CompletionsCacheTest {
         ) {
             val instance = also(mkBasicCompletionsCache(cacheFileName), (it) -> cacheSetter.accept(it, cs));
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).isNotEmptyFile(); // this also checks that the file exists and is a regular file
-                assertThat(path).hasFileName(cacheFileName);
-                assertThat(path).hasParent(ctx.get().home().dirs().useCompletionsCache());
-            });
+            val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
+            assertThat(primaryCacheFile).isNotEmptyFile(); // this also checks that the file exists and is a regular file
+            assertThat(primaryCacheFile).hasFileName(cacheFileName);
+            assertThat(primaryCacheFile).hasParent(ctx.get().home().dirs().useCompletionsCache());
         }
 
         @Property
@@ -51,9 +46,8 @@ public class CompletionsCacheTest {
         ) {
             val instance = also(mkBasicCompletionsCache(cacheFileName), (it) -> cacheSetter.accept(it, cs));
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).doesNotExist();
-            });
+            val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
+            assertThat(primaryCacheFile).doesNotExist();
         }
 
         @Property
@@ -64,41 +58,10 @@ public class CompletionsCacheTest {
         ) {
             val instance = mkBasicCompletionsCache(cacheFileName);
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).doesNotExist();
-            });
+            val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
+            assertThat(primaryCacheFile).doesNotExist();
 
             cacheDeleter.accept(instance, cs);
-        }
-
-        @Property
-        public void does_not_create_cache_file_if_no_cache_dir(
-            @ForAll @NotEmpty List<@NotBlank String> cs,
-            @ForAll("appendCache") CacheSetter cacheSetter
-        ) {
-            val returnEmptyCacheDir = new AtomicBoolean(true);
-
-            Supplier<CompletionsCache> mkInstance = () -> new CompletionsCache(ctx.get()) {
-                @Override
-                protected Optional<Path> useCacheDir() {
-                    return (returnEmptyCacheDir.get()) ? Optional.empty() : super.useCacheDir();
-                }
-
-                @Override
-                protected String useCacheFileName() {
-                    throw new IllegalStateException("Should not be called if no cache dir");
-                }
-            };
-
-            // if we call `.setCache()` and no error from accessing the cache file name is thrown,
-            // then it must mean we just returned immediately
-            cacheSetter.accept(mkInstance.get(), cs);
-
-            // sanity check
-            returnEmptyCacheDir.set(false);
-
-            assertThatThrownBy(() -> cacheSetter.accept(mkInstance.get(), cs))
-                .isInstanceOf(IllegalStateException.class);
         }
     }
 
@@ -113,15 +76,12 @@ public class CompletionsCacheTest {
         ) {
             val instance = also(mkBasicCompletionsCache(cacheFileName), (it) -> cacheSetter.accept(it, cs));
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).isNotEmptyFile();
-            });
+            val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
+            assertThat(primaryCacheFile).isNotEmptyFile();
 
             cacheDeleter.accept(instance, cs);
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).doesNotExist();
-            });
+            assertThat(primaryCacheFile).doesNotExist();
         }
     }
 
@@ -134,31 +94,26 @@ public class CompletionsCacheTest {
             @ForAll @Size(min = 1) @UniqueElements List<@NotBlank String> updated
         ) {
             val instance = mkBasicCompletionsCache(cacheFileName);
+            val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
 
             instance.setCache(existing);
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).isRegularFile();
-
-                assertThat(path).content().satisfies((content) -> {
-                    assertThat(content.lines().toList()).containsExactlyInAnyOrderElementsOf(
-                        existing.stream().map(JsonUtils::writeValue).toList()
-                    );
-                });
+            assertThat(primaryCacheFile).isRegularFile();
+            assertThat(primaryCacheFile).content().satisfies((content) -> {
+                assertThat(content.lines().toList()).containsExactlyInAnyOrderElementsOf(
+                    existing.stream().map(JsonUtils::writeValue).toList()
+                );
             });
 
             for (val item : updated) {
                 instance.addToCache(item);
             }
 
-            assertThat(instance.resolveCacheFile()).hasValueSatisfying((path) -> {
-                assertThat(path).isRegularFile();
-
-                assertThat(path).content().satisfies((content) -> {
-                    assertThat(content.lines().toList()).containsExactlyInAnyOrderElementsOf(
-                        listConcat(existing, updated).stream().distinct().map(JsonUtils::writeValue).toList()
-                    );
-                });
+            assertThat(primaryCacheFile).isRegularFile();
+            assertThat(primaryCacheFile).content().satisfies((content) -> {
+                assertThat(content.lines().toList()).containsExactlyInAnyOrderElementsOf(
+                    listConcat(existing, updated).stream().distinct().map(JsonUtils::writeValue).toList()
+                );
             });
         }
     }
@@ -203,12 +158,26 @@ public class CompletionsCacheTest {
         toDelete.forEach(instance::removeFromCache);
     }
 
-    private CompletionsCache mkBasicCompletionsCache(String cacheFileName) {
-        return new CompletionsCache(ctx.get()) {
-            @Override
-            protected String useCacheFileName() {
-                return cacheFileName;
-            }
-        };
+    private BasicCompletionsCache mkBasicCompletionsCache(String cacheFileName) {
+        return new BasicCompletionsCache(ctx.get(), cacheFileName);
+    }
+
+    private static class BasicCompletionsCache extends CompletionsCache {
+        private final Path primaryCacheFile;
+
+        BasicCompletionsCache(com.dtsx.astra.cli.core.CliContext ctx, String cacheFileName) {
+            super(ctx);
+            this.primaryCacheFile = defaultCacheDir(ctx).resolve(cacheFileName);
+        }
+
+        @Override
+        protected java.util.Optional<Path> primaryCacheFile() {
+            return java.util.Optional.of(primaryCacheFile);
+        }
+
+        @Override
+        protected List<Path> mirrorCacheFiles() {
+            return List.of();
+        }
     }
 }

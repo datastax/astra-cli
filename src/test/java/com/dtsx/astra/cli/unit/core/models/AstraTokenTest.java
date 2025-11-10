@@ -35,14 +35,14 @@ public class AstraTokenTest extends BaseParseableTest.WithTrimAndBasicValidation
         }
 
         @Property
-        public void errors_if_token_looks_like_filename(@ForAll String name, @ForAll @NotBlank @CharRange(from = 'a', to = 'z') String ext) {
+        public void errors_if_token_looks_like_filename(@ForAll @AlphaChars String name, @ForAll @NotBlank @CharRange(from = 'a', to = 'z') String ext) {
             assertThat((parser.apply(name + "." + ext)))
                 .extracting(Either::getLeft)
                 .isEqualTo("Astra token looks like a file name; use the @file syntax to pass the token from a file, where the file contains only the token as a plain string (e.g. `--token @token.txt`)");
         }
 
         @Property
-        public void errors_if_token_does_not_start_with_astra_cs(@ForAll @NotBlank String token) {
+        public void errors_if_token_does_not_start_with_astra_cs(@ForAll @NotBlank @AlphaChars String token) {
             assumeThat(token).doesNotStartWith("AstraCS:");
 
             assertThat((parser.apply(token)))

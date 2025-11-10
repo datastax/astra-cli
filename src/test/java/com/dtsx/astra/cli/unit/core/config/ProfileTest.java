@@ -18,14 +18,14 @@ public class ProfileTest {
             assumeThat(profileName).isNotEqualTo(Optional.of(ProfileName.DEFAULT));
 
             assertThat(
-                new Profile(profileName, null, null).isDefault()
+                new Profile(profileName, null, null, null).isDefault()
             ).isFalse();
         }
 
         @Example
         public void true_if_profile_name_is_default() {
             assertThat(
-                new Profile(Optional.of(ProfileName.DEFAULT), null, null).isDefault()
+                new Profile(Optional.of(ProfileName.DEFAULT), null, null, null).isDefault()
             ).isTrue();
         }
     }
@@ -35,14 +35,14 @@ public class ProfileTest {
         @Example
         public void true_if_profile_name_is_empty() {
             assertThat(
-                new Profile(Optional.empty(), null, null).isReconstructedFromCreds()
+                new Profile(Optional.empty(), null, null, null).isReconstructedFromCreds()
             ).isTrue();
         }
 
         @Example
         public void false_if_profile_name_is_present(@ForAll @From("profileName") ProfileName profileName) {
             assertThat(
-                new Profile(Optional.of(profileName), null, null).isReconstructedFromCreds()
+                new Profile(Optional.of(profileName), null, null, null).isReconstructedFromCreds()
             ).isFalse();
         }
     }
@@ -52,14 +52,14 @@ public class ProfileTest {
         @Example
         public void returns_default_name_if_empty() {
             assertThat(
-                new Profile(Optional.empty(), null, null).nameOrDefault()
+                new Profile(Optional.empty(), null, null, null).nameOrDefault()
             ).isEqualTo(ProfileName.mkUnsafe("<args_provided>"));
         }
 
         @Example
         public void returns_name_if_present(@ForAll @From("profileName") ProfileName profileName) {
             assertThat(
-                new Profile(Optional.of(profileName), null, null).nameOrDefault()
+                new Profile(Optional.of(profileName), null, null, null).nameOrDefault()
             ).isEqualTo(profileName);
         }
     }

@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.0.0-rc.4"
+version = "1.0.0-rc.5"
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
@@ -211,22 +211,30 @@ tasks.register("generateGraalReflectionConfig") {
         val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray())
 
         val inputLines = inputFile.readLines().map(String::trim).filter { it.isNotBlank() && !it.startsWith("#") }
-        val allClasses = mutableSetOf<String>()
+        val defaultReflectionKeys = listOf("allPublicConstructors", "allDeclaredMethods")
 
         val scanResult = io.github.classgraph.ClassGraph()
             .overrideClassLoaders(classLoader)
             .enableAllInfo()
             .scan()
 
-        inputLines.forEach { line ->
-            if (line.endsWith(".*") || line.endsWith("]")) {
-                val packageName = line.substringBeforeLast(".^[", "").ifBlank { line.substringBeforeLast(".[", "").ifBlank { line.substringBeforeLast(".") } }
+        val classesWithConfigs = inputLines.flatMap { line ->
+            val (classPattern, customConfig) = if (line.contains(" = ")) {
+                val parts = line.split(" = ", limit = 2)
+                parts[0].trim() to parts[1].trim().split(",").map(String::trim)
+            } else {
+                line to defaultReflectionKeys
+            }
+
+            // Expand pattern to actual class names
+            if (classPattern.endsWith(".*") || classPattern.endsWith("]")) {
+                val packageName = classPattern.substringBeforeLast(".^[", "").ifBlank { classPattern.substringBeforeLast(".[", "").ifBlank { classPattern.substringBeforeLast(".") } }
                 val classesInPackage = scanResult.getPackageInfo(packageName)?.classInfo ?: emptyList()
 
-                val filter: (String) -> Boolean = if (line.contains("[")) {
-                    val regexes = line.substringAfter("[").substringBefore("]").split(",").map(String::trim).map(String::toRegex)
+                val filter: (String) -> Boolean = if (classPattern.contains("[")) {
+                    val regexes = classPattern.substringAfter("[").substringBefore("]").split(",").map(String::trim).map(String::toRegex)
 
-                    if (line.contains("^[")) {
+                    if (classPattern.contains("^[")) {
                         { className -> regexes.none { className.matches(it) } }
                     } else {
                         { className -> regexes.any { className.matches(it) } }
@@ -235,33 +243,27 @@ tasks.register("generateGraalReflectionConfig") {
                     { true }
                 }
 
-                for (classInfo in classesInPackage) {
-                    if (!classInfo.isInterface && !classInfo.isAbstract && filter(classInfo.name.substringAfterLast('.'))) {
-                        allClasses.add(classInfo.name)
-                    }
-                }
+                classesInPackage
+                    .filter { !it.isInterface && !it.isAbstract && filter(it.name.substringAfterLast('.')) }
+                    .map { it.name to customConfig }
             } else {
-                allClasses.add(line)
+                listOf(classPattern to customConfig)
             }
-        }
+        }.distinctBy { it.first }
 
         scanResult.close()
 
-        allClasses.forEach { className ->
+        val reflectionConfig = classesWithConfigs.map { (className, configKeys) ->
             try {
                 Class.forName(className, false, classLoader)
             } catch (_: ClassNotFoundException) {
                 throw GradleException("Invalid class '$className' found in reflected.txt")
             }
-        }
 
-        val reflectionConfig = allClasses.map {
-            mapOf(
-                "name" to it,
-                "allDeclaredConstructors" to true,
-                "allPublicConstructors" to true,
-                "allDeclaredMethods" to true,
-            )
+            buildMap {
+                put("name", className)
+                configKeys.forEach { put(it, true) }
+            }
         }
 
         val json = groovy.json.JsonBuilder(reflectionConfig).toString()
