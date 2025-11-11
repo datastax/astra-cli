@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.datatypes.Unit;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
@@ -69,12 +68,6 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
     }
 
     @Option(
-        names = { "-y", "--yes" },
-        description = "Install the upgrade without any confirmation prompting"
-    )
-    public boolean $yes;
-
-    @Option(
         names = { "--allow-reinstall" },
         description = "Allow re-installing the same version"
     )
@@ -115,20 +108,6 @@ public class UpgradeCmd extends AbstractCmd<Unit> {
         );
 
         ctx.console().println(trimIndent(infoMsg));
-
-        if ($yes) {
-            return;
-        }
-
-        val proceed = ctx.console().confirm(NL + NL + "Do you want to proceed?")
-            .defaultYes()
-            .fallbackFlag("--yes")
-            .fix(originalArgs(), "--yes")
-            .clearAfterSelection();
-
-        if (!proceed) {
-            throw new ExecutionCancelledException();
-        }
     }
 
     @Override

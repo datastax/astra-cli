@@ -114,7 +114,7 @@ function Get-Env {
 }
 
 # Constants
-$ASTRA_CLI_VERSION = "1.0.0-rc.5"
+$ASTRA_CLI_VERSION = "1.0.0-rc.6"
 
 if ($env:ASTRA_HOME) {
     $ASTRA_CLI_DIR = "$env:ASTRA_HOME\cli"

@@ -69,8 +69,26 @@ public class VersionTest extends BaseParseableTest.WithTrimAndBasicValidation {
             assertThat(Version.mkUnsafe(v1)).isGreaterThan(Version.mkUnsafe(v2));
         }
 
-        public void eq(String v1, String v2) {
+        private void eq(String v1, String v2) {
             assertThat(Version.mkUnsafe(v1)).isEqualTo(Version.mkUnsafe(v2));
+        }
+    }
+
+    @Group
+    public class short_version_format {
+        @Example
+        public void parses_two_part_versions_as_zero_patch() {
+            assertThat(Version.mkUnsafe("0.6").toString()).isEqualTo("0.6.0");
+            assertThat(Version.mkUnsafe("1.2").toString()).isEqualTo("1.2.0");
+            assertThat(Version.mkUnsafe("v1.5").toString()).isEqualTo("1.5.0");
+        }
+
+        @Example
+        public void compares_short_versions_correctly() {
+            assertThat(Version.mkUnsafe("0.6")).isEqualTo(Version.mkUnsafe("0.6.0"));
+            assertThat(Version.mkUnsafe("1.2")).isEqualTo(Version.mkUnsafe("1.2.0"));
+            assertThat(Version.mkUnsafe("1.2")).isGreaterThan(Version.mkUnsafe("1.1.0"));
+            assertThat(Version.mkUnsafe("1.2")).isGreaterThan(Version.mkUnsafe("1.1"));
         }
     }
 

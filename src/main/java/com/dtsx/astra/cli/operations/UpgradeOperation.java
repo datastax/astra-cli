@@ -58,7 +58,7 @@ public class UpgradeOperation implements Operation<Unit> {
         }
 
         val backupMvCmd = ctx.isWindows()
-            ? "rename %s %s".formatted(newExePath.getRight(), currentExePath)
+            ? "move /Y \"%s\" \"%s\"".formatted(newExePath.getRight(), currentExePath)
             : "mv %s %s".formatted(newExePath.getRight(), currentExePath);
 
         request.confirmUpgrade().accept(version, backupMvCmd);
@@ -147,7 +147,7 @@ public class UpgradeOperation implements Operation<Unit> {
                     """.formatted(version));
                 }
 
-                if (version.equals(ctx.properties().version()) && !request.allowSameVersion()) {
+                if (version.equals(ctx.properties().version()) && !request.allowSameVersion) {
                     throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
                       @|bold,red Error: You are already using Astra CLI v%s|@
                     """.formatted(version));
@@ -159,7 +159,13 @@ public class UpgradeOperation implements Operation<Unit> {
             case LatestVersion(var includePreReleases) -> {
                 val latest = upgradeGateway.latestVersion(includePreReleases);
 
-                if (latest.compareTo(ctx.properties().version()) < 1) {
+                if (latest.equals(ctx.properties().version()) && !request.allowSameVersion) {
+                    throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
+                      @|bold,red Error: You are already using the latest Astra CLI version (v%s)|@
+                    """.formatted(latest));
+                }
+
+                if (latest.compareTo(ctx.properties().version()) < 0) {
                     throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
                       @|bold,red Error: No newer version available (latest is v%s, you have v%s)|@
                     """.formatted(latest, ctx.properties().version()));

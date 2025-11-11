@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Version implements Highlightable, Comparable<Version> {
-    private static final Pattern VERSION_PATTERN = Pattern.compile("^v?(\\d+)\\.(\\d+)\\.(\\d+)(?:-([a-zA-Z0-9-_]+\\.\\d+))?$");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("^v?(\\d+)\\.(\\d+)(?:\\.(\\d+))?(?:-([a-zA-Z0-9-_]+\\.\\d+))?$");
 
     private final int major;
     private final int minor;
@@ -29,7 +29,7 @@ public class Version implements Highlightable, Comparable<Version> {
             if (matcher.matches()) {
                 val major = Integer.parseInt(matcher.group(1));
                 val minor = Integer.parseInt(matcher.group(2));
-                val patch = Integer.parseInt(matcher.group(3));
+                val patch = matcher.group(3) != null ? Integer.parseInt(matcher.group(3)) : 0;
 
                 val preRelease = Optional.ofNullable(matcher.group(4))
                     .map((pr) -> {
@@ -39,7 +39,7 @@ public class Version implements Highlightable, Comparable<Version> {
 
                 return Either.pure(new Version(major, minor, patch, preRelease));
             } else {
-                return Either.left("Invalid version format: " + trimmed + " (expected format: x.y.z[-<label>.n])");
+                return Either.left("Invalid version format: " + trimmed + " (expected format: x.y[.z][-<label>.n])");
             }
         });
     }
