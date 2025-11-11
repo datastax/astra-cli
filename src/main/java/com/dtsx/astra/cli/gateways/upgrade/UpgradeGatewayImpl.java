@@ -48,6 +48,8 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
 
             val json = JsonUtils.readTree(response.body());
 
+            System.out.println(json.get("tag_name").asText());
+
             return Version.mkUnsafe(json.get("tag_name").asText());
         });
     }
@@ -57,17 +59,17 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
             var attempt = 1;
 
             while (true) {
-                val endpoint = ctx.properties().cliGithubApiReposUrl() + "/releases?per_page=1";
+                val endpoint = ctx.properties().cliGithubApiReposUrl() + "/releases?per_page=1&page=" + attempt;
 
                 val response = HttpUtils.GET(endpoint, c -> c, r -> r);
 
                 if (response.statusCode() >= 400 && response.statusCode() != 404) {
                     throw new AstraCliException(ExitCode.RELEASE_NOT_FOUND, """
                       @|bold,red An error occurred while fetching the latest release from %s|@
-                    
+
                       Status:
                       @!%d!@
-                    
+
                       Body:
                       %s
                     """.formatted(endpoint, response.statusCode(), response.body()));
@@ -81,6 +83,7 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
                     """.formatted(endpoint));
                 }
 
+                // very, very unlikely to happen
                 if (json.isArray() && json.get(0).get("draft").asBoolean()) {
                     updateMsg.accept("Resolving latest release of @!astra!@ (attempt %d)".formatted(++attempt));
                     continue;

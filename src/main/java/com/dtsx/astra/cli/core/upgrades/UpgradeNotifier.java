@@ -49,13 +49,13 @@ public class UpgradeNotifier {
         val latestVersion = status.latestVersion().orElseThrow().toString();
 
         val versionMsg = "Update available! " + ctx.colors().NEUTRAL_400.use(currentVersion) + " -> " + ctx.colors().YELLOW_300.use(latestVersion);
-        val commandMsg = mkUpgradeCommandMsg(ctx);
+        val commandMsg = ctx.colors().format(mkUpgradeCommandMsg(ctx));
 
         val versionMsgLength = stripAnsi(versionMsg).length();
         val commandMsgLength = stripAnsi(commandMsg).length();
 
         val maxTextWidth = Math.max(versionMsgLength, commandMsgLength);
-        val boxWidth = Math.max(versionMsgLength, commandMsgLength) + PADDING * 2;
+        val boxWidth = Math.max(versionMsgLength, commandMsgLength) + PADDING * 2 + 2;
 
         val main = new StringBuilder();
         val blue = ctx.colors().BLUE_300;
@@ -84,14 +84,18 @@ public class UpgradeNotifier {
     }
 
     private static void appendFillerLine(StringBuilder main, int boxWidth, AstraColor blue, char l, char m, char r) {
-        main.append(blue.on()).append(l).repeat(m, boxWidth).append(r).append(blue.off()).append(NL);
+        main.append(blue.on()).append(l).repeat(m, boxWidth - 2).append(r).append(blue.off()).append(NL);
     }
 
     private static void appendTextualLine(StringBuilder main, String text, int maxTextWidth, int actualLength, AstraColor blue) {
+        int leftPadding = PADDING + Math.floorDiv(maxTextWidth - actualLength, 2);
+        int contentWidth = maxTextWidth + 2 * PADDING;
+        int rightPadding = contentWidth - actualLength - leftPadding;
+
         main.append(blue.on()).append("│").append(blue.off())
-            .repeat(' ', PADDING + Math.floorDiv(maxTextWidth - actualLength, 2))
+            .repeat(' ', leftPadding)
             .append(text)
-            .repeat(' ', PADDING + Math.ceilDiv(maxTextWidth - actualLength, 2))
+            .repeat(' ', rightPadding)
             .append(blue.on()).append("│").append(blue.off())
             .append(NL);
     }

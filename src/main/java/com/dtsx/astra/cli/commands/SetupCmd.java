@@ -26,6 +26,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
@@ -155,6 +157,14 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private void assertShouldSetup(Path existing) {
+        assertShouldSetup(existing, true);
+    }
+
+    private void assertShouldContinueIfAlreadySetup(Path existing) {
+        assertShouldSetup(existing, false);
+    }
+
+    private void assertShouldSetup(Path path, boolean newUser) {
         ctx.log().banner();
 
         if (ctx.isNotTty()) {
@@ -170,57 +180,39 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         }
 
         val prompt = """
-          @|bold Welcome to the Astra CLI setup!|@
+          @|bold Welcome to the interactive Astra CLI setup!|@
         
-          @|faint A configuration file with your profile will be created at|@ @|faint,italic %s|@
-        
-          If you'd prefer to provide credentials on a per-command basis rather than storing them in a file, you can either:
-          - Use the per-command @'!--token!@ flag to pass your existing @!AstraCS!@ token directly.
-          - Use the per-command @'!--config-file!@ flag to specify an existing @!.astrarc!@ file.
-        
-          %s
-          %s
+          @|faint Your configuration file %s at|@ @|faint,italic %s|@
         """.formatted(
-            existing,
-            renderComment(ctx.colors(), "Example:"),
-            renderCommand(ctx.colors(), "${cli.name} db list --token <your_token>")
+            (newUser) ? "will be created" : "already exists",
+            path
         );
 
-        ctx.console().println(trimIndent(prompt));
+        val addendum = (!newUser)
+            ? NL + NL + "Do you want to continue and create a new profile?"
+            : mkArgsAddendum();
+
+        ctx.console().println(trimIndent(prompt) + addendum);
         ctx.console().println();
         ctx.console().unsafeReadLine(ctx.colors().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "), false);
         ctx.console().println();
     }
 
-    private void assertShouldContinueIfAlreadySetup(Path existing) {
-        ctx.log().banner();
-
-        val prompt = """
-          @|bold Looks like you're already set up!|@
-        
-          @|faint Your config file already exists at|@ @|faint,italic %s|@
-        
-          Hint: You can use the @'!${cli.name} config!@ commands to manage your profiles.
-       
-          %s
-          %s
-        
-          Do you want to continue and create a new profile?
-        """.formatted(
-            existing,
-            renderComment(ctx.colors(), "Example:"),
-            renderCommand(ctx.colors(), "${cli.name} config list")
-        );
-
-        val shouldContinue = ctx.console().confirm(prompt)
-            .defaultYes()
-            .fallbackFlag("")
-            .fix(List.of(), "")
-            .clearAfterSelection();
-
-        if (!shouldContinue) {
-            throw new ExecutionCancelledException();
+    private String mkArgsAddendum() {
+        if ($env.isEmpty() && $token.isEmpty()) {
+            if ($name.isPresent()) {
+                return "%n%n@|faint The profile will be called '%s'.|@".formatted($name.get());
+            }
+            return "";
         }
+
+        return "%n%n@|faint %s will be created%s.|@".formatted(
+            $name.map(n -> "Profile '" + n + "'").orElse("The profile"),
+            Stream.concat(
+                $token.stream().map(t -> " with token " + t),
+                $env.stream().map(e -> " in env '" + e.name().toLowerCase() + "'")
+            ).collect(Collectors.joining(""))
+        );
     }
 
     private void assertShouldOverwriteExistingProfile(Profile existing) {

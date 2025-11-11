@@ -38,14 +38,14 @@ public record UpgradeStatus(
             val rawLastChecked = properties.getProperty(LAST_CHECKED_KEY);
             val rawLastNotified = properties.getProperty(LAST_NOTIFIED_KEY);
 
-            if (rawLatestVersion == null || rawLastChecked == null) {
+            if (rawLatestVersion == null || rawLastChecked == null || rawLastNotified == null) {
                 ctx.log().exception("Upgrade notifier properties file is missing required keys. Recreating it.");
                 return createNewStatusFile(properties, ctx, path);
             }
 
             val version = Optional.of(rawLatestVersion).filter(s -> !s.isEmpty()).map(Version::parse);
             val lastChecked = Either.tryCatch(() -> Long.parseLong(rawLastChecked), Exception::getMessage);
-             val lastNotified = Either.tryCatch(() -> Long.parseLong(rawLastNotified), Exception::getMessage);
+            val lastNotified = Either.tryCatch(() -> Long.parseLong(rawLastNotified), Exception::getMessage);
 
             if (version.isPresent() && version.get().isLeft()) {
                 ctx.log().exception("Upgrade notifier properties file has invalid latest version value '" + rawLatestVersion + "'. Recreating it.");

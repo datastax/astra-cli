@@ -94,7 +94,7 @@ public class UpgradeStatusKeeper {
           # update properties file
           echo "LATEST_VERSION=$latest_version
           LAST_CHECKED=$last_checked
-          LAST_NOTIFIED=$last_notified" > "$(printf %%q '%s')"
+          LAST_NOTIFIED=$last_notified" > '%s'
         """).formatted(pathStr);
 
         return script;
