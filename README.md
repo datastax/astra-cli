@@ -84,7 +84,7 @@ You can also download a specific version, or the latest prerelease version, usin
 
 ```bash
 # Upgrade (or downgrade!) to a specific version
-astra upgrade --version 1.0.0-rc.6
+astra upgrade --version 1.0.0
 
 # Upgrade to the latest prerelease version
 astra upgrade --pre
