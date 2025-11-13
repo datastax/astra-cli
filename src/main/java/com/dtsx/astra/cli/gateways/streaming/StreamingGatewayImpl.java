@@ -52,7 +52,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
             }
         });
     }
-r
+
     @Override
     public DeletionStatus<TenantName> delete(TenantName tenantName) {
         val exists = exists(tenantName);
