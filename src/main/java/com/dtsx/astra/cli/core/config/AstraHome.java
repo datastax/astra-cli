@@ -60,35 +60,35 @@ public class AstraHome {
         }
 
         public Path useCqlsh(Version version) {
-            val path = dir.get().resolve("cqlsh-astra@" + version);
+            val path = dir.get().resolve("cqlsh-astra").resolve(version.toString());
             FileUtils.createDirIfNotExists(path, null);
             return CQLSH;
         }
 
         public Path useDsbulk(Version version) {
-            val path = dir.get().resolve("dsbulk@" + version);
+            val path = dir.get().resolve("dsbulk").resolve(version.toString());
             FileUtils.createDirIfNotExists(path, null);
             return path;
         }
 
         public Path usePulsar(Version version) {
-            val path = dir.get().resolve("lunastreaming-shell@" + version);
+            val path = dir.get().resolve("lunastreaming-shell").resolve(version.toString());
             FileUtils.createDirIfNotExists(path, null);
             return path;
         }
 
         public boolean cqlshExists(Version version) {
-            val path = dir.get().resolve("cqlsh-astra@" + version);
+            val path = dir.get().resolve("cqlsh-astra").resolve(version.toString());
             return Files.exists(path);
         }
 
         public boolean dsbulkExists(Version version) {
-            val path = dir.get().resolve("dsbulk@" + version);
+            val path = dir.get().resolve("dsbulk").resolve(version.toString());
             return Files.exists(path);
         }
 
         public boolean pulsarExists(Version version) {
-            val path = dir.get().resolve("lunastreaming-shell@" + version);
+            val path = dir.get().resolve("lunastreaming-shell").resolve(version.toString());
             return Files.exists(path);
         }
     }

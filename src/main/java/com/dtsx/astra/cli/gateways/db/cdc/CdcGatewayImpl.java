@@ -10,12 +10,14 @@ import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CdcGatewayImpl implements CdcGateway {
     private final CliContext ctx;

@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.gateways.downloads;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.Version;
+import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.apache.commons.io.file.PathUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.function.Supplier;
@@ -101,6 +102,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @SneakyThrows
+    @SuppressWarnings("resource")
     private Either<String, Path> installGenericArchive(Path installDir, String url, Version version, String exe, CliContext ctx) {
         if (Files.isRegularFile(installDir)) {
             return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
@@ -149,6 +151,29 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         }
 
         try {
+            Files.delete(archiveFile);
+        } catch (Exception e) {
+            ctx.log().exception(e);
+            return Either.left("Failed to delete temporary " + exe + " archive %s (%s): '%s'".formatted(archiveFile, e.getClass().getSimpleName(), e.getMessage()));
+        }
+
+        try {
+            val extractedDir = Files.list(installDir).findFirst();
+
+            if (extractedDir.isEmpty()) {
+                return Either.left("Failed to locate extracted " + exe + " directory in " + installDir);
+            }
+
+            for (val item : Files.list(extractedDir.get()).toList()) {
+                Files.move(item, installDir.resolve(item.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+            Files.delete(extractedDir.get());
+        } catch (Exception e) {
+            ctx.log().exception(e);
+            return Either.left("Failed to move extracted files (%s): '%s'".formatted(e.getClass().getSimpleName(), e.getMessage()));
+        }
+
+        try {
             Files.setPosixFilePermissions(exeFile, Set.of(
                 PosixFilePermission.OWNER_WRITE,
                 PosixFilePermission.OWNER_READ, PosixFilePermission.GROUP_READ,
@@ -159,13 +184,6 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         } catch (Exception e) {
             ctx.log().exception(e);
             return Either.left("Failed to set execute permissions on %s (%s): '%s'".formatted(exeFile, e.getClass().getSimpleName(), e.getMessage()));
-        }
-
-        try {
-            Files.delete(archiveFile);
-        } catch (Exception e) {
-            ctx.log().exception(e);
-            return Either.left("Failed to delete temporary " + exe + " archive %s (%s): '%s'".formatted(archiveFile, e.getClass().getSimpleName(), e.getMessage()));
         }
 
         return Either.pure(exeFile);
