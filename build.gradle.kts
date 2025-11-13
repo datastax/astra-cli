@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.0.1-rc.1"
+version = "1.0.1-rc.2"
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
