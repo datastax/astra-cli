@@ -133,7 +133,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             ? "The @'!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
             : "To overwrite it, either interactively respond @'!yes@! to the prompt, or use the @'!--overwrite!@ option to proceed without confirmation.";
 
-        throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
+        throw new AstraCliException(PROFILE_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists in the configuration file.|@
 
           %s

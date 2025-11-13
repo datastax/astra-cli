@@ -30,6 +30,8 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
     public record ScbDownloadFailed(String error) implements DownloadScbResult {}
     public record ScbDownloadedAndMoved(Path dest) implements DownloadScbResult {}
     public record ScbDownloadedAndMoveFailed(Path source, Path dest, boolean deleteSucceeded, IOException ex) implements DownloadScbResult {}
+    public record ScbDestinationAlreadyExists() implements DownloadScbResult {}
+    public record ScbInvalidDestination(String reason) implements DownloadScbResult {}
 
     public record DbDownloadScbRequest(
         DbRef dbRef,
@@ -39,12 +41,30 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
 
     @Override
     public DownloadScbResult execute() {
+        val destinationError = request.destination.flatMap(this::validateDestinationFile);
+
+        if (destinationError.isPresent()) {
+            return destinationError.get();
+        }
+
         val db = dbGateway.findOne(request.dbRef);
 
         return downloadSCB(db).fold(
             ScbDownloadFailed::new,
             this::handleDownloadedFiles
         );
+    }
+
+    private Optional<DownloadScbResult> validateDestinationFile(Path path) {
+        if (!path.toString().endsWith(".zip")) {
+            return Optional.of(new ScbInvalidDestination("Destination file " + path + " is not a .zip file."));
+        }
+
+        if (Files.exists(path)) {
+            return Optional.of(new ScbDestinationAlreadyExists());
+        }
+
+        return Optional.empty();
     }
 
     private DownloadScbResult handleDownloadedFiles(Path downloadedFile) {

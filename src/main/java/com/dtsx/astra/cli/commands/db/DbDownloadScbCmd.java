@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDownloadScbOperation;
 import lombok.val;
@@ -14,6 +15,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -49,7 +51,7 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
 
     @Option(
         names = { "-f", "--file" },
-        description = "Destination file. Defaults to `~/.astra/scb/scb_<name/id>_<region>.zip`",
+        description = { "Destination SCB file", SHOW_CUSTOM_DEFAULT + "@|code ~/.astra/scb/scb_<dc_id>_<dc_region>.zip|@" },
         paramLabel = "DEST"
     )
     public Optional<Path> $destination;
@@ -72,6 +74,8 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
             case ScbDownloadedAndMoved(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoveFailed fail -> throwScbDownloadedAndMoveFailed(fail);
             case ScbDownloadFailed (var error) -> throwScbDownloadFailed(error);
+            case ScbDestinationAlreadyExists() -> throwScbDestinationAlreadyExists();
+            case ScbInvalidDestination(var reason) -> throwScbInvalidDestination(reason);
         };
     }
 
@@ -124,10 +128,28 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
     private <T> T throwScbDownloadFailed(String error) {
         throw new AstraCliException(DOWNLOAD_ISSUE, trimIndent("""
           @|bold,red Error: Failed to download secure connect bundle.|@
-        
+
           Cause:
           %s
         """).formatted(error));
+    }
+
+    private <T> T throwScbDestinationAlreadyExists() {
+        throw new AstraCliException(FILE_ISSUE, trimIndent("""
+          @|bold,red Error: The destination file already exists.|@
+
+          Please delete the existing file or specify a different destination.
+        """), List.of(
+            new Hint("Delete the existing file:", "rm " + $destination.get())
+        ));
+    }
+
+    private <T> T throwScbInvalidDestination(String reason) {
+        throw new AstraCliException(FILE_ISSUE, trimIndent("""
+          @|bold,red Error: Invalid destination file.|@
+
+          %s
+        """).formatted(reason));
     }
 
     private LinkedHashMap<String, Object> mkData(Path dest) {
