@@ -188,6 +188,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected final List<String> originalArgs() {
-        return listAdd(ctx.properties().cliName(), spec.commandLine().getParseResult().originalArgs());
+        return listAdd(ctx.properties().cliName(), spec.commandLine().getParseResult().originalArgs()).stream()
+            .map(s -> s.contains(" ") ? "'" + s + "'" : s)
+            .toList();
     }
 }

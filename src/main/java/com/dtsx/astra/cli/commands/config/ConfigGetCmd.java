@@ -147,8 +147,8 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
             key,
             section.name(),
             section.pairs().stream().map(p -> "- " + ctx.highlight(p.key())).collect(Collectors.joining(NL)),
-            renderComment(ctx.colors(), "Get the values of the keys in this profile with:"),
-            renderCommand(ctx.colors(), "${cli.name} config get " + section.name())
+            renderComment(ctx.colors(), "Get the definition of profile with:"),
+            renderCommand(ctx.colors(), "${cli.name} config get '" + section.name() + "'")
         );
     }
 

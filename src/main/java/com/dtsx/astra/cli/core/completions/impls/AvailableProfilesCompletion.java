@@ -9,7 +9,14 @@ public class AvailableProfilesCompletion extends DynamicCompletion {
 
     public AvailableProfilesCompletion() {
         super("""
-          RC_FILE=$(get_astra_rc); [ -f "$RC_FILE" ]&&OUT=( $(grep '^\\[.*\\]$' "$RC_FILE" | tr -d '[]') )||OUT=()
+          RC_FILE=$(get_astra_rc);
+          OUT=();
+        
+          if [ -f "$RC_FILE" ]; then
+            while IFS= read -r line; do
+              OUT+=("$line");
+            done < <(grep '^\\[.*\\]$' "$RC_FILE" | tr -d '[]');
+          fi
         """);
     }
 }

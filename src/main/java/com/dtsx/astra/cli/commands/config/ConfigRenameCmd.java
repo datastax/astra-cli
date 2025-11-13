@@ -90,8 +90,8 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
             ctx.highlight(oldName),
             ctx.highlight(newName)
         ), List.of(
-            new Hint("Delete the existing profile first:", "${cli.name} config delete " + newName),
-            new Hint("See your existing profiles:", "${cli.name} config list")
+            new Hint("Delete the existing profile first:", "${cli.name} config delete '" + newName + "'"),
+            new Hint("Get the definition of the existing profile:", "${cli.name} config get '" + newName + "'")
         ));
     }
 
