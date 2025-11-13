@@ -93,8 +93,8 @@ public class AsciidocGenerator {
         val collapsibleGroups = docsSpec.collapsibleOptionGroups();
 
         return new CommandOptions(
-            commandSpec.argGroups().stream().filter((g) -> g.heading() != null && collapsibleGroups.contains(g.heading().replace("%n", ""))).toList(),
-            commandSpec.argGroups().stream().filter((g) -> g.heading() == null || !collapsibleGroups.contains(g.heading().replace("%n", ""))).toList(),
+            commandSpec.argGroups().stream().filter((g) -> g.heading() != null && collapsibleGroups.stream().anyMatch(g.heading()::contains)).toList(),
+            commandSpec.argGroups().stream().filter((g) -> g.heading() == null || collapsibleGroups.stream().noneMatch(g.heading()::contains)).toList(),
             commandSpec.args().stream().filter((a) -> a.group() == null).toList()
         );
     }
