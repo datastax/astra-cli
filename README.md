@@ -43,13 +43,13 @@ The preferred installation method is via the installation script:
 
 ```bash
 # Unix (recommended)
-curl -sSL ibm.biz/astra-cli | sh
+curl -sSL https://ibm.biz/astra-cli | sh
 
 # Unix (brew)
 brew install datastax/astra-cli/astra
 
 # Windows
-powershell -c "irm ibm.biz/astra-cli-win | iex"
+powershell -c "irm https://ibm.biz/astra-cli-win | iex"
 ```
 
 The CLI can also be downloaded directly from the [releases page](https://github.com/datastax/astra-cli/releases).
