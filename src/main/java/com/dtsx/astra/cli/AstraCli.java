@@ -158,6 +158,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
     @SneakyThrows
     @VisibleForTesting
+    @SuppressWarnings("unused")
     public static int run(Ref<CliContext> ctxRef, String... args) {
         @Cleanup val jansi = JansiUtils.installIfNecessary();
 
