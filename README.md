@@ -1,7 +1,7 @@
 # Astra CLI
 
 [![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-![Latest Release](https://img.shields.io/badge/release-1.0.0.beta-orange)
+![Latest Release](https://img.shields.io/github/v/release/datastax/astra-cli)
 
 Astra CLI provides a terminal interface to operate DataStax Astra. The goal is to offer access to any feature without accessing the user interface.
 
