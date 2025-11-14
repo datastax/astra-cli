@@ -1,13 +1,13 @@
 # Astra CLI
 
 [![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-![Latest Release](https://img.shields.io/badge/release-1.0.0.beta-orange)
+![GitHub Release](https://img.shields.io/github/v/release/datastax/astra-cli)
 
 Astra CLI provides a terminal interface to operate DataStax Astra. The goal is to offer access to any feature without accessing the user interface.
 
 ![Astra CLI MacOS demo](assets/demo.gif)
 
-> This is the README for the new 1.0.0 (beta) version of the Astra CLI. See the README for the previous version [here](https://github.com/datastax/astra-cli/tree/0.x?tab=readme-ov-file#astra-cli).
+> This is the README for the new 1.0.0 (beta) version of the Astra CLI. See the README for the previous version [here](https://github.com/datastax/astra-cli/tree/v0.x?tab=readme-ov-file).
 
 ## Table of Contents
 
