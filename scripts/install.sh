@@ -41,7 +41,7 @@ renderCommand() {
 }
 
 # Constants
-ASTRA_CLI_VERSION="1.0.1-rc.3"
+ASTRA_CLI_VERSION="1.0.1"
 
 get_astra_dir() {
   if [ -n "${ASTRA_HOME:-}" ]; then
