@@ -3,8 +3,12 @@
 set -eu
 IFS=$(printf '\n\t')
 
+if command -v tput >/dev/null 2>&1 && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
+  COLORS_SUPPORTED=true
+fi
+
 color() {
-  if command -v tput >/dev/null 2>&1 && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
+  if [ "$COLORS_SUPPORTED" = true ]; then
     tput "$@"
   else
     printf ""
@@ -37,7 +41,7 @@ renderCommand() {
 }
 
 # Constants
-ASTRA_CLI_VERSION="1.0.0"
+ASTRA_CLI_VERSION="1.0.1-rc.3"
 
 get_astra_dir() {
   if [ -n "${ASTRA_HOME:-}" ]; then
@@ -126,22 +130,116 @@ install_url="https://github.com/datastax/astra-cli/releases/download/v$ASTRA_CLI
 
 # Out of order but shh
 print_next_steps() {
+  steps_str=$(mk_print_next_steps_str "$1")
+
+  if [ "$COLORS_SUPPORTED" = true ]; then
+    draw_box_around "$steps_str"
+  else
+    printf '%s\n' "$steps_str"
+  fi
+}
+
+draw_box_around() {
+  max_width=0
+  while IFS= read -r line; do
+    visible_len=$(visible_len "$line")
+
+    if [ "$visible_len" -gt "$max_width" ]; then
+      max_width=$visible_len
+    fi
+  done <<EOF
+$1
+EOF
+
+  box_width=$((max_width + 6))
+  border_len=$((box_width - 2))
+
+  draw_line "$border_len" "┌" "─" "┐"
+  draw_line "$border_len" "│" " " "│"
+
+  while IFS= read -r line; do
+    padding=$((max_width - $(visible_len "$line")))
+    draw_line "$padding" "${BLUE}│${RESET}  ${line}" " " "  ${BLUE}│${RESET}"
+  done <<EOF
+$1
+EOF
+
+  draw_line "$border_len" "│" " " "│"
+  draw_line "$border_len" "└" "─" "┘"
+}
+
+# https://stackoverflow.com/a/56170835
+visible_len() {
+  esc=$(printf '\033')
+  stripped=$(printf '%s' "$1" | sed "s/${esc}[^m]*m//g")
+  printf '%d' "${#stripped}"
+}
+
+draw_line() {
+  i=0
+  printf '%s' "${BLUE}${2}"
+  while [ "$i" -lt "$1" ]; do
+    printf "$3"
+    i=$((i + 1))
+  done
+  printf '%s\n' "${4}${RESET}"
+}
+
+mk_print_next_steps_str() {
+  echo "$1"
+  echo ""
+
   if [ $os = "macos" ] && command -v xattr >/dev/null 2>&1 && xattr -l "$EXE_PATH" | grep -q "com.apple.quarantine"; then
     renderComment "Run the following to remove the quarantine label from the binary"
     renderCommand "xattr -d com.apple.quarantine \"$(tildify "$EXE_PATH")\""
     echo ""
   fi
 
-  renderComment "Append the following to your shell profile (e.g. $(underline "~/.zprofile"), $(underline "~/.bash_profile"), etc.)"
-  if [ "$ASTRA_CLI_DIR_RESOLVER" = "custom" ]; then
-    renderCommand "eval \"\$($(tildify "$EXE_PATH") shellenv --home \"$(tildify "$ASTRA_HOME")\")\""
-  else
-    renderCommand "eval \"\$($(tildify "$EXE_PATH") shellenv)\""
-  fi
-  echo ""
+  case "${SHELL}" in
+    */bash*)
+      if [ "$os" = linux ]; then
+        print_append_to_shell_profile "${HOME}/.bashrc"
+      else
+        print_append_to_shell_profile "${HOME}/.bash_profile"
+      fi
+      ;;
+    */zsh*)
+      if [ "$os" = linux ]; then
+        print_append_to_shell_profile "${ZDOTDIR:-"${HOME}"}/.zshrc"
+      else
+        print_append_to_shell_profile "${ZDOTDIR:-"${HOME}"}/.zprofile"
+      fi
+      ;;
+    *)
+      renderComment "Add astra to your PATH in your shell profile"
+      renderCommand "export PATH=$(dirname \""$(tildify "$EXE_PATH")"\"):\$PATH\""
+      echo ""
+      ;;
+  esac
 
   renderComment "Run the following to get started!"
   renderCommand "astra setup"
+}
+
+print_append_to_shell_profile() {
+  file="$1"
+
+  # shellcheck disable=SC2016
+  if [ "$ASTRA_CLI_DIR_RESOLVER" = "custom" ]; then
+     command="eval \"\$($(tildify "$EXE_PATH") shellenv --home \"$(tildify "$ASTRA_HOME")\")\""
+  else
+     command="eval \"\$($(tildify "$EXE_PATH") shellenv)\""
+  fi
+
+  if [ -w "$file" ]; then
+    renderComment "Run the following to enable completions and update your PATH"
+    renderCommand "echo '$command' >> $(tildify "$file")"
+  else
+    renderComment "Append the following to your $(underline "$(tildify "$file")") to enable completions and update your PATH"
+    renderCommand "$command"
+  fi
+
+  echo ""
 }
 
 # Existing installation checks
@@ -157,10 +255,12 @@ if [ -f "$existing_install_path" ]; then
   echo "${BLUE}→ ${LIGHT_GRAY}(< astra-cli 1.x)${RESET} Remove the existing installation manually and re-run this installer."
   echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra upgrade${RESET} to automatically update to the latest version."
   echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra nuke${RESET} to completely remove the CLI and then re-run this installer."
-  echo ""
-  echo "If you already knew astra was installed but you can't use it, please make sure you've done the following:"
-  echo ""
-  print_next_steps
+
+  if command -v astra >/dev/null 2>&1; then
+    echo ""
+    print_next_steps "If you just can't use ${BLUE}astra${RESET}, ensure you've done the following:"
+  fi
+
   exit 1
 else
   checklist "No existing installation found."
@@ -198,6 +298,4 @@ rm "$TAR_PATH" 2>/dev/null || true
 echo ""
 echo "${GREEN}Astra CLI installed successfully! 🎉${RESET}"
 echo ""
-echo "Next steps:"
-echo ""
-print_next_steps
+print_next_steps "Next steps:"

@@ -118,7 +118,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         }
 
         return OutputAll.response(creationMessage + mkHint(), data, List.of(
-            new Hint("Set it as the default profile:", "${cli.name} config use " + result.profileName())
+            new Hint("Set it as the default profile:", "${cli.name} config use '" + result.profileName() + "'")
         ));
     }
 
@@ -133,7 +133,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             ? "The @'!--fail-if-exists!@ flag was set, so the operation failed without confirmation or warning."
             : "To overwrite it, either interactively respond @'!yes@! to the prompt, or use the @'!--overwrite!@ option to proceed without confirmation.";
 
-        throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
+        throw new AstraCliException(PROFILE_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists in the configuration file.|@
 
           %s
@@ -142,7 +142,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             mainMsg
         ), List.of(
             new Hint("Example fix:", originalArgsWithoutFailIfExists, "--overwrite"),
-            new Hint("See the values of the existing profile:", "${cli.name} config get " + profileName)
+            new Hint("Get the definition of the existing profile:", "${cli.name} config get '" + profileName + "'")
         ));
     }
 
@@ -152,7 +152,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             : "";
 
         val originalArgsWithoutDefault = originalArgs().stream()
-            .map((s) -> ProfileName.DEFAULT.unwrap().equals(s) ? "<new_name>" : s)
+            .map((s) -> s.contains(ProfileName.DEFAULT.unwrap()) ? "<new_name>" : s)
             .toList();
 
         throw new AstraCliException(ILLEGAL_OPERATION, """

@@ -93,7 +93,7 @@ public class FileUtils {
 
     @SneakyThrows
     private static <A extends ArchiveEntry, IS extends ArchiveInputStream<A>> void extractArchiveInPlace(Path tarFile, CliContext ctx, MkArchiveInputStream<IS> mkArchiveInputStream) {
-        val outputDir = tarFile.getParent().getParent();
+        val outputDir = tarFile.getParent();
 
         @Cleanup val fis = Files.newInputStream(tarFile);
         @Cleanup val ais = mkArchiveInputStream.apply(fis);

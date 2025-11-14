@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.CONFIG_ALREADY_EXISTS;
+import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
@@ -81,7 +81,7 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
     }
 
     private <T> T throwNewProfileAlreadyExists(ProfileName oldName, ProfileName newName) {
-        throw new AstraCliException(CONFIG_ALREADY_EXISTS, """
+        throw new AstraCliException(PROFILE_ALREADY_EXISTS, """
           @|bold,red Error: A profile with the name '%s' already exists.|@
 
           Cannot rename profile %s to %s because a profile with that name already exists.
@@ -90,8 +90,8 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
             ctx.highlight(oldName),
             ctx.highlight(newName)
         ), List.of(
-            new Hint("Delete the existing profile first:", "${cli.name} config delete " + newName),
-            new Hint("See your existing profiles:", "${cli.name} config list")
+            new Hint("Delete the existing profile first:", "${cli.name} config delete '" + newName + "'"),
+            new Hint("Get the definition of the existing profile:", "${cli.name} config get '" + newName + "'")
         ));
     }
 

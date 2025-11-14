@@ -185,6 +185,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
                 }
 
                 val profileNamesHint = profileNames.stream()
+                    .map(n -> "'" + n + "'")
                     .reduce((a, b) -> a + "|" + b)
                     .orElse("<name>");
 

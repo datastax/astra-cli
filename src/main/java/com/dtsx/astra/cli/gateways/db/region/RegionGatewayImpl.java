@@ -20,10 +20,12 @@ public class RegionGatewayImpl implements RegionGateway {
     private final APIProvider api;
 
     @Override
-    public SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector) {
-        val regionType = vector ? RegionType.VECTOR : RegionType.ALL;
+    public SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vectorOnly) {
+        val regionType = (vectorOnly)
+            ? RegionType.VECTOR
+            : RegionType.ALL;
 
-        return ctx.log().loading("Fetching all available " + ((vector) ? "vector" : "serverless") + " regions", (_) -> (
+        return ctx.log().loading("Fetching all available " + ((vectorOnly) ? "vectorOnly" : "serverless") + " regions", (_) -> (
             api.astraOpsClient().db().regions()
                 .findAllServerless(regionType)
                 .collect(Collectors.toMap(

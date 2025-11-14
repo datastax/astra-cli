@@ -44,7 +44,12 @@ public class StreamingGatewayImpl implements StreamingGateway {
     @Override
     public boolean exists(TenantName tenantName) {
         return ctx.log().loading("Checking if streaming tenant " + tenantName + " exists", (_) -> {
-            return apiProvider.astraOpsClient().streaming().exist(tenantName.unwrap());
+            try {
+                findOne(tenantName);
+                return true;
+            } catch (TenantNotFoundException e) {
+                return false;
+            }
         });
     }
 
@@ -131,7 +136,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
     @Override
     public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail) {
         val exists = exists(tenantName);
-        
+
         if (exists) {
             val tenant = findOne(tenantName);
             return CreationStatus.alreadyExists(tenant);

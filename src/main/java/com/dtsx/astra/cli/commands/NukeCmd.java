@@ -67,8 +67,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
     @Option(
         names = { "--yes", "-y" },
         description = "Whether to nuke without confirmation (if not a dry run)",
-        defaultValue = "false",
-        fallbackValue = "false"
+        defaultValue = "false"
     )
     public boolean $yes;
 
