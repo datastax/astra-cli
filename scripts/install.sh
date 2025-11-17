@@ -3,6 +3,7 @@
 set -eu
 IFS=$(printf '\n\t')
 
+COLORS_SUPPORTED=false
 if command -v tput >/dev/null 2>&1 && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
   COLORS_SUPPORTED=true
 fi
@@ -68,7 +69,7 @@ EXE_PATH="$ASTRA_CLI_DIR/astra"
 TAR_PATH="$ASTRA_CLI_DIR/astra.tar.gz"
 
 # Colors
-if [ "$(color colors)" -ge 256 ]; then
+if [ -n "$(color colors)" ] && [ "$(color colors)" -ge 256 ]; then
   LIGHT_GRAY=$(color setaf 245)
   BLUE=$(color setaf 110)
   PURPLE=$(color setaf 134)
@@ -195,7 +196,7 @@ mk_print_next_steps_str() {
     echo ""
   fi
 
-  case "${SHELL}" in
+  case "${SHELL:-}" in
     */bash*)
       if [ "$os" = linux ]; then
         print_append_to_shell_profile "${HOME}/.bashrc"
