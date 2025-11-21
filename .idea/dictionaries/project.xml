@@ -26,6 +26,7 @@
       <w>readln</w>
       <w>shellenv</w>
       <w>tildify</w>
+      <w>xattr</w>
       <w>xsel</w>
       <w>zprofile</w>
     </words>

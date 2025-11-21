@@ -75,6 +75,7 @@ public class CompletionsCmd implements Runnable {
 
         val props = CliPropertiesImpl.mkAndLoadSysProps(new CliEnvironmentImpl());
 
+        // TODO should check for -p as well
         sb.append("""
           get_profile(){ for ((i=0;i<${#COMP_WORDS[@]};i++));do [[ ${COMP_WORDS[i]} == --profile ]]&&((i+1<${#COMP_WORDS[@]}))&&echo ${COMP_WORDS[i+1]}&&return;done; echo default;};
         """).append(NL);

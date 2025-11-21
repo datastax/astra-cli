@@ -3,8 +3,12 @@
 set -eu
 IFS=$(printf '\n\t')
 
+exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
 COLORS_SUPPORTED=false
-if command -v tput >/dev/null 2>&1 && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
+if exists tput && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
   COLORS_SUPPORTED=true
 fi
 
@@ -43,16 +47,6 @@ renderCommand() {
 
 # Constants
 ASTRA_CLI_VERSION="1.0.1"
-
-get_astra_dir() {
-  if [ -n "${ASTRA_HOME:-}" ]; then
-    echo "$ASTRA_HOME/cli"
-  elif [ -n "${XDG_DATA_HOME:-}" ]; then
-    echo "$XDG_DATA_HOME/astra/cli"
-  else
-    echo "$HOME/.astra/cli"
-  fi
-}
 
 if [ -n "${ASTRA_HOME:-}" ]; then
   ASTRA_CLI_DIR_RESOLVER="custom"
@@ -98,11 +92,11 @@ echo "                    Installer: $ASTRA_CLI_VERSION"
 echo "$RESET"
 
 # Required tools check
-if ! command -v curl >/dev/null 2>&1; then
+if ! exists curl; then
   error "Error: curl is not installed. Please install curl and try again."
 fi
 
-if ! command -v tar >/dev/null 2>&1; then
+if ! exists tar; then
   error "Error: tar is not installed. Please install tar and try again."
 fi
 
@@ -190,7 +184,7 @@ mk_print_next_steps_str() {
   echo "$1"
   echo ""
 
-  if [ $os = "macos" ] && command -v xattr >/dev/null 2>&1 && xattr -l "$EXE_PATH" | grep -q "com.apple.quarantine"; then
+  if [ $os = "macos" ] && exists xattr && xattr -l "$EXE_PATH" | grep -q "com.apple.quarantine"; then
     renderComment "Run the following to remove the quarantine label from the binary"
     renderCommand "xattr -d com.apple.quarantine \"$(tildify "$EXE_PATH")\""
     echo ""
@@ -243,21 +237,82 @@ print_append_to_shell_profile() {
   echo ""
 }
 
-# Existing installation checks
-existing_install_path=$(command -v astra 2>/dev/null || { [ -f "$ASTRA_CLI_DIR/astra" ] && echo "$ASTRA_CLI_DIR/astra"; } || { [ -f "${ASTRA_DIR:-}/astra" ] && echo "$ASTRA_DIR/astra"; } || echo "")
+# Resolve any existing installations
+if exists brew; then
+  brew_prefix=$(brew --prefix 2>/dev/null || echo "")
 
-if [ -f "$existing_install_path" ]; then
+  if [ -n "$brew_prefix" ] && [ -f "$brew_prefix/bin/astra" ]; then
+    existing_install_path="$brew_prefix/bin/astra"
+    existing_package_manager="homebrew"
+    return
+  fi
+fi
+
+if exists astra; then
+  existing_install_path=$(command -v astra)
+elif [ -f "$ASTRA_CLI_DIR/astra" ]; then
+  existing_install_path="$ASTRA_CLI_DIR/astra"
+elif [ -f "${ASTRA_DIR:-}/astra" ]; then
+  existing_install_path="$ASTRA_DIR/astra"
+fi
+
+print_basic_0_x_removal_instructions() {
+  echo "To remove the existing Astra CLI binary (but preserve other Astra files), please do the following:"
+  echo "${BLUE}→ ${LIGHT_GRAY}rm -f $(tildify "$existing_install_path")${RESET}"
+}
+
+print_brew_0_x_removal_instructions() {
+  echo "To remove the existing Astra CLI binary (but preserve other Astra files), please do the following:"
+  echo "${BLUE}→ ${LIGHT_GRAY}brew uninstall datastax/astra-cli/astra-cli${RESET}"
+}
+
+print_basic_1_x_removal_instructions() {
+  echo "Prefer to use ${BLUE}astra upgrade${RESET} to automatically update to the latest version."
+  echo ""
+  echo "Otherwise, to remove the existing Astra CLI binary (but preserve other Astra files), please do the following:"
+  echo "${BLUE}→ ${LIGHT_GRAY}rm -f $(tildify "$existing_install_path")${RESET}"
+}
+
+print_brew_1_x_removal_instructions() {
+  echo "To remove the existing Astra CLI binary (but preserve other Astra files), please do the following:"
+  echo "${BLUE}→ ${LIGHT_GRAY}brew uninstall astra${RESET}"
+}
+
+print_generic_removal_instructions() {
+  echo "If you want to update the existing installation, please do one of the following:"
+  echo "${BLUE}→ ${LIGHT_GRAY}(< astra-cli 1.x)${RESET} Remove the existing installation manually and re-run this installer."
+  echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra upgrade${RESET} to automatically update to the latest version."
+  echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra nuke${RESET} to completely remove the CLI and then re-run this installer."
+}
+
+if [ -f "${existing_install_path:-}" ]; then
   echo ""
   echo "${RED}Error: An existing astra installation was already found.${RESET}"
   echo ""
   echo "An existing installation was found at $(underline "$(tildify "$existing_install_path")")."
   echo ""
-  echo "If you want to update the existing installation, please do one of the following:"
-  echo "${BLUE}→ ${LIGHT_GRAY}(< astra-cli 1.x)${RESET} Remove the existing installation manually and re-run this installer."
-  echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra upgrade${RESET} to automatically update to the latest version."
-  echo "${BLUE}→ ${LIGHT_GRAY}(> astra-cli 1.x)${RESET} Run ${BLUE}astra nuke${RESET} to completely remove the CLI and then re-run this installer."
 
-  if command -v astra >/dev/null 2>&1; then
+  case "$("$existing_install_path" --version 2>/dev/null | cut -d. -f1)" in
+    *0)
+      if [ "$existing_package_manager" = "homebrew" ]; then
+        print_brew_0_x_removal_instructions
+      else
+        print_basic_0_x_removal_instructions
+      fi
+      ;;
+    *1)
+      if [ "$existing_package_manager" = "homebrew" ]; then
+        print_brew_1_x_removal_instructions
+      else
+        print_basic_1_x_removal_instructions
+      fi
+      ;;
+    *)
+      print_generic_removal_instructions
+      ;;
+  esac
+
+  if ! exists astra; then
     echo ""
     print_next_steps "If you just can't use ${BLUE}astra${RESET}, ensure you've done the following:"
   fi
