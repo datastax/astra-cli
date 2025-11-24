@@ -24,10 +24,12 @@ public interface DbCache {
 
         val keyspaces = db.getInfo().getKeyspaces();
 
-        if (keyspaces.size() == 1) {
-            cacheDbDefaultKs(id, keyspaces.stream().toList().getFirst());
-        } else if (keyspaces.contains(DEFAULT_KEYSPACE)) {
-            cacheDbDefaultKs(id, DEFAULT_KEYSPACE);
+        if (keyspaces != null) {
+            if (keyspaces.size() == 1) {
+                cacheDbDefaultKs(id, keyspaces.stream().toList().getFirst());
+            } else if (keyspaces.contains(DEFAULT_KEYSPACE)) {
+                cacheDbDefaultKs(id, DEFAULT_KEYSPACE);
+            }
         }
     }
 
