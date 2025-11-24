@@ -28,10 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -248,7 +245,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
     private String resolveKeyspace(CreateDotEnvRequest request) {
         if (cachedKeyspace == null) {
             cachedKeyspace = request.ksRef
-                .map(ks -> db(request).getInfo().getKeyspaces().stream()
+                .map(ks -> Optional.ofNullable(db(request).getInfo().getKeyspaces()).orElse(Set.of()).stream()
                     .filter(ks.name()::equalsIgnoreCase)
                     .findFirst()
                     .orElseThrow(() -> new KeyspaceNotFoundException(ks))

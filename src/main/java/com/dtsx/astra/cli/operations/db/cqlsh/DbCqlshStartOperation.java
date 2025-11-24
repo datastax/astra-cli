@@ -22,7 +22,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
     }
 
     public record CqlshRequest(
-        DbRef dbRef,
+        Either<DbRef, Path> dbOrScb,
         boolean debug,
         Optional<String> encoding,
         Optional<String> keyspace,
@@ -45,7 +45,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
     protected Either<CqlshExecResult, List<String>> buildCommandLine() {
         val commands = new ArrayList<String>();
 
-        val scbFile = downloadSCB(request.dbRef, request.region);
+        val scbFile = getScb(request.dbOrScb, request.region);
 
         if (scbFile.isLeft()) {
             return Either.left(scbFile.getLeft());

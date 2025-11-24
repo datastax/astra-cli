@@ -12,8 +12,7 @@ import com.dtsx.astra.sdk.db.domain.Datacenter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.db.DbGetOperation.*;
@@ -78,8 +77,8 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbInfo> {
             put("Vector", Optional.ofNullable(dbInfo.getInfo().getDbType()).orElse("").equals("vector") ? "Enabled" : "Disabled");
             put("Default Keyspace", dbInfo.getInfo().getKeyspace());
             put("Creation Time", dbInfo.getCreationTime());
-            put("Keyspaces", dbInfo.getInfo().getKeyspaces().stream().sorted().toList());
-            put("Regions", dbInfo.getInfo().getDatacenters().stream().map(Datacenter::getRegion).sorted().toList());
+            put("Keyspaces", Objects.requireNonNullElse(dbInfo.getInfo().getKeyspaces(), Set.of()).stream().sorted().toList());
+            put("Regions", Objects.requireNonNullElse(dbInfo.getInfo().getDatacenters(), Set.<Datacenter>of()).stream().map(Datacenter::getRegion).sorted().toList());
         }});
     }
 

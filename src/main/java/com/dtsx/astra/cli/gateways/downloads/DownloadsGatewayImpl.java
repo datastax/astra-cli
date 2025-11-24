@@ -29,17 +29,17 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         for (val datacenter : datacenters) {
             try {
-                ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
-                    val scbName = "scb_%s_%s.zip".formatted(datacenter.getId(), datacenter.getRegion());
-                    val scbPath = ctx.home().dirs().useScb().resolve(scbName);
+                val scbName = "scb_%s_%s.zip".formatted(datacenter.getId(), datacenter.getRegion());
+                val scbPath = ctx.home().dirs().useScb().resolve(scbName);
 
-                    if (Files.notExists(scbPath)) {
+                if (Files.notExists(scbPath)) {
+                    ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
                         FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath);
-                    }
+                        return null;
+                    });
+                }
 
-                    result.add(scbPath);
-                    return null;
-                });
+                result.add(scbPath);
             } catch (Exception e) {
                 ctx.log().exception("Failed to download secure connect bundle for database '%s' in region '%s'".formatted(ref, datacenter.getRegion()));
                 ctx.log().exception(e);

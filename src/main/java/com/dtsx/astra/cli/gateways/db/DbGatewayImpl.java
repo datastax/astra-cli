@@ -66,7 +66,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public boolean exists(DbRef ref) {
-        return ctx.log().loading("Checking if database " + ctx.highlight(ref) + " exists", (_) -> tryFindOne(ref).isPresent());
+        return ctx.log().loading("Checking if database " + ctx.highlight(ref) + " exists", (_) -> tryFindOne(ref).filter((db) -> db.getStatus() != TERMINATED).isPresent());
     }
 
     @Override
