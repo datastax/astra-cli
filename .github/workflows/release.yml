@@ -13,23 +13,14 @@ on:
         default: false
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
-
-  release:
-    needs: build
+  verify:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Verify versions are up to date
         run: |
           files=(
-            "scripts/install.ps1"
-            "scripts/install.sh"
             "build.gradle.kts"
             "src/test/resources/snapshots/AstraCli/help_output.human.approved.txt"
           )
@@ -49,6 +40,29 @@ jobs:
             exit 1
           fi
 
+  build:
+    needs: verify
+    uses: ./.github/workflows/build.yml
+    with:
+      upload-artifacts: true
+      build-all-platforms: true
+
+  update-install-scripts:
+    needs: build
+    uses: update-install-scripts.yml
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      tag: ${{ inputs.tag }}
+
+  release:
+    needs: [build, update-install-scripts]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:

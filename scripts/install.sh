@@ -48,6 +48,12 @@ renderCommand() {
 # Constants
 ASTRA_CLI_VERSION="1.0.1"
 
+# Checksum constants (updated automatically by CI)
+LINUX_X86_64_CHECKSUM="0000000000000000000000000000000000000000000000000000000000000000"
+LINUX_ARM64_CHECKSUM="0000000000000000000000000000000000000000000000000000000000000000"
+MACOS_X86_64_CHECKSUM="0000000000000000000000000000000000000000000000000000000000000000"
+MACOS_ARM64_CHECKSUM="0000000000000000000000000000000000000000000000000000000000000000"
+
 if [ -n "${ASTRA_HOME:-}" ]; then
   ASTRA_CLI_DIR_RESOLVER="custom"
   ASTRA_CLI_DIR="$ASTRA_HOME/cli"
@@ -98,6 +104,10 @@ fi
 
 if ! exists tar; then
   error "Error: tar is not installed. Please install tar and try again."
+fi
+
+if ! exists sha256sum && ! exists shasum && ! exists openssl; then
+  error "Error: No SHA-256 checksum tool found. Please install sha256sum, shasum, or openssl and try again."
 fi
 
 checklist "Required tools are available."
@@ -341,7 +351,38 @@ else
   error "\nError: Failed to download the archive to $(underline "$(tildify "$TAR_PATH")"). Please check your internet connection, verify write permissions, and try again."
 fi
 
-if tar -xzf "$TAR_PATH" -C "$ASTRA_CLI_DIR" --strip-components=2 astra/bin/astra; then
+# Verify checksum
+case "$os-$arch" in
+  linux-x86_64)
+    expected_checksum="$LINUX_X86_64_CHECKSUM"
+    ;;
+  linux-arm64)
+    expected_checksum="$LINUX_ARM64_CHECKSUM"
+    ;;
+  macos-x86_64)
+    expected_checksum="$MACOS_X86_64_CHECKSUM"
+    ;;
+  macos-arm64)
+    expected_checksum="$MACOS_ARM64_CHECKSUM"
+    ;;
+esac
+
+if exists sha256sum; then
+  actual_checksum=$(sha256sum "$TAR_PATH" | cut -d' ' -f1)
+elif exists shasum; then
+  actual_checksum=$(shasum -a 256 "$TAR_PATH" | awk '{print $1}')
+else
+  actual_checksum=$(openssl dgst -sha256 "$TAR_PATH" | awk '{print $2}')
+fi
+
+if [ "$actual_checksum" != "$expected_checksum" ]; then
+  rm "$TAR_PATH" 2>/dev/null || true
+  error "\nError: Checksum verification failed. Expected $expected_checksum but got $actual_checksum. The downloaded file may be corrupted."
+fi
+
+checklist "Checksum verified."
+
+if tar -xzf "$TAR_PATH" -C "$ASTRA_CLI_DIR" --strip-components=2 --no-same-owner astra/bin/astra; then
   checklist "Archive verified and extracted."
 else
   rm "$TAR_PATH" "$EXE_PATH" 2>/dev/null || true

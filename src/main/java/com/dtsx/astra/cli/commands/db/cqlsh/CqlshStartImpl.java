@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Db;
 import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
+import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -15,11 +16,13 @@ import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.ExecSource;
 import lombok.val;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
@@ -33,6 +36,13 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
         paramLabel = $Db.LABEL
     )
     public Optional<DbRef> $dbRef;
+
+    @Option(
+        names = { "--secure-connect-bundle", "-b" },
+        description = "Path to the secure connect bundle to use for authentication instead of the database name",
+        paramLabel = "PATH"
+    )
+    public Optional<Path> $scb;
 
     @Option(
         names = { $Keyspace.LONG, $Keyspace.SHORT },
@@ -59,9 +69,18 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     protected abstract Optional<ExecSource> execSource();
 
     @Override
+    protected void prelude() {
+        super.prelude();
+
+        if ($dbRef.isPresent() && $scb.isPresent()) {
+            throw new ParameterException(spec.commandLine(), "Cannot use both a database name/ID and a secure connect bundle. Please choose one method of authentication.");
+        }
+    }
+
+    @Override
     protected Operation<CqlshExecResult> mkOperation(boolean captureOutput) {
         return new DbCqlshStartOperation(ctx, dbGateway, downloadsGateway, new CqlshRequest(
-            $dbRef.orElseGet(this::promptForDb),
+            Either.fromOptional($scb, () -> $dbRef.orElseGet(this::promptForDb)),
             $debug,
             $encoding,
             $keyspace,

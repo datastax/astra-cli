@@ -1,7 +1,19 @@
 name: build.yml
 on:
   workflow_call:
+    inputs: &workflow-inputs
+      upload-artifacts:
+        description: 'Upload build artifacts'
+        required: false
+        type: boolean
+        default: true
+      build-all-platforms:
+        description: 'Build for all platforms'
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs: *workflow-inputs
   push:
     branches: [ main ]
 
@@ -9,7 +21,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-15-intel, macos-14 ]
+        os: ${{ inputs.build-all-platforms == true && fromJSON('["ubuntu-24.04", "windows-2022", "ubuntu-24.04-arm", "macos-15-intel", "macos-14"]') || fromJSON('["ubuntu-24.04"]') }}
         include:
           - os: ubuntu-24.04
             artifact-name: astra-cli-linux-x86_64
@@ -28,7 +40,7 @@ jobs:
             artifact-type: tar
 
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -44,6 +56,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Build and package native image (tar)
         if: matrix.artifact-type == 'tar'
@@ -54,9 +67,10 @@ jobs:
         run: ./gradlew nativeZip -Pprod
 
       - name: Upload artifacts
+        if: inputs.upload-artifacts == true
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: build/distributions/*.${{ matrix.artifact-type }}*
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7

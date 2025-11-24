@@ -9,8 +9,10 @@ import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CoreCqlshOptions;
 import com.dtsx.astra.cli.utils.DbUtils;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -32,6 +34,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
 
     public sealed interface CqlshExecResult {}
 
+    public record InvalidDbStatus(DatabaseStatusType status) implements CqlshExecResult {}
     public record CqlshInstallFailed(String error) implements CqlshExecResult {}
     public record ScbDownloadFailed(String error) implements CqlshExecResult {}
     public record Executed(int exitCode) implements CqlshExecResult {}
@@ -155,11 +158,36 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
         return cqlshExe;
     }
 
-    protected Either<CqlshExecResult, Path> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
-        val db = dbGateway.findOne(dbRef);
+    protected Either<CqlshExecResult, Path> getScb(Either<DbRef, Path> dbOrScb, Optional<RegionName> regionName) {
+        if (dbOrScb.isRight()) {
+            return validateScbPath(dbOrScb);
+        }
+        return downloadScb(dbOrScb, regionName);
+    }
+
+    private static @NotNull Either<CqlshExecResult, Path> validateScbPath(Either<DbRef, Path> dbRef) {
+        val path = dbRef.getRight();
+
+        if (!path.toString().endsWith(".zip")) {
+            return Either.left(new ScbDownloadFailed("Invalid SCB path (" + path + "): bundle must be a .zip file"));
+        }
+
+        if (!Files.exists(path)) {
+            return Either.left(new ScbDownloadFailed("Invalid SCB path (" + path + "): file does not exist"));
+        }
+
+        return Either.pure(path);
+    }
+
+    private Either<CqlshExecResult, Path> downloadScb(Either<DbRef, Path> dbRef, Optional<RegionName> regionName) {
+        val db = dbGateway.findOne(dbRef.getLeft());
+
+        if (db.getStatus() != DatabaseStatusType.ACTIVE) {
+            return Either.left(new InvalidDbStatus(db.getStatus()));
+        }
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
-            dbRef,
+            dbRef.getLeft(),
             Collections.singleton(DbUtils.resolveDatacenter(db, regionName))
         );
 
