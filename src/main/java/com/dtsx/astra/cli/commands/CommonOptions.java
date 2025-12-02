@@ -27,7 +27,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
         description = { "One of: ${COMPLETION-CANDIDATES}", SHOW_CUSTOM_DEFAULT + "auto" },
         arity = "0..1",
         fallbackValue = "always",
-        defaultValue = "${ASTRA_DEFAULT_COLOR:-auto}",
         paramLabel = "WHEN"
     )
     private void setAnsi(ColorMode mode) {
@@ -40,7 +39,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
 
     @Option(
         names = "--no-color",
-        defaultValue = "${ASTRA_NO_COLOR:-false}", // no DEFAULT in env var on purpose to better adhere to per-program NO_COLOR semantics
         hidden = true
     )
     private void setAnsi(boolean noColor) {
@@ -50,7 +48,7 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     @Option(
         names = { "--output", "-o" },
         completionCandidates = OutputTypeCompletion.class,
-        defaultValue = "${ASTRA_DEFAULT_OUTPUT_TYPE:-human}",
+        defaultValue = "human",
         description = "One of: ${COMPLETION-CANDIDATES}",
         paramLabel = "FORMAT"
     )
@@ -61,7 +59,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     @Option(
         names = { "-V", "--verbose" },
         description = "Enable verbose logging output",
-        defaultValue = "${ASTRA_DEFAULT_VERBOSE:-false}",
         showDefaultValue = Visibility.NEVER
     )
     private boolean verbose;
@@ -70,7 +67,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     @Option(
         names = { "-q", "--quiet" },
         description = "Only output essential information",
-        defaultValue = "${ASTRA_DEFAULT_QUIET:-false}",
         showDefaultValue = Visibility.NEVER
     )
     private boolean quiet;
@@ -79,7 +75,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     @Option(
         names = { "--spinner" },
         description = { "Enable/disable loading spinners", SHOW_CUSTOM_DEFAULT + "enabled if tty and not quiet" },
-        defaultValue = "${ASTRA_DEFAULT_SPINNER:-" + Option.NULL_VALUE + "}",
         negatable = true,
         fallbackValue = "true"
     )
@@ -95,7 +90,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
         names = "--dump-logs",
         description = { "Write all logs to an optionally specified file", SHOW_CUSTOM_DEFAULT + "${cli.home-folder.path}/logs/<file>.log" },
         fallbackValue = "__fallback__",
-        defaultValue = "${ASTRA_DEFAULT_DUMP_LOGS:-" + Option.NULL_VALUE + "}",
         paramLabel = "FILE",
         arity = "0..1"
     )
@@ -130,7 +124,6 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     @Option(
         names = "--no-input",
         description = "Don't ask for user input (e.g. confirmation prompts)",
-        defaultValue = "${ASTRA_DEFAULT_NO_INPUT:-false}",
         showDefaultValue = Visibility.NEVER
     )
     private boolean noInput;

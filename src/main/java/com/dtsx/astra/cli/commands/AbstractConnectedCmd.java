@@ -16,6 +16,7 @@ import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.PARSE_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
@@ -71,7 +73,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         @Option(
             names = { $Profile.LONG, $Profile.SHORT },
             completionCandidates = AvailableProfilesCompletion.class,
-            description = "The @|code .astrarc|@ profile to use for this command",
+            description = "The @|code .astrarc|@ profile to use for this command. Can be set via @|code " + ConstEnvVars.PROFILE + "|@.",
             paramLabel = $Profile.LABEL
         )
         public Optional<ProfileName> $profileName;
@@ -121,7 +123,14 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
         if ($credsProvider != null && $credsProvider.$config != null) {
             val configFile = $credsProvider.$config.$configFile;
-            val profileName = $credsProvider.$config.$profileName.orElse(ProfileName.DEFAULT);
+
+            val defaultProfileName = Optional.ofNullable(System.getenv(ConstEnvVars.PROFILE))
+                 .map(ProfileName::parse)
+                 .map((p) -> p.getRight((e) -> new AstraCliException(PARSE_ISSUE, "Invalid profile name in " + ConstEnvVars.PROFILE + ": '" + e + "'")))
+                 .orElse(ProfileName.DEFAULT);
+
+            val profileName = $credsProvider.$config.$profileName
+                .orElse(defaultProfileName);
 
             // the check for if it's the default file is later used to decide whether to update the completions cache or not
             if (configFile.isPresent()) {

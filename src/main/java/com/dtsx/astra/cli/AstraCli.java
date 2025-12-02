@@ -42,6 +42,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -53,6 +54,7 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -197,7 +199,17 @@ public class AstraCli extends AbstractCmd<Void> {
             return DefaultsRenderer.helpWithOverriddenDefaultsRendering(spec, cs);
         });
 
-        return cmd.execute(args);
+        val allArgs = ArrayUtils.addAll(defaultArgs(), args);
+        return cmd.execute(allArgs);
+    }
+
+    private static String[] defaultArgs() {
+        val defaultArgsStr = Optional.ofNullable(System.getenv(ConstEnvVars.DEFAULT_ARGS))
+            .orElse("");
+
+        return Arrays.stream(defaultArgsStr.split("\\s+"))
+            .filter(s -> !s.isBlank())
+            .toArray(String[]::new);
     }
 
     private static IFactory mkFactory(Ref<CliContext> ctxRef) {
