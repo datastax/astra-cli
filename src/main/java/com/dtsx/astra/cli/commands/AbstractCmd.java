@@ -112,10 +112,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         );
 
         val level =
-            (common.quiet())
-                ? Level.QUIET :
             (common.verbose())
-                ? Level.VERBOSE
+                ? Level.VERBOSE :
+            (common.quiet())
+                ? Level.QUIET
                 : ctx.logLevel();
 
         run(new CliContext(

@@ -33,32 +33,32 @@ public class CommonOptions {
     @Option(
         names = "--color",
         description = { "One of: ${COMPLETION-CANDIDATES}", SHOW_CUSTOM_DEFAULT + "auto" },
+        arity = "0..1",
         fallbackValue = "always",
+        defaultValue = "${ASTRA_DEFAULT_COLOR:-auto}",
         paramLabel = "WHEN"
     )
     private void setAnsi(ColorMode mode) {
         switch (mode) {
             case always -> this.ansi = Optional.of(Ansi.ON); // auto is handled by Optional.empty() here, not Ansi.AUTO
             case never -> this.ansi = Optional.of(Ansi.OFF);
+            default -> this.ansi = Optional.empty();
         }
     }
 
     @Option(
         names = "--no-color",
+        defaultValue = "${ASTRA_NO_COLOR:-false}", // no DEFAULT in env var on purpose to better adhere to per-program NO_COLOR semantics
         hidden = true
     )
     private void setAnsi(boolean noColor) {
-        if (noColor) {
-            this.ansi = Optional.of(Ansi.OFF);
-        } else {
-            throw new OptionValidationException("--no-color", "--no-color must be called without a value (or with 'true'); use --color=never instead");
-        }
+        this.ansi = Optional.of((noColor) ? Ansi.OFF : Ansi.ON);
     }
 
     @Option(
         names = { "--output", "-o" },
         completionCandidates = OutputTypeCompletion.class,
-        defaultValue = "human",
+        defaultValue = "${ASTRA_DEFAULT_OUTPUT_TYPE:-human}",
         description = "One of: ${COMPLETION-CANDIDATES}",
         paramLabel = "FORMAT"
     )
@@ -69,6 +69,7 @@ public class CommonOptions {
     @Option(
         names = { "-V", "--verbose" },
         description = "Enable verbose logging output",
+        defaultValue = "${ASTRA_DEFAULT_VERBOSE:-false}",
         showDefaultValue = Visibility.NEVER
     )
     private boolean verbose;
@@ -77,6 +78,7 @@ public class CommonOptions {
     @Option(
         names = { "-q", "--quiet" },
         description = "Only output essential information",
+        defaultValue = "${ASTRA_DEFAULT_QUIET:-false}",
         showDefaultValue = Visibility.NEVER
     )
     private boolean quiet;
@@ -84,7 +86,8 @@ public class CommonOptions {
     @Getter
     @Option(
         names = { "--spinner" },
-        description = { "Enable/disable loading spinners", SHOW_CUSTOM_DEFAULT + "enabled if tty" },
+        description = { "Enable/disable loading spinners", SHOW_CUSTOM_DEFAULT + "enabled if tty and not quiet" },
+        defaultValue = "${ASTRA_DEFAULT_SPINNER:-" + Option.NULL_VALUE + "}",
         negatable = true,
         fallbackValue = "true"
     )
@@ -100,6 +103,7 @@ public class CommonOptions {
         names = "--dump-logs",
         description = { "Write all logs to an optionally specified file", SHOW_CUSTOM_DEFAULT + "${cli.home-folder.path}/logs/<file>.log" },
         fallbackValue = "__fallback__",
+        defaultValue = "${ASTRA_DEFAULT_DUMP_LOGS:-" + Option.NULL_VALUE + "}",
         paramLabel = "FILE",
         arity = "0..1"
     )
@@ -134,6 +138,7 @@ public class CommonOptions {
     @Option(
         names = "--no-input",
         description = "Don't ask for user input (e.g. confirmation prompts)",
+        defaultValue = "${ASTRA_DEFAULT_NO_INPUT:-false}",
         showDefaultValue = Visibility.NEVER
     )
     private boolean noInput;
