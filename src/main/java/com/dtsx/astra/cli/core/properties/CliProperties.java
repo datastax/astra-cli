@@ -47,6 +47,10 @@ public interface CliProperties {
         private final String displayName;
     }
 
+    sealed interface PathToAstra { Path unwrap(); }
+    record AstraBinary(Path unwrap) implements PathToAstra {}
+    record AstraJar(Path unwrap) implements PathToAstra {}
+
     ExternalSoftware cqlsh();
 
     ExternalSoftware dsbulk();
@@ -77,7 +81,7 @@ public interface CliProperties {
 
     boolean noUpgradeNotifications();
 
-    Optional<Path> binaryPath();
+    PathToAstra cliPath(CliContext ctx);
 
     Optional<SupportedPackageManager> owningPackageManager();
 

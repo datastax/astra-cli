@@ -11,7 +11,7 @@ import com.dtsx.astra.cli.core.output.prompters.strategies.NumberedSelectionStra
 import com.dtsx.astra.cli.core.output.prompters.strategies.TextSelectionStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.LinkedHashMap;
 import java.util.List;

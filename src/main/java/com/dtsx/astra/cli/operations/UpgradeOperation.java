@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
+import com.dtsx.astra.cli.core.properties.CliProperties.AstraJar;
 import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
 import com.dtsx.astra.cli.core.properties.CliProperties.SupportedPackageManager;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
@@ -98,9 +99,9 @@ public class UpgradeOperation implements Operation<Unit> {
     }
 
     private Path resolveCurrentExePath() {
-        val binaryPath = ctx.properties().binaryPath();
+        val binaryPath = ctx.properties().cliPath(ctx);
 
-        if (binaryPath.isEmpty()) {
+        if (binaryPath instanceof AstraJar) {
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Cannot run this command when Astra CLI is not being run as a binary|@
             """);
@@ -127,7 +128,7 @@ public class UpgradeOperation implements Operation<Unit> {
             """.formatted(pm.displayName()), hints);
         });
 
-        if (!Files.isWritable(binaryPath.get())) {
+        if (!Files.isWritable(binaryPath.unwrap())) {
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
               @|bold,red Error: No write permissions to update the current process @|faint,italic (%s)|@|@
 
@@ -135,7 +136,7 @@ public class UpgradeOperation implements Operation<Unit> {
             """.formatted(binaryPath), hints);
         }
 
-        return binaryPath.get();
+        return binaryPath.unwrap();
     }
 
     private Version resolveReleaseVersion(VersionType versionType) {

@@ -1,7 +1,11 @@
 package com.dtsx.astra.cli.utils;
 
+import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.CannotCreateFileException;
+import com.dtsx.astra.cli.core.properties.CliProperties.AstraBinary;
+import com.dtsx.astra.cli.core.properties.CliProperties.AstraJar;
+import com.dtsx.astra.cli.core.properties.CliProperties.PathToAstra;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -12,25 +16,49 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
-import org.graalvm.nativeimage.ImageInfo;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 @UtilityClass
 public class FileUtils {
-    public Optional<Path> getCurrentBinaryPath() {
-        return ProcessHandle.current().info().command()
-            .filter((_) -> ImageInfo.inImageCode())
+    // This is only here so that the shellenv cmd can use it without requiring going through AbstractCmd
+    // (may or may not be a slight speed improvement; haven't measured)
+    public PathToAstra resolvePathToAstra() {
+        val isNative = System.getProperty("org.graalvm.nativeimage.imagecode") != null;
+
+        return (isNative)
+            ? new AstraBinary(resolveCurrentBinaryPath())
+            : new AstraJar(resolveCurrentJarPath());
+    }
+
+    private Path resolveCurrentBinaryPath() {
+        return ProcessHandle.current()
+            .info().command()
             .map(Path::of)
-            .map(FileUtils::tryToRealPath);
+            .map(FileUtils::tryToRealPath)
+            .orElseThrow(() -> new IllegalStateException("Could not determine current binary path"));
+    }
+
+    private Path resolveCurrentJarPath() {
+        try {
+            return Path.of(
+                AstraCli.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI()
+            );
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Could not determine current JAR path: '" + e.getMessage() + ";", e);
+        }
     }
 
     public Path tryToRealPath(Path path) {

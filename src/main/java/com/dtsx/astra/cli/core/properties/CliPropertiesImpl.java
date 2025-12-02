@@ -1,15 +1,20 @@
 package com.dtsx.astra.cli.core.properties;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.properties.CliEnvironment.OS;
 import com.dtsx.astra.cli.utils.FileUtils;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Cleanup;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +50,7 @@ public class CliPropertiesImpl implements CliProperties {
         }
 
         props.cliName();
-        props.binaryPath();
+        props.cliPath(null);
         props.rcFileLocations(env.platform().os() == OS.WINDOWS);
         props.homeFolderLocations(env.platform().os() == OS.WINDOWS);
 
@@ -185,10 +190,9 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public String cliName() {
-        binaryPath().ifPresent((path) -> {
-            System.setProperty("cli.name", path.getFileName().toString());
-        });
-
+        if (cliPath(null) instanceof AstraBinary(var binaryPath)) {
+            System.setProperty("cli.name", binaryPath.getFileName().toString());
+        }
         return System.getProperty("cli.name", "astra");
     }
 
@@ -214,23 +218,30 @@ public class CliPropertiesImpl implements CliProperties {
     }
 
     @Override
-    public Optional<Path> binaryPath() {
-        val path = FileUtils.getCurrentBinaryPath();
-        path.ifPresent(value -> System.setProperty("cli.path", value.toString()));
-        return path;
+    public PathToAstra cliPath(@Nullable CliContext ctx) {
+        val path = FileUtils.resolvePathToAstra();
+
+        if (path instanceof AstraBinary(var binaryPath)) {
+            System.setProperty("cli.path", binaryPath.toString());
+        }
+
+        val fs = (ctx == null)
+            ? FileSystems.getDefault()
+            : ctx.fs();
+
+        return switch (path) {
+            case AstraBinary(var binaryPath) -> new AstraBinary(fs.getPath(binaryPath.toString()));
+            case AstraJar(var jarPath) -> new AstraJar(fs.getPath(jarPath.toString()));
+        };
     }
 
     @Override
     public Optional<SupportedPackageManager> owningPackageManager() {
-        return binaryPath().flatMap((binaryPath) -> {
-            if (binaryPath.startsWith("/nix/store/")) {
-                return Optional.of(SupportedPackageManager.NIX);
-            }
-            if (binaryPath.startsWith("/usr/local/") || binaryPath.startsWith("/opt/homebrew/")) {
-                return Optional.of(SupportedPackageManager.BREW);
-            }
-            return Optional.empty();
-        });
+        return switch (cliPath(null)) {
+            case AstraBinary(var binaryPath) when binaryPath.startsWith("/nix/store/") -> Optional.of(SupportedPackageManager.NIX);
+            case AstraBinary(var binaryPath) when binaryPath.startsWith("/usr/local/") || binaryPath.startsWith("/opt/homebrew/") -> Optional.of(SupportedPackageManager.BREW);
+            default -> Optional.empty();
+        };
     }
 
     protected final String requireProperty(String string) {

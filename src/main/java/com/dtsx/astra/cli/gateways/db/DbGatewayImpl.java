@@ -18,7 +18,7 @@ import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -80,17 +80,17 @@ public class DbGatewayImpl implements DbGateway {
 
         return switch (currentStatus) {
             case ACTIVE -> {
-                yield Pair.create(currentStatus, Duration.ZERO);
+                yield Pair.of(currentStatus, Duration.ZERO);
             }
             case HIBERNATED -> {
                 ctx.log().loading("Resuming database '%s'".formatted(ref), (_) -> {
                     resumeDbInternal(ref);
                     return null;
                 });
-                yield Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
+                yield Pair.of(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
             }
             case MAINTENANCE, INITIALIZING, PENDING, ASSOCIATING, RESUMING, UNPARKING -> {
-                yield Pair.create(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
+                yield Pair.of(currentStatus, timeout.map((t) -> waitUntilDbStatus(ref, ACTIVE, t)).orElse(Duration.ZERO));
             }
             default -> {
                 throw new UnexpectedDbStatusException(ref, currentStatus, expectedStatuses);

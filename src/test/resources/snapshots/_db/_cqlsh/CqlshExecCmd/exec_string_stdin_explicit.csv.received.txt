@@ -12,8 +12,8 @@ stderr: [INFO] Reading CQL statements from stdin...
 stderr: [INFO] Use backslashes for multi-line statements
 stdout: code,message,exit_code,stdout,stderr
 stdout: OK,"Cqlsh executed with exit code 1, with 0 lines in stdout and 29 lines in stderr.",1,,"Traceback (most recent call last):
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 88, in get_cloud_config
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 101, in read_cloud_config_from_zip
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 88, in get_cloud_config
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 101, in read_cloud_config_from_zip
 stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py"", line 1313, in __init__
 stdout:     self._RealGetContents()
 stdout:   File ""/opt/homebrew/Cellar/python@3.11/3.11.13_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/zipfile.py"", line 1380, in _RealGetContents
@@ -23,21 +23,21 @@ stdout:
 stdout: During handling of the above exception, another exception occurred:
 stdout: 
 stdout: Traceback (most recent call last):
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/dsecqlsh.py"", line 534, in <module>
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/dsecqlsh.py"", line 534, in <module>
 stdout:     cqlsh.main(*cqlsh.read_options(sys.argv[1:], os.environ))
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/cqlsh.py"", line 2616, in main
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/cqlsh.py"", line 2616, in main
 stdout:     shell = Shell(hostname,
 stdout:             ^^^^^^^^^^^^^^^
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/dsecqlsh.py"", line 367, in __init__
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/dsecqlsh.py"", line 367, in __init__
 stdout:     conn = cluster_factory(
 stdout:            ^^^^^^^^^^^^^^^^
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/../pylib/cqlshlib/driver.py"", line 90, in cluster_factory
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/../pylib/cqlshlib/driver.py"", line 90, in cluster_factory
 stdout:     return _cloud_cluster_factory(whitelist_lbp, **options)
 stdout:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/../pylib/cqlshlib/driver.py"", line 120, in _cloud_cluster_factory
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/../pylib/cqlshlib/driver.py"", line 120, in _cloud_cluster_factory
 stdout:     cluster = Cluster(**options)
 stdout:               ^^^^^^^^^^^^^^^^^^
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/cluster.py"", line 1125, in __init__
-stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 90, in get_cloud_config
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/cluster.py"", line 1125, in __init__
+stdout:   File ""/Users/me/work/astra-cli/.cli_tests_temp/java/cqlsh-astra@v1/6.8.0/bin/../zipfiles/cassandra-driver-internal-only-3.26.0-df103d3a.zip/cassandra-driver-3.26.0-df103d3a/cassandra/datastax/cloud/__init__.py"", line 90, in get_cloud_config
 stdout: ValueError: Unable to open the zip file for the cloud config. Check your secure connect bundle."
 ---- end ----

@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.testlib.laws.Idempotent;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
 import net.jqwik.api.*;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import picocli.CommandLine.Help.Ansi;
 
 import java.util.List;
@@ -91,10 +91,10 @@ public class StringUtilsTest {
             return Arbitraries.strings().excludeChars('\n').flatMap((targetIndent) -> {
                 val arb = Arbitraries.strings().excludeChars('\n').list()
                     .flatMapEach((_, elem) -> {
-                        return Arbitraries.integers().between(0, 50).map((initialIndent) -> Pair.create(elem.trim(), initialIndent));
+                        return Arbitraries.integers().between(0, 50).map((initialIndent) -> Pair.of(elem.trim(), initialIndent));
                     });
 
-                return arb.map((initialLines) -> Pair.create(targetIndent, initialLines));
+                return arb.map((initialLines) -> Pair.of(targetIndent, initialLines));
             });
         }
 
@@ -170,12 +170,12 @@ public class StringUtilsTest {
 
         @Provide
         private Arbitrary<Pair<String, Integer>> underLength() {
-            return Arbitraries.integers().between(0, 100).flatMap((maxLen) -> Arbitraries.strings().ofMaxLength(maxLen).map((str) -> Pair.create(str, maxLen)));
+            return Arbitraries.integers().between(0, 100).flatMap((maxLen) -> Arbitraries.strings().ofMaxLength(maxLen).map((str) -> Pair.of(str, maxLen)));
         }
 
         @Provide
         private Arbitrary<Pair<String, Integer>> overLength() {
-            return Arbitraries.integers().between(0, 100).flatMap((maxLen) -> Arbitraries.strings().ofMinLength(maxLen + 1).map((str) -> Pair.create(str, maxLen)));
+            return Arbitraries.integers().between(0, 100).flatMap((maxLen) -> Arbitraries.strings().ofMinLength(maxLen + 1).map((str) -> Pair.of(str, maxLen)));
         }
     }
 

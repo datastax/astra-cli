@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.nio.file.Path;

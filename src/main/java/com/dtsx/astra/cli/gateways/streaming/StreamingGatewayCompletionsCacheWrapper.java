@@ -10,7 +10,7 @@ import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 import java.util.SortedMap;

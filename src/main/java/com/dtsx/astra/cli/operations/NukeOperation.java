@@ -1,9 +1,14 @@
 package com.dtsx.astra.cli.operations;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.properties.CliProperties.AstraBinary;
+import com.dtsx.astra.cli.core.properties.CliProperties.AstraJar;
+import com.dtsx.astra.cli.core.properties.CliProperties.PathToAstra;
 import com.dtsx.astra.cli.core.properties.CliProperties.SupportedPackageManager;
 import com.dtsx.astra.cli.operations.NukeOperation.NukeResult;
+import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.JustCouldNot;
+import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.NeedsSudo;
+import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.UserChoseToKeep;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.io.file.PathUtils;
@@ -17,8 +22,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 
 @RequiredArgsConstructor
 public class NukeOperation implements Operation<NukeResult> {
@@ -42,12 +45,12 @@ public class NukeOperation implements Operation<NukeResult> {
         private Set<Path> shellRcFilesToUpdate;
         private Map<Path, SkipDeleteReason> skipped;
         private BinaryDeleteResult binaryDeleteResult;
-        private Path cliBinaryPath;
+        private PathToAstra cliPath;
     }
 
     public sealed interface BinaryDeleteResult {}
     public record BinaryOwnedByPackageManager(SupportedPackageManager packageManager) implements BinaryDeleteResult {}
-    public record BinaryMustBeDeleted(String deleteCommand) implements BinaryDeleteResult {}
+    public record CLIMustBeDeleted(String deleteCommand) implements BinaryDeleteResult {}
     public record BinaryNotWritable(Path path) implements BinaryDeleteResult {}
     public record BinaryDeleted() implements BinaryDeleteResult {}
 
@@ -83,8 +86,8 @@ public class NukeOperation implements Operation<NukeResult> {
             request.assertShouldNotUseWindowsUninstaller.run();
         }
 
-        val cliBinaryPath = Resolve.cliBinaryPath(ctx);
-        val cliName = Resolve.cliName(cliBinaryPath);
+        val cliPath = Resolve.cliPath(ctx);
+        val cliName = Resolve.cliName(cliPath);
 
         val astraHomes = Resolve.astraHomes(ctx);
         val astraRcs = Resolve.astraRcs(ctx);
@@ -97,44 +100,54 @@ public class NukeOperation implements Operation<NukeResult> {
             return !request.promptShouldDeleteAstrarc.apply(astraRcs, request.dryRun);
         });
 
-        val res = mkResult(cliBinaryPath, shellRcFiles);
+        val res = mkResult(cliPath, shellRcFiles);
 
         deleteAstraRcs(astraRcs, shouldPreserveAstraRcs, res);
-        deleteHomesAndBinary(cliBinaryPath, astraHomes, res);
+        deleteHomesAndBinary(cliPath, astraHomes, res);
 
         return res;
     }
 
-    private @NotNull NukeResult mkResult(Path cliBinaryPath, Set<Path> shellRcFiles) {
-        return new NukeResult(new LinkedHashSet<>(), shellRcFiles, new LinkedHashMap<>(), null, cliBinaryPath);
+    private @NotNull NukeResult mkResult(PathToAstra cliPath, Set<Path> shellRcFiles) {
+        return new NukeResult(new LinkedHashSet<>(), shellRcFiles, new LinkedHashMap<>(), null, cliPath);
     }
 
     private void deleteAstraRcs(List<Path> astraRcs, Boolean shouldPreserveAstraRcs, NukeResult res) {
         astraRcs.forEach((path) -> {
             if (shouldPreserveAstraRcs) {
-                res.skipped().put(path, new SkipDeleteReason.UserChoseToKeep());
+                res.skipped().put(path, new UserChoseToKeep());
             } else {
                 delete(path, res);
             }
         });
     }
 
-    private void deleteHomesAndBinary(Path cliBinaryPath, List<Path> homePaths, NukeResult res) {
+    private void deleteHomesAndBinary(PathToAstra cliPath, List<Path> homePaths, NukeResult res) {
         if (ctx.isWindows()) {
-            deleteHomesWindows(homePaths, cliBinaryPath, res);
+            deleteHomesWindows(homePaths, cliPath, res);
         } else {
             deleteHomesUnix(homePaths, res);
         }
 
-        val pm = ctx.properties().owningPackageManager();
+        var binDelRes = new Object() {
+            BinaryDeleteResult ref;
+        };
 
-        res.binaryDeleteResult(
-            (pm.isPresent())
-                ? new BinaryOwnedByPackageManager(pm.get()) :
-            (ctx.isWindows())
-                ? deleteBinaryWindows(homePaths, cliBinaryPath)
-                : deleteBinaryUnix(cliBinaryPath, res)
-        );
+        ctx.properties().owningPackageManager().ifPresent((pm) -> {
+            binDelRes.ref = new BinaryOwnedByPackageManager(pm);
+        });
+
+        if (binDelRes.ref == null) {
+            binDelRes.ref = switch (cliPath) {
+                case AstraJar(var jarPath) when ctx.isWindows() -> new CLIMustBeDeleted("del " + jarPath);
+                case AstraJar(var jarPath) -> new CLIMustBeDeleted("rm " + jarPath);
+                case AstraBinary bin -> (ctx.isWindows())
+                    ? deleteBinaryWindows(homePaths, bin)
+                    : deleteBinaryUnix(bin, res);
+            };
+        }
+
+        res.binaryDeleteResult(binDelRes.ref);
     }
 
     public void deleteHomesUnix(List<Path> homePaths, NukeResult res) {
@@ -143,33 +156,33 @@ public class NukeOperation implements Operation<NukeResult> {
         }
     }
 
-    public BinaryDeleteResult deleteBinaryUnix(Path cliBinaryPath, NukeResult res) {
-        if (!Files.exists(cliBinaryPath)) {
+    public BinaryDeleteResult deleteBinaryUnix(AstraBinary cliPath, NukeResult res) {
+        if (!Files.exists(cliPath.unwrap())) {
             return new BinaryDeleted();
         }
 
-        if (needsSudo(cliBinaryPath)) {
-            return new BinaryNotWritable(cliBinaryPath);
+        if (needsSudo(cliPath.unwrap())) {
+            return new BinaryNotWritable(cliPath.unwrap());
         }
 
-        delete(cliBinaryPath, res);
+        delete(cliPath.unwrap(), res);
 
-        return (Files.exists(cliBinaryPath) && !request.dryRun)
-            ? new BinaryMustBeDeleted("rm " + cliBinaryPath)
+        return (Files.exists(cliPath.unwrap()) && !request.dryRun)
+            ? new CLIMustBeDeleted("rm " + cliPath.unwrap())
             : new BinaryDeleted();
     }
 
-    public void deleteHomesWindows(List<Path> homePaths, Path cliBinaryPath, NukeResult res) {
+    public void deleteHomesWindows(List<Path> homePaths, PathToAstra cliPath, NukeResult res) {
         for (val folder : homePaths) {
             try {
-                if (cliBinaryPath.startsWith(folder)) {
+                if (cliPath.unwrap().startsWith(folder)) {
                     @Cleanup val astraHomeFiles = Files.list(folder);
                     astraHomeFiles.filter(f -> f.endsWith("cli")).forEach((f) -> delete(f, res));
                 } else {
                     delete(folder, res);
                 }
             } catch (IOException e) {
-                res.skipped().put(folder, new SkipDeleteReason.JustCouldNot(e.getMessage()));
+                res.skipped().put(folder, new JustCouldNot(e.getMessage()));
             }
         }
 
@@ -178,21 +191,21 @@ public class NukeOperation implements Operation<NukeResult> {
         }
     }
 
-    public BinaryDeleteResult deleteBinaryWindows(List<Path> homePaths, Path cliBinaryPath) {
+    public BinaryDeleteResult deleteBinaryWindows(List<Path> homePaths, AstraBinary cliPath) {
         val homeFolderWhichAstraIsRunningInside = homePaths.stream()
-            .filter(cliBinaryPath::startsWith)
+            .filter((folder) -> cliPath.unwrap().startsWith(folder))
             .findFirst();
 
-        return new BinaryMustBeDeleted(
+        return new CLIMustBeDeleted(
             (homeFolderWhichAstraIsRunningInside)
                 .map((folder) -> "rmdir /s /q " + folder)
-                .orElse("del " + cliBinaryPath)
+                .orElse("del " + cliPath.unwrap())
         );
     }
 
     private void delete(Path path, NukeResult res) {
         if (needsSudo(path)) {
-            res.skipped().put(path, new SkipDeleteReason.NeedsSudo());
+            res.skipped().put(path, new NeedsSudo());
             return;
         }
 
@@ -206,7 +219,7 @@ public class NukeOperation implements Operation<NukeResult> {
             }
             res.deletedFiles().add(path);
         } catch (Exception e) {
-            res.skipped().put(path, new SkipDeleteReason.JustCouldNot(e.getMessage()));
+            res.skipped().put(path, new JustCouldNot(e.getMessage()));
         }
     }
 
@@ -234,7 +247,7 @@ public class NukeOperation implements Operation<NukeResult> {
 
                 if (exitCode != 0) {
                     ctx.log().warn("Could not delete Windows registry key (exit code ", String.valueOf(exitCode), ")");
-                    res.skipped().put(registryKeyPath, new SkipDeleteReason.JustCouldNot("Registry key deletion failed with exit code " + exitCode));
+                    res.skipped().put(registryKeyPath, new JustCouldNot("Registry key deletion failed with exit code " + exitCode));
                     return;
                 }
             }
@@ -242,22 +255,14 @@ public class NukeOperation implements Operation<NukeResult> {
             res.deletedFiles().add(registryKeyPath);
         } catch (Exception e) {
             ctx.log().warn("Could not delete Windows registry key: ", e.getMessage());
-            res.skipped().put(registryKeyPath, new SkipDeleteReason.JustCouldNot(e.getMessage()));
+            res.skipped().put(registryKeyPath, new JustCouldNot(e.getMessage()));
         }
     }
 
     private static class Resolve {
-        private static Path cliBinaryPath(CliContext ctx) {
+        private static PathToAstra cliPath(CliContext ctx) {
             return ctx.log().loading("Resolving the binary's own path", (_) -> {
-                val binaryPath = ctx.properties().binaryPath();
-
-                if (binaryPath.isEmpty()) {
-                    throw new AstraCliException(UNSUPPORTED_EXECUTION, """
-                      @|bold,red Error: can not nuke the CLI when not running as a native image.|@
-                    """);
-                }
-
-                return binaryPath.get();
+                return ctx.properties().cliPath(ctx);
             });
         }
 
@@ -280,8 +285,11 @@ public class NukeOperation implements Operation<NukeResult> {
             }
         }
 
-        private static String cliName(Path cliBinaryPath) {
-            return PathUtils.getFileNameString(cliBinaryPath);
+        private static String cliName(PathToAstra cliPath) {
+            return switch (cliPath) {
+                case AstraBinary(var binaryPath) -> binaryPath.getFileName().toString();
+                case AstraJar _ -> "astra";
+            };
         }
 
         private static List<Path> astraHomes(CliContext ctx) {

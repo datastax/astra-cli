@@ -11,7 +11,7 @@ import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
 import com.dtsx.astra.cli.snapshot.annotations.TestForDifferentOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 import com.dtsx.astra.sdk.db.domain.Database;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
 
                 when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(6789));
 
-                when(mock.resume(any(), any())).thenReturn(Pair.create(ACTIVE, Duration.ZERO));
+                when(mock.resume(any(), any())).thenReturn(Pair.of(ACTIVE, Duration.ZERO));
             })
             .verify((mocks) -> {
                 verify(mocks.dbGateway()).findCloudForRegion(Optional.empty(), RegionName.mkUnsafe("us-east-1"), true);

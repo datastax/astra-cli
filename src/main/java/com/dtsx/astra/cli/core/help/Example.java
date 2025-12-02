@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.core.help;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.annotation.*;
 

@@ -42,7 +42,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
@@ -229,20 +229,20 @@ public class AstraCli extends AbstractCmd<Void> {
                     val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
                     if (!configFileExists) {
-                        return Pair.create("Setup the Astra CLI", "${cli.name} setup");
+                        return Pair.of("Setup the Astra CLI", "${cli.name} setup");
                     }
 
                     val autocompleteSetup = System.getenv(ConstEnvVars.COMPLETIONS_SETUP) != null;
 
                     if (!autocompleteSetup && ctx.isNotWindows()) {
-                        return Pair.create("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
+                        return Pair.of("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
                     }
                 } catch (Exception e) {
                     ctx.log().exception("Error resolving main example for AstraCli", e);
                 }
             }
 
-            return Pair.create("Create a new profile", "${cli.name} setup");
+            return Pair.of("Create a new profile", "${cli.name} setup");
         }
     }
 }

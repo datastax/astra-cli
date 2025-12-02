@@ -16,7 +16,7 @@ import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
 import com.dtsx.astra.cli.utils.DbUtils;
 import lombok.Cleanup;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 
@@ -65,7 +65,7 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
 
         val binary = getFromJunitStore(asBinaryName, ec).orElseGet(() -> {
             val downloaded = downloadBinary(asBinaryName, ec);
-            return addToJunitStore(Pair.create(downloaded, asBinaryName), ec);
+            return addToJunitStore(Pair.of(downloaded, asBinaryName), ec);
         });
 
         return switch (asBinaryName) {

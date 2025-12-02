@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 

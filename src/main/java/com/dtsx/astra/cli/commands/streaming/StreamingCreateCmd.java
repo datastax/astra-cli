@@ -14,7 +14,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingCreateOperation;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
@@ -114,7 +114,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<Strea
         return new StreamingCreateOperation(streamingGateway, new StreamingCreateRequest(
             $tenantName,
             ($tenantCreationOptions.$clusterOrCloud.$regionSpec != null)
-                ? Either.pure(Pair.create($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, $tenantCreationOptions.$clusterOrCloud.$regionSpec.$region))
+                ? Either.pure(Pair.of($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, $tenantCreationOptions.$clusterOrCloud.$regionSpec.$region))
                 : Either.left($tenantCreationOptions.$clusterOrCloud.$cluster.orElseThrow()),
             $tenantCreationOptions.$plan,
             $tenantCreationOptions.$userEmail,

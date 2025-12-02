@@ -4,7 +4,7 @@ import lombok.val;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.providers.ArbitraryProvider;
 import net.jqwik.api.providers.TypeUsage;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -24,7 +24,7 @@ public class PairProvider implements ArbitraryProvider {
         return subtypeProvider.apply(typeA).stream()
             .flatMap((arbA) ->
                 subtypeProvider.apply(typeB).stream().map((arbB) ->
-                    arbA.flatMap(a -> arbB.map(b -> Pair.create(a, b)))
+                    arbA.flatMap(a -> arbB.map(b -> Pair.of(a, b)))
                 )
             )
             .collect(Collectors.toSet());

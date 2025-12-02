@@ -9,7 +9,7 @@ import com.dtsx.astra.sdk.db.domain.Datacenter;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.jqwik.api.*;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -51,7 +51,7 @@ class DbUtilsTest {
         @Provide
         private Arbitrary<Pair<Database, RegionName>> withSomeRegion() {
             return Arbitraries.defaultFor(Database.class).map((db) -> {
-                return Pair.create(db, RegionName.mkUnsafe(db.getInfo().getDatacenters().stream().findFirst().orElseThrow().getRegion()));
+                return Pair.of(db, RegionName.mkUnsafe(db.getInfo().getDatacenters().stream().findFirst().orElseThrow().getRegion()));
             });
         }
 

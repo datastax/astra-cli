@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.core.output.prompters.builders;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.prompters.CLIPrompter;
 import lombok.RequiredArgsConstructor;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -76,7 +76,7 @@ public class PrompterBuilder {
         private final String fallback;
 
         public NeedsClearAfterSelection<T> fix(Iterable<String> originalArgs, String newArg) {
-            return new NeedsClearAfterSelection<>(defaultOption, mapper, echoOff, displayContentWhenDone, fallback, Pair.create(originalArgs, newArg));
+            return new NeedsClearAfterSelection<>(defaultOption, mapper, echoOff, displayContentWhenDone, fallback, Pair.of(originalArgs, newArg));
         }
     }
 

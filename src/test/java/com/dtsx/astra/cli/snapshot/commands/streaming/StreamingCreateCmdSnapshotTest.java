@@ -12,7 +12,7 @@ import com.dtsx.astra.cli.snapshot.annotations.TestForDifferentOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures.Regions;
 import com.dtsx.astra.cli.testlib.Fixtures.Tenants;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,7 +31,7 @@ public class StreamingCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
             .verify((mocks) -> {
                 verify(mocks.streamingGateway()).findCloudForRegion(Optional.of(CloudProvider.AWS), Regions.NAME);
 
-                verify(mocks.streamingGateway()).create(Tenants.Name, Either.pure(Pair.create(CloudProvider.AWS, Regions.NAME)), "serverless", null);
+                verify(mocks.streamingGateway()).create(Tenants.Name, Either.pure(Pair.of(CloudProvider.AWS, Regions.NAME)), "serverless", null);
             });
     }
 

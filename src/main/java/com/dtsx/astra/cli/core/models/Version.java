@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugExcep
 import com.dtsx.astra.cli.core.output.Highlightable;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -35,7 +35,7 @@ public class Version implements Highlightable, Comparable<Version> {
                 val preRelease = Optional.ofNullable(matcher.group(4))
                     .map((pr) -> {
                         val parts = pr.split("\\.");
-                        return Pair.create(parts[0].toLowerCase(), Integer.parseInt(parts[1]));
+                        return Pair.of(parts[0].toLowerCase(), Integer.parseInt(parts[1]));
                     });
 
                 return Either.pure(new Version(major, minor, patch, preRelease));

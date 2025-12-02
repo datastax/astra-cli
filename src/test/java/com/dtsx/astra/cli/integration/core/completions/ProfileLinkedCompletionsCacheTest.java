@@ -14,7 +14,7 @@ import com.dtsx.astra.cli.utils.JsonUtils;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.jqwik.api.*;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -182,7 +182,7 @@ public class ProfileLinkedCompletionsCacheTest {
 
         return new TestConfig(
             config,
-            Pair.create(
+            Pair.of(
                 profile,
                 new DefaultFile(profile.name().orElseThrow())
             )

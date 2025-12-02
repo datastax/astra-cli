@@ -18,7 +18,7 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -101,7 +101,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     }
 
     public final Pair<Profile, ProfileSource> profileAndSource() {
-        return Pair.create(profile(), profileSource());
+        return Pair.of(profile(), profileSource());
     }
 
     private ProfileSource profileSource() {
