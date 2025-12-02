@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
 import lombok.val;
 
-import java.io.File;
+import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -118,14 +118,29 @@ public abstract class Fixtures {
         Optional.empty()
     );
 
+    public static class Files {
+        public static final URL AstraTarGz = file("astra.tar.gz");
+        public static final URL AstraZip = file("astra.zip");
+        public static final URL CqlshTarGz = file("cqlsh.tar.gz");
+    }
+
     @SneakyThrows
     private static <T> T load(String resource, TypeReference<T> type) {
-        try (val is = Fixtures.class.getClassLoader().getResourceAsStream("serialized-fixtures" + File.separator + resource)) {
+        try (val is = Fixtures.class.getClassLoader().getResourceAsStream("fixtures/serialized/" + resource)) {
             if (is == null) {
                 throw new IllegalArgumentException("Resource not found: " + resource);
             }
-
             return JsonUtils.objectMapper().readValue(is, type);
         }
+    }
+
+    private static URL file(String name) {
+        val url = Fixtures.class.getClassLoader().getResource("fixtures/files/" + name);
+
+        if (url == null) {
+            throw new IllegalArgumentException("Resource not found: " + name);
+        }
+
+        return url;
     }
 }

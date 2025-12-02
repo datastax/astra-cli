@@ -7,7 +7,7 @@ stderr:
 stderr: This may be expected, but to avoid this error, pass the '--if-not-exists' flag to skip this error if the user already exists.
 stderr: 
 stderr: # Example fix:
-stderr: $ astra user invite alice@example.bob --roles R/W Svc Acct --if-not-exists
+stderr: $ astra user invite alice@example.bob --roles 'R/W Svc Acct' --if-not-exists
 stderr: 
 stderr: # See all existing users:
 stderr: $ astra user list

@@ -70,7 +70,7 @@ public class StreamingPulsarPathCmd extends AbstractStreamingCmd<PulsarPathRespo
           Please install @!pulsar!@ by running any pulsar command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize pulsar installations done outside of astra.|@
-        """.formatted(ctx.home().getDir()), List.of(
+        """.formatted(ctx.home().root()), List.of(
             new Hint("Example command to install pulsar:", "${cli.name} streaming pulsar version")
         ));
     }

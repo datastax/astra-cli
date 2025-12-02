@@ -35,7 +35,7 @@ public class CompletionsCacheTest {
             val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
             assertThat(primaryCacheFile).isNotEmptyFile(); // this also checks that the file exists and is a regular file
             assertThat(primaryCacheFile).hasFileName(cacheFileName);
-            assertThat(primaryCacheFile).hasParent(ctx.get().home().dirs().useCompletionsCache());
+            assertThat(primaryCacheFile).hasParent(ctx.get().home().dirs.completionsCache.use());
         }
 
         @Property

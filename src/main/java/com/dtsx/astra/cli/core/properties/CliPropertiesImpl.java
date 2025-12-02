@@ -55,17 +55,17 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public ExternalSoftware cqlsh() {
-        return new ExternalSoftware(requireProperty("cqlsh.url"), Version.mkUnsafe(requireProperty("cqlsh.version")));
+        return new ExternalSoftware(requireProperty("cqlsh.url"), requireProperty("cqlsh.version"));
     }
 
     @Override
     public ExternalSoftware dsbulk() {
-        return new ExternalSoftware(requireProperty("dsbulk.url"), Version.mkUnsafe(requireProperty("dsbulk.version")));
+        return new ExternalSoftware(requireProperty("dsbulk.url"), requireProperty("dsbulk.version"));
     }
 
     @Override
     public ExternalSoftware pulsar() {
-        return new ExternalSoftware(requireProperty("pulsar-shell.url"), Version.mkUnsafe(requireProperty("pulsar-shell.version")));
+        return new ExternalSoftware(requireProperty("pulsar-shell.url"), requireProperty("pulsar-shell.version"));
     }
 
     @Override

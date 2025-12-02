@@ -76,7 +76,7 @@ public abstract class AbstractPulsarExeOperation<Req> implements Operation<Pulsa
     protected Either<PulsarExecResult, Path> mkPulsarConfFile(TenantName tenantName) {
         val tenant = streamingGateway.findOne(tenantName);
 
-        val confFile = ctx.home().dirs().usePulsar(ctx.properties().pulsar().version()).resolve(
+        val confFile = ctx.home().dirs.pulsar(ctx.properties().pulsar().version()).use().resolve(
             "client-" + tenant.getCloudProvider() + "-" + tenant.getCloudRegion() + "-" + tenant.getTenantName() + ".conf"
         );
 

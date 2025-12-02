@@ -48,7 +48,7 @@ public class UpgradeOperation implements Operation<Unit> {
 
         val newExePath = downloadsGateway.downloadAstra(new ExternalSoftware(
             ctx.properties().cliGithubRepoUrl() + "/releases/download/v" + version + "/" + ctx.properties().cliName() + "-" + platform + (ctx.isWindows() ? ".zip" : ".tar.gz"),
-            version
+            version.toString()
         ));
 
         if (newExePath.isLeft()) {

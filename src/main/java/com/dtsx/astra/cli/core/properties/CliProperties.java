@@ -23,7 +23,7 @@ public interface CliProperties {
 
     record ExternalSoftware(
         String url,
-        Version version
+        String version // can't use Version here unfortunately b/c pulsar-shell doesn't use semver ._.
     ) {}
 
     enum PathLocationResolver { CUSTOM, XDG, HOME }

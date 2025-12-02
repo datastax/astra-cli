@@ -61,7 +61,7 @@ public class AstraLogger {
             this.sessionLogFile = () -> {
                 if (cachedLogFile.ref == null) {
                     val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(ZoneId.systemDefault()));
-                    cachedLogFile.ref = ctx().home().dirs().useLogs().resolve(timestamp + ".astra.log");
+                    cachedLogFile.ref = ctx().home().dirs.logs.use().resolve(timestamp + ".astra.log");
                 }
                 return cachedLogFile.ref;
             };
@@ -191,7 +191,7 @@ public class AstraLogger {
         }
         logsDumped = true;
 
-        deleteOldLogs(ctx().home().dirs().useLogs());
+        deleteOldLogs(ctx().home().dirs.logs.use());
 
         try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
             for (val line : accumulated) {

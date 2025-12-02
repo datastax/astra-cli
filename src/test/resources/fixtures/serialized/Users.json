@@ -1,0 +1,90 @@
+[
+  {
+    "UserID": "ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o",
+    "Email": "alice@example.bob",
+    "Status": "active",
+    "Roles": [
+      {
+        "ID": "b4ed0e9e-67e8-47b6-8b58-c6629be961a9",
+        "Name": "R/W Svc Acct",
+        "Policy": {
+          "description": "R/W Svc Acct",
+          "effect": "allow",
+          "resources": [
+            "drn:astra:org:__ORG_ID__",
+            "drn:astra:org:__ORG_ID__:db:*",
+            "drn:astra:org:__ORG_ID__:db:*:keyspace:*",
+            "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*"
+          ],
+          "actions": [
+            "accesslist-read",
+            "db-all-keyspace-describe",
+            "db-keyspace-describe",
+            "db-table-select",
+            "db-table-modify",
+            "db-table-describe",
+            "db-graphql",
+            "db-rest",
+            "db-cql"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "UserID": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
+    "Email": "example@bob.alice",
+    "Status": "invited",
+    "Roles": [
+      {
+        "ID": "b4ed0e9e-67e8-47b6-8b58-c6629be961a9",
+        "Name": "R/W Svc Acct",
+        "Policy": {
+          "description": "R/W Svc Acct",
+          "effect": "allow",
+          "resources": [
+            "drn:astra:org:__ORG_ID__",
+            "drn:astra:org:__ORG_ID__:db:*",
+            "drn:astra:org:__ORG_ID__:db:*:keyspace:*",
+            "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*"
+          ],
+          "actions": [
+            "accesslist-read",
+            "db-all-keyspace-describe",
+            "db-keyspace-describe",
+            "db-table-select",
+            "db-table-modify",
+            "db-table-describe",
+            "db-graphql",
+            "db-rest",
+            "db-cql"
+          ]
+        }
+      },
+      {
+        "ID": "16a4b1d7-a615-41f8-95ca-52b0280f4d77",
+        "Name": "RO Svc Acct",
+        "Policy": {
+          "description": "RO Svc Acct",
+          "effect": "allow",
+          "resources": [
+            "drn:astra:org:__ORG_ID__",
+            "drn:astra:org:__ORG_ID__:db:*",
+            "drn:astra:org:__ORG_ID__:db:*:keyspace:*",
+            "drn:astra:org:__ORG_ID__:db:*:keyspace:*:table:*"
+          ],
+          "actions": [
+            "accesslist-read",
+            "db-all-keyspace-describe",
+            "db-keyspace-describe",
+            "db-table-select",
+            "db-table-describe",
+            "db-graphql",
+            "db-rest",
+            "db-cql"
+          ]
+        }
+      }
+    ]
+  }
+]

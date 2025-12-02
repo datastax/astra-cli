@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -45,7 +46,7 @@ public class Version implements Highlightable, Comparable<Version> {
     }
 
     public static Version mkUnsafe(String version) {
-        return parse(version).getRight();
+        return parse(version).getRight((_) -> new CongratsYouFoundABugException("Invalid version: " + version));
     }
 
     public boolean isPreRelease() {

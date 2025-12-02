@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -60,20 +59,27 @@ public class FileUtils {
             throw new CannotCreateFileException(path, extra, e);
         }
     }
-    
+
     @SneakyThrows
-    public static void downloadFile(String urlStr, Path path) {
-        val urlConnection = (HttpURLConnection) new URI(urlStr).toURL().openConnection();
-        val buffer = new byte[1024];
+    public static Path downloadFile(String urlStr, Path installDir, @Nullable String fileName) {
+        if (fileName == null) {
+            fileName = installDir.getFileSystem().getPath(new URI(urlStr).getPath()).getFileName().toString();
+        }
+
+        val targetPath = installDir.resolve(fileName);
+
+        val urlConnection = new URI(urlStr).toURL().openConnection();
+        val buffer = new byte[8192];
 
         @Cleanup val bis = new BufferedInputStream(urlConnection.getInputStream());
-        @Cleanup val fis = Files.newOutputStream(path);
+        @Cleanup val fos = Files.newOutputStream(targetPath);
 
         int count;
-
-        while ((count = bis.read(buffer, 0, 1024)) != -1) {
-            fis.write(buffer, 0, count);
+        while ((count = bis.read(buffer)) != -1) {
+            fos.write(buffer, 0, count);
         }
+
+        return targetPath;
     }
 
     @SneakyThrows

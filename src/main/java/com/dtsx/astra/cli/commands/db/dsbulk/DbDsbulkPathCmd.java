@@ -69,7 +69,7 @@ public class DbDsbulkPathCmd extends AbstractDbCmd<DsbulkPathResponse> {
           Please install @!dsbulk!@ by running any dsbulk command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize dsbulk installations done outside of astra.|@
-        """.formatted(ctx.home().getDir()), List.of(
+        """.formatted(ctx.home().root()), List.of(
             new Hint("Example command to install dsbulk (no --if-exists flag):", "${cli.name} db dsbulk path")
         ));
     }

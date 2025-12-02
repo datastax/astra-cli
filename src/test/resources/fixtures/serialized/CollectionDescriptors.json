@@ -1,0 +1,38 @@
+[
+  {
+    "name": "test_coll",
+    "options": {
+      "defaultId": null,
+      "indexing": null,
+      "vector": {
+        "dimension": 5,
+        "metric": "cosine",
+        "service": null
+      },
+      "lexical": {
+        "enabled": false,
+        "analyzer": null
+      },
+      "rerank": {
+        "enabled": false,
+        "service": null
+      }
+    }
+  },
+  {
+    "name": "other_coll",
+    "options": {
+      "defaultId": { "type": "UUIDV6" },
+      "indexing": null,
+      "vector": null,
+      "lexical": {
+        "enabled": false,
+        "analyzer": null
+      },
+      "rerank": {
+        "enabled": false,
+        "service": null
+      }
+    }
+  }
+]

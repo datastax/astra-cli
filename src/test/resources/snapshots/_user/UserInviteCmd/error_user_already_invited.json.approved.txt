@@ -8,7 +8,7 @@ stdout:   "message" : "Error: User 'alice@example.bob' already exists in this or
 stdout:   "data" : null,
 stdout:   "nextSteps" : [ {
 stdout:     "comment" : "Example fix:",
-stdout:     "command" : "astra user invite alice@example.bob --roles R/W Svc Acct -o json --if-not-exists"
+stdout:     "command" : "astra user invite alice@example.bob --roles 'R/W Svc Acct' -o json --if-not-exists"
 stdout:   }, {
 stdout:     "comment" : "See all existing users:",
 stdout:     "command" : "astra user list"
