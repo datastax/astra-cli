@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -15,16 +16,7 @@ import java.util.Optional;
 import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
 
 @Accessors(fluent = true)
-public class CommonOptions {
-    @Option(
-        names = { "-h", "--help" },
-        description = "Show this help message and exit.",
-        showDefaultValue = Visibility.NEVER,
-        usageHelp = true,
-        hidden = true
-    )
-    private boolean helpRequested; // unfortunately mixins not allowed in arg groups :(
-
+public class CommonOptions extends HelpMixin { // I don't like extending here but mixins don't compose w/ arg groups :(
     @Getter
     private Optional<Ansi> ansi = Optional.empty();
 
