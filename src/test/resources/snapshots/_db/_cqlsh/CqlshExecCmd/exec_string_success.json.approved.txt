@@ -1,13 +1,11 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db CONSISTENCY -o json
+command: astra db cqlsh exec two_regions_db -e CONSISTENCY -o json
 exit_code: 0
 comments: 
  | Can't really test human output since we don't capture cqlsh output for human outputs
  | But at least we can verify the command runs and the exit code is correct
  | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
 ---- output ----
-stderr: [WARNING] Providing the CQL statement as a positional parameter is deprecated and will be removed in future versions.
-stderr: [WARNING] Please use the 'astra db cqlsh exec -e "CQL STATEMENT"' syntax instead.
 stdout: {
 stdout:   "code" : "OK",
 stdout:   "message" : "Cqlsh executed with exit code 0, with 1 lines in stdout and 0 lines in stderr.",

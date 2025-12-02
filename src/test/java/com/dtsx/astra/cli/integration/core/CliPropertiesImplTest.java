@@ -55,7 +55,7 @@ public class CliPropertiesImplTest {
             val dsbulk = cliProps.dsbulk();
 
             assertThat(dsbulk.url()).isEqualTo("<dsbulk_url>");
-            assertThat(dsbulk.version()).isEqualTo("6.5.4");
+            assertThat(dsbulk.version()).isEqualTo("v6.5.4");
         }
 
         @Test

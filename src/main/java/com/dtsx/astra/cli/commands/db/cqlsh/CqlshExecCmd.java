@@ -38,6 +38,8 @@ public class CqlshExecCmd extends CqlshStartImpl {
         @Option(
             names = { "-e", "--execute" },
             description = "Execute the statement then exit",
+            fallbackValue = "-",
+            arity = "0..1",
             paramLabel = "STATEMENT"
         )
         public Optional<String> $statement = Optional.empty();

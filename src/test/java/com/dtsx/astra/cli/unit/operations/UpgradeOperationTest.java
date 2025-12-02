@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -147,6 +148,7 @@ public class UpgradeOperationTest {
             .isEqualTo(ExitCode.UNSUPPORTED_EXECUTION);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private CliContext mkCtx(String version, SupportedPackageManager pm) throws Exception {
         val binaryPath = testCtx.get().path("/usr/local/bin/astra");
         Files.createDirectories(binaryPath.getParent());
@@ -156,7 +158,7 @@ public class UpgradeOperationTest {
         val mockProperties = mock(CliProperties.class);
 
         when(mockProperties.version()).thenReturn(Version.mkUnsafe(version));
-        when(mockProperties.cliPath(originalCtx)).thenReturn(new AstraBinary(binaryPath));
+        when(mockProperties.cliPath(any())).thenReturn(new AstraBinary(binaryPath));
         when(mockProperties.owningPackageManager()).thenReturn(Optional.ofNullable(pm));
 
         return originalCtx.withProperties(mockProperties);

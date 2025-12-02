@@ -1,13 +1,11 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db - -o csv
+command: astra db cqlsh exec two_regions_db -e - -o csv
 exit_code: 0
 comments: 
  | Can't really test human output since we don't capture cqlsh output for human outputs
  | But at least we can verify the command runs and the exit code is correct
  | (human output returns cqlsh exit code; non-human output returns the cqlsh exit code via a field)
 ---- output ----
-stderr: [WARNING] Providing the CQL statement as a positional parameter is deprecated and will be removed in future versions.
-stderr: [WARNING] Please use the 'astra db cqlsh exec -e "CQL STATEMENT"' syntax instead.
 stderr: [INFO] Reading CQL statements from stdin...
 stderr: [INFO] Use backslashes for multi-line statements
 stdout: code,message,exit_code,stdout,stderr

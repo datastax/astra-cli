@@ -1,9 +1,7 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db CONSISTENCY
+command: astra db cqlsh exec two_regions_db -e CONSISTENCY
 exit_code: 2
 ---- output ----
-stderr: [WARNING] Providing the CQL statement as a positional parameter is deprecated and will be removed in future versions.
-stderr: [WARNING] Please use the 'astra db cqlsh exec -e "CQL STATEMENT"' syntax instead.
 stderr: Error: A database named 'two_regions_db' could not be found.
 stderr: 
 stderr: Please ensure that:
