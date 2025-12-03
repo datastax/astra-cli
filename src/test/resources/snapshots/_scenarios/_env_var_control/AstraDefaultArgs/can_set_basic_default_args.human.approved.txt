@@ -1,0 +1,118 @@
+---- meta ----
+command: astra --verbose -o json db list
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "id" : "8d770448-20c1-47f0-bb76-96d0d1a66b7f",
+stdout:     "orgId" : "8c731576-345b-4bd9-bde1-798dcca0e5f8",
+stdout:     "ownerId" : "BOjPpMRcaWergiKIyHXEAymP",
+stdout:     "creationTime" : "2025-06-17T02:28:00Z",
+stdout:     "terminationTime" : "0001-01-01T00:00:00Z",
+stdout:     "lastUsageTime" : "2025-08-21T20:40:56Z",
+stdout:     "info" : {
+stdout:       "name" : "hi",
+stdout:       "keyspace" : "default_keyspace",
+stdout:       "dbType" : "vector",
+stdout:       "keyspaces" : [ "default_keyspace", "other_keyspace" ],
+stdout:       "datacenters" : [ ],
+stdout:       "cloudProvider" : "GCP",
+stdout:       "tier" : "serverless",
+stdout:       "capacityUnits" : 1,
+stdout:       "region" : "us-east1",
+stdout:       "additionalKeyspaces" : [ "other_keyspace" ]
+stdout:     },
+stdout:     "status" : "ACTIVE",
+stdout:     "observedStatus" : "ACTIVE",
+stdout:     "storage" : {
+stdout:       "nodeCount" : 3,
+stdout:       "replicationFactor" : 1,
+stdout:       "totalStorage" : 5,
+stdout:       "usedStorage" : 0
+stdout:     },
+stdout:     "cost" : {
+stdout:       "costPerMinCents" : 0.0,
+stdout:       "costPerHourCents" : 0.0,
+stdout:       "costPerDayCents" : 0.0,
+stdout:       "costPerMonthCents" : 0.0,
+stdout:       "costPerMinMRCents" : 0.0,
+stdout:       "costPerHourMRCents" : 0.0,
+stdout:       "costPerDayMRCents" : 0.0,
+stdout:       "costPerMonthMRCents" : 0.0,
+stdout:       "costPerMinParkedCents" : 0.0,
+stdout:       "costPerHourParkedCents" : 0.0,
+stdout:       "costPerDayParkedCents" : 0.0,
+stdout:       "costPerMonthParkedCents" : 0.0,
+stdout:       "costPerNetworkGbCents" : 0.0,
+stdout:       "costPerWrittenGbCents" : 0.1,
+stdout:       "costPerReadGbCents" : 0.1
+stdout:     },
+stdout:     "metrics" : {
+stdout:       "writeRequestsTotalCount" : 0,
+stdout:       "readRequestsTotalCount" : 0,
+stdout:       "liveDataSizeBytes" : 0,
+stdout:       "errorsTotalCount" : 0
+stdout:     },
+stdout:     "availableActions" : [ "addDatacenters", "addKeyspace", "cloneDatabaseFromSnapshot", "getCreds", "getVectorAgentConfig", "hibernate", "migrate", "migrateServerlessTenant", "removeKeyspace", "setEngineType", "suspend", "terminate", "terminateDatacenter", "updateVectorAgent" ],
+stdout:     "grafanaUrl" : "https://8d770448-20c1-47f0-bb76-96d0d1a66b7f-us-east1.dashboard.astra.datastax.com/d/cloud/dse-cluster-condensed?refresh=30s&orgId=1&kiosk=tv",
+stdout:     "cqlshUrl" : "https://8d770448-20c1-47f0-bb76-96d0d1a66b7f-us-east1.apps.astra.datastax.com/cqlsh",
+stdout:     "graphqlUrl" : "https://8d770448-20c1-47f0-bb76-96d0d1a66b7f-us-east1.apps.astra.datastax.com/api/graphql",
+stdout:     "dataEndpointUrl" : "https://8d770448-20c1-47f0-bb76-96d0d1a66b7f-us-east1.apps.astra.datastax.com/api/rest"
+stdout:   }, {
+stdout:     "id" : "822b0fff-6a73-4322-a8ec-09832b075287",
+stdout:     "orgId" : "8c731576-345b-4bd9-bde1-798dcca0e5f8",
+stdout:     "ownerId" : "ef4f3478-7ee3-457e-8821-b1b4599691b3",
+stdout:     "creationTime" : "2025-08-21T20:26:03Z",
+stdout:     "terminationTime" : "0001-01-01T00:00:00Z",
+stdout:     "lastUsageTime" : "2025-08-21T20:30:11Z",
+stdout:     "info" : {
+stdout:       "name" : "two_regions_db",
+stdout:       "keyspace" : "default_keyspace",
+stdout:       "dbType" : "vector",
+stdout:       "keyspaces" : [ "default_keyspace" ],
+stdout:       "datacenters" : [ ],
+stdout:       "cloudProvider" : "AWS",
+stdout:       "tier" : "serverless",
+stdout:       "capacityUnits" : 1,
+stdout:       "region" : "us-east-2"
+stdout:     },
+stdout:     "status" : "ACTIVE",
+stdout:     "observedStatus" : "ACTIVE",
+stdout:     "storage" : {
+stdout:       "nodeCount" : 6,
+stdout:       "replicationFactor" : 1,
+stdout:       "totalStorage" : 5,
+stdout:       "usedStorage" : 0
+stdout:     },
+stdout:     "cost" : {
+stdout:       "costPerMinCents" : 0.0,
+stdout:       "costPerHourCents" : 0.0,
+stdout:       "costPerDayCents" : 0.0,
+stdout:       "costPerMonthCents" : 0.0,
+stdout:       "costPerMinMRCents" : 0.0,
+stdout:       "costPerHourMRCents" : 0.0,
+stdout:       "costPerDayMRCents" : 0.0,
+stdout:       "costPerMonthMRCents" : 0.0,
+stdout:       "costPerMinParkedCents" : 0.0,
+stdout:       "costPerHourParkedCents" : 0.0,
+stdout:       "costPerDayParkedCents" : 0.0,
+stdout:       "costPerMonthParkedCents" : 0.0,
+stdout:       "costPerNetworkGbCents" : 0.0,
+stdout:       "costPerWrittenGbCents" : 0.1,
+stdout:       "costPerReadGbCents" : 0.1
+stdout:     },
+stdout:     "metrics" : {
+stdout:       "writeRequestsTotalCount" : 0,
+stdout:       "readRequestsTotalCount" : 0,
+stdout:       "liveDataSizeBytes" : 0,
+stdout:       "errorsTotalCount" : 0
+stdout:     },
+stdout:     "availableActions" : [ "addDatacenters", "addKeyspace", "cloneDatabaseFromSnapshot", "getCreds", "getVectorAgentConfig", "hibernate", "migrate", "migrateServerlessTenant", "removeKeyspace", "setEngineType", "suspend", "terminate", "terminateDatacenter", "updateVectorAgent" ],
+stdout:     "grafanaUrl" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.dashboard.astra.datastax.com/d/cloud/dse-cluster-condensed?refresh=30s&orgId=1&kiosk=tv",
+stdout:     "cqlshUrl" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra.datastax.com/cqlsh",
+stdout:     "graphqlUrl" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra.datastax.com/api/graphql",
+stdout:     "dataEndpointUrl" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra.datastax.com/api/rest"
+stdout:   } ]
+stdout: }
+---- end ----

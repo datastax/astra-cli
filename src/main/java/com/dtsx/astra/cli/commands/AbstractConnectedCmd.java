@@ -4,12 +4,6 @@ import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.CustomFile
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.DefaultFile;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.Forced;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.FromArgs;
-import com.dtsx.astra.cli.core.CliConstants.$ConfigFile;
-import com.dtsx.astra.cli.core.CliConstants.$Env;
-import com.dtsx.astra.cli.core.CliConstants.$Profile;
-import com.dtsx.astra.cli.core.CliConstants.$Token;
-import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
@@ -20,9 +14,9 @@ import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
-import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -34,50 +28,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     @ArgGroup(heading = "%nConnection Options:%n", order = 100)
-    private @Nullable CredsProvider $credsProvider;
-
-    public static class CredsProvider {
-        @ArgGroup(exclusive = false)
-        public @Nullable ConfigSpec $config;
-
-        @ArgGroup(exclusive = false)
-        public @Nullable CredsSpec $creds;
-    }
-
-    public static class CredsSpec {
-        @Option(
-            names = { $Token.LONG },
-            description = "The astra token to use for this command. Use the @|code --token @file|@ syntax to read the token from a file, to avoid potential leaks.",
-            paramLabel = $Token.LABEL,
-            required = true
-        )
-        public AstraToken $token;
-
-        @Option(
-            names = { $Env.LONG },
-            completionCandidates = AstraEnvCompletion.class,
-            description = "Override the target astra environment",
-            paramLabel = $Env.LABEL
-        )
-        private Optional<AstraEnvironment> $env;
-    }
-
-    public static class ConfigSpec {
-        @Option(
-            names = { $ConfigFile.LONG, $ConfigFile.SHORT },
-            description = { "The @|code .astrarc|@ file to use for this command", SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" },
-            paramLabel = $ConfigFile.LABEL
-        )
-        private Optional<Path> $configFile;
-
-        @Option(
-            names = { $Profile.LONG, $Profile.SHORT },
-            completionCandidates = AvailableProfilesCompletion.class,
-            description = "The @|code .astrarc|@ profile to use for this command. Can be set via @|code " + ConstEnvVars.PROFILE + "|@.",
-            paramLabel = $Profile.LABEL
-        )
-        public Optional<ProfileName> $profileName;
-    }
+    private ConnectionOptions $connOpts = ConnectionOptions.EMPTY;
 
     private @Nullable ProfileSource cachedProfileSource;
     private @Nullable Profile cachedProfile;
@@ -87,6 +38,24 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         record FromArgs(AstraToken token, Optional<AstraEnvironment> env) implements ProfileSource {}
         record CustomFile(Path path, ProfileName profile) implements ProfileSource {}
         record DefaultFile(ProfileName profile) implements ProfileSource {}
+    }
+
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        super.prelude();
+        $connOpts = mergeConnectionOptions();
+    }
+
+    private ConnectionOptions mergeConnectionOptions() {
+        var opts = $connOpts;
+
+        for (var spec = this.spec.parent(); spec != null; spec = spec.parent()) {
+            if (spec.userObject() instanceof AbstractConnectedCmd<?> cmd) {
+                opts = opts.merge(cmd.$connOpts);
+            }
+        }
+
+        return opts;
     }
 
     public final Profile profile() {
@@ -115,21 +84,21 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             return new Forced(ctx.forceProfileForTesting().get());
         }
 
-        if ($credsProvider != null && $credsProvider.$creds != null) {
-            return new FromArgs($credsProvider.$creds.$token, $credsProvider.$creds.$env);
+        if ($connOpts.$creds != null) {
+            return new FromArgs($connOpts.$creds.$token, $connOpts.$creds.$env);
         }
 
         val defaultFilePath = AstraConfig.resolveDefaultAstraConfigFile(ctx);
 
-        if ($credsProvider != null && $credsProvider.$config != null) {
-            val configFile = $credsProvider.$config.$configFile;
+        if ($connOpts.$config != null) {
+            val configFile = $connOpts.$config.$configFile;
 
             val defaultProfileName = Optional.ofNullable(System.getenv(ConstEnvVars.PROFILE))
                  .map(ProfileName::parse)
                  .map((p) -> p.getRight((e) -> new AstraCliException(PARSE_ISSUE, "Invalid profile name in " + ConstEnvVars.PROFILE + ": '" + e + "'")))
                  .orElse(ProfileName.DEFAULT);
 
-            val profileName = $credsProvider.$config.$profileName
+            val profileName = $connOpts.$config.$profileName
                 .orElse(defaultProfileName);
 
             // the check for if it's the default file is later used to decide whether to update the completions cache or not

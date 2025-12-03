@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Help.Visibility;
@@ -16,11 +16,14 @@ import java.util.Optional;
 import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
 
 @Accessors(fluent = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class CommonOptions extends HelpMixin { // I don't like extending here but mixins don't compose w/ arg groups :(
-    @Getter
-    private Optional<Ansi> ansi = Optional.empty();
+    public static CommonOptions EMPTY = new CommonOptions();
 
     public enum ColorMode { auto, never, always }
+
+    private Optional<Ansi> ansi = Optional.empty();
 
     @Option(
         names = "--color",
@@ -48,42 +51,35 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     @Option(
         names = { "--output", "-o" },
         completionCandidates = OutputTypeCompletion.class,
-        defaultValue = "human",
-        description = "One of: ${COMPLETION-CANDIDATES}",
+        description = { "One of: ${COMPLETION-CANDIDATES}", SHOW_CUSTOM_DEFAULT + "human" },
         paramLabel = "FORMAT"
     )
-    @Getter
-    private OutputType outputType;
+    private Optional<OutputType> outputType = Optional.empty();
 
-    @Getter
     @Option(
         names = { "-V", "--verbose" },
         description = "Enable verbose logging output",
         showDefaultValue = Visibility.NEVER
     )
-    private boolean verbose;
+    private Optional<Boolean> verbose = Optional.empty();
 
-    @Getter
     @Option(
         names = { "-q", "--quiet" },
         description = "Only output essential information",
         showDefaultValue = Visibility.NEVER
     )
-    private boolean quiet;
+    private Optional<Boolean> quiet = Optional.empty();
 
-    @Getter
     @Option(
         names = { "--spinner" },
         description = { "Enable/disable loading spinners", SHOW_CUSTOM_DEFAULT + "enabled if tty and not quiet" },
         negatable = true,
         fallbackValue = "true"
     )
-    private Optional<Boolean> enableSpinner;
+    private Optional<Boolean> enableSpinner = Optional.empty();
 
-    @Getter
-    private boolean shouldDumpLogs = false;
+    private Optional<Boolean> shouldDumpLogs = Optional.empty();
 
-    @Getter
     private Optional<Path> dumpLogsTo = Optional.empty();
 
     @Option(
@@ -96,10 +92,10 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
     private void setDumpLogs(Optional<Path> dest) {
         dest.ifPresent((path) -> {
             if (path.toString().equalsIgnoreCase("false")) {
-                shouldDumpLogs = false;
+                shouldDumpLogs = Optional.of(false);
                 dumpLogsTo = Optional.empty();
             } else {
-                shouldDumpLogs = true;
+                shouldDumpLogs = Optional.of(true);
 
                 if (!path.toString().equalsIgnoreCase("__fallback__")) {
                     dumpLogsTo = Optional.of(path);
@@ -113,18 +109,65 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
         hidden = true
     )
     private void setDumpLogs(boolean noDumpLogs) {
-        if (noDumpLogs) {
-            shouldDumpLogs = false;
-        } else {
-            throw new OptionValidationException("--no-dump-logs", "--no-dump-logs must be called without a value (or with 'true'); use --dump-logs[=FILE] instead");
-        }
+        shouldDumpLogs = Optional.of(!noDumpLogs);
+        dumpLogsTo = Optional.empty();
     }
 
-    @Getter
     @Option(
         names = "--no-input",
         description = "Don't ask for user input (e.g. confirmation prompts)",
         showDefaultValue = Visibility.NEVER
     )
-    private boolean noInput;
+    private Optional<Boolean> noInput = Optional.empty();
+
+    public Optional<Ansi> ansi() {
+        return ansi;
+    }
+
+    public OutputType outputType() {
+        return outputType.orElse(OutputType.HUMAN);
+    }
+
+    public boolean verbose() {
+        return verbose.orElse(false);
+    }
+
+    public boolean quiet() {
+        return quiet.orElse(false);
+    }
+
+    public Optional<Boolean> enableSpinner() {
+        return enableSpinner;
+    }
+
+    public boolean shouldDumpLogs() {
+        return shouldDumpLogs.orElse(false);
+    }
+
+    public Optional<Path> dumpLogsTo() {
+        return dumpLogsTo;
+    }
+
+    public boolean noInput() {
+        return noInput.orElse(false);
+    }
+
+    public CommonOptions merge(CommonOptions other) {
+        if (this == EMPTY) {
+            return other;
+        }
+        if (other == EMPTY) {
+            return this;
+        }
+        return new CommonOptions(
+            (this.ansi.isPresent()) ? this.ansi : other.ansi,
+            (this.outputType.isPresent()) ? this.outputType : other.outputType,
+            (this.verbose.isPresent()) ? this.verbose : other.verbose,
+            (this.quiet.isPresent()) ? this.quiet : other.quiet,
+            (this.enableSpinner.isPresent()) ? this.enableSpinner : other.enableSpinner,
+            (this.shouldDumpLogs.isPresent()) ? this.shouldDumpLogs : other.shouldDumpLogs,
+            (this.dumpLogsTo.isPresent()) ? this.dumpLogsTo : other.dumpLogsTo,
+            (this.noInput.isPresent()) ? this.noInput : other.noInput
+        );
+    }
 }

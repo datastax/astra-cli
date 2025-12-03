@@ -200,6 +200,7 @@ public class AstraCli extends AbstractCmd<Void> {
         });
 
         val allArgs = ArrayUtils.addAll(defaultArgs(), args);
+
         return cmd.execute(allArgs);
     }
 

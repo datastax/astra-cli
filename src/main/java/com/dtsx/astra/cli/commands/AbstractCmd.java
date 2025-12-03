@@ -54,7 +54,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)
-    public CommonOptions common = new CommonOptions();
+    public CommonOptions common = CommonOptions.EMPTY;
 
     protected OutputAll execute(Supplier<OpRes> _result) {
         val otherTypes = Arrays.stream(OutputType.values()).filter(o -> o != ctx.outputType()).map(o -> o.name().toLowerCase()).toList();
@@ -105,6 +105,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             throw new CongratsYouFoundABugException("initCtx(...) was not called before run()");
         }
 
+        val common = mergeCommonOptions();
+
         val ansi = common.ansi().orElse(
             (common.outputType().isHuman())
                 ? ctx.colors().ansi()
@@ -131,6 +133,18 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.upgradeNotifier(),
             ctx.forceProfileForTesting()
         ));
+    }
+
+    private CommonOptions mergeCommonOptions() {
+        var common = this.common;
+
+        for (var spec = this.spec.parent(); spec != null; spec = spec.parent()) {
+            if (spec.userObject() instanceof AbstractCmd<?> cmd) {
+                common = common.merge(cmd.common);
+            }
+        }
+
+        return common;
     }
 
     @VisibleForTesting
