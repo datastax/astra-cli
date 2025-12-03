@@ -53,6 +53,7 @@ jobs:
       build-native: ${{ !inputs.jar-only }}
 
   update-install-scripts:
+    if: ${{ !inputs.jar-only }}
     needs: build
     uses: ./.github/workflows/update-install-scripts.yml
     permissions:
