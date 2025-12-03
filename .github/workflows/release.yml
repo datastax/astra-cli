@@ -68,6 +68,9 @@ jobs:
     permissions:
       contents: write
 
+    # https://github.com/actions/runner/issues/491#issuecomment-850884422
+    if: always() && (needs.update-install-scripts.result == 'success' || needs.update-install-scripts.result == 'skipped')
+
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
