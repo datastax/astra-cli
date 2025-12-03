@@ -7,7 +7,7 @@ on:
         required: false
         type: boolean
         default: true
-      build-all-platforms:
+      build-native:
         description: 'Build for all platforms'
         required: false
         type: boolean
@@ -18,10 +18,11 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-native:
+    if: ${{ github.event_name != 'push' && inputs.build-native == true }}
     strategy:
       matrix:
-        os: ${{ inputs.build-all-platforms == true && fromJSON('["ubuntu-24.04", "windows-2022", "ubuntu-24.04-arm", "macos-15-intel", "macos-14"]') || fromJSON('["ubuntu-24.04"]') }}
+        os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-15-intel, macos-14 ]
         include:
           - os: ubuntu-24.04
             artifact-name: astra-cli-linux-x86_64
@@ -74,3 +75,25 @@ jobs:
           path: build/distributions/*.${{ matrix.artifact-type }}*
           if-no-files-found: error
           retention-days: 7
+
+  build-jar:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Build JAR
+        run: ./gradlew fatJar -Pprod
+
+      - name: Upload JAR artifact
+        if: inputs.upload-artifacts == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: astra-cli-fat-jar
+          path: build/libs/astra-fat.jar

@@ -386,7 +386,7 @@ tasks.register<Jar>("fatJar") {
     dependsOn(configurations.runtimeClasspath)
     dependsOn("createDynamicProperties")
 
-    archiveFileName.set("fat.jar")
+    archiveFileName.set("astra-fat.jar")
     archiveVersion.set(project.version.toString())
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

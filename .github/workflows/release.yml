@@ -45,7 +45,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       upload-artifacts: true
-      build-all-platforms: true
+      build-native: true
 
   update-install-scripts:
     needs: build
@@ -80,5 +80,6 @@ jobs:
             artifacts/astra-cli-linux-arm64/*
             artifacts/astra-cli-macos-x86_64/*
             artifacts/astra-cli-macos-arm64/*
+            artifacts/astra-cli-fat-jar/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
