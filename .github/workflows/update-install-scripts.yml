@@ -1,4 +1,4 @@
-name: Update Checksums
+name: update-install-scripts.yml
 on:
   workflow_call:
     inputs:

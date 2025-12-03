@@ -49,7 +49,7 @@ jobs:
 
   update-install-scripts:
     needs: build
-    uses: update-install-scripts.yml
+    uses: ./.github/workflows/update-install-scripts.yml
     permissions:
       contents: write
       pull-requests: write
