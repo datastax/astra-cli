@@ -11,6 +11,11 @@ on:
         required: false
         type: boolean
         default: false
+      jar-only:
+        description: 'Release only the fat jar'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   verify:
@@ -45,7 +50,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       upload-artifacts: true
-      build-native: true
+      build-native: ${{ inputs.jar-only != 'true' }}
 
   update-install-scripts:
     needs: build
@@ -57,7 +62,7 @@ jobs:
       tag: ${{ inputs.tag }}
 
   release:
-    needs: [build, update-install-scripts]
+    needs: [ build, update-install-scripts ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -68,18 +73,30 @@ jobs:
         with:
           path: artifacts
 
+      - name: Determine artifact list
+        id: artifact-list
+        run: |
+          if [ "${{ inputs.jar-only }}" = "true" ]; then
+            echo "files=artifacts/astra-cli-fat-jar/*" >> $GITHUB_OUTPUT
+          else
+            {
+              echo "files<<EOT"
+              echo "artifacts/astra-cli-linux-x86_64/*"
+              echo "artifacts/astra-cli-windows-x86_64/*"
+              echo "artifacts/astra-cli-linux-arm64/*"
+              echo "artifacts/astra-cli-macos-x86_64/*"
+              echo "artifacts/astra-cli-macos-arm64/*"
+              echo "artifacts/astra-cli-fat-jar/*"
+              echo "EOT"
+            } >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
           name: ${{ inputs.tag }}
           prerelease: ${{ inputs.prerelease }}
-          files: |
-            artifacts/astra-cli-linux-x86_64/*
-            artifacts/astra-cli-windows-x86_64/*
-            artifacts/astra-cli-linux-arm64/*
-            artifacts/astra-cli-macos-x86_64/*
-            artifacts/astra-cli-macos-arm64/*
-            artifacts/astra-cli-fat-jar/*
+          files: ${{ steps.artifact-list.outputs.files }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
