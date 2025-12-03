@@ -50,7 +50,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       upload-artifacts: true
-      build-native: ${{ inputs.jar-only != 'true' }}
+      build-native: ${{ !inputs.jar-only }}
 
   update-install-scripts:
     needs: build
