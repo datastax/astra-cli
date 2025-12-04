@@ -99,17 +99,9 @@ public class UpgradeOperation implements Operation<Unit> {
     }
 
     private Path resolveCurrentExePath() {
-        val binaryPath = ctx.properties().cliPath(ctx);
+        val hints = new ArrayList<Hint>();
 
-        if (binaryPath instanceof AstraJar) {
-            throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
-              @|bold,red Error: Cannot run this command when Astra CLI is not being run as a binary|@
-            """);
-        }
-
-        val hints = new ArrayList<Hint>() {{
-            add(new Hint("(Not recommended) Attempt an update anyways", request.originalArgs(), "--force-unsafe"));
-        }};
+        // hints.add(new Hint("(Not recommended) Attempt an update anyway", request.originalArgs(), "--force-unsafe"));
 
         ctx.properties().owningPackageManager().ifPresent((pm) -> {
             if (request.force) {
@@ -127,6 +119,14 @@ public class UpgradeOperation implements Operation<Unit> {
               Please use the package manager to update Astra CLI.
             """.formatted(pm.displayName()), hints);
         });
+
+        val binaryPath = ctx.properties().cliPath(ctx);
+
+        if (binaryPath instanceof AstraJar) {
+            throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
+              @|bold,red Error: Cannot run this command when Astra CLI is not being run as a binary|@
+            """);
+        }
 
         if (!Files.isWritable(binaryPath.unwrap())) {
             throw new AstraCliException(ExitCode.UNSUPPORTED_EXECUTION, """
