@@ -116,7 +116,7 @@ function Get-Env {
     $EnvRegisterKey.GetValue($Key, $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
 }
 
-# Constants
+# Version (updated automatically by CI)
 $ASTRA_CLI_VERSION = "1.0.2-beta.3"
 
 # Checksum constant (updated automatically by CI)

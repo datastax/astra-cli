@@ -45,7 +45,7 @@ renderCommand() {
   printf "${BLUE}\$${RESET} %s\n" "$1"
 }
 
-# Constants
+# Version (updated automatically by CI)
 ASTRA_CLI_VERSION="1.0.2-beta.3"
 
 # Checksum constants (updated automatically by CI)
