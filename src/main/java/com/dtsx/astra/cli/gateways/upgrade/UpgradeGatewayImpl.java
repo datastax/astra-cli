@@ -48,7 +48,7 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
 
             val json = JsonUtils.readTree(response.body());
 
-            ctx.log().info("Latest release from @!astra!@ is '" + json.get("tag_name").asText() + "'");
+            ctx.log().debug("Latest release from @!astra!@ is '" + json.get("tag_name").asText() + "'");
 
             return Version.mkUnsafe(json.get("tag_name").asText());
         });

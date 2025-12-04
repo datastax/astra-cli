@@ -155,7 +155,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
             try {
                 if (Files.exists(legacyPath)) {
-                    ctx.log().info("Cleaning up legacy installation at " + legacyPath);
+                    ctx.log().debug("Cleaning up legacy installation at " + legacyPath);
                     PathUtils.deleteDirectory(legacyPath);
                 }
             } catch (Exception e) {
@@ -169,7 +169,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             for (val child : Files.walk(installDirParent, 1).skip(1).toList()) {
                 if (!Files.isDirectory(child) || Version.parse(child.getFileName().toString()).isLeft()) {
                     try {
-                        ctx.log().info("Cleaning up legacy installation at " + child);
+                        ctx.log().debug("Cleaning up legacy installation at " + child);
                         PathUtils.deleteDirectory(child);
                     } catch (Exception e) {
                         ctx.log().exception("Issue cleaning up legacy installation at " + child, e);
