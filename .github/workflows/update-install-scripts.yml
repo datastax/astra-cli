@@ -107,7 +107,7 @@ jobs:
           sed -i 's/^MACOS_ARM64_CHECKSUM=.*/MACOS_ARM64_CHECKSUM="${{ steps.checksums.outputs.macos_arm64 }}"/' scripts/install.sh
           
           # Update version
-          sed -i 's/^ASTRA_CLI_VERSION=.*/ASTRA_CLI_VERSION="${{ steps.version.version }}"/' scripts/install.sh
+          sed -i 's/^ASTRA_CLI_VERSION=.*/ASTRA_CLI_VERSION="${{ steps.version.outputs.version }}"/' scripts/install.sh
 
       - name: Update install.ps1
         run: |
@@ -117,7 +117,7 @@ jobs:
           sed -i 's/^\(\$WINDOWS_X86_64_CHECKSUM\s*=\s*\).*/\1"${{ steps.checksums.outputs.windows_x86_64 }}"/' scripts/install.ps1
           
           # Update version
-          sed -i 's/^\(\$ASTRA_CLI_VERSION\s*=\s*\).*/\1"${{ steps.version.version }}"/' scripts/install.ps1
+          sed -i 's/^\(\$ASTRA_CLI_VERSION\s*=\s*\).*/\1"${{ steps.version.outputs.version }}"/' scripts/install.ps1
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
@@ -129,6 +129,9 @@ jobs:
             Automated update for release ${{ inputs.tag }}
             
             **Changes:**
-            - Updated version to ${{ steps.version.version }}
+            - Updated version to ${{ steps.version.outputs.version }}
             - Updated checksums for all platforms
           labels: automated
+          add-paths: |
+            scripts/install.sh
+            scripts/install.ps1
