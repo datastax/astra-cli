@@ -7,13 +7,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RequiredArgsConstructor
 public class ConfigPathOperation implements Operation<ConfigPathResult> {
     private final CliContext ctx;
 
     public record ConfigPathResult(
-        String path,
+        Path path,
+        String readablePath,
         String resolver,
         boolean exists
     ) {}
@@ -23,6 +25,7 @@ public class ConfigPathOperation implements Operation<ConfigPathResult> {
         val path = ctx.path(ctx.properties().rcFileLocations(ctx.isWindows()).preferred());
 
         return new ConfigPathResult(
+            path,
             System.getProperty("cli.rc-file.path"), // this is a more user-readable path meant more for help messages and such
             System.getProperty("cli.rc-file.resolver"),
             Files.exists(path)
