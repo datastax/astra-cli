@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.snapshot;
 
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
-import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.doubles.GatewayProviderMock;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContextOptions;
 import lombok.val;
@@ -65,6 +64,6 @@ public class SnapshotTestOptions extends TestCliContextOptions {
     }
 
     public static SnapshotTestOptionsBuilder emptySnapshotTestOptionsBuilder() {
-        return new SnapshotTestOptionsBuilder(emptyTestCliContextOptionsBuilder().forceProfile(Fixtures.Profile).build());
+        return new SnapshotTestOptionsBuilder(emptyTestCliContextOptionsBuilder().build());
     }
 }

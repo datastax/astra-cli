@@ -1,14 +1,14 @@
 package com.dtsx.astra.cli.gateways.role;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.exceptions.internal.role.RoleNotFoundException;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.StringUtils;
 import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -27,5 +27,16 @@ public class RoleGatewayImpl implements RoleGateway {
             id -> apiProvider.astraOpsClient().roles().find(id.toString()),
             name -> apiProvider.astraOpsClient().roles().findByName(StringUtils.removeQuotesIfAny(name))
         ));
+    }
+
+    @Override
+    public Map<UUID, Optional<String>> findNames(Set<UUID> ids) {
+        return ids.stream()
+            .collect(Collectors.toMap(
+                id -> id,
+                id -> ctx.log().loading("Looking up role name for " + ctx.highlight(id), (_) ->
+                    tryFindOne(RoleRef.fromId(id)).map(Role::getName)
+                )
+            ));
     }
 }

@@ -1,39 +1,8 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="AutoCloseableResource" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="METHOD_MATCHER_CONFIG" value="java.util.Formatter,format,java.io.Writer,append,com.google.common.base.Preconditions,checkNotNull,org.hibernate.Session,close,java.io.PrintWriter,printf,java.io.PrintStream,printf,java.lang.foreign.Arena,ofAuto,java.lang.foreign.Arena,global,com.dtsx.astra.cli.core.CliContext,fs,com.dtsx.astra.cli.unit.utils.FileUtilsTest,fs" />
-    </inspection_tool>
-    <inspection_tool class="ClassCanBeRecord" enabled="true" level="WEAK WARNING" enabled_by_default="true">
-      <option name="myIgnoredAnnotations">
-        <list>
-          <option value="io.micronaut.*" />
-          <option value="jakarta.*" />
-          <option value="javax.*" />
-          <option value="lombok.RequiredArgsConstructor" />
-          <option value="lombok.Value" />
-          <option value="org.springframework.*" />
-        </list>
-      </option>
-    </inspection_tool>
+    <inspection_tool class="ClassCanBeRecord" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="CodeBlock2Expr" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="InnerClassMayBeStatic" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ignorableAnnotations">
-        <set>
-          <option value="net.jqwik.api.Group" />
-          <option value="org.junit.jupiter.api.Nested" />
-        </set>
-      </option>
-    </inspection_tool>
-    <inspection_tool class="NewClassNamingConvention" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="OptionalIsPresent" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="OptionalUsedAsFieldOrParameterType" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="RedundantLabeledSwitchRuleCodeBlock" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="ShellCheck" enabled="true" level="ERROR" enabled_by_default="true">
-      <shellcheck_settings value="SC2059" />
-    </inspection_tool>
-    <inspection_tool class="SwitchStatementWithTooFewBranches" enabled="false" level="WARNING" enabled_by_default="false">
-      <option name="m_limit" value="2" />
-    </inspection_tool>
   </profile>
 </component>

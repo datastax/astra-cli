@@ -2,10 +2,10 @@
 command: astra token list
 exit_code: 0
 ---- output ----
-stdout: ┌──────────────────────────┬──────────────────────────┬────────────────────────────────┐
-stdout: │ Generated On             │ Client Id                │ Roles                          │
-stdout: ├──────────────────────────┼──────────────────────────┼────────────────────────────────┤
-stdout: │ 2025-06-17T02:26:29.846Z │ BOjPpMRcaWergiKIyHXEAymP │ [0] Organization Administrator │
-stdout: │ 2025-07-14T19:39:06.918Z │ aBc123XyZ789LmnOpQrStUvW │ [0] Admin User                 │
-stdout: └──────────────────────────┴──────────────────────────┴────────────────────────────────┘
+stdout: ┌─────────────────────┬──────────────────────────┬────────────────────────────────┐
+stdout: │ Generated On        │ Client Id                │ Roles                          │
+stdout: ├─────────────────────┼──────────────────────────┼────────────────────────────────┤
+stdout: │ 2025-07-14 14:39:06 │ aBc123XyZ789LmnOpQrStUvW │ [0] Admin User                 │
+stdout: │ 2025-06-16 21:26:29 │ BOjPpMRcaWergiKIyHXEAymP │ [0] Organization Administrator │
+stdout: └─────────────────────┴──────────────────────────┴────────────────────────────────┘
 ---- end ----

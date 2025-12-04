@@ -181,7 +181,7 @@ public class AstraCli extends AbstractCmd<Void> {
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
-        ctxRef.onUpdate((ctx) -> {
+        ctxRef.nowAndOnUpdate((ctx) -> {
             cmd.setOut(ctx.console().getOut());
             cmd.setErr(ctx.console().getErr());
         });

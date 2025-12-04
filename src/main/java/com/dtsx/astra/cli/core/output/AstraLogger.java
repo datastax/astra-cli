@@ -69,7 +69,11 @@ public class AstraLogger {
     }
 
     public String useSessionLogFilePath() {
-        return sessionLogFile.get().toString();
+        try {
+            return sessionLogFile.get().toString();
+        } catch (Exception e) {
+            return "<unknown>"; // only really triggered in tests if DummyFileSystem is used
+        }
     }
 
     public void banner() {
@@ -191,9 +195,9 @@ public class AstraLogger {
         }
         logsDumped = true;
 
-        deleteOldLogs(ctx().home().dirs.logs.use());
-
         try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
+            deleteOldLogs(ctx().home().dirs.logs.use());
+
             for (val line : accumulated) {
                 writer.write(AstraColors.stripAnsi(ctx().colors().format(line)));
                 writer.write(System.lineSeparator());

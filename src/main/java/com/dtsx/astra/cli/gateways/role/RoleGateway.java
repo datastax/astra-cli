@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.org.domain.Role;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 public interface RoleGateway extends SomeGateway {
@@ -16,4 +16,6 @@ public interface RoleGateway extends SomeGateway {
     default Role findOne(RoleRef ref) {
         return tryFindOne(ref).orElseThrow(() -> new RoleNotFoundException(ref));
     }
+
+    Map<UUID, Optional<String>> findNames(Set<UUID> ids);
 }

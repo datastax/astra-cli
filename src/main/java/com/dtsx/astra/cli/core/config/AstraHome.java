@@ -36,6 +36,7 @@ public class AstraHome {
     public class AstraSubfolders {
         public final AstraSubfolder scb = new AstraSubfolder("scb");
         public final AstraSubfolder completionsCache = new AstraSubfolder("completions-cache");
+        public final AstraSubfolder cache = new AstraSubfolder("cache");
         public final AstraSubfolder logs = new AstraSubfolder("logs");
 
         public AstraSubfolder cqlsh(String version) {

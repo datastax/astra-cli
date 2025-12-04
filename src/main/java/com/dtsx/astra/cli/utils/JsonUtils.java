@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.utils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -43,6 +44,11 @@ public class JsonUtils {
 
     @SneakyThrows
     public static <T> T readValue(String body, Class<T> ref) {
+        return objectMapper().readValue(body, ref);
+    }
+
+    @SneakyThrows
+    public static <T> T readValue(String body, TypeReference<T> ref) {
         return objectMapper().readValue(body, ref);
     }
 

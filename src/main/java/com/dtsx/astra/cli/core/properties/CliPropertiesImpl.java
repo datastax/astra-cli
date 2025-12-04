@@ -237,11 +237,15 @@ public class CliPropertiesImpl implements CliProperties {
 
     @Override
     public Optional<SupportedPackageManager> owningPackageManager() {
-        return switch (cliPath(null)) {
-            case AstraBinary(var binaryPath) when binaryPath.startsWith("/nix/store/") -> Optional.of(SupportedPackageManager.NIX);
-            case AstraBinary(var binaryPath) when binaryPath.startsWith("/usr/local/") || binaryPath.startsWith("/opt/homebrew/") -> Optional.of(SupportedPackageManager.BREW);
-            default -> Optional.empty();
-        };
+        if (System.getProperty("cli.via-brew") != null) {
+            return Optional.of(SupportedPackageManager.BREW);
+        }
+
+        if (cliPath(null) instanceof AstraBinary(var binaryPath) && binaryPath.toAbsolutePath().startsWith("/nix/store")) {
+            return Optional.of(SupportedPackageManager.NIX);
+        }
+
+        return Optional.empty();
     }
 
     protected final String requireProperty(String string) {

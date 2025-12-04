@@ -29,6 +29,7 @@ import com.dtsx.astra.cli.gateways.pcu.associations.PcuAssociationsGatewayImpl;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.role.RoleGatewayCompletionsCacheWrapper;
 import com.dtsx.astra.cli.gateways.role.RoleGatewayImpl;
+import com.dtsx.astra.cli.gateways.role.RoleGatewayPersistentCacheWrapper;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGatewayCompletionsCacheWrapper;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGatewayImpl;
@@ -105,7 +106,7 @@ public class GatewayProviderImpl implements GatewayProvider {
 
     @Override
     public RoleGateway mkRoleGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache) {
-        return new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(ctx(), apiProvider(token, env)), roleCompletionsCache);
+        return new RoleGatewayPersistentCacheWrapper(ctx(), new RoleGatewayCompletionsCacheWrapper(new RoleGatewayImpl(ctx(), apiProvider(token, env)), roleCompletionsCache), ctx().home().dirs.cache::use);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.testlib.extensions.context;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.SomeGateway;
+import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.TestConfig;
 import com.dtsx.astra.cli.testlib.doubles.DummyFileSystem;
 import com.dtsx.astra.cli.testlib.doubles.GatewayProviderMock;
@@ -43,7 +44,7 @@ public class TestCliContextOptions {
         protected final Opts options;
 
         @SuppressWarnings("unchecked")
-        public Builder use(Function<Builder, Builder> modifier) {
+        public <F extends Function<Builder, Builder>> Builder use(F modifier) {
             return modifier.apply((Builder) this);
         }
 
@@ -117,7 +118,7 @@ public class TestCliContextOptions {
             List.of(),
             DummyFileSystem.INSTANCE,
             OutputType.HUMAN,
-            Optional.empty(),
+            Optional.of(Fixtures.Profile),
             Optional.empty(),
             Map.of()
         ));
