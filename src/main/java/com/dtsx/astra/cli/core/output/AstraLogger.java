@@ -61,7 +61,7 @@ public class AstraLogger {
             this.sessionLogFile = () -> {
                 if (cachedLogFile.ref == null) {
                     val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(Instant.now().atZone(ZoneId.systemDefault()));
-                    cachedLogFile.ref = ctx().home().dirs().useLogs().resolve(timestamp + ".astra.log");
+                    cachedLogFile.ref = ctx().home().dirs.logs.use().resolve(timestamp + ".astra.log");
                 }
                 return cachedLogFile.ref;
             };
@@ -69,7 +69,11 @@ public class AstraLogger {
     }
 
     public String useSessionLogFilePath() {
-        return sessionLogFile.get().toString();
+        try {
+            return sessionLogFile.get().toString();
+        } catch (Exception e) {
+            return "<unknown>"; // only really triggered in tests if DummyFileSystem is used
+        }
     }
 
     public void banner() {
@@ -191,9 +195,9 @@ public class AstraLogger {
         }
         logsDumped = true;
 
-        deleteOldLogs(ctx().home().dirs().useLogs());
-
         try (var writer = Files.newBufferedWriter(sessionLogFile.get())) {
+            deleteOldLogs(ctx().home().dirs.logs.use());
+
             for (val line : accumulated) {
                 writer.write(AstraColors.stripAnsi(ctx().colors().format(line)));
                 writer.write(System.lineSeparator());

@@ -1,12 +1,15 @@
 #!/usr/bin/env pwsh
 param(
-# Skips adding the astra.exe directory to the user's %PATH%
+    # Skips adding the astra.exe directory to the user's %PATH%
     [Switch]$NoPathUpdate = $false,
-# Skips adding Astra CLI to the list of installed programs
+    # Skips adding Astra CLI to the list of installed programs
     [Switch]$NoRegisterInstallation = $false
 );
 
 $ErrorActionPreference = "Stop"
+
+# https://stackoverflow.com/questions/64581966/default-securityprotocol-in-powershell-5-1
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Utilities
 function Write-MultiColor {
@@ -113,8 +116,11 @@ function Get-Env {
     $EnvRegisterKey.GetValue($Key, $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
 }
 
-# Constants
-$ASTRA_CLI_VERSION = "1.0.1"
+# Version (updated automatically by CI)
+$ASTRA_CLI_VERSION = "1.0.2-beta.3"
+
+# Checksum constant (updated automatically by CI)
+$WINDOWS_X86_64_CHECKSUM = "37694ac4272d61471f6403d98499363e65e89b383d786bc360317365eb22a3c4"
 
 if ($env:ASTRA_HOME) {
     $ASTRA_CLI_DIR = "$env:ASTRA_HOME\cli"
@@ -227,6 +233,16 @@ catch {
         Panic "`nError: Failed to download the archive to $( Tildify $zipPath ). Check your internet connection and permissions."
     }
 }
+
+$actualChecksum = (Get-FileHash -Path $zipPath -Algorithm SHA256).Hash.ToLower()
+$expectedChecksum = $WINDOWS_X86_64_CHECKSUM.ToLower()
+
+if ($actualChecksum -ne $expectedChecksum) {
+    Remove-Item $zipPath -ErrorAction SilentlyContinue
+    Panic "`nError: Checksum verification failed. Expected $expectedChecksum but got $actualChecksum. The downloaded file may be corrupted."
+}
+
+Checklist "Checksum verified."
 
 try {
     $lastProgressPreference = $global:ProgressPreference

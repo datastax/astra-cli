@@ -27,6 +27,10 @@ public class DataclassProvider implements ArbitraryProvider {
         }
 
         for (val field : clazz.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+
             try {
                 Arbitraries.defaultFor(TypeUsage.forType(field.getGenericType()));
             } catch (CannotFindArbitraryException e) {

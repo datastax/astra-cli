@@ -55,7 +55,6 @@ public class TokenGatewayImpl implements TokenGateway {
 
             val res = client.POST(client.getEndpointTokens(), body, "tokens.create");
 
-
             return JsonUtils.readValue(res.getBody(), CreateTokenResponse.class);
         });
     }

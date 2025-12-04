@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.core.properties.CliProperties.AstraBinary;
 import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.val;
@@ -86,9 +87,9 @@ public class ShellEnvCmd implements Runnable {
 
     @Override
     public void run() {
-        val binaryPath = FileUtils.getCurrentBinaryPath();
+        val binaryPath = FileUtils.resolvePathToAstra();
 
-        if (binaryPath.isEmpty()) {
+        if (!(binaryPath instanceof AstraBinary)) {
             throw new AstraCliException(UNSUPPORTED_EXECUTION, """
               @|bold,red Error: Can not run this command when not executing from a binary|@
             """);
@@ -96,8 +97,8 @@ public class ShellEnvCmd implements Runnable {
 
         val sb = new StringBuilder();
 
-        sb.append("export PATH=").append(binaryPath.get().getParent()).append(":$PATH").append(NL);
-        sb.append("source <(").append(binaryPath.get()).append(" compgen)").append(NL);
+        sb.append("export PATH=").append(binaryPath.unwrap().getParent()).append(":$PATH").append(NL);
+        sb.append("source <(").append(binaryPath.unwrap()).append(" compgen)").append(NL);
 
         if ($ignoreMultiplePaths) {
             sb.append("export ").append(ConstEnvVars.IGNORE_MULTIPLE_PATHS).append("=true").append(NL);

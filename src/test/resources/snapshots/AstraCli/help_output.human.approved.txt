@@ -10,17 +10,17 @@ stderr:   /    |    \\___ \  |  |  |  | \ //__ \_
 stderr:   \____|__  /____  > |__|  |__|  (____  /
 stderr:           \/     \/                   \/
 stderr: 
-stderr:                        Version: 1.0.1
+stderr:                        Version: 1.0.2
 stdout: Documentation: https://docs.datastax.com/en/astra-cli
 stdout: 
-stdout: Usage: astra [-qVv] [--no-input] [--[no-]spinner] [--dump-logs[=FILE]]
-stdout:              [--color=WHEN] [-o=FORMAT] [COMMAND]
+stdout: Usage: astra [-qVv] [--no-input] [--[no-]spinner] [--color[=WHEN]] [--dump-logs
+stdout:              [=FILE]] [-o=FORMAT] [COMMAND]
 stdout: 
 stdout:   -v, --version            Print version information and exit.
 stdout:                              (default: false)
 stdout: 
 stdout: Common Options:
-stdout:       --color=WHEN         One of: auto, never, always
+stdout:       --color[=WHEN]       One of: auto, never, always
 stdout:                              (default: auto)
 stdout:       --dump-logs[=FILE]   Write all logs to an optionally specified file
 stdout:                              (default: ~/.astra-dev/logs/<file>.log)
@@ -29,7 +29,7 @@ stdout:   -o, --output=FORMAT      One of: human, json, csv
 stdout:                              (default: human)
 stdout:   -q, --quiet              Only output essential information
 stdout:       --[no-]spinner       Enable/disable loading spinners
-stdout:                              (default: enabled if tty)
+stdout:                              (default: enabled if tty and not quiet)
 stdout:   -V, --verbose            Enable verbose logging output
 stdout: 
 stdout: Commands:

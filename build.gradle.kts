@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.0.1"
+version = "1.0.2"
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
@@ -386,7 +386,7 @@ tasks.register<Jar>("fatJar") {
     dependsOn(configurations.runtimeClasspath)
     dependsOn("createDynamicProperties")
 
-    archiveFileName.set("fat.jar")
+    archiveFileName.set("astra-fat.jar")
     archiveVersion.set(project.version.toString())
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

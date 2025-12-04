@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -26,7 +26,7 @@ public class CdcRef implements Highlightable {
     }
 
     public static CdcRef fromDefinition(TableRef tableRef, TenantName tenantName) {
-        return new CdcRef(tableRef.db(), Either.pure(Pair.create(tableRef, tenantName)));
+        return new CdcRef(tableRef.db(), Either.pure(Pair.of(tableRef, tenantName)));
     }
 
     public boolean isId() {

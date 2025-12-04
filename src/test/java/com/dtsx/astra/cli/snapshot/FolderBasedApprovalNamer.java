@@ -16,7 +16,6 @@ public class FolderBasedApprovalNamer implements ApprovalNamer {
     private final StackTraceNamer internal;
     private final Class<?> testClazz;
 
-
     public FolderBasedApprovalNamer(Class<?> testClazz) {
         this.internal = new StackTraceNamer();
         this.testClazz = testClazz;

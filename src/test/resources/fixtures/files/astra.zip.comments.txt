@@ -1,0 +1,5 @@
+$ unzip astra.zip
+> Archive:  astra.zip
+>   inflating: astra/bin/uninstall.ps1
+>   inflating: astra/bin/astra.ico
+>   inflating: astra/bin/astra.exe

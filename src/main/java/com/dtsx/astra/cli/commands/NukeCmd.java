@@ -91,7 +91,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
         val summary = new StringBuilder();
         val nothingToReport = new ArrayList<String>();
 
-        appendToSummary("Files deleted", summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.of(" @|faint (contained binary)|@").filter((_) -> res.cliBinaryPath().startsWith(v))), Map::putAll));
+        appendToSummary("Files deleted", summary, nothingToReport, "deleted", res.deletedFiles().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.of(" @|faint (contained binary)|@").filter((_) -> res.cliPath().unwrap().startsWith(v))), Map::putAll));
         appendToSummary("Shell profiles containing @!astra!@", summary, nothingToReport, "needing updates", res.shellRcFilesToUpdate().stream().collect(HashMap::new, (m, v) -> m.put(v, Optional.empty()), Map::putAll));
         appendToSummary("Files skipped", summary, nothingToReport, "skipped", res.skipped().entrySet().stream().collect(HashMap::new, (m, v) -> m.put(v.getKey(), Optional.of(" - " + v.getValue().reason())), Map::putAll));
 
@@ -134,7 +134,7 @@ public class NukeCmd extends AbstractCmd<NukeResult> {
             case BinaryDeleted() -> """
               @|green Astra CLI binary has been successfully deleted from your system.|@
             """;
-            case BinaryMustBeDeleted(var deleteCommand) -> """
+            case CLIMustBeDeleted(var deleteCommand) -> """
               To complete the uninstallation, please run the following command in your terminal:
             
               %s

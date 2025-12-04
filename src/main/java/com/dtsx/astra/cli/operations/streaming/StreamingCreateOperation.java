@@ -11,7 +11,7 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ public class StreamingCreateOperation implements Operation<StreamingCreateOperat
     public StreamingCreateResult execute() {
         val status = streamingGateway.create(
             request.tenantName,
-            request.clusterOrCloud.map((p) -> Pair.create(
+            request.clusterOrCloud.map((p) -> Pair.of(
                 streamingGateway.findCloudForRegion(p.getLeft(), p.getRight()),
                 p.getRight()
             )),

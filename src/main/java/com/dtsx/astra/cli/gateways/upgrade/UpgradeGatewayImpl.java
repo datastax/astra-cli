@@ -48,7 +48,7 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
 
             val json = JsonUtils.readTree(response.body());
 
-            System.out.println(json.get("tag_name").asText());
+            ctx.log().debug("Latest release from @!astra!@ is '" + json.get("tag_name").asText() + "'");
 
             return Version.mkUnsafe(json.get("tag_name").asText());
         });
@@ -56,10 +56,10 @@ public class UpgradeGatewayImpl implements UpgradeGateway {
 
     private Version fetchLatestIncPreRelease() {
         return ctx.log().loading("Resolving latest release of @!astra!@", (updateMsg) -> {
-            var attempt = 1;
+            var attempt = 0;
 
             while (true) {
-                val endpoint = ctx.properties().cliGithubApiReposUrl() + "/releases?per_page=1&page=" + attempt;
+                val endpoint = ctx.properties().cliGithubApiReposUrl() + "/releases?per_page=2&page=" + attempt;
 
                 val response = HttpUtils.GET(endpoint, c -> c, r -> r);
 

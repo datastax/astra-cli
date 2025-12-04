@@ -24,8 +24,10 @@
       <w>pcus</w>
       <w>pkgs</w>
       <w>readln</w>
+      <w>shasum</w>
       <w>shellenv</w>
       <w>tildify</w>
+      <w>xattr</w>
       <w>xsel</w>
       <w>zprofile</w>
     </words>

@@ -2,9 +2,11 @@ package com.dtsx.astra.cli.snapshot;
 
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
+import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsBuilder;
 import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.Fixtures.*;
+import com.dtsx.astra.cli.testlib.Fixtures.Collections;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext.OutputLine;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext.StderrLine;
@@ -17,10 +19,7 @@ import org.approvaltests.Approvals;
 import org.approvaltests.core.Options;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,11 +64,12 @@ public class BaseCmdSnapshotTest {
 
             return """
                 ---- meta ----
-                command: astra %s
+                command: astra %s%s
                 exit_code: %d%s
                 ---- output ----%s
                 ---- end ----
                 """.formatted(
+                Optional.ofNullable(System.getenv(ConstEnvVars.DEFAULT_ARGS)).map(p -> p + " ").orElse(""),
                 Arrays.stream(command).map(s -> s.contains(" ") ? "'" + s + "'" : s).collect(Collectors.joining(" ")),
                 exitCode,
                 options.comments().isEmpty() ? "" : NL + "comments: " + options.comments().stream().map((NL + " | ")::concat).collect(Collectors.joining()),

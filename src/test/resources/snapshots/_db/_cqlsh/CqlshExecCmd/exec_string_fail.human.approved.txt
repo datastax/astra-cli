@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db 'DESC CARS'
+command: astra db cqlsh exec two_regions_db -e 'DESC CARS'
 exit_code: 2
 comments: 
  | Can't really test human output since we don't capture cqlsh output for human outputs

@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.output.prompters.CLIPrompter;
 import lombok.RequiredArgsConstructor;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -71,7 +71,7 @@ public class SelectorBuilder {
         private final String fallback;
 
         public NeedsClearAfterSelection<T> fix(Iterable<String> originalArgs, String newArg) {
-            return new NeedsClearAfterSelection<>(options, defaultOption, mapper, fallback, Pair.create(originalArgs, newArg));
+            return new NeedsClearAfterSelection<>(options, defaultOption, mapper, fallback, Pair.of(originalArgs, newArg));
         }
     }
 

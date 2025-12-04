@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.core.output.prompters.builders;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.output.prompters.CLIPrompter;
 import lombok.RequiredArgsConstructor;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ public class ConfirmerBuilder {
         private final String fallback;
 
         public NeedsClearAfterSelection fix(Iterable<String> originalArgs, String newArg) {
-            return new NeedsClearAfterSelection(defaultOption, fallback, Pair.create(originalArgs, newArg));
+            return new NeedsClearAfterSelection(defaultOption, fallback, Pair.of(originalArgs, newArg));
         }
     }
 

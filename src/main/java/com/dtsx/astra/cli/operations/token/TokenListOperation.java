@@ -1,42 +1,52 @@
 package com.dtsx.astra.cli.operations.token;
 
-import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
-import com.dtsx.astra.sdk.org.domain.Role;
+import com.dtsx.astra.sdk.org.domain.IamToken;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
 public class TokenListOperation implements Operation<Stream<TokenInfo>> {
     private final TokenGateway tokenGateway;
     private final RoleGateway roleGateway;
 
-    public record TokenInfo(String generatedOn, String clientId, List<String> roleNames, List<String> roleIds) {}
+    public record TokenInfo(
+        List<String> roleNames,
+        List<UUID> roleIds,
+        IamToken raw
+    ) {}
 
     @Override
     public Stream<TokenInfo> execute() {
-        val tokens = tokenGateway.findAll();
-        val roleCache = new HashMap<UUID, String>();
+        val tokens = tokenGateway.findAll().toList();
 
-        return tokens.map((token) -> {
-            val roleNames = token.getRoles().stream()
+        val roleMappings = roleGateway.findNames(
+            tokens
+                .stream()
+                .flatMap((token) -> token.getRoles().stream())
                 .map(UUID::fromString)
-                .map((roleId) -> roleCache.computeIfAbsent(roleId, (id) ->
-                    roleGateway
-                        .tryFindOne(RoleRef.fromId(id))
-                        .map(Role::getName)
-                        .orElse(id.toString())))
+                .collect(toSet())
+        );
+
+        return tokens.stream().map((token) -> {
+            val roleIds = token.getRoles().stream()
+                .map(UUID::fromString)
                 .toList();
 
-            return new TokenInfo(token.getGeneratedOn(), token.getClientId(), roleNames, token.getRoles());
+            val roleNames = roleIds.stream()
+                .map((roleId) -> roleMappings.get(roleId).orElse(roleId.toString()))
+                .toList();
+
+            return new TokenInfo(roleNames, roleIds, token);
         });
     }
 }

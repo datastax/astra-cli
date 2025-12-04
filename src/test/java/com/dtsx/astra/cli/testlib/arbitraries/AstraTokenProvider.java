@@ -20,7 +20,7 @@ public class AstraTokenProvider implements ArbitraryProvider {
 
     @Override
     public @NotNull Set<Arbitrary<?>> provideFor(@NotNull TypeUsage targetType, @NotNull SubtypeProvider subtypeProvider) {
-        val base = Arbitraries.strings().ascii();
+        val base = Arbitraries.strings().alpha();
 
         val arbs = Combinators.combine(
             base.ofLength(24),

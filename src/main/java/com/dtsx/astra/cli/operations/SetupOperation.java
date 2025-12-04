@@ -13,7 +13,7 @@ import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
@@ -87,7 +87,7 @@ public class SetupOperation implements Operation<SetupResult> {
 
                 if (shouldSetDefault) {
                     ctx.deleteProfile(ProfileName.DEFAULT);
-                    ctx.createProfile(ProfileName.DEFAULT, details.token, details.env);
+                    ctx.createProfile(ProfileName.DEFAULT, details.token, details.env); // TODO needs source!!!
                 }
             });
 
@@ -136,7 +136,7 @@ public class SetupOperation implements Operation<SetupResult> {
         val org = validateTokenAndFetchOrg(orgGateway);
 
         return (org.isPresent())
-            ? Either.pure(Pair.create(env, org.get()))
+            ? Either.pure(Pair.of(env, org.get()))
             : Either.left(guessedEnv);
     }
 

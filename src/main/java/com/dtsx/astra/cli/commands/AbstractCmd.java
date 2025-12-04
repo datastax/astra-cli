@@ -23,6 +23,7 @@ import picocli.CommandLine.Spec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -54,7 +55,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)
-    public CommonOptions common = new CommonOptions();
+    public CommonOptions common = CommonOptions.EMPTY;
 
     protected OutputAll execute(Supplier<OpRes> _result) {
         val otherTypes = Arrays.stream(OutputType.values()).filter(o -> o != ctx.outputType()).map(o -> o.name().toLowerCase()).toList();
@@ -105,6 +106,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             throw new CongratsYouFoundABugException("initCtx(...) was not called before run()");
         }
 
+        val common = mergeCommonOptions();
+
         val ansi = common.ansi().orElse(
             (common.outputType().isHuman())
                 ? ctx.colors().ansi()
@@ -112,10 +115,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         );
 
         val level =
-            (common.quiet())
-                ? Level.QUIET :
             (common.verbose())
-                ? Level.VERBOSE
+                ? Level.VERBOSE :
+            (common.quiet())
+                ? Level.QUIET
                 : ctx.logLevel();
 
         run(new CliContext(
@@ -131,6 +134,18 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.upgradeNotifier(),
             ctx.forceProfileForTesting()
         ));
+    }
+
+    private CommonOptions mergeCommonOptions() {
+        var common = this.common;
+
+        for (var spec = this.spec.parent(); spec != null; spec = spec.parent()) {
+            if (spec.userObject() instanceof AbstractCmd<?> cmd) {
+                common = common.merge(cmd.common);
+            }
+        }
+
+        return common;
     }
 
     @VisibleForTesting
@@ -188,6 +203,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected final List<String> originalArgs() {
+        if (spec == null) {
+            return Collections.emptyList(); // Only triggered in tests where spec is not initialized
+        }
+
         return listAdd(ctx.properties().cliName(), spec.commandLine().getParseResult().originalArgs()).stream()
             .map(s -> s.contains(" ") ? "'" + s + "'" : s)
             .toList();

@@ -42,7 +42,8 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
@@ -53,6 +54,7 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -179,7 +181,7 @@ public class AstraCli extends AbstractCmd<Void> {
             .setCaseInsensitiveEnumValuesAllowed(true)
             .setOverwrittenOptionsAllowed(true);
 
-        ctxRef.onUpdate((ctx) -> {
+        ctxRef.nowAndOnUpdate((ctx) -> {
             cmd.setOut(ctx.console().getOut());
             cmd.setErr(ctx.console().getErr());
         });
@@ -197,7 +199,18 @@ public class AstraCli extends AbstractCmd<Void> {
             return DefaultsRenderer.helpWithOverriddenDefaultsRendering(spec, cs);
         });
 
-        return cmd.execute(args);
+        val allArgs = ArrayUtils.addAll(defaultArgs(), args);
+
+        return cmd.execute(allArgs);
+    }
+
+    private static String[] defaultArgs() {
+        val defaultArgsStr = Optional.ofNullable(System.getenv(ConstEnvVars.DEFAULT_ARGS))
+            .orElse("");
+
+        return Arrays.stream(defaultArgsStr.split("\\s+"))
+            .filter(s -> !s.isBlank())
+            .toArray(String[]::new);
     }
 
     private static IFactory mkFactory(Ref<CliContext> ctxRef) {
@@ -229,20 +242,20 @@ public class AstraCli extends AbstractCmd<Void> {
                     val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
                     if (!configFileExists) {
-                        return Pair.create("Setup the Astra CLI", "${cli.name} setup");
+                        return Pair.of("Setup the Astra CLI", "${cli.name} setup");
                     }
 
                     val autocompleteSetup = System.getenv(ConstEnvVars.COMPLETIONS_SETUP) != null;
 
                     if (!autocompleteSetup && ctx.isNotWindows()) {
-                        return Pair.create("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
+                        return Pair.of("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
                     }
                 } catch (Exception e) {
                     ctx.log().exception("Error resolving main example for AstraCli", e);
                 }
             }
 
-            return Pair.create("Create a new profile", "${cli.name} setup");
+            return Pair.of("Create a new profile", "${cli.name} setup");
         }
     }
 }

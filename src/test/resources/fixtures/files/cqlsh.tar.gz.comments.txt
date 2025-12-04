@@ -1,0 +1,18 @@
+$ tree cqlsh-astra -L2
+> cqlsh-astra
+> ├── bin
+> │   ├── cqlsh
+> │   ├── cqlsh.py
+> │   └── dsecqlsh.py
+> ├── pylib
+> │   ├── cqlhelp
+> │   ├── cqlshlib
+> │   ├── dselib
+> │   ├── requirements.txt
+> │   └── setup.py
+> └── zipfiles
+>     ├── cassandra-driver-internal-only-3.26.0-df103d3a.zip
+>     ├── futures-2.1.6-py2.py3-none-any.zip
+>     ├── geomet-0.1.0.zip
+>     ├── six-1.12.0-py2.py3-none-any.zip
+>     └── wcwidth-0.2.6-py2.py3-none-any.zip

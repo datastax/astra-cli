@@ -9,8 +9,10 @@ import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
+import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.*;
+import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
@@ -20,6 +22,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
+import static com.dtsx.astra.cli.core.output.ExitCode.STATUS_ISSUE;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
@@ -68,7 +71,8 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     protected final OutputHuman executeHuman(Supplier<CqlshExecResult> result) {
         return switch (result.get()) {
             case CqlshInstallFailed(var msg) -> throwCqlshInstallationFailed(msg);
-            case ScbDownloadFailed(var msg) -> throwCqlshInstallationFailed(msg);
+            case ScbDownloadFailed(var msg) -> throwScbInstallationFailed(msg);
+            case InvalidDbStatus(var status) -> throwInvalidDbStatus(status);
             case Executed(var exitCode) -> AstraCli.exit(exitCode);
             case ExecutedWithOutput _ -> throw new CongratsYouFoundABugException("Should not be able to get to `executeHuman` with `ExecutedWithOutput` when output is `HUMAN`");
         };
@@ -82,12 +86,14 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
 
         return switch (result.get()) {
             case CqlshInstallFailed(var msg) -> throwCqlshInstallationFailed(msg);
-            case ScbDownloadFailed(var msg) -> throwCqlshInstallationFailed(msg);
+            case ScbDownloadFailed(var msg) -> throwScbInstallationFailed(msg);
+            case InvalidDbStatus(var status) -> throwInvalidDbStatus(status);
             case Executed _ -> throw new CongratsYouFoundABugException("Should not be able to get to `execute` with `Executed` when output is `" + ctx.outputType() + "`");
             case ExecutedWithOutput res -> handleExecutedWithOutput(res);
         };
     }
 
+    // don't love reusing this tbh may move it later
     public static <T> T throwCqlshInstallationFailed(String error) {
         throw new AstraCliException(FILE_ISSUE, """
           @|bold,red Failed to install cqlsh: %s|@
@@ -95,6 +101,26 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
           Please ensure you have a stable network connection and sufficient permissions, then try again.
         """.formatted(error), List.of(
             new Hint("Retry installation:", "${cli.name} db cqlsh version")
+        ));
+    }
+
+    private <T> T throwScbInstallationFailed(String error) {
+        throw new AstraCliException(FILE_ISSUE, """
+          @|bold,red Failed to download secure connect bundle: %s|@
+        
+          Please ensure you have a stable network connection and sufficient permissions, then try again.
+        """.formatted(error), List.of(
+            new Hint("Retry download:", "${cli.name} db cqlsh version")
+        ));
+    }
+
+    private <T> T throwInvalidDbStatus(DatabaseStatusType status) {
+        throw new AstraCliException(STATUS_ISSUE, """
+          @|bold,red Cannot execute cqlsh because database is in invalid state: %s|@
+        
+          Please ensure the database is %s and try again.
+        """.formatted(status, ctx.highlight(PcuGroupStatusType.ACTIVE)), List.of(
+            new Hint("Check database status:", "${cli.name} db status --name <db-name>")
         ));
     }
 

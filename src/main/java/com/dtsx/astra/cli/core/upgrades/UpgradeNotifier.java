@@ -21,7 +21,7 @@ public class UpgradeNotifier {
             return;
         }
 
-        val path = ctx.home().useDir().resolve("upgrade-notifier.properties");
+        val path = ctx.home().updateNotifierProperties.use();
 
         // every 10 minutes for pre-releases, every 48 hours for actual releases
         val INTERVAL_MS = (ctx.properties().version().isPreRelease())

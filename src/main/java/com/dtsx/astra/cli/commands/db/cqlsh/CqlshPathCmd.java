@@ -69,7 +69,7 @@ public class CqlshPathCmd extends AbstractDbCmd<CqlPathResponse> {
           Please install @!cqlsh!@ by running any cqlsh command through @!${cli.name}!@.
         
           @|faint,italic Note that the CLI does not recognize cqlsh installations done outside of astra.|@
-        """.formatted(ctx.home().getDir()), List.of(
+        """.formatted(ctx.home().root()), List.of(
             new Hint("Example command to install cqlsh (no --if-exists flag):", "${cli.name} db cqlsh path")
         ));
     }

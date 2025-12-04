@@ -43,7 +43,7 @@ public class DbDeleteOperation implements Operation<DbDeleteResult> {
     public DbDeleteResult execute() {
         val dbInfo = dbGateway.tryFindOne(request.dbRef);
 
-        if (dbInfo.isEmpty()) {
+        if (dbInfo.isEmpty() || dbInfo.get().getStatus() == TERMINATED) {
             return handleDbNotFound(request.ifExists);
         }
 

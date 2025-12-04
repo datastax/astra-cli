@@ -132,8 +132,10 @@ public class AstraConfig {
                 val env = AstraEnvironment.valueOf(rawEnv.toUpperCase());
 
                 val sourceForDefault = section.lookupKey(SOURCE_KEY)
-                    .filter(_ -> profileName.isDefault())
-                    .map(ProfileName::mkUnsafe);
+                    .filter(s -> profileName.isDefault() && !s.isBlank() && !s.equals(ProfileName.DEFAULT.unwrap()))
+                    .map(ProfileName::parse)
+                    .filter(Either::isRight)
+                    .map(Either::getRight);
 
                 return AstraToken.parse(token.get()).bimap(
                     (msg) -> new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY) + ": " + msg),

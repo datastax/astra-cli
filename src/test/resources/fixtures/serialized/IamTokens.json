@@ -1,0 +1,20 @@
+[
+  {
+    "roles": [
+      "ad0566b5-2a67-49de-89e8-92258c2f2c98"
+    ],
+    "generatedOn": "2025-06-17T02:26:29.846Z",
+    "clientId": "BOjPpMRcaWergiKIyHXEAymP",
+    "description": "Token for service A",
+    "tokenExpiry": "2025-12-31T23:59:59.000Z"
+  },
+  {
+    "roles": [
+      "43745b73-ad46-46e4-b826-c15d06d2cea0"
+    ],
+    "generatedOn": "2025-07-14T19:39:06.918Z",
+    "clientId": "aBc123XyZ789LmnOpQrStUvW",
+    "description": "",
+    "tokenExpiry": null
+  }
+]

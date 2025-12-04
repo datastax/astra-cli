@@ -1,0 +1,4 @@
+$ tar -xvf astra.tar.gz
+> astra/
+> astra/bin/
+> astra/bin/astra

@@ -1,12 +1,25 @@
 name: build.yml
 on:
   workflow_call:
+    inputs: &workflow-inputs
+      upload-artifacts:
+        description: 'Upload build artifacts'
+        required: false
+        type: boolean
+        default: true
+      build-native:
+        description: 'Build for all platforms'
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs: *workflow-inputs
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  build-native:
+    if: github.event_name != 'push' && inputs.build-native
     strategy:
       matrix:
         os: [ ubuntu-24.04, windows-2022, ubuntu-24.04-arm, macos-15-intel, macos-14 ]
@@ -28,22 +41,21 @@ jobs:
             artifact-type: tar
 
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
+        uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'graalvm'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Build and package native image (tar)
         if: matrix.artifact-type == 'tar'
@@ -54,9 +66,38 @@ jobs:
         run: ./gradlew nativeZip -Pprod
 
       - name: Upload artifacts
+        if: github.event_name != 'push' && inputs.upload-artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: build/distributions/*.${{ matrix.artifact-type }}*
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
+
+  build-jar:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up GraalVM
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'graalvm'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Build JAR
+        run: ./gradlew fatJar -Pprod
+
+      - name: Upload JAR artifact
+        if: github.event_name != 'push' && inputs.upload-artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: astra-cli-fat-jar
+          path: build/libs/astra-fat.jar

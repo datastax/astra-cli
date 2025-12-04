@@ -43,7 +43,7 @@ public class TestCliContextOptions {
         protected final Opts options;
 
         @SuppressWarnings("unchecked")
-        public Builder use(Function<Builder, Builder> modifier) {
+        public <F extends Function<Builder, Builder>> Builder use(F modifier) {
             return modifier.apply((Builder) this);
         }
 

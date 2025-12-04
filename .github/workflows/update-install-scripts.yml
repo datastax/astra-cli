@@ -1,0 +1,137 @@
+name: update-install-scripts.yml
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+
+jobs:
+  update-install-scripts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Calculate checksums
+        id: checksums
+        run: |
+          set -euo pipefail
+
+          # Linux x86_64
+          LINUX_X86_64_FILES=(artifacts/astra-cli-linux-x86_64/*.tar.gz)
+          if [ ${#LINUX_X86_64_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No Linux x86_64 artifact found"
+            exit 1
+          fi
+          LINUX_X86_64=$(sha256sum "${LINUX_X86_64_FILES[0]}" | cut -d' ' -f1)
+
+          # Linux ARM64
+          LINUX_ARM64_FILES=(artifacts/astra-cli-linux-arm64/*.tar.gz)
+          if [ ${#LINUX_ARM64_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No Linux ARM64 artifact found"
+            exit 1
+          fi
+          LINUX_ARM64=$(sha256sum "${LINUX_ARM64_FILES[0]}" | cut -d' ' -f1)
+
+          # macOS x86_64
+          MACOS_X86_64_FILES=(artifacts/astra-cli-macos-x86_64/*.tar.gz)
+          if [ ${#MACOS_X86_64_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No macOS x86_64 artifact found"
+            exit 1
+          fi
+          MACOS_X86_64=$(sha256sum "${MACOS_X86_64_FILES[0]}" | cut -d' ' -f1)
+
+          # macOS ARM64
+          MACOS_ARM64_FILES=(artifacts/astra-cli-macos-arm64/*.tar.gz)
+          if [ ${#MACOS_ARM64_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No macOS ARM64 artifact found"
+            exit 1
+          fi
+          MACOS_ARM64=$(sha256sum "${MACOS_ARM64_FILES[0]}" | cut -d' ' -f1)
+
+          # Windows x86_64
+          WINDOWS_X86_64_FILES=(artifacts/astra-cli-windows-x86_64/*.zip)
+          if [ ${#WINDOWS_X86_64_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No Windows x86_64 artifact found"
+            exit 1
+          fi
+          WINDOWS_X86_64=$(sha256sum "${WINDOWS_X86_64_FILES[0]}" | cut -d' ' -f1)
+
+          echo "linux_x86_64=$LINUX_X86_64" >> $GITHUB_OUTPUT
+          echo "linux_arm64=$LINUX_ARM64" >> $GITHUB_OUTPUT
+          echo "macos_x86_64=$MACOS_X86_64" >> $GITHUB_OUTPUT
+          echo "macos_arm64=$MACOS_ARM64" >> $GITHUB_OUTPUT
+          echo "windows_x86_64=$WINDOWS_X86_64" >> $GITHUB_OUTPUT
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          # Remove 'v' prefix from tag (e.g., v1.0.0 -> 1.0.0)
+          VERSION="${{ inputs.tag }}"
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Validate variables exist in scripts
+        run: |
+          set -euo pipefail
+          
+          # Check checksum variables
+          for var in LINUX_X86_64_CHECKSUM LINUX_ARM64_CHECKSUM MACOS_X86_64_CHECKSUM MACOS_ARM64_CHECKSUM; do
+            grep -q "^${var}=" scripts/install.sh || { echo "ERROR: ${var} not found in install.sh"; exit 1; }
+          done
+          grep -q '^\$WINDOWS_X86_64_CHECKSUM' scripts/install.ps1 || { echo "ERROR: WINDOWS_X86_64_CHECKSUM not found in install.ps1"; exit 1; }
+          
+          # Check version variables
+          grep -q '^ASTRA_CLI_VERSION=' scripts/install.sh || { echo "ERROR: ASTRA_CLI_VERSION not found in install.sh"; exit 1; }
+          grep -q '^\$ASTRA_CLI_VERSION' scripts/install.ps1 || { echo "ERROR: ASTRA_CLI_VERSION not found in install.ps1"; exit 1; }
+
+      - name: Update install.sh
+        run: |
+          set -euo pipefail
+          
+          # Update checksums
+          sed -i 's/^LINUX_X86_64_CHECKSUM=.*/LINUX_X86_64_CHECKSUM="${{ steps.checksums.outputs.linux_x86_64 }}"/' scripts/install.sh
+          sed -i 's/^LINUX_ARM64_CHECKSUM=.*/LINUX_ARM64_CHECKSUM="${{ steps.checksums.outputs.linux_arm64 }}"/' scripts/install.sh
+          sed -i 's/^MACOS_X86_64_CHECKSUM=.*/MACOS_X86_64_CHECKSUM="${{ steps.checksums.outputs.macos_x86_64 }}"/' scripts/install.sh
+          sed -i 's/^MACOS_ARM64_CHECKSUM=.*/MACOS_ARM64_CHECKSUM="${{ steps.checksums.outputs.macos_arm64 }}"/' scripts/install.sh
+          
+          # Update version
+          sed -i 's/^ASTRA_CLI_VERSION=.*/ASTRA_CLI_VERSION="${{ steps.version.outputs.version }}"/' scripts/install.sh
+
+      - name: Update install.ps1
+        run: |
+          set -euo pipefail
+          
+          # Update checksum
+          sed -i 's/^\(\$WINDOWS_X86_64_CHECKSUM\s*=\s*\).*/\1"${{ steps.checksums.outputs.windows_x86_64 }}"/' scripts/install.ps1
+          
+          # Update version
+          sed -i 's/^\(\$ASTRA_CLI_VERSION\s*=\s*\).*/\1"${{ steps.version.outputs.version }}"/' scripts/install.ps1
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update-install-scripts-${{ github.run_id }}
+          commit-message: "chore: update checksums and version for ${{ inputs.tag }}"
+          title: "Update checksums and version for ${{ inputs.tag }}"
+          body: |
+            Automated update for release ${{ inputs.tag }}
+            
+            **Changes:**
+            - Updated version to ${{ steps.version.outputs.version }}
+            - Updated checksums for all platforms
+          labels: automated
+          add-paths: |
+            scripts/install.sh
+            scripts/install.ps1

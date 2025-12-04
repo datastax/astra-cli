@@ -6,10 +6,10 @@ import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.*;
+import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
 
 @RequiredArgsConstructor
 public class RoleGatewayCompletionsCacheWrapper implements RoleGateway {
@@ -31,6 +31,17 @@ public class RoleGatewayCompletionsCacheWrapper implements RoleGateway {
             cache.addToCache(res.get().getName());
         } else {
             removeRefFromCache(ref);
+        }
+
+        return res;
+    }
+
+    @Override
+    public Map<UUID, Optional<String>> findNames(Set<UUID> ids) {
+        val res = delegate.findNames(ids);
+
+        for (val maybeName : res.values()) {
+            maybeName.ifPresent(cache::addToCache);
         }
 
         return res;

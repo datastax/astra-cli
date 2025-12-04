@@ -10,7 +10,7 @@ import com.dtsx.astra.cli.utils.JsonUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
-import org.graalvm.collections.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public class DbResumeCmdSnapshotTest extends BaseCmdSnapshotTest {
     private SnapshotTestOptionsModifier resumeDbOpts(DatabaseStatusType initialStatus, Duration waitedTime) {
         return (o) -> o
             .gateway(DbGateway.class, (mock) -> {
-                when(mock.resume(any(), any())).thenReturn(Pair.create(initialStatus, waitedTime));
+                when(mock.resume(any(), any())).thenReturn(Pair.of(initialStatus, waitedTime));
             })
             .verify((mocks) -> {
                 verify(mocks.dbGateway()).resume(Databases.NameRef, Optional.of(Duration.ofSeconds(600)));
@@ -33,7 +33,7 @@ public class DbResumeCmdSnapshotTest extends BaseCmdSnapshotTest {
     private SnapshotTestOptionsModifier resumeDbAsyncOpts(DatabaseStatusType initialStatus) {
         return (o) -> o
             .gateway(DbGateway.class, (mock) -> {
-                when(mock.resume(any(), any())).thenReturn(Pair.create(initialStatus, Duration.ZERO));
+                when(mock.resume(any(), any())).thenReturn(Pair.of(initialStatus, Duration.ZERO));
 
                 val copiedDb = JsonUtils.clone(Databases.One, Database.class);
                 copiedDb.setStatus(initialStatus);

@@ -10,6 +10,10 @@ import com.dtsx.astra.cli.operations.token.TokenListOperation;
 import lombok.val;
 import picocli.CommandLine.Command;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -27,9 +31,11 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
     @Override
     protected final OutputJson executeJson(Supplier<Stream<TokenInfo>> tokens) {
-        return OutputJson.serializeValue(tokens.get().map((t) -> sequencedMapOf(
-            "generatedOn", t.generatedOn(),
-            "clientId", t.clientId(),
+        return OutputJson.serializeValue(getSorted(tokens).map((t) -> sequencedMapOf(
+            "generatedOn", t.raw().getGeneratedOn(),
+            "clientId", t.raw().getClientId(),
+            "tokenExpiry", t.raw().getTokenExpiry(),
+            "description", t.raw().getDescription(),
             "roleNames", t.roleNames(),
             "roleIds", t.roleIds()
         )).toList());
@@ -37,15 +43,22 @@ public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
 
     @Override
     public final OutputAll execute(Supplier<Stream<TokenInfo>> tokens) {
-        val rows = tokens.get()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
+
+        val rows = getSorted(tokens)
             .map((token) -> sequencedMapOf(
-                "Generated On", token.generatedOn(),
-                "Client Id", token.clientId(),
+                "Generated On", formatter.format(Instant.parse(token.raw().getGeneratedOn())),
+                "Client Id", token.raw().getClientId(),
                 "Roles", token.roleNames()
             ))
             .toList();
 
         return new ShellTable(rows).withColumns("Generated On", "Client Id", "Roles");
+    }
+
+    private Stream<TokenInfo> getSorted(Supplier<Stream<TokenInfo>> tokens) {
+        return tokens.get().sorted(Comparator.<TokenInfo, String>comparing(t -> t.raw().getGeneratedOn()).reversed());
     }
 
     @Override

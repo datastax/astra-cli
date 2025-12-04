@@ -11,13 +11,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.commons.io.file.PathUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class DownloadsGatewayImpl implements DownloadsGateway {
@@ -29,17 +29,17 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
 
         for (val datacenter : datacenters) {
             try {
-                ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
-                    val scbName = "scb_%s_%s.zip".formatted(datacenter.getId(), datacenter.getRegion());
-                    val scbPath = ctx.home().dirs().useScb().resolve(scbName);
+                val scbName = "scb_%s_%s.zip".formatted(datacenter.getId(), datacenter.getRegion());
+                val scbPath = ctx.home().dirs.scb.use().resolve(scbName);
 
-                    if (Files.notExists(scbPath)) {
-                        FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath);
-                    }
+                if (Files.notExists(scbPath)) {
+                    ctx.log().loading("Downloading secure connect bundle for database %s in region %s".formatted(ctx.highlight(ref), ctx.highlight(datacenter.getRegion())), (_) -> {
+                        FileUtils.downloadFile(datacenter.getSecureBundleUrl(), scbPath.getParent(), scbName);
+                        return null;
+                    });
+                }
 
-                    result.add(scbPath);
-                    return null;
-                });
+                result.add(scbPath);
             } catch (Exception e) {
                 ctx.log().exception("Failed to download secure connect bundle for database '%s' in region '%s'".formatted(ref, datacenter.getRegion()));
                 ctx.log().exception(e);
@@ -51,48 +51,60 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     }
 
     @Override
-    public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) {
-        return installGenericArchive(ctx.home().dirs().useCqlsh(cqlsh.version()), cqlsh.url(), cqlsh.version(), "cqlsh", ctx);
+    public Either<String, Path> downloadCqlsh(ExternalSoftware cqlsh) { // also cqlsh@6.8.0
+        return installArchiveIfNotExists(ctx.home().dirs.cqlsh(cqlsh.version()).use(), cqlsh, "cqlsh", Set.of("cqlsh-astra@6.8.0"), ctx);
     }
 
     @Override
     public Either<String, Path> downloadDsbulk(ExternalSoftware dsbulk) {
-        return installGenericArchive(ctx.home().dirs().useDsbulk(dsbulk.version()), dsbulk.url(), dsbulk.version(), "dsbulk", ctx);
+        return installArchiveIfNotExists(ctx.home().dirs.dsbulk(dsbulk.version()).use(), dsbulk, "dsbulk", Set.of("dsbulk@1.11.0"), ctx);
     }
 
     @Override
     public Either<String, Path> downloadPulsarShell(ExternalSoftware pulsar) {
-        return installGenericArchive(ctx.home().dirs().usePulsar(pulsar.version()), pulsar.url(), pulsar.version(), "pulsar-shell", ctx);
+        return installArchiveIfNotExists(ctx.home().dirs.pulsar(pulsar.version()).use(), pulsar, "pulsar-shell", Set.of("lunastreaming-shell@3.1.411"), ctx);
     }
 
     @Override
     public Either<String, Path> downloadAstra(ExternalSoftware astra) {
         try {
-            val tmpDir = Files.createTempDirectory(ctx.path(System.getProperty("java.io.tmpdir")), "astra-cli-upgrade-").resolve("astra");
-            return installGenericArchive(tmpDir, astra.url(), astra.version(), "astra", ctx);
+            // must use ctx.path(...) instead of letting Files.createTempDirectory use the default tmpdir
+            // so that jimfs can be used in tests
+            val tmpDirPath = ctx.path(System.getProperty("java.io.tmpdir"));
+
+            // I think this is only necessary for jimfs reasons, doubt this would ever be triggered in the real world
+            Files.createDirectories(tmpDirPath);
+
+            val tmpDir = Files.createTempDirectory(tmpDirPath, "astra-cli-upgrade-").resolve("astra");
+
+            val exeName = (astra.url().endsWith(".zip"))
+                ? "astra.exe"
+                : "astra";
+
+            return installArchiveIfNotExists(tmpDir, astra, exeName, Set.of(), ctx);
         } catch (Exception e) {
-            return Either.left("Failed to create temporary directory in %s: '%s'".formatted(System.getProperty("java.io.tmpdir"), e.getMessage()));
+            return Either.left("Failed to create temporary directory in %s (%s): '%s'".formatted(System.getProperty("java.io.tmpdir"), e.getClass().getSimpleName(), e.getMessage()));
         }
     }
 
     @Override
     public Optional<Path> cqlshPath(ExternalSoftware cqlsh) {
-        return getPath(() -> ctx.home().dirs().cqlshExists(cqlsh.version()), () -> ctx.home().dirs().useCqlsh(cqlsh.version()), "cqlsh");
+        return getExePath(ctx.home().dirs.cqlsh(cqlsh.version()).useIfExists(), "cqlsh");
     }
 
     @Override
     public Optional<Path> dsbulkPath(ExternalSoftware dsbulk) {
-        return getPath(() -> ctx.home().dirs().dsbulkExists(dsbulk.version()), () -> ctx.home().dirs().useDsbulk(dsbulk.version()), "dsbulk");
+        return getExePath(ctx.home().dirs.dsbulk(dsbulk.version()).useIfExists(), "dsbulk");
     }
 
     @Override
     public Optional<Path> pulsarShellPath(ExternalSoftware pulsar) {
-        return getPath(() -> ctx.home().dirs().pulsarExists(pulsar.version()), () -> ctx.home().dirs().usePulsar(pulsar.version()), "pulsar-shell");
+        return getExePath(ctx.home().dirs.pulsar(pulsar.version()).useIfExists(), "pulsar-shell");
     }
 
-    private Optional<Path> getPath(Supplier<Boolean> dirExists, Supplier<Path> getDir, String exe) {
-        if (dirExists.get()) {
-            val exeFile = getDir.get().resolve("bin/" + exe);
+    private Optional<Path> getExePath(Optional<Path> subfolder, String exe) {
+        if (subfolder.isPresent()) {
+            val exeFile = subfolder.get().resolve("bin").resolve(exe);
 
             if (Files.exists(exeFile) && Files.isExecutable(exeFile)) {
                 return Optional.of(exeFile);
@@ -101,77 +113,144 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
         return Optional.empty();
     }
 
+    private Either<String, Path> installArchiveIfNotExists(Path installDir, ExternalSoftware ex, String exeName, Set<String> legacyInstallDirs, CliContext ctx) {
+        val existing = getExePath(Optional.of(installDir), exeName);
+
+        if (existing.isPresent()) {
+            return Either.pure(existing.get());
+        }
+
+        return installArchive(installDir, ex, exeName, legacyInstallDirs, ctx);
+    }
+
+    // WARNING: THIS ASSUMES THE ARCHIVE FOLLOWS THE STANDARD <name>/<bin>/<exe> STRUCTURE
+    private Either<String, Path> installArchive(Path installDir, ExternalSoftware ex, String exeName, Set<String> legacyInstallDirs, CliContext ctx) {
+        cleanupExistingInstallation(installDir, legacyInstallDirs, ctx);
+
+        return downloadArchive(installDir, ex, exeName, ctx).flatMap((archivePath) -> {
+            return extractAndSetupArchive(installDir, archivePath, ex.version(), exeName, ctx);
+        });
+    }
+
+    private void cleanupExistingInstallation(Path installDir, Set<String> legacyInstallDirs, CliContext ctx) {
+        tryCleanupLegacyFiles(installDir, legacyInstallDirs, ctx);
+
+        try {
+            if (Files.exists(installDir)) {
+                PathUtils.deleteDirectory(installDir);
+            }
+            Files.createDirectories(installDir);
+        } catch (Exception e) {
+            ctx.log().exception("Issue cleaning up existing installation", e);
+        }
+    }
+
     @SneakyThrows
     @SuppressWarnings("resource")
-    private Either<String, Path> installGenericArchive(Path installDir, String url, Version version, String exe, CliContext ctx) {
-        if (Files.isRegularFile(installDir)) {
-            return Either.left("%s is a file; expected it to be a directory".formatted(installDir));
+    private void tryCleanupLegacyFiles(Path installDir, Set<String> legacyInstallDirs, CliContext ctx) {
+        val homeDir = ctx.path(ctx.home().root());
+
+        for (val legacyInstallDir : legacyInstallDirs) {
+            val legacyPath = homeDir.resolve(legacyInstallDir);
+
+            try {
+                if (Files.exists(legacyPath)) {
+                    ctx.log().debug("Cleaning up legacy installation at " + legacyPath);
+                    PathUtils.deleteDirectory(legacyPath);
+                }
+            } catch (Exception e) {
+                ctx.log().exception("Issue cleaning up legacy installation at " + legacyPath, e);
+            }
         }
 
-        val suffix = (ctx.isWindows()) ? ".zip" : ".tar.gz";
+        val installDirParent = installDir.getParent();
 
-        val archiveFile = installDir.resolve(exe + "-download" + suffix);
-        val exeFile = installDir.resolve("bin/" + exe);
-
-        if (PathUtils.isRegularFile(exeFile) && !PathUtils.isEmptyFile(exeFile)) {
-            return Either.pure(exeFile);
+        if (installDirParent != null) {
+            for (val child : Files.walk(installDirParent, 1).skip(1).toList()) {
+                if (!Files.isDirectory(child) || Version.parse(child.getFileName().toString()).isLeft()) {
+                    try {
+                        ctx.log().debug("Cleaning up legacy installation at " + child);
+                        PathUtils.deleteDirectory(child);
+                    } catch (Exception e) {
+                        ctx.log().exception("Issue cleaning up legacy installation at " + child, e);
+                    }
+                }
+            }
         }
+    }
 
+    private static @NotNull Either<String, Path> downloadArchive(Path installDir, ExternalSoftware ex, String exeName, CliContext ctx) {
         try {
-            FileUtils.createDirIfNotExists(installDir, null);
-            PathUtils.cleanDirectory(installDir);
-            Files.deleteIfExists(archiveFile);
-        } catch (Exception e) {
-            ctx.log().exception(e);
-            return Either.left("Failed to clean existing " + exe + " installation in %s (%s): '%s'".formatted(installDir, e.getClass().getSimpleName(), e.getMessage()));
-        }
-
-        try {
-            ctx.log().loading("Downloading @!" + exe + " v" + version + "!@, please wait", (_) -> {
-                FileUtils.downloadFile(url, archiveFile);
-                return null;
+            return ctx.log().loading("Downloading @!" + exeName + " v" + ex.version() + "!@, please wait", (_) -> {
+                return Either.pure(
+                    FileUtils.downloadFile(ex.url(), installDir, null)
+                );
             });
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to download " + exe + " archive from %s (%s): '%s'".formatted(url, e.getClass().getSimpleName(), e.getMessage()));
+            return Either.left("Failed to download " + exeName + " archive from %s (%s): '%s'".formatted(ex.url(), e.getClass().getSimpleName(), e.getMessage()));
         }
+    }
 
+    private Either<String, Path> extractAndSetupArchive(Path installDir, Path archivePath, String version, String exeName, CliContext ctx) {
         try {
-            ctx.log().loading("Extracting @!" + exe  + " v" + version + "!@, please wait", (_) -> {
-                if (archiveFile.endsWith(".zip")) {
-                    FileUtils.extractZipArchiveInPlace(archiveFile, ctx);
+            ctx.log().loading("Extracting @!" + exeName + " v" + version + "!@, please wait", (_) -> {
+                if (archivePath.toString().endsWith(".zip")) {
+                    FileUtils.extractZipArchiveInPlace(archivePath, ctx);
                 } else {
-                    FileUtils.extractTarGzArchiveInPlace(archiveFile, ctx);
+                    FileUtils.extractTarGzArchiveInPlace(archivePath, ctx);
                 }
                 return null;
             });
         } catch (Exception e) {
             ctx.log().exception(e);
-            return Either.left("Failed to extract " + exe + " archive %s (%s): '%s'".formatted(archiveFile, e.getClass().getSimpleName(), e.getMessage()));
+            return Either.left("Failed to extract " + exeName + " archive %s (%s): '%s'".formatted(archivePath, e.getClass().getSimpleName(), e.getMessage()));
         }
 
-        try {
-            Files.delete(archiveFile);
-        } catch (Exception e) {
-            ctx.log().exception(e);
-            return Either.left("Failed to delete temporary " + exe + " archive %s (%s): '%s'".formatted(archiveFile, e.getClass().getSimpleName(), e.getMessage()));
-        }
+        return findExtractedDirAndCleanLeftovers(installDir).flatMap((extractedDir) -> {
+            return setupArchive(installDir, extractedDir, version, exeName, ctx);
+        });
+    }
 
-        try {
-            val extractedDir = Files.list(installDir).findFirst();
+    @SneakyThrows
+    @SuppressWarnings("resource")
+    private Either<String, Path> findExtractedDirAndCleanLeftovers(Path installDir) {
+        val children = Files.list(installDir).toList();
 
-            if (extractedDir.isEmpty()) {
-                return Either.left("Failed to locate extracted " + exe + " directory in " + installDir);
+        for (val child : children) {
+            try {
+                if (!Files.isDirectory(child)) {
+                    Files.delete(child);
+                }
+            } catch (Exception e) {
+                ctx.log().exception("Error checking/deleting leftover file from installation", e); // technically no harm if not cleaned, at least w/ existing installable programs
             }
+        }
 
-            for (val item : Files.list(extractedDir.get()).toList()) {
+        val extractedDir = Files.list(installDir)
+            .filter(Files::isDirectory)
+            .toList();
+
+        if (extractedDir.size() == 1) {
+            return Either.pure(extractedDir.getFirst());
+        } else {
+            return Either.left("Failed to locate extracted directory in " + installDir + "; found " + extractedDir.size() + " directories (expected 1)");
+        }
+    }
+
+    @SuppressWarnings("resource")
+    private Either<String, Path> setupArchive(Path installDir, Path extractedDir, String version, String exe, CliContext ctx) {
+        try {
+            for (val item : Files.list(extractedDir).toList()) {
                 Files.move(item, installDir.resolve(item.getFileName()), StandardCopyOption.REPLACE_EXISTING);
             }
-            Files.delete(extractedDir.get());
+            PathUtils.deleteDirectory(extractedDir);
         } catch (Exception e) {
             ctx.log().exception(e);
             return Either.left("Failed to move extracted files (%s): '%s'".formatted(e.getClass().getSimpleName(), e.getMessage()));
         }
+
+        val exeFile = installDir.resolve("bin/" + exe);
 
         try {
             Files.setPosixFilePermissions(exeFile, Set.of(

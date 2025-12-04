@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import static com.datastax.astra.client.core.options.DataAPIClientOptions.DEFAULT_KEYSPACE;
 
-// TODO cache default keyspace
 public interface DbCache {
     void cacheDbId(String dbName, UUID id);
     void cacheDbRegion(UUID id, RegionName region);
@@ -24,10 +23,12 @@ public interface DbCache {
 
         val keyspaces = db.getInfo().getKeyspaces();
 
-        if (keyspaces.size() == 1) {
-            cacheDbDefaultKs(id, keyspaces.stream().toList().getFirst());
-        } else if (keyspaces.contains(DEFAULT_KEYSPACE)) {
-            cacheDbDefaultKs(id, DEFAULT_KEYSPACE);
+        if (keyspaces != null) {
+            if (keyspaces.size() == 1) {
+                cacheDbDefaultKs(id, keyspaces.stream().toList().getFirst());
+            } else if (keyspaces.contains(DEFAULT_KEYSPACE)) {
+                cacheDbDefaultKs(id, DEFAULT_KEYSPACE);
+            }
         }
     }
 

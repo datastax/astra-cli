@@ -28,4 +28,9 @@ public class Ref<T> {
     public void onUpdate(Consumer<T> listener) {
         listeners.add(listener);
     }
+
+    public void nowAndOnUpdate(Consumer<T> listener) {
+        listener.accept(value);
+        listeners.add(listener);
+    }
 }

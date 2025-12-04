@@ -11,25 +11,21 @@ on:
         required: false
         type: boolean
         default: false
+      jar-only:
+        description: 'Release only the fat jar'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
-
-  release:
-    needs: build
+  verify:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Verify versions are up to date
         run: |
           files=(
-            "scripts/install.ps1"
-            "scripts/install.sh"
             "build.gradle.kts"
             "src/test/resources/snapshots/AstraCli/help_output.human.approved.txt"
           )
@@ -49,10 +45,55 @@ jobs:
             exit 1
           fi
 
+  build:
+    needs: verify
+    uses: ./.github/workflows/build.yml
+    with:
+      upload-artifacts: true
+      build-native: ${{ !inputs.jar-only }}
+
+  update-install-scripts:
+    if: ${{ !inputs.jar-only }}
+    needs: build
+    uses: ./.github/workflows/update-install-scripts.yml
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      tag: ${{ inputs.tag }}
+
+  release:
+    needs: [ build, update-install-scripts ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    # https://github.com/actions/runner/issues/491#issuecomment-850884422
+    if: always() && (needs.update-install-scripts.result == 'success' || needs.update-install-scripts.result == 'skipped')
+
+    steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Determine artifact list
+        id: artifact-list
+        run: |
+          if [ "${{ inputs.jar-only }}" = "true" ]; then
+            echo "files=artifacts/astra-cli-fat-jar/*" >> $GITHUB_OUTPUT
+          else
+            {
+              echo "files<<EOT"
+              echo "artifacts/astra-cli-linux-x86_64/*"
+              echo "artifacts/astra-cli-windows-x86_64/*"
+              echo "artifacts/astra-cli-linux-arm64/*"
+              echo "artifacts/astra-cli-macos-x86_64/*"
+              echo "artifacts/astra-cli-macos-arm64/*"
+              echo "artifacts/astra-cli-fat-jar/*"
+              echo "EOT"
+            } >> $GITHUB_OUTPUT
+          fi
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -60,11 +101,6 @@ jobs:
           tag_name: ${{ inputs.tag }}
           name: ${{ inputs.tag }}
           prerelease: ${{ inputs.prerelease }}
-          files: |
-            artifacts/astra-cli-linux-x86_64/*
-            artifacts/astra-cli-windows-x86_64/*
-            artifacts/astra-cli-linux-arm64/*
-            artifacts/astra-cli-macos-x86_64/*
-            artifacts/astra-cli-macos-arm64/*
+          files: ${{ steps.artifact-list.outputs.files }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

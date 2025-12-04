@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db cqlsh exec two_regions_db CONSISTENCY
+command: astra db cqlsh exec two_regions_db -e CONSISTENCY
 exit_code: 0
 comments: 
  | Can't really test human output since we don't capture cqlsh output for human outputs

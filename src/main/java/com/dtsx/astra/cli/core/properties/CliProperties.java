@@ -19,11 +19,13 @@ public interface CliProperties {
         public static final String IGNORE_BETA_WARNINGS = "ASTRA_IGNORE_BETA_WARNINGS";
         public static final String NO_UPDATE_NOTIFIER = "ASTRA_NO_UPDATE_NOTIFIER";
         public static final String COMPLETIONS_SETUP = "ASTRA_COMPLETIONS_SETUP";
+        public static final String DEFAULT_ARGS = "ASTRA_DEFAULT_ARGS";
+        public static final String PROFILE = "ASTRA_PROFILE";
     }
 
     record ExternalSoftware(
         String url,
-        Version version
+        String version // can't use Version here unfortunately b/c pulsar-shell doesn't use semver ._.
     ) {}
 
     enum PathLocationResolver { CUSTOM, XDG, HOME }
@@ -46,6 +48,10 @@ public interface CliProperties {
         NIX("Nix");
         private final String displayName;
     }
+
+    sealed interface PathToAstra { Path unwrap(); }
+    record AstraBinary(Path unwrap) implements PathToAstra {}
+    record AstraJar(Path unwrap) implements PathToAstra {}
 
     ExternalSoftware cqlsh();
 
@@ -73,11 +79,13 @@ public interface CliProperties {
 
     String homeEnvVar();
 
+    String useProfile();
+
     boolean disableBetaWarnings();
 
     boolean noUpgradeNotifications();
 
-    Optional<Path> binaryPath();
+    PathToAstra cliPath(CliContext ctx);
 
     Optional<SupportedPackageManager> owningPackageManager();
 

@@ -103,7 +103,7 @@ public abstract class CompletionsCache {
     }
 
     protected static Path defaultCacheDir(CliContext ctx) {
-        return ctx.home().dirs().useCompletionsCache();
+        return ctx.home().dirs.completionsCache.use();
     }
 
     @SneakyThrows

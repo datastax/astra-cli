@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class KeyspaceGatewayImpl implements KeyspaceGateway {
@@ -24,11 +25,11 @@ public class KeyspaceGatewayImpl implements KeyspaceGateway {
 
             val defaultKeyspace = db.getInfo().getKeyspace();
 
-            if (db.getInfo().getKeyspaces() == null) {
-                return new FoundKeyspaces(defaultKeyspace, java.util.List.of());
-            }
+            val keyspaces = (db.getInfo().getKeyspaces() != null)
+                ? new ArrayList<>(db.getInfo().getKeyspaces())
+                : List.<String>of();
 
-            return new FoundKeyspaces(defaultKeyspace, new ArrayList<>(db.getInfo().getKeyspaces()));
+            return new FoundKeyspaces(defaultKeyspace, keyspaces);
         });
     }
 
