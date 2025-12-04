@@ -35,11 +35,12 @@ public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequ
     }
 
     @Override
-    Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        return buildCoreFlags(request).map(coreFlags -> {
-            val cmd = new ArrayList<>(coreFlags);
-
-            cmd.add("count");
+    protected Either<DsbulkExecResult, List<String>> buildCommandLine() {
+        return buildCoreFlags(request).map((coreFlags) -> {
+            val cmd = new ArrayList<String>() {{
+                add("count");
+                addAll(coreFlags);
+            }};
 
             if (request.query() != null && !request.query().isEmpty()) {
                 cmd.add("--schema.query");

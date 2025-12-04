@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Group
 public class CommonOptionsTest {
     @Group
-    class merge {
+    public class merge {
         @Example
         void empty_merge_with_empty_returns_empty() {
             val empty1 = new CommonOptions();

@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.unit.misc;
 
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
 import lombok.Cleanup;
@@ -97,7 +98,9 @@ public class AstraDefaultArgsTest {
 
     private TestCliContext mkCtx() {
         return new TestCliContext(
-            emptyTestCliContextOptionsBuilder().gateway(DbGateway.class, (mock) -> when(mock.findAll()).thenReturn(Databases.Many.stream()))
+            emptyTestCliContextOptionsBuilder()
+                .gateway(DbGateway.class, (mock) -> when(mock.findAll()).thenReturn(Databases.Many.stream()))
+                .forceProfile(Fixtures.Profile)
         );
     }
 }

@@ -207,6 +207,11 @@ public class CliPropertiesImpl implements CliProperties {
     }
 
     @Override
+    public String useProfile() {
+        return System.getenv(ConstEnvVars.PROFILE);
+    }
+
+    @Override
     public boolean disableBetaWarnings() {
         return System.getenv(ConstEnvVars.IGNORE_BETA_WARNINGS) != null;
     }

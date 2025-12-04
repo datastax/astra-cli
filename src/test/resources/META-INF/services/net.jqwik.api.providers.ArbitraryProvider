@@ -5,3 +5,5 @@ com.dtsx.astra.cli.testlib.arbitraries.EitherProvider
 com.dtsx.astra.cli.testlib.arbitraries.EnumProvider
 com.dtsx.astra.cli.testlib.arbitraries.PairProvider
 com.dtsx.astra.cli.testlib.arbitraries.ParseableProvider
+com.dtsx.astra.cli.testlib.arbitraries.ProfileProvider
+com.dtsx.astra.cli.testlib.arbitraries.PathProvider

@@ -43,10 +43,11 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
 
     @Override
     protected Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        return buildCoreFlags(request).map(coreFlags -> {
-            val cmd = new ArrayList<>(coreFlags);
-            
-            cmd.add("load");
+        return buildCoreFlags(request).map((coreFlags) -> {
+            val cmd = new ArrayList<String>() {{
+                add("load");
+                addAll(coreFlags);
+            }};
 
             addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.encoding(), request.skipRecords(), request.maxErrors());
 

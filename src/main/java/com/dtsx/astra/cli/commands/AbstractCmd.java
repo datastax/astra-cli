@@ -23,6 +23,7 @@ import picocli.CommandLine.Spec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -202,6 +203,10 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
     }
 
     protected final List<String> originalArgs() {
+        if (spec == null) {
+            return Collections.emptyList(); // Only triggered in tests where spec is not initialized
+        }
+
         return listAdd(ctx.properties().cliName(), spec.commandLine().getParseResult().originalArgs()).stream()
             .map(s -> s.contains(" ") ? "'" + s + "'" : s)
             .toList();

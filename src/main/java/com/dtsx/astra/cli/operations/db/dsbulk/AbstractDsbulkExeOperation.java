@@ -44,7 +44,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         Optional<RegionName> region();
     }
 
-    abstract Either<DsbulkExecResult, List<String>> buildCommandLine();
+    protected abstract Either<DsbulkExecResult, List<String>> buildCommandLine();
 
     @Override
     public DsbulkExecResult execute() {

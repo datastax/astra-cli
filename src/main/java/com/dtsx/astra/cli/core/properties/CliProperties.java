@@ -79,6 +79,8 @@ public interface CliProperties {
 
     String homeEnvVar();
 
+    String useProfile();
+
     boolean disableBetaWarnings();
 
     boolean noUpgradeNotifications();

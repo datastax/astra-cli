@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Group
 public class ConnectionOptionsTest {
     @Group
-    class merge {
+    public class merge {
         @Example
         void empty_merge_with_empty_returns_empty() {
             val empty1 = new ConnectionOptions();
@@ -73,11 +73,8 @@ public class ConnectionOptionsTest {
             assertThat(result.$config.$configFile).contains(thisPath);
         }
 
-        @Example
-        void other_takes_precedence_for_profile_name() {
-            val thisProfile = ProfileName.parse("this-profile").getRight();
-            val otherProfile = ProfileName.parse("other-profile").getRight();
-
+        @Property
+        void other_takes_precedence_for_profile_name(@ForAll ProfileName thisProfile, @ForAll ProfileName otherProfile) {
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.empty(), Optional.of(thisProfile)),
                 null
@@ -93,10 +90,8 @@ public class ConnectionOptionsTest {
             assertThat(result.$config.$profileName).contains(otherProfile);
         }
 
-        @Example
-        void uses_this_when_other_profile_name_is_empty() {
-            val thisProfile = ProfileName.parse("this-profile").getRight();
-
+        @Property
+        void uses_this_when_other_profile_name_is_empty(@ForAll ProfileName thisProfile) {
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.empty(), Optional.of(thisProfile)),
                 null
@@ -180,12 +175,10 @@ public class ConnectionOptionsTest {
             assertThat(result.$creds.$env).contains(thisEnv);
         }
 
-        @Example
-        void all_config_fields_present_in_other_returns_other_values() {
+        @Property
+        void all_config_fields_present_in_other_returns_other_values(@ForAll ProfileName thisProfile, @ForAll ProfileName otherProfile) {
             val thisPath = Paths.get("/this/config");
-            val thisProfile = ProfileName.parse("this-profile").getRight();
             val otherPath = Paths.get("/other/config");
-            val otherProfile = ProfileName.parse("other-profile").getRight();
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.of(thisProfile)),
@@ -222,9 +215,8 @@ public class ConnectionOptionsTest {
         }
 
         @Property
-        void all_fields_empty_in_other_returns_this_values(@ForAll AstraToken thisToken, @ForAll AstraEnvironment thisEnv) {
+        void all_fields_empty_in_other_returns_this_values(@ForAll AstraToken thisToken, @ForAll AstraEnvironment thisEnv, @ForAll ProfileName thisProfile) {
             val thisPath = Paths.get("/this/config");
-            val thisProfile = ProfileName.parse("this-profile").getRight();
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.of(thisProfile)),
@@ -303,9 +295,8 @@ public class ConnectionOptionsTest {
         }
 
         @Property
-        void mixed_presence_selective_merge(@ForAll AstraToken thisToken, @ForAll AstraEnvironment otherEnv) {
+        void mixed_presence_selective_merge(@ForAll AstraToken thisToken, @ForAll AstraEnvironment otherEnv, @ForAll ProfileName otherProfile) {
             val thisPath = Paths.get("/this/config");
-            val otherProfile = ProfileName.parse("other-profile").getRight();
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.empty()),
@@ -329,10 +320,9 @@ public class ConnectionOptionsTest {
             assertThat(result.$creds.$env).contains(otherEnv);
         }
 
-        @Example
-        void null_config_in_this_uses_other_config() {
+        @Property
+        void null_config_in_this_uses_other_config(@ForAll ProfileName otherProfile) {
             val otherPath = Paths.get("/other/config");
-            val otherProfile = ProfileName.parse("other-profile").getRight();
 
             val thisOpt = new ConnectionOptions(null, null);
             val otherOpt = new ConnectionOptions(
@@ -362,10 +352,9 @@ public class ConnectionOptionsTest {
             assertThat(result.$creds.$env).contains(otherEnv);
         }
 
-        @Example
-        void null_config_in_other_uses_this_config() {
+        @Property
+        void null_config_in_other_uses_this_config(@ForAll ProfileName thisProfile) {
             val thisPath = Paths.get("/this/config");
-            val thisProfile = ProfileName.parse("this-profile").getRight();
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.of(thisProfile)),

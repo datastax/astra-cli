@@ -5,15 +5,19 @@ import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.ModelUtils;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Value;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import org.jetbrains.annotations.NotNull;
 
-@Value
+@EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProfileName implements Highlightable {
     public static final ProfileName DEFAULT = ProfileName.mkUnsafe("default");
 
-    String name;
+    private final String name;
 
-    public static Either<String, ProfileName> parse(String name) {
+    public static @NotNull Either<String, ProfileName> parse(String name) {
         return ModelUtils.trimAndValidateBasics("Profile name", name).flatMap((trimmed) -> {
             return Either.pure(ProfileName.mkUnsafe(trimmed));
         });

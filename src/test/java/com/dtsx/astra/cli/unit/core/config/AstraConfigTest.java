@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.unit.core.config;
 
-
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;

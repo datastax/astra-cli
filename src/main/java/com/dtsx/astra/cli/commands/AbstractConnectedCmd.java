@@ -35,7 +35,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
     public sealed interface ProfileSource {
         record Forced(Profile profile) implements ProfileSource {}
-        record FromArgs(AstraToken token, Optional<AstraEnvironment> env) implements ProfileSource {}
+        record FromArgs(AstraToken token, AstraEnvironment env) implements ProfileSource {}
         record CustomFile(Path path, ProfileName profile) implements ProfileSource {}
         record DefaultFile(ProfileName profile) implements ProfileSource {}
     }
@@ -65,7 +65,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
 
         return cachedProfile = switch (cachedProfileSource = profileSource()) {
             case Forced(var profile) -> profile;
-            case FromArgs(var token, var env) -> new Profile(Optional.empty(), token, env.orElse(AstraEnvironment.PROD), Optional.empty());
+            case FromArgs(var token, var env) -> new Profile(Optional.empty(), token, env, Optional.empty());
             case CustomFile(var path, var profileName) -> resolveProfileFromConfigFile(path, profileName);
             case DefaultFile(var profileName) -> resolveProfileFromConfigFile(null, profileName);
         };
@@ -85,21 +85,19 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         }
 
         if ($connOpts.$creds != null) {
-            return new FromArgs($connOpts.$creds.$token, $connOpts.$creds.$env);
+            return new FromArgs($connOpts.$creds.$token, $connOpts.$creds.$env.orElse(AstraEnvironment.PROD));
         }
 
         val defaultFilePath = AstraConfig.resolveDefaultAstraConfigFile(ctx);
 
+        val defaultProfileName = Optional.ofNullable(ctx.properties().useProfile())
+            .map(ProfileName::parse)
+            .map((p) -> p.getRight((e) -> new AstraCliException(PARSE_ISSUE, "Invalid profile name in " + ConstEnvVars.PROFILE + ": '" + e + "'")))
+            .orElse(ProfileName.DEFAULT);
+
         if ($connOpts.$config != null) {
             val configFile = $connOpts.$config.$configFile;
-
-            val defaultProfileName = Optional.ofNullable(System.getenv(ConstEnvVars.PROFILE))
-                 .map(ProfileName::parse)
-                 .map((p) -> p.getRight((e) -> new AstraCliException(PARSE_ISSUE, "Invalid profile name in " + ConstEnvVars.PROFILE + ": '" + e + "'")))
-                 .orElse(ProfileName.DEFAULT);
-
-            val profileName = $connOpts.$config.$profileName
-                .orElse(defaultProfileName);
+            val profileName = $connOpts.$config.$profileName.orElse(defaultProfileName);
 
             // the check for if it's the default file is later used to decide whether to update the completions cache or not
             if (configFile.isPresent()) {
@@ -116,7 +114,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
             return new DefaultFile(profileName);
         }
 
-        return new DefaultFile(ProfileName.DEFAULT);
+        return new DefaultFile(defaultProfileName);
     }
 
     private Profile resolveProfileFromConfigFile(@Nullable Path path, ProfileName targetProfileName) {
