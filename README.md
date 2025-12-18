@@ -46,7 +46,7 @@ The preferred installation method is via the installation script:
 curl -sSL https://ibm.biz/astra-cli | sh
 
 # Unix (brew)
-brew install datastax/astra-cli/astra
+brew install astra
 
 # Windows
 powershell -c "irm https://ibm.biz/astra-cli-win | iex"
