@@ -57,7 +57,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<Strea
     )
     public boolean $ifNotExists;
 
-    @ArgGroup(heading = "%nTenant configuration options:%n", multiplicity = "1")
+    @ArgGroup(heading = "%nTenant configuration options:%n", multiplicity = "1", exclusive = false)
     public TenantCreationOptions $tenantCreationOptions;
 
     public static class TenantCreationOptions {
