@@ -19,13 +19,13 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class AstraConsole {
     @Getter
-    private final InputStream in;
+    private final InputStream stdin;
 
     @Getter
-    private final PrintWriter out;
+    private final PrintWriter stdout;
 
     @Getter
-    private final PrintWriter err;
+    private final PrintWriter stderr;
 
     @Getter
     private final @Nullable Supplier<String> readLineImpl;
@@ -34,43 +34,43 @@ public class AstraConsole {
     private final boolean noInput;
 
     @Getter @Setter
-    private @Nullable Console console = System.console();
+    private @Nullable Console rawConsole = System.console();
 
     public void print(String... items) {
         if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
-        write(getOut(), items);
+        write(stdout, items);
     }
 
     public void printf(@PrintFormat String format, Object... items) {
         if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.print() when the output format is not 'human'");
         }
-        write(getOut(), format.formatted(items));
+        write(stdout, format.formatted(items));
     }
 
     public void println(String... items) {
         if (ctx().outputIsNotHuman()) {
             throw new CongratsYouFoundABugException("Can not use AstraConsole.println() when the output format is not 'human'");
         }
-        writeln(getOut(), items);
+        writeln(stdout, items);
     }
 
     public void unsafePrintln(String... items) {
-        writeln(getOut(), items); // no check on output format
+        writeln(stdout, items); // no check on output format
     }
 
     public void error(String... items) {
-        write(getErr(), items);
+        write(stderr, items);
     }
 
     public void errorf(@PrintFormat String format, Object... items) {
-        write(getErr(), format.formatted(items));
+        write(stderr, format.formatted(items));
     }
 
     public void errorln(String... items) {
-        writeln(getErr(), items);
+        writeln(stderr(), items);
     }
 
     public ConfirmerBuilder confirm(String prompt) {
@@ -86,7 +86,7 @@ public class AstraConsole {
     }
 
     public String unsafeReadLine(@Nullable String prompt, boolean echoOff) {
-        if (console == null) {
+        if (rawConsole == null) {
             throw new CongratsYouFoundABugException("System.console() is null, unable to read input"); // should only be used internally in prompters
         }
 
@@ -97,8 +97,8 @@ public class AstraConsole {
         }
 
         return (echoOff)
-            ? String.valueOf(console.readPassword())
-            : console.readLine();
+            ? String.valueOf(rawConsole.readPassword())
+            : rawConsole.readLine();
     }
 
     private void write(PrintWriter ps, String... items) {

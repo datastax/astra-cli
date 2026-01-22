@@ -10,7 +10,6 @@ import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.JustCouldNot
 import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.NeedsSudo;
 import com.dtsx.astra.cli.operations.NukeOperation.SkipDeleteReason.UserChoseToKeep;
 import lombok.*;
-import lombok.experimental.Accessors;
 import org.apache.commons.io.file.PathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,8 +38,7 @@ public class NukeOperation implements Operation<NukeResult> {
 
     @Data
     @AllArgsConstructor
-    @Accessors(fluent = true)
-    public static class NukeResult {
+        public static class NukeResult {
         private Set<Path> deletedFiles;
         private Set<Path> shellRcFilesToUpdate;
         private Map<Path, SkipDeleteReason> skipped;
@@ -295,7 +293,7 @@ public class NukeOperation implements Operation<NukeResult> {
         private static List<Path> astraHomes(CliContext ctx) {
             return ctx.log().loading("Resolving all possible astra home locations", (_) -> {
                 return ctx.properties().homeFolderLocations(ctx.isWindows()).all().stream()
-                    .map((loc) -> ctx.path(loc.path()))
+                    .map((loc) -> loc.path(ctx))
                     .filter(Files::exists)
                     .toList();
             });
@@ -304,7 +302,7 @@ public class NukeOperation implements Operation<NukeResult> {
         private static List<Path> astraRcs(CliContext ctx) {
             return ctx.log().loading("Resolving all possible astrarc locations", (_) -> {
                 return ctx.properties().rcFileLocations(ctx.isWindows()).all().stream()
-                    .map((loc) -> ctx.path(loc.path()))
+                    .map((loc) -> loc.path(ctx))
                     .filter(Files::exists)
                     .toList();
             });

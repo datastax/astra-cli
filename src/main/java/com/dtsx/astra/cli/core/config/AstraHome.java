@@ -17,7 +17,7 @@ public class AstraHome {
         this.ctxSupplier = ctxSupplier;
 
         this.dir = new Thunk<>(() -> (
-           ctx().path(ctx().properties().homeFolderLocations(ctx().isWindows()).preferred())
+           ctx().properties().homeFolderLocations(ctx().isWindows()).preferred(ctx())
         ));
     }
 
@@ -60,7 +60,7 @@ public class AstraHome {
         private final Supplier<Path> folder;
 
         public AstraSubfolder(String... subfolder) {
-            this.folder = new Thunk<>(() -> dir.get().resolve(ctx().fs().getPath("", subfolder)));
+            this.folder = new Thunk<>(() -> dir.get().resolve(ctx().path("", subfolder)));
         }
 
         public boolean exists() {

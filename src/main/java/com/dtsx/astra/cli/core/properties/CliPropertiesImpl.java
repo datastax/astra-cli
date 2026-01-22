@@ -112,7 +112,7 @@ public class CliPropertiesImpl implements CliProperties {
             System.setProperty("cli.rc-file.resolver", PathLocationResolver.HOME.name());
 
             locations.add(
-                new PathLocation(System.getProperty("user.home") + path, PathLocationResolver.HOME)
+                PathLocation.from(System.getProperty("user.home") + path, PathLocationResolver.HOME)
             );
         }
 
@@ -123,7 +123,7 @@ public class CliPropertiesImpl implements CliProperties {
             System.setProperty("cli.rc-file.resolver", PathLocationResolver.XDG.name());
 
             locations.add(
-                new PathLocation(xdgConfigHome + path, PathLocationResolver.XDG)
+                PathLocation.from(xdgConfigHome + path, PathLocationResolver.XDG)
             );
         }
 
@@ -132,11 +132,11 @@ public class CliPropertiesImpl implements CliProperties {
             System.setProperty("cli.rc-file.resolver", PathLocationResolver.CUSTOM.name());
 
             locations.add(
-                new PathLocation(customPath, PathLocationResolver.CUSTOM)
+                PathLocation.from(customPath, PathLocationResolver.CUSTOM)
             );
         }
 
-        return new PathLocations(locations.getLast().path(), NEList.parse(locations).orElseThrow(() ->
+        return new PathLocations(NEList.parse(locations).orElseThrow(() ->
             new CongratsYouFoundABugException("No .astrarc file locations could be determined")
         ));
     }
@@ -159,7 +159,7 @@ public class CliPropertiesImpl implements CliProperties {
             System.setProperty("cli.home-folder.resolver", PathLocationResolver.HOME.name());
 
             locations.add(
-                new PathLocation(base + path, PathLocationResolver.HOME)
+                PathLocation.from(base + path, PathLocationResolver.HOME)
             );
         }
 
@@ -170,7 +170,7 @@ public class CliPropertiesImpl implements CliProperties {
             System.setProperty("cli.home-folder.resolver", PathLocationResolver.XDG.name());
 
             locations.add(
-                new PathLocation(xdgDataHome + path, PathLocationResolver.XDG)
+                PathLocation.from(xdgDataHome + path, PathLocationResolver.XDG)
             );
         }
 
@@ -179,11 +179,11 @@ public class CliPropertiesImpl implements CliProperties {
             System.setProperty("cli.home-folder.resolver", PathLocationResolver.CUSTOM.name());
 
             locations.add(
-                new PathLocation(customPath, PathLocationResolver.CUSTOM)
+                PathLocation.from(customPath, PathLocationResolver.CUSTOM)
             );
         }
 
-        return new PathLocations(locations.getLast().path(), NEList.parse(locations).orElseThrow(() ->
+        return new PathLocations(NEList.parse(locations).orElseThrow(() ->
             new CongratsYouFoundABugException("No astra home folder locations could be determined")
         ));
     }

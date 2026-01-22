@@ -10,6 +10,7 @@ import com.dtsx.astra.sdk.utils.ApiResponseError;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.dtsx.astra.sdk.utils.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
+@Accessors(fluent = false)
 public class PcuGroupsClient extends AbstractApiClient {
     private static final TypeReference<List<PcuGroup>> RESPONSE_PCU_GROUPS =
         new TypeReference<>(){};

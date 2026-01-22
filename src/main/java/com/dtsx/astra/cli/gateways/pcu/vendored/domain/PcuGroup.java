@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Accessors(fluent = false)
 public class PcuGroup {
     @Setter(onMethod = @__(@JsonSetter("uuid")))
     @Getter(onMethod = @__(@JsonGetter("uuid")))

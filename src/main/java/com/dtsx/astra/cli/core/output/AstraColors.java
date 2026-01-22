@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.core.output;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Help;
@@ -16,7 +15,6 @@ import java.util.HashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-@Accessors(fluent = true)
 @RequiredArgsConstructor
 public class AstraColors {
     private static final String CSI = "\u001B[";

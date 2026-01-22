@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.gateways.pcu.vendored.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
@@ -9,6 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 @Setter
 @Jacksonized
 @SuperBuilder
+@Accessors(fluent = false)
 public final class PcuGroupCreationRequest extends PcuGroupCreateUpdateRequest {
     private String instanceType;
     private PcuGroupProvisionType provisionType;

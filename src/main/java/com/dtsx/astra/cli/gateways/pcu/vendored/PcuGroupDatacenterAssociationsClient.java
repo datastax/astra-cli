@@ -8,6 +8,7 @@ import com.dtsx.astra.sdk.utils.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Slf4j
+@Accessors(fluent = false)
 public class PcuGroupDatacenterAssociationsClient extends AbstractApiClient {
     private static final TypeReference<List<PcuGroupDatacenterAssociation>> PCU_GROUP_DB_ASSOCIATIONS =
         new TypeReference<>() {};

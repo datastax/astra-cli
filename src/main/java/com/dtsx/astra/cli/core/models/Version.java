@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Getter
-@Accessors(fluent = true)
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Version implements Highlightable, Comparable<Version> {

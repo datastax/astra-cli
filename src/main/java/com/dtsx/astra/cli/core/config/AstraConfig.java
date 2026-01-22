@@ -16,7 +16,6 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.val;
 import org.apache.commons.io.file.PathUtils;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +35,6 @@ import java.util.function.Predicate;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
-@Accessors(fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
@@ -54,7 +52,7 @@ public class AstraConfig {
     private final Path backingFile;
 
     public static Path resolveDefaultAstraConfigFile(CliContext ctx) {
-        return ctx.path(ctx.properties().rcFileLocations(ctx.isWindows()).preferred());
+        return ctx.properties().rcFileLocations(ctx.isWindows()).preferred(ctx);
     }
 
     public static AstraConfig readAstraConfigFile(CliContext ctx, @Nullable Path maybePath, boolean createIfNotExists) {
@@ -209,8 +207,7 @@ public class AstraConfig {
 
     public class ProfileModificationCtx {
         @Getter
-        @Accessors(fluent = true)
-        private final List<Runnable> actions = new ArrayList<>();
+                private final List<Runnable> actions = new ArrayList<>();
 
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
             actions.add(() -> {

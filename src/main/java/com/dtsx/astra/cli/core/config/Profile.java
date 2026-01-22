@@ -13,7 +13,6 @@ import java.util.Optional;
 @Getter
 @ToString
 @EqualsAndHashCode
-@Accessors(fluent = true)
 @RequiredArgsConstructor
 public class Profile {
     private final Optional<ProfileName> name;

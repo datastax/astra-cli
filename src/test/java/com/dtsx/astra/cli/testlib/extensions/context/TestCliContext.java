@@ -36,7 +36,6 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Getter
-@Accessors(fluent = true)
 public class TestCliContext implements AutoCloseable {
     public sealed interface OutputLine { String unwrap(); }
     public record StdoutLine(String unwrap) implements OutputLine {}
@@ -175,7 +174,7 @@ public class TestCliContext implements AutoCloseable {
             fs.close();
         }
 
-        get().console().getIn().close();
+        get().console().stdin().close();
         validate((_, _) -> {});
     }
 

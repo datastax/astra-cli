@@ -9,8 +9,7 @@ import java.util.function.Function;
 
 public abstract class PromptRequest {
     @Value
-    @Accessors(fluent = true)
-    public static class Open<T> {
+        public static class Open<T> {
         String prompt;
         Optional<String> defaultOption;
         Function<String, T> mapper;
@@ -20,8 +19,7 @@ public abstract class PromptRequest {
     }
 
     @Value
-    @Accessors(fluent = true)
-    public static class Closed<T> {
+        public static class Closed<T> {
         String prompt;
         Optional<String> defaultOption;
         Function<String, T> mapper;

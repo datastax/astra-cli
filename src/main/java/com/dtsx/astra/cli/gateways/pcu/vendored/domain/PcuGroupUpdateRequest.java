@@ -9,6 +9,7 @@ import lombok.val;
 
 @Jacksonized
 @SuperBuilder
+@Accessors(fluent = false)
 public class PcuGroupUpdateRequest extends PcuGroupCreateUpdateRequest {
     public PcuGroupCreateUpdateRequest withDefaultsAndValidations(PcuGroup base) {
         val internalRep = new InternalRep(
@@ -32,7 +33,7 @@ public class PcuGroupUpdateRequest extends PcuGroupCreateUpdateRequest {
 
     @Setter
     @Getter
-    @Accessors(chain = true)
+    @Accessors(chain = true, fluent = false)
     public static class InternalRep extends PcuGroupUpdateRequest {
         private String pcuGroupUUID;
         private String instanceType;

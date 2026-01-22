@@ -24,7 +24,6 @@ import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
-@Accessors(fluent = true)
 public class AstraLogger {
     @Getter
     private final Level level;

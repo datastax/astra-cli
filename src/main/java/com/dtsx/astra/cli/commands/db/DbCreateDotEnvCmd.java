@@ -218,7 +218,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
         if ($keysGroup != null && $keysGroup.preset != null) {
             return $keysGroup.preset.stream()
-                .flatMap(p -> p.getKeys().stream())
+                .flatMap(p -> p.keys().stream())
                 .collect(Collectors.toSet());
         }
 

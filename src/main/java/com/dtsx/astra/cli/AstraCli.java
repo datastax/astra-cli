@@ -40,7 +40,6 @@ import com.dtsx.astra.cli.operations.Operation;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
 import lombok.val;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -155,8 +154,7 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     @Getter
-    @Accessors(fluent = true)
-    private static @Nullable Supplier<CliContext> unsafeGlobalCliContext;
+        private static @Nullable Supplier<CliContext> unsafeGlobalCliContext;
 
     @SneakyThrows
     @VisibleForTesting
@@ -182,8 +180,8 @@ public class AstraCli extends AbstractCmd<Void> {
             .setOverwrittenOptionsAllowed(true);
 
         ctxRef.nowAndOnUpdate((ctx) -> {
-            cmd.setOut(ctx.console().getOut());
-            cmd.setErr(ctx.console().getErr());
+            cmd.setOut(ctx.console().stdout());
+            cmd.setErr(ctx.console().stderr());
         });
 
         cmd.getSubcommands().get("help").getCommandSpec().usageMessage().hidden(true);
