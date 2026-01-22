@@ -142,7 +142,7 @@ public class AstraCli extends AbstractCmd<Void> {
             CliPropertiesImpl.mkAndLoadSysProps(cliEnv, MemoizedCliProperties::new),
             OutputType.HUMAN,
             new AstraColors(Ansi.AUTO),
-            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), Optional.empty()),
+            new AstraLogger(Level.REGULAR, cliEnv, getCtx, false, Optional.empty(), Optional.empty()),
             new AstraConsole(System.in, mkPrintWriter(System.out, "stdout"), mkPrintWriter(System.err, "stderr"), null, getCtx, false),
             new AstraHome(getCtx),
             FileSystems.getDefault(),

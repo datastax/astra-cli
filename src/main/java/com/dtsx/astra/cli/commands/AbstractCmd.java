@@ -126,7 +126,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.properties(),
             common.outputType(),
             new AstraColors(ansi),
-            new AstraLogger(level, () -> ctx, common.shouldDumpLogs(), common.dumpLogsTo(), common.enableSpinner()),
+            new AstraLogger(level, ctx.env(), () -> ctx, common.shouldDumpLogs(), common.dumpLogsTo(), common.enableSpinner()),
             new AstraConsole(ctx.console().getIn(), ctx.console().getOut(), ctx.console().getErr(), ctx.console().getReadLineImpl(), () -> ctx, common.noInput()),
             ctx.home(),
             ctx.fs(),

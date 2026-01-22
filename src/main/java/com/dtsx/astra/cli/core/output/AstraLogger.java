@@ -1,7 +1,8 @@
 package com.dtsx.astra.cli.core.output;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.datatypes.Thunk;
+import com.dtsx.astra.cli.core.output.LoadingSpinner.LoadingSpinnerControls;
+import com.dtsx.astra.cli.core.properties.CliEnvironment;
 import com.dtsx.astra.cli.utils.MiscUtils;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -34,20 +35,25 @@ public class AstraLogger {
 
     private final List<String> accumulated = Collections.synchronizedList(new ArrayList<>());
 
-    private Optional<LoadingSpinner> globalSpinner = Optional.empty();
-    private final Supplier<Boolean> spinnerEnabled;
+    private final Optional<LoadingSpinner> globalSpinner;
 
-    public AstraLogger(Level level, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo, Optional<Boolean> enableSpinner) {
+    public AstraLogger(Level level, CliEnvironment cliEnv, Supplier<CliContext> ctxSupplier, boolean shouldDumpLogs, Optional<Path> dumpLogsTo, Optional<Boolean> enableSpinner) {
         this.level = level;
         this.ctxSupplier = ctxSupplier;
         this.shouldDumpLogs = shouldDumpLogs;
 
-        this.spinnerEnabled = new Thunk<>(() -> enableSpinner.orElseGet(() -> {
+        val isSpinnerEnabled = enableSpinner.orElseGet(() -> {
             if (System.getProperty("cli.output.spinner.disable", "").equals("true")) { // for tests
                 return false;
             }
-            return ctx().isTty() && ctx().logLevel() != Level.QUIET;
-        }));
+            return cliEnv.isTty() && level != Level.QUIET;
+        });
+
+        if (isSpinnerEnabled) {
+            this.globalSpinner = Optional.of(new LoadingSpinner(cliEnv, ctxSupplier));
+        } else {
+            this.globalSpinner = Optional.empty();
+        }
 
         if (dumpLogsTo.isPresent()) {
             this.sessionLogFile = dumpLogsTo::get;
@@ -126,27 +132,15 @@ public class AstraLogger {
 
         started(initialMsg);
 
-        val isFirstLoading = globalSpinner.isEmpty();
-
-        if (isFirstLoading && spinnerEnabled.get()) {
-            globalSpinner = Optional.of(new LoadingSpinner(initialMsg, ctx()));
-            globalSpinner.get().start();
-        } else {
-            globalSpinner.ifPresent(s -> s.pushMessage(initialMsg));
-        }
+        val controls = globalSpinner.flatMap(s -> s.start(initialMsg));
 
         try {
             return supplier.apply((msg) -> {
-                globalSpinner.ifPresent(s -> s.updateMessage(msg));
+                controls.ifPresent(c -> c.updateMessage(ctx().colors().format(msg)));
                 accumulated.add("[LOADING:UPDATED] " + msg);
             });
         } finally {
-            if (isFirstLoading) {
-                globalSpinner.ifPresent(LoadingSpinner::stop);
-                globalSpinner = Optional.empty();
-            } else {
-                globalSpinner.ifPresent(LoadingSpinner::popMessage);
-            }
+            controls.ifPresent(LoadingSpinnerControls::stop);
             done(initialMsg);
         }
     }
@@ -174,12 +168,12 @@ public class AstraLogger {
             return;
         }
 
-        globalSpinner.ifPresent(LoadingSpinner::pause);
+        val resume = globalSpinner.map(LoadingSpinner::pause);
 
         try {
             ctx().console().errorln(msg);
         } finally {
-            globalSpinner.ifPresent(LoadingSpinner::resume);
+            resume.ifPresent(Runnable::run);
         }
     }
 
