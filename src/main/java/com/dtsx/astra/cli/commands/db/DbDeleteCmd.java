@@ -23,7 +23,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
@@ -72,7 +71,7 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
 
     @Option(
         names = LR_OPTS_TIMEOUT_NAME,
-        description = LR_OPTS_TIMEOUT_DESC,
+        description = "How long the command should wait for the database to become terminated",
         defaultValue = "15m"
     )
     public void setTimeout(Duration timeout) {

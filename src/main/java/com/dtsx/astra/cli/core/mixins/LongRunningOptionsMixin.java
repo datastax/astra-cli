@@ -27,7 +27,7 @@ public final class LongRunningOptionsMixin {
     }
 
     public static final String LR_OPTS_TIMEOUT_NAME = "--timeout";
-    public static final String LR_OPTS_TIMEOUT_DESC = "How long the command should wait for the database to become active";
+    public static final String LR_OPTS_TIMEOUT_DB_ACTIVE_DESC = "How long the command should wait for the database to become active";
 
     @Spec(MIXEE)
     private CommandSpec mixeeSpec;
