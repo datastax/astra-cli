@@ -58,6 +58,7 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
             
             if (request.dryRun()) {
                 cmd.add("-dryRun");
+                cmd.add("true");
             }
             
             if (request.allowMissingFields()) {
