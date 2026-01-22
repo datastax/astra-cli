@@ -63,66 +63,72 @@ public final class LongRunningOptionsMixin {
     }
 
     public static <S> Duration awaitGenericStatus(CliContext ctx, String thing, S target, Supplier<S> fetchStatus, Function<S, String> highlightStatus, Duration timeout) {
-        val startTime = System.currentTimeMillis();
+        try {
+            val startTime = System.currentTimeMillis();
 
-        var status = new AtomicReference<>(
-            ctx.log().loading("Fetching initial status of %s".formatted(thing), (_) -> fetchStatus.get())
-        );
+            var status = new AtomicReference<>(
+                ctx.log().loading("Fetching initial status of %s".formatted(thing), (_) -> fetchStatus.get())
+            );
 
-        if (status.get().equals(target)) {
-            return Duration.ZERO;
-        }
+            if (status.get().equals(target)) {
+                return Duration.ZERO;
+            }
 
-        val initialMessage = "Waiting for %s to become %s (currently %s)"
-            .formatted(thing, highlightStatus.apply(target), highlightStatus.apply(status.get()));
+            val initialMessage = "Waiting for %s to become %s (currently %s)"
+                .formatted(thing, highlightStatus.apply(target), highlightStatus.apply(status.get()));
 
-        return ctx.log().loading(initialMessage, (updateMsg) -> {
-            var cycles = 0;
+            return ctx.log().loading(initialMessage, (updateMsg) -> {
+                var cycles = 0;
 
-            while (!status.get().equals(target)) {
-                val elapsed = Duration.ofMillis(System.currentTimeMillis() - startTime);
+                while (!status.get().equals(target)) {
+                    val elapsed = Duration.ofMillis(System.currentTimeMillis() - startTime);
 
-                if (timeout.isPositive() && elapsed.compareTo(timeout) >= 0) {
-                    throw new AstraCliException(TIMED_OUT, """
+                    if (timeout.isPositive() && elapsed.compareTo(timeout) >= 0) {
+                        throw new AstraCliException(TIMED_OUT, """
                       @|bold,red Operation timed out after %d seconds while waiting for %s to become %s (currently %s)|@
                     
                       You can retry the operation or increase the timeout using the @!%s!@ option. @!0!@ means no timeout.
                     
                       Alternatively, you can run the command without waiting with the @!--async!@ option.
                     """.formatted(
-                        timeout.toSeconds(),
-                        stripAnsi(thing),
-                        target,
-                        status.get(),
-                        LR_OPTS_TIMEOUT_NAME
-                    ));
-                }
+                            timeout.toSeconds(),
+                            stripAnsi(thing),
+                            target,
+                            status.get(),
+                            LR_OPTS_TIMEOUT_NAME
+                        ));
+                    }
 
-                try {
-                    updateMsg.accept(
-                        "Waiting for %s to become %s (currently %s, elapsed: %ds)"
-                            .formatted(thing, highlightStatus.apply(target), highlightStatus.apply(status.get()), elapsed.toSeconds())
-                    );
-
-                    if (cycles % 5 == 0) {
+                    try {
                         updateMsg.accept(
-                            "Checking if %s is status %s (currently %s, elapsed: %ds)"
+                            "Waiting for %s to become %s (currently %s, elapsed: %ds)"
                                 .formatted(thing, highlightStatus.apply(target), highlightStatus.apply(status.get()), elapsed.toSeconds())
                         );
 
-                        status.set(fetchStatus.get());
+                        if (cycles % 5 == 0) {
+                            updateMsg.accept(
+                                "Checking if %s is status %s (currently %s, elapsed: %ds)"
+                                    .formatted(thing, highlightStatus.apply(target), highlightStatus.apply(status.get()), elapsed.toSeconds())
+                            );
+
+                            status.set(fetchStatus.get());
+                        }
+
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
                     }
 
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
+                    cycles++;
                 }
 
-                cycles++;
-            }
-
-            return Duration.ofMillis(System.currentTimeMillis() - startTime);
-        });
+                return Duration.ofMillis(System.currentTimeMillis() - startTime);
+            });
+        } catch (Exception e) {
+            ctx.log().info("An error occurred while waiting for %s to become %s".formatted(thing, highlightStatus.apply(target)));
+            ctx.log().info("However, this error occurred after the main operation had already completed, so the operation was likely successful.");
+            throw e;
+        }
     }
 }

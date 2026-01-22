@@ -253,6 +253,7 @@ public class AstraConfig {
                 profiles.removeIf(isProfileName(target));
                 backingIniFile.deleteSection(target.unwrap());
 
+                // TODO is src workign?
                 profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name())));
                 backingIniFile.addSection(target.unwrap(), srcSection);
             });
