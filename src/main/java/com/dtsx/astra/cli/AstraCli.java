@@ -154,7 +154,7 @@ public class AstraCli extends AbstractCmd<Void> {
     }
 
     @Getter
-        private static @Nullable Supplier<CliContext> unsafeGlobalCliContext;
+    private static @Nullable Supplier<CliContext> unsafeGlobalCliContext;
 
     @SneakyThrows
     @VisibleForTesting
