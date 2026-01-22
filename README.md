@@ -482,7 +482,7 @@ Some commands, namely the ones that build on `cqlsh`, `dsbulk`, and `pulsar-shel
     astra db cqlsh mydb -k my_keyspace -f ./my_script.cql
     
     # v1.x
-    echo "SELECT * FROM my_table" | astra db cqlsh exec mydb -k my_keyspace
+    echo "SELECT * FROM my_table" | astra db cqlsh exec mydb -k my_keyspace -e
     astra db cqlsh exec mydb -k my_keyspace "SELECT * FROM my_table"
     astra db cqlsh exec mydb -k my_keyspace -f ./my_script.cql
     ```
