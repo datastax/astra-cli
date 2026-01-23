@@ -9,14 +9,9 @@ import picocli.CommandLine.Command;
     name = "get-endpoint-playground",
     description = "Get the GraphQL Playground for the specified database"
 )
-public class EndpointPlaygroundCmd extends AbstractEndpointGetCmd {
+public class EndpointPlaygroundCmd extends AbstractLegacyEndpointGetCmd {
     @Override
     protected String mkEndpoint(EndpointGetResponse result) {
         return EndpointUtils.getPlaygroundEndpoint(result, profile().env());
-    }
-
-    @Override
-    protected boolean isLegacy() {
-        return true;
     }
 }

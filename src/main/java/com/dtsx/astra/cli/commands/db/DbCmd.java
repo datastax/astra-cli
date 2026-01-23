@@ -16,6 +16,10 @@ import com.dtsx.astra.cli.commands.db.keyspace.KeyspaceListCmd;
 import com.dtsx.astra.cli.commands.db.misc.CloudsListCmd;
 import com.dtsx.astra.cli.commands.db.misc.EmbeddingProvidersListCmd;
 import com.dtsx.astra.cli.commands.db.region.*;
+import com.dtsx.astra.cli.commands.db.region.regions.legacy.RegionListClassicCmd;
+import com.dtsx.astra.cli.commands.db.region.regions.legacy.RegionListServerlessCmd;
+import com.dtsx.astra.cli.commands.db.region.regions.legacy.RegionListVectorCmd;
+import com.dtsx.astra.cli.commands.db.region.regions.RegionsCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDeleteCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDescribeCmd;
 import com.dtsx.astra.cli.commands.db.table.TableListCmd;
@@ -57,6 +61,7 @@ import picocli.CommandLine.Command;
         RegionCreateCmd.class,
         RegionDeleteCmd.class,
         RegionListCmd.class,
+        RegionsCmd.class,
         RegionListClassicCmd.class,
         RegionListServerlessCmd.class,
         RegionListVectorCmd.class,

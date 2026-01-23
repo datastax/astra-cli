@@ -1,6 +1,5 @@
 package com.dtsx.astra.cli.commands.db.endpoints.legacy;
 
-import com.dtsx.astra.cli.commands.db.endpoints.AbstractEndpointGetCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.EndpointUtils;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
 import picocli.CommandLine.Command;
@@ -9,14 +8,9 @@ import picocli.CommandLine.Command;
     name = "get-endpoint-api",
     description = "Get the API endpoint to interact with the specified database"
 )
-public class EndpointApiCmd extends AbstractEndpointGetCmd {
+public class EndpointApiCmd extends AbstractLegacyEndpointGetCmd {
     @Override
     protected String mkEndpoint(EndpointGetResponse result) {
         return EndpointUtils.getApiEndpoint(result, profile().env());
-    }
-
-    @Override
-    protected boolean isLegacy() {
-        return true;
     }
 }

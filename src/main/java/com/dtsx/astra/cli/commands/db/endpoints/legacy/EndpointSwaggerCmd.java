@@ -9,14 +9,9 @@ import picocli.CommandLine.Command;
     name = "get-endpoint-swagger",
     description = "Get the SwaggerUI endpoint for the specified database"
 )
-public class EndpointSwaggerCmd extends AbstractEndpointGetCmd {
+public class EndpointSwaggerCmd extends AbstractLegacyEndpointGetCmd {
     @Override
     protected String mkEndpoint(EndpointGetResponse result) {
         return EndpointUtils.getSwaggerEndpoint(result, profile().env());
-    }
-
-    @Override
-    protected boolean isLegacy() {
-        return true;
     }
 }

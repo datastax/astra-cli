@@ -1,5 +1,6 @@
-package com.dtsx.astra.cli.commands.db.region;
+package com.dtsx.astra.cli.commands.db.region.regions;
 
+import com.dtsx.astra.cli.commands.db.region.AbstractRegionCmd;
 import com.dtsx.astra.cli.core.CliConstants.$Cloud;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
@@ -55,7 +56,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
     }
 
     @Override
-    protected final OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
+    protected OutputAll execute(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
             .map((r) -> sequencedMapOf(
                 "Cloud Provider", formatCloudProviderName(r.cloudProvider(), r.hasFreeTier()),
