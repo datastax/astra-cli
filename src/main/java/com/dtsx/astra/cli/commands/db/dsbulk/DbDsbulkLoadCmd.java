@@ -7,6 +7,8 @@ import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkLoadOperation.LoadRequest
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.Optional;
+
 @Command(
     name = "load",
     description = "Load data leveraging DSBulk"
@@ -33,7 +35,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
         description = "Field-to-column mapping to use",
         paramLabel = "MAPPING"
     )
-    public String $mapping;
+    public Optional<String> $mapping;
 
     @Option(
         names = { "--header" },
@@ -80,7 +82,8 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $encoding,
             $maxConcurrentQueries,
             $logDir,
-            $configProvider(),
+            $configFile,
+            $flags(),
             profile().token(),
             $url,
             $delimiter,

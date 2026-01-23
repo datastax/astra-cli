@@ -19,17 +19,18 @@ import java.util.Optional;
 public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRequest> {
     public record UnloadRequest(
         DbRef dbRef,
-        String keyspace,
-        String table,
-        String query,
+        Optional<String> keyspace,
+        Optional<String> table,
+        Optional<String> query,
         String encoding,
         String maxConcurrentQueries,
         String logDir,
-        Either<Path, Map<String, String>> dsBulkConfig,
+        Optional<Path> dsBulkConfigPath,
+        Map<String, String> dsBulkConfigMap,
         AstraToken token,
         String url,
         String delimiter,
-        String mapping,
+        Optional<String> mapping,
         boolean header,
         int skipRecords,
         int maxErrors,
@@ -48,17 +49,12 @@ public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRe
                 addAll(coreFlags);
             }};
 
-            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.encoding(), request.skipRecords(), request.maxErrors());
+            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.skipRecords(), request.maxErrors(), request.mapping());
 
-            if (request.query() != null && !request.query().isEmpty()) {
+            request.query().ifPresent(q -> {
                 cmd.add("-query");
-                cmd.add(request.query());
-            }
-            
-            if (request.mapping() != null && !request.mapping().isEmpty()) {
-                cmd.add("-m");
-                cmd.add(request.mapping());
-            }
+                cmd.add(q);
+            });
             
             return cmd;
         });

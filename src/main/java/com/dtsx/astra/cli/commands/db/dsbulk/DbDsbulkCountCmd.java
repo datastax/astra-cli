@@ -7,6 +7,8 @@ import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkCountOperation.CountReque
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.Optional;
+
 @Command(
     name = "count",
     description = "Count items for a table, a query"
@@ -17,7 +19,7 @@ public class DbDsbulkCountCmd extends AbstractDsbulkExecWithCoreOptsCmd {
         description = "Optional query to unload or count",
         paramLabel = "QUERY"
     )
-    public String $query;
+    public Optional<String> $query;
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
@@ -29,7 +31,8 @@ public class DbDsbulkCountCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $encoding,
             $maxConcurrentQueries,
             $logDir,
-            $configProvider(),
+            $configFile,
+            $flags(),
             profile().token(),
             $region
         ));

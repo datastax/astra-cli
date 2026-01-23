@@ -7,6 +7,8 @@ import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation.UnloadReq
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.Optional;
+
 @Command(
     name = "unload",
     description = "Unload data leveraging DSBulk"
@@ -33,7 +35,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
         description = "Field-to-column mapping to use",
         paramLabel = "MAPPING"
     )
-    public String $mapping;
+    public Optional<String> $mapping;
 
     @Option(
         names = { "--header" },
@@ -64,7 +66,7 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
         description = "Optional query to unload or count",
         paramLabel = "QUERY"
     )
-    public String $query;
+    public Optional<String> $query;
 
     @Override
     protected Operation<DsbulkExecResult> mkOperation() {
@@ -76,7 +78,8 @@ public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $encoding,
             $maxConcurrentQueries,
             $logDir,
-            $configProvider(),
+            $configFile,
+            $flags(),
             profile().token(),
             $url,
             $delimiter,
