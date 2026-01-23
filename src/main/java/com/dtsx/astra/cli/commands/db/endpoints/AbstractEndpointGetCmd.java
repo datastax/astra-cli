@@ -25,16 +25,24 @@ public abstract class AbstractEndpointGetCmd extends AbstractPromptForDbCmd<Endp
 
     @Override
     protected final OutputAll execute(Supplier<EndpointGetResponse> result) {
+        if (isLegacy()) {
+            ctx.log().warn("@!astra db %s!@ is deprecated".formatted(spec.commandLine().getCommandName()));
+            ctx.log().warn("Use the new command @!astra db get-endpoint %s!@ instead".formatted(spec.commandLine().getCommandName().replace("get-endpoint-", "")));
+        }
         return OutputAll.serializeValue(mkEndpoint(result.get()));
     }
 
     @Override
-    protected Operation<EndpointGetResponse> mkOperation() {
+    protected final Operation<EndpointGetResponse> mkOperation() {
         return new EndpointGetOperation(dbGateway, new EndpointGetRequest($dbRef, region, profile().env()));
     }
 
     @Override
-    protected String dbRefPrompt() {
+    protected final String dbRefPrompt() {
         return "Select the database to get the endpoint for";
+    }
+
+    protected boolean isLegacy() {
+        return false;
     }
 }

@@ -1,24 +1,22 @@
-package com.dtsx.astra.cli.commands.db.endpoints;
+package com.dtsx.astra.cli.commands.db.endpoints.legacy;
 
-import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.commands.db.endpoints.AbstractEndpointGetCmd;
+import com.dtsx.astra.cli.commands.db.endpoints.EndpointUtils;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
 import picocli.CommandLine.Command;
 
 @Command(
-    name = "playground",
+    name = "get-endpoint-playground",
     description = "Get the GraphQL Playground for the specified database"
-)
-@Example(
-    comment = "Get the GraphQL Playground for the database",
-    command = "${cli.name} db get-endpoint playground mydb"
-)
-@Example(
-    comment = "Get the GraphQL Playground for the database in a specific region",
-    command = "${cli.name} db get-endpoint playground mydb --region us-east1"
 )
 public class EndpointPlaygroundCmd extends AbstractEndpointGetCmd {
     @Override
     protected String mkEndpoint(EndpointGetResponse result) {
         return EndpointUtils.getPlaygroundEndpoint(result, profile().env());
+    }
+
+    @Override
+    protected boolean isLegacy() {
+        return true;
     }
 }
