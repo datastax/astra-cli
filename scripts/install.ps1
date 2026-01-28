@@ -120,7 +120,7 @@ function Get-Env {
 $ASTRA_CLI_VERSION = "1.0.3"
 
 # Checksum constant (updated automatically by CI)
-$WINDOWS_X86_64_CHECKSUM = "cce6d6082d304e907897d804000241bafb2a9ee7e37c096211a617184c14422b"
+$WINDOWS_X86_64_CHECKSUM = "bac92ad514cedd07e21e9e5435f7361751c679a6d28b9ee8f4df000e88cc12d3"
 
 if ($env:ASTRA_HOME) {
     $ASTRA_CLI_DIR = "$env:ASTRA_HOME\cli"
