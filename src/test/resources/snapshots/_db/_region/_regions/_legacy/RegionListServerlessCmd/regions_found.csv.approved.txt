@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db list-regions-serverless -o csv
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-serverless' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions serverless' instead
+stdout: code,message,cloud_provider,region,display_name,zone
+stdout: OK,,aws,us-east-1,US East (N. Virginia),North America
+stdout: OK,,aws (free),us-west-2,US West (Oregon),North America
+stdout: OK,,azure,eastus,East US,North America
+stdout: OK,,azure (free),westus2,West US 2,Europe
+stdout: OK,,gcp,us-central1,Iowa,North America
+stdout: OK,,gcp (free),us-east1,South Carolina,Europe
+---- end ----

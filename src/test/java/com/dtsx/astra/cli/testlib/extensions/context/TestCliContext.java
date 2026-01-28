@@ -17,7 +17,6 @@ import com.dtsx.astra.cli.testlib.extensions.context.TestCliContextOptions.TestC
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -93,7 +92,6 @@ public class TestCliContext implements AutoCloseable {
             val pathStr = homeDirPath.get().toString();
 
             return new PathLocations(
-                pathStr,
                 NEList.of(new PathLocation(pathStr, PathLocationResolver.CUSTOM))
             );
         }

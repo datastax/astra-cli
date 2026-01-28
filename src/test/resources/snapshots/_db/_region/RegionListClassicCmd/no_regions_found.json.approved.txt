@@ -1,9 +1,0 @@
----- meta ----
-command: astra db list-regions-classic -o json
-exit_code: 0
----- output ----
-stdout: {
-stdout:   "code" : "OK",
-stdout:   "data" : [ ]
-stdout: }
----- end ----

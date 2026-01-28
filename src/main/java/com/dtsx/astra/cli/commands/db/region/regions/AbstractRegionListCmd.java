@@ -43,7 +43,7 @@ public abstract class AbstractRegionListCmd extends AbstractRegionCmd<Stream<Fou
     public @Nullable List<String> $zoneFilter;
 
     @Override
-    protected final OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
+    protected OutputJson executeJson(Supplier<Stream<FoundRegion>> regions) {
         val data = regions.get()
             .map((r) -> sequencedMapOf(
                 "cloudProvider", r.cloudProvider().name(),

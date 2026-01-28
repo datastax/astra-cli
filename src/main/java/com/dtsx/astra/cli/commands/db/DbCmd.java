@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.commands.db.cdc.CdcListCmd;
 import com.dtsx.astra.cli.commands.db.collections.*;
 import com.dtsx.astra.cli.commands.db.cqlsh.CqlshCmd;
 import com.dtsx.astra.cli.commands.db.dsbulk.DbDsbulkCmd;
-import com.dtsx.astra.cli.commands.db.endpoints.GetEndpointCmd;
+import com.dtsx.astra.cli.commands.db.endpoints.EndpointsCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointApiCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointPlaygroundCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointSwaggerCmd;
@@ -61,12 +61,12 @@ import picocli.CommandLine.Command;
         RegionCreateCmd.class,
         RegionDeleteCmd.class,
         RegionListCmd.class,
-        RegionsCmd.class,
+        CloudsListCmd.class,
         RegionListClassicCmd.class,
         RegionListServerlessCmd.class,
         RegionListVectorCmd.class,
-        CloudsListCmd.class,
-        GetEndpointCmd.class,
+        RegionsCmd.class,
+        EndpointsCmd.class,
         EndpointSwaggerCmd.class,
         EndpointApiCmd.class,
         EndpointPlaygroundCmd.class,

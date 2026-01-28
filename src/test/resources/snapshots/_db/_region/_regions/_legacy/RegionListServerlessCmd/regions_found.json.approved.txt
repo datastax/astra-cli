@@ -1,0 +1,41 @@
+---- meta ----
+command: astra db list-regions-serverless -o json
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-serverless' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions serverless' instead
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "zone" : "North America",
+stdout:     "displayName" : "US East (N. Virginia)",
+stdout:     "cloudProvider" : "aws",
+stdout:     "region" : "us-east-1"
+stdout:   }, {
+stdout:     "zone" : "North America",
+stdout:     "displayName" : "US West (Oregon)",
+stdout:     "cloudProvider" : "aws (free)",
+stdout:     "region" : "us-west-2"
+stdout:   }, {
+stdout:     "zone" : "North America",
+stdout:     "displayName" : "East US",
+stdout:     "cloudProvider" : "azure",
+stdout:     "region" : "eastus"
+stdout:   }, {
+stdout:     "zone" : "Europe",
+stdout:     "displayName" : "West US 2",
+stdout:     "cloudProvider" : "azure (free)",
+stdout:     "region" : "westus2"
+stdout:   }, {
+stdout:     "zone" : "North America",
+stdout:     "displayName" : "Iowa",
+stdout:     "cloudProvider" : "gcp",
+stdout:     "region" : "us-central1"
+stdout:   }, {
+stdout:     "zone" : "Europe",
+stdout:     "displayName" : "South Carolina",
+stdout:     "cloudProvider" : "gcp (free)",
+stdout:     "region" : "us-east1"
+stdout:   } ]
+stdout: }
+---- end ----

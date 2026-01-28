@@ -36,7 +36,7 @@ public class AstraConfigTest {
             assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), null, false))
                 .asInstanceOf(InstanceOfAssertFactories.throwable(AstraCliException.class))
                 .hasMessageContaining("Error: The default configuration file (%s) does not exist.", AstraConfig.resolveDefaultAstraConfigFile(ctx.get()))
-                .satisfies(ex -> assertThat(ex.getCode()).isEqualTo(FILE_ISSUE));
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(FILE_ISSUE));
         }
 
         @Test
@@ -46,7 +46,7 @@ public class AstraConfigTest {
             assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
                 .asInstanceOf(InstanceOfAssertFactories.throwable(AstraCliException.class))
                 .hasMessageContaining("Error: The given configuration file at %s could not be found.", path)
-                .satisfies(ex -> assertThat(ex.getCode()).isEqualTo(FILE_ISSUE));
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(FILE_ISSUE));
         }
 
         @Test
@@ -60,7 +60,7 @@ public class AstraConfigTest {
                 .asInstanceOf(InstanceOfAssertFactories.throwable(AstraCliException.class))
                 .hasMessageContaining("An error occurred parsing the configuration file '.astrarc'")
                 .hasMessageContaining("Unknown syntax")
-                .satisfies(ex -> assertThat(ex.getCode()).isEqualTo(PARSE_ISSUE));
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
         }
     }
 
@@ -180,7 +180,7 @@ public class AstraConfigTest {
                 .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
                 .hasMessageContaining("default")
                 .hasMessageContaining("Missing the required key 'ASTRA_DB_APPLICATION_TOKEN'")
-                .satisfies(ex -> assertThat(ex.getCode()).isEqualTo(PARSE_ISSUE));
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
 
             // invalid profile (missing token key)
             assertThat(config.profiles().getFirst())

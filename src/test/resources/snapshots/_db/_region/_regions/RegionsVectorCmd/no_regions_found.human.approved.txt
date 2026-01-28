@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db regions vector
+exit_code: 0
+---- output ----
+stdout: ┌─────────────────┬─────────┬───────────────┬───────┐
+stdout: │ Cloud Provider  │ Region  │ Display Name  │ Zone  │
+stdout: ├─────────────────┼─────────┼───────────────┼───────┤
+stdout: └─────────────────┴─────────┴───────────────┴───────┘
+---- end ----

@@ -47,9 +47,7 @@ public abstract class AssertUtils {
 
             var codeFound = false;
 
-            for (var it = node.fields(); it.hasNext(); ) {
-                val e = it.next();
-
+            for (val e : node.properties()) {
                 switch (e.getKey()) {
                     case OutputJson.Fields.CODE -> {
                         codeFound = true;

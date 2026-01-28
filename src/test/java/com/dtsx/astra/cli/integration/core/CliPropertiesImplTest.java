@@ -5,6 +5,8 @@ import com.dtsx.astra.cli.core.properties.CliEnvironment;
 import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
 import com.dtsx.astra.cli.core.properties.CliProperties;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
+import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
+import com.dtsx.astra.cli.testlib.extensions.context.UseTestCtx;
 import lombok.val;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CliPropertiesImplTest {
     private static final CliEnvironment cliEnv = new CliEnvironmentImpl();
     private static final CliProperties cliProps = CliPropertiesImpl.mkAndLoadSysProps(cliEnv);
+    
+    @UseTestCtx(fs = "real")
+    private TestCliContext ctx;
 
     @Nested
     public class external_software {
@@ -145,10 +150,10 @@ public class CliPropertiesImplTest {
                 val customPath = mkRcFileSteps.apply(sys, env).applyAll();
 
                 // whether it's windows should not matter here
-                assertThat(cliProps.rcFileLocations(true).preferred()).isEqualTo(customPath);
+                assertThat(cliProps.rcFileLocations(true).preferred(ctx.get())).isEqualTo(ctx.get().absPath(customPath));
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo(customPath);
 
-                assertThat(cliProps.rcFileLocations(false).preferred()).isEqualTo(customPath);
+                assertThat(cliProps.rcFileLocations(false).preferred(ctx.get())).isEqualTo(ctx.get().absPath(customPath));
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo(customPath);
             }
 
@@ -160,10 +165,10 @@ public class CliPropertiesImplTest {
                 val expectedSubpath = File.separator + "<home_folder_name>" + File.separator + cliProps.rcFileName();
 
                 // returned path should not depend on the os; the display path should depend on the os though
-                assertThat(cliProps.rcFileLocations(true).preferred()).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps.rcFileLocations(true).preferred(ctx.get())).isEqualTo(ctx.get().absPath(xdgPath + expectedSubpath));
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("%XDG_CONFIG_HOME%" + expectedSubpath);
 
-                assertThat(cliProps.rcFileLocations(false).preferred()).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps.rcFileLocations(false).preferred(ctx.get())).isEqualTo(ctx.get().absPath(xdgPath + expectedSubpath));
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("$XDG_CONFIG_HOME" + expectedSubpath);
             }
 
@@ -175,10 +180,10 @@ public class CliPropertiesImplTest {
                 val expectedSubpath = File.separator + "custom-rc-file";
 
                 // returned path should not depend on the os; the display path should depend on the os though
-                assertThat(cliProps.rcFileLocations(true).preferred()).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps.rcFileLocations(true).preferred(ctx.get())).isEqualTo(ctx.get().absPath(defaultPath + expectedSubpath));
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("%USERPROFILE%" + expectedSubpath);
 
-                assertThat(cliProps.rcFileLocations(false).preferred()).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps.rcFileLocations(false).preferred(ctx.get())).isEqualTo(ctx.get().absPath(defaultPath + expectedSubpath));
                 assertThat(System.getProperty("cli.rc-file.path")).isEqualTo("~" + expectedSubpath);
             }
         }
@@ -189,10 +194,10 @@ public class CliPropertiesImplTest {
             public void prioritizes_custom_path(SystemProperties sys, EnvironmentVariables env) {
                 val customPath = mkHomeFolderSteps.apply(sys, env).applyAll();
 
-                assertThat(cliProps.homeFolderLocations(true).preferred()).isEqualTo(customPath);
+                assertThat(cliProps.homeFolderLocations(true).preferred(ctx.get())).isEqualTo(ctx.get().absPath(customPath));
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo(customPath);
 
-                assertThat(cliProps.homeFolderLocations(false).preferred()).isEqualTo(customPath);
+                assertThat(cliProps.homeFolderLocations(false).preferred(ctx.get())).isEqualTo(ctx.get().absPath(customPath));
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo(customPath);
             }
 
@@ -204,10 +209,10 @@ public class CliPropertiesImplTest {
                 val expectedSubpath = File.separator + "custom-home-folder";
 
                 // returned path should not depend on the os; the display path should depend on the os though
-                assertThat(cliProps.homeFolderLocations(true).preferred()).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps.homeFolderLocations(true).preferred(ctx.get())).isEqualTo(ctx.get().absPath(xdgPath + expectedSubpath));
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%XDG_DATA_HOME%" + expectedSubpath);
 
-                assertThat(cliProps.homeFolderLocations(false).preferred()).isEqualTo(xdgPath + expectedSubpath);
+                assertThat(cliProps.homeFolderLocations(false).preferred(ctx.get())).isEqualTo(ctx.get().absPath(xdgPath + expectedSubpath));
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("$XDG_DATA_HOME" + expectedSubpath);
             }
 
@@ -218,7 +223,7 @@ public class CliPropertiesImplTest {
                 sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + ".custom-home-folder";
 
-                assertThat(cliProps.homeFolderLocations(false).preferred()).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps.homeFolderLocations(false).preferred(ctx.get())).isEqualTo(ctx.get().absPath(defaultPath + expectedSubpath));
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("~" + expectedSubpath);
             }
 
@@ -229,7 +234,7 @@ public class CliPropertiesImplTest {
                 sys.set("cli.home-folder.name", "custom-home-folder");
                 val expectedSubpath = File.separator + ".custom-home-folder";
 
-                assertThat(cliProps.homeFolderLocations(true).preferred()).isEqualTo(defaultPath + expectedSubpath);
+                assertThat(cliProps.homeFolderLocations(true).preferred(ctx.get())).isEqualTo(ctx.get().absPath(defaultPath + expectedSubpath));
                 assertThat(System.getProperty("cli.home-folder.path")).isEqualTo("%LOCALAPPDATA%" + expectedSubpath);
             }
         }

@@ -1,0 +1,21 @@
+---- meta ----
+command: astra db list-regions-serverless --zone Europe -o json
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-serverless' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions serverless' instead
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "zone" : "Europe",
+stdout:     "displayName" : "West US 2",
+stdout:     "cloudProvider" : "azure (free)",
+stdout:     "region" : "westus2"
+stdout:   }, {
+stdout:     "zone" : "Europe",
+stdout:     "displayName" : "South Carolina",
+stdout:     "cloudProvider" : "gcp (free)",
+stdout:     "region" : "us-east1"
+stdout:   } ]
+stdout: }
+---- end ----

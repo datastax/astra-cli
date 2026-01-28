@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db list-regions-vector -o json
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-vector' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions vector' instead
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ ]
+stdout: }
+---- end ----

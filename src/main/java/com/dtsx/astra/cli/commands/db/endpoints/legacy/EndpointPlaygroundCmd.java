@@ -1,8 +1,6 @@
 package com.dtsx.astra.cli.commands.db.endpoints.legacy;
 
-import com.dtsx.astra.cli.commands.db.endpoints.AbstractEndpointGetCmd;
-import com.dtsx.astra.cli.commands.db.endpoints.EndpointUtils;
-import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
+import com.dtsx.astra.cli.commands.db.endpoints.Endpoint;
 import picocli.CommandLine.Command;
 
 @Command(
@@ -10,8 +8,7 @@ import picocli.CommandLine.Command;
     description = "Get the GraphQL Playground for the specified database"
 )
 public class EndpointPlaygroundCmd extends AbstractLegacyEndpointGetCmd {
-    @Override
-    protected String mkEndpoint(EndpointGetResponse result) {
-        return EndpointUtils.getPlaygroundEndpoint(result, profile().env());
+    public EndpointPlaygroundCmd() {
+        super(Endpoint.PLAYGROUND);
     }
 }

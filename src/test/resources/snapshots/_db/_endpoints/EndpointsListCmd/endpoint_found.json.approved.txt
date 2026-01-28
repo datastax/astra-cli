@@ -1,0 +1,21 @@
+---- meta ----
+command: astra db endpoints list 822b0fff-6a73-4322-a8ec-09832b075287 -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "endpoint" : "api",
+stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com"
+stdout:   }, {
+stdout:     "endpoint" : "swagger",
+stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/json/swagger-ui"
+stdout:   }, {
+stdout:     "endpoint" : "playground",
+stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/playground"
+stdout:   }, {
+stdout:     "endpoint" : "data-api",
+stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json"
+stdout:   } ]
+stdout: }
+---- end ----

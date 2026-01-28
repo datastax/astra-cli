@@ -150,7 +150,8 @@ tasks.test {
 
     jvmArgs = listOf(
         "--enable-native-access=ALL-UNNAMED",
-        "-javaagent:${mockitoAgent.asPath}"
+        "-javaagent:${mockitoAgent.asPath}",
+        "-Duser.timezone=CST"
     )
 }
 

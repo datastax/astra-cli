@@ -30,7 +30,7 @@ public interface CliProperties {
 
     enum PathLocationResolver { CUSTOM, XDG, HOME }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    @RequiredArgsConstructor
     class PathLocation {
         private final String path;
         private final PathLocationResolver resolver;
