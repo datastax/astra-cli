@@ -13,10 +13,10 @@ import com.dtsx.astra.cli.core.properties.CliEnvironment.OS;
 import com.dtsx.astra.cli.core.properties.CliProperties;
 import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
+import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.Value;
 import lombok.With;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.nio.file.FileSystem;
@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 
 @With
 @Value
-@Accessors(fluent = true)
 public class CliContext {
     CliEnvironment env;
     CliProperties properties;
@@ -45,6 +44,10 @@ public class CliContext {
 
     public Path path(String first, String... more) {
         return fs.getPath(first, more);
+    }
+
+    public Path absPath(String first, String... more) {
+        return FileUtils.toAbsPath(this, path(first, more));
     }
 
     public boolean ansiEnabled() {

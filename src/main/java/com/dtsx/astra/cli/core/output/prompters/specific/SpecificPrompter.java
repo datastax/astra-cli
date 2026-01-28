@@ -24,8 +24,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.stripAnsi;
 public class SpecificPrompter {
     @Data
     @Builder
-    @Accessors(fluent = true)
-    public static class Options<T, R> {
+        public static class Options<T, R> {
         @NonNull String thing;
         @NonNull String prompt;
         @NonNull ExitCode thingNotFoundCode;

@@ -19,16 +19,17 @@ import java.util.Optional;
 public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadRequest> {
     public record LoadRequest(
         DbRef dbRef,
-        String keyspace,
-        String table,
+        Optional<String> keyspace,
+        Optional<String> table,
         String encoding,
         String maxConcurrentQueries,
         String logDir,
-        Either<Path, Map<String, String>> dsBulkConfig,
+        Optional<Path> dsBulkConfigPath,
+        Map<String, String> dsBulkConfigMap,
         AstraToken token,
         String url,
         String delimiter,
-        String mapping,
+        Optional<String> mapping,
         boolean header,
         int skipRecords,
         int maxErrors,
@@ -49,15 +50,11 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
                 addAll(coreFlags);
             }};
 
-            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.encoding(), request.skipRecords(), request.maxErrors());
+            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.skipRecords(), request.maxErrors(), request.mapping());
 
-            if (request.mapping() != null && !request.mapping().isEmpty()) {
-                cmd.add("-m");
-                cmd.add(request.mapping());
-            }
-            
             if (request.dryRun()) {
                 cmd.add("-dryRun");
+                cmd.add("true");
             }
             
             if (request.allowMissingFields()) {

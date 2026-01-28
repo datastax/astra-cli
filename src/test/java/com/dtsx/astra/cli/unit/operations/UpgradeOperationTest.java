@@ -50,7 +50,7 @@ public class UpgradeOperationTest {
         assertThatThrownBy(operation::execute)
             .isInstanceOf(AstraCliException.class)
             .hasMessageContaining("already using")
-            .extracting(e -> ((AstraCliException) e).getCode())
+            .extracting(e -> ((AstraCliException) e).code())
             .isEqualTo(ExitCode.RELEASE_NOT_FOUND);
     }
 
@@ -73,7 +73,7 @@ public class UpgradeOperationTest {
         assertThatThrownBy(operation::execute)
             .isInstanceOf(AstraCliException.class)
             .hasMessageContaining("Can not downgrade to a version prior to 1.0.0")
-            .extracting(e -> ((AstraCliException) e).getCode())
+            .extracting(e -> ((AstraCliException) e).code())
             .isEqualTo(ExitCode.RELEASE_NOT_FOUND);
     }
 
@@ -98,7 +98,7 @@ public class UpgradeOperationTest {
         assertThatThrownBy(operation::execute)
             .isInstanceOf(AstraCliException.class)
             .hasMessageContaining("No newer version available")
-            .extracting(e -> ((AstraCliException) e).getCode())
+            .extracting(e -> ((AstraCliException) e).code())
             .isEqualTo(ExitCode.RELEASE_NOT_FOUND);
     }
 
@@ -144,7 +144,7 @@ public class UpgradeOperationTest {
         assertThatThrownBy(operation::execute)
             .isInstanceOf(AstraCliException.class)
             .hasMessageContaining("managed by a package manager")
-            .extracting(e -> ((AstraCliException) e).getCode())
+            .extracting(e -> ((AstraCliException) e).code())
             .isEqualTo(ExitCode.UNSUPPORTED_EXECUTION);
     }
 

@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db list-regions-serverless
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-serverless' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions serverless' instead
+stdout: ┌─────────────────┬─────────┬───────────────┬───────┐
+stdout: │ Cloud Provider  │ Region  │ Display Name  │ Zone  │
+stdout: ├─────────────────┼─────────┼───────────────┼───────┤
+stdout: └─────────────────┴─────────┴───────────────┴───────┘
+---- end ----

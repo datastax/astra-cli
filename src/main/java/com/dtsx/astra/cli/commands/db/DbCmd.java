@@ -6,15 +6,20 @@ import com.dtsx.astra.cli.commands.db.cdc.CdcListCmd;
 import com.dtsx.astra.cli.commands.db.collections.*;
 import com.dtsx.astra.cli.commands.db.cqlsh.CqlshCmd;
 import com.dtsx.astra.cli.commands.db.dsbulk.DbDsbulkCmd;
-import com.dtsx.astra.cli.commands.db.endpoints.EndpointApiCmd;
-import com.dtsx.astra.cli.commands.db.endpoints.EndpointPlaygroundCmd;
-import com.dtsx.astra.cli.commands.db.endpoints.EndpointSwaggerCmd;
+import com.dtsx.astra.cli.commands.db.endpoints.EndpointsCmd;
+import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointApiCmd;
+import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointPlaygroundCmd;
+import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointSwaggerCmd;
 import com.dtsx.astra.cli.commands.db.keyspace.KeyspaceCreateCmd;
 import com.dtsx.astra.cli.commands.db.keyspace.KeyspaceDeleteCmd;
 import com.dtsx.astra.cli.commands.db.keyspace.KeyspaceListCmd;
 import com.dtsx.astra.cli.commands.db.misc.CloudsListCmd;
 import com.dtsx.astra.cli.commands.db.misc.EmbeddingProvidersListCmd;
 import com.dtsx.astra.cli.commands.db.region.*;
+import com.dtsx.astra.cli.commands.db.region.regions.legacy.RegionListClassicCmd;
+import com.dtsx.astra.cli.commands.db.region.regions.legacy.RegionListServerlessCmd;
+import com.dtsx.astra.cli.commands.db.region.regions.legacy.RegionListVectorCmd;
+import com.dtsx.astra.cli.commands.db.region.regions.RegionsCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDeleteCmd;
 import com.dtsx.astra.cli.commands.db.table.TableDescribeCmd;
 import com.dtsx.astra.cli.commands.db.table.TableListCmd;
@@ -56,10 +61,12 @@ import picocli.CommandLine.Command;
         RegionCreateCmd.class,
         RegionDeleteCmd.class,
         RegionListCmd.class,
+        CloudsListCmd.class,
         RegionListClassicCmd.class,
         RegionListServerlessCmd.class,
         RegionListVectorCmd.class,
-        CloudsListCmd.class,
+        RegionsCmd.class,
+        EndpointsCmd.class,
         EndpointSwaggerCmd.class,
         EndpointApiCmd.class,
         EndpointPlaygroundCmd.class,

@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db list-regions-classic
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-classic' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions classic' instead
+stdout: ┌─────────────────┬─────────┬───────────────┬───────┐
+stdout: │ Cloud Provider  │ Region  │ Display Name  │ Zone  │
+stdout: ├─────────────────┼─────────┼───────────────┼───────┤
+stdout: └─────────────────┴─────────┴───────────────┴───────┘
+---- end ----

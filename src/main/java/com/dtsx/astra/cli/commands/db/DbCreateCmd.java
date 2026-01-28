@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DB_ACTIVE_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.DbCreateOperation.*;
@@ -132,7 +132,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
     @Option(
         names = LR_OPTS_TIMEOUT_NAME,
-        description = LR_OPTS_TIMEOUT_DESC,
+        description = LR_OPTS_TIMEOUT_DB_ACTIVE_DESC,
         defaultValue = "10m"
     )
     public void setTimeout(Duration timeout) {

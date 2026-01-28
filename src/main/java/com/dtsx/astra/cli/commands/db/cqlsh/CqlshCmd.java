@@ -25,7 +25,7 @@ import picocli.CommandLine.Mixin;
 )
 @Example(
     comment = "Execute a CQL statement",
-    command = "${cli.name} db cqlsh exec my_db \"SELECT * FROM my_keyspace.my_table\""
+    command = "${cli.name} db cqlsh exec my_db -e \"SELECT * FROM my_keyspace.my_table\""
 )
 @Example(
     comment = "Execute a CQL file",

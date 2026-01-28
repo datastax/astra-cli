@@ -1,0 +1,11 @@
+---- meta ----
+command: astra db get-endpoint-swagger 822b0fff-6a73-4322-a8ec-09832b075287 -r ap-south-1 -o json
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db get-endpoint-swagger' is deprecated
+stderr: [WARNING] Use the new command 'astra db endpoints get-endpoint-swagger' instead
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : "https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com/api/json/swagger-ui"
+stdout: }
+---- end ----

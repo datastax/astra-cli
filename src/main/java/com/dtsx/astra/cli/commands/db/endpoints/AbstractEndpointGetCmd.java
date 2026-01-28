@@ -8,33 +8,35 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetRequest;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
+import lombok.RequiredArgsConstructor;
 import picocli.CommandLine.Option;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@RequiredArgsConstructor
 public abstract class AbstractEndpointGetCmd extends AbstractPromptForDbCmd<EndpointGetResponse> {
     @Option(
         names = { $Regions.LONG, $Regions.SHORT },
         description = "The region to use",
         paramLabel = $Regions.LABEL
     )
-    protected Optional<RegionName> region;
+    public Optional<RegionName> $region;
 
-    protected abstract String mkEndpoint(EndpointGetResponse result);
+    private final Endpoint endpoint;
 
     @Override
-    protected final OutputAll execute(Supplier<EndpointGetResponse> result) {
-        return OutputAll.serializeValue(mkEndpoint(result.get()));
+    protected OutputAll execute(Supplier<EndpointGetResponse> result) {
+        return OutputAll.serializeValue(endpoint.mkUrl(result.get(), profile().env()));
     }
 
     @Override
-    protected Operation<EndpointGetResponse> mkOperation() {
-        return new EndpointGetOperation(dbGateway, new EndpointGetRequest($dbRef, region, profile().env()));
+    protected final Operation<EndpointGetResponse> mkOperation() {
+        return new EndpointGetOperation(dbGateway, new EndpointGetRequest($dbRef, $region, profile().env()));
     }
 
     @Override
-    protected String dbRefPrompt() {
+    protected final String dbRefPrompt() {
         return "Select the database to get the endpoint for";
     }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DB_ACTIVE_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_NOT_FOUND;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
@@ -40,7 +40,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> implements WithSetTimeout {
     @Option(
         names = LR_OPTS_TIMEOUT_NAME,
-        description = LR_OPTS_TIMEOUT_DESC,
+        description = LR_OPTS_TIMEOUT_DB_ACTIVE_DESC,
         defaultValue = "30m"
     )
     public void setTimeout(Duration timeout) {

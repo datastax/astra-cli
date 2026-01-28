@@ -99,7 +99,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     }
 
     private String readStdin() {
-        try (val reader = new BufferedReader(new InputStreamReader(ctx.console().getIn()))) {
+        try (val reader = new BufferedReader(new InputStreamReader(ctx.console().stdin()))) {
             val sb = new StringBuilder();
             var line = "";
 

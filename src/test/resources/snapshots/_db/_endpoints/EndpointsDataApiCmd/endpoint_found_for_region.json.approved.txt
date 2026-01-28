@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db endpoints data-api 822b0fff-6a73-4322-a8ec-09832b075287 -r ap-south-1 -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : "https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com/api/v1/json"
+stdout: }
+---- end ----

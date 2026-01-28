@@ -61,11 +61,36 @@ public class FileUtils {
         }
     }
 
+    public Path toAbsPath(CliContext ctx, Path path) {
+        return expandTilde(ctx, path).toAbsolutePath().normalize();
+    }
+
+    private Path expandTilde(CliContext ctx, Path path) {
+        if (path.isAbsolute()) {
+            return path;
+        }
+
+        val first = (path.getNameCount() > 0)
+            ? path.getName(0)
+            : null;
+
+        if (first != null && first.toString().equals("~")) {
+            val home = ctx.path(System.getProperty("user.home"));
+
+            if (path.getNameCount() > 1) {
+                return home.resolve(path.subpath(1, path.getNameCount()));
+            }
+            return home;
+        }
+
+        return path;
+    }
+
     public Path tryToRealPath(Path path) {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            return path.toAbsolutePath();
+            return path.normalize().toAbsolutePath();
         }
     }
 

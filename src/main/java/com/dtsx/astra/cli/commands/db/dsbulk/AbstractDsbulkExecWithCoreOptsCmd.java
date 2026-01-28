@@ -5,21 +5,18 @@ import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
+import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static java.util.Collections.emptyMap;
 
 public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkExecCmd {
     @Parameters(
@@ -35,14 +32,14 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         description = "Keyspace used for loading or unloading data",
         paramLabel = $Keyspace.LABEL
     )
-    public String $keyspace;
+    public Optional<String> $keyspace;
     
     @Option(
         names = { $Table.LONG, $Table.SHORT },
         description = "Table used for loading or unloading data.",
         paramLabel = $Table.LABEL
     )
-    public String $table;
+    public Optional<String> $table;
 
     @Option(
         names = { "--encoding" },
@@ -74,25 +71,28 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         paramLabel = $Regions.LABEL
     )
     public Optional<RegionName> $region;
-    
-    @ArgGroup
-    private @Nullable DsBulkConfigProvider $dsBulkConfigProvider;
 
-    public static class DsBulkConfigProvider {
-        @Option(
-            names = { "--dsbulk-config" },
-            description = "Configuration file for DSBulk loader options",
-            paramLabel = "CONFIG_FILE"
-        )
-        public Optional<Path> configFile;
-        
-        @Option(
-            names = { "--dsbulk-flags", "-F" },
-            description = "Additional flags to pass to DSBulk loader",
-            paramLabel = "FLAGS"
-        )
-        public Map<String, String> flags;
-    }
+    @Option(
+        names = { "--dsbulk-config" },
+        description = "Configuration file for DSBulk loader options",
+        paramLabel = "CONFIG_FILE"
+    )
+    public Optional<Path> $configFile;
+
+    @Option(
+        names = { "--dsbulk-flag", "-F" },
+        description = "Additional flags to pass to DSBulk loader, can be specified multiple times (e.g., -F '--key1=value1' -F '--key2')",
+        paramLabel = "FLAGS",
+        mapFallbackValue = Option.NULL_VALUE
+    )
+    public Map<String, String> $newFlags;
+
+    @Option(
+        names = { "--dsbulk-flags" },
+        mapFallbackValue = Option.NULL_VALUE,
+        hidden = true
+    )
+    public Map<String, String> $legacyFlags;
 
     public DbRef $dbRef;
 
@@ -106,11 +106,18 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         ));
     }
 
-    protected Either<Path, Map<String, String>> $configProvider() {
-        return $dsBulkConfigProvider != null
-            ? ($dsBulkConfigProvider.configFile
-                .<Either<Path, Map<String, String>>>map(Either::left)
-                .orElseGet(() -> Either.pure($dsBulkConfigProvider.flags)))
-            : Either.pure(emptyMap());
+    protected Map<String, String> $flags() {
+        val allFlags = new HashMap<String, String>();
+
+        if ($newFlags != null && !$newFlags.isEmpty()) { // TODO can this be null
+            allFlags.putAll($newFlags);
+        }
+
+        if ($legacyFlags != null && !$legacyFlags.isEmpty()) {
+            ctx.log().warn("The @!--dsbulk-flags!@ option is deprecated. Please use @!--dsbulk-flag/-F!@ instead as a direct replacement.");
+            allFlags.putAll($legacyFlags);
+        }
+
+        return allFlags;
     }
 }

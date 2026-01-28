@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.core.output;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Help;
@@ -16,7 +15,8 @@ import java.util.HashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-@Accessors(fluent = true)
+import static java.util.regex.Matcher.quoteReplacement;
+
 @RequiredArgsConstructor
 public class AstraColors {
     private static final String CSI = "\u001B[";
@@ -141,17 +141,17 @@ public class AstraColors {
         val sb = new StringBuilder();
 
         for (val str : args) {
-             var processedStr = str
-                 .replace("${cli.name}", System.getProperty("cli.name"))
-                 .replace("${cli.path}", System.getProperty("cli.path", "/path/to/astra"));
+            var processedStr = str
+                .replace("${cli.name}", System.getProperty("cli.name"))
+                .replace("${cli.path}", System.getProperty("cli.path", "/path/to/astra"));
 
-             processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
-                 .replaceAll((match) -> highlight(match.group(1), false));
+            processedStr = HIGHLIGHT_PATTERN.matcher(processedStr)
+                .replaceAll((match) -> quoteReplacement(highlight(match.group(1), false)));
 
-             processedStr = HIGHLIGHT_OR_QUOTE_PATTERN.matcher(processedStr)
-                 .replaceAll((match) -> highlight(match.group(1), true));
+            processedStr = HIGHLIGHT_OR_QUOTE_PATTERN.matcher(processedStr)
+                .replaceAll((match) -> quoteReplacement(highlight(match.group(1), true)));
 
-             sb.append(ansi.new Text(processedStr, colorScheme()));
+            sb.append(ansi.new Text(processedStr, colorScheme()));
         }
 
         return sb.toString();

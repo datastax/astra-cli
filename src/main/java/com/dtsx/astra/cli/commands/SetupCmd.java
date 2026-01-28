@@ -176,7 +176,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
               Please use @'!${cli.name} config create!@ to programmatically create profiles instead.
             """);
         } else {
-            assert ctx.console().getConsole() != null; // not necessary, just makes the linter shut up
+            assert ctx.console().rawConsole() != null; // not necessary, just makes the linter shut up
         }
 
         val prompt = """

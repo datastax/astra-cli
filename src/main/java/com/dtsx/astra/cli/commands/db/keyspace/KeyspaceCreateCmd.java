@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DESC;
+import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DB_ACTIVE_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.core.output.ExitCode.KEYSPACE_ALREADY_EXISTS;
 import static com.dtsx.astra.cli.operations.db.keyspace.KeyspaceCreateOperation.*;
@@ -55,7 +55,7 @@ public class KeyspaceCreateCmd extends AbstractKeyspaceRequiredCmd<KeyspaceCreat
 
     @Option(
         names = LR_OPTS_TIMEOUT_NAME,
-        description = LR_OPTS_TIMEOUT_DESC,
+        description = LR_OPTS_TIMEOUT_DB_ACTIVE_DESC,
         defaultValue = "1m"
     )
     public void setTimeout(Duration timeout) {

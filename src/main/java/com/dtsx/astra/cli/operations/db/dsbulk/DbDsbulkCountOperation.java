@@ -19,13 +19,14 @@ import java.util.Optional;
 public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequest> {
     public record CountRequest(
         DbRef dbRef,
-        String keyspace,
-        String table,
-        String query,
+        Optional<String> keyspace,
+        Optional<String> table,
+        Optional<String> query,
         String encoding,
         String maxConcurrentQueries,
         String logDir,
-        Either<Path, Map<String, String>> dsBulkConfig,
+        Optional<Path> dsBulkConfigPath,
+        Map<String, String> dsBulkConfigMap,
         AstraToken token,
         Optional<RegionName> region
     ) implements CoreDsbulkOptions {}
@@ -42,10 +43,10 @@ public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequ
                 addAll(coreFlags);
             }};
 
-            if (request.query() != null && !request.query().isEmpty()) {
+            request.query().ifPresent((q) -> {
                 cmd.add("--schema.query");
-                cmd.add(request.query());
-            }
+                cmd.add(q);
+            });
             
             return cmd;
         });

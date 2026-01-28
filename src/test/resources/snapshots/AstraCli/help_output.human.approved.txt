@@ -10,7 +10,7 @@ stderr:   /    |    \\___ \  |  |  |  | \ //__ \_
 stderr:   \____|__  /____  > |__|  |__|  (____  /
 stderr:           \/     \/                   \/
 stderr: 
-stderr:                        Version: 1.0.2
+stderr:                        Version: 1.0.3
 stdout: Documentation: https://docs.datastax.com/en/astra-cli
 stdout: 
 stdout: Usage: astra [-qVv] [--no-input] [--[no-]spinner] [--color[=WHEN]] [--dump-logs

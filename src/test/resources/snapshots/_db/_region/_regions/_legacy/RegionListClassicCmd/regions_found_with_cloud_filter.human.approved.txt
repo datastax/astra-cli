@@ -1,0 +1,15 @@
+---- meta ----
+command: astra db list-regions-classic -c gcp,aws
+exit_code: 0
+---- output ----
+stderr: [WARNING] 'astra db list-regions-classic' is deprecated
+stderr: [WARNING] Use the new command 'astra db regions classic' instead
+stdout: ┌─────────────────┬─────────────┬───────────────────────┬───────────────┐
+stdout: │ Cloud Provider  │ Region      │ Display Name          │ Zone          │
+stdout: ├─────────────────┼─────────────┼───────────────────────┼───────────────┤
+stdout: │ aws             │ us-east-1   │ US East (N. Virginia) │ North America │
+stdout: │ aws (free)      │ us-west-2   │ US West (Oregon)      │ North America │
+stdout: │ gcp             │ us-central1 │ Iowa                  │ North America │
+stdout: │ gcp (free)      │ us-east1    │ South Carolina        │ Europe        │
+stdout: └─────────────────┴─────────────┴───────────────────────┴───────────────┘
+---- end ----

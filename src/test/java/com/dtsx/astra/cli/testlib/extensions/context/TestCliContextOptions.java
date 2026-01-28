@@ -24,7 +24,6 @@ import static org.mockito.Mockito.*;
 
 @With
 @Getter
-@Accessors(fluent = true)
 @RequiredArgsConstructor
 public class TestCliContextOptions {
     private final List<String> stdin;

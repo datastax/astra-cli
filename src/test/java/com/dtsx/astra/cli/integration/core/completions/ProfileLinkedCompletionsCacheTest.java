@@ -139,7 +139,7 @@ public class ProfileLinkedCompletionsCacheTest {
     }
 
     private Path completionsDir() {
-        return ctx.get().path(ctx.get().properties().homeFolderLocations(ctx.get().isWindows()).preferred()).resolve("completions-cache");
+        return ctx.get().properties().homeFolderLocations(ctx.get().isWindows()).preferred(ctx.get()).resolve("completions-cache");
     }
 
     private Path defaultCacheFile() {

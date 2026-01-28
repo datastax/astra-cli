@@ -217,7 +217,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
             """.formatted(
                 Arrays.stream(examples)
                     .map(e -> ExampleProvider.resolve(e, ctx))
-                    .map((e) -> "# " + e.comment() + NL + "$ " + e.command() )
+                    .map((e) -> "# " + e.comment() + NL + "$ " + String.join(" ", e.command()))
                     .collect(Collectors.joining(NL + NL))
             );
         }

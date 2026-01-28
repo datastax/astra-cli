@@ -22,7 +22,7 @@ public class ConfigHomePathOperation implements Operation<ConfigPathResult> {
 
     @Override
     public ConfigPathResult execute() {
-        val path = ctx.path(ctx.properties().homeFolderLocations(ctx.isWindows()).preferred());
+        val path = ctx.properties().homeFolderLocations(ctx.isWindows()).preferred(ctx);
 
         return new ConfigPathResult(
             path,

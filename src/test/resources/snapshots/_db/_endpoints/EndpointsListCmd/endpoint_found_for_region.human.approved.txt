@@ -1,0 +1,13 @@
+---- meta ----
+command: astra db endpoints list 822b0fff-6a73-4322-a8ec-09832b075287 -r ap-south-1
+exit_code: 0
+---- output ----
+stdout: ┌────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+stdout: │ Endpoint   │ URL                                                                                                     │
+stdout: ├────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+stdout: │ api        │ https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com                     │
+stdout: │ swagger    │ https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com/api/json/swagger-ui │
+stdout: │ playground │ https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com/api/playground      │
+stdout: │ data-api   │ https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com/api/v1/json         │
+stdout: └────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+---- end ----

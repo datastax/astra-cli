@@ -3,15 +3,15 @@ package com.dtsx.astra.cli.core.properties;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.Version;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.val;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public interface CliProperties {
     class ConstEnvVars {
@@ -30,19 +30,35 @@ public interface CliProperties {
 
     enum PathLocationResolver { CUSTOM, XDG, HOME }
 
-    record PathLocation(
-        String path,
-        PathLocationResolver resolver
-    ) {}
+    @RequiredArgsConstructor
+    class PathLocation {
+        private final String path;
+        private final PathLocationResolver resolver;
 
-    record PathLocations(
-        String preferred,
-        NEList<PathLocation> all
-    ) {}
+        public static PathLocation from(String path, PathLocationResolver resolver) {
+            return new PathLocation(path, resolver);
+        }
+
+        public Path path(CliContext ctx) {
+            return ctx.absPath(this.path);
+        }
+
+        public PathLocationResolver resolver() {
+            return resolver;
+        }
+    }
+
+    @Value
+    class PathLocations {
+        NEList<PathLocation> all;
+
+        public Path preferred(CliContext ctx) {
+            return all.getLast().path(ctx);
+        }
+    }
 
     @Getter
-    @Accessors(fluent = true)
-    @RequiredArgsConstructor
+        @RequiredArgsConstructor
     enum SupportedPackageManager {
         BREW("Homebrew"),
         NIX("Nix");
@@ -110,24 +126,35 @@ public interface CliProperties {
     }
 
     private boolean testAndWarnIfMultiplePathsExist(CliContext ctx, NEList<PathLocation> locations, String thing) {
-        val paths = locations.stream().map((loc) -> Pair.of(ctx.path(loc.path()), loc.resolver())).toList();
+        val existingPaths = new HashMap<Path, Set<PathLocationResolver>>();
 
-        val existingPaths = paths.stream().filter((p) -> Files.exists(p.getLeft())).toList();
+        for (val loc : locations) {
+            val path = loc.path(ctx);
+
+            if (Files.exists(path)) {
+                existingPaths.computeIfAbsent(path, _ -> new HashSet<>()).add(loc.resolver());
+            }
+        }
 
         if (existingPaths.size() > 1) {
             ctx.log().warn("Multiple @!" + thing + "!@ were detected at the following locations:");
 
-            for (val p : existingPaths) {
-                val label = switch (p.getRight()) {
-                    case CUSTOM -> "custom path set via environment variable";
-                    case XDG -> "using the xdg specification";
-                    case HOME -> "default location";
-                };
+            for (val e : existingPaths.entrySet()) {
+                val path = e.getKey();
+                val resolvers = e.getValue();
 
-                ctx.log().warn(" - " + p.getLeft() + " @|faint (" + label + ")|@");
-                ctx.log().warn();
+                val label = resolvers.stream()
+                    .map((r) -> switch (r) {
+                        case CUSTOM -> "custom path set via environment variable";
+                        case XDG -> "using the xdg specification";
+                        case HOME -> "default location";
+                    })
+                    .collect(Collectors.joining(" and "));
+
+                ctx.log().warn(" - " + path + " @|faint (" + label + ")|@");
             }
 
+            ctx.log().warn();
             return true;
         }
 

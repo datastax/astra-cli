@@ -17,7 +17,6 @@ import com.dtsx.astra.cli.testlib.extensions.context.TestCliContextOptions.TestC
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +35,6 @@ import java.util.function.Supplier;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Getter
-@Accessors(fluent = true)
 public class TestCliContext implements AutoCloseable {
     public sealed interface OutputLine { String unwrap(); }
     public record StdoutLine(String unwrap) implements OutputLine {}
@@ -68,7 +66,7 @@ public class TestCliContext implements AutoCloseable {
             cliProperties,
             options.outputType(),
             new AstraColors(Ansi.OFF),
-            new AstraLogger(Level.REGULAR, getCtx, false, Optional.empty(), Optional.of(false)),
+            new AstraLogger(Level.REGULAR, cliEnv, getCtx, false, Optional.empty(), Optional.of(false)),
             mkConsole(inputStream, rawOutput, getCtx),
             new AstraHome(getCtx),
             options.fs(),
@@ -94,7 +92,6 @@ public class TestCliContext implements AutoCloseable {
             val pathStr = homeDirPath.get().toString();
 
             return new PathLocations(
-                pathStr,
                 NEList.of(new PathLocation(pathStr, PathLocationResolver.CUSTOM))
             );
         }
@@ -175,7 +172,7 @@ public class TestCliContext implements AutoCloseable {
             fs.close();
         }
 
-        get().console().getIn().close();
+        get().console().stdin().close();
         validate((_, _) -> {});
     }
 

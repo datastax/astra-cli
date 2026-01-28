@@ -9,11 +9,15 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 public record ShellTable(List<? extends Map<String, ?>> raw) {
     public static RenderableShellTable forAttributes(LinkedHashMap<String, Object> attributes) {
+        return forAttributes(attributes, "Attribute", "Value");
+    }
+
+    public static RenderableShellTable forAttributes(LinkedHashMap<String, Object> attributes, String attr, String value) {
         val rows = attributes.entrySet().stream()
-            .map(entry -> sequencedMapOf("Attribute", entry.getKey(), "Value", entry.getValue()))
+            .map(entry -> sequencedMapOf(attr, entry.getKey(), value, entry.getValue()))
             .toList();
 
-        return new RenderableShellTable(rows, Arrays.asList("Attribute", "Value"));
+        return new RenderableShellTable(rows, Arrays.asList(attr, value));
     }
 
     public static String highlight(CliContext ctx, String s) {

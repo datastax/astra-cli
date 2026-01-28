@@ -101,7 +101,7 @@ public class CompletionsCmd implements Runnable {
             sb.append("function ").append(fn(instance)).append("() {").append(NL);
             sb.append("  [ \"${#").append(arr(instance)).append("[@]}\" -ne 0 ] && return").append(NL);
             sb.append(NL);
-            sb.append(withIndent(instance.getBash(), 2).replace("OUT", arr(instance))).append(NL);
+            sb.append(withIndent(instance.bash(), 2).replace("OUT", arr(instance))).append(NL);
             sb.append("}").append(NL).append(NL);
         }
     }

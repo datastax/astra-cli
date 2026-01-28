@@ -134,7 +134,11 @@ public class StringUtils {
             }
 
             if (i == 0) {
-                sb.append(Character.toLowerCase(part.charAt(0))).append(part.substring(1));
+                if (part.toUpperCase().equals(part)) {
+                    sb.append(part.toLowerCase()); // e.g. URL => url instead of uRL
+                } else {
+                    sb.append(Character.toLowerCase(part.charAt(0))).append(part.substring(1));
+                }
             } else {
                 sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
             }

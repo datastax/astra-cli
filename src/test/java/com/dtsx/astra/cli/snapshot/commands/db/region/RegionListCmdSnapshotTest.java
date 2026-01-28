@@ -14,7 +14,8 @@ import com.dtsx.astra.cli.testlib.Fixtures.Regions;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class RegionListCmdSnapshotTest extends BaseCmdSnapshotTest {
+public
+class RegionListCmdSnapshotTest extends BaseCmdSnapshotTest {
     private final SnapshotTestOptionsModifier foundDb = (o) -> o
         .gateway(DbGateway.class, (mock) -> {
             when(mock.findOne(any())).thenReturn(Databases.One);

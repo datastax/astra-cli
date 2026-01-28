@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
 
-@Accessors(fluent = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommonOptions extends HelpMixin { // I don't like extending here but mixins don't compose w/ arg groups :(

@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db endpoints list 822b0fff-6a73-4322-a8ec-09832b075287 -r i-like-cars-123
+exit_code: 2
+---- output ----
+stderr: Error: Region 'i-like-cars-123' not found in database 'two_regions_db'.
+---- end ----

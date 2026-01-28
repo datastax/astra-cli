@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkLoadOperation;
@@ -7,9 +8,49 @@ import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkLoadOperation.LoadRequest
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.util.Optional;
+
 @Command(
     name = "load",
     description = "Load data leveraging DSBulk"
+)
+@Example(
+    comment = "Load a CSV that includes a header row",
+    command = {
+        "astra db dsbulk load my_db -k my_keyspace -t customers",
+        "--url dsbulk_samples/customers.csv",
+        "--header",
+    }
+)
+@Example(
+    comment = "Load a delimited file with no header",
+    command = {
+        "astra db dsbulk load my_db -k my_keyspace -t products",
+        "--url dsbulk_samples/products.psv",
+        "--delimiter '|'",
+        "-m '0=sku,1=name,2=category,3=price,4=inventory'",
+    }
+)
+@Example(
+    comment = "Map input field names to different table columns",
+    command = {
+        "astra db dsbulk load my_db -k my_keyspace -t orders_by_customer",
+        "--url dsbulk_samples/orders_legacy.csv",
+        "--header",
+        "-m 'cust_id=customer_id,ts=order_ts,id=order_id,status=status,total_usd=total,item_count=items'",
+        "--log-dir dsbulk_out/logs/load-orders",
+    }
+)
+@Example(
+    comment = "Skip preamble lines and use a dsbulk config file",
+    command = {
+        "astra db dsbulk load my_db -k my_keyspace -t orders_by_customer",
+        "--url dsbulk_samples/orders_export.csv",
+        "--skip-records 1",
+        "--header",
+        "--dsbulk-config dsbulk_samples/dsbulk-timestamp.conf",
+        "--max-errors 25",
+    }
 )
 public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(
@@ -33,7 +74,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
         description = "Field-to-column mapping to use",
         paramLabel = "MAPPING"
     )
-    public String $mapping;
+    public Optional<String> $mapping;
 
     @Option(
         names = { "--header" },
@@ -80,7 +121,8 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $encoding,
             $maxConcurrentQueries,
             $logDir,
-            $configProvider(),
+            $configFile,
+            $flags(),
             profile().token(),
             $url,
             $delimiter,

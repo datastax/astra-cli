@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.operations.db.dsbulk;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -34,12 +35,13 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
 
     public interface CoreDsbulkOptions {
         DbRef dbRef();
-        String keyspace();
-        String table();
+        Optional<String> keyspace();
+        Optional<String> table();
         String encoding();
         String maxConcurrentQueries();
         String logDir();
-        Either<Path, Map<String, String>> dsBulkConfig();
+        Optional<Path> dsBulkConfigPath();
+        Map<String, String> dsBulkConfigMap();
         AstraToken token();
         Optional<RegionName> region();
     }
@@ -56,7 +58,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
 
             val process = ctx.log().loading("Starting dsbulk", (_) -> {
                 try {
-                    return new ProcessBuilder(commandLine)
+                    return new ProcessBuilder(commandLine) // TODO log what's being run for all exe commands
                         .inheritIO()
                         .start();
                 } catch (IOException e) {
@@ -111,25 +113,21 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             flags.add("-b");
             flags.add(scbFile.toString());
 
-            if (options.keyspace() != null && !options.keyspace().isEmpty()) {
+            options.keyspace().ifPresent((ks) -> {
                 flags.add("-k");
-                flags.add(options.keyspace());
-            }
+                flags.add(ks);
+            });
 
-            if (options.table() != null && !options.table().isEmpty()) {
+            options.table().ifPresent((tb) -> {
                 flags.add("-t");
-                flags.add(options.table());
-            }
+                flags.add(tb);
+            });
 
-            if (options.encoding() != null && !options.encoding().isEmpty()) {
-                flags.add("-encoding");
-                flags.add(options.encoding());
-            }
+            flags.add("-encoding");
+            flags.add(options.encoding());
 
-            if (options.logDir() != null && !options.logDir().isEmpty()) {
-                flags.add("-logDir");
-                flags.add(options.logDir());
-            }
+            flags.add("-logDir");
+            flags.add(options.logDir());
 
             flags.add("--log.verbosity");
             flags.add("normal");
@@ -137,33 +135,33 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             flags.add("--schema.allowMissingFields");
             flags.add("true");
 
-            if (options.maxConcurrentQueries() != null && !options.maxConcurrentQueries().isEmpty()) {
-                flags.add("-maxConcurrentQueries");
-                flags.add(options.maxConcurrentQueries());
+            flags.add("-maxConcurrentQueries");
+            flags.add(options.maxConcurrentQueries());
+
+            options.dsBulkConfigPath().ifPresent((configPath) -> {
+                flags.add("-f");
+                flags.add(configPath.toString());
+            });
+
+            if (options.dsBulkConfigMap() != null) {
+                options.dsBulkConfigMap().forEach((key, value) -> {
+                    if (!key.startsWith("-")) {
+                        throw new OptionValidationException("custom dsbulk flag '" + key + "'", "flag must start with '-' or '--'");
+                    }
+
+                    flags.add(key);
+
+                    if (value != null) {
+                        flags.add(value);
+                    }
+                });
             }
 
-            options.dsBulkConfig().fold(
-                configFile -> {
-                    flags.add("-f");
-                    flags.add(configFile.toString());
-                    return null;
-                },
-                configMap -> {
-                    configMap.forEach((key, value) -> {
-                        flags.add(key);
-                        if (value != null && !value.isEmpty()) {
-                            flags.add(value);
-                        }
-                    });
-                    return null;
-                }
-            );
-            
             return flags;
         });
     }
 
-    protected static void addLoadUnloadOptions(ArrayList<String> cmd, String delimiter, String url, boolean header, String encoding, int i, int i2) {
+    protected static void addLoadUnloadOptions(ArrayList<String> cmd, String delimiter, String url, boolean header, int i, int i2, Optional<String> mapping) {
         cmd.add("-delim");
         cmd.add(delimiter);
 
@@ -173,13 +171,15 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         cmd.add("-header");
         cmd.add(String.valueOf(header));
 
-        cmd.add("-encoding");
-        cmd.add(encoding);
-
         cmd.add("-skipRecords");
         cmd.add(String.valueOf(i));
 
         cmd.add("-maxErrors");
         cmd.add(String.valueOf(i2));
+
+        mapping.ifPresent((m) -> {
+            cmd.add("-m");
+            cmd.add(m);
+        });
     }
 }

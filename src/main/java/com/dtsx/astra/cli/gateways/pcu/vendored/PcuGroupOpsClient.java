@@ -9,6 +9,7 @@ import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.dtsx.astra.sdk.utils.JsonUtils;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
+@Accessors(fluent = false)
 public class PcuGroupOpsClient extends AbstractApiClient {
     @Getter
     private final String pcuGroupId;

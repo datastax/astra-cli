@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -57,7 +58,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<Strea
     )
     public boolean $ifNotExists;
 
-    @ArgGroup(heading = "%nTenant configuration options:%n", multiplicity = "1")
+    @ArgGroup(heading = "%nTenant configuration options:%n", validate = false)
     public TenantCreationOptions $tenantCreationOptions;
 
     public static class TenantCreationOptions {
@@ -111,6 +112,10 @@ public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<Strea
 
     @Override
     protected Operation<StreamingCreateResult> mkOperation() {
+        if ($tenantCreationOptions == null || $tenantCreationOptions.$clusterOrCloud == null) {
+            throw new ParameterException(spec.commandLine(), "Must provide required tenant cluster/region+cloud options.");
+        }
+
         return new StreamingCreateOperation(streamingGateway, new StreamingCreateRequest(
             $tenantName,
             ($tenantCreationOptions.$clusterOrCloud.$regionSpec != null)
