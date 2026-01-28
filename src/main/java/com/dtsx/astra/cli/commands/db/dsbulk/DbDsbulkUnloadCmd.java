@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
+import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation;
@@ -12,6 +13,44 @@ import java.util.Optional;
 @Command(
     name = "unload",
     description = "Unload data leveraging DSBulk"
+)
+@Example(
+    comment = "Unload a table to a local directory",
+    command = {
+        "astra db dsbulk unload my_db -k my_keyspace -t customers",
+        "--url dsbulk_out/customers",
+        "--header",
+    }
+)
+@Example(
+    comment = "Unload selected columns with renamed output headers",
+    command = {
+        "astra db dsbulk unload my_db -k my_keyspace -t products",
+        "--url dsbulk_out/products_pipe",
+        "--delimiter '|'",
+        "-m 'product_sku=sku,product_name=name,usd_price=price'",
+        "--header",
+    }
+)
+@Example(
+    comment = "Unload only rows that match a query",
+    command = {
+        "astra db dsbulk unload my_db -k my_keyspace",
+        "-query \"SELECT * FROM orders_by_customer WHERE customer_id = 111111-1111-1111-1111-111111111111\"",
+        "--url dsbulk_out/orders_one_customer",
+        "--header",
+    }
+)
+@Example(
+    comment = "Unload a large table with custom output file naming and tuned paging",
+    command = {
+        "astra db dsbulk unload my_db -k my_keyspace -t orders_by_customer",
+        "--url dsbulk_out/orders",
+        "-F '--connector.csv.fileNameFormat=orders-%06d.csv'",
+        "-F '--driver.basic.request.page-size=5000'",
+        "--max-concurrent-queries 32",
+        "--header",
+    }
 )
 public class DbDsbulkUnloadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
     @Option(

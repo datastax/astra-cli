@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.Nullable;
 

@@ -53,7 +53,7 @@ public class ExamplesRenderer {
         for (val example : resolved) {
             sb.append("  ").append(renderComment(colors, colors.format(example.comment()))).append(NL);
 
-            sb.append("  ").append(renderCommand(colors, colors.format(example.command()))).append(NL);
+            sb.append("  ").append(renderCommand(colors, colors.format(joinCommand(example.command())))).append(NL);
 
             if (example != resolved.getLast()) {
                 sb.append(NL);
@@ -70,6 +70,19 @@ public class ExamplesRenderer {
             add(index, SECTION_HEADINGS_KEY);
             add(index + 1, SECTION_DETAILS_KEY);
         }};
+    }
+
+    private String joinCommand(String[] command) {
+        val sb = new StringBuilder();
+
+        for (val part : command) {
+            if (!sb.isEmpty()) {
+                sb.append(" \\").append(NL).append("     ");
+            }
+            sb.append(part);
+        }
+
+        return sb.toString();
     }
 
     // Because --[no-]color is an argument which is not parsed if we are just rendering help,

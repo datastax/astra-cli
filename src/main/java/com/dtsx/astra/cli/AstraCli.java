@@ -53,6 +53,7 @@ import picocli.CommandLine.Option;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.sql.DataTruncation;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -234,26 +235,26 @@ public class AstraCli extends AbstractCmd<Void> {
 
     public static class SetupExampleProvider implements ExampleProvider {
         @Override
-        public Pair<String, String> get(CliContext ctx) {
+        public Pair<String, String[]> get(CliContext ctx) {
             if (System.getProperty("cli.testing") == null) { // keeps output deterministic for testing
                 try {
                     val configFileExists = Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx));
 
                     if (!configFileExists) {
-                        return Pair.of("Setup the Astra CLI", "${cli.name} setup");
+                        return Pair.of("Setup the Astra CLI", new String[] { "${cli.name} setup" });
                     }
 
                     val autocompleteSetup = System.getenv(ConstEnvVars.COMPLETIONS_SETUP) != null;
 
                     if (!autocompleteSetup && ctx.isNotWindows()) {
-                        return Pair.of("Put this in your shell profile to generate completions and more!",  "eval \"$(${cli.path} shellenv)\"");
+                        return Pair.of("Put this in your shell profile to generate completions and more!", new String[] { "eval \"$(${cli.path} shellenv)\"" });
                     }
                 } catch (Exception e) {
                     ctx.log().exception("Error resolving main example for AstraCli", e);
                 }
             }
 
-            return Pair.of("Create a new profile", "${cli.name} setup");
+            return Pair.of("Create a new profile", new String[] { "${cli.name} setup"});
         }
     }
 }
