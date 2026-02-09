@@ -304,14 +304,14 @@ if [ -f "${existing_install_path:-}" ]; then
 
   case "$("$existing_install_path" --version 2>/dev/null | cut -d. -f1)" in
     *0)
-      if [ "$existing_package_manager" = "homebrew" ]; then
+      if [ "${existing_package_manager:-}" = "homebrew" ]; then
         print_brew_0_x_removal_instructions
       else
         print_basic_0_x_removal_instructions
       fi
       ;;
     *1)
-      if [ "$existing_package_manager" = "homebrew" ]; then
+      if [ "${existing_package_manager:-}" = "homebrew" ]; then
         print_brew_1_x_removal_instructions
       else
         print_basic_1_x_removal_instructions
