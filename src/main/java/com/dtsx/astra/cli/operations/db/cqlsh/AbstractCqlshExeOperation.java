@@ -18,12 +18,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @RequiredArgsConstructor
 public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> implements Operation<CqlshExecResult> {
@@ -104,58 +104,9 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
     }
 
     private Either<CqlshExecResult, Path> downloadCqlsh() {
-        val downloadResult = downloadsGateway.downloadCqlsh(ctx.properties().cqlsh());
-
-        return downloadResult.bimap(
-            CqlshInstallFailed::new,
-            this::tryPatchCqlsh
-        );
-    }
-
-    private Path tryPatchCqlsh(Path cqlshExe) {
-        try {
-            val content = Files.readAllLines(cqlshExe);
-
-            val matcher = Pattern.compile("^for interpreter in (python.*\\s*)+; do\\s*$");
-
-            val updatedLine = new Object() {
-                int index = -1;
-                String content = null;
-            };
-
-            val replaced = content.stream()
-                .map(l -> matcher.matcher(l).replaceFirst((r) -> {
-                    val existingInterpreters = r.group(1).split("\\s+");
-
-                    val allInterpreters = new LinkedHashSet<String>() {{
-                        addAll(List.of("python3.11", "python3.10", "python3.9"));
-                        addAll(List.of(existingInterpreters));
-                    }};
-
-                    updatedLine.index = content.indexOf(l);
-                    updatedLine.content = l;
-
-                    return "for interpreter in " + String.join(" ", allInterpreters) + "; do";
-                }))
-                .collect(Collectors.toList());
-
-            if (!content.equals(replaced)) {
-                replaced.add(updatedLine.index, "# Patched by `astra-cli` to try known supported Python versions first");
-                replaced.add(updatedLine.index + 1, "# Previous line: `" + updatedLine.content + "`");
-
-                Files.writeString(cqlshExe, String.join(NL, replaced));
-
-                // keeps output deterministic for testing
-                if (System.getProperty("cli.testing") == null) {
-                    ctx.log().info("Patched cqlsh script to try known supported Python versions first");
-                }
-            }
-        } catch (Exception e) {
-            ctx.log().exception("Error occurred attempting to patch '" + cqlshExe + "'");
-            ctx.log().exception(e);
-        }
-
-        return cqlshExe;
+        return downloadsGateway
+            .downloadCqlsh(ctx.properties().cqlsh())
+            .mapLeft(CqlshInstallFailed::new);
     }
 
     protected Either<CqlshExecResult, Path> getScb(Either<DbRef, Path> dbOrScb, Optional<RegionName> regionName) {

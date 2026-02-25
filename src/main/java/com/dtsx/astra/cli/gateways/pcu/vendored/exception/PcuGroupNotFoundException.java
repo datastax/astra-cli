@@ -4,7 +4,6 @@ import lombok.Getter;
 
 import java.util.Optional;
 
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType") // what a stupid rule ~ sincerely, a haskeller
 public class PcuGroupNotFoundException extends RuntimeException {
     @Getter
     private final Optional<String> title;
