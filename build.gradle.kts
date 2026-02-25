@@ -31,7 +31,7 @@ dependencies {
     // for underlying api calls
     implementation("com.datastax.astra:astra-db-java:2.1.0")
 //    implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
-    implementation(files("astra-sdk-devops.jar")) // temporary until it's on maven central
+    implementation(files("assets/astra-sdk-devops.jar")) // temporary until it's on maven central
 
     // unzip downloaded external programs (cqlsh, dsbulk, etc.)
     implementation("org.apache.commons:commons-compress:1.28.0")
