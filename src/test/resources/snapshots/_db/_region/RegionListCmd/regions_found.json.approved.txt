@@ -15,10 +15,10 @@ stdout:     "region" : "us-east-2",
 stdout:     "regionZone" : "na",
 stdout:     "regionClassification" : "standard",
 stdout:     "capacityUnits" : 1,
-stdout:     "secureBundleUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-1/secure-connect-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=945016cea473db7c8dadc2eb83e4b420c7abe9d49cdd7fad8c774ec6e6e2157d",
-stdout:     "secureBundleInternalUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-1/secure-connect-internal-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=6bf552cf41f455d49e29d7c5acc9fbdcd24d486020611c562282f9886d5af4c5",
-stdout:     "secureBundleMigrationProxyUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-1/secure-connect-proxy-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=85aa7957d26ee48415de2b0a4d7ace8c8a53db994a826abe4bd46b2f8181f3f7",
-stdout:     "secureBundleMigrationProxyInternalUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-1/secure-connect-proxy-internal-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=08baf1863e0ba0893cef701ba058c533b1cebd3ffd16730ae127dbfc22a06a26"
+stdout:     "secureBundleUrl": "<redacted>",
+stdout:     "secureBundleUrl": "<redacted>",
+stdout:     "secureBundleUrl": "<redacted>",
+stdout:     "secureBundleUrl": "<redacted>"
 stdout:   }, {
 stdout:     "id" : "822b0fff-6a73-4322-a8ec-09832b075287-2",
 stdout:     "name" : "dc-2",
@@ -30,10 +30,10 @@ stdout:     "region" : "ap-south-1",
 stdout:     "regionZone" : "apac",
 stdout:     "regionClassification" : "standard",
 stdout:     "capacityUnits" : 1,
-stdout:     "secureBundleUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-2/secure-connect-region-test-ap-south-1.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=70fd9bc464f46d87a007fad15381e679003205c0fda0cc92038dee46680a1806",
-stdout:     "secureBundleInternalUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-2/secure-connect-internal-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=aa795f5d2d9a4d8077dc25d30aeb3c8d90199df89da9b10d7b391f64c6800349",
-stdout:     "secureBundleMigrationProxyUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-2/secure-connect-proxy-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=d986ab3f770dbaca53e9b88fe42738beac49464c47c3fb56d075a0cb1cd16344",
-stdout:     "secureBundleMigrationProxyInternalUrl" : "https://datastax-cluster-config-prod.s3.us-east-2.amazonaws.com/822b0fff-6a73-4322-a8ec-09832b075287-2/secure-connect-proxy-internal-region-test.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2AIQRQ76WSWBKT4M%2F20250902%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20250902T173817Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=1c1859161eeb98e51ca6e7272f06ac7c60480dec537aa81c71f50536e0314cd8"
+stdout:     "secureBundleUrl": "<redacted>",
+stdout:     "secureBundleUrl": "<redacted>",
+stdout:     "secureBundleUrl": "<redacted>",
+stdout:     "secureBundleUrl": "<redacted>"
 stdout:   } ]
 stdout: }
 ---- end ----

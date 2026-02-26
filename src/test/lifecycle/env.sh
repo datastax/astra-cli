@@ -26,7 +26,7 @@ if [[ ! " ${VALID_CP[*]} " =~  ${ASTRA_CLOUD}  ]]; then
   exit 1
 fi
 
-if [[ "$ASTRA_REGION" != "${ASTRA_REGION,,}" ]]; then
+if [[ "$ASTRA_REGION" != "${ASTRA_REGION:-}" ]]; then
   print_error "Error: ASTRA_REGION must be in lowercase."
   exit 1
 fi

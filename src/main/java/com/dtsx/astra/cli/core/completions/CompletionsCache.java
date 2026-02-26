@@ -113,6 +113,6 @@ public abstract class CompletionsCache {
 
     @SneakyThrows
     private String writeJsonString(String value) {
-        return JsonUtils.writeValue(value); // easy way to escape strings
+        return JsonUtils.formatJsonCompact(value); // easy way to escape strings
     }
 }

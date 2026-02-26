@@ -3,8 +3,6 @@ package com.dtsx.astra.cli.core.output.formats;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
-import com.dtsx.astra.cli.utils.JsonUtils;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.SequencedMap;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.OK;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
+import static com.dtsx.astra.cli.utils.JsonUtils.formatJsonPretty;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
 @FunctionalInterface
@@ -27,7 +26,7 @@ public interface OutputJson {
     }
 
     static OutputJson response(CharSequence message, @Nullable SequencedMap<String, Object> data, @Nullable List<Hint> nextSteps, ExitCode code) {
-        return () -> serializeValue(sequencedMapOf(
+        return () -> formatJsonPretty(sequencedMapOf(
             Fields.CODE, code,
             Fields.MESSAGE, trimIndent(message.toString()),
             Fields.DATA, Optional.ofNullable(data).map(OutputSerializer::serializeAsJson),
@@ -36,16 +35,9 @@ public interface OutputJson {
     }
 
     static OutputJson serializeValue(Object o) {
-        return () -> serializeValue(sequencedMapOf(
+        return () -> formatJsonPretty(sequencedMapOf(
             Fields.CODE, OK,
             Fields.DATA, OutputSerializer.serializeAsJson(o)
         ));
-    }
-
-    @SneakyThrows
-    private static String serializeValue(SequencedMap<String, ?> data) {
-        return JsonUtils.objectMapper()
-            .writerWithDefaultPrettyPrinter()
-            .writeValueAsString(data);
     }
 }

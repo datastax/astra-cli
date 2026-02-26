@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.upgrades;
 
+import com.datastax.astra.client.core.vectorize.EmbeddingProvider;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.models.Version;
 import lombok.val;

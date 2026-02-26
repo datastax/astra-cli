@@ -51,8 +51,8 @@ public class DocsCmd extends AbstractCmd<Void> {
             throw new OptionValidationException("spec file", "Specified path does not exist: " + specFile);
         }
 
-        val docsSpec = JsonUtils.objectMapper().readValue(
-            specFile.toFile(),
+        val docsSpec = JsonUtils.readValue(
+            Files.readString(specFile),
             ExternalDocsSpec.class
         );
 

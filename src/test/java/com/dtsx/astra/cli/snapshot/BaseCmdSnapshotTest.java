@@ -17,6 +17,8 @@ import lombok.experimental.Delegate;
 import lombok.val;
 import org.approvaltests.Approvals;
 import org.approvaltests.core.Options;
+import org.approvaltests.core.Scrubber;
+import org.approvaltests.scrubbers.RegExScrubber;
 
 import java.io.InputStream;
 import java.util.*;
@@ -95,6 +97,8 @@ public class BaseCmdSnapshotTest {
         }
     }
 
+    private static final Scrubber SECURE_BUNDLE_SCRUBBER = new RegExScrubber("\"secureBundle.*?\"\\s*:\\s*\"[^\"]+\"", "\"secureBundleUrl\": \"<redacted>\"");
+
     protected final CmdOutput verifyRun(String cmd, OutputType outputType, Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> optionsFn) {
         val output = run(cmd, outputType, optionsFn);
 
@@ -107,6 +111,7 @@ public class BaseCmdSnapshotTest {
             }
 
             val approvalsOptions = new Options()
+                .withScrubber(SECURE_BUNDLE_SCRUBBER)
                 .forFile().withNamer(new FolderBasedApprovalNamer(getClass())) // override for inherited classes so they don't use parent class name
                 .forFile().withAdditionalInformation(outputType.name().toLowerCase());
 

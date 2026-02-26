@@ -49,8 +49,8 @@ public class ProfileNameTest extends BaseParseableTest.WithTrimAndBasicValidatio
     public class toJSON {
         @Property
         public void returns_unwrapped_string(@ForAll String name) {
-            assertThat(JsonUtils.writeValue(ProfileName.mkUnsafe(name)))
-                .isEqualTo(JsonUtils.writeValue(name));
+            assertThat(JsonUtils.formatJsonCompact(ProfileName.mkUnsafe(name)))
+                .isEqualTo(JsonUtils.formatJsonCompact(name));
         }
     }
 }
