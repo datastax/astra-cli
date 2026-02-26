@@ -101,7 +101,7 @@ public class CompletionsCacheTest {
             assertThat(primaryCacheFile).isRegularFile();
             assertThat(primaryCacheFile).content().satisfies((content) -> {
                 assertThat(content.lines().toList()).containsExactlyInAnyOrderElementsOf(
-                    existing.stream().map(JsonUtils::writeValue).toList()
+                    existing.stream().map(JsonUtils::formatJsonCompact).toList()
                 );
             });
 
@@ -112,7 +112,7 @@ public class CompletionsCacheTest {
             assertThat(primaryCacheFile).isRegularFile();
             assertThat(primaryCacheFile).content().satisfies((content) -> {
                 assertThat(content.lines().toList()).containsExactlyInAnyOrderElementsOf(
-                    listConcat(existing, updated).stream().distinct().map(JsonUtils::writeValue).toList()
+                    listConcat(existing, updated).stream().distinct().map(JsonUtils::formatJsonCompact).toList()
                 );
             });
         }

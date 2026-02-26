@@ -43,7 +43,7 @@ public class CliContext {
     Optional<Profile> forceProfileForTesting;
 
     public Path path(String first, String... more) {
-        return fs.getPath(first, more);
+        return FileUtils.expandTilde(this, fs.getPath(first, more));
     }
 
     public Path absPath(String first, String... more) {

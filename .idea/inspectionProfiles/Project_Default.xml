@@ -24,5 +24,6 @@
     </inspection_tool>
     <inspection_tool class="NewClassNamingConvention" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="OptionalUsedAsFieldOrParameterType" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="RedundantLabeledSwitchRuleCodeBlock" enabled="true" level="INFORMATION" enabled_by_default="true" />
   </profile>
 </component>

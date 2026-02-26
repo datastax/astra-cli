@@ -1,9 +1,11 @@
 package com.dtsx.astra.cli.core.upgrades;
 
+import com.datastax.astra.client.core.vectorize.EmbeddingProvider;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.models.Version;
 import lombok.val;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 
@@ -18,8 +20,11 @@ public class UpgradeStatusKeeper {
         val script = runUnix(ctx, status, path, shouldCheckForUpdate, userWasAnnoyed);
 
         try {
+            val tempScript = Files.createTempFile("astra-upgrade-", ".sh");
+            Files.writeString(tempScript, script);
+
             new ProcessBuilder()
-                .command("sh", "-c", script)
+                .command("sh", "-c", "nohup sh " + tempScript.toAbsolutePath() + " > /dev/null 2>&1 &")
                 .start();
         } catch (Exception e) {
             ctx.log().exception("Unable to update upgrade status file at " + path);
@@ -34,6 +39,9 @@ public class UpgradeStatusKeeper {
         val pathStr = path.toAbsolutePath().toString().replace("\"", "\\\"");
 
         var script = """
+          # initiating self destruct sequence
+          trap 'rm -f "$0"' EXIT
+
           # just return if `curl` is not available
           command -v curl >/dev/null 2>&1 || { exit 0; }
 

@@ -11,7 +11,8 @@ com.dtsx.astra.sdk.org.domain.[User,ResponseAllUsers,InviteUserRequest]
 com.dtsx.astra.sdk.org.domain.[Role,RolePolicy]
 
 # Db gateway
-com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
+# com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
+com.dtsx.astra.sdk.db.domain.*
 
 # Token gateway
 com.dtsx.astra.sdk.org.domain.[CreateTokenResponse,ResponseAllIamTokens,IamToken]
@@ -35,10 +36,8 @@ com.dtsx.astra.sdk.pcu.domain.*
 
 # Other misc Data API stuff
 com.datastax.astra.internal.api.[DataAPI.+]
-com.datastax.astra.client.core.vectorize.VectorServiceOptions
-com.datastax.astra.client.core.vector.VectorOptions
-com.datastax.astra.client.core.rerank.RerankServiceOptions$Parameters
-com.datastax.astra.client.core.rerank.RerankServiceOptions
-com.datastax.astra.client.core.rerank.CollectionRerankOptions
+com.datastax.astra.client.core.vectorize.*
+com.datastax.astra.client.core.vector.*
+com.datastax.astra.client.core.rerank.*
 com.datastax.astra.client.core.lexical.LexicalOptions
 com.datastax.astra.client.core.commands.Command$CommandSerializer

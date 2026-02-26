@@ -65,7 +65,7 @@ public class FileUtils {
         return expandTilde(ctx, path).toAbsolutePath().normalize();
     }
 
-    private Path expandTilde(CliContext ctx, Path path) {
+    public Path expandTilde(CliContext ctx, Path path) {
         if (path.isAbsolute()) {
             return path;
         }
