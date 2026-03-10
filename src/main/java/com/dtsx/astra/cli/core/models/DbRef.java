@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -15,16 +16,43 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class DbRef implements Highlightable {
+    private static final int UUID_LENGTH = 36;
+
     private final Either<UUID, String> ref;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
         return ModelUtils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
+            val maybeIdFromEndpoint = tryParseEndpointUrl(trimmed);
+            if (maybeIdFromEndpoint.isPresent()) {
+                return Either.pure(new DbRef(Either.left(maybeIdFromEndpoint.get())));
+            }
+
             try {
                 return Either.pure(new DbRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {
                 return Either.pure(new DbRef(Either.pure(trimmed)));
             }
         });
+    }
+
+    private static Optional<UUID> tryParseEndpointUrl(String input) {
+        if (!input.startsWith("https://") && !input.startsWith("http://")) {
+            return Optional.empty();
+        }
+
+        val hostStart = input.indexOf("://") + 3;
+        val afterScheme = input.substring(hostStart);
+        val host = afterScheme.contains("/") ? afterScheme.substring(0, afterScheme.indexOf('/')) : afterScheme;
+
+        if (host.length() <= UUID_LENGTH || host.charAt(UUID_LENGTH) != '-') {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(UUID.fromString(host.substring(0, UUID_LENGTH)));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
     public static DbRef fromNameUnsafe(@NonNull String name) {
