@@ -105,7 +105,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
 
             while ((line = reader.readLine()) != null) {
                 if (line.trim().endsWith("\\")) {
-                    sb.append(line, 0, line.lastIndexOf('\\'));
+                    sb.append(line.substring(0, line.lastIndexOf('\\')).stripTrailing());
                     sb.append(NL);
                 } else {
                     sb.append(line);
