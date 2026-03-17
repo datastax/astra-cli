@@ -9,7 +9,7 @@ import picocli.CommandLine.Mixin;
     description = "Get various endpoints for your database",
     subcommands = {
         EndpointsListCmd.class,
-        EndpointsApiCmd.class,
+        EndpointsClientCmd.class,
         EndpointsDataApiCmd.class,
         EndpointsSwaggerCmd.class,
         EndpointsPlaygroundCmd.class,

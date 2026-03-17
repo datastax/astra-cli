@@ -11,12 +11,16 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 public enum Endpoint {
-    API("api", (result, env) -> {
-        val db = result.database();
+    CLIENT("client", (result, env) -> {
+        return apiBaseUrl(result, env);
+    }),
 
-        return (db.getInfo().getDbType() == null)
-            ? ApiLocator.getApiRestEndpoint(env, db.getId(), result.region())
-            : ApiLocator.getApiEndpoint(env, db.getId(), result.region());
+    CURL("curl", (result, env) -> {
+        return apiBaseUrl(result, env) + "/api/v1/json";
+    }),
+
+    PLAYGROUND("playground", (result, env) -> {
+        return ApiLocator.getApiGraphQLEndPoint(env, result.database().getId(), result.region()) + "/playground";
     }),
 
     SWAGGER("swagger", (result, env) -> {
@@ -25,14 +29,6 @@ public enum Endpoint {
         return (db.getInfo().getDbType() == null)
             ? ApiLocator.getApiRestEndpoint(env, db.getId(), result.region()) + "/swagger-ui"
             : ApiLocator.getApiEndpoint(env, db.getId(), result.region()) + "/api/json/swagger-ui";
-    }),
-
-    PLAYGROUND("playground", (result, env) -> {
-        return ApiLocator.getApiGraphQLEndPoint(env, result.database().getId(), result.region()) + "/playground";
-    }),
-
-    DATA_API("data-api", (result, env) -> {
-        return API.mkUrl.apply(result, env) + "/api/v1/json";
     });
 
     @Getter
@@ -41,5 +37,13 @@ public enum Endpoint {
 
     public String mkUrl(EndpointGetResponse result, AstraEnvironment env) {
         return mkUrl.apply(result, env);
+    }
+
+    private static String apiBaseUrl(EndpointGetResponse result, AstraEnvironment env) {
+        val db = result.database();
+
+        return (db.getInfo().getDbType() == null)
+            ? ApiLocator.getApiRestEndpoint(env, db.getId(), result.region())
+            : ApiLocator.getApiEndpoint(env, db.getId(), result.region());
     }
 }

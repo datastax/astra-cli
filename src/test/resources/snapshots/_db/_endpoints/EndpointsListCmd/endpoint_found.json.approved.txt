@@ -5,17 +5,17 @@ exit_code: 0
 stdout: {
 stdout:   "code" : "OK",
 stdout:   "data" : [ {
-stdout:     "endpoint" : "api",
+stdout:     "endpoint" : "client",
 stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com"
 stdout:   }, {
-stdout:     "endpoint" : "swagger",
-stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/json/swagger-ui"
+stdout:     "endpoint" : "curl",
+stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json"
 stdout:   }, {
 stdout:     "endpoint" : "playground",
 stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/playground"
 stdout:   }, {
-stdout:     "endpoint" : "data-api",
-stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json"
+stdout:     "endpoint" : "swagger",
+stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/json/swagger-ui"
 stdout:   } ]
 stdout: }
 ---- end ----

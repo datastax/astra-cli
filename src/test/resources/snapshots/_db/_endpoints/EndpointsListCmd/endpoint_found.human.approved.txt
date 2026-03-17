@@ -5,9 +5,9 @@ exit_code: 0
 stdout: ┌────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 stdout: │ Endpoint   │ URL                                                                                                    │
 stdout: ├────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-stdout: │ api        │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com                     │
-stdout: │ swagger    │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/json/swagger-ui │
+stdout: │ client     │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com                     │
+stdout: │ curl       │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json         │
 stdout: │ playground │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/playground      │
-stdout: │ data-api   │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json         │
+stdout: │ swagger    │ https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/json/swagger-ui │
 stdout: └────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ---- end ----
