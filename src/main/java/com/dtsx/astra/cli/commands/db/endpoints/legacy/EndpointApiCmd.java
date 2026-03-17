@@ -9,6 +9,6 @@ import picocli.CommandLine.Command;
 )
 public class EndpointApiCmd extends AbstractLegacyEndpointGetCmd {
     public EndpointApiCmd() {
-        super(Endpoint.API);
+        super(Endpoint.CLIENT);
     }
 }

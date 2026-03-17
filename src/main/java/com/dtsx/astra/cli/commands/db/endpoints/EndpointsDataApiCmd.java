@@ -17,6 +17,6 @@ import picocli.CommandLine.Command;
 )
 public class EndpointsDataApiCmd extends AbstractEndpointGetCmd {
     public EndpointsDataApiCmd() {
-        super(Endpoint.DATA_API);
+        super(Endpoint.CURL);
     }
 }
