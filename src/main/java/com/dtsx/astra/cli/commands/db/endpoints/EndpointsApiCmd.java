@@ -5,6 +5,7 @@ import picocli.CommandLine.Command;
 
 @Command(
     name = "api",
+    aliases = {"data-api-client"},
     description = "Get the API endpoint to interact with the specified database"
 )
 @Example(
