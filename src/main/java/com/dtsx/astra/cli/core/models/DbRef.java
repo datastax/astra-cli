@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.models;
 
+import com.datastax.astra.internal.api.AstraApiEndpoint;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.Highlightable;
@@ -7,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -16,15 +16,15 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class DbRef implements Highlightable {
-    private static final int UUID_LENGTH = 36;
-
     private final Either<UUID, String> ref;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
         return ModelUtils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
-            val maybeIdFromEndpoint = tryParseEndpointUrl(trimmed);
-            if (maybeIdFromEndpoint.isPresent()) {
-                return Either.pure(new DbRef(Either.left(maybeIdFromEndpoint.get())));
+            try {
+                val endpoint = AstraApiEndpoint.parse(trimmed);
+                return Either.pure(new DbRef(Either.left(endpoint.getDatabaseId())));
+            } catch (Exception e) {
+                // not a valid Astra endpoint URL, fall through
             }
 
             try {
@@ -33,26 +33,6 @@ public class DbRef implements Highlightable {
                 return Either.pure(new DbRef(Either.pure(trimmed)));
             }
         });
-    }
-
-    private static Optional<UUID> tryParseEndpointUrl(String input) {
-        if (!input.startsWith("https://") && !input.startsWith("http://")) {
-            return Optional.empty();
-        }
-
-        val hostStart = input.indexOf("://") + 3;
-        val afterScheme = input.substring(hostStart);
-        val host = afterScheme.contains("/") ? afterScheme.substring(0, afterScheme.indexOf('/')) : afterScheme;
-
-        if (host.length() <= UUID_LENGTH || host.charAt(UUID_LENGTH) != '-') {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(UUID.fromString(host.substring(0, UUID_LENGTH)));
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
     }
 
     public static DbRef fromNameUnsafe(@NonNull String name) {
