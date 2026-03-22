@@ -11,11 +11,11 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 public enum Endpoint {
-    CLIENT("client", (result, env) -> {
+    API("api", (result, env) -> {
         return apiBaseUrl(result, env);
     }),
 
-    CURL("curl", (result, env) -> {
+    DATA_API("data-api", (result, env) -> {
         return apiBaseUrl(result, env) + "/api/v1/json";
     }),
 

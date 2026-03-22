@@ -3,8 +3,8 @@ command: astra db endpoints list 822b0fff-6a73-4322-a8ec-09832b075287 -o csv
 exit_code: 0
 ---- output ----
 stdout: code,message,endpoint,url
-stdout: OK,,client,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com
-stdout: OK,,curl,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json
+stdout: OK,,api,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com
+stdout: OK,,data-api,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/v1/json
 stdout: OK,,playground,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/playground
 stdout: OK,,swagger,https://822b0fff-6a73-4322-a8ec-09832b075287-us-east-2.apps.astra-dev.datastax.com/api/json/swagger-ui
 ---- end ----

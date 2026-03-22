@@ -5,10 +5,10 @@ exit_code: 0
 stdout: {
 stdout:   "code" : "OK",
 stdout:   "data" : [ {
-stdout:     "endpoint" : "client",
+stdout:     "endpoint" : "api",
 stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com"
 stdout:   }, {
-stdout:     "endpoint" : "curl",
+stdout:     "endpoint" : "data-api",
 stdout:     "url" : "https://822b0fff-6a73-4322-a8ec-09832b075287-ap-south-1.apps.astra-dev.datastax.com/api/v1/json"
 stdout:   }, {
 stdout:     "endpoint" : "playground",
