@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.core.models;
 
+import com.datastax.astra.internal.api.AstraApiEndpoint;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.Highlightable;
@@ -19,6 +20,13 @@ public class DbRef implements Highlightable {
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
         return ModelUtils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
+            try {
+                val endpoint = AstraApiEndpoint.parse(trimmed);
+                return Either.pure(new DbRef(Either.left(endpoint.getDatabaseId())));
+            } catch (Exception e) {
+                // not a valid Astra endpoint URL, fall through
+            }
+
             try {
                 return Either.pure(new DbRef(Either.left(UUID.fromString(trimmed))));
             } catch (IllegalArgumentException e) {
