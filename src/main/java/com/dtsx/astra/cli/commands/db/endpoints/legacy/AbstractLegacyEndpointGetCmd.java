@@ -17,9 +17,9 @@ public abstract class AbstractLegacyEndpointGetCmd extends AbstractEndpointGetCm
     }
 
     @Override
-    protected final OutputAll execute(Supplier<EndpointGetResponse> result) {
+    protected final OutputAll execute(Supplier<EndpointGetResponse> res) {
         ctx.log().warn("@'!astra db %s!@ is deprecated".formatted(spec.commandLine().getCommandName()));
         ctx.log().warn("Use the new command @'!astra db endpoints %s!@ instead".formatted(spec.commandLine().getCommandName().replace("endpoints-", "")));
-        return super.execute(result);
+        return super.execute(res);
     }
 }
