@@ -13,6 +13,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 // TODO do this like the endpoints snapshot tests so we don't need duplicates
@@ -37,7 +38,7 @@ public abstract class BaseRegionListCmdSnapshotTest extends BaseCmdSnapshotTest 
     private SnapshotTestOptionsModifier mkOpts(SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> ret) {
         return (o) -> o
             .gateway(RegionGateway.class, (mock) -> {
-                doReturn(ret).when(mock).findAllServerless(anyBoolean());
+                doReturn(ret).when(mock).findAllServerless(anyBoolean(), eq(false));
                 doReturn(ret).when(mock).findAllClassic();
             })
             .verify((mocks) -> {

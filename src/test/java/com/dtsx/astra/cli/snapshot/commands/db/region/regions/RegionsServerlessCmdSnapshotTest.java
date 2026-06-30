@@ -11,6 +11,6 @@ public class RegionsServerlessCmdSnapshotTest extends BaseRegionsCmdSnapshotTest
 
     @Override
     protected void verifyMockGateway(RegionGateway mock) {
-        verify(mock).findAllServerless(false);
+        verify(mock).findAllServerless(false, false);
     }
 }

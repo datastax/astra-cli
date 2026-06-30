@@ -31,8 +31,17 @@ public abstract class AbstractRegionListOperation implements Operation<Stream<Fo
     public record RegionListRequest(
         @Nullable List<String> nameFilter,
         @Nullable List<CloudProvider> cloudFilter,
-        @Nullable List<String> zoneFilter
-    ) {}
+        @Nullable List<String> zoneFilter,
+        boolean all
+    ) {
+        public RegionListRequest(
+            @Nullable List<String> nameFilter,
+            @Nullable List<CloudProvider> cloudFilter,
+            @Nullable List<String> zoneFilter
+        ) {
+            this(nameFilter, cloudFilter, zoneFilter, false);
+        }
+    }
 
     protected abstract SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> fetchRegions();
 

@@ -15,7 +15,7 @@ import java.util.SortedSet;
 public interface RegionGateway extends SomeGateway {
     record RegionInfo(String displayName, boolean hasFreeTier, String zone, Object raw) {}
 
-    SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector);
+    SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector, boolean all);
 
     SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllClassic();
 

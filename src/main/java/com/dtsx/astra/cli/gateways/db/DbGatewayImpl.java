@@ -127,7 +127,7 @@ public class DbGatewayImpl implements DbGateway {
 
     @Override
     public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
-        val cloudRegions = regionGateway.findAllServerless(vectorOnly);
+        val cloudRegions = regionGateway.findAllServerless(vectorOnly, false);
 
         if (cloud.isPresent()) {
             val cloudName = cloud.get().name().toLowerCase();
