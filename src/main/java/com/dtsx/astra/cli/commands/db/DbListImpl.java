@@ -58,7 +58,7 @@ public abstract class DbListImpl extends AbstractDbCmd<Stream<Database>> {
     }
 
     private List<String> regions(Database db) {
-        return db.getInfo().getDatacenters().stream().map(Datacenter::getRegion).sorted().toList();
+        return db.getInfo().getDatacenters().stream().map(Datacenter::getRegion).toList();
     }
 
     private String cloud(Database db) {

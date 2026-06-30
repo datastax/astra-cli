@@ -13,8 +13,8 @@ stdout: │ Status           │ ACTIVE                               │
 stdout: │ Vector           │ Enabled                              │
 stdout: │ Default Keyspace │ default_keyspace                     │
 stdout: │ Creation Time    │ 2025-08-21T20:26:03Z                 │
-stdout: │ Keyspaces        │ [0] default_keyspace                 │
-stdout: │ Regions          │ [0] ap-south-1                       │
-stdout: │                  │ [1] us-east-2                        │
+stdout: │ Keyspaces        │ default_keyspace                     │
+stdout: │ Regions          │ ap-south-1                           │
+stdout: │                  │ us-east-2                            │
 stdout: └──────────────────┴──────────────────────────────────────┘
 ---- end ----

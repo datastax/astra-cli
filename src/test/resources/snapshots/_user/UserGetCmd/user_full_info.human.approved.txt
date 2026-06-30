@@ -8,6 +8,6 @@ stdout: ├────────────┼──────────
 stdout: │ User Id    │ ae2f3b2c-4d5e-6f7g-8h9i-0j1k2l3m4n5o │
 stdout: │ User Email │ alice@example.bob                    │
 stdout: │ Status     │ active                               │
-stdout: │ Roles      │ [0] R/W Svc Acct                     │
+stdout: │ Roles      │ R/W Svc Acct                         │
 stdout: └────────────┴──────────────────────────────────────┘
 ---- end ----
