@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.utils;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.operations.token.TokenGetOperation.CopiedToken;
 import lombok.val;
 
 import java.io.BufferedWriter;
@@ -13,7 +12,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.PLATFORM_ISSUE;
 
 public class ShellUtils {
-    public static CopiedToken copyToClipboard(CliContext ctx, String content) {
+    public static void copyToClipboard(CliContext ctx, String content) {
         val os = ctx.env().platform().os();
 
         try {
@@ -33,9 +32,7 @@ public class ShellUtils {
                 writer.flush();
             }
 
-            if (process.waitFor() == 0) {
-                return new CopiedToken();
-            } else {
+            if (process.waitFor() != 0) {
                 throw new AstraCliException(IO_ISSUE, """
                   @|bold,red Failed to copy token to clipboard. Process exited with code %d|@
                 """.formatted(process.exitValue()));

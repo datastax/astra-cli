@@ -103,13 +103,13 @@ public class DbGatewayImpl implements DbGateway {
 
         val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("X-Cassandra-Token", token.unsafeUnwrap()));
 
-        if (response.statusCode() >= 400) {
+        if (response.statusCode() != 503) {
             throw new AstraCliException(IO_ISSUE, """
               @|bold,red An error occurred while attempting to resume database %s|@
             
-              The server returned the following response:
+              The server returned the following response (%d):
               %s
-            """.formatted(ref, response.body()));
+            """.formatted(ref, response.statusCode(), response.body()));
         }
     }
 
