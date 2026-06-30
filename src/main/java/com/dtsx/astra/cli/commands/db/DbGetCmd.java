@@ -41,7 +41,7 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbInfo> {
         region,
         regions,
         creation_time,
-        vector
+        vector,
     }
 
     @Option(

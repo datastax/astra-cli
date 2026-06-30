@@ -74,7 +74,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = "Astra environment the token targets",
+        description = "Astra environment the token belongs to: prod (default), dev, or test. Leave unset unless you were issued a non-prod token.",
         completionCandidates = AstraEnvCompletion.class,
         defaultValue = $Env.DEFAULT,
         paramLabel = $Env.LABEL
@@ -167,17 +167,28 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     }
 
     private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
-        val hintStr = hint
-            .map((env) -> " It is, however, valid for @!" + env.name().toLowerCase() + "!@.")
-            .orElse("");
+        if (hint.isPresent()) {
+            val currentEnvName = $env.name().toLowerCase();
+            val validEnvName = hint.get().name().toLowerCase();
+
+            val fixAction = hint.get() == AstraEnvironment.PROD
+                ? "drop @'!--env!@ (prod is the default) or pass @'!--env prod!@"
+                : "pass @'!--env " + validEnvName + "!@";
+
+            throw new AstraCliException(INVALID_TOKEN, """
+              @|bold,red Error: This token isn't valid for the '%s' environment — it's valid for '%s'.|@
+            
+              To use it, %s. The 'dev' and 'test' environments are for DataStax-internal use.
+            """.formatted(currentEnvName, validEnvName, fixAction));
+        }
 
         throw new AstraCliException(INVALID_TOKEN, """
           @|bold,red Error: The token you provided is invalid.|@
         
-          The token is not a valid Astra token for the given Astra environment.%s
+          The token is not a valid Astra token for the given Astra environment.
         
           If you are targeting a different environment, ensure that the right environment is set with the @'!--env!@ option.
-        """.formatted(hintStr));
+        """);
     }
 
     @Override

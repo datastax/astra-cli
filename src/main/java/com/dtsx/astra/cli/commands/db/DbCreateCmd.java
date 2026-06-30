@@ -57,7 +57,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 )
 @Example(
     comment = "List available vector database regions for creating a database",
-    command = "${cli.name} db list-regions-vector"
+    command = "${cli.name} db regions vector"
 )
 public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implements WithSetTimeout {
     @ArgGroup

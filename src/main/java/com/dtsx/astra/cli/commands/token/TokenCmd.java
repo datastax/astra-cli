@@ -18,5 +18,13 @@ import picocli.CommandLine.Command;
     comment = "Show your current token",
     command = "${cli.name} token"
 )
+@Example(
+    comment = "Copy your current token",
+    command = "${cli.name} token -c"
+)
+@Example(
+    comment = "Show a token from a different profile",
+    command = "${cli.name} token -p <profile>"
+)
 @AliasForSubcommand(TokenGetCmd.class)
 public final class TokenCmd extends TokenGetImpl {}
