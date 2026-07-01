@@ -10,7 +10,9 @@ import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
+import com.dtsx.astra.cli.commands.dotenv.DotEnvCmd;
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.commands.dotenv.DotEnvCmd;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.AstraHome;
@@ -69,6 +71,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         SetupCmd.class,
         ConfigCmd.class,
         DbCmd.class,
+        DotEnvCmd.class,
         PcuCmd.class,
         OrgCmd.class,
         RoleCmd.class,

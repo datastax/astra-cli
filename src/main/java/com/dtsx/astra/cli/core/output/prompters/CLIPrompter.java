@@ -3,12 +3,15 @@ package com.dtsx.astra.cli.core.output.prompters;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy.Meta.Closed;
 import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy.Meta.Open;
 import com.dtsx.astra.cli.core.output.prompters.strategies.ArrowKeySelectionStrategy;
 import com.dtsx.astra.cli.core.output.prompters.strategies.NumberedSelectionStrategy;
 import com.dtsx.astra.cli.core.output.prompters.strategies.TextSelectionStrategy;
+import com.dtsx.astra.cli.core.output.prompters.SelectionStrategy.Meta.MultiClosed;
+import com.dtsx.astra.cli.core.output.prompters.strategies.CheckboxSelectionStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
@@ -73,6 +76,9 @@ public class CLIPrompter {
                         ctx, new PromptRequest.Open<>(updatedPrompt + " " + promptSuffix, defaultOptionStr, r -> yeses.contains(r.trim().toLowerCase()), clearAfterSelection, false, null)
                     ).select();
                 }
+                case MultiClosed _ -> {
+                    throw new CongratsYouFoundABugException("MultiClosed is not supported for confirm");
+                }
             };
         });
     }
@@ -91,6 +97,25 @@ public class CLIPrompter {
         return runPrompter(strategies, prompt, fallback, fix, (meta, updatedPrompt) -> {
             return meta.mkInstance(
                 ctx, new PromptRequest.Closed<>(updatedPrompt, defaultStringOption, reverseMapper, clearAfterSelection, stringOptions, false)
+            ).select();
+        });
+    }
+
+    public <T> List<T> multiSelect(String prompt, NEList<T> options, List<T> defaultOptions, Function<T, String> mapper, String fallback, Pair<? extends Iterable<String>, String> fix, boolean clearAfterSelection) {
+        val stringOptions = options.map(mapper);
+        val defaultStringOptions = defaultOptions == null ? List.<String>of() : defaultOptions.stream().map(mapper).toList();
+
+        Function<String, T> reverseMapper = (str) -> options.stream().filter(opt -> mapper.apply(opt).equals(str)).findFirst().orElse(null);
+
+        val strategies = NEList.of(
+            new CheckboxSelectionStrategy.Meta()
+        );
+
+        assertCanPrompt(fallback, fix);
+
+        return runPrompter(strategies, prompt, fallback, fix, (meta, updatedPrompt) -> {
+            return meta.mkInstance(
+                ctx, new PromptRequest.MultiClosed<>(updatedPrompt, defaultStringOptions, reverseMapper, clearAfterSelection, stringOptions)
             ).select();
         });
     }

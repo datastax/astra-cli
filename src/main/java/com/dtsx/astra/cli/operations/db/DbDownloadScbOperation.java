@@ -27,7 +27,7 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
 
     public sealed interface DownloadScbResult {}
     public record ScbDownloaded(Path file) implements DownloadScbResult {}
-    public record ScbDownloadFailed(String error) implements DownloadScbResult {}
+
     public record ScbDownloadedAndMoved(Path dest) implements DownloadScbResult {}
     public record ScbDownloadedAndMoveFailed(Path source, Path dest, boolean deleteSucceeded, IOException ex) implements DownloadScbResult {}
     public record ScbDestinationAlreadyExists() implements DownloadScbResult {}
@@ -49,10 +49,7 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
 
         val db = dbGateway.findOne(request.dbRef);
 
-        return downloadSCB(db).fold(
-            ScbDownloadFailed::new,
-            this::handleDownloadedFiles
-        );
+        return handleDownloadedFiles(downloadSCB(db));
     }
 
     private Optional<DownloadScbResult> validateDestinationFile(Path path) {
@@ -87,10 +84,10 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
         }
     }
 
-    private Either<String, Path> downloadSCB(Database db) {
+    private Path downloadSCB(Database db) {
         return downloadsGateway.downloadCloudSecureBundles(
             request.dbRef,
             List.of(DbUtils.resolveDatacenter(db, request.region))
-        ).map(List::getFirst);
+        ).getFirst();
     }
 }

@@ -70,6 +70,6 @@ public class DbRef implements Highlightable {
 
     @Override
     public String highlight(CliContext ctx) {
-        return ctx.highlight(ref.fold(UUID::toString, name -> name));
+        return ctx.highlight(toString());
     }
 }

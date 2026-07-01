@@ -1,0 +1,47 @@
+---- meta ----
+command: astra dotenv list-keys -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "key" : "ASTRA_ORG_ID"
+stdout:   }, {
+stdout:     "key" : "ASTRA_ORG_NAME"
+stdout:   }, {
+stdout:     "key" : "ASTRA_ORG_TOKEN"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_ID"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_NAME"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_REGION"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_KEYSPACE"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_APPLICATION_TOKEN"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_ENVIRONMENT"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_SECURE_BUNDLE_PATH"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_SECURE_BUNDLE_URL"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_GRAPHQL_URL"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_GRAPHQL_URL_PLAYGROUND"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_GRAPHQL_URL_SCHEMA"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_GRAPHQL_URL_ADMIN"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_API_ENDPOINT"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_API_ENDPOINT_SWAGGER"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_REST_URL"
+stdout:   }, {
+stdout:     "key" : "ASTRA_DB_REST_URL_SWAGGER"
+stdout:   } ]
+stdout: }
+---- end ----

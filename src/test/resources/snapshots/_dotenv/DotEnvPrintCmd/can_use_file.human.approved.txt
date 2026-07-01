@@ -1,0 +1,12 @@
+---- meta ----
+command: astra dotenv print -f .env --db two_regions_db --overwrite
+exit_code: 0
+---- output ----
+stdout: # astra: ASTRA_ORG_ID (comment)
+stdout: ORG_ID=123e4567-e89b-12d3-a456-426614174000
+stdout: 
+stdout: # astra: ASTRA_DB_ID
+stdout: DB_NAME=two_regions_db # astra: ASTRA_DB_NAME - comment
+stdout: 
+stdout: # astra: ASTRA_DB_ID
+---- end ----

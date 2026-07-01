@@ -10,7 +10,8 @@ import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkInstallFailed;
 import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.Executed;
-import com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.ScbDownloadFailed;
+
+
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public abstract class AbstractDsbulkExecCmd extends AbstractDbCmd<DsbulkExecResu
     protected final OutputHuman executeHuman(Supplier<DsbulkExecResult> result) {
         return switch (result.get()) {
             case DsbulkInstallFailed(var msg) -> throwDsbulkInstallationFailed(msg);
-            case ScbDownloadFailed(var msg) -> throwDsbulkInstallationFailed(msg);
+
             case Executed(var exitCode) -> AstraCli.exit(exitCode);
         };
     }

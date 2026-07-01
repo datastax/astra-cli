@@ -2,10 +2,12 @@ package com.dtsx.astra.cli.utils;
 
 import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.CannotCreateFileException;
 import com.dtsx.astra.cli.core.properties.CliProperties.AstraBinary;
 import com.dtsx.astra.cli.core.properties.CliProperties.AstraJar;
 import com.dtsx.astra.cli.core.properties.CliProperties.PathToAstra;
+import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -26,6 +28,7 @@ import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 @UtilityClass
 public class FileUtils {
@@ -111,6 +114,16 @@ public class FileUtils {
         } catch (Exception e) {
             throw new CannotCreateFileException(path, extra, e);
         }
+    }
+
+    public void useResource(String path, Consumer<InputStream> consumer) {
+        val stream = CliPropertiesImpl.class.getClassLoader().getResourceAsStream(path);
+
+        if (stream == null) {
+            throw new CongratsYouFoundABugException("Could not find resource '" + path + "' in classpath.");
+        }
+
+        consumer.accept(stream);
     }
 
     @SneakyThrows

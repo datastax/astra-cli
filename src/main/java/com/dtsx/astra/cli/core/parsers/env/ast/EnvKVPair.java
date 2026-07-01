@@ -1,11 +1,19 @@
 package com.dtsx.astra.cli.core.parsers.env.ast;
 
 import com.dtsx.astra.cli.core.output.AstraColors;
+import lombok.val;
 
-public record EnvKVPair(String key, String value) implements EnvNode {
+import java.util.Optional;
+
+public record EnvKVPair(String key, String value, Optional<EnvComment> inlineComment) implements EnvNode {
     @Override
-    @SuppressWarnings("DuplicatedCode")
     public String render(AstraColors colors) {
-        return colors.BLUE_300.use(key) + colors.NEUTRAL_400.use("=") + value;
+        val base = colors.BLUE_300.use(key) + colors.NEUTRAL_400.use("=") + value;
+
+        if (inlineComment.isPresent()) {
+            return base + inlineComment().get().render(colors);
+        }
+
+        return base;
     }
 }

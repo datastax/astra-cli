@@ -42,21 +42,17 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
     }
 
     @Override
-    protected Either<CqlshExecResult, List<String>> buildCommandLine() {
+    protected List<String> buildCommandLine() {
         val commands = new ArrayList<String>();
 
         val scbFile = getScb(request.dbOrScb, request.region);
-
-        if (scbFile.isLeft()) {
-            return Either.left(scbFile.getLeft());
-        }
 
         commands.add("-u");
         commands.add("token");
         commands.add("-p");
         commands.add(request.profile().token().unsafeUnwrap());
         commands.add("-b");
-        commands.add(scbFile.getRight().toString());
+        commands.add(scbFile.toString());
 
         if (request.keyspace().isPresent()) {
             commands.add("-k");
@@ -87,6 +83,6 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
             }
         }
 
-        return Either.pure(commands);
+        return commands;
     }
 }

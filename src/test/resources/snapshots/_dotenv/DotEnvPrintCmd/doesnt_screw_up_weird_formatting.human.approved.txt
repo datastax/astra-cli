@@ -1,0 +1,17 @@
+---- meta ----
+command: astra dotenv print -f .env
+exit_code: 0
+---- output ----
+stdout: ASTRA_ORG_ID=123e4567-e89b-12d3-a456-426614174000
+stdout: 
+stdout: KEY1="double quote: \" single quote: '"
+stdout: KEY2='single quote: \' double quote: "'
+stdout: 
+stdout: #comment1
+stdout: # comment2
+stdout:    #   comment3
+stdout: 
+stdout: 	
+stdout: key3=value   ### #   comment
+stdout: key4="value"   ### #   comment
+---- end ----

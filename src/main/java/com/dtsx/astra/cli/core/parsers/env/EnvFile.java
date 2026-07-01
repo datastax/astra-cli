@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.core.parsers.env;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.parsers.ParsedFile;
 import com.dtsx.astra.cli.core.parsers.env.ast.EnvComment;
+import com.dtsx.astra.cli.core.parsers.env.ast.EnvEmptyLine;
 import com.dtsx.astra.cli.core.parsers.env.ast.EnvKVPair;
 import com.dtsx.astra.cli.core.parsers.env.ast.EnvNode;
 import lombok.*;
@@ -17,18 +18,32 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 @RequiredArgsConstructor
 public class EnvFile extends ParsedFile {
     @Getter
-    private final @NonNull ArrayList<EnvNode> nodes;
+    private final @NonNull List<EnvNode> nodes;
 
     public void appendComment(String comment) {
         nodes.add(new EnvComment(comment));
     }
 
     public void appendVariable(String key, String value) {
-        nodes.add(new EnvKVPair(key, value));
+        nodes.add(new EnvKVPair(key, value, Optional.empty()));
+    }
+
+    public void appendNewLine() {
+        nodes.add(new EnvEmptyLine(""));
     }
 
     public void deleteVariable(String key) {
         nodes.removeIf((n) -> (n instanceof EnvKVPair kv) && kv.key().equals(key));
+    }
+
+    public boolean updateVariable(String key, String value) {
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i) instanceof EnvKVPair kv && kv.key().equals(key)) {
+                nodes.set(i, new EnvKVPair(key, value, kv.inlineComment()));
+                return true;
+            }
+        }
+        return false;
     }
 
     public void filterNodes(Predicate<EnvNode> predicate) {
@@ -44,7 +59,7 @@ public class EnvFile extends ParsedFile {
 
     public Optional<String> lookupKey(String targetKey) {
         for (int i = nodes.size() - 1; i >= 0; i--) {
-            if (nodes.get(i) instanceof EnvKVPair(String key, String value) && key.equals(targetKey)) {
+            if (nodes.get(i) instanceof EnvKVPair(var key, var value, var _) && key.equals(targetKey)) {
                 return Optional.of(value);
             }
         }

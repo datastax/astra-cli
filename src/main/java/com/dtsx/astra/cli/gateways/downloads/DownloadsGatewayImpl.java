@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.gateways.downloads;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.db.ScbDownloadException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.properties.CliProperties.ExternalSoftware;
@@ -24,7 +25,7 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
     private final CliContext ctx;
 
     @Override
-    public Either<String, List<Path>> downloadCloudSecureBundles(DbRef ref, Collection<Datacenter> datacenters) {
+    public List<Path> downloadCloudSecureBundles(DbRef ref, Collection<Datacenter> datacenters) {
         val result = new ArrayList<Path>();
 
         for (val datacenter : datacenters) {
@@ -43,11 +44,11 @@ public class DownloadsGatewayImpl implements DownloadsGateway {
             } catch (Exception e) {
                 ctx.log().exception("Failed to download secure connect bundle for database '%s' in region '%s'".formatted(ref, datacenter.getRegion()));
                 ctx.log().exception(e);
-                return Either.left("Failed to download secure connect bundle for database '%s' in region '%s': %s".formatted(ref, datacenter.getRegion(), e.getMessage()));
+                throw new ScbDownloadException("Failed to download secure connect bundle for database '%s' in region '%s': %s".formatted(ref, datacenter.getRegion(), e.getMessage()));
             }
         }
 
-        return Either.pure(result);
+        return result;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDownloadScbOperation;
+
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -73,7 +74,7 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
             case ScbDownloaded(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoved(var path) -> handleScbDownloaded(path);
             case ScbDownloadedAndMoveFailed fail -> throwScbDownloadedAndMoveFailed(fail);
-            case ScbDownloadFailed (var error) -> throwScbDownloadFailed(error);
+
             case ScbDestinationAlreadyExists() -> throwScbDestinationAlreadyExists();
             case ScbInvalidDestination(var reason) -> throwScbInvalidDestination(reason);
         };
@@ -125,14 +126,7 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         ));
     }
 
-    private <T> T throwScbDownloadFailed(String error) {
-        throw new AstraCliException(DOWNLOAD_ISSUE, trimIndent("""
-          @|bold,red Error: Failed to download secure connect bundle.|@
 
-          Cause:
-          %s
-        """).formatted(error));
-    }
 
     private <T> T throwScbDestinationAlreadyExists() {
         throw new AstraCliException(FILE_ISSUE, trimIndent("""

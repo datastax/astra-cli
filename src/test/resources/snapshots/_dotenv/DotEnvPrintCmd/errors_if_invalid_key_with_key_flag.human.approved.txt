@@ -1,0 +1,50 @@
+---- meta ----
+command: astra dotenv print -k INVALID_KEY
+exit_code: 2
+---- output ----
+stderr: Invalid value for option '--keys' (<EnvKey=String>): expected one of [ASTRA_ORG_ID, ASTRA_ORG_NAME, ASTRA_ORG_TOKEN, ASTRA_DB_ID, ASTRA_DB_NAME, ASTRA_DB_REGION, ASTRA_DB_KEYSPACE, ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_ENVIRONMENT, ASTRA_DB_SECURE_BUNDLE_PATH, ASTRA_DB_SECURE_BUNDLE_URL, ASTRA_DB_GRAPHQL_URL, ASTRA_DB_GRAPHQL_URL_PLAYGROUND, ASTRA_DB_GRAPHQL_URL_SCHEMA, ASTRA_DB_GRAPHQL_URL_ADMIN, ASTRA_DB_API_ENDPOINT, ASTRA_DB_API_ENDPOINT_SWAGGER, ASTRA_DB_REST_URL, ASTRA_DB_REST_URL_SWAGGER] (case-insensitive) but was 'INVALID_KEY'
+stderr: Usage: astra dotenv print [-qV] [--no-input] [--[no-]overwrite] [--[no-]
+stderr:                           spinner] [--color[=WHEN]] [--dump-logs[=FILE]]
+stderr:                           [--db=DB] [-f=FILE] [--keyspace=KEYSPACE] [-o=FORMAT]
+stderr:                           [--region=REGION] [-k=<EnvKey=String>[,
+stderr:                           <EnvKey=String>...]]... [[[-cf=PATH] [-p=NAME]] |
+stderr:                           [--token=TOKEN [--env=ENV]]]
+stderr: 
+stderr: Fill bound keys and print to stdout.
+stderr: 
+stderr:       --db=DB               Database to bind to.
+stderr:   -f, --file=FILE           The target .env file to update.
+stderr:   -k, --keys=<EnvKey=String>[,<EnvKey=String>...]
+stderr:                             Comma-separated EnvKey names to filter the resolved
+stderr:                               binding set.
+stderr:                               (default: {})
+stderr:       --keyspace=KEYSPACE   The keyspace to use.
+stderr:       --[no-]overwrite      Always overwrite non-empty values.
+stderr:       --region=REGION       The region to use.
+stderr: 
+stderr: Common Options:
+stderr:       --color[=WHEN]        One of: auto, never, always
+stderr:                               (default: auto)
+stderr:       --dump-logs[=FILE]    Write all logs to an optionally specified file
+stderr:                               (default: ~/.astra-dev/logs/<file>.log)
+stderr:       --no-input            Don't ask for user input (e.g. confirmation prompts)
+stderr:   -o, --output=FORMAT       One of: human, json, csv
+stderr:                               (default: human)
+stderr:   -q, --quiet               Only output essential information
+stderr:       --[no-]spinner        Enable/disable loading spinners
+stderr:                               (default: enabled if tty and not quiet)
+stderr:   -V, --verbose             Enable verbose logging output
+stderr: 
+stderr: Connection Options:
+stderr:       -cf, --config-file=PATH
+stderr:                             The .astrarc file to use for this command
+stderr:                               (default: ~/.astrarc-dev)
+stderr:       --env=ENV             Override the target astra environment
+stderr:   -p, --profile=NAME        The .astrarc profile to use for this command. Can
+stderr:                               be set via ASTRA_PROFILE.
+stderr:       --token=TOKEN         The astra token to use for this command. Use the
+stderr:                               --token @file syntax to read the token from a
+stderr:                               file, to avoid potential leaks.
+stderr: 
+stderr: See 'astra <command> <subcommand> --help' for help on a specific subcommand.
+---- end ----

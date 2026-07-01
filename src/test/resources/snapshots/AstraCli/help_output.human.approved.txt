@@ -36,6 +36,7 @@ stdout: Commands:
 stdout:   setup      Interactively set up the Astra CLI and create profiles
 stdout:   config     Manage your Astra CLI configuration profiles
 stdout:   db         Manage your Astra databases
+stdout:   dotenv     Easily create and update your .env files
 stdout:   pcu        Manage your PCU groups and associations
 stdout:   org        Get organization information
 stdout:   role       Discover Astra roles

@@ -1,0 +1,13 @@
+---- meta ----
+command: astra dotenv print -k ASTRA_ORG_ID=ORG_ID,ASTRA_ORG_NAME -k ASTRA_DB_ID --db two_regions_db
+exit_code: 0
+---- output ----
+stdout: # astra: ASTRA_ORG_ID - Created by Astra CLI
+stdout: ORG_ID=123e4567-e89b-12d3-a456-426614174000
+stdout: 
+stdout: # Created by Astra CLI
+stdout: ASTRA_ORG_NAME=firstname.lastname@email.tld
+stdout: 
+stdout: # Created by Astra CLI
+stdout: ASTRA_DB_ID=822b0fff-6a73-4322-a8ec-09832b075287
+---- end ----

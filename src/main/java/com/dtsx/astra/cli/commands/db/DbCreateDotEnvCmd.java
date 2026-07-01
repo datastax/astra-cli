@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -34,7 +35,8 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @Command(
     name = "create-dotenv",
-    description = "Create a env file to help you connect to your Astra DB instance."
+    description = "Create a env file to help you connect to your Astra DB instance.",
+    hidden = true
 )
 @Example(
     comment = "Create a fully-populated .env file, updating the existing one if it exists",
@@ -129,6 +131,9 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
     @Override
     protected final OutputAll execute(Supplier<CreateDotEnvResult> result) {
+        ctx.log().warn("@'!astra db create-dotenv!@ is deprecated");
+        ctx.log().warn("Use the new commands under @'!astra dotenv!@ instead");
+
         return switch (result.get()) {
             case CreatedDotEnvContent(var content) -> OutputAll.response(
                 content.render(ctx.colors()),
@@ -166,12 +171,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
                 new Hint("View the env file", "cat " + outputFile)
             ));
 
-            case FailedToDownloadSCB(var reason) -> throw new AstraCliException(DOWNLOAD_ISSUE, """
-              @|bold, red Error: Failed to download the secure connect bundle.|@
-            
-              Cause:
-              %s
-            """.formatted(reason));
+
         };
     }
 

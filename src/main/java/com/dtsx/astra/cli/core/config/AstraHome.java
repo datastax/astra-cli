@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.core.config;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Thunk;
 import com.dtsx.astra.cli.utils.FileUtils;
+import lombok.val;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +27,7 @@ public class AstraHome {
     }
 
     public final UsablePath updateNotifierProperties = new Thunk<>(() -> {
-        Path path = dir.get().resolve("upgrade-notifier.properties");
+        val path = dir.get().resolve("upgrade-notifier.properties");
         FileUtils.createFileIfNotExists(path, null);
         return path;
     })::get;
@@ -80,6 +81,7 @@ public class AstraHome {
             return folder.get();
         }
     }
+
 
     private CliContext ctx() {
         return ctxSupplier.get();

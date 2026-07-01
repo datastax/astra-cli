@@ -42,21 +42,20 @@ public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRe
     }
 
     @Override
-    protected Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        return buildCoreFlags(request).map((coreFlags) -> {
-            val cmd = new ArrayList<String>() {{
-                add("unload");
-                addAll(coreFlags);
-            }};
+    protected List<String> buildCommandLine() {
+        val coreFlags = buildCoreFlags(request);
+        val cmd = new ArrayList<String>() {{
+            add("unload");
+            addAll(coreFlags);
+        }};
 
-            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.skipRecords(), request.maxErrors(), request.mapping());
+        addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.skipRecords(), request.maxErrors(), request.mapping());
 
-            request.query().ifPresent(q -> {
-                cmd.add("-query");
-                cmd.add(q);
-            });
-            
-            return cmd;
+        request.query().ifPresent(q -> {
+            cmd.add("-query");
+            cmd.add(q);
         });
+        
+        return cmd;
     }
 }

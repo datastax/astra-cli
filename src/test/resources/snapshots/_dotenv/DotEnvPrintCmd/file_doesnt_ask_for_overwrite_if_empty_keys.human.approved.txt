@@ -1,0 +1,13 @@
+---- meta ----
+command: astra dotenv print -f .env --db two_regions_db
+exit_code: 0
+---- output ----
+stdout: ASTRA_ORG_ID=123e4567-e89b-12d3-a456-426614174000
+stdout: 
+stdout: # astra: RANDOM_NONSENSE
+stdout: DB_NAME=two_regions_db# astra: ASTRA_DB_NAME comment
+stdout: 
+stdout: UNKNOWN=
+stdout: 
+stdout: # astra: ASTRA_DB_ID
+---- end ----

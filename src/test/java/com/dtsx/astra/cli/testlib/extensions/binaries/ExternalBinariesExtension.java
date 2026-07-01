@@ -83,7 +83,7 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
             };
             case SCB -> (mock) -> {
                 for (val ref : List.of(Databases.NameRef, Databases.IdRef)) {
-                    doReturn(Either.pure(List.of(binary))).when(mock).downloadCloudSecureBundles(ref, Set.of(DbUtils.resolveDatacenter(Databases.One, Optional.empty())));
+                    doReturn(List.of(binary)).when(mock).downloadCloudSecureBundles(ref, Set.of(DbUtils.resolveDatacenter(Databases.One, Optional.empty())));
                 }
             };
         };
@@ -97,7 +97,7 @@ public class ExternalBinariesExtension implements ParameterResolver, TestInstanc
             case SCB -> {
                 val db = dbGateway(ec).findOne(TestConfig.dbId());
                 val paths = downloadsGateway(ec).downloadCloudSecureBundles(TestConfig.dbId(), Set.of(DbUtils.resolveDatacenter(db, Optional.of(TestConfig.dbRegion()))));
-                yield paths.map(List::getFirst);
+                yield Either.pure(paths.getFirst());
             }
         };
 

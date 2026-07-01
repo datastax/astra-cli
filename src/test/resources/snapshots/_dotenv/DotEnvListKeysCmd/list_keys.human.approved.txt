@@ -1,0 +1,28 @@
+---- meta ----
+command: astra dotenv list-keys
+exit_code: 0
+---- output ----
+stdout: ┌─────────────────────────────────┐
+stdout: │ Key                             │
+stdout: ├─────────────────────────────────┤
+stdout: │ ASTRA_ORG_ID                    │
+stdout: │ ASTRA_ORG_NAME                  │
+stdout: │ ASTRA_ORG_TOKEN                 │
+stdout: │ ASTRA_DB_ID                     │
+stdout: │ ASTRA_DB_NAME                   │
+stdout: │ ASTRA_DB_REGION                 │
+stdout: │ ASTRA_DB_KEYSPACE               │
+stdout: │ ASTRA_DB_APPLICATION_TOKEN      │
+stdout: │ ASTRA_DB_ENVIRONMENT            │
+stdout: │ ASTRA_DB_SECURE_BUNDLE_PATH     │
+stdout: │ ASTRA_DB_SECURE_BUNDLE_URL      │
+stdout: │ ASTRA_DB_GRAPHQL_URL            │
+stdout: │ ASTRA_DB_GRAPHQL_URL_PLAYGROUND │
+stdout: │ ASTRA_DB_GRAPHQL_URL_SCHEMA     │
+stdout: │ ASTRA_DB_GRAPHQL_URL_ADMIN      │
+stdout: │ ASTRA_DB_API_ENDPOINT           │
+stdout: │ ASTRA_DB_API_ENDPOINT_SWAGGER   │
+stdout: │ ASTRA_DB_REST_URL               │
+stdout: │ ASTRA_DB_REST_URL_SWAGGER       │
+stdout: └─────────────────────────────────┘
+---- end ----

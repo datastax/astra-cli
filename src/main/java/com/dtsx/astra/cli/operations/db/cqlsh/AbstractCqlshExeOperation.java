@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.operations.db.cqlsh;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.db.ScbDownloadException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -33,12 +35,16 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
     protected final Req request;
 
     public sealed interface CqlshExecResult {}
-
     public record InvalidDbStatus(DatabaseStatusType status) implements CqlshExecResult {}
+
     public record CqlshInstallFailed(String error) implements CqlshExecResult {}
-    public record ScbDownloadFailed(String error) implements CqlshExecResult {}
     public record Executed(int exitCode) implements CqlshExecResult {}
     public record ExecutedWithOutput(int exitCode, List<String> stdout, List<String> stderr) implements CqlshExecResult {}
+
+    public static class CqlshInvalidDbStatusException extends RuntimeException {
+        public final DatabaseStatusType status;
+        public CqlshInvalidDbStatusException(DatabaseStatusType status) { this.status = status; }
+    }
 
     public interface CoreCqlshOptions {
         boolean debug();
@@ -47,36 +53,41 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
         boolean captureOutput();
     }
 
-    abstract Either<CqlshExecResult, List<String>> buildCommandLine();
+    abstract List<String> buildCommandLine();
 
     @Override
     public CqlshExecResult execute() {
-        return downloadCqlsh().flatMap((exe) -> buildCommandLine().map((flags) -> {
-            val commandLine = new ArrayList<String>() {{
-                add(exe.toString());
-                addAll(buildCoreFlags());
-                addAll(flags);
-            }};
+        try {
+            return downloadCqlsh().map((exe) -> {
+                val flags = buildCommandLine();
+                val commandLine = new ArrayList<String>() {{
+                    add(exe.toString());
+                    addAll(buildCoreFlags());
+                    addAll(flags);
+                }};
 
-            val startedProcess = ctx.log().loading("Starting cqlsh", (_) -> {
+                val startedProcess = ctx.log().loading("Starting cqlsh", (_) -> {
+                    try {
+                        val res = startProcess(commandLine);
+                        Thread.sleep(100); // cqlsh doesn't print anything immediately, so let spinner run a bit longer
+                        return res;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
                 try {
-                    val res = startProcess(commandLine);
-                    Thread.sleep(100); // cqlsh doesn't print anything immediately, so let spinner run a bit longer
-                    return res;
-                } catch (Exception e) {
+                    val result = startedProcess.waitFor();
+                    Thread.sleep(500);
+                    return result;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
                 }
-            });
-
-            try {
-                val result = startedProcess.waitFor();
-                Thread.sleep(500);
-                return result;
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
-            }
-        })).fold(l -> l, r -> r);
+            }).fold(l -> l, r -> r);
+        } catch (CqlshInvalidDbStatusException e) {
+            return new InvalidDbStatus(e.status);
+        }
     }
 
     @FunctionalInterface
@@ -109,32 +120,32 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
             .mapLeft(CqlshInstallFailed::new);
     }
 
-    protected Either<CqlshExecResult, Path> getScb(Either<DbRef, Path> dbOrScb, Optional<RegionName> regionName) {
+    protected Path getScb(Either<DbRef, Path> dbOrScb, Optional<RegionName> regionName) {
         if (dbOrScb.isRight()) {
             return validateScbPath(dbOrScb);
         }
         return downloadScb(dbOrScb, regionName);
     }
 
-    private static @NotNull Either<CqlshExecResult, Path> validateScbPath(Either<DbRef, Path> dbRef) {
+    private static @NotNull Path validateScbPath(Either<DbRef, Path> dbRef) {
         val path = dbRef.getRight();
 
         if (!path.toString().endsWith(".zip")) {
-            return Either.left(new ScbDownloadFailed("Invalid SCB path (" + path + "): bundle must be a .zip file"));
+            throw new ScbDownloadException("Invalid SCB path (" + path + "): bundle must be a .zip file");
         }
 
         if (!Files.exists(path)) {
-            return Either.left(new ScbDownloadFailed("Invalid SCB path (" + path + "): file does not exist"));
+            throw new ScbDownloadException("Invalid SCB path (" + path + "): file does not exist");
         }
 
-        return Either.pure(path);
+        return path;
     }
 
-    private Either<CqlshExecResult, Path> downloadScb(Either<DbRef, Path> dbRef, Optional<RegionName> regionName) {
+    private Path downloadScb(Either<DbRef, Path> dbRef, Optional<RegionName> regionName) {
         val db = dbGateway.findOne(dbRef.getLeft());
 
         if (db.getStatus() != DatabaseStatusType.ACTIVE) {
-            return Either.left(new InvalidDbStatus(db.getStatus()));
+            throw new CqlshInvalidDbStatusException(db.getStatus());
         }
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
@@ -142,10 +153,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
             Collections.singleton(DbUtils.resolveDatacenter(db, regionName))
         );
 
-        return scbPaths.bimap(
-            ScbDownloadFailed::new,
-            List::getFirst
-        );
+        return scbPaths.getFirst();
     }
 
     private List<String> buildCoreFlags() {

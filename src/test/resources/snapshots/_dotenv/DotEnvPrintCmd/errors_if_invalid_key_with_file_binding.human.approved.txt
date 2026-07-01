@@ -1,0 +1,8 @@
+---- meta ----
+command: astra dotenv print -f .env
+exit_code: 2
+---- output ----
+stderr: Unknown Astra key in binding comment: 'RANDOM_NONSENSE'
+stderr: 
+stderr: Run 'astra dotenv list-keys' to see valid keys.
+---- end ----
