@@ -87,14 +87,14 @@ public class AstraConsole {
     }
 
     public String unsafeReadLine(@Nullable String prompt, boolean echoOff) {
-        if (rawConsole == null) {
-            throw new CongratsYouFoundABugException("System.console() is null, unable to read input"); // should only be used internally in prompters
-        }
-
         error(prompt != null ? prompt : "");
 
         if (readLineImpl != null) {
             return readLineImpl.get();
+        }
+
+        if (rawConsole == null) {
+            throw new CongratsYouFoundABugException("System.console() is null, unable to read input"); // should only be used internally in prompters
         }
 
         return (echoOff)

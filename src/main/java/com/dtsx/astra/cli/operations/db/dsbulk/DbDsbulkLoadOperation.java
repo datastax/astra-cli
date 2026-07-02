@@ -43,26 +43,25 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
     }
 
     @Override
-    protected Either<DsbulkExecResult, List<String>> buildCommandLine() {
-        return buildCoreFlags(request).map((coreFlags) -> {
-            val cmd = new ArrayList<String>() {{
-                add("load");
-                addAll(coreFlags);
-            }};
+    protected List<String> buildCommandLine() {
+        val coreFlags = buildCoreFlags(request);
+        val cmd = new ArrayList<String>() {{
+            add("load");
+            addAll(coreFlags);
+        }};
 
-            addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.skipRecords(), request.maxErrors(), request.mapping());
+        addLoadUnloadOptions(cmd, request.delimiter(), request.url(), request.header(), request.skipRecords(), request.maxErrors(), request.mapping());
 
-            if (request.dryRun()) {
-                cmd.add("-dryRun");
-                cmd.add("true");
-            }
-            
-            if (request.allowMissingFields()) {
-                cmd.add("--schema.allowMissingFields");
-                cmd.add("true");
-            }
-            
-            return cmd;
-        });
+        if (request.dryRun()) {
+            cmd.add("-dryRun");
+            cmd.add("true");
+        }
+        
+        if (request.allowMissingFields()) {
+            cmd.add("--schema.allowMissingFields");
+            cmd.add("true");
+        }
+
+        return cmd;
     }
 }

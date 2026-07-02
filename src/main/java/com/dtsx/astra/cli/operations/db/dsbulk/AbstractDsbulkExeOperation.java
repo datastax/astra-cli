@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.operations.db.dsbulk;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.exceptions.internal.db.ScbDownloadException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -30,7 +31,6 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
     public sealed interface DsbulkExecResult {}
 
     public record DsbulkInstallFailed(String error) implements DsbulkExecResult {}
-    public record ScbDownloadFailed(String error) implements DsbulkExecResult {}
     public record Executed(int exitCode) implements DsbulkExecResult {}
 
     public interface CoreDsbulkOptions {
@@ -46,11 +46,12 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         Optional<RegionName> region();
     }
 
-    protected abstract Either<DsbulkExecResult, List<String>> buildCommandLine();
+    protected abstract List<String> buildCommandLine();
 
     @Override
     public DsbulkExecResult execute() {
-        return downloadDsbulk().flatMap((exe) -> buildCommandLine().map((flags) -> {
+        return downloadDsbulk().map((exe) -> {
+            val flags = buildCommandLine();
             val commandLine = new ArrayList<String>() {{
                 add(exe.toString());
                 addAll(flags);
@@ -74,7 +75,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
-        })).fold(l -> l, r -> r);
+        }).fold(l -> l, r -> r);
     }
 
     private Either<DsbulkExecResult, Path> downloadDsbulk() {
@@ -86,7 +87,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         );
     }
 
-    protected Either<DsbulkExecResult, Path> downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
+    protected Path downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
@@ -94,15 +95,12 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             Collections.singleton(DbUtils.resolveDatacenter(db, regionName))
         );
 
-        return scbPaths.bimap(
-            ScbDownloadFailed::new,
-            List::getFirst
-        );
+        return scbPaths.getFirst();
     }
 
-    protected Either<DsbulkExecResult, List<String>> buildCoreFlags(CoreDsbulkOptions options) {
-        return downloadSCB(options.dbRef(), options.region()).map(scbFile -> {
-            val flags = new ArrayList<String>();
+    protected List<String> buildCoreFlags(CoreDsbulkOptions options) {
+        val scbFile = downloadSCB(options.dbRef(), options.region());
+        val flags = new ArrayList<String>();
             
             flags.add("-u");
             flags.add("token");
@@ -158,7 +156,6 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
             }
 
             return flags;
-        });
     }
 
     protected static void addLoadUnloadOptions(ArrayList<String> cmd, String delimiter, String url, boolean header, int i, int i2, Optional<String> mapping) {

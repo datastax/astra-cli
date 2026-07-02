@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -96,6 +97,90 @@ public class SelectorBuilder {
                 prompt,
                 options,
                 defaultOption,
+                mapper,
+                fallback,
+                fix,
+                clearAfterSelection
+            );
+        }
+    }
+
+    public <T> MultiNeedsOptions<T> multiOptions(NEList<T> options) {
+        return new MultiNeedsOptions<>(options);
+    }
+
+    @SafeVarargs
+    public final <T> MultiNeedsOptions<T> multiOptions(T... options) {
+        return new MultiNeedsOptions<>(NEList.of(options));
+    }
+
+    @RequiredArgsConstructor
+    public class MultiNeedsOptions<T> {
+        private final NEList<T> options;
+
+        public MultiNeedsMapper<T> defaultOptions(List<T> defaultOptions) {
+            return new MultiNeedsMapper<>(options, defaultOptions);
+        }
+
+        public MultiNeedsMapper<T> requireAnswer() {
+            return new MultiNeedsMapper<>(options, List.of());
+        }
+    }
+
+    @RequiredArgsConstructor
+    public class MultiNeedsMapper<T> {
+        private final NEList<T> options;
+        private final List<T> defaultOptions;
+
+        public MultiNeedsFallback<T> mapper(Function<T, String> mapper) {
+            return new MultiNeedsFallback<>(options, defaultOptions, mapper);
+        }
+    }
+
+    @RequiredArgsConstructor
+    public class MultiNeedsFallback<T> {
+        private final NEList<T> options;
+        private final List<T> defaultOptions;
+        private final Function<T, String> mapper;
+
+        public MultiNeedsFix<T> fallbackFlag(String flag) {
+            return new MultiNeedsFix<>(options, defaultOptions, mapper, ctx.highlight(flag) + " flag");
+        }
+    }
+
+    @RequiredArgsConstructor
+    public class MultiNeedsFix<T> {
+        private final NEList<T> options;
+        private final List<T> defaultOptions;
+        private final Function<T, String> mapper;
+        private final String fallback;
+
+        public MultiNeedsClearAfterSelection<T> fix(Iterable<String> originalArgs, String newArg) {
+            return new MultiNeedsClearAfterSelection<>(options, defaultOptions, mapper, fallback, Pair.of(originalArgs, newArg));
+        }
+    }
+
+    @RequiredArgsConstructor
+    public class MultiNeedsClearAfterSelection<T> {
+        private final NEList<T> options;
+        private final List<T> defaultOptions;
+        private final Function<T, String> mapper;
+        private final String fallback;
+        private final Pair<? extends Iterable<String>, String> fix;
+
+        public List<T> clearAfterSelection() {
+            return clearAfterSelection(true);
+        }
+
+        public List<T> dontClearAfterSelection() {
+            return clearAfterSelection(false);
+        }
+
+        private List<T> clearAfterSelection(boolean clearAfterSelection) {
+            return new CLIPrompter(ctx, noInput).multiSelect(
+                prompt,
+                options,
+                defaultOptions,
                 mapper,
                 fallback,
                 fix,

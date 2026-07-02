@@ -1,0 +1,25 @@
+---- meta ----
+command: astra dotenv list-keys -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,key
+stdout: OK,,ASTRA_ORG_ID
+stdout: OK,,ASTRA_ORG_NAME
+stdout: OK,,ASTRA_ORG_TOKEN
+stdout: OK,,ASTRA_DB_ID
+stdout: OK,,ASTRA_DB_NAME
+stdout: OK,,ASTRA_DB_REGION
+stdout: OK,,ASTRA_DB_KEYSPACE
+stdout: OK,,ASTRA_DB_APPLICATION_TOKEN
+stdout: OK,,ASTRA_DB_ENVIRONMENT
+stdout: OK,,ASTRA_DB_SECURE_BUNDLE_PATH
+stdout: OK,,ASTRA_DB_SECURE_BUNDLE_URL
+stdout: OK,,ASTRA_DB_GRAPHQL_URL
+stdout: OK,,ASTRA_DB_GRAPHQL_URL_PLAYGROUND
+stdout: OK,,ASTRA_DB_GRAPHQL_URL_SCHEMA
+stdout: OK,,ASTRA_DB_GRAPHQL_URL_ADMIN
+stdout: OK,,ASTRA_DB_API_ENDPOINT
+stdout: OK,,ASTRA_DB_API_ENDPOINT_SWAGGER
+stdout: OK,,ASTRA_DB_REST_URL
+stdout: OK,,ASTRA_DB_REST_URL_SWAGGER
+---- end ----

@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import static com.datastax.astra.client.core.options.DataAPIClientOptions.DEFAULT_KEYSPACE;
+
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class KeyspaceRef implements Highlightable {
@@ -34,7 +36,7 @@ public class KeyspaceRef implements Highlightable {
     }
 
     public boolean isDefaultKeyspace() {
-        return "default_keyspace".equals(name);
+        return DEFAULT_KEYSPACE.equals(name);
     }
 
     @Override

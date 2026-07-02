@@ -7,13 +7,11 @@ import com.dtsx.astra.cli.core.models.Version;
 import com.dtsx.astra.cli.core.properties.CliEnvironment.OS;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.AccessLevel;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +34,13 @@ public class CliPropertiesImpl implements CliProperties {
         }
 
         for (val file : List.of("static.properties", "dynamic.properties")) {
-            try {
-                @Cleanup val stream = CliPropertiesImpl.class.getClassLoader().getResourceAsStream(file);
-
-                if (stream == null) {
-                    throw new CongratsYouFoundABugException("Could not find resource '" + file + "' in classpath.");
+            FileUtils.useResource(file, (is) -> {
+                try {
+                    System.getProperties().load(is);
+                } catch (Exception e) {
+                    throw new CongratsYouFoundABugException("Could not read '" + file + "' - '" + e.getMessage() + "'", e);
                 }
-
-                System.getProperties().load(stream);
-            } catch (IOException e) {
-                throw new CongratsYouFoundABugException("Could not read '" + file + "' - '" + e.getMessage() + "'", e);
-            }
+            });
         }
 
         props.cliName();

@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.datatypes.NEList;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -19,12 +20,21 @@ public abstract class PromptRequest {
     }
 
     @Value
-        public static class Closed<T> {
+    public static class Closed<T> {
         String prompt;
         Optional<String> defaultOption;
         Function<String, T> mapper;
         boolean clearAfterSelection;
         NEList<String> options;
         boolean labelDefault;
+    }
+
+    @Value
+    public static class MultiClosed<T> {
+        String prompt;
+        List<String> defaultOptions;
+        Function<String, T> mapper;
+        boolean clearAfterSelection;
+        NEList<String> options;
     }
 }

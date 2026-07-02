@@ -63,8 +63,6 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
     public record UpdatedDotEnvFile(Path file, boolean overwritten) implements CreateDotEnvResult {}
     public record CreatedDotEnvContent(EnvFile content) implements CreateDotEnvResult {}
     public record NothingToUpdate(Path file) implements CreateDotEnvResult {}
-    public record FailedToDownloadSCB(String reason) implements CreateDotEnvResult {}
-
     @Override
     public CreateDotEnvResult execute() {
         val DEFAULT_ENV_FILE = ctx.path(".env");
@@ -73,35 +71,30 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
         val shouldOverwrite = shouldOverwrite(source, request);
 
-        val maybeScbPath = (request.keys.contains(ASTRA_DB_SECURE_BUNDLE_PATH))
+        val scbPath = (request.keys.contains(ASTRA_DB_SECURE_BUNDLE_PATH))
             ? downloadAndResolveScbPath(request)
-            : Either.<String, Path>pure(null);
+            : null;
 
-        return maybeScbPath.fold(
-            FailedToDownloadSCB::new,
-            (scbPath) -> {
-                val wasUpdated = appendToEnvFile(source, request, shouldOverwrite, scbPath);
+        val wasUpdated = appendToEnvFile(source, request, shouldOverwrite, scbPath);
 
-                if (request.print) {
-                    return new CreatedDotEnvContent(source);
-                }
+        if (request.print) {
+            return new CreatedDotEnvContent(source);
+        }
 
-                val outputFile = request.file().orElse(DEFAULT_ENV_FILE);
-                val fileAlreadyExists = Files.exists(outputFile);
+        val outputFile = request.file().orElse(DEFAULT_ENV_FILE);
+        val fileAlreadyExists = Files.exists(outputFile);
 
-                if (wasUpdated) {
-                    source.writeToFile(outputFile);
+        if (wasUpdated) {
+            source.writeToFile(outputFile);
 
-                    if (fileAlreadyExists) {
-                        return new UpdatedDotEnvFile(outputFile, shouldOverwrite);
-                    } else {
-                        return new CreatedDotEnvFile(outputFile);
-                    }
-                } else {
-                    return new NothingToUpdate(outputFile);
-                }
+            if (fileAlreadyExists) {
+                return new UpdatedDotEnvFile(outputFile, shouldOverwrite);
+            } else {
+                return new CreatedDotEnvFile(outputFile);
             }
-        );
+        } else {
+            return new NothingToUpdate(outputFile);
+        }
     }
 
     public enum EnvKey {
@@ -255,12 +248,11 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         return cachedKeyspace;
     }
 
-    private Either<String, Path> downloadAndResolveScbPath(CreateDotEnvRequest request) {
+    private Path downloadAndResolveScbPath(CreateDotEnvRequest request) {
         val dbName = db(request).getInfo().getName();
         val datacenter = resolveDatacenter(request);
 
-        return downloadsGateway.downloadCloudSecureBundles(request.dbRef, List.of(datacenter))
-            .map(List::getFirst);
+        return downloadsGateway.downloadCloudSecureBundles(request.dbRef, List.of(datacenter)).getFirst();
     }
 
     private String resolveScbUrl(CreateDotEnvRequest request) {

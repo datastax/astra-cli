@@ -11,6 +11,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
+
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.*;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
@@ -71,8 +72,8 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
     protected final OutputHuman executeHuman(Supplier<CqlshExecResult> result) {
         return switch (result.get()) {
             case CqlshInstallFailed(var msg) -> throwCqlshInstallationFailed(msg);
-            case ScbDownloadFailed(var msg) -> throwScbInstallationFailed(msg);
             case InvalidDbStatus(var status) -> throwInvalidDbStatus(status);
+
             case Executed(var exitCode) -> AstraCli.exit(exitCode);
             case ExecutedWithOutput _ -> throw new CongratsYouFoundABugException("Should not be able to get to `executeHuman` with `ExecutedWithOutput` when output is `HUMAN`");
         };
@@ -86,8 +87,8 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
 
         return switch (result.get()) {
             case CqlshInstallFailed(var msg) -> throwCqlshInstallationFailed(msg);
-            case ScbDownloadFailed(var msg) -> throwScbInstallationFailed(msg);
             case InvalidDbStatus(var status) -> throwInvalidDbStatus(status);
+
             case Executed _ -> throw new CongratsYouFoundABugException("Should not be able to get to `execute` with `Executed` when output is `" + ctx.outputType() + "`");
             case ExecutedWithOutput res -> handleExecutedWithOutput(res);
         };
@@ -104,15 +105,6 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
         ));
     }
 
-    private <T> T throwScbInstallationFailed(String error) {
-        throw new AstraCliException(FILE_ISSUE, """
-          @|bold,red Failed to download secure connect bundle: %s|@
-        
-          Please ensure you have a stable network connection and sufficient permissions, then try again.
-        """.formatted(error), List.of(
-            new Hint("Retry download:", "${cli.name} db cqlsh version")
-        ));
-    }
 
     private <T> T throwInvalidDbStatus(DatabaseStatusType status) {
         throw new AstraCliException(STATUS_ISSUE, """
@@ -123,6 +115,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
             new Hint("Check database status:", "${cli.name} db status --name <db-name>")
         ));
     }
+
 
     private OutputAll handleExecutedWithOutput(ExecutedWithOutput res) {
         val msg = "Cqlsh executed with exit code %d, with %d lines in stdout and %d lines in stderr."

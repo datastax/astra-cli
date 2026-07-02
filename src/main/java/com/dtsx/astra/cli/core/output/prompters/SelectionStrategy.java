@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.output.prompters;
 
 import com.dtsx.astra.cli.core.CliContext;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SelectionStrategy<T> {
@@ -16,6 +17,10 @@ public interface SelectionStrategy<T> {
 
         non-sealed interface Closed extends Meta {
             <T> SelectionStrategy<T> mkInstance(CliContext ctx, PromptRequest.Closed<T> request);
+        }
+
+        non-sealed interface MultiClosed extends Meta {
+            <T> SelectionStrategy<List<T>> mkInstance(CliContext ctx, PromptRequest.MultiClosed<T> request);
         }
     }
 }

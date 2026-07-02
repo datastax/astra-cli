@@ -22,7 +22,7 @@ public class DbCqlshVersionOperation extends AbstractCqlshExeOperation<CqlshVers
     ) implements CoreCqlshOptions {}
 
     @Override
-    protected Either<CqlshExecResult, List<String>> buildCommandLine() {
-        return Either.pure(List.of("--version"));
+    protected List<String> buildCommandLine() {
+        return List.of("--version");
     }
 }

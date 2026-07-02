@@ -22,6 +22,7 @@ import org.approvaltests.scrubbers.RegExScrubber;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -99,8 +100,12 @@ public class BaseCmdSnapshotTest {
 
     private static final Scrubber SECURE_BUNDLE_SCRUBBER = new RegExScrubber("\"secureBundle.*?\"\\s*:\\s*\"[^\"]+\"", "\"secureBundleUrl\": \"<redacted>\"");
 
-    protected final CmdOutput verifyRun(String cmd, OutputType outputType, Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> optionsFn) {
-        val output = run(cmd, outputType, optionsFn);
+    protected final CmdOutput verifyRun(String cmd, OutputType outputType, Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> modifyOpts) {
+        return verifyRun(cmd, outputType, modifyOpts, _ -> {});
+    }
+
+    protected final CmdOutput verifyRun(String cmd, OutputType outputType, Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> modifyOpts, Consumer<TestCliContext> useCtx) {
+        val output = run(cmd, outputType, modifyOpts, useCtx);
 
         try {
             output.validate();
@@ -126,10 +131,11 @@ public class BaseCmdSnapshotTest {
         }
     }
 
-    protected final UnverifiedCmdOutput run(String cmd, OutputType outputType, Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> optionsMod) {
+    protected final UnverifiedCmdOutput run(String cmd, OutputType outputType, Function<SnapshotTestOptionsBuilder, SnapshotTestOptionsBuilder> optionsMod, Consumer<TestCliContext> useCtx) {
         val options = optionsMod.apply(emptySnapshotTestOptionsBuilder().outputType(outputType)).build();
 
         val ctx = new TestCliContext(options);
+        useCtx.accept(ctx);
 
         val cmdParts = buildCmdParts(cmd, outputType);
         val exitCode = AstraCli.run(ctx.ref(), cmdParts);

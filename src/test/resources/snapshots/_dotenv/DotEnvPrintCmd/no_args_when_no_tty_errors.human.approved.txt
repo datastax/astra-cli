@@ -1,0 +1,11 @@
+---- meta ----
+command: astra dotenv print
+exit_code: 2
+---- output ----
+stderr: Error: No interactive selection strategy is supported on this terminal
+stderr: 
+stderr: Please programmatically pass an option using the '--keys' flag.
+stderr: 
+stderr: # Potential fix
+stderr: $ astra dotenv print --keys ASTRA_ORG_TOKEN
+---- end ----
