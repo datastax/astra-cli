@@ -6,10 +6,15 @@ import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.StringUtils;
 import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor
 public class RoleGatewayImpl implements RoleGateway {
@@ -30,13 +35,23 @@ public class RoleGatewayImpl implements RoleGateway {
     }
 
     @Override
-    public Map<UUID, Optional<String>> findNames(Set<UUID> ids) {
+    public Map<UUID, String> findNames(Set<UUID> ids) {
+        val roles = findAll().collect(toMap(
+            r -> {
+                try {
+                    return UUID.fromString(r.getId());
+                } catch (Exception e) {
+                    return null;
+                }
+            },
+            Role::getName
+        ));
+
         return ids.stream()
-            .collect(Collectors.toMap(
+            .filter(roles::containsKey)
+            .collect(toMap(
                 id -> id,
-                id -> ctx.log().loading("Looking up role name for " + ctx.highlight(id), (_) ->
-                    tryFindOne(RoleRef.fromId(id)).map(Role::getName)
-                )
+                roles::get
             ));
     }
 }

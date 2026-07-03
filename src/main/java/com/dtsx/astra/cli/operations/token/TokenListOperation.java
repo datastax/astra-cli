@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.operations.token;
 
+import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -7,6 +8,7 @@ import com.dtsx.astra.cli.operations.token.TokenListOperation.TokenInfo;
 import com.dtsx.astra.sdk.org.domain.IamToken;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +24,7 @@ public class TokenListOperation implements Operation<Stream<TokenInfo>> {
 
     public record TokenInfo(
         List<String> roleNames,
-        List<UUID> roleIds,
+        List<@Nullable UUID> roleIds,
         IamToken raw
     ) {}
 
@@ -30,21 +32,12 @@ public class TokenListOperation implements Operation<Stream<TokenInfo>> {
     public Stream<TokenInfo> execute() {
         val tokens = tokenGateway.findAll().toList();
 
-//        tokens.forEach((t) -> {
-//            try {
-//                t.getRoles().forEach(UUID::fromString);
-//            } catch (Exception _) {
-//                System.out.println(JsonUtils.formatJsonPretty(t));
-//            }
-//        });
-
         val roleMappings = roleGateway.findNames(
-            tokens
-                .stream()
+            tokens.stream()
                 .flatMap((token) -> token.getRoles().stream())
-                .map((id) -> {
+                .map((nameOrId) -> {
                     try {
-                        return UUID.fromString(id);
+                        return UUID.fromString(nameOrId);
                     } catch (Exception e) {
                         return null;
                     }
@@ -54,18 +47,25 @@ public class TokenListOperation implements Operation<Stream<TokenInfo>> {
         );
 
         return tokens.stream().map((token) -> {
-            val roleIds = token.getRoles().stream()
-                .map((id) -> {
+            val roles = token.getRoles().stream()
+                .map((nameOrId) -> {
                     try {
-                        return UUID.fromString(id); // ugly duplication and null usage but whatever it's fine for now
+                        return Either.<String, UUID>pure(UUID.fromString(nameOrId));
                     } catch (Exception e) {
-                        return null;
+                        return Either.<String, UUID>left(nameOrId);
                     }
                 })
                 .toList();
 
-            val roleNames = roleIds.stream()
-                .map((roleId) -> roleMappings.get(roleId).orElse((roleId != null) ? roleId.toString() : null))
+            val roleIds = roles.stream()
+                .map((either) -> either.fold(_ -> null, id -> id))
+                .toList();
+
+            val roleNames = roles.stream()
+                .map((either) -> either.fold(
+                    name -> name,
+                    roleMappings::get
+                ))
                 .toList();
 
             return new TokenInfo(roleNames, roleIds, token);

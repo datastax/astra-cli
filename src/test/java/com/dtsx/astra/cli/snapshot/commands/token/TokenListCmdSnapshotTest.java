@@ -11,9 +11,9 @@ import com.dtsx.astra.cli.snapshot.annotations.TestForDifferentOutputs;
 import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.Fixtures.Roles;
 import com.dtsx.astra.sdk.org.domain.IamToken;
+import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.val;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -39,7 +39,7 @@ public class TokenListCmdSnapshotTest extends BaseCmdSnapshotTest {
                     .filter(r -> roleIds.contains(UUID.fromString(r.getId())))
                     .collect(toMap(
                         r -> UUID.fromString(r.getId()),
-                        r -> Optional.of(r.getName())
+                        Role::getName
                     ));
 
                 when(mock.findNames(roleIds)).thenReturn(roleMappings);
