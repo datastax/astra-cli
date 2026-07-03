@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 @RequiredArgsConstructor
 public class DbCreateOperation implements Operation<DbCreateResult> {
     private final DbGateway dbGateway;
+    private final RegionGateway regionGateway;
     private final CreateDbRequest request;
 
     public enum ExistingBehavior {
@@ -38,7 +40,8 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
         Integer capacityUnits,
         boolean nonVector,
         ExistingBehavior existingBehavior,
-        LongRunningOptions lrOptions
+        LongRunningOptions lrOptions,
+        boolean skipRegionVerification
     ) {}
 
     public sealed interface DbCreateResult {}
@@ -50,11 +53,13 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
 
     @Override
     public DbCreateResult execute() {
-        val cloudProvider = dbGateway.findCloudForRegion(
-            request.cloud,
-            request.region,
-            !request.nonVector
-        );
+        val cloudProvider = (request.skipRegionVerification && request.cloud.isPresent())
+            ? request.cloud.get()
+            : regionGateway.findCloudForRegion(
+                request.cloud,
+                request.region,
+                !request.nonVector
+            );
 
         val status = dbGateway.create(
             request.dbName,

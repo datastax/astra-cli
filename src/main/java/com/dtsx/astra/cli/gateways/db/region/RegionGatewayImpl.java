@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.db.region;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -118,6 +120,41 @@ public class RegionGatewayImpl implements RegionGateway {
         });
 
         return DeletionStatus.deleted(region);
+    }
+
+    @Override
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
+        val cloudRegions = findAllServerless(vectorOnly, false);
+
+        if (cloud.isPresent()) {
+            val cloudName = cloud.get().name().toLowerCase();
+
+            if (!cloudRegions.containsKey(cloud.get())) {
+                throw new OptionValidationException("cloud", "Cloud provider '%s' does not have any available%s regions".formatted(cloudName, (vectorOnly) ? " vector" : ""));
+            }
+
+            if (!cloudRegions.get(cloud.get()).containsKey(region.unwrap().toLowerCase())) {
+                throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(region.unwrap(), cloud.get()));
+            }
+
+            return cloud.get();
+        }
+
+        val matchingClouds = cloudRegions.entrySet().stream()
+            .filter(entry -> entry.getValue().containsKey(region.unwrap().toLowerCase()))
+            .map(Entry::getKey)
+            .toList();
+
+        return switch (matchingClouds.size()) {
+            case 0 ->
+                throw new OptionValidationException("region", "Region '%s' is not available for any cloud provider".formatted(region.unwrap()));
+            case 1 ->
+                matchingClouds.getFirst();
+            default ->
+                throw new OptionValidationException("region", "Region '%s' is available for multiple cloud providers: %s".formatted(
+                    region.unwrap(), matchingClouds.stream().map(CloudProvider::name).toList()
+                ));
+        };
     }
 
     private boolean existsInDb(DbRef dbRef, RegionName region) {

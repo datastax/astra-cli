@@ -80,11 +80,6 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
-        return delegate.findCloudForRegion(cloud, region, vectorOnly);
-    }
-
-    @Override
     public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
         val status = delegate.create(name, keyspace, region, cloud, tier, capacityUnits, vector, allowDuplicate);
         cache.addToCache(name);

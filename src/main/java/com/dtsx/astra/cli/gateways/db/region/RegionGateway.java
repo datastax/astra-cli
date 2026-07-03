@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -26,4 +27,6 @@ public interface RegionGateway extends SomeGateway {
     CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProvider cp);
 
     DeletionStatus<RegionName> delete(DbRef ref, RegionName region);
+
+    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly);
 }
