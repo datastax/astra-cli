@@ -55,7 +55,14 @@ public final class PythonRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public ProcessBuilder executeCmd(Path cacheDir, String initScript) {
-        return new ProcessBuilder(cacheDir.resolve("bin").resolve("python").toString(), "-i", "-c", initScript);
+    public ProcessBuilder executeCmd(Path cacheDir, String initScript, boolean isRepl) {
+        return new ProcessBuilder(new ArrayList<>() {{
+            add(cacheDir.resolve("bin").resolve("python").toString());
+            if (isRepl) {
+                add("-i");
+            }
+            add("-c");
+            add(initScript);
+        }});
     }
 }

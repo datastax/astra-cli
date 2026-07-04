@@ -20,6 +20,8 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +45,9 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         Optional<String> tableName,
         Profile profile,
         List<String> packages,
-        String extraCode
+        String extraCode,
+        boolean isRepl,
+        boolean captureOutput
     ) {}
 
     public record ExecContext(
@@ -60,6 +64,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
     public record InvalidDbStatus(DatabaseStatusType status) implements DataAPIExecResult {}
     public record OperationFailed(String error) implements DataAPIExecResult {}
     public record Executed(int exitCode) implements DataAPIExecResult {}
+    public record ExecutedWithOutput(int exitCode, List<String> stdout, List<String> stderr) implements DataAPIExecResult {}
 
     @Override
     public DataAPIExecResult execute() {
@@ -81,11 +86,23 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
                 return null;
             });
 
-            val initScript = runner.createInitScript(execCtx, request.extraCode);
-            val pb = runner.executeCmd(cacheDir, initScript);
+            val initScript = runner.createInitScript(execCtx, request.extraCode());
+            val pb = runner.executeCmd(cacheDir, initScript, request.isRepl());
 
-            val exit = pb.inheritIO().start().waitFor();
-            return new Executed(exit);
+            if (request.captureOutput()) {
+                val process = pb.start();
+
+                val stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                val stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+                val output = stdOut.lines().toList();
+                val error = stdErr.lines().toList();
+                val exit = process.waitFor();
+                return new ExecutedWithOutput(exit, output, error);
+            } else {
+                val exit = pb.inheritIO().start().waitFor();
+                return new Executed(exit);
+            }
         } catch (Exception e) {
             return new OperationFailed(e.getMessage());
         }

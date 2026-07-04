@@ -53,8 +53,15 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public ProcessBuilder executeCmd(Path cacheDir, String initScript) {
-        val pb = new ProcessBuilder("node", "-i", "-e", initScript);
+    public ProcessBuilder executeCmd(Path cacheDir, String initScript, boolean isRepl) {
+        val pb = new ProcessBuilder(new ArrayList<>() {{
+            add("node");
+            if (isRepl) {
+                add("-i");
+            }
+            add("-e");
+            add(initScript);
+        }});
         pb.environment().put("NODE_PATH", cacheDir.resolve("node_modules").toString());
         return pb;
     }

@@ -12,5 +12,5 @@ public interface DataAPIClientRunner {
 
     String createInitScript(ExecContext ctx, String extraCode);
 
-    ProcessBuilder executeCmd(Path cacheDir, String initScript);
+    ProcessBuilder executeCmd(Path cacheDir, String initScript, boolean isRepl);
 }

@@ -9,6 +9,7 @@ import picocli.CommandLine.Mixin;
     description = "Work with the Data API",
     subcommands = {
         DataAPIReplCmd.class,
+        DataAPIExecCmd.class,
     }
 )
 public class DataAPICmd {
