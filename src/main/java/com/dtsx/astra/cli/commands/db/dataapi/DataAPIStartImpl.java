@@ -90,7 +90,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
             ctx.log().warn("${cli.name} db data-api commands are still in beta and may change without notice.");
         }
 
-        if ($extraArgs.size() > 1) {
+        if (!$extraArgs.isEmpty()) {
             if ($extraArgs.getFirst().trim().startsWith("-")) {
                 throw new AstraCliException(ExitCode.VALIDATION_ISSUE, """
                   @|bold,red Database must explicitly be passed as the first positional argument when using extra flags after '--'|@

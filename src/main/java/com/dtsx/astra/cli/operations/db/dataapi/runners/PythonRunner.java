@@ -55,6 +55,14 @@ public final class PythonRunner implements DataAPIClientRunner {
     }
 
     @Override
+    public List<String> createInitVars(ExecContext ctx) {
+        return new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
+            ctx.collection().ifPresent(c -> add("collection"));
+            ctx.table().ifPresent(t -> add("table"));
+        }};
+    }
+
+    @Override
     public ProcessBuilder executeCmd(Path cacheDir, String initScript, List<String> extraArgs, boolean isRepl) {
         return new ProcessBuilder(new ArrayList<>() {{
             add(cacheDir.resolve("bin").resolve("python").toString());

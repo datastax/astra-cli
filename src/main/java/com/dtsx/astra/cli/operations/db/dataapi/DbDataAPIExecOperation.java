@@ -86,6 +86,9 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
                 return null;
             });
 
+            val initVars = runner.createInitVars(execCtx);
+            printHeader(initVars);
+
             val initScript = runner.createInitScript(execCtx, request.extraCode());
             val pb = runner.executeCmd(cacheDir, initScript, request.extraArgs(), request.isRepl());
 
@@ -125,5 +128,9 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         val cacheDir = ctx.home().dirs.cache.use().resolve("dapi-exec").resolve(runner.languageName());
         FileUtils.createDirIfNotExists(cacheDir, "could not create cache directory for " + runner.languageName() + " dependencies");
         return cacheDir;
+    }
+
+    private void printHeader(List<String> initVars) {
+
     }
 }

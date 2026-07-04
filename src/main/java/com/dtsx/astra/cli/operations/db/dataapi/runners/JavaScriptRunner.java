@@ -53,6 +53,14 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
     }
 
     @Override
+    public List<String> createInitVars(ExecContext ctx) {
+        return new ArrayList<>(List.of("client", "db", "admin", "dbAdmin")) {{
+            ctx.collection().ifPresent(_ -> add("collection"));
+            ctx.table().ifPresent(_ -> add("table"));
+        }};
+    }
+
+    @Override
     public ProcessBuilder executeCmd(Path cacheDir, String initScript, List<String> extraArgs, boolean isRepl) {
         val pb = new ProcessBuilder(new ArrayList<>() {{
             add("node");
