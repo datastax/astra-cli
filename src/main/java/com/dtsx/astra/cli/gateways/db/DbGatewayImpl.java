@@ -79,7 +79,7 @@ public class DbGatewayImpl implements DbGateway {
                 yield Pair.of(currentStatus, Duration.ZERO);
             }
             case HIBERNATED -> {
-                ctx.log().loading("Resuming database '%s'".formatted(ref), (_) -> {
+                ctx.log().loading("Resuming database @'!%s!@".formatted(ref), (_) -> {
                     resumeDbInternal(ref);
                     return null;
                 });
@@ -95,9 +95,11 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     private void resumeDbInternal(DbRef ref) {
-        val endpoint = api.restApiEndpoint(ref, env) + "/v2/schemas/keyspace";
+        // TODO this relies on the behavior of Astra to call resume on any operation w/ Token or X-Cassandra-Token,
+        // but I wouldn't rely on this behavior in the long-term. Need to push for a proper /resume endpoint.
+        val endpoint = api.apiEndpoint(ref, env) + "/fake";
 
-        val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("X-Cassandra-Token", token.unsafeUnwrap()));
+        val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("Token", token.unsafeUnwrap()));
 
         if (response.statusCode() != 503) {
             throw new AstraCliException(IO_ISSUE, """
