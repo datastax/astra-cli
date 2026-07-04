@@ -46,7 +46,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         Profile profile,
         List<String> packages,
         String extraCode,
-        boolean isRepl,
+        List<String> extraArgs, boolean isRepl,
         boolean captureOutput
     ) {}
 
@@ -87,7 +87,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
             });
 
             val initScript = runner.createInitScript(execCtx, request.extraCode());
-            val pb = runner.executeCmd(cacheDir, initScript, request.isRepl());
+            val pb = runner.executeCmd(cacheDir, initScript, request.extraArgs(), request.isRepl());
 
             if (request.captureOutput()) {
                 val process = pb.start();

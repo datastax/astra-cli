@@ -53,7 +53,7 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public ProcessBuilder executeCmd(Path cacheDir, String initScript, boolean isRepl) {
+    public ProcessBuilder executeCmd(Path cacheDir, String initScript, List<String> extraArgs, boolean isRepl) {
         val pb = new ProcessBuilder(new ArrayList<>() {{
             add("node");
             if (isRepl) {
@@ -61,6 +61,7 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
             }
             add("-e");
             add(initScript);
+            addAll(extraArgs);
         }});
         pb.environment().put("NODE_PATH", cacheDir.resolve("node_modules").toString());
         return pb;

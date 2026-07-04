@@ -55,7 +55,7 @@ public final class PythonRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public ProcessBuilder executeCmd(Path cacheDir, String initScript, boolean isRepl) {
+    public ProcessBuilder executeCmd(Path cacheDir, String initScript, List<String> extraArgs, boolean isRepl) {
         return new ProcessBuilder(new ArrayList<>() {{
             add(cacheDir.resolve("bin").resolve("python").toString());
             if (isRepl) {
@@ -63,6 +63,7 @@ public final class PythonRunner implements DataAPIClientRunner {
             }
             add("-c");
             add(initScript);
+            addAll(extraArgs);
         }});
     }
 }

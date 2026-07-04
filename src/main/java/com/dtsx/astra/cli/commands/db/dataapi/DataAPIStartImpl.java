@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.ExitCode;
+import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.Operation;
@@ -18,9 +19,10 @@ import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation.*;
 import com.dtsx.astra.cli.utils.CollectionUtils;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -38,7 +40,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
         split = ",",
         description = "Additional packages to include (e.g., pandas for Python, lodash for JS)"
     )
-    public List<String> $packages = new ArrayList<>();
+    public List<String> $packages = List.of();
 
     @Option(
         names = { $Regions.LONG, $Regions.SHORT },
@@ -68,6 +70,9 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
     )
     public Optional<String> $tableName;
 
+    @Parameters
+    public List<String> $extraArgs = List.of();
+
     protected abstract String code();
     
     protected abstract boolean isRepl();
@@ -77,11 +82,31 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
     protected abstract String contextName();
 
     @Override
-    protected OutputHuman executeHuman(Supplier<DataAPIExecResult> resultSupplier) {
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        super.prelude();
+
         if (!ctx.properties().disableBetaWarnings()) {
             ctx.log().warn("${cli.name} db data-api commands are still in beta and may change without notice.");
         }
 
+        if ($extraArgs.size() > 1) {
+            if ($extraArgs.getFirst().trim().startsWith("-")) {
+                throw new AstraCliException(ExitCode.VALIDATION_ISSUE, """
+                  @|bold,red Database must explicitly be passed as the first positional argument when using extra flags after '--'|@
+            
+                  @|italic Note: if you really have a database name that starts with a dash which triggered this check, pass the db's ID instead (which you can get with @!${cli.name} db list!@).|@
+                """, List.of(
+                    new Hint("Example usage", "${cli.name} db data-api repl my_db -- -p --trace-warnings")
+                ));
+            }
+
+            $extraArgs.removeFirst();
+        }
+    }
+
+    @Override
+    protected OutputHuman executeHuman(Supplier<DataAPIExecResult> resultSupplier) {
         return switch (resultSupplier.get()) {
             case Executed e -> AstraCli.exit(e.exitCode());
             case InvalidDbStatus e -> throwInvalidDbStatus(e);
@@ -94,10 +119,6 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
     protected final OutputAll execute(Supplier<DataAPIExecResult> resultSupplier) {
         if (!captureOutputForNonHumanOutput()) {
             return super.execute(resultSupplier);
-        }
-
-        if (!ctx.properties().disableBetaWarnings()) {
-            ctx.log().warn("${cli.name} db data-api commands are still in beta and may change without notice.");
         }
 
         return switch (resultSupplier.get()) {
@@ -136,6 +157,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
             profile(),
             $packages,
             code(),
+            $extraArgs,
             isRepl(),
             captureOutputForNonHumanOutput() && ctx.outputIsNotHuman()
         ));
