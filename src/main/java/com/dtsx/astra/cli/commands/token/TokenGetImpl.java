@@ -39,6 +39,6 @@ public abstract class TokenGetImpl extends AbstractTokenCmd<AstraToken> {
 
     @Override
     protected Operation<AstraToken> mkOperation() {
-        return new TokenGetOperation(ctx, profile(), tokenGateway, new TokenGetRequest($validate));
+        return new TokenGetOperation(tokenGateway, new TokenGetRequest(profile(), $validate));
     }
 }
