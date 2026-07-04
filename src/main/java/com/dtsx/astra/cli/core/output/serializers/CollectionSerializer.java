@@ -18,7 +18,7 @@ enum CollectionSerializer implements OutputSerializer<Collection<?>> {
     @Override
     public String serializeAsHumanInternal(Collection<?> values) {
         if (values.isEmpty()) {
-            return "n/a";
+            return "<none>";
         }
 
         return values.stream()
