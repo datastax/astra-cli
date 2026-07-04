@@ -5,11 +5,9 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.utils.HttpUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseCreationRequest;
@@ -22,7 +20,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -38,7 +35,6 @@ public class DbGatewayImpl implements DbGateway {
     private final AstraToken token;
     private final AstraEnvironment env;
     private final DbCache dbCache;
-    private final RegionGateway regionGateway;
 
     @Override
     public Stream<Database> findAll() {
@@ -83,7 +79,7 @@ public class DbGatewayImpl implements DbGateway {
                 yield Pair.of(currentStatus, Duration.ZERO);
             }
             case HIBERNATED -> {
-                ctx.log().loading("Resuming database '%s'".formatted(ref), (_) -> {
+                ctx.log().loading("Resuming database @'!%s!@".formatted(ref), (_) -> {
                     resumeDbInternal(ref);
                     return null;
                 });
@@ -99,17 +95,19 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     private void resumeDbInternal(DbRef ref) {
-        val endpoint = api.restApiEndpoint(ref, env) + "/v2/schemas/keyspace";
+        // TODO this relies on the behavior of Astra to call resume on any operation w/ Token or X-Cassandra-Token,
+        // but I wouldn't rely on this behavior in the long-term. Need to push for a proper /resume endpoint.
+        val endpoint = api.apiEndpoint(ref, env) + "/fake";
 
-        val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("X-Cassandra-Token", token.unsafeUnwrap()));
+        val response = HttpUtils.GET(endpoint, c -> c, r -> r.header("Token", token.unsafeUnwrap()));
 
-        if (response.statusCode() >= 400) {
+        if (response.statusCode() != 503) {
             throw new AstraCliException(IO_ISSUE, """
               @|bold,red An error occurred while attempting to resume database %s|@
             
-              The server returned the following response:
+              The server returned the following response (%d):
               %s
-            """.formatted(ref, response.body()));
+            """.formatted(ref, response.statusCode(), response.body()));
         }
     }
 
@@ -123,41 +121,6 @@ public class DbGatewayImpl implements DbGateway {
             ctx::highlight,
             timeout
         );
-    }
-
-    @Override
-    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
-        val cloudRegions = regionGateway.findAllServerless(vectorOnly);
-
-        if (cloud.isPresent()) {
-            val cloudName = cloud.get().name().toLowerCase();
-
-            if (!cloudRegions.containsKey(cloud.get())) {
-                throw new OptionValidationException("cloud", "Cloud provider '%s' does not have any available%s regions".formatted(cloudName, (vectorOnly) ? " vector" : ""));
-            }
-
-            if (!cloudRegions.get(cloud.get()).containsKey(region.unwrap().toLowerCase())) {
-                throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(region.unwrap(), cloud.get()));
-            }
-
-            return cloud.get();
-        }
-
-        val matchingClouds = cloudRegions.entrySet().stream()
-            .filter(entry -> entry.getValue().containsKey(region.unwrap().toLowerCase()))
-            .map(Entry::getKey)
-            .toList();
-
-        return switch (matchingClouds.size()) {
-            case 0 ->
-                throw new OptionValidationException("region", "Region '%s' is not available for any cloud provider".formatted(region.unwrap()));
-            case 1 ->
-                matchingClouds.getFirst();
-            default ->
-                throw new OptionValidationException("region", "Region '%s' is available for multiple cloud providers: %s".formatted(
-                    region.unwrap(), matchingClouds.stream().map(CloudProvider::name).toList()
-                ));
-        };
     }
 
     @Override

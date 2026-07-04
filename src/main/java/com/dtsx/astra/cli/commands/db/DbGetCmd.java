@@ -41,7 +41,7 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbInfo> {
         region,
         regions,
         creation_time,
-        vector
+        vector,
     }
 
     @Option(
@@ -77,8 +77,8 @@ public class DbGetCmd extends AbstractPromptForDbCmd<DbInfo> {
             put("Vector", Optional.ofNullable(dbInfo.getInfo().getDbType()).orElse("").equals("vector") ? "Enabled" : "Disabled");
             put("Default Keyspace", dbInfo.getInfo().getKeyspace());
             put("Creation Time", dbInfo.getCreationTime());
-            put("Keyspaces", Objects.requireNonNullElse(dbInfo.getInfo().getKeyspaces(), Set.of()).stream().sorted().toList());
-            put("Regions", Objects.requireNonNullElse(dbInfo.getInfo().getDatacenters(), Set.<Datacenter>of()).stream().map(Datacenter::getRegion).sorted().toList());
+            put("Keyspaces", Objects.requireNonNullElse(dbInfo.getInfo().getKeyspaces(), Set.of()).stream().toList());
+            put("Regions", Objects.requireNonNullElse(dbInfo.getInfo().getDatacenters(), Set.<Datacenter>of()).stream().map(Datacenter::getRegion).toList());
         }});
     }
 

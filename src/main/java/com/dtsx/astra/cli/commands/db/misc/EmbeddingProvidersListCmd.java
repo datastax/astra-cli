@@ -44,7 +44,7 @@ public class EmbeddingProvidersListCmd extends AbstractPromptForDbCmd<EmbeddingP
         val data = result.get().embeddingProviders()
             .map(r -> sequencedMapOf(
                 "Key", r.key(),
-                "Display Name", r.displayName().orElse("N/A"),
+                "Display Name", r.displayName().orElse("n/a"),
                 "Models", String.valueOf(r.modelsCount()),
                 "Parameters", String.valueOf(r.parametersCount()),
                 "Auth Header", r.hasAuthHeader() ? PlatformChars.presenceIndicator(ctx.isWindows()) : "",

@@ -46,17 +46,17 @@ public class RoleGatewayPersistentCacheWrapper implements RoleGateway {
     }
 
     @Override
-    public Map<UUID, Optional<String>> findNames(Set<UUID> ids) {
+    public Map<UUID, String> findNames(Set<UUID> ids) {
         val cache = loadCache();
 
-        val res = new HashMap<UUID, Optional<String>>();
+        val res = new HashMap<UUID, String>();
 
         for (val id : ids) {
             val cached = cache.getProperty(id.toString());
 
             if (cached != null) {
                 ctx.log().debug("Role name for id ", id.toString(), " found in cache: ", cached);
-                res.put(id, Optional.of(cached));
+                res.put(id, cached);
             } else {
                 ctx.log().debug("Role name for id ", id.toString(), " not found in cache");
             }
@@ -70,13 +70,15 @@ public class RoleGatewayPersistentCacheWrapper implements RoleGateway {
             val fetched = delegate.findNames(idsToFetch);
             res.putAll(fetched);
 
-            val newMappings = new HashMap<String, String>();
+            if (fetched.size() <= 50) { // naive way to prevent bloating ¯\_(ツ)_/¯
+                val newMappings = new HashMap<String, String>();
 
-            for (val entry : fetched.entrySet()) {
-                entry.getValue().ifPresent(name -> newMappings.put(entry.getKey().toString(), name));
+                for (val entry : fetched.entrySet()) {
+                    newMappings.put(entry.getKey().toString(), entry.getValue());
+                }
+
+                saveCache(cache, newMappings);
             }
-
-            saveCache(cache, newMappings);
         }
 
         return res;

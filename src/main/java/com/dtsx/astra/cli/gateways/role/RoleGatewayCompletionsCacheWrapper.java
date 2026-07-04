@@ -37,11 +37,11 @@ public class RoleGatewayCompletionsCacheWrapper implements RoleGateway {
     }
 
     @Override
-    public Map<UUID, Optional<String>> findNames(Set<UUID> ids) {
+    public Map<UUID, String> findNames(Set<UUID> ids) {
         val res = delegate.findNames(ids);
 
-        for (val maybeName : res.values()) {
-            maybeName.ifPresent(cache::addToCache);
+        for (val name : res.values()) {
+            cache.addToCache(name);
         }
 
         return res;

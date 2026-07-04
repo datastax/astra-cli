@@ -51,7 +51,7 @@ public class GatewayProviderImpl implements GatewayProvider {
 
     @Override
     public DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
-        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(ctx(), apiProvider(token, env), token, env, GlobalInfoCache.INSTANCE, mkRegionGateway(token, env)), dbCompletionsCache);
+        return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(ctx(), apiProvider(token, env), token, env, GlobalInfoCache.INSTANCE), dbCompletionsCache);
     }
 
     @Override

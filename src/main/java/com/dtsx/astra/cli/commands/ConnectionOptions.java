@@ -46,7 +46,7 @@ public class ConnectionOptions {
         @Option(
             names = { $Env.LONG },
             completionCandidates = AstraEnvCompletion.class,
-            description = "Override the target astra environment",
+            description = "Astra environment the token belongs to: prod (default), dev, or test. Leave unset unless you were issued a non-prod token.",
             paramLabel = $Env.LABEL
         )
         public Optional<AstraEnvironment> $env;
@@ -56,6 +56,7 @@ public class ConnectionOptions {
             this.$env = $env;
         }
 
+        @SuppressWarnings("unused") // it may be marked as unused but used by picocli
         public CredsSpec() {
             this(null, Optional.empty());
         }

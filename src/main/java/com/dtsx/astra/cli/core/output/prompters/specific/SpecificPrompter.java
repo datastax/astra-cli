@@ -10,7 +10,6 @@ import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder.NeedsFa
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class SpecificPrompter {
     }
 
     public static <T, R> R run(CliContext ctx, Function<Options.OptionsBuilder<T, R>, Options.OptionsBuilder<T, R>> builderFn) {
-        val options = builderFn.apply(Options.builder()).build();
+        val options = builderFn.apply(Options.<T, R>builder()).build();
 
         if (options.modifier == null) {
             options.modifier = (things) -> things;

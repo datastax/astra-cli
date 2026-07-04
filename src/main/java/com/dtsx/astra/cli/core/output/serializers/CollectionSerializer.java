@@ -21,12 +21,8 @@ enum CollectionSerializer implements OutputSerializer<Collection<?>> {
             return "<none>";
         }
 
-        val counter = new int[1];
-
         return values.stream()
-            .map((s) -> (
-                "[" + counter[0]++ + "] " + withIndent(OutputSerializer.serializeAsHuman(s), 4).substring(4)
-            ))
+            .map(OutputSerializer::serializeAsHuman)
             .collect(Collectors.joining(NL));
     }
 

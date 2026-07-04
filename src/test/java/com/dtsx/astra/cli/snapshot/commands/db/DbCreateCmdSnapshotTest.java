@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
+import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
 import com.dtsx.astra.cli.snapshot.SnapshotTestOptions.SnapshotTestOptionsModifier;
 import com.dtsx.astra.cli.snapshot.annotations.TestForAllOutputs;
@@ -26,16 +27,17 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     private SnapshotTestOptionsModifier opts(Function<Database, CreationStatus<Database>> lift, boolean allowDuplicates) {
         return (o) -> o
             .gateway(DbGateway.class, (mock) -> {
-                when(mock.findCloudForRegion(any(), any(), anyBoolean())).thenReturn(CloudProvider.AWS);
-
                 doReturn(lift.apply(Databases.One)).when(mock).create(any(), any(), any(), any(), any(), anyInt(), anyBoolean(), anyBoolean());
 
                 when(mock.waitUntilDbStatus(any(), any(), any())).thenReturn(Duration.ofMillis(6789));
 
                 when(mock.resume(any(), any())).thenReturn(Pair.of(ACTIVE, Duration.ZERO));
             })
+            .gateway(RegionGateway.class, (mock) -> {
+                when(mock.findCloudForRegion(any(), any(), anyBoolean())).thenReturn(CloudProvider.AWS);
+            })
             .verify((mocks) -> {
-                verify(mocks.dbGateway()).findCloudForRegion(Optional.empty(), RegionName.mkUnsafe("us-east-1"), true);
+                verify(mocks.regionGateway()).findCloudForRegion(Optional.empty(), RegionName.mkUnsafe("us-east-1"), true);
 
                 verify(mocks.dbGateway()).create(Databases.NameRef.toString(), "default_keyspace", RegionName.mkUnsafe("us-east-1"), CloudProvider.AWS, "serverless", 1, true, allowDuplicates);
             });

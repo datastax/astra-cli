@@ -17,5 +17,5 @@ public interface RoleGateway extends SomeGateway {
         return tryFindOne(ref).orElseThrow(() -> new RoleNotFoundException(ref));
     }
 
-    Map<UUID, Optional<String>> findNames(Set<UUID> ids);
+    Map<UUID, String> findNames(Set<UUID> ids);
 }

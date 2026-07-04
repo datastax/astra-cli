@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.db.endpoints;
 
 import com.dtsx.astra.cli.commands.db.AbstractPromptForDbCmd;
+import com.dtsx.astra.cli.core.CliConstants.$Copy;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
@@ -8,7 +9,9 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetRequest;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
+import com.dtsx.astra.cli.utils.ShellUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import picocli.CommandLine.Option;
 
 import java.util.Optional;
@@ -23,11 +26,23 @@ public abstract class AbstractEndpointGetCmd extends AbstractPromptForDbCmd<Endp
     )
     public Optional<RegionName> $region;
 
+    @Option(
+        names = { $Copy.SHORT, $Copy.LONG },
+        description = "Copy the endpoint to clipboard as well as print it"
+    )
+    boolean $copyToClipboard;
+
     private final Endpoint endpoint;
 
     @Override
-    protected OutputAll execute(Supplier<EndpointGetResponse> result) {
-        return OutputAll.serializeValue(endpoint.mkUrl(result.get(), profile().env()));
+    protected OutputAll execute(Supplier<EndpointGetResponse> res) {
+        val out = endpoint.mkUrl(res.get(), profile().env());
+
+        if ($copyToClipboard) {
+            ShellUtils.copyToClipboard(ctx, out);
+        }
+
+        return OutputAll.serializeValue(out);
     }
 
     @Override

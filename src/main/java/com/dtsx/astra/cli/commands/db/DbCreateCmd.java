@@ -12,11 +12,17 @@ import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.prompters.specific.RegionNamePrompter;
+import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.operations.db.DbCreateOperation;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
-import picocli.CommandLine.*;
+import picocli.CommandLine.ArgGroup;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -57,7 +63,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 )
 @Example(
     comment = "List available vector database regions for creating a database",
-    command = "${cli.name} db list-regions-vector"
+    command = "${cli.name} db regions vector"
 )
 public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implements WithSetTimeout {
     @ArgGroup
@@ -78,7 +84,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
     }
 
     @ArgGroup(validate = false, heading = "%nDatabase configuration options:%n")
-    public @Nullable DatabaseCreationOptions $databaseCreationOptions;
+    public DatabaseCreationOptions $databaseCreationOptions = new DatabaseCreationOptions();
 
     @Mixin
     protected LongRunningOptionsMixin lrMixin;
@@ -139,16 +145,33 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
         lrMixin.setTimeout(timeout);
     }
 
+    private boolean skipRegionVerification;
+    protected RegionGateway regionGateway;
+
+    @Override
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        super.prelude();
+        regionGateway = ctx.gateways().mkRegionGateway(profile().token(), profile().env());
+
+        if ($databaseCreationOptions.region == null) {
+            val candidate = RegionNamePrompter.prompt(
+                ctx, regionGateway, $databaseCreationOptions.nonVector, "Select a region to create the database in:",
+                (b) -> b.fallbackIndex(0).fix(originalArgs(), "--region")
+            );
+
+            $databaseCreationOptions.region = RegionName.mkUnsafe(candidate.name());
+            $databaseCreationOptions.cloud = Optional.of(candidate.cloudProvider());
+            skipRegionVerification = true;
+        }
+    }
+
     @Override
     protected DbCreateOperation mkOperation() {
         val dbName = $dbRef.fold(
             id -> { throw new OptionValidationException("database name", "may not provide an id (%s) when creating a new database; must be a human-readable database name".formatted(id.toString())); },
             name -> name
         );
-
-        if ($databaseCreationOptions == null || $databaseCreationOptions.region == null) {
-            throw new ParameterException(spec.commandLine(), "Must provide a region (via --region) when creating a new database. Use the `${cli.name} db list-regions-*` commands to see available regions.");
-        }
 
         val existingBehavior =
             ($existingBehavior != null && $existingBehavior.$ifNotExists)
@@ -157,7 +180,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
                 ? DbCreateOperation.ExistingBehavior.ALLOW_DUPLICATES
                 : DbCreateOperation.ExistingBehavior.FAIL;
 
-        return new DbCreateOperation(dbGateway, new CreateDbRequest(
+        return new DbCreateOperation(dbGateway, regionGateway, new CreateDbRequest(
             dbName,
             $databaseCreationOptions.region,
             $databaseCreationOptions.cloud,
@@ -166,7 +189,8 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             $databaseCreationOptions.capacityUnits,
             $databaseCreationOptions.nonVector,
             existingBehavior,
-            lrMixin.options(ctx)
+            lrMixin.options(ctx),
+            skipRegionVerification
         ));
     }
 
@@ -215,7 +239,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
     }
 
     private OutputAll handleDbAlreadyExistsAndIsActive(UUID dbId, DatabaseStatusType prevStatus, Duration awaited) {
-        val message = awaited.isZero() 
+        val message = awaited.isZero()
             ? "Database %s already exists with id %s, and was already active; no action was required.".formatted(
                 ctx.highlight($dbRef),
                 ctx.highlight(dbId)

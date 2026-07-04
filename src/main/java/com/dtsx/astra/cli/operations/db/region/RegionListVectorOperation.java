@@ -13,6 +13,6 @@ public class RegionListVectorOperation extends AbstractRegionListOperation {
 
     @Override
     public SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> fetchRegions() {
-        return regionGateway.findAllServerless(true);
+        return regionGateway.findAllServerless(true, request.all());
     }
 }

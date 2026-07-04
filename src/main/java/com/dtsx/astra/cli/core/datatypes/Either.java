@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.core.datatypes;
 
+import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -53,11 +55,11 @@ public sealed interface Either<L, R> {
     }
 
     default R getRight() {
-        return getRight((_) -> new RuntimeException("Expected Right but found Left"));
+        return getRight((_) -> new CongratsYouFoundABugException("Expected Right but found Left"));
     }
 
     default L getLeft() {
-        return getLeft((_) -> new RuntimeException("Expected Left but found Right"));
+        return getLeft((_) -> new CongratsYouFoundABugException("Expected Left but found Right"));
     }
 
     default <L2, R2> Either<L2, R2> bimap(Function<L, L2> leftMapper, Function<R, R2> rightMapper) {

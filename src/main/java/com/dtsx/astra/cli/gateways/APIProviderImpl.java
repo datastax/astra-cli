@@ -71,8 +71,8 @@ public class APIProviderImpl implements APIProvider {
     }
 
     @Override
-    public String restApiEndpoint(DbRef dbRef, AstraEnvironment env) {
-        return ApiLocator.getApiRestEndpoint(env, resolveDbId(dbRef).toString(), resolveDbRegion(dbRef));
+    public String apiEndpoint(DbRef dbRef, AstraEnvironment env) {
+        return ApiLocator.getApiEndpoint(env, resolveDbId(dbRef).toString(), resolveDbRegion(dbRef));
     }
 
     private DataAPIClient dataApiClient() {

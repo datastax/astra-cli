@@ -9,13 +9,14 @@ import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
 public interface RegionGateway extends SomeGateway {
     record RegionInfo(String displayName, boolean hasFreeTier, String zone, Object raw) {}
 
-    SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector);
+    SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllServerless(boolean vector, boolean all);
 
     SortedMap<CloudProvider, ? extends SortedMap<String, RegionInfo>> findAllClassic();
 
@@ -26,4 +27,6 @@ public interface RegionGateway extends SomeGateway {
     CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProvider cp);
 
     DeletionStatus<RegionName> delete(DbRef ref, RegionName region);
+
+    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly);
 }

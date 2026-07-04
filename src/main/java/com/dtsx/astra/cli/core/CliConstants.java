@@ -69,4 +69,9 @@ public abstract class CliConstants {
         public static final String LABEL = "ENV";
         public static final String DEFAULT = "prod";
     }
+
+    public static class $Copy {
+        public static final String LONG = "--copy";
+        public static final String SHORT = "-c";
+    }
 }

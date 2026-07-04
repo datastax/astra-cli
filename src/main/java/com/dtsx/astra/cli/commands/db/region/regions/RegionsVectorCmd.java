@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.Found
 import com.dtsx.astra.cli.operations.db.region.AbstractRegionListOperation.RegionListRequest;
 import com.dtsx.astra.cli.operations.db.region.RegionListVectorOperation;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 import java.util.stream.Stream;
 
@@ -30,12 +31,20 @@ import java.util.stream.Stream;
     command = "${cli.name} db regions vector --zone Europe"
 )
 public class RegionsVectorCmd extends AbstractRegionListCmd {
+    @Option(
+        names = { "-a", "--all" },
+        description = "List all available regions, including those not enabled for the current organization",
+        defaultValue = "false"
+    )
+    public boolean $all;
+
     @Override
     protected Operation<Stream<FoundRegion>> mkOperation() {
         return new RegionListVectorOperation(regionGateway, new RegionListRequest(
             $nameFilter,
             $cloudFilter,
-            $zoneFilter
+            $zoneFilter,
+            $all
         ));
     }
 }

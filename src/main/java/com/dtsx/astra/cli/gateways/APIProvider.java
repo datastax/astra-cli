@@ -34,7 +34,7 @@ public interface APIProvider {
 
     DatabaseAdmin dataApiDatabaseAdmin(DbRef dbRef);
 
-    String restApiEndpoint(DbRef dbRef, AstraEnvironment env);
+    String apiEndpoint(DbRef dbRef, AstraEnvironment env);
 
     // I don't love having these here, but it's to avoid code duplication and circular dependencies
     //

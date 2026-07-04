@@ -34,8 +34,6 @@ public interface DbGateway extends SomeGateway {
 
     Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, Duration timeout);
 
-    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly);
-
     CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate);
 
     DeletionStatus<DbRef> delete(DbRef ref);

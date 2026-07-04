@@ -37,29 +37,6 @@ public class OutputSerializerHumanTest extends BaseOutputSerializerTest {
     @Group
     public class collections {
         @Example
-        public void collections_are_serialized_as_numbered_list() {
-            val values = List.of(List.of("a", List.of("b\nc", "d\ne", "f"), "g"), "I", Optional.of(Optional.of("like\ncars")), (Supplier<String>) () -> "but I prefer\nbikes nowadays\ntbh");
-
-            val expected = trimIndent("""
-              [0] [0] a
-                  [1] [0] b
-                          c
-                      [1] d
-                          e
-                      [2] f
-                  [2] g
-              [1] I
-              [2] like
-                  cars
-              [3] but I prefer
-                  bikes nowadays
-                  tbh
-            """);
-
-            assertThat(serialize(values)).isEqualTo(expected);
-        }
-
-        @Example
         public void empty_collections_are_serialized_as_none() {
             assertThat(serialize(Set.of())).isEqualTo("<none>");
         }
