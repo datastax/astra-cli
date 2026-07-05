@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<DataAPIExecResult> {
     @Option(
         names = { "-l", "--lang" },
-        description = "The client language to use (default: ${DEFAULT-VALUE}). Valid values: ${COMPLETION-CANDIDATES}",
+        description = "The client language to use (one of: ${COMPLETION-CANDIDATES})",
         defaultValue = "js"
     )
     public Language $language;
@@ -69,7 +69,10 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
     )
     public @Nullable String $tableName;
 
-    @Parameters
+    @Parameters(
+        paramLabel = "ARGS",
+        description = "Verbatim arguments to pass to the underlying node/python (anything after '--' is passed through)"
+    )
     public List<String> $extraArgs = List.of();
 
     protected abstract String code();
