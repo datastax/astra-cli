@@ -23,7 +23,7 @@ public abstract class AbstractPromptForTableCmd<OpRes> extends AbstractTableCmd<
         super.prelude();
 
         if (tableName == null) {
-            tableName = TableNamePrompter.prompt(ctx, tableGateway, $keyspaceRef, tablePrompt(), (b) -> b.fallbackFlag("-t").fix(originalArgs(), "-t <table>"));
+            tableName = TableNamePrompter.prompt(ctx, tableGateway, $keyspaceRef, tablePrompt(), originalArgs());
         }
 
         this.$tableRef = TableRef.parse($keyspaceRef, tableName).getRight((msg) -> {

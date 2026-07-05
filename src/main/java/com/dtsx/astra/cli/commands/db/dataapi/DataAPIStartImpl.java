@@ -12,6 +12,8 @@ import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.core.output.prompters.specific.CollectionNamePrompter;
+import com.dtsx.astra.cli.core.output.prompters.specific.TableNamePrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation.*;
@@ -19,6 +21,7 @@ import com.dtsx.astra.cli.utils.CollectionUtils;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -51,22 +54,26 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
     @Option(
         names = { $Collection.LONG, $Collection.SHORT },
         description = "The collection to use",
-        paramLabel = $Collection.LABEL
+        paramLabel = $Collection.LABEL,
+        fallbackValue = "__prompt__",
+        arity = "0..1"
     )
-    public Optional<String> $collectionName;
+    public @Nullable String $collectionName;
 
     @Option(
         names = { $Table.LONG, $Table.SHORT },
         description = "The table to use",
-        paramLabel = $Table.LABEL
+        paramLabel = $Table.LABEL,
+        fallbackValue = "__prompt__",
+        arity = "0..1"
     )
-    public Optional<String> $tableName;
+    public @Nullable String $tableName;
 
     @Parameters
     public List<String> $extraArgs = List.of();
 
     protected abstract String code();
-    
+
     protected abstract boolean isRepl();
 
     protected abstract boolean captureOutputForNonHumanOutput();
@@ -94,6 +101,16 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             }
 
             $extraArgs.removeFirst();
+        }
+
+        if ("__prompt__".equals($collectionName)) {
+            val collectionGateway = ctx.gateways().mkCollectionGateway(profile().token(), profile().env());
+            $collectionName = CollectionNamePrompter.prompt(ctx, collectionGateway, $keyspaceRef, "Select the collection to use", originalArgs());
+        }
+
+        if ("__prompt__".equals($tableName)) {
+            val tableGateway = ctx.gateways().mkTableGateway(profile().token(), profile().env());
+            $tableName = TableNamePrompter.prompt(ctx, tableGateway, $keyspaceRef, "Select the table to use", originalArgs());
         }
     }
 
@@ -144,8 +161,8 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             $dbRef,
             $region,
             $keyspaceRef,
-            $collectionName,
-            $tableName,
+            Optional.ofNullable($collectionName),
+            Optional.ofNullable($tableName),
             profile(),
             $packages,
             code(),
