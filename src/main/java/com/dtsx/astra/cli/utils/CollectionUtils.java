@@ -87,6 +87,14 @@ public class CollectionUtils {
         return map;
     }
 
+    public static <A> List<List<A>> windowed(List<A> list, int size) {
+        val result = new ArrayList<List<A>>();
+        for (int i = 0; i < list.size(); i += size) {
+            result.add(list.subList(i, Math.min(i + size, list.size())));
+        }
+        return result;
+    }
+
     public static <A> Set<A> setAdd(Set<? extends A> init, A a) {
         val newSet = new HashSet<A>(init);
         newSet.add(a);

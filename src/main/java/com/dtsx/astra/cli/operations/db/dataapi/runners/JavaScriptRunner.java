@@ -12,11 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class JavaScriptRunner implements DataAPIClientRunner {
     @Override
-    public String languageName() {
-        return "nodejs";
-    }
-
-    @Override
     @SneakyThrows
     public void installDeps(Path cacheDir, List<String> packages) {
         val cmd = new ArrayList<>(List.of("npm", "install", "--no-save", "@datastax/astra-db-ts@latest")) {{
@@ -44,7 +39,7 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
         """.formatted(
             ctx.token().unsafeUnwrap(),
             ctx.endpoint(),
-            ctx.collection().map(c -> "let collection = db.collection(\"" + c + "\");").orElse(""),
+            ctx.collection().map(c -> "let coll = db.collection(\"" + c + "\");").orElse(""),
             ctx.table().map(t -> "let table = db.table(\"" + t + "\");").orElse(""),
             ctx.env().name().toLowerCase(),
             ctx.env().name().toLowerCase(),
@@ -55,7 +50,7 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
     @Override
     public List<String> createInitVars(ExecContext ctx) {
         return new ArrayList<>(List.of("client", "db", "admin", "dbAdmin")) {{
-            ctx.collection().ifPresent(_ -> add("collection"));
+            ctx.collection().ifPresent(_ -> add("coll"));
             ctx.table().ifPresent(_ -> add("table"));
         }};
     }

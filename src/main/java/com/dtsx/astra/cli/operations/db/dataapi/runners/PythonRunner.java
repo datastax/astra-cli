@@ -12,11 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class PythonRunner implements DataAPIClientRunner {
     @Override
-    public String languageName() {
-        return "python";
-    }
-
-    @Override
     @SneakyThrows
     public void installDeps(Path cacheDir, List<String> packages) {
         new ProcessBuilder("python", "-m", "venv", cacheDir.toString()).start().waitFor();
@@ -48,7 +43,7 @@ public final class PythonRunner implements DataAPIClientRunner {
             ctx.token().unsafeUnwrap(),
             ctx.env().name().toLowerCase(),
             ctx.endpoint(),
-            ctx.collection().map(c -> "collection = db.get_collection(\"" + c + "\")").orElse(""),
+            ctx.collection().map(c -> "coll = db.get_collection(\"" + c + "\")").orElse(""),
             ctx.table().map(t -> "table = db.get_table(\"" + t + "\")").orElse(""),
             extraCode
         );
@@ -57,7 +52,7 @@ public final class PythonRunner implements DataAPIClientRunner {
     @Override
     public List<String> createInitVars(ExecContext ctx) {
         return new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
-            ctx.collection().ifPresent(c -> add("collection"));
+            ctx.collection().ifPresent(c -> add("coll"));
             ctx.table().ifPresent(t -> add("table"));
         }};
     }

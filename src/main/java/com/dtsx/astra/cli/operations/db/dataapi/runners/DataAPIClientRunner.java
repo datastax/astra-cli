@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface DataAPIClientRunner {
-    String languageName();
-
     void installDeps(Path cacheDir, List<String> packages);
 
     String createInitScript(ExecContext ctx, String extraCode);
