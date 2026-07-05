@@ -21,7 +21,6 @@ import com.dtsx.astra.cli.utils.CollectionUtils;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -55,21 +54,23 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
     @Option(
         names = { $Collection.LONG, $Collection.SHORT },
-        description = "The collection to use",
+        description = "The collections to use",
         paramLabel = $Collection.LABEL,
         fallbackValue = "__prompt__",
+        split = ",",
         arity = "0..1"
     )
-    public @Nullable String $collectionName;
+    public List<String> $collectionNames = List.of();
 
     @Option(
         names = { $Table.LONG, $Table.SHORT },
-        description = "The table to use",
+        description = "The tables to use",
         paramLabel = $Table.LABEL,
         fallbackValue = "__prompt__",
+        split = ",",
         arity = "0..1"
     )
-    public @Nullable String $tableName;
+    public List<String> $tableNames = List.of();
 
     @Parameters(
         paramLabel = "ARGS",
@@ -104,14 +105,21 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             $extraArgs.removeFirst();
         }
 
-        if ("__prompt__".equals($collectionName)) {
-            val collectionGateway = ctx.gateways().mkCollectionGateway(profile().token(), profile().env());
-            $collectionName = CollectionNamePrompter.prompt(ctx, collectionGateway, $keyspaceRef, "Select the collection to use", originalArgs());
+        val numPromptForColls = $collectionNames.stream().filter("__prompt__"::equals).count();
+        val numPromptForTables = $tableNames.stream().filter("__prompt__"::equals).count();
+
+        if (numPromptForColls != $collectionNames.size() || numPromptForTables != $tableNames.size()) {
+            throw new AstraCliException(ExitCode.VALIDATION_ISSUE, "@|bold,red If multiple -c or -t flags are provided, they must all be either empty or contain an explicit collection/table name. You cannot mix and match.|@");
         }
 
-        if ("__prompt__".equals($tableName)) {
+        if (numPromptForColls > 0) {
+            val collectionGateway = ctx.gateways().mkCollectionGateway(profile().token(), profile().env());
+            $collectionNames = CollectionNamePrompter.multiPrompt(ctx, collectionGateway, $keyspaceRef, "Select the collection to use", originalArgs());
+        }
+
+        if (numPromptForTables > 0) {
             val tableGateway = ctx.gateways().mkTableGateway(profile().token(), profile().env());
-            $tableName = TableNamePrompter.prompt(ctx, tableGateway, $keyspaceRef, "Select the table to use", originalArgs());
+            $tableNames = TableNamePrompter.multiPrompt(ctx, tableGateway, $keyspaceRef, "Select the table to use", originalArgs());
         }
     }
 
@@ -162,8 +170,8 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             $dbRef,
             $region,
             $keyspaceRef,
-            Optional.ofNullable($collectionName),
-            Optional.ofNullable($tableName),
+            $collectionNames,
+            $tableNames,
             profile(),
             $packages,
             code(),

@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
+
 @RequiredArgsConstructor
 public final class JavaScriptRunner implements DataAPIClientRunner {
     @Override
@@ -39,8 +41,8 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
         """.formatted(
             ctx.token().unsafeUnwrap(),
             ctx.endpoint(),
-            ctx.collection().map(c -> "let coll = db.collection(\"" + c + "\");").orElse(""),
-            ctx.table().map(t -> "let table = db.table(\"" + t + "\");").orElse(""),
+            ctx.collections().stream().map(c -> "let " + c + " = db.collection(\"" + c + "\");").collect(joining("\n")),
+            ctx.tables().stream().map(t -> "let " + t + " = db.table(\"" + t + "\");").collect(joining("\n")),
             ctx.env().name().toLowerCase(),
             ctx.env().name().toLowerCase(),
             extraCode
@@ -50,8 +52,8 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
     @Override
     public List<String> createInitVars(ExecContext ctx) {
         return new ArrayList<>(List.of("client", "db", "admin", "dbAdmin")) {{
-            ctx.collection().ifPresent(_ -> add("coll"));
-            ctx.table().ifPresent(_ -> add("table"));
+            addAll(ctx.collections());
+            addAll(ctx.tables());
         }};
     }
 

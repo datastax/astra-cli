@@ -50,8 +50,8 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         DbRef dbRef,
         Optional<RegionName> region,
         KeyspaceRef ksRef,
-        Optional<String> collectionName,
-        Optional<String> tableName,
+        List<String> collectionNames,
+        List<String> tableNames,
         Profile profile,
         List<String> packages,
         String extraCode,
@@ -65,8 +65,8 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         Database db,
         String endpoint,
         String keyspace,
-        Optional<String> collection,
-        Optional<String> table
+        List<String> collections,
+        List<String> tables
     ) {}
 
     public sealed interface DataAPIExecResult {}
@@ -132,7 +132,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         val endpoint = ApiLocator.getApiEndpoint(env, db.getId(), region);
         val keyspace = req.ksRef().name();
 
-        return new ExecContext(token, env, db, endpoint, keyspace, req.collectionName(), req.tableName());
+        return new ExecContext(token, env, db, endpoint, keyspace, req.collectionNames(), req.tableNames());
     }
 
     private Path resolveCacheDir(Language language) {

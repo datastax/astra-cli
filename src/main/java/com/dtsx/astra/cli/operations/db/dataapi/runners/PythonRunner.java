@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
+
 @RequiredArgsConstructor
 public final class PythonRunner implements DataAPIClientRunner {
     @Override
@@ -43,8 +45,8 @@ public final class PythonRunner implements DataAPIClientRunner {
             ctx.token().unsafeUnwrap(),
             ctx.env().name().toLowerCase(),
             ctx.endpoint(),
-            ctx.collection().map(c -> "coll = db.get_collection(\"" + c + "\")").orElse(""),
-            ctx.table().map(t -> "table = db.get_table(\"" + t + "\")").orElse(""),
+            ctx.collections().stream().map(c ->  c + " = db.get_collection(\"" + c + "\")").collect(joining("\n")),
+            ctx.tables().stream().map(t -> t + " = db.get_table(\"" + t + "\")").collect(joining("\n")),
             extraCode
         );
     }
@@ -52,8 +54,8 @@ public final class PythonRunner implements DataAPIClientRunner {
     @Override
     public List<String> createInitVars(ExecContext ctx) {
         return new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
-            ctx.collection().ifPresent(c -> add("coll"));
-            ctx.table().ifPresent(t -> add("table"));
+            addAll(ctx.collections());
+            addAll(ctx.tables());
         }};
     }
 
