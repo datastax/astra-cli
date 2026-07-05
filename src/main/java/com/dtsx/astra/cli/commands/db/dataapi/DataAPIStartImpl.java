@@ -108,8 +108,12 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
         val numPromptForColls = $collectionNames.stream().filter("__prompt__"::equals).count();
         val numPromptForTables = $tableNames.stream().filter("__prompt__"::equals).count();
 
-        if (numPromptForColls != $collectionNames.size() || numPromptForTables != $tableNames.size()) {
-            throw new AstraCliException(ExitCode.VALIDATION_ISSUE, "@|bold,red If multiple -c or -t flags are provided, they must all be either empty or contain an explicit collection/table name. You cannot mix and match.|@");
+        if (numPromptForColls > 0 && numPromptForColls != $collectionNames.size()) {
+            throw new AstraCliException(ExitCode.VALIDATION_ISSUE, "@|bold,red If multiple -c flags are provided, they must all be either empty or contain an explicit collection name. You cannot mix and match.|@");
+        }
+
+        if (numPromptForTables > 0 && numPromptForTables != $tableNames.size()) {
+            throw new AstraCliException(ExitCode.VALIDATION_ISSUE, "@|bold,red If multiple -t flags are provided, they must all be either empty or contain an explicit table name. You cannot mix and match.|@");
         }
 
         if (numPromptForColls > 0) {
