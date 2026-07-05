@@ -10,7 +10,8 @@ import picocli.CommandLine.Option;
 public class DataAPIReplCmd extends DataAPIStartImpl {
     @Option(
         names = { "-e", "--extra" },
-        description = "Code to execute after starting the REPL (e.g., to import modules or set up the environment)"
+        description = "Code to execute after starting the REPL (e.g., to import modules or set up the environment)",
+        paramLabel = "CODE"
     )
     public String $extraCode = "";
 
@@ -22,15 +23,5 @@ public class DataAPIReplCmd extends DataAPIStartImpl {
     @Override
     protected boolean isRepl() {
         return true;
-    }
-
-    @Override
-    protected boolean captureOutputForNonHumanOutput() {
-        return false;
-    }
-
-    @Override
-    protected String contextName() {
-        return "REPL";
     }
 }

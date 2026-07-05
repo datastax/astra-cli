@@ -10,7 +10,8 @@ import picocli.CommandLine.Option;
 public class DataAPIExecCmd extends DataAPIStartImpl {
     @Option(
         names = { "-e", "--execute" },
-        description = "Code to execute using the Data API"
+        description = "Code to execute using the Data API",
+        paramLabel = "CODE"
     )
     public String $execCode = "";
 
@@ -22,15 +23,5 @@ public class DataAPIExecCmd extends DataAPIStartImpl {
     @Override
     protected boolean isRepl() {
         return false;
-    }
-
-    @Override
-    protected boolean captureOutputForNonHumanOutput() {
-        return true;
-    }
-
-    @Override
-    protected String contextName() {
-        return "execution";
     }
 }

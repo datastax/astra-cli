@@ -33,14 +33,16 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
     @Option(
         names = { "-l", "--lang" },
         description = "The client language to use (one of: ${COMPLETION-CANDIDATES})",
+        paramLabel = "LANG",
         defaultValue = "js"
     )
     public Language $language;
 
     @Option(
         names = { "-a", "--artifacts" },
-        split = ",",
-        description = "Additional packages to include (e.g., pandas for Python, lodash for JS)"
+        description = "Additional packages to include (e.g., pandas, lodash)",
+        paramLabel = "PACKAGES",
+        split = ","
     )
     public List<String> $packages = List.of();
 
@@ -78,10 +80,6 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
     protected abstract String code();
 
     protected abstract boolean isRepl();
-
-    protected abstract boolean captureOutputForNonHumanOutput();
-
-    protected abstract String contextName();
 
     @Override
     @MustBeInvokedByOverriders
@@ -129,7 +127,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
     @Override
     protected final OutputAll execute(Supplier<DataAPIExecResult> resultSupplier) {
-        if (!captureOutputForNonHumanOutput()) {
+        if (isRepl()) {
             return super.execute(resultSupplier);
         }
 
@@ -150,11 +148,11 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
     }
 
     private <T> T throwInvalidDbStatus(InvalidDbStatus e) {
-        throw new AstraCliException(ExitCode.STATUS_ISSUE, "Cannot start " + contextName() + ": database is in status " + e.status());
+        throw new AstraCliException(ExitCode.STATUS_ISSUE, "Cannot start execution: database is in status " + e.status());
     }
 
     private <T> T throwOperationFailed(OperationFailed e) {
-        throw new AstraCliException(ExitCode.IO_ISSUE, "Failed to start " + contextName() + ": " + e.error());
+        throw new AstraCliException(ExitCode.IO_ISSUE, "Failed to start execution: " + e.error());
     }
 
     @Override
@@ -171,7 +169,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             code(),
             $extraArgs,
             isRepl(),
-            captureOutputForNonHumanOutput() && ctx.outputIsNotHuman()
+            !isRepl() && ctx.outputIsNotHuman()
         ));
     }
 
