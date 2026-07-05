@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.BoxDrawer;
 import com.dtsx.astra.cli.core.output.BoxDrawer.Alignment;
@@ -48,7 +49,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         Language language,
         DbRef dbRef,
         Optional<RegionName> region,
-        Optional<String> keyspaceName,
+        KeyspaceRef ksRef,
         Optional<String> collectionName,
         Optional<String> tableName,
         Profile profile,
@@ -129,7 +130,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
 
         val region = DbUtils.resolveDatacenter(db, req.region()).getRegion();
         val endpoint = ApiLocator.getApiEndpoint(env, db.getId(), region);
-        val keyspace = req.keyspaceName().orElseGet(() -> db.getInfo().getKeyspace());
+        val keyspace = req.ksRef().name();
 
         return new ExecContext(token, env, db, endpoint, keyspace, req.collectionName(), req.tableName());
     }

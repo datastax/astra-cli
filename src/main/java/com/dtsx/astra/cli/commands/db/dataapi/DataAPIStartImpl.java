@@ -1,9 +1,8 @@
 package com.dtsx.astra.cli.commands.db.dataapi;
 
 import com.dtsx.astra.cli.AstraCli;
-import com.dtsx.astra.cli.commands.db.AbstractPromptForDbCmd;
+import com.dtsx.astra.cli.commands.db.keyspace.AbstractPromptForKeyspaceCmd;
 import com.dtsx.astra.cli.core.CliConstants.$Collection;
-import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExecResult> {
+public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<DataAPIExecResult> {
     @Option(
         names = { "-l", "--lang" },
         description = "The client language to use (default: ${DEFAULT-VALUE}). Valid values: ${COMPLETION-CANDIDATES}",
@@ -48,13 +47,6 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
         paramLabel = $Regions.LABEL
     )
     protected Optional<RegionName> $region;
-
-    @Option(
-        names = { $Keyspace.LONG, $Keyspace.SHORT },
-        description = "The keyspace to use",
-        paramLabel = $Keyspace.LABEL
-    )
-    public Optional<String> $keyspaceName;
 
     @Option(
         names = { $Collection.LONG, $Collection.SHORT },
@@ -151,7 +143,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForDbCmd<DataAPIExe
             $language,
             $dbRef,
             $region,
-            $keyspaceName,
+            $keyspaceRef,
             $collectionName,
             $tableName,
             profile(),
