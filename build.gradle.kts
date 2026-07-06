@@ -29,9 +29,8 @@ dependencies {
     implementation("org.slf4j:slf4j-nop:2.0.17")
 
     // for underlying api calls
-    implementation("com.datastax.astra:astra-db-java:2.1.0")
-//    implementation("com.datastax.astra:astra-sdk-devops:1.2.9")
-    implementation(files("assets/astra-sdk-devops.jar")) // temporary until it's on maven central
+    implementation("com.datastax.astra:astra-db-java:2.3.0")
+    implementation("com.datastax.astra:astra-sdk-devops:2.3.0")
 
     // unzip downloaded external programs (cqlsh, dsbulk, etc.)
     implementation("org.apache.commons:commons-compress:1.28.0")
@@ -50,7 +49,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     // prettier assertions, may remove if it ends up not being super useful
-    testImplementation("org.assertj:assertj-core:3.27.4")
+    testImplementation("org.assertj:assertj-core:3.27.7")
 
     // property-based testing
     testImplementation("net.jqwik:jqwik:1.9.3")

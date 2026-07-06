@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.completions.impls.PcuGroupsCompletion;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.core.output.prompters.specific.PcuRefPrompter;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Parameters;
 
@@ -34,7 +34,7 @@ public abstract class AbstractPromptForPcuCmd<OpRes> extends AbstractPcuCmd<OpRe
         return $pcuRef == null;
     }
 
-    protected NEList<PcuGroup> modifyPcusPromptList(NEList<PcuGroup> pcus) {
+    protected NEList<PCUGroup> modifyPcusPromptList(NEList<PCUGroup> pcus) {
         return pcus;
     }
 }

@@ -5,13 +5,13 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUnparkOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuUnparkOperation.*;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
@@ -66,7 +66,7 @@ public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> imple
             waited.getSeconds()
         );
 
-        val data = mkData(neededUnparking, PcuGroupStatusType.ACTIVE, waited);
+        val data = mkData(neededUnparking, PcuStatus.ACTIVE, waited);
 
         return OutputAll.response(message, data);
     }
@@ -74,7 +74,7 @@ public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> imple
     private OutputAll handlePcuAlreadyUnparked() {
         val message = "PCU group @!%s!@ was already unparked; no action was required.".formatted($pcuRef);
 
-        val data = mkData(false, PcuGroupStatusType.ACTIVE, Duration.ZERO);
+        val data = mkData(false, PcuStatus.ACTIVE, Duration.ZERO);
 
         return OutputAll.response(message, data);
     }
@@ -82,7 +82,7 @@ public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> imple
     private OutputAll handlePcuAlreadyUnparking() {
         val message = "PCU group @!%s!@ was already unparking; no action was required.".formatted($pcuRef);
 
-        val data = mkData(false, PcuGroupStatusType.UNPARKING, Duration.ZERO);
+        val data = mkData(false, PcuStatus.UNPARKING, Duration.ZERO);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Poll the group's status:", "${cli.name} pcu status %s".formatted($pcuRef))
@@ -92,7 +92,7 @@ public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> imple
     private OutputAll handlePcuStartedUnparking() {
         val message = "PCU group @!%s!@ is currently unparking".formatted($pcuRef);
 
-        val data = mkData(true, PcuGroupStatusType.UNPARKING, Duration.ZERO);
+        val data = mkData(true, PcuStatus.UNPARKING, Duration.ZERO);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Poll the group's status:", "${cli.name} pcu status %s".formatted($pcuRef))
@@ -107,7 +107,7 @@ public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> imple
         ));
     }
 
-    private LinkedHashMap<String, Object> mkData(Boolean neededUnparking, PcuGroupStatusType currentStatus, @Nullable Duration waitedDuration) {
+    private LinkedHashMap<String, Object> mkData(Boolean neededUnparking, PcuStatus currentStatus, @Nullable Duration waitedDuration) {
         return sequencedMapOf(
             "neededUnparking", neededUnparking,
             "currentStatus", currentStatus,
@@ -121,9 +121,9 @@ public class PcuUnparkCmd extends AbstractPromptForPcuCmd<PcuUnparkResult> imple
     }
 
     @Override
-    protected NEList<PcuGroup> modifyPcusPromptList(NEList<PcuGroup> pcus) {
+    protected NEList<PCUGroup> modifyPcusPromptList(NEList<PCUGroup> pcus) {
         return NEList.parse(
-            pcus.stream().filter((pcu) -> pcu.getStatus() == PcuGroupStatusType.UNPARKING || pcu.getStatus() == PcuGroupStatusType.PARKED).toList()
+            pcus.stream().filter((pcu) -> new PcuStatus(pcu).equals(PcuStatus.PARKED)).toList()
         ).orElseThrow(
             () -> new AstraCliException(PCU_GROUP_NOT_FOUND, "@|bold,red No parked PCU groups found to select from|@")
         );

@@ -3,12 +3,12 @@ package com.dtsx.astra.cli.operations.pcu;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuRef;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuUpdateResult;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -33,12 +33,12 @@ public class PcuUpdateOperation implements Operation<PcuUpdateResult> {
     ) {}
 
     public sealed interface PcuUpdateResult {}
-    public record PcuGroupAlreadyExistsIllegallyWithStatus(UUID pcuId, PcuGroupStatusType currStatus) implements PcuUpdateResult {}
+    public record PcuGroupAlreadyExistsIllegallyWithStatus(UUID pcuId, PcuStatus currStatus) implements PcuUpdateResult {}
     public record PcuGroupUpdated() implements PcuUpdateResult {}
 
     @Override
     public PcuUpdateResult execute() {
-        val builder = PcuGroupUpdateRequest.builder()
+        val builder = PCUGroupUpdateRequest.builder()
             .title(request.title.orElse(null))
             .description(request.description.orElse(null))
             .cloudProvider(request.cloud.map(CloudProvider::toSdkType).orElse(null))
@@ -55,11 +55,10 @@ public class PcuUpdateOperation implements Operation<PcuUpdateResult> {
         );
 
         val pcu = status.value();
-        val pcuId = UUID.fromString(pcu.getId());
 
         return switch (status) {
             case CreationStatus.Created<?> _ -> new PcuUpdateOperation.PcuGroupUpdated();
-            case CreationStatus.AlreadyExists<?> _ -> new PcuGroupAlreadyExistsIllegallyWithStatus(pcuId, pcu.getStatus());
+            case CreationStatus.AlreadyExists<?> _ -> new PcuGroupAlreadyExistsIllegallyWithStatus(pcu.getId(), new PcuStatus(pcu));
         };
     }
 }

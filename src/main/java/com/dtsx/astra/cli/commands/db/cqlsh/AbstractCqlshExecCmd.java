@@ -9,7 +9,6 @@ import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.*;
@@ -111,7 +110,7 @@ public abstract class AbstractCqlshExecCmd extends AbstractDbCmd<CqlshExecResult
           @|bold,red Cannot execute cqlsh because database is in invalid state: %s|@
         
           Please ensure the database is %s and try again.
-        """.formatted(status, ctx.highlight(PcuGroupStatusType.ACTIVE)), List.of(
+        """.formatted(status, ctx.highlight(DatabaseStatusType.ACTIVE)), List.of(
             new Hint("Check database status:", "${cli.name} db status --name <db-name>")
         ));
     }

@@ -4,12 +4,12 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.pcu.PcuGroupNotFoundException;
+import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuRef;
+import com.dtsx.astra.cli.core.models.PcuStatus;
+import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
+import com.dtsx.astra.sdk.pcu.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -25,14 +25,25 @@ public class PcuGatewayImpl implements PcuGateway {
     private final APIProvider api;
 
     @Override
-    public Stream<PcuGroup> findAll() {
+    public Stream<PCUGroup> findAll() {
         return ctx.log().loading("Fetching all PCU groups", (_) ->
             api.pcuGroupsClient().findAll()
         );
     }
 
     @Override
-    public Optional<PcuGroup> tryFindOne(PcuRef ref) {
+    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionName> region) {
+        return ctx.log().loading("Fetching PCU types", (_) -> {
+            val filter = new PCUTypeLocationFilter(
+                provider.map(CloudProvider::name).orElse(null),
+                region.map(RegionName::unwrap).orElse(null)
+            );
+            return api.pcuGroupsClient().listPcuTypes(filter);
+        });
+    }
+
+    @Override
+    public Optional<PCUGroup> tryFindOne(PcuRef ref) {
         return ctx.log().loading("Fetching info for PCU group " + ctx.highlight(ref), (_) ->
            api.tryResolvePcuGroup(ref)
         );
@@ -68,19 +79,19 @@ public class PcuGatewayImpl implements PcuGateway {
     }
 
     @Override
-    public Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, Duration timeout) {
+    public Duration waitUntilPcuStatus(PcuRef ref, PcuStatus target, Duration timeout) {
         return awaitGenericStatus(
             ctx,
             "PCU group %s".formatted(ctx.highlight(ref)),
             target,
-            () -> findOne(ref).getStatus(),
+            () -> new PcuStatus(findOne(ref)),
             ctx::highlight,
             timeout
         );
     }
 
     @Override
-    public CreationStatus<PcuGroup> create(String title, PcuGroupCreationRequest req, boolean allowDuplicate) {
+    public CreationStatus<PCUGroup> create(String title, PCUGroupCreationRequest req, boolean allowDuplicate) {
         if (!allowDuplicate) {
             val existingGroup = ctx.log().loading("Checking if PCU group " + ctx.highlight(title) + " already exists", (_) -> (
                 tryFindOne(PcuRef.fromTitleUnsafe(title))
@@ -99,7 +110,7 @@ public class PcuGatewayImpl implements PcuGateway {
     }
 
     @Override
-    public CreationStatus<PcuGroup> update(PcuRef ref, PcuGroupUpdateRequest req, boolean allowDuplicate) {
+    public CreationStatus<PCUGroup> update(PcuRef ref, PCUGroupUpdateRequest req, boolean allowDuplicate) {
         if (!allowDuplicate && req.getTitle() != null) {
             val existingGroup = ctx.log().loading("Checking if PCU group " + ctx.highlight(req.getTitle()) + " already exists", (_) -> (
                 tryFindOne(PcuRef.fromTitleUnsafe(req.getTitle()))

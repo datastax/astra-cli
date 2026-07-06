@@ -14,12 +14,12 @@ import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.cli.gateways.pcu.PcuCache;
-import com.dtsx.astra.cli.gateways.pcu.vendored.PcuGroupOpsClient;
-import com.dtsx.astra.cli.gateways.pcu.vendored.PcuGroupsClient;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.db.domain.DatabaseInfo;
+import com.dtsx.astra.sdk.pcu.PCUGroupOpsClient;
+import com.dtsx.astra.sdk.pcu.PCUGroupsOpsClient;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.sdk.utils.ApiLocator;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +46,8 @@ public class APIProviderImpl implements APIProvider {
     }
 
     @Override
-    public PcuGroupsClient pcuGroupsClient() {
-        return new PcuGroupsClient(token.unsafeUnwrap(), env);
+    public PCUGroupsOpsClient pcuGroupsClient() {
+        return new PCUGroupsOpsClient(token.unsafeUnwrap(), env);
     }
 
     @Override
@@ -56,8 +56,8 @@ public class APIProviderImpl implements APIProvider {
     }
 
     @Override
-    public PcuGroupOpsClient pcuGroupOpsClient(PcuRef pcuRef) {
-        return pcuGroupsClient().group(resolvePcuId(pcuRef).toString());
+    public PCUGroupOpsClient pcuGroupOpsClient(PcuRef pcuRef) {
+        return pcuGroupsClient().group(resolvePcuId(pcuRef));
     }
 
     @Override
@@ -113,8 +113,7 @@ public class APIProviderImpl implements APIProvider {
 
         return cachedId.orElseGet(() -> ctx.log().loading("Resolving ID for PCU group " + ctx.highlight(ref), (_) ->
             tryResolvePcuGroup(ref)
-                .map(PcuGroup::getId)
-                .map(UUID::fromString)
+                .map(PCUGroup::getId)
                 .orElseThrow(() -> new PcuGroupNotFoundException(ref))
         ));
     }
@@ -153,13 +152,13 @@ public class APIProviderImpl implements APIProvider {
     }
 
     @Override
-    public Optional<PcuGroup> tryResolvePcuGroup(@NotNull PcuRef ref) {
+    public Optional<PCUGroup> tryResolvePcuGroup(@NotNull PcuRef ref) {
         val cachedRef = pcuCache.convertPcuTitleToIdIfCached(ref);
 
         val pcuGroupClient = pcuGroupsClient();
 
-        val pcuGroup = cachedRef.<Optional<PcuGroup>>fold(
-            (id) -> pcuGroupClient.findById(id.toString()),
+        val pcuGroup = cachedRef.<Optional<PCUGroup>>fold(
+            pcuGroupClient::findById,
             (name) -> {
                 val all = pcuGroupClient.findByTitle(name).toList();
 
@@ -182,8 +181,7 @@ public class APIProviderImpl implements APIProvider {
         );
 
         pcuGroup.ifPresent((pg) -> {
-            val id = UUID.fromString(pg.getId());
-            pcuCache.cachePcuGroupId(pg.getTitle(), id);
+            pcuCache.cachePcuGroupId(pg.getTitle(), pg.getId());
         });
 
         return pcuGroup;

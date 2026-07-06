@@ -6,17 +6,17 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CloudProvider;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuCreateResult;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuGroupAlreadyExistsIllegallyWithStatus;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuGroupAlreadyExistsWithStatus;
 import com.dtsx.astra.cli.operations.pcu.PcuCreateOperation.PcuGroupCreated;
+import com.dtsx.astra.sdk.pcu.domain.PCUProvisionType;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
@@ -103,7 +103,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             description = "Provision type for the PCU group",
             defaultValue = "shared"
         )
-        public PcuGroupProvisionType provisionType;
+        public PCUProvisionType provisionType;
 
         @Option(
             names = { "--min" },
@@ -167,11 +167,11 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
         return switch (result.get()) {
             case PcuGroupAlreadyExistsWithStatus(var pcuId, var currStatus) -> handlePcuAlreadyExistsWithStatus(pcuId, currStatus);
             case PcuGroupAlreadyExistsIllegallyWithStatus(var pcuId, var currStatus) -> throwPcuAlreadyExistsWithStatus(pcuId, currStatus);
-            case PcuGroupCreated(var pcuId) -> handlePcuCreated(pcuId);
+            case PcuGroupCreated(var pcuId, PcuStatus pcuStatus) -> handlePcuCreated(pcuId, pcuStatus);
         };
     }
 
-    private OutputAll handlePcuAlreadyExistsWithStatus(UUID pcuId, PcuGroupStatusType currStatus) {
+    private OutputAll handlePcuAlreadyExistsWithStatus(UUID pcuId, PcuStatus currStatus) {
         val message = "PCU group %s already exists with id %s, and has status %s.".formatted(
             ctx.highlight($pcuRef),
             ctx.highlight(pcuId),
@@ -185,7 +185,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
         ));
     }
 
-    private <T> T throwPcuAlreadyExistsWithStatus(UUID pcuId, PcuGroupStatusType currStatus) {
+    private <T> T throwPcuAlreadyExistsWithStatus(UUID pcuId, PcuStatus currStatus) {
         throw new AstraCliException(PCU_GROUP_ALREADY_EXISTS, """
           @|bold,red Error: PCU group %s already exists with id %s, and has status %s.|@
         
@@ -203,20 +203,20 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
         ));
     }
 
-    private OutputAll handlePcuCreated(UUID pcuId) {
+    private OutputAll handlePcuCreated(UUID pcuId, PcuStatus pcuStatus) {
         val message = "PCU group %s has been created with id %s.".formatted(
             ctx.highlight($pcuRef),
             ctx.highlight(pcuId)
         );
 
-        val data = mkData(pcuId, true, PcuGroupStatusType.CREATED);
+        val data = mkData(pcuId, true, pcuStatus);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Get more information about the new group:", "${cli.name} pcu get %s".formatted($pcuRef))
         ));
     }
 
-    private LinkedHashMap<String, Object> mkData(UUID pcuId, Boolean wasCreated, PcuGroupStatusType currentStatus) {
+    private LinkedHashMap<String, Object> mkData(UUID pcuId, Boolean wasCreated, PcuStatus currentStatus) {
         return sequencedMapOf(
             "pcuId", pcuId,
             "wasCreated", wasCreated,

@@ -49,17 +49,15 @@ public class PcuAssociationTransferOperation implements Operation<AssociationTra
     public AssociationTransferResult execute() {
         val dcId = DbUtils.resolvePcuAssocTarget(dbGateway, request.target);
 
-        val toPcuId = UUID.fromString(
-            pcuGateway.findOne(request.to).getId()
-        );
+        val toPcuId = pcuGateway.findOne(request.to).getId();
 
 //        val fromPcuId = associationsGateway.tryFindByDatacenter(dcId)
-//            .map(PcuGroupDatacenterAssociation::getPcuGroupUUID)
+//            .map(PCUGroupDatacenterAssociation::getPcuGroupUUID)
 //            .map(UUID::fromString);
 
         Optional<UUID> fromPcuId = switch (request.sourceBehavior) {
             case AutodetectAndRequireSource(), AutodetectSourceOrCreate() -> Optional.empty();
-            case UseSource(var ref) -> Optional.of(UUID.fromString(pcuGateway.findOne(ref).getId()));
+            case UseSource(var ref) -> Optional.of(pcuGateway.findOne(ref).getId());
         };
 
         if (fromPcuId.isPresent() && fromPcuId.get().equals(toPcuId)) {
@@ -95,9 +93,7 @@ public class PcuAssociationTransferOperation implements Operation<AssociationTra
 
     private AssociationTransferResult useSource(PcuRef givenSource, Optional<UUID> actualSource, UUID toPcuId, DatacenterId dcId) {
         Optional<AssociationTransferResult> res = ctx.log().loading("Verifying if @!%s!@ is actually associated to @!%s!@".formatted(givenSource, request.target), (_) -> {
-            val givenSourceId = UUID.fromString(
-                pcuGateway.findOne(givenSource).getId()
-            );
+            val givenSourceId = pcuGateway.findOne(givenSource).getId();
 
             if (actualSource.isEmpty()) {
                 return Optional.of(new GivenSourceNotAssociated(givenSourceId, Optional.empty(), dcId));

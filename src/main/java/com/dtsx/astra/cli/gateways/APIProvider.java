@@ -7,9 +7,9 @@ import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.PcuRef;
-import com.dtsx.astra.cli.gateways.pcu.vendored.PcuGroupOpsClient;
-import com.dtsx.astra.cli.gateways.pcu.vendored.PcuGroupsClient;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
+import com.dtsx.astra.sdk.pcu.PCUGroupOpsClient;
+import com.dtsx.astra.sdk.pcu.PCUGroupsOpsClient;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.sdk.AstraOpsClient;
 import com.dtsx.astra.sdk.db.DbOpsClient;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -24,11 +24,11 @@ public interface APIProvider {
 
     AstraOpsClient astraOpsClient();
 
-    PcuGroupsClient pcuGroupsClient();
+    PCUGroupsOpsClient pcuGroupsClient();
 
     DbOpsClient dbOpsClient(DbRef dbRef);
 
-    PcuGroupOpsClient pcuGroupOpsClient(PcuRef pcuRef);
+    PCUGroupOpsClient pcuGroupOpsClient(PcuRef pcuRef);
 
     Database dataApiDatabase(KeyspaceRef ksRef);
 
@@ -47,5 +47,5 @@ public interface APIProvider {
     //
     // You're welcome.
     Optional<com.dtsx.astra.sdk.db.domain.Database> tryResolveDb(@NotNull DbRef ref);
-    Optional<PcuGroup> tryResolvePcuGroup(@NotNull PcuRef ref);
+    Optional<PCUGroup> tryResolvePcuGroup(@NotNull PcuRef ref);
 }

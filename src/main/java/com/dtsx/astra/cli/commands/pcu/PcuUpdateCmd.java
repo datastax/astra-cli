@@ -5,11 +5,11 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CloudProvider;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
+import com.dtsx.astra.sdk.pcu.domain.PCUProvisionType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuGroupAlreadyExistsIllegallyWithStatus;
@@ -91,7 +91,7 @@ public class PcuUpdateCmd extends AbstractPromptForPcuCmd<PcuUpdateResult> {
             description = "Provision type for the PCU group",
             defaultValue = "shared"
         )
-        public Optional<PcuGroupProvisionType> provisionType;
+        public Optional<PCUProvisionType> provisionType;
 
         @Option(
             names = { "--min" },
@@ -145,7 +145,7 @@ public class PcuUpdateCmd extends AbstractPromptForPcuCmd<PcuUpdateResult> {
         };
     }
 
-    private <T> T throwPcuAlreadyExistsWithStatus(UUID pcuId, PcuGroupStatusType currStatus) {
+    private <T> T throwPcuAlreadyExistsWithStatus(UUID pcuId, PcuStatus currStatus) {
         assert $pcuUpdateOptions != null; // will always be true if this method is reached
 
         throw new AstraCliException(PCU_GROUP_ALREADY_EXISTS, """

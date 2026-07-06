@@ -52,17 +52,15 @@ public class PcuAssociationListCmd extends AbstractPcuAssociationPromptForPcuCmd
                     .map((assoc) -> sequencedMapOf(
                         "PCU Group", Objects.requireNonNullElse(res.pcuGroup().getTitle(), "n/a"),
                         "PCU Group ID", res.pcuGroup().getId(),
-//                        "Type", "DC", // maybe need to add if streaming PCUs later
-                        "Target", assoc.getClusterName(),
                         "Target ID", assoc.getDatacenterUUID()
                     ))
             )
             .toList();
 
         if ($all) {
-            return new ShellTable(data).withColumns("PCU Group", "PCU Group ID", "Target", "Target ID");
+            return new ShellTable(data).withColumns("PCU Group", "PCU Group ID", "Target ID");
         } else {
-            return new ShellTable(data).withColumns("Target", "Target ID");
+            return new ShellTable(data).withColumns("Target ID");
         }
     }
 
