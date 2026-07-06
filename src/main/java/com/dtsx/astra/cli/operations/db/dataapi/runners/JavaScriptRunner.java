@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dtsx.astra.cli.utils.CollectionUtils.windowed;
 import static java.util.stream.Collectors.joining;
 
 @RequiredArgsConstructor
@@ -50,11 +51,15 @@ public final class JavaScriptRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public List<String> createInitVars(ExecContext ctx) {
-        return new ArrayList<>(List.of("client", "db", "admin", "dbAdmin")) {{
+    public List<List<String>> createInitVars(ExecContext ctx) {
+        val vars = new ArrayList<>(List.of("client", "db", "admin", "dbAdmin")) {{
             addAll(ctx.collections());
             addAll(ctx.tables());
         }};
+
+        val ret = windowed(vars, 2);
+        ret.addFirst(List.of("$ @|purple:300 (the astra-db-ts module)|@"));
+        return ret;
     }
 
     @Override

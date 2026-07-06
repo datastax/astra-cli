@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.utils.CollectionUtils.windowed;
-
 @RequiredArgsConstructor
 public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
     private final CliContext ctx;
@@ -141,12 +139,12 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         return cacheDir;
     }
 
-    private void printHeader(List<String> initVars) {
+    private void printHeader(List<List<String>> initVars) {
         val lines = new ArrayList<String>() {{
             add(ctx.colors().format("Welcome to the @!%s Data API REPL!@".formatted(request.language().displayName)));
             add("");
             add("The following variables are available:");
-            windowed(initVars, 2).forEach(pair -> add(ctx.colors().format(" @!*!@ " + String.join(", ", pair))));
+            initVars.forEach(pair -> add(ctx.colors().format(" @!*!@ " + String.join(", ", pair))));
         }};
 
         ctx.console().error(BoxDrawer.drawBox(3, ctx.colors().BLUE_300, lines, Alignment.LEFT));

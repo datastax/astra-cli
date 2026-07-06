@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.dotenv.EnvKey;
 import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Command;
 
 import java.util.ArrayList;
@@ -17,6 +18,15 @@ import java.util.function.Supplier;
     description = "List all available Astra keys (no values resolved)."
 )
 public class DotEnvListKeysCmd extends AbstractCmd<Void> {
+    @Override
+    @MustBeInvokedByOverriders
+    public void prelude() {
+        super.prelude();
+        if (!ctx.properties().disableBetaWarnings()) {
+            ctx.log().warn("${cli.name} dotenv commands are still in beta and may change without notice.");
+        }
+    }
+
     @Override
     protected Operation<Void> mkOperation() {
         return () -> null;

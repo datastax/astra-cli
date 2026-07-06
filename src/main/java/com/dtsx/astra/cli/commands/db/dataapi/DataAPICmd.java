@@ -6,7 +6,7 @@ import picocli.CommandLine.Mixin;
 
 @Command(
     name = "data-api",
-    description = "Work with the Data API",
+    description = "Easily work with the Data API @|italic (beta)|@",
     subcommands = {
         DataAPIReplCmd.class,
         DataAPIExecCmd.class,

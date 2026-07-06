@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dtsx.astra.cli.utils.CollectionUtils.windowed;
 import static java.util.stream.Collectors.joining;
 
 @RequiredArgsConstructor
@@ -52,11 +53,13 @@ public final class PythonRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public List<String> createInitVars(ExecContext ctx) {
-        return new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
+    public List<List<String>> createInitVars(ExecContext ctx) {
+        val vars = new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
             addAll(ctx.collections());
             addAll(ctx.tables());
         }};
+
+        return windowed(vars, 2);
     }
 
     @Override

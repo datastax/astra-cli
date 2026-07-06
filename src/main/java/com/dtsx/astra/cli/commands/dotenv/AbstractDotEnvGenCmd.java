@@ -16,6 +16,7 @@ import com.dtsx.astra.cli.operations.dotenv.DotEnvOperation.DotEnvRequest;
 import com.dtsx.astra.cli.operations.dotenv.DotEnvOperation.DotEnvResult;
 import com.dtsx.astra.cli.operations.dotenv.EnvKey;
 import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 
@@ -70,6 +71,15 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
     protected Optional<String> $regionName;
 
     protected abstract boolean isPrint();
+
+    @Override
+    @MustBeInvokedByOverriders
+    public void prelude() {
+        super.prelude();
+        if (!ctx.properties().disableBetaWarnings()) {
+            ctx.log().warn("${cli.name} dotenv commands are still in beta and may change without notice.");
+        }
+    }
 
     @Override
     protected DotEnvOperation mkOperation() {
