@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.commands.db.cdc.CdcDeleteCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcListCmd;
 import com.dtsx.astra.cli.commands.db.collections.*;
 import com.dtsx.astra.cli.commands.db.cqlsh.CqlshCmd;
+import com.dtsx.astra.cli.commands.db.dataapi.DataAPICmd;
 import com.dtsx.astra.cli.commands.db.dsbulk.DbDsbulkCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.EndpointsCmd;
 import com.dtsx.astra.cli.commands.db.endpoints.legacy.EndpointApiCmd;
@@ -38,6 +39,7 @@ import picocli.CommandLine.Command;
         DbDeleteCmd.class,
         DbStatusCmd.class,
         CqlshCmd.class,
+        DataAPICmd.class,
         DbDsbulkCmd.class,
         DbCreateDotEnvCmd.class,
         DbDownloadScbCmd.class,

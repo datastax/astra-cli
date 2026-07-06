@@ -1,16 +1,16 @@
 package com.dtsx.astra.cli.core.upgrades;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.output.AstraColors.AstraColor;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
+import com.dtsx.astra.cli.core.output.BoxDrawer;
+import com.dtsx.astra.cli.core.output.BoxDrawer.Alignment;
 import lombok.val;
 import org.jetbrains.annotations.VisibleForTesting;
 
-import static com.dtsx.astra.cli.core.output.AstraColors.stripAnsi;
-import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import java.util.List;
 
 public class UpgradeNotifier {
-    public static final int PADDING = 3;
+    private static final int PADDING = 3;
 
     public static void run(CliContext ctx) {
         if (ctx.isWindows()) {
@@ -51,23 +51,7 @@ public class UpgradeNotifier {
         val versionMsg = "Update available! " + ctx.colors().NEUTRAL_400.use(currentVersion) + " -> " + ctx.colors().YELLOW_300.use(latestVersion);
         val commandMsg = ctx.colors().format(mkUpgradeCommandMsg(ctx));
 
-        val versionMsgLength = stripAnsi(versionMsg).length();
-        val commandMsgLength = stripAnsi(commandMsg).length();
-
-        val maxTextWidth = Math.max(versionMsgLength, commandMsgLength);
-        val boxWidth = Math.max(versionMsgLength, commandMsgLength) + PADDING * 2 + 2;
-
-        val main = new StringBuilder();
-        val blue = ctx.colors().BLUE_300;
-
-        appendFillerLine(main, boxWidth, blue, '┌', '─', '┐');
-        appendFillerLine(main, boxWidth, blue, '│', ' ', '│');
-        appendTextualLine(main, versionMsg, maxTextWidth, versionMsgLength, blue);
-        appendTextualLine(main, commandMsg, maxTextWidth, commandMsgLength, blue);
-        appendFillerLine(main, boxWidth, blue, '│', ' ', '│');
-        appendFillerLine(main, boxWidth, blue, '└', '─', '┘');
-
-        return main.toString();
+        return BoxDrawer.drawBox(PADDING, ctx.colors().BLUE_300, List.of(versionMsg, commandMsg), Alignment.CENTER);
     }
 
     private static String mkUpgradeCommandMsg(CliContext ctx) {
@@ -81,23 +65,6 @@ public class UpgradeNotifier {
             case BREW -> "Run @!brew upgrade astra!@ to update";
             case NIX -> "Upgrade @!astra!@ through @!Nix!@";
         };
-    }
-
-    private static void appendFillerLine(StringBuilder main, int boxWidth, AstraColor blue, char l, char m, char r) {
-        main.append(blue.on()).append(l).repeat(m, boxWidth - 2).append(r).append(blue.off()).append(NL);
-    }
-
-    private static void appendTextualLine(StringBuilder main, String text, int maxTextWidth, int actualLength, AstraColor blue) {
-        int leftPadding = PADDING + Math.floorDiv(maxTextWidth - actualLength, 2);
-        int contentWidth = maxTextWidth + 2 * PADDING;
-        int rightPadding = contentWidth - actualLength - leftPadding;
-
-        main.append(blue.on()).append("│").append(blue.off())
-            .repeat(' ', leftPadding)
-            .append(text)
-            .repeat(' ', rightPadding)
-            .append(blue.on()).append("│").append(blue.off())
-            .append(NL);
     }
 
     private static boolean updateAvailable(UpgradeStatus status, CliContext ctx) {

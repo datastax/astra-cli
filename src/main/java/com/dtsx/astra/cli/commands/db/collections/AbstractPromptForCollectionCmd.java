@@ -23,7 +23,7 @@ public abstract class AbstractPromptForCollectionCmd<OpRes> extends AbstractColl
         super.prelude();
 
         if (collectionName == null) {
-            collectionName = CollectionNamePrompter.prompt(ctx, collectionGateway, $keyspaceRef, collectionPrompt(), (b) -> b.fallbackFlag("-c").fix(originalArgs(), "-c <collection>"));
+            collectionName = CollectionNamePrompter.prompt(ctx, collectionGateway, $keyspaceRef, collectionPrompt(), originalArgs());
         }
 
         this.$collRef = CollectionRef.parse($keyspaceRef, collectionName).getRight((msg) -> {
