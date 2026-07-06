@@ -4,7 +4,7 @@ exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Database 'two_regions_db' already exists with id '822b0fff-6a73-4322-a8ec-09832b075287', and has status 'ACTIVE'.",
+stdout:   "message" : "Database 'two_regions_db' already exists with id '822b0fff-6a73-4322-a8ec-09832b075287', and has status ACTIVE.",
 stdout:   "data" : {
 stdout:     "dbId" : "822b0fff-6a73-4322-a8ec-09832b075287",
 stdout:     "wasCreated" : false,

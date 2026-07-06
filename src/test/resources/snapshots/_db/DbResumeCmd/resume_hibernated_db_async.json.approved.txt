@@ -4,7 +4,7 @@ exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Database '822b0fff-6a73-4322-a8ec-09832b075287' was resumed, but is not yet active (current status: 'HIBERNATED').",
+stdout:   "message" : "Database '822b0fff-6a73-4322-a8ec-09832b075287' was resumed, but is not yet active (current status: HIBERNATED).",
 stdout:   "data" : {
 stdout:     "wasHibernated" : true,
 stdout:     "currentStatus" : "HIBERNATED",
