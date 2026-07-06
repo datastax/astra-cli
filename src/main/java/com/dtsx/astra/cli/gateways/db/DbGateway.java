@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface DbGateway extends SomeGateway {
@@ -31,7 +32,7 @@ public interface DbGateway extends SomeGateway {
 
     Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, Duration timeout);
 
-    CreationStatus<Database> create(String name, String keyspace, RegionRef region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate);
+    CreationStatus<Database> create(String name, String keyspace, RegionRef region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, Optional<UUID> pcuId, boolean allowDuplicate);
 
     DeletionStatus<DbRef> delete(DbRef ref);
 

@@ -34,7 +34,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     @Parameters(
         arity = "0..1",
         completionCandidates = DbNamesCompletion.class,
-        description = "The name/ID of the Astra database to connect to",
+        description = "The name/ID/endpoint of the Astra database to connect to",
         paramLabel = $Db.LABEL
     )
     public Optional<DbRef> $dbRef;
@@ -83,7 +83,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
         $extraArgs = CliUtils.removeDbFromExtraArgs($extraArgs, "astra db cqlsh start my_db -- --key1 value1 --key2");
 
         if ($dbRef.isPresent() && $scb.isPresent()) {
-            throw new ParameterException(spec.commandLine(), "Cannot use both a database name/ID and a secure connect bundle. Please choose one method of authentication.");
+            throw new ParameterException(spec.commandLine(), "Cannot use both a database name/ID/endpoint and a secure connect bundle. Please choose one method of authentication.");
         }
     }
 

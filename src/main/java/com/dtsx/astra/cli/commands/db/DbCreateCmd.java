@@ -3,17 +3,20 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.core.CliConstants.$Cloud;
 import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
+import com.dtsx.astra.cli.core.completions.caches.PcuGroupsCompletionsCache;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.CloudProvider;
+import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.prompters.specific.RegionNamePrompter;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
+import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.operations.db.DbCreateOperation;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
@@ -134,6 +137,13 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             defaultValue = "false"
         )
         public boolean nonVector;
+
+        @Option(
+            names = { "--pcu-group", "-pg" },
+            description = "The PCU group to associate the database to.",
+            paramLabel = "PCU_GROUP"
+        )
+        public Optional<PcuRef> pcuGroup;
     }
 
     @Option(
@@ -147,12 +157,14 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
     private boolean skipRegionVerification;
     protected RegionGateway regionGateway;
+    protected PcuGateway pcuGateway;
 
     @Override
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
         regionGateway = ctx.gateways().mkRegionGateway(profile().token(), profile().env());
+        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profileAndSource()));
 
         if ($databaseCreationOptions.region == null) {
             val candidate = RegionNamePrompter.prompt(
@@ -180,7 +192,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
                 ? DbCreateOperation.ExistingBehavior.ALLOW_DUPLICATES
                 : DbCreateOperation.ExistingBehavior.FAIL;
 
-        return new DbCreateOperation(dbGateway, regionGateway, new CreateDbRequest(
+        return new DbCreateOperation(dbGateway, regionGateway, pcuGateway, new CreateDbRequest(
             dbName,
             RegionRef.mustParse($databaseCreationOptions.region),
             $databaseCreationOptions.cloud,
@@ -188,6 +200,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             $databaseCreationOptions.tier,
             $databaseCreationOptions.capacityUnits,
             $databaseCreationOptions.nonVector,
+            $databaseCreationOptions.pcuGroup,
             existingBehavior,
             lrMixin.options(ctx),
             skipRegionVerification

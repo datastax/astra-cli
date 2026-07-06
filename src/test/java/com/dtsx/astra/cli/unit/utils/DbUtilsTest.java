@@ -32,26 +32,26 @@ class DbUtilsTest {
         }
 
         @Property
-        public void returns_corresponding_datacenter_given_valid_region(@ForAll("withSomeRegion") Pair<Database, RegionRef> p) {
-            val expected = findDatacenter(p.getLeft(), p.getRight().unwrap());
+        public void returns_corresponding_datacenter_given_valid_region(@ForAll("withSomeRegion") Pair<Database, String> p) {
+            val expected = findDatacenter(p.getLeft(), p.getRight());
 
-            val result = DbUtils.resolveDatacenter(p.getLeft(), Optional.of(p.getRight()));
+            val result = DbUtils.resolveDatacenter(p.getLeft(), Optional.of(RegionRef.mkUnsafe(p.getRight())));
 
             assertThat(result).isEqualTo(expected);
         }
 
         @Property
-        public void throws_exception_when_region_not_found(@ForAll Database db, @ForAll RegionRef regionName) {
-            Assume.that(db.getInfo().getDatacenters().stream().noneMatch(dc -> dc.getRegion().equals(regionName.unwrap())));
+        public void throws_exception_when_region_not_found(@ForAll Database db, @ForAll String regionName) {
+            Assume.that(db.getInfo().getDatacenters().stream().noneMatch(dc -> dc.getRegion().equals(regionName)));
 
             assertThatExceptionOfType(RegionNotFoundException.class)
-                .isThrownBy(() -> DbUtils.resolveDatacenter(db, Optional.of(regionName)));
+                .isThrownBy(() -> DbUtils.resolveDatacenter(db, Optional.of(RegionRef.mkUnsafe(regionName))));
         }
 
         @Provide
-        private Arbitrary<Pair<Database, RegionRef>> withSomeRegion() {
+        private Arbitrary<Pair<Database, String>> withSomeRegion() {
             return Arbitraries.defaultFor(Database.class).map((db) -> {
-                return Pair.of(db, RegionRef.mkUnsafe(db.getInfo().getDatacenters().stream().findFirst().orElseThrow().getRegion()));
+                return Pair.of(db, db.getInfo().getDatacenters().stream().findFirst().orElseThrow().getRegion());
             });
         }
 
@@ -64,14 +64,14 @@ class DbUtilsTest {
     @Group
     class resolveRegionName {
         @Property
-        public void behaves_as_resolveDatacenter(@ForAll Database db, @ForAll RegionRef regionName) {
+        public void behaves_as_resolveDatacenter(@ForAll Database db, @ForAll String regionName) {
             val expected = Either.tryCatch(
-                () -> RegionRef.mkUnsafe(DbUtils.resolveDatacenter(db, Optional.of(regionName)).getRegion()),
+                () -> RegionRef.mkUnsafe(DbUtils.resolveDatacenter(db, Optional.of(RegionRef.mkUnsafe(regionName))).getRegion()),
                 Function.identity()
             );
 
             val result = Either.tryCatch(
-                () -> DbUtils.resolveRegionName(db, Optional.of(regionName)),
+                () -> DbUtils.resolveRegionName(db, Optional.of(RegionRef.mkUnsafe(regionName))),
                 Function.identity()
             );
 

@@ -14,7 +14,7 @@ public class DbRefTest extends BaseParseableTest.WithTrimAndBasicValidation {
     private static final UUID SAMPLE_ID = UUID.fromString("822b0fff-6a73-4322-a8ec-09832b075287");
 
     public DbRefTest() {
-        super("Database name/id", DbRef::parse);
+        super("Database name/id/endpoint", DbRef::parse);
     }
 
     @Group

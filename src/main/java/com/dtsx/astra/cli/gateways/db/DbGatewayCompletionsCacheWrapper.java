@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
@@ -77,8 +78,8 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     }
 
     @Override
-    public CreationStatus<Database> create(String name, String keyspace, RegionRef region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
-        val status = delegate.create(name, keyspace, region, cloud, tier, capacityUnits, vector, allowDuplicate);
+    public CreationStatus<Database> create(String name, String keyspace, RegionRef region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, Optional<UUID> pcuId, boolean allowDuplicate) {
+        val status = delegate.create(name, keyspace, region, cloud, tier, capacityUnits, vector, pcuId, allowDuplicate);
         cache.addToCache(name);
         return status;
     }

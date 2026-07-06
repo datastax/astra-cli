@@ -38,7 +38,7 @@ public class PcuDisassociateCmd extends AbstractPcuAssociationRequirePcuCmd<Asso
     @Parameters(
         paramLabel = "TARGET",
         completionCandidates = PcuAssocTargetsCompletion.class,
-        description = "PCU association target (database name/id or datacenter id)",
+        description = "PCU association target (database name/id/endpoint or datacenter id)",
         index = "1"
     )
     public PcuAssocTarget $target;
