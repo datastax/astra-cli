@@ -5,10 +5,10 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuParkOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuParkOperation.*;
@@ -66,7 +66,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
             waited.getSeconds()
         );
 
-        val data = mkData(neededParking, PcuGroupStatusType.PARKED, waited);
+        val data = mkData(neededParking, PcuStatus.PARKED, waited);
 
         return OutputAll.response(message, data);
     }
@@ -74,7 +74,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
     private OutputAll handlePcuAlreadyParked() {
         val message = "PCU group @!%s!@ was already parked; no action was required.".formatted($pcuRef);
 
-        val data = mkData(false, PcuGroupStatusType.PARKED, Duration.ZERO);
+        val data = mkData(false, PcuStatus.PARKED, Duration.ZERO);
 
         return OutputAll.response(message, data);
     }
@@ -82,7 +82,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
     private OutputAll handlePcuAlreadyParking() {
         val message = "PCU group @!%s!@ was already parking; no action was required.".formatted($pcuRef);
 
-        val data = mkData(false, PcuGroupStatusType.PARKING, Duration.ZERO);
+        val data = mkData(false, PcuStatus.PARKING, Duration.ZERO);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Poll the group's status:", "${cli.name} pcu status %s".formatted($pcuRef))
@@ -92,7 +92,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
     private OutputAll handlePcuStartedParking() {
         val message = "PCU group @!%s!@ is currently parking".formatted($pcuRef);
 
-        val data = mkData(true, PcuGroupStatusType.PARKING, Duration.ZERO);
+        val data = mkData(true, PcuStatus.PARKING, Duration.ZERO);
 
         return OutputAll.response(message, data, List.of(
             new Hint("Poll the group's status:", "${cli.name} pcu status %s".formatted($pcuRef))
@@ -107,7 +107,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
         ));
     }
 
-    private LinkedHashMap<String, Object> mkData(Boolean neededParking, PcuGroupStatusType currentStatus, @Nullable Duration waitedDuration) {
+    private LinkedHashMap<String, Object> mkData(Boolean neededParking, PcuStatus currentStatus, @Nullable Duration waitedDuration) {
         return sequencedMapOf(
             "neededParking", neededParking,
             "currentStatus", currentStatus,
@@ -121,9 +121,12 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
     }
 
     @Override
-    protected NEList<PcuGroup> modifyPcusPromptList(NEList<PcuGroup> pcus) {
+    protected NEList<PCUGroup> modifyPcusPromptList(NEList<PCUGroup> pcus) {
         return NEList.parse(
-            pcus.stream().filter((pcu) -> pcu.getStatus() != PcuGroupStatusType.PARKING && pcu.getStatus() != PcuGroupStatusType.PARKED).toList()
+            pcus.stream().filter((pcu) -> {
+                val status = new PcuStatus(pcu);
+                return !status.equals(PcuStatus.PARKED) && !status.equals(PcuStatus.PARKING);
+            }).toList()
         ).orElseThrow(
             () -> new AstraCliException(PCU_GROUP_NOT_FOUND, "@|bold,red No unparked PCU groups found to select from|@")
         );

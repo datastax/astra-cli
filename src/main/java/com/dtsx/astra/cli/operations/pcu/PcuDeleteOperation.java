@@ -38,7 +38,7 @@ public class PcuDeleteOperation implements Operation<PcuDeleteResult> {
                 return handlePcuNotFound(request.ifExists);
             }
 
-            request.assertShouldDelete.accept(pcuInfo.get().getTitle(), UUID.fromString(pcuInfo.get().getId()));
+            request.assertShouldDelete.accept(pcuInfo.get().getTitle(), pcuInfo.get().getId());
         }
 
         val status = pcuGateway.delete(request.pcuRef);

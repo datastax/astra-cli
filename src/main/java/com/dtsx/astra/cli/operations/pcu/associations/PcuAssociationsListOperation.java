@@ -3,13 +3,12 @@ package com.dtsx.astra.cli.operations.pcu.associations;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.gateways.pcu.associations.PcuAssociationsGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupDatacenterAssociation;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.associations.PcuAssociationsListOperation.PcuAssociationsListResult;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupDatacenterAssociation;
 import lombok.RequiredArgsConstructor;
 
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -24,8 +23,8 @@ public class PcuAssociationsListOperation implements Operation<Stream<PcuAssocia
     ) {}
 
     public record PcuAssociationsListResult(
-        PcuGroup pcuGroup,
-        Stream<PcuGroupDatacenterAssociation> associations
+        PCUGroup pcuGroup,
+        Stream<PCUGroupDatacenterAssociation> associations
     ) {}
 
     @Override
@@ -43,7 +42,7 @@ public class PcuAssociationsListOperation implements Operation<Stream<PcuAssocia
             .map((pcu) -> new PcuAssociationsListResult(
                 pcu,
                 associationsGateway.findAll(
-                    PcuRef.fromId(UUID.fromString(pcu.getId()))
+                    PcuRef.fromId(pcu.getId())
                 )
             ));
     }

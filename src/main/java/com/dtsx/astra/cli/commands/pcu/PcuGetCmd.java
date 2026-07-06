@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.RenderableShellTable;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuGetOperation;
 import picocli.CommandLine.Command;
@@ -68,7 +68,7 @@ public class PcuGetCmd extends AbstractPromptForPcuCmd<PcuInfo> {
         };
     }
 
-    private RenderableShellTable mkTable(PcuGroup pcuInfo) {
+    private RenderableShellTable mkTable(PCUGroup pcuInfo) {
         return ShellTable.forAttributes(new LinkedHashMap<>() {{
             put("Title", Objects.requireNonNullElse(pcuInfo.getTitle(), "n/a"));
             put("ID", pcuInfo.getId());

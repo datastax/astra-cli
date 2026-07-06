@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import com.dtsx.astra.cli.core.models.PcuRef;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUnparkOperation.PcuUnparkResult;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +30,18 @@ public class PcuUnparkOperation implements Operation<PcuUnparkResult> {
 
     @Override
     public PcuUnparkResult execute() {
-        val currentStatus = pcuGateway.findOne(request.pcuRef).getStatus();
+        val currentStatus = new PcuStatus(pcuGateway.findOne(request.pcuRef));
 
-        return switch (currentStatus) {
-            case UNPARKING -> handleUnparking(false, PcuAlreadyUnparking::new);
-            case PARKED -> {
-                pcuGateway.unpark(request.pcuRef);
-                yield handleUnparking(true, PcuStartedUnparking::new);
-            }
-            default -> new PcuAlreadyUnparked();
-        };
+        if (currentStatus.equals(PcuStatus.UNPARKING)) {
+            return handleUnparking(false, PcuAlreadyUnparking::new);
+        }
+
+        if (currentStatus.equals(PcuStatus.PARKED)) {
+            pcuGateway.unpark(request.pcuRef);
+            return handleUnparking(true, PcuStartedUnparking::new);
+        }
+
+        return new PcuAlreadyUnparked();
     }
 
     private PcuUnparkResult handleUnparking(boolean neededUnparking, Supplier<PcuUnparkResult> ifDontWait) {
@@ -49,7 +51,7 @@ public class PcuUnparkOperation implements Operation<PcuUnparkResult> {
 
         val waited = pcuGateway.waitUntilPcuStatus(
             request.pcuRef,
-            PcuGroupStatusType.ACTIVE,
+            PcuStatus.ACTIVE,
             request.lrOptions.timeout()
         );
 

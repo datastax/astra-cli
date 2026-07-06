@@ -2,8 +2,8 @@ package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import com.dtsx.astra.cli.core.models.PcuRef;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuParkOperation.PcuParkResult;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +30,18 @@ public class PcuParkOperation implements Operation<PcuParkResult> {
 
     @Override
     public PcuParkResult execute() {
-        val currentStatus = pcuGateway.findOne(request.pcuRef).getStatus();
+        val currentStatus = new PcuStatus(pcuGateway.findOne(request.pcuRef));
 
-        return switch (currentStatus) {
-            case PARKED -> new PcuAlreadyParked();
-            case PARKING -> handleParking(false, PcuAlreadyParking::new);
-            default -> {
-                pcuGateway.park(request.pcuRef);
-                yield handleParking(true, PcuStartedParking::new);
-            }
-        };
+        if (currentStatus.equals(PcuStatus.PARKED)) {
+            return new PcuAlreadyParked();
+        }
+
+        if (currentStatus.equals(PcuStatus.PARKING)) {
+            return handleParking(false, PcuAlreadyParking::new);
+        }
+
+        pcuGateway.park(request.pcuRef);
+        return handleParking(true, PcuStartedParking::new);
     }
 
     private PcuParkResult handleParking(boolean neededParking, Supplier<PcuParkResult> ifDontWait) {
@@ -49,7 +51,7 @@ public class PcuParkOperation implements Operation<PcuParkResult> {
 
         val waited = pcuGateway.waitUntilPcuStatus(
             request.pcuRef,
-            PcuGroupStatusType.PARKED,
+            PcuStatus.PARKED,
             request.lrOptions.timeout()
         );
 

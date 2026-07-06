@@ -1,9 +1,9 @@
 package com.dtsx.astra.cli.commands.pcu;
 
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuStatusOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuStatusOperation.PcuStatusRequest;
@@ -19,19 +19,19 @@ import java.util.function.Supplier;
     comment = "Get the status of a PCU group",
     command = "${cli.name} db status my_db"
 )
-public class PcuStatusCmd extends AbstractPromptForPcuCmd<PcuGroupStatusType> {
+public class PcuStatusCmd extends AbstractPromptForPcuCmd<PcuStatus> {
     @Override
-    protected Operation<PcuGroupStatusType> mkOperation() {
+    protected Operation<PcuStatus> mkOperation() {
         return new PcuStatusOperation(ctx, pcuGateway, new PcuStatusRequest($pcuRef));
     }
 
     @Override
-    protected final OutputHuman executeHuman(Supplier<PcuGroupStatusType> result) {
+    protected final OutputHuman executeHuman(Supplier<PcuStatus> result) {
         return OutputHuman.response("PCU group %s is %s".formatted(ctx.highlight($pcuRef), ctx.highlight(result.get())));
     }
 
     @Override
-    protected final OutputAll execute(Supplier<PcuGroupStatusType> result) {
+    protected final OutputAll execute(Supplier<PcuStatus> result) {
         return OutputAll.serializeValue(result.get());
     }
 

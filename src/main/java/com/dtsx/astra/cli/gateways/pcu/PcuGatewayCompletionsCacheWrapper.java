@@ -4,10 +4,10 @@ import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.PcuRef;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
+import com.dtsx.astra.cli.core.models.PcuStatus;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupCreationRequest;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.dtsx.astra.cli.utils.MiscUtils.*;
+import static com.dtsx.astra.cli.utils.MiscUtils.toFn;
 
 @RequiredArgsConstructor
 public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
@@ -23,14 +23,14 @@ public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     private final CompletionsCache cache;
 
     @Override
-    public Stream<PcuGroup> findAll() {
+    public Stream<PCUGroup> findAll() {
         val pcuGroups = delegate.findAll().toList();
-        cache.setCache(pcuGroups.stream().map(PcuGroup::getTitle).toList());
+        cache.setCache(pcuGroups.stream().map(PCUGroup::getTitle).toList());
         return pcuGroups.stream();
     }
 
     @Override
-    public Optional<PcuGroup> tryFindOne(PcuRef ref) {
+    public Optional<PCUGroup> tryFindOne(PcuRef ref) {
         val res = delegate.tryFindOne(ref);
 
         if (res.isPresent()) {
@@ -66,21 +66,21 @@ public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     }
 
     @Override
-    public Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, Duration timeout) {
+    public Duration waitUntilPcuStatus(PcuRef ref, PcuStatus target, Duration timeout) {
         val duration = delegate.waitUntilPcuStatus(ref, target, timeout);
         addRefToCache(ref);
         return duration;
     }
 
     @Override
-    public CreationStatus<PcuGroup> create(String title, PcuGroupCreationRequest req, boolean allowDuplicate) {
+    public CreationStatus<PCUGroup> create(String title, PCUGroupCreationRequest req, boolean allowDuplicate) {
         val status = delegate.create(title, req, allowDuplicate);
         cache.addToCache(title);
         return status;
     }
 
     @Override
-    public CreationStatus<PcuGroup> update(PcuRef ref, PcuGroupUpdateRequest req, boolean allowDuplicate) {
+    public CreationStatus<PCUGroup> update(PcuRef ref, PCUGroupUpdateRequest req, boolean allowDuplicate) {
         val status = delegate.update(ref, req, allowDuplicate);
         addRefToCache(ref);
         return status;

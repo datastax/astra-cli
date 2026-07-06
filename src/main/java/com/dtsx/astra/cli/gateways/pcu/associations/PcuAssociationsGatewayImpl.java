@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DatacenterId;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupDatacenterAssociation;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupDatacenterAssociation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     private final CliContext ctx;
     private final APIProvider api;
 
-    private Optional<PcuGroupDatacenterAssociation> tryFindOne(PcuRef group, DatacenterId dcId) {
+    private Optional<PCUGroupDatacenterAssociation> tryFindOne(PcuRef group, DatacenterId dcId) {
         return ctx.log().loading("Finding association of @!%s!@ with @!%s!@".formatted(group, dcId), (_) ->
             findAll(group)
                 .filter((assoc) -> assoc.getDatacenterUUID().equals(dcId.unwrap()))
@@ -27,7 +27,7 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     }
 
     @Override
-    public Optional<PcuGroupDatacenterAssociation> tryFindByDatacenter(DatacenterId datacenter) {
+    public Optional<PCUGroupDatacenterAssociation> tryFindByDatacenter(DatacenterId datacenter) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -39,7 +39,7 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     }
 
     @Override
-    public Stream<PcuGroupDatacenterAssociation> findAll(PcuRef group) {
+    public Stream<PCUGroupDatacenterAssociation> findAll(PcuRef group) {
         return ctx.log().loading("Fetching all associations for PCU group @!%s!@".formatted(group), (_) ->
             api.pcuGroupOpsClient(group).datacenterAssociations().findAll()
         );
@@ -74,9 +74,9 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     }
 
     @Override
-    public PcuGroupDatacenterAssociation transfer(UUID from, UUID to, DatacenterId dcId) {
+    public PCUGroupDatacenterAssociation transfer(UUID from, UUID to, DatacenterId dcId) {
         return ctx.log().loading("Transferring association of @!%s!@ from @!%s!@ to @!%s!@".formatted(dcId, from, to), (_) -> {
-            return api.pcuGroupOpsClient(PcuRef.fromId(from)).datacenterAssociations().transfer(to.toString(), dcId.unwrap());
+            return api.pcuGroupOpsClient(PcuRef.fromId(from)).datacenterAssociations().transfer(to, dcId.unwrap());
         });
     }
 }

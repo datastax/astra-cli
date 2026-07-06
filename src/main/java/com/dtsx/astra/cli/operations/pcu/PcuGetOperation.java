@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.operations.pcu;
 import com.dtsx.astra.cli.commands.pcu.PcuGetCmd.PcuGetKeys;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuGetOperation.PcuInfo;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class PcuGetOperation implements Operation<PcuInfo> {
     ) {}
 
     public sealed interface PcuInfo {}
-    public record PcuInfoFull(PcuGroup pcuGroup) implements PcuInfo {}
+    public record PcuInfoFull(PCUGroup pcuGroup) implements PcuInfo {}
     public record PcuInfoValue(Object value) implements PcuInfo {}
 
     @Override
@@ -35,11 +35,11 @@ public class PcuGetOperation implements Operation<PcuInfo> {
             .orElseGet(() -> mkPcuInfoFull(pcuGroup));
     }
 
-    private PcuInfo mkPcuInfoFull(PcuGroup pcuGroup) {
+    private PcuInfo mkPcuInfoFull(PCUGroup pcuGroup) {
         return new PcuInfoFull(pcuGroup);
     }
 
-    private PcuInfo mkPcuInfoValue(PcuGetKeys key, PcuGroup pcuGroup) {
+    private PcuInfo mkPcuInfoValue(PcuGetKeys key, PCUGroup pcuGroup) {
         val value = switch (key) {
             case title -> Objects.requireNonNullElse(pcuGroup.getTitle(), "n/a");
             case description -> pcuGroup.getDescription();

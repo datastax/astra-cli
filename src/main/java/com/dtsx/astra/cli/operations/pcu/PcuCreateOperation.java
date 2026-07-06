@@ -2,11 +2,11 @@ package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupProvisionType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupCreationRequest;
+import com.dtsx.astra.sdk.pcu.domain.PCUProvisionType;
 import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -33,7 +33,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
         CloudProvider cloud,
         RegionName region,
         String instanceType,
-        PcuGroupProvisionType provisionType,
+        PCUProvisionType provisionType,
         Integer min,
         Integer max,
         Integer reserved,
@@ -41,17 +41,17 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
     ) {}
 
     public sealed interface PcuCreateResult {}
-    public record PcuGroupAlreadyExistsWithStatus(UUID pcuId, PcuGroupStatusType currStatus) implements PcuCreateResult {}
-    public record PcuGroupAlreadyExistsIllegallyWithStatus(UUID pcuId, PcuGroupStatusType currStatus) implements PcuCreateResult {}
-    public record PcuGroupCreated(UUID pcuId) implements PcuCreateResult {}
+    public record PcuGroupAlreadyExistsWithStatus(UUID pcuId, PcuStatus currStatus) implements PcuCreateResult {}
+    public record PcuGroupAlreadyExistsIllegallyWithStatus(UUID pcuId, PcuStatus currStatus) implements PcuCreateResult {}
+    public record PcuGroupCreated(UUID pcuId, PcuStatus pcuStatus) implements PcuCreateResult {}
 
     @Override
     public PcuCreateResult execute() {
-        val builder = PcuGroupCreationRequest.builder()
+        val builder = PCUGroupCreationRequest.builder()
             .title(request.title)
             .description(request.description.orElse(null))
             .instanceType(request.instanceType)
-            .provisionType(request.provisionType)
+            .provisionType(request.provisionType.name())
             .cloudProvider(request.cloud.toSdkType())
             .region(request.region.unwrap())
             .min(request.min)
@@ -66,16 +66,15 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
         );
 
         val pcu = status.value();
-        val pcuId = UUID.fromString(pcu.getId());
 
         if (status instanceof CreationStatus.Created<?>) {
-            return new PcuCreateOperation.PcuGroupCreated(pcuId);
+            return new PcuCreateOperation.PcuGroupCreated(pcu.getId(), new PcuStatus(pcu));
         }
 
         if (request.existingBehavior == ExistingBehavior.FAIL) {
-            return new PcuGroupAlreadyExistsIllegallyWithStatus(pcuId, pcu.getStatus());
+            return new PcuGroupAlreadyExistsIllegallyWithStatus(pcu.getId(), new PcuStatus(pcu));
         }
 
-        return new PcuCreateOperation.PcuGroupAlreadyExistsWithStatus(pcuId, pcu.getStatus());
+        return new PcuCreateOperation.PcuGroupAlreadyExistsWithStatus(pcu.getId(), new PcuStatus(pcu));
     }
 }

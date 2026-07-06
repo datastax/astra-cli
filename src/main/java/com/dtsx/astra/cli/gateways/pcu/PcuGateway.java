@@ -4,22 +4,22 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.pcu.PcuGroupNotFoundException;
 import com.dtsx.astra.cli.core.models.PcuRef;
+import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.gateways.SomeGateway;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroup;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupCreationRequest;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupStatusType;
-import com.dtsx.astra.cli.gateways.pcu.vendored.domain.PcuGroupUpdateRequest;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupCreationRequest;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroupUpdateRequest;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface PcuGateway extends SomeGateway {
-    Stream<PcuGroup> findAll();
+    Stream<PCUGroup> findAll();
 
-    Optional<PcuGroup> tryFindOne(PcuRef ref);
+    Optional<PCUGroup> tryFindOne(PcuRef ref);
 
-    default PcuGroup findOne(PcuRef ref) {
+    default PCUGroup findOne(PcuRef ref) {
         return tryFindOne(ref).orElseThrow(() -> new PcuGroupNotFoundException(ref));
     }
 
@@ -29,11 +29,11 @@ public interface PcuGateway extends SomeGateway {
 
     void unpark(PcuRef ref);
 
-    Duration waitUntilPcuStatus(PcuRef ref, PcuGroupStatusType target, Duration timeout);
+    Duration waitUntilPcuStatus(PcuRef ref, PcuStatus target, Duration timeout);
 
-    CreationStatus<PcuGroup> create(String title, PcuGroupCreationRequest req, boolean allowDuplicate);
+    CreationStatus<PCUGroup> create(String title, PCUGroupCreationRequest req, boolean allowDuplicate);
 
-    CreationStatus<PcuGroup> update(PcuRef ref, PcuGroupUpdateRequest req, boolean allowDuplicate);
+    CreationStatus<PCUGroup> update(PcuRef ref, PCUGroupUpdateRequest req, boolean allowDuplicate);
 
     DeletionStatus<PcuRef> delete(PcuRef ref);
 }
