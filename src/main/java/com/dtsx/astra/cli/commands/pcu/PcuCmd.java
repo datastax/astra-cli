@@ -24,6 +24,7 @@ import picocli.CommandLine.Command;
         PcuDisassociateCmd.class,
         PcuAssociationListCmd.class,
         PcuAssociationTransferCmd.class,
+        PcuListTypesCmd.class,
     }
 )
 @Example(
