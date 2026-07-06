@@ -98,7 +98,7 @@ public abstract class Fixtures {
 
         public static final Datacenter ONE = DATACENTERS.getFirst();
 
-        public static final RegionName NAME = RegionName.mkUnsafe(ONE.getRegion());
+        public static final RegionRef NAME = RegionRef.mkUnsafe(ONE.getRegion());
     }
 
     public static final CreateTokenResponse CreateTokenResponse = load("CreateTokenResponse.json", new TypeReference<>() {});

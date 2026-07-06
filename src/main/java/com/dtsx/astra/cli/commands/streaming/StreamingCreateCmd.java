@@ -5,10 +5,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.cli.core.models.TenantStatus;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -100,7 +97,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<Strea
             paramLabel = $Regions.LABEL,
             required = true
         )
-        public RegionName $region;
+        public String $regionName;
 
         @Option(
             names = { $Cloud.LONG, $Cloud.SHORT },
@@ -119,7 +116,7 @@ public class StreamingCreateCmd extends AbstractStreamingTenantRequiredCmd<Strea
         return new StreamingCreateOperation(streamingGateway, new StreamingCreateRequest(
             $tenantName,
             ($tenantCreationOptions.$clusterOrCloud.$regionSpec != null)
-                ? Either.pure(Pair.of($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, $tenantCreationOptions.$clusterOrCloud.$regionSpec.$region))
+                ? Either.pure(Pair.of($tenantCreationOptions.$clusterOrCloud.$regionSpec.$cloud, RegionRef.mustParse($tenantCreationOptions.$clusterOrCloud.$regionSpec.$regionName)))
                 : Either.left($tenantCreationOptions.$clusterOrCloud.$cluster.orElseThrow()),
             $tenantCreationOptions.$plan,
             $tenantCreationOptions.$userEmail,

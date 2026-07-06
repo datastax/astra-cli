@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
@@ -66,7 +66,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
         description = "The region to use. Uses the db's default region if not specified.",
         paramLabel = $Regions.LABEL
     )
-    private Optional<RegionName> $region;
+    private Optional<String> $regionName;
 
     @Parameters(
         paramLabel = "ARGS",
@@ -89,6 +89,8 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
 
     @Override
     protected Operation<CqlshExecResult> mkOperation(boolean captureOutput) {
+        val regionRef = RegionRef.mustParse($dbRef.orElse(null), $regionName);
+
         return new DbCqlshStartOperation(ctx, dbGateway, downloadsGateway, new CqlshRequest(
             Either.fromOptional($scb, () -> $dbRef.orElseGet(this::promptForDb)),
             $debug,
@@ -97,7 +99,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
             execSource(),
             $connectTimeout,
             $requestTimeout,
-            $region,
+            regionRef,
             profile(),
             this::readStdin,
             captureOutput

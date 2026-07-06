@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.sdk.db.domain.Database;
 import lombok.val;
 
@@ -12,14 +12,14 @@ import static com.datastax.astra.client.core.options.DataAPIClientOptions.DEFAUL
 
 public interface DbCache {
     void cacheDbId(String dbName, UUID id);
-    void cacheDbRegion(UUID id, RegionName region);
+    void cacheDbRegion(UUID id, RegionRef region);
     void cacheDbDefaultKs(UUID id, String keyspace);
 
     default void cache(Database db) {
         val id = UUID.fromString(db.getId());
 
         cacheDbId(db.getInfo().getName(), id);
-        cacheDbRegion(id, RegionName.mkUnsafe(db.getInfo().getRegion()));
+        cacheDbRegion(id, RegionRef.mkUnsafe(db.getInfo().getRegion()));
 
         val keyspaces = db.getInfo().getKeyspaces();
 
@@ -33,7 +33,7 @@ public interface DbCache {
     }
 
     Optional<UUID> lookupDbId(DbRef ref);
-    Optional<RegionName> lookupDbRegion(DbRef ref);
+    Optional<RegionRef> lookupDbRegion(DbRef ref);
     Optional<String> lookupDbDefaultKs(DbRef ref);
 
     default DbRef convertDbNameToIdIfCached(DbRef ref) {

@@ -4,10 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.pcu.PcuGroupNotFoundException;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.PcuRef;
-import com.dtsx.astra.cli.core.models.PcuStatus;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.pcu.domain.*;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +29,11 @@ public class PcuGatewayImpl implements PcuGateway {
     }
 
     @Override
-    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionName> region) {
+    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region) {
         return ctx.log().loading("Fetching PCU types", (_) -> {
             val filter = new PCUTypeLocationFilter(
                 provider.map(CloudProvider::name).orElse(null),
-                region.map(RegionName::unwrap).orElse(null)
+                region.map(RegionRef::unwrap).orElse(null)
             );
             return api.pcuGroupsClient().listPcuTypes(filter);
         });

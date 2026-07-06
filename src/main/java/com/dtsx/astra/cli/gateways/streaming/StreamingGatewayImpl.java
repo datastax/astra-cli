@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.streaming.role.TenantNotFoundException;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.sdk.streaming.domain.CreateTenant;
@@ -99,7 +99,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
     }
 
     @Override
-    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionRef region) {
         val cloudRegions = findAllRegions();
 
         if (cloud.isPresent()) {
@@ -109,7 +109,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
                 throw new OptionValidationException("cloud", "Cloud provider '%s' does not have any available streaming regions".formatted(cloudName));
             }
 
-            if (!cloudRegions.get(cloud.get()).containsKey(region.unwrap().toLowerCase())) {
+            if (!cloudRegions.get(cloud.get()).containsKey(region.unwrap())) {
                 throw new OptionValidationException("region", "Region '%s' is not available for cloud provider '%s'".formatted(region, cloud.get()));
             }
 
@@ -117,7 +117,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
         }
 
         val matchingClouds = cloudRegions.entrySet().stream()
-            .filter(entry -> entry.getValue().containsKey(region.unwrap().toLowerCase()))
+            .filter(entry -> entry.getValue().containsKey(region.unwrap()))
             .map(Entry::getKey)
             .toList();
 
@@ -134,7 +134,7 @@ public class StreamingGatewayImpl implements StreamingGateway {
     }
 
     @Override
-    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail) {
+    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionRef>> clusterOrCloud, String plan, String userEmail) {
         val exists = exists(tenantName);
 
         if (exists) {

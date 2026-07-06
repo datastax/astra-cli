@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.operations.db.region;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -30,7 +30,7 @@ public class RegionCreateOperation implements Operation<RegionCreateResult> {
 
     public record RegionCreateRequest(
         DbRef dbRef,
-        RegionName region,
+        RegionRef region,
         boolean ifNotExists,
         LongRunningOptions lrOptions
     ) {}

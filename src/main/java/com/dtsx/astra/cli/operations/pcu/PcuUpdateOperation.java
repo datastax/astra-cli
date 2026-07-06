@@ -1,10 +1,7 @@
 package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.PcuRef;
-import com.dtsx.astra.cli.core.models.PcuStatus;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuUpdateOperation.PcuUpdateResult;
@@ -25,7 +22,7 @@ public class PcuUpdateOperation implements Operation<PcuUpdateResult> {
         Optional<String> title,
         Optional<String> description,
         Optional<CloudProvider> cloud,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         Optional<Integer> min,
         Optional<Integer> max,
         Optional<Integer> reserved,
@@ -42,7 +39,7 @@ public class PcuUpdateOperation implements Operation<PcuUpdateResult> {
             .title(request.title.orElse(null))
             .description(request.description.orElse(null))
             .cloudProvider(request.cloud.map(CloudProvider::toSdkType).orElse(null))
-            .region(request.region.map(RegionName::unwrap).orElse(null))
+            .region(request.region.map(RegionRef::unwrap).orElse(null))
             .min(request.min.orElse(null))
             .max(request.max.orElse(null))
             .reserved(request.reserved.orElse(null))

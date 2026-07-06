@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.commands.pcu;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
@@ -41,7 +41,7 @@ public class PcuListTypesCmd extends AbstractPcuCmd<Stream<PCUType>> {
         names = { $Regions.LONG, $Regions.SHORT },
         description = "Region filter"
     )
-    public RegionName $region;
+    public String $regionName;
 
     @Override
     protected final OutputJson executeJson(Supplier<Stream<PCUType>> result) {
@@ -66,7 +66,7 @@ public class PcuListTypesCmd extends AbstractPcuCmd<Stream<PCUType>> {
     protected PcuListTypesOperation mkOperation() {
         val req = new PcuListTypesRequest(
             Optional.ofNullable($cloudProvider),
-            Optional.ofNullable($region)
+            Optional.ofNullable(RegionRef.mustParse($regionName))
         );
         return new PcuListTypesOperation(pcuGateway, req);
     }

@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.KeyspaceNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
 import com.dtsx.astra.cli.core.parsers.env.EnvParseException;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -45,7 +45,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
         Profile profile,
         @Nullable DbRef dbRef,
         Function<DbRef, Optional<KeyspaceRef>> mkKsRef,
-        Optional<RegionName> region,
+        Function<DbRef, Optional<RegionRef>> region,
         Optional<Path> file,
         boolean print,
         Map<EnvKey, String> keys,
@@ -214,7 +214,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
 
     private @Nullable Organization cachedOrg;
     private @Nullable Database cachedDb;
-    private @Nullable RegionName cachedRegion;
+    private @Nullable RegionRef cachedRegion;
     private @Nullable String cachedKeyspace;
 
     private Organization org() {
@@ -231,9 +231,9 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
         return cachedDb;
     }
 
-    private RegionName resolveRegion(DotEnvRequest request, DbRef dbRef) {
+    private RegionRef resolveRegion(DotEnvRequest request, DbRef dbRef) {
         if (cachedRegion == null) {
-            cachedRegion = DbUtils.resolveRegionName(db(dbRef), request.region);
+            cachedRegion = DbUtils.resolveRegionName(db(dbRef), request.region.apply(dbRef));
         }
         return cachedRegion;
     }
@@ -282,7 +282,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
     }
 
     private Datacenter resolveDatacenter(DotEnvRequest request, DbRef dbRef) {
-        return DbUtils.resolveDatacenter(db(dbRef), request.region);
+        return DbUtils.resolveDatacenter(db(dbRef), request.region.apply(dbRef));
     }
 
     public static class EnvParseExceptionWrapper extends AstraCliException {

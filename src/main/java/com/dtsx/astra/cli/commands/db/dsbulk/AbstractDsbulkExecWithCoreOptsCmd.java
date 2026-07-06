@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
 import com.dtsx.astra.cli.utils.CliUtils;
 import lombok.val;
@@ -72,7 +72,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         description = "The region to use. Uses the db's default region if not specified.",
         paramLabel = $Regions.LABEL
     )
-    public Optional<RegionName> $region;
+    public Optional<String> $regionName;
 
     @Option(
         names = { "--dsbulk-config" },
@@ -105,6 +105,10 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         $dbRef = $maybeDbRef.orElseGet(() -> (
             DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"))
         ));
+    }
+
+    protected Optional<RegionRef> $region() {
+        return RegionRef.mustParse($dbRef, $regionName);
     }
 
     protected List<String> $flags() {

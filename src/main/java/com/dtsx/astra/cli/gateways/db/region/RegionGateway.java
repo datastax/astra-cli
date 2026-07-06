@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 
@@ -24,9 +24,9 @@ public interface RegionGateway extends SomeGateway {
 
     SortedSet<CloudProvider> findAvailableClouds();
 
-    CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProvider cp);
+    CreationStatus<RegionRef> create(DbRef ref, RegionRef region, String tier, CloudProvider cp);
 
-    DeletionStatus<RegionName> delete(DbRef ref, RegionName region);
+    DeletionStatus<RegionRef> delete(DbRef ref, RegionRef region);
 
-    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly);
+    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionRef region, boolean vectorOnly);
 }

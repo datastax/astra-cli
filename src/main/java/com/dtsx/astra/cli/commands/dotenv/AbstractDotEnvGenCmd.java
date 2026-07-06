@@ -8,7 +8,7 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
 import com.dtsx.astra.cli.operations.dotenv.DotEnvOperation;
@@ -60,14 +60,14 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
         description = "The keyspace to use.",
         paramLabel = $Keyspace.LABEL
     )
-    protected Optional<String> $keyspace;
+    protected Optional<String> $keyspaceName;
 
     @Option(
         names = { $Regions.LONG },
         description = "The region to use.",
         paramLabel = $Regions.LABEL
     )
-    protected Optional<RegionName> $region;
+    protected Optional<String> $regionName;
 
     protected abstract boolean isPrint();
 
@@ -76,13 +76,14 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
         val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
 
-        Function<DbRef, Optional<KeyspaceRef>> mkKsRef = (dbRef) -> $keyspace.map(ks -> KeyspaceRef.mustParse(dbRef, ks));
+        Function<DbRef, Optional<KeyspaceRef>> mkKsRef = (dbRef) -> $keyspaceName.map(ks -> KeyspaceRef.mustParse(dbRef, ks));
+        Function<DbRef, Optional<RegionRef>> mkRegionRef = (dbRef) -> RegionRef.mustParse(dbRef, $regionName);
 
         return new DotEnvOperation(ctx, dbGateway, orgGateway, downloadsGateway, new DotEnvRequest(
             profile(),
             $dbRef,
             mkKsRef,
-            $region,
+            mkRegionRef,
             $file,
             isPrint(),
             $keys,

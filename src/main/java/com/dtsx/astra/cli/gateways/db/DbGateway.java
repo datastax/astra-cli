@@ -4,10 +4,7 @@ import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvide
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
@@ -34,7 +31,7 @@ public interface DbGateway extends SomeGateway {
 
     Duration waitUntilDbStatus(DbRef ref, DatabaseStatusType target, Duration timeout);
 
-    CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate);
+    CreationStatus<Database> create(String name, String keyspace, RegionRef region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate);
 
     DeletionStatus<DbRef> delete(DbRef ref);
 

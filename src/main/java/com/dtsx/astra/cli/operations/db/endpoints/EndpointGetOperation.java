@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.operations.db.endpoints;
 
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.endpoints.EndpointGetOperation.EndpointGetResponse;
@@ -20,7 +20,7 @@ public class EndpointGetOperation implements Operation<EndpointGetResponse> {
 
     public record EndpointGetRequest(
         DbRef dbRef,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         AstraEnvironment env
     ) {}
 

@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.unit.utils;
 
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.db.RegionNotFoundException;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.utils.DbUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
@@ -32,7 +32,7 @@ class DbUtilsTest {
         }
 
         @Property
-        public void returns_corresponding_datacenter_given_valid_region(@ForAll("withSomeRegion") Pair<Database, RegionName> p) {
+        public void returns_corresponding_datacenter_given_valid_region(@ForAll("withSomeRegion") Pair<Database, RegionRef> p) {
             val expected = findDatacenter(p.getLeft(), p.getRight().unwrap());
 
             val result = DbUtils.resolveDatacenter(p.getLeft(), Optional.of(p.getRight()));
@@ -41,7 +41,7 @@ class DbUtilsTest {
         }
 
         @Property
-        public void throws_exception_when_region_not_found(@ForAll Database db, @ForAll RegionName regionName) {
+        public void throws_exception_when_region_not_found(@ForAll Database db, @ForAll RegionRef regionName) {
             Assume.that(db.getInfo().getDatacenters().stream().noneMatch(dc -> dc.getRegion().equals(regionName.unwrap())));
 
             assertThatExceptionOfType(RegionNotFoundException.class)
@@ -49,9 +49,9 @@ class DbUtilsTest {
         }
 
         @Provide
-        private Arbitrary<Pair<Database, RegionName>> withSomeRegion() {
+        private Arbitrary<Pair<Database, RegionRef>> withSomeRegion() {
             return Arbitraries.defaultFor(Database.class).map((db) -> {
-                return Pair.of(db, RegionName.mkUnsafe(db.getInfo().getDatacenters().stream().findFirst().orElseThrow().getRegion()));
+                return Pair.of(db, RegionRef.mkUnsafe(db.getInfo().getDatacenters().stream().findFirst().orElseThrow().getRegion()));
             });
         }
 
@@ -64,9 +64,9 @@ class DbUtilsTest {
     @Group
     class resolveRegionName {
         @Property
-        public void behaves_as_resolveDatacenter(@ForAll Database db, @ForAll RegionName regionName) {
+        public void behaves_as_resolveDatacenter(@ForAll Database db, @ForAll RegionRef regionName) {
             val expected = Either.tryCatch(
-                () -> RegionName.mkUnsafe(DbUtils.resolveDatacenter(db, Optional.of(regionName)).getRegion()),
+                () -> RegionRef.mkUnsafe(DbUtils.resolveDatacenter(db, Optional.of(regionName)).getRegion()),
                 Function.identity()
             );
 

@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import lombok.RequiredArgsConstructor;
@@ -65,12 +65,12 @@ public class StreamingGatewayCompletionsCacheWrapper implements StreamingGateway
     }
 
     @Override
-    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionRef region) {
         return delegate.findCloudForRegion(cloud, region);
     }
 
     @Override
-    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail) {
+    public CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionRef>> clusterOrCloud, String plan, String userEmail) {
         val status = delegate.create(tenantName, clusterOrCloud, plan, userEmail);
         cache.addToCache(tenantName.unwrap());
         return status;

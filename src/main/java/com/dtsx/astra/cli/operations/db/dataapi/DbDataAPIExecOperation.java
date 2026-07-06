@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.BoxDrawer;
 import com.dtsx.astra.cli.core.output.BoxDrawer.Alignment;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -48,7 +48,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
     public record DbDataAPIExecRequest(
         Language language,
         DbRef dbRef,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         KeyspaceRef ksRef,
         List<String> collectionNames,
         List<String> tableNames,

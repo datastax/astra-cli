@@ -57,7 +57,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     @Override
     protected Operation<RegionDeleteResult> mkOperation() {
-        return new RegionDeleteOperation(regionGateway, dbGateway, new RegionDeleteRequest($dbRef, $region, $ifExists, lrMixin.options(ctx)));
+        return new RegionDeleteOperation(regionGateway, dbGateway, new RegionDeleteRequest($dbRef, $regionRef, $ifExists, lrMixin.options(ctx)));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionNotFound() {
         val message = "Region %s does not exist in database %s; nothing to delete.".formatted(
-            ctx.highlight($region),
+            ctx.highlight($regionRef),
             ctx.highlight($dbRef)
         );
 
@@ -86,7 +86,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionDeleted() {
         val message = "Region %s has been deleted from database %s (database may not be active yet).".formatted(
-            ctx.highlight($region),
+            ctx.highlight($regionRef),
             ctx.highlight($dbRef)
         );
 
@@ -100,7 +100,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
 
     private OutputAll handleRegionDeletedAndDbActive(Duration waitTime) {
         val message = "Region %s has been deleted from database %s. Database is now active after waiting %s seconds.".formatted(
-            ctx.highlight($region),
+            ctx.highlight($regionRef),
             ctx.highlight($dbRef),
             ctx.highlight(waitTime.toSeconds())
         );
@@ -118,7 +118,7 @@ public class RegionDeleteCmd extends AbstractLongRunningRegionRequiredCmd<Region
     
           To ignore this error, provide the @'!--if-exists!@ flag to skip this error if the region doesn't exist.
         """.formatted(
-            $region,
+            $regionRef,
             $dbRef
         ), List.of(
             new Hint("Example fix:", originalArgs(), "--if-exists"),

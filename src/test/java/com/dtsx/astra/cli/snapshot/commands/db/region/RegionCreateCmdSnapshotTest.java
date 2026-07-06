@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.snapshot.commands.db.region;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -29,7 +29,7 @@ public class RegionCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
             verify(mocks.dbGateway()).findOne(Databases.IdRef);
         });
 
-    private SnapshotTestOptionsModifier mkRegion(Function<RegionName, CreationStatus<RegionName>> lift) {
+    private SnapshotTestOptionsModifier mkRegion(Function<RegionRef, CreationStatus<RegionRef>> lift) {
         return (o) -> o
             .gateway(DbGateway.class, (mock) -> {
                 when(mock.findOne(any())).thenReturn(Databases.One);

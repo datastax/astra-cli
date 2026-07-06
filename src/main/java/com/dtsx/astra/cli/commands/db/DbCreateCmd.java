@@ -9,7 +9,7 @@ import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.prompters.specific.RegionNamePrompter;
@@ -95,7 +95,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
             description = "Cloud provider region to provision. @|bold Use one of the `${cli.name} db list-regions-*` commands to see available regions.|@",
             paramLabel = $Regions.LABEL
         )
-        public RegionName region;
+        public String region;
 
         @Option(
             names = { $Cloud.LONG, $Cloud.SHORT },
@@ -160,7 +160,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
                 (b) -> b.fallbackIndex(0).fix(originalArgs(), "--region")
             );
 
-            $databaseCreationOptions.region = RegionName.mkUnsafe(candidate.name());
+            $databaseCreationOptions.region = candidate.name();
             $databaseCreationOptions.cloud = Optional.of(candidate.cloudProvider());
             skipRegionVerification = true;
         }
@@ -182,7 +182,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
 
         return new DbCreateOperation(dbGateway, regionGateway, new CreateDbRequest(
             dbName,
-            $databaseCreationOptions.region,
+            RegionRef.mustParse($databaseCreationOptions.region),
             $databaseCreationOptions.cloud,
             $databaseCreationOptions.keyspace,
             $databaseCreationOptions.tier,

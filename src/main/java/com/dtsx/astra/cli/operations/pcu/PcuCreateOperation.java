@@ -3,11 +3,11 @@ package com.dtsx.astra.cli.operations.pcu;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuStatus;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
+import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupCreationRequest;
 import com.dtsx.astra.sdk.pcu.domain.PCUProvisionType;
-import com.dtsx.astra.cli.operations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -31,7 +31,7 @@ public class PcuCreateOperation implements Operation<PcuCreateResult> {
         String title,
         Optional<String> description,
         CloudProvider cloud,
-        RegionName region,
+        RegionRef region,
         String instanceType,
         PCUProvisionType provisionType,
         Integer min,

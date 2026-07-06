@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -44,7 +44,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         Optional<Path> dsBulkConfigPath();
         List<String> extraArgs();
         AstraToken token();
-        Optional<RegionName> region();
+        Optional<RegionRef> region();
     }
 
     protected abstract List<String> buildCommandLine();
@@ -88,7 +88,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         );
     }
 
-    protected Path downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
+    protected Path downloadSCB(DbRef dbRef, Optional<RegionRef> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(

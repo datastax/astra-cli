@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
@@ -50,7 +50,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
         description = "The region to use",
         paramLabel = $Regions.LABEL
     )
-    protected Optional<RegionName> $region;
+    protected Optional<String> $regionName;
 
     @Option(
         names = { $Collection.LONG, $Collection.SHORT },
@@ -157,10 +157,12 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
     @Override
     protected Operation<DataAPIExecResult> mkOperation() {
+        val regionRef = RegionRef.mustParse($dbRef, $regionName);
+
         return new DbDataAPIExecOperation(ctx, dbGateway, new DbDataAPIExecRequest(
             $language,
             $dbRef,
-            $region,
+            regionRef,
             $keyspaceRef,
             $collectionNames,
             $tableNames,

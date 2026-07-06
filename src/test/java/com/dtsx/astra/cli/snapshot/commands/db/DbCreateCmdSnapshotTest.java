@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.snapshot.commands.db;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -37,9 +37,9 @@ public class DbCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
                 when(mock.findCloudForRegion(any(), any(), anyBoolean())).thenReturn(CloudProvider.AWS);
             })
             .verify((mocks) -> {
-                verify(mocks.regionGateway()).findCloudForRegion(Optional.empty(), RegionName.mkUnsafe("us-east-1"), true);
+                verify(mocks.regionGateway()).findCloudForRegion(Optional.empty(), RegionRef.mkUnsafe("us-east-1"), true);
 
-                verify(mocks.dbGateway()).create(Databases.NameRef.toString(), "default_keyspace", RegionName.mkUnsafe("us-east-1"), CloudProvider.AWS, "serverless", 1, true, allowDuplicates);
+                verify(mocks.dbGateway()).create(Databases.NameRef.toString(), "default_keyspace", RegionRef.mkUnsafe("us-east-1"), CloudProvider.AWS, "serverless", 1, true, allowDuplicates);
             });
     }
 

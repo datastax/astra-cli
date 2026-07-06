@@ -3,10 +3,7 @@ package com.dtsx.astra.cli.utils;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.RegionNotFoundException;
-import com.dtsx.astra.cli.core.models.DatacenterId;
-import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.PcuAssocTarget;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
@@ -18,8 +15,8 @@ import java.util.Optional;
 
 @UtilityClass
 public class DbUtils {
-    public static Datacenter resolveDatacenter(Database db, Optional<RegionName> maybeRegionName) {
-        val regionName = maybeRegionName.orElse(RegionName.mkUnsafe(db.getInfo().getRegion()));
+    public static Datacenter resolveDatacenter(Database db, Optional<RegionRef> maybeRegionName) {
+        val regionName = maybeRegionName.orElse(RegionRef.mkUnsafe(db.getInfo().getRegion()));
 
         return db.getInfo().getDatacenters().stream()
             .sorted(Comparator.comparing(Datacenter::getId))
@@ -28,8 +25,8 @@ public class DbUtils {
             .orElseThrow(() -> new RegionNotFoundException(DbRef.fromNameUnsafe(db.getInfo().getName()), regionName));
     }
 
-    public static RegionName resolveRegionName(Database db, Optional<RegionName> maybeRegionName) {
-        return RegionName.mkUnsafe(resolveDatacenter(db, maybeRegionName).getRegion());
+    public static RegionRef resolveRegionName(Database db, Optional<RegionRef> maybeRegionName) {
+        return RegionRef.mkUnsafe(resolveDatacenter(db, maybeRegionName).getRegion());
     }
 
     public static DatacenterId resolvePcuAssocTarget(DbGateway dbGateway, PcuAssocTarget pcuAssocTarget) {

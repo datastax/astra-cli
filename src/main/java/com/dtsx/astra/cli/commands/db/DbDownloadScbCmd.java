@@ -3,11 +3,10 @@ package com.dtsx.astra.cli.commands.db;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDownloadScbOperation;
-
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbDownloadScbOperation.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
@@ -48,7 +46,7 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
         description = "The cloud provider region to target. Defaults to the default region of the database.",
         paramLabel = $Regions.LABEL
     )
-    public Optional<RegionName> $region;
+    public Optional<String> $regionName;
 
     @Option(
         names = { "-f", "--file" },
@@ -60,10 +58,11 @@ public class DbDownloadScbCmd extends AbstractPromptForDbCmd<DownloadScbResult> 
     @Override
     protected DbDownloadScbOperation mkOperation() {
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
+        val regionRef = RegionRef.mustParse($dbRef, $regionName);
 
         return new DbDownloadScbOperation(dbGateway, downloadsGateway, new DbDownloadScbRequest(
             $dbRef,
-            $region,
+            regionRef,
             $destination
         ));
     }

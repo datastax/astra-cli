@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.operations.db.dsbulk;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkCountOperation.CountRequest;
@@ -26,7 +26,7 @@ public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequ
         Optional<Path> dsBulkConfigPath,
         List<String> extraArgs,
         AstraToken token,
-        Optional<RegionName> region
+        Optional<RegionRef> region
     ) implements CoreDsbulkOptions {}
 
     public DbDsbulkCountOperation(CliContext ctx, DbGateway dbGateway, DownloadsGateway downloadsGateway, CountRequest request) {

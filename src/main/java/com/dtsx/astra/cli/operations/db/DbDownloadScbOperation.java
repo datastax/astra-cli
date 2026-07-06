@@ -1,8 +1,7 @@
 package com.dtsx.astra.cli.operations.db;
 
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -35,7 +34,7 @@ public class DbDownloadScbOperation implements Operation<DownloadScbResult> {
 
     public record DbDownloadScbRequest(
         DbRef dbRef,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         Optional<Path> destination
     ) {}
 

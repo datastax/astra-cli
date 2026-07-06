@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.commands.db.endpoints;
 
 import com.dtsx.astra.cli.commands.db.AbstractPromptForDbCmd;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
@@ -22,7 +22,7 @@ public abstract class EndpointsListImpl extends AbstractPromptForDbCmd<EndpointG
         description = "The region to use",
         paramLabel = $Regions.LABEL
     )
-    protected Optional<RegionName> region;
+    protected Optional<String> $regionName;
 
     @Override
     protected OutputAll execute(Supplier<EndpointGetResponse> result) {
@@ -37,7 +37,8 @@ public abstract class EndpointsListImpl extends AbstractPromptForDbCmd<EndpointG
 
     @Override
     protected final Operation<EndpointGetResponse> mkOperation() {
-        return new EndpointGetOperation(dbGateway, new EndpointGetRequest($dbRef, region, profile().env()));
+        val regionRef = RegionRef.mustParse($dbRef, $regionName);
+        return new EndpointGetOperation(dbGateway, new EndpointGetRequest($dbRef, regionRef, profile().env()));
     }
 
     @Override

@@ -1,10 +1,7 @@
 package com.dtsx.astra.cli.operations.streaming;
 
 import com.dtsx.astra.cli.commands.streaming.StreamingGetCmd.StreamingGetKeys;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.cli.core.models.TenantName;
-import com.dtsx.astra.cli.core.models.TenantStatus;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.streaming.StreamingGetOperation.StreamingInfo;
@@ -29,7 +26,7 @@ public class StreamingGetOperation implements Operation<StreamingInfo> {
     public record StreamingInfoFull(
         TenantStatus status,
         CloudProvider cloud,
-        RegionName region,
+        RegionRef region,
         String clusterName,
         String pulsarVersion,
         String jvmVersion,
@@ -86,7 +83,7 @@ public class StreamingGetOperation implements Operation<StreamingInfo> {
         return CloudProvider.fromString(tenant.getCloudProvider());
     }
 
-    private RegionName region(Tenant tenant) {
-        return RegionName.mkUnsafe(tenant.getCloudRegion());
+    private RegionRef region(Tenant tenant) {
+        return RegionRef.mkUnsafe(tenant.getCloudRegion());
     }
 }

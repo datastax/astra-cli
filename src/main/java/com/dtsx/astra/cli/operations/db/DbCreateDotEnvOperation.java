@@ -2,12 +2,11 @@ package com.dtsx.astra.cli.operations.db;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.Profile;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.KeyspaceNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
 import com.dtsx.astra.cli.core.parsers.env.EnvParseException;
 import com.dtsx.astra.cli.core.parsers.env.ast.EnvComment;
@@ -28,7 +27,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -49,7 +51,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         Profile profile,
         DbRef dbRef,
         Optional<KeyspaceRef> ksRef,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         Optional<Path> file,
         boolean print,
         Set<EnvKey> keys,
@@ -211,7 +213,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
 
     private @Nullable Organization cachedOrg;
     private @Nullable Database cachedDb;
-    private @Nullable RegionName cachedRegion;
+    private @Nullable RegionRef cachedRegion;
     private @Nullable String cachedKeyspace;
 
     private Organization org() {
@@ -228,7 +230,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
         return cachedDb;
     }
 
-    private RegionName resolveRegion(CreateDotEnvRequest request) {
+    private RegionRef resolveRegion(CreateDotEnvRequest request) {
         if (cachedRegion == null) {
             cachedRegion = DbUtils.resolveRegionName(db(request), request.region);
         }
@@ -249,9 +251,7 @@ public class DbCreateDotEnvOperation implements Operation<CreateDotEnvResult> {
     }
 
     private Path downloadAndResolveScbPath(CreateDotEnvRequest request) {
-        val dbName = db(request).getInfo().getName();
         val datacenter = resolveDatacenter(request);
-
         return downloadsGateway.downloadCloudSecureBundles(request.dbRef, List.of(datacenter)).getFirst();
     }
 

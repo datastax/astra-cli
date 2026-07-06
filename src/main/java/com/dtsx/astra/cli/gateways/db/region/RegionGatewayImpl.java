@@ -6,9 +6,12 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
-import com.dtsx.astra.sdk.db.domain.*;
+import com.dtsx.astra.sdk.db.domain.DatabaseRegionServerless;
+import com.dtsx.astra.sdk.db.domain.Datacenter;
+import com.dtsx.astra.sdk.db.domain.FilterByOrgType;
+import com.dtsx.astra.sdk.db.domain.RegionType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -91,7 +94,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public CreationStatus<RegionName> create(DbRef ref, RegionName region, String tier, CloudProvider cp) {
+    public CreationStatus<RegionRef> create(DbRef ref, RegionRef region, String tier, CloudProvider cp) {
         val exists = existsInDb(ref, region);
 
         if (exists) {
@@ -107,7 +110,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public DeletionStatus<RegionName> delete(DbRef ref, RegionName region) {
+    public DeletionStatus<RegionRef> delete(DbRef ref, RegionRef region) {
         val exists = existsInDb(ref, region);
 
         if (!exists) {
@@ -123,7 +126,7 @@ public class RegionGatewayImpl implements RegionGateway {
     }
 
     @Override
-    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region, boolean vectorOnly) {
+    public CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionRef region, boolean vectorOnly) {
         val cloudRegions = findAllServerless(vectorOnly, false);
 
         if (cloud.isPresent()) {
@@ -157,7 +160,7 @@ public class RegionGatewayImpl implements RegionGateway {
         };
     }
 
-    private boolean existsInDb(DbRef dbRef, RegionName region) {
+    private boolean existsInDb(DbRef dbRef, RegionRef region) {
         return ctx.log().loading("Checking if region " + ctx.highlight(region) + " exists in db " + ctx.highlight(dbRef), (_) -> (
             findAllForDb(dbRef).stream().anyMatch(dc -> dc.getRegion().equalsIgnoreCase(region.unwrap()))
         ));

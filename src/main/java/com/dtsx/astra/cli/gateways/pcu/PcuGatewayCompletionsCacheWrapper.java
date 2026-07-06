@@ -3,10 +3,7 @@ package com.dtsx.astra.cli.gateways.pcu;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.PcuRef;
-import com.dtsx.astra.cli.core.models.PcuStatus;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupCreationRequest;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupUpdateRequest;
@@ -33,7 +30,7 @@ public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     }
 
     @Override
-    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionName> region) {
+    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region) {
         return delegate.listPcuTypes(provider, region);
     }
 

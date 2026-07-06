@@ -18,34 +18,43 @@ import java.util.Optional;
 public class RegionRef implements Highlightable {
     private final String name;
 
-    public static Either<String, Optional<RegionRef>> parse(@NonNull DbRef dbRef, Optional<String> maybeName) {
-        var name = Optional.<String>empty();
-
-        if (dbRef.hasPreferredRegion()) {
-            name = dbRef.preferredRegion();
-        }
-
+    public static Either<String, Optional<RegionRef>> parse(@Nullable DbRef dbRef, Optional<String> maybeName) {
         if (maybeName.isPresent()) {
-            name = maybeName;
+            return parse(maybeName.get()).map(Optional::of);
         }
 
-        if (name.isEmpty()) {
-            return Either.pure(Optional.empty());
+        if (dbRef != null) {
+            return Either.pure(dbRef.preferredRegion());
         }
 
-        if (ModelUtils.trim(name.get()).isBlank()) {
+        return Either.pure(Optional.empty());
+    }
+
+    // Intentionally not registered as a type converter to prevent forgetting
+    // that you should use the DbRef version of this method whenever possible
+    public static Either<String, RegionRef> parse(String name) {
+        if (ModelUtils.trim(name).isBlank()) {
             return Either.left("Region should not be blank or empty. Use one of the `${cli.name} db list-regions-*` commands to see available regions.");
         }
 
-        return ModelUtils.trimAndValidateBasics("Region", name.get())
-            .map(RegionRef::new)
-            .map(Optional::of);
+        return ModelUtils.trimAndValidateBasics("Region", name)
+            .map(RegionRef::mkUnsafe);
     }
 
-    public static Optional<RegionRef> mustParse(@NonNull DbRef dbRef, @Nullable String name) {
-        return parse(dbRef, Optional.ofNullable(name)).getRight((err -> {
+    public static Optional<RegionRef> mustParse(@Nullable DbRef dbRef, Optional<String> name) {
+        return parse(dbRef, name).getRight((err -> {
             throw new OptionValidationException("region name", err);
         }));
+    }
+
+    public static RegionRef mustParse(String name) {
+        return parse(name).getRight((err -> {
+            throw new OptionValidationException("region name", err);
+        }));
+    }
+
+    public static RegionRef mkUnsafe(@NonNull String name) {
+        return new RegionRef(name);
     }
 
     @JsonValue

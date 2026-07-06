@@ -124,7 +124,7 @@ public class DbGatewayImpl implements DbGateway {
     }
 
     @Override
-    public CreationStatus<Database> create(String name, String keyspace, RegionName region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
+    public CreationStatus<Database> create(String name, String keyspace, RegionRef region, CloudProvider cloud, String tier, int capacityUnits, boolean vector, boolean allowDuplicate) {
         if (!allowDuplicate) {
             val existingDb = ctx.log().loading("Checking if database " + ctx.highlight(name) + " already exists", (_) -> (
                 tryFindOne(DbRef.fromNameUnsafe(name))

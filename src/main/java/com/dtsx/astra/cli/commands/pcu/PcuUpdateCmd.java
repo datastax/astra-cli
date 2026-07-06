@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuStatus;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.sdk.pcu.domain.PCUProvisionType;
@@ -68,7 +68,7 @@ public class PcuUpdateCmd extends AbstractPromptForPcuCmd<PcuUpdateResult> {
             description = "Cloud region this PCU will work in. @|bold Use one of the `${cli.name} db list-regions-*` commands to see available regions.|@",
             paramLabel = $Regions.LABEL
         )
-        public Optional<RegionName> region;
+        public Optional<String> regionName;
 
         @Option(
             names = { "--description", "-d" },
@@ -129,7 +129,7 @@ public class PcuUpdateCmd extends AbstractPromptForPcuCmd<PcuUpdateResult> {
             $pcuUpdateOptions.title,
             $pcuUpdateOptions.description,
             $pcuUpdateOptions.cloud,
-            $pcuUpdateOptions.region,
+            $pcuUpdateOptions.regionName.map(RegionRef::mustParse),
             $pcuUpdateOptions.min,
             $pcuUpdateOptions.max,
             $pcuUpdateOptions.reserved,

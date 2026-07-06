@@ -20,31 +20,35 @@ public class DbRef implements Highlightable {
     private final Either<UUID, String> ref;
 
     @Getter
-    private final Optional<String> preferredRegion;
+    private final Optional<RegionRef> preferredRegion;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
-        return ModelUtils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
+        return ModelUtils.trimAndValidateBasics("Database name/id/endpoint", ref).flatMap((trimmed) -> {
             try {
                 val endpoint = AstraApiEndpoint.parse(trimmed);
-                return Either.pure(new DbRef(Either.left(endpoint.getDatabaseId())));
+
+                val id = endpoint.getDatabaseId();
+                val region = RegionRef.mkUnsafe(endpoint.getDatabaseRegion());
+
+                return Either.pure(new DbRef(Either.left(id), Optional.of(region)));
             } catch (Exception e) {
                 // not a valid Astra endpoint URL, fall through
             }
 
             try {
-                return Either.pure(new DbRef(Either.left(UUID.fromString(trimmed))));
+                return Either.pure(new DbRef(Either.left(UUID.fromString(trimmed)), Optional.empty()));
             } catch (IllegalArgumentException e) {
-                return Either.pure(new DbRef(Either.pure(trimmed)));
+                return Either.pure(new DbRef(Either.pure(trimmed), Optional.empty()));
             }
         });
     }
 
     public static DbRef fromNameUnsafe(@NonNull String name) {
-        return new DbRef(Either.pure(name));
+        return new DbRef(Either.pure(name), Optional.empty());
     }
 
     public static DbRef fromId(@NonNull UUID id) {
-        return new DbRef(Either.left(id));
+        return new DbRef(Either.left(id), Optional.empty());
     }
 
     public boolean isId() {
@@ -53,10 +57,6 @@ public class DbRef implements Highlightable {
 
     public boolean isName() {
         return ref.isRight();
-    }
-
-    public boolean hasPreferredRegion() {
-        return preferredRegion.isPresent();
     }
 
     public <T> T fold(Function<UUID, T> idMapper, Function<String, T> nameMapper) {

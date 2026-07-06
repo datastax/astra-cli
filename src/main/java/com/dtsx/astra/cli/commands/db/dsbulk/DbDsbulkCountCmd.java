@@ -61,7 +61,7 @@ public class DbDsbulkCountCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $configFile,
             $flags(),
             profile().token(),
-            $region
+            $region()
         ));
     }
 }

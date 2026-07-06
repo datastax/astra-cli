@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.operations.streaming;
 
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.models.TenantStatus;
 import com.dtsx.astra.cli.gateways.streaming.StreamingGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -18,7 +18,7 @@ public class StreamingListOperation implements Operation<Stream<TenantInfo>> {
     public record TenantInfo(
         String name,
         CloudProvider cloud,
-        RegionName region,
+        RegionRef region,
         TenantStatus status,
         Tenant raw
     ) {}
@@ -28,7 +28,7 @@ public class StreamingListOperation implements Operation<Stream<TenantInfo>> {
         return streamingGateway.findAll().map((raw) -> new TenantInfo(
             raw.getTenantName(),
             CloudProvider.fromString(raw.getCloudProvider()),
-            RegionName.mkUnsafe(raw.getCloudRegion()),
+            RegionRef.mkUnsafe(raw.getCloudRegion()),
             TenantStatus.mkUnsafe(raw.getStatus()),
             raw
         ));

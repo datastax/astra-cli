@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation;
@@ -93,7 +93,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
         description = "The region to use. Uses the db's default region if not specified.",
         paramLabel = $Regions.LABEL
     )
-    private Optional<RegionName> $region;
+    private Optional<String> $regionName;
 
     @ArgGroup
     private @Nullable Keys $keysGroup;
@@ -181,6 +181,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
     @Override
     protected DbCreateDotEnvOperation mkOperation() {
         val ksRef = $keyspaceName.map(ks -> KeyspaceRef.mustParse($dbRef, ks));
+        val regionRef = RegionRef.mustParse($dbRef, $regionName);
 
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
         val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
@@ -189,7 +190,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
             profile(),
             $dbRef,
             ksRef,
-            $region,
+            regionRef,
             $file,
             $print,
             resolveKeys(),

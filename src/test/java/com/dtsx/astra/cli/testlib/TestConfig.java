@@ -3,7 +3,7 @@ package com.dtsx.astra.cli.testlib;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.val;
@@ -42,11 +42,11 @@ public class TestConfig {
         ));
     }
 
-    public static RegionName dbRegion() {
+    public static RegionRef dbRegion() {
         val hostname = apiEndpoint().replaceFirst("https?://", "");
         val matcher = DB_COMPONENTS_REGEX.matcher(hostname);
 
-        return RegionName.mkUnsafe(
+        return RegionRef.mkUnsafe(
             matcher.find()
                 ? matcher.group(2).toLowerCase()
                 : "*error*"

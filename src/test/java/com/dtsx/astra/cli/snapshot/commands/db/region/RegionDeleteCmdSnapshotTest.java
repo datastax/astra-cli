@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.snapshot.commands.db.region;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -29,7 +29,7 @@ public class RegionDeleteCmdSnapshotTest extends BaseCmdSnapshotTest {
             verify(mocks.regionGateway()).delete(any(), any());
         });
 
-    private SnapshotTestOptionsModifier deleteRegion(Function<RegionName, DeletionStatus<RegionName>> lift) {
+    private SnapshotTestOptionsModifier deleteRegion(Function<RegionRef, DeletionStatus<RegionRef>> lift) {
         return (o) -> o
             .gateway(RegionGateway.class, (mock) -> {
                 doReturn(lift.apply(Regions.NAME)).when(mock).delete(any(), any());
