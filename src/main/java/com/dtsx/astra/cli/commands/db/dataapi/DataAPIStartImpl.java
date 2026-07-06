@@ -9,7 +9,6 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.ExitCode;
-import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.prompters.specific.CollectionNamePrompter;
@@ -17,6 +16,7 @@ import com.dtsx.astra.cli.core.output.prompters.specific.TableNamePrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation.*;
+import com.dtsx.astra.cli.utils.CliUtils;
 import com.dtsx.astra.cli.utils.CollectionUtils;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
@@ -74,7 +74,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
     @Parameters(
         paramLabel = "ARGS",
-        description = "Verbatim arguments to pass to the underlying node/python (anything after '--' is passed through)"
+        description = "Verbatim arguments to pass to the underlying node/python directly (anything after '--' is passed through)"
     )
     public List<String> $extraArgs = List.of();
 
@@ -91,19 +91,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             ctx.log().warn("${cli.name} db data-api commands are still in beta and may change without notice.");
         }
 
-        if (!$extraArgs.isEmpty()) {
-            if ($extraArgs.getFirst().trim().startsWith("-")) {
-                throw new AstraCliException(ExitCode.VALIDATION_ISSUE, """
-                  @|bold,red Database must explicitly be passed as the first positional argument when using extra flags after '--'|@
-            
-                  @|italic Note: if you really have a database name that starts with a dash which triggered this check, pass the db's ID instead (which you can get with @!${cli.name} db list!@).|@
-                """, List.of(
-                    new Hint("Example usage", "${cli.name} db data-api repl my_db -- -p --trace-warnings")
-                ));
-            }
-
-            $extraArgs.removeFirst();
-        }
+        $extraArgs = CliUtils.removeDbFromExtraArgs($extraArgs, "db data-api repl my_db -- -p --trace-warnings");
 
         val numPromptForColls = $collectionNames.stream().filter("__prompt__"::equals).count();
         val numPromptForTables = $tableNames.stream().filter("__prompt__"::equals).count();

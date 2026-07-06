@@ -14,6 +14,7 @@ import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExe
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.ExecSource;
+import com.dtsx.astra.cli.utils.CliUtils;
 import lombok.val;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
@@ -23,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
@@ -66,11 +68,19 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     )
     private Optional<RegionName> $region;
 
+    @Parameters(
+        paramLabel = "ARGS",
+        description = "Verbatim arguments to pass to cqlsh directly (anything after '--' is passed through)"
+    )
+    public List<String> $extraArgs = List.of();
+
     protected abstract Optional<ExecSource> execSource();
 
     @Override
     protected void prelude() {
         super.prelude();
+
+        $extraArgs = CliUtils.removeDbFromExtraArgs($extraArgs, "astra db cqlsh start my_db -- --key1 value1 --key2");
 
         if ($dbRef.isPresent() && $scb.isPresent()) {
             throw new ParameterException(spec.commandLine(), "Cannot use both a database name/ID and a secure connect bundle. Please choose one method of authentication.");

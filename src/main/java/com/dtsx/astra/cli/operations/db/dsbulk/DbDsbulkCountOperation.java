@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
@@ -13,7 +12,6 @@ import lombok.val;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequest> {
@@ -26,7 +24,7 @@ public class DbDsbulkCountOperation extends AbstractDsbulkExeOperation<CountRequ
         String maxConcurrentQueries,
         String logDir,
         Optional<Path> dsBulkConfigPath,
-        Map<String, String> dsBulkConfigMap,
+        List<String> extraArgs,
         AstraToken token,
         Optional<RegionName> region
     ) implements CoreDsbulkOptions {}

@@ -8,13 +8,15 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
+import com.dtsx.astra.cli.utils.CliUtils;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -85,14 +87,13 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         paramLabel = "FLAGS",
         mapFallbackValue = Option.NULL_VALUE
     )
-    public Map<String, String> $newFlags;
+    public Map<String, String> $legacyExtraArgs = Map.of();
 
-    @Option(
-        names = { "--dsbulk-flags" },
-        mapFallbackValue = Option.NULL_VALUE,
-        hidden = true
+    @Parameters(
+        paramLabel = "ARGS",
+        description = "Verbatim arguments to pass to dsbulk directly (anything after '--' is passed through)"
     )
-    public Map<String, String> $legacyFlags;
+    public List<String> $extraArgs = List.of();
 
     public DbRef $dbRef;
 
@@ -106,18 +107,23 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         ));
     }
 
-    protected Map<String, String> $flags() {
-        val allFlags = new HashMap<String, String>();
+    protected List<String> $flags() {
+        val allArgs = new ArrayList<String>();
 
-        if ($newFlags != null && !$newFlags.isEmpty()) { // TODO can this be null
-            allFlags.putAll($newFlags);
-        }
-
-        if ($legacyFlags != null && !$legacyFlags.isEmpty()) {
+        if (!$legacyExtraArgs.isEmpty()) {
             ctx.log().warn("The @!--dsbulk-flags!@ option is deprecated. Please use @!--dsbulk-flag/-F!@ instead as a direct replacement.");
-            allFlags.putAll($legacyFlags);
+
+            $legacyExtraArgs.forEach((k, v) -> {
+                allArgs.add(k);
+                if (v != null) {
+                    allArgs.add(v);
+                }
+            });
         }
 
-        return allFlags;
+        $extraArgs = CliUtils.removeDbFromExtraArgs($extraArgs, "db dsbulk <cmd> -- --key1 value1 --key2");
+        allArgs.addAll($extraArgs);
+
+        return allArgs;
     }
 }
