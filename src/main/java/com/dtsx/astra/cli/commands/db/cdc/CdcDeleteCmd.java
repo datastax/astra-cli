@@ -166,15 +166,9 @@ public class CdcDeleteCmd extends AbstractCdcCmd<CdcDeleteResult> {
             });
             return CdcRef.fromId($dbRef, cdcId);
         } else {
-            val keyspaceRef = KeyspaceRef.parse($dbRef, $cdcIdentifier.tableTenant.keyspace).getRight((msg) -> {
-                throw new OptionValidationException("keyspace", msg);
-            });
-            val tableRef = TableRef.parse(keyspaceRef, $cdcIdentifier.tableTenant.table).getRight((msg) -> {
-                throw new OptionValidationException("table", msg);
-            });
-            val tenantName = TenantName.parse($cdcIdentifier.tableTenant.tenant).getRight((msg) -> {
-                throw new OptionValidationException("tenant", msg);
-            });
+            val keyspaceRef = KeyspaceRef.mustParse($dbRef, $cdcIdentifier.tableTenant.keyspace);
+            val tableRef = TableRef.mustParse(keyspaceRef, $cdcIdentifier.tableTenant.table);
+            val tenantName = TenantName.mustParse($cdcIdentifier.tableTenant.tenant);
             return CdcRef.fromDefinition(tableRef, tenantName);
         }
     }

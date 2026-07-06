@@ -73,20 +73,15 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
 
     @Override
     protected DotEnvOperation mkOperation() {
-        val ksRef = $keyspace.map(ks -> KeyspaceRef.parse($dbRef, ks).fold(
-            err -> {
-                throw new AstraCliException(ExitCode.VALIDATION_ISSUE, "keyspace " + err);
-            },
-            Function.identity()
-        ));
-
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
         val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
+
+        Function<DbRef, Optional<KeyspaceRef>> mkKsRef = (dbRef) -> $keyspace.map(ks -> KeyspaceRef.mustParse(dbRef, ks));
 
         return new DotEnvOperation(ctx, dbGateway, orgGateway, downloadsGateway, new DotEnvRequest(
             profile(),
             $dbRef,
-            ksRef,
+            mkKsRef,
             $region,
             $file,
             isPrint(),

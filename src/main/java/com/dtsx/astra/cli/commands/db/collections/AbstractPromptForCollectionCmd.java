@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.CliConstants.$Collection;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import com.dtsx.astra.cli.core.output.prompters.specific.CollectionNamePrompter;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -21,14 +20,10 @@ public abstract class AbstractPromptForCollectionCmd<OpRes> extends AbstractColl
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-
         if (collectionName == null) {
             collectionName = CollectionNamePrompter.prompt(ctx, collectionGateway, $keyspaceRef, collectionPrompt(), originalArgs());
         }
-
-        this.$collRef = CollectionRef.parse($keyspaceRef, collectionName).getRight((msg) -> {
-            throw new OptionValidationException("collection name", msg);
-        });
+        this.$collRef = CollectionRef.mustParse($keyspaceRef, collectionName);
     }
 
     protected abstract String collectionPrompt();

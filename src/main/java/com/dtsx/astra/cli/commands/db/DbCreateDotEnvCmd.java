@@ -2,15 +2,12 @@ package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.RegionName;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -24,11 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -91,7 +86,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
         description = "The keyspace to use. Uses the db's default keyspace if not specified.",
         paramLabel = $Keyspace.LABEL
     )
-    private Optional<String> $keyspace;
+    private Optional<String> $keyspaceName;
 
     @Option(
         names = { $Regions.LONG, $Regions.SHORT },
@@ -185,10 +180,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
     @Override
     protected DbCreateDotEnvOperation mkOperation() {
-        val ksRef = $keyspace.map(ks -> KeyspaceRef.parse($dbRef, ks).fold(
-            err -> { throw new OptionValidationException("keyspace", err); },
-            Function.identity()
-        ));
+        val ksRef = $keyspaceName.map(ks -> KeyspaceRef.mustParse($dbRef, ks));
 
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
         val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());

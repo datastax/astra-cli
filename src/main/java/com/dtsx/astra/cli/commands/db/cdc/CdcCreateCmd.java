@@ -4,7 +4,6 @@ import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.CliConstants.$Tenant;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
 import com.dtsx.astra.cli.core.models.TableRef;
@@ -49,7 +48,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
         defaultValue = $Keyspace.DEFAULT,
         paramLabel = $Keyspace.LABEL
     )
-    public String $keyspace;
+    public String $keyspaceName;
 
     @Option(
         names = { $Table.LONG },
@@ -157,12 +156,7 @@ public class CdcCreateCmd extends AbstractCdcCmd<CdcCreateResult> {
     }
 
     private TableRef tableRef() {
-        val keyspaceRef = KeyspaceRef.parse($dbRef, $keyspace).getRight((msg) -> {
-            throw new OptionValidationException("keyspace", msg);
-        });
-
-        return TableRef.parse(keyspaceRef, $table).getRight((msg) -> {
-            throw new OptionValidationException("table", msg);
-        });
+        val keyspaceRef = KeyspaceRef.mustParse($dbRef, $keyspaceName);
+        return TableRef.mustParse(keyspaceRef, $table);
     }
 }

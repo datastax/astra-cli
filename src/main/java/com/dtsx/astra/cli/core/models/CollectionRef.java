@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
@@ -12,13 +13,19 @@ public class CollectionRef implements Highlightable {
     private final String name;
     private final KeyspaceRef ksRef;
 
-    public static Either<String, CollectionRef> parse(@NonNull KeyspaceRef keyspace, @NonNull String name) {
+    public static Either<String, CollectionRef> parse(@NonNull KeyspaceRef ksRef, @NonNull String name) {
         return ModelUtils.trimAndValidateBasics("Collection name", name)
-            .map((trimmed) -> new CollectionRef(trimmed, keyspace));
+            .map((trimmed) -> new CollectionRef(trimmed, ksRef));
     }
 
-    public static CollectionRef mkUnsafe(@NonNull KeyspaceRef keyspace, @NonNull String name) {
-        return new CollectionRef(name, keyspace);
+    public static CollectionRef mustParse(@NonNull KeyspaceRef ksRef, @NonNull String name) {
+        return parse(ksRef, name).getRight((err) -> {
+            throw new OptionValidationException("collection", err);
+        });
+    }
+
+    public static CollectionRef mkUnsafe(@NonNull KeyspaceRef ksRef, @NonNull String name) {
+        return new CollectionRef(name, ksRef);
     }
 
     @JsonValue

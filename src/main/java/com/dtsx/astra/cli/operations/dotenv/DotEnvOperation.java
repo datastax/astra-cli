@@ -44,7 +44,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
     public record DotEnvRequest(
         Profile profile,
         @Nullable DbRef dbRef,
-        Optional<KeyspaceRef> ksRef,
+        Function<DbRef, Optional<KeyspaceRef>> mkKsRef,
         Optional<RegionName> region,
         Optional<Path> file,
         boolean print,
@@ -240,7 +240,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
 
     private String resolveKeyspace(DotEnvRequest request, DbRef dbRef) {
         if (cachedKeyspace == null) {
-            cachedKeyspace = request.ksRef
+            cachedKeyspace = request.mkKsRef.apply(dbRef)
                 .map(ks -> Optional.ofNullable(db(dbRef).getInfo().getKeyspaces()).orElse(Set.of()).stream()
                     .filter(ks.name()::equalsIgnoreCase)
                     .findFirst()

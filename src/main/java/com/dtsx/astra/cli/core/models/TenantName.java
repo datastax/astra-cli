@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
@@ -13,6 +14,12 @@ public class TenantName implements Highlightable {
 
     public static Either<String, TenantName> parse(@NonNull String name) {
         return ModelUtils.trimAndValidateBasics("Tenant name", name).map(TenantName::mkUnsafe);
+    }
+
+    public static TenantName mustParse(@NonNull String name) {
+        return parse(name).getRight((err) -> {
+            throw new OptionValidationException("tenant", err);
+        });
     }
 
     public static TenantName mkUnsafe(@NonNull String name) {

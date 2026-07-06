@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -17,6 +18,9 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class DbRef implements Highlightable {
     private final Either<UUID, String> ref;
+
+    @Getter
+    private final Optional<String> preferredRegion;
 
     public static Either<String, DbRef> parse(@NonNull String ref) {
         return ModelUtils.trimAndValidateBasics("Database name/id", ref).flatMap((trimmed) -> {
@@ -49,6 +53,10 @@ public class DbRef implements Highlightable {
 
     public boolean isName() {
         return ref.isRight();
+    }
+
+    public boolean hasPreferredRegion() {
+        return preferredRegion.isPresent();
     }
 
     public <T> T fold(Function<UUID, T> idMapper, Function<String, T> nameMapper) {
