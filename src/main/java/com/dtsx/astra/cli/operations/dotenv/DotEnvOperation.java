@@ -140,7 +140,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
             case ASTRA_DB_NAME -> db(dbRef).getInfo().getName();
             case ASTRA_DB_REGION -> resolveRegion(request, dbRef).unwrap();
             case ASTRA_DB_KEYSPACE -> resolveKeyspace(request, dbRef);
-            case ASTRA_DB_APPLICATION_TOKEN -> request.profile.token().unsafeUnwrap();
+            case ASTRA_DB_TOKEN -> request.profile.token().unsafeUnwrap();
             case ASTRA_DB_ENVIRONMENT -> request.profile.env().name().toLowerCase();
 
             case ASTRA_DB_SECURE_BUNDLE_PATH -> Optional.ofNullable(scbPath).map(Path::toString).orElse(null);

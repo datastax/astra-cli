@@ -39,7 +39,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Create a .env file specifying the keys to include",
-    command = "${cli.name} db create-dotenv --keys ASTRA_DB_APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT"
+    command = "${cli.name} db create-dotenv --keys ASTRA_DB_TOKEN,ASTRA_DB_API_ENDPOINT"
 )
 @Example(
     comment = "Create a .env file with a preset specifying the keys to include",
@@ -117,7 +117,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
         @RequiredArgsConstructor
         enum Preset {
-            data_api_client(Set.of(EnvKey.ASTRA_DB_APPLICATION_TOKEN, EnvKey.ASTRA_DB_API_ENDPOINT, EnvKey.ASTRA_DB_ENVIRONMENT));
+            data_api_client(Set.of(EnvKey.ASTRA_DB_TOKEN, EnvKey.ASTRA_DB_API_ENDPOINT, EnvKey.ASTRA_DB_ENVIRONMENT));
 
             @Getter
             private final Set<EnvKey> keys;

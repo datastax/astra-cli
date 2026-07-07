@@ -19,7 +19,7 @@ stdout:     "key" : "ASTRA_DB_REGION"
 stdout:   }, {
 stdout:     "key" : "ASTRA_DB_KEYSPACE"
 stdout:   }, {
-stdout:     "key" : "ASTRA_DB_APPLICATION_TOKEN"
+stdout:     "key" : "ASTRA_DB_TOKEN"
 stdout:   }, {
 stdout:     "key" : "ASTRA_DB_ENVIRONMENT"
 stdout:   }, {
