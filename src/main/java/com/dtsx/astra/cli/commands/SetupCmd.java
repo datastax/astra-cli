@@ -289,7 +289,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             .dontClearAfterSelection();
     }
 
-    private Boolean promptShouldSetDefault() {
+    private boolean promptShouldSetDefault() {
         val prompt = """
           @|bold A default profile already exists.|@
         
