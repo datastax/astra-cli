@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesNoDefaultCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -41,7 +41,7 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
         index = "0",
         arity = "0..1",
         description = "Name of the profile to rename",
-        completionCandidates = AvailableProfilesCompletion.class,
+        completionCandidates = AvailableProfilesNoDefaultCompletion.class,
         paramLabel = $Profile.LABEL
     )
     public Optional<ProfileName> $oldProfileName;
