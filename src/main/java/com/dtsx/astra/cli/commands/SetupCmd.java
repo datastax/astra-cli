@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Token;
 import com.dtsx.astra.cli.core.completions.impls.AstraEnvCompletion;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
@@ -13,16 +14,19 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.SetupOperation;
 import com.dtsx.astra.cli.operations.SetupOperation.*;
 import com.dtsx.astra.cli.utils.StringUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
+import org.graalvm.collections.Pair;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -31,9 +35,9 @@ import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
-import static com.dtsx.astra.cli.utils.StringUtils.*;
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
+import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 
-// TODO mention how to setup autocomplete
 @Command(
     name = "setup",
     description = {
@@ -75,6 +79,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             case ProfileCreated pc -> handleProfileCreated(pc);
             case SameProfileAlreadyExists pe -> handleSameProfileAlreadyExists(pe);
             case InvalidToken(var hint) -> throwInvalidToken(hint);
+            case ExplainAutocomplete _ -> explainAutocomplete();
         };
     }
 
@@ -146,6 +151,20 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         """);
     }
 
+    public OutputHuman explainAutocomplete() {
+        return OutputHuman.response("""
+          @|bold The Astra CLI can generate shell completions for bash and zsh.|@
+        
+          To set up shell completions, add the following to your shell profile:
+        
+            @|code eval "$(${cli.path} shellenv)"|@
+        
+          Then restart your shell or source your profile.
+        
+          You can run @'!${cli.name} shellenv -h!@ for additional configuration you can apply.
+        """);
+    }
+
     @Override
     protected Operation<SetupResult> mkOperation() {
         return new SetupOperation(
@@ -157,7 +176,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
                 $env,
                 $name,
                 this::assertShouldSetup,
-                this::assertShouldContinueIfAlreadySetup,
+                this::promptForNextActionIfExistingUser,
                 this::assertShouldOverwriteExistingProfile,
                 this::promptForToken,
                 this::promptForEnv,
@@ -167,15 +186,54 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         );
     }
 
-    private void assertShouldSetup(Path existing) {
-        assertShouldSetup(existing, true);
+    private void assertShouldSetup(Path config) {
+        printShouldSetupHeader(config, true, mkArgsAddendum());
+        ctx.console().unsafeReadLine(ctx.colors().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "), false);
+        ctx.console().println();
     }
 
-    private void assertShouldContinueIfAlreadySetup(Path existing) {
-        assertShouldSetup(existing, false);
+    private String mkArgsAddendum() {
+        if ($env.isEmpty() && $token.isEmpty()) {
+            if ($name.isPresent()) {
+                return "%n%n@|faint The profile will be called '%s'.|@".formatted($name.get());
+            }
+            return "";
+        }
+
+        return "%n%n@|faint %s will be created%s.|@".formatted(
+            $name.map(n -> "Profile '" + n + "'").orElse("The profile"),
+            Stream.concat(
+                $token.map(t -> " with token " + t).stream(),
+                $env.map(e -> " in env '" + e.name().toLowerCase() + "'").stream()
+            ).collect(Collectors.joining(""))
+        );
     }
 
-    private void assertShouldSetup(Path path, boolean newUser) {
+    private SetupAction promptForNextActionIfExistingUser(SetupActionSelector act, Path config) {
+        printShouldSetupHeader(config, false, "");
+
+        val options = NEList.parse(new ArrayList<Pair<String, SetupAction>>() {{
+            add(Pair.create("Create a new profile", act.createProfile()));
+
+            if (System.getenv(ConstEnvVars.COMPLETIONS_SETUP) == null && ctx.isNotWindows()) {
+                add(Pair.create("Set up shell autocomplete", act.explainAutocomplete()));
+            }
+
+            add(Pair.create("Cancel", act.cancel()));
+        }}).orElseThrow();
+
+        val res = ctx.console().select("What would you like to do?")
+            .options(options)
+            .defaultOption(options.getFirst())
+            .mapper(Pair::getLeft)
+            .fallbackFlag("")
+            .fix(List.of(), "")
+            .clearAfterSelection();
+
+        return res.getRight();
+    }
+
+    private void printShouldSetupHeader(Path config, boolean newUser, String extra) {
         ctx.log().banner();
 
         if (ctx.isNotTty()) {
@@ -196,34 +254,11 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           @|faint Your configuration file %s at|@ @|faint,italic %s|@
         """.formatted(
             (newUser) ? "will be created" : "already exists",
-            path
+            config
         );
 
-        val addendum = (!newUser)
-            ? NL + NL + "Do you want to continue and create a new profile?"
-            : mkArgsAddendum();
-
-        ctx.console().println(trimIndent(prompt) + addendum);
+        ctx.console().println(trimIndent(prompt) + extra);
         ctx.console().println();
-        ctx.console().unsafeReadLine(ctx.colors().format("Press @!Enter!@ to continue, or use @!Ctrl+C!@ to cancel. "), false);
-        ctx.console().println();
-    }
-
-    private String mkArgsAddendum() {
-        if ($env.isEmpty() && $token.isEmpty()) {
-            if ($name.isPresent()) {
-                return "%n%n@|faint The profile will be called '%s'.|@".formatted($name.get());
-            }
-            return "";
-        }
-
-        return "%n%n@|faint %s will be created%s.|@".formatted(
-            $name.map(n -> "Profile '" + n + "'").orElse("The profile"),
-            Stream.concat(
-                $token.stream().map(t -> " with token " + t),
-                $env.stream().map(e -> " in env '" + e.name().toLowerCase() + "'")
-            ).collect(Collectors.joining(""))
-        );
     }
 
     private void assertShouldOverwriteExistingProfile(Profile existing) {
