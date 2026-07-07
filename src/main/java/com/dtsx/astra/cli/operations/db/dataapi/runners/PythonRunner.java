@@ -14,6 +14,12 @@ import static java.util.stream.Collectors.joining;
 
 @RequiredArgsConstructor
 public final class PythonRunner implements DataAPIClientRunner {
+    public enum Mode {
+        PYTHON, IPYTHON
+    }
+
+    private final Mode mode;
+
     @Override
     @SneakyThrows
     public void installDeps(Path cacheDir, List<String> packages) {
@@ -21,6 +27,9 @@ public final class PythonRunner implements DataAPIClientRunner {
 
         val pipPath = cacheDir.resolve("bin").resolve("pip").toString();
         val pipCmd = new ArrayList<>(List.of(pipPath, "install", "-U", "astrapy")) {{
+            if (mode == Mode.IPYTHON) {
+                add("ipython");
+            }
             addAll(packages);
         }};
 
@@ -65,7 +74,12 @@ public final class PythonRunner implements DataAPIClientRunner {
     @Override
     public ProcessBuilder executeCmd(Path cacheDir, String initScript, List<String> extraArgs, boolean isRepl) {
         return new ProcessBuilder(new ArrayList<>() {{
-            add(cacheDir.resolve("bin").resolve("python").toString());
+            val exe = switch (mode) {
+                case PYTHON -> "python";
+                case IPYTHON -> "ipython";
+            };
+
+            add(cacheDir.resolve("bin").resolve(exe).toString());
             if (isRepl) {
                 add("-i");
             }

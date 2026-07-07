@@ -13,6 +13,7 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation.DataAPIExecResult;
 import com.dtsx.astra.cli.operations.db.dataapi.runners.JavaScriptRunner;
 import com.dtsx.astra.cli.operations.db.dataapi.runners.PythonRunner;
+import com.dtsx.astra.cli.operations.db.dataapi.runners.PythonRunner.Mode;
 import com.dtsx.astra.cli.utils.DbUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
@@ -39,7 +40,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
     @Getter
     @RequiredArgsConstructor
     public enum Language {
-        js("JS"), python("Python");
+        NODE("Node"), PYTHON("Python"), IPYTHON("IPython");
         private final String displayName;
     }
 
@@ -82,8 +83,9 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         }
 
         val runner = switch (request.language()) {
-            case js -> new JavaScriptRunner();
-            case python -> new PythonRunner();
+            case NODE -> new JavaScriptRunner();
+            case PYTHON -> new PythonRunner(Mode.PYTHON);
+            case IPYTHON -> new PythonRunner(Mode.IPYTHON);
         };
 
         try {

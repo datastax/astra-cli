@@ -31,13 +31,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<DataAPIExecResult> {
-    @ArgGroup
+    @ArgGroup(heading = "%nLanguage selectors:%n")
     public LanguageSelector $language = new LanguageSelector() {{ $node = true; }};
 
     public static class LanguageSelector {
         @Option(
             names = { "--node" },
-            description = "Use astra-db-ts with Node.js (default)"
+            description = "Use astra-db-ts with Node.js @|faint (default)|@"
         )
         public boolean $node;
 
@@ -46,6 +46,12 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             description = "Use astrapy with Python"
         )
         public boolean $python;
+
+        @Option(
+            names = { "--ipython" },
+            description = "Use astrapy with IPython"
+        )
+        public boolean $ipython;
     }
 
     @Option(
@@ -187,16 +193,21 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
     }
 
     private Language resolveLanguage() {
-        var language = Language.js;
+        var language = Language.NODE;
         var count = 0;
 
         if ($language.$python) {
-            language = Language.python;
+            language = Language.PYTHON;
+            count++;
+        }
+
+        if ($language.$ipython) {
+            language = Language.IPYTHON;
             count++;
         }
 
         if ($language.$node) {
-            language = Language.js;
+            language = Language.NODE;
             count++;
         }
 
