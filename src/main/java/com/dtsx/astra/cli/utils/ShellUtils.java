@@ -4,9 +4,12 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import lombok.val;
 
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.PLATFORM_ISSUE;
@@ -64,6 +67,33 @@ public class ShellUtils {
 
     private static ProcessBuilder copyToClipboardMac() {
         return new ProcessBuilder("pbcopy");
+    }
+
+    public static void openURL(String urlString) {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            try {
+                Desktop.getDesktop().browse(new URI(urlString));
+            } catch (IOException | URISyntaxException e) {
+                fallbackOpen(urlString);
+            }
+        } else {
+            fallbackOpen(urlString);
+        }
+    }
+
+    private static void fallbackOpen(String urlString) {
+        val os = System.getProperty("os.name").toLowerCase();
+        val runtime = Runtime.getRuntime();
+
+        try {
+            if (os.contains("win")) {
+                runtime.exec(new String[]{"rundll32", "url.dll,FileProtocolHandler", urlString});
+            } else if (os.contains("mac")) {
+                runtime.exec(new String[]{"open", urlString});
+            } else if (os.contains("nix") || os.contains("nux")) {
+                runtime.exec(new String[]{"xdg-open", urlString});
+            }
+        } catch (IOException _) {}
     }
 
     public static boolean isCommandAvailable(String command) {

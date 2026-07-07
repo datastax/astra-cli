@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledExcepti
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.operations.SetupOperation.SetupResult;
+import com.dtsx.astra.cli.utils.ShellUtils;
 import com.dtsx.astra.sdk.exception.AuthenticationException;
 import com.dtsx.astra.sdk.org.domain.Organization;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -50,6 +51,7 @@ public class SetupOperation implements Operation<SetupResult> {
     public record ProfileCreated(ProfileName profileName, boolean overwritten, boolean isDefault) implements SetupResult {}
     public record InvalidToken(Optional<AstraEnvironment> hint) implements SetupResult {}
     public record ExplainAutocomplete() implements SetupResult {}
+    public record ShowDocsLink() implements SetupResult {}
 
     @Override
     public SetupResult execute() {
@@ -101,6 +103,13 @@ public class SetupOperation implements Operation<SetupResult> {
         public SetupAction cancel() {
             return (_, _) -> {
                 throw new ExecutionCancelledException();
+            };
+        }
+
+        public SetupAction viewDocs() {
+            return (_, _) -> {
+                ShellUtils.openURL(ctx.properties().cliDocsUrl());
+                return new ShowDocsLink();
             };
         }
     }

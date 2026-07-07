@@ -80,6 +80,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             case SameProfileAlreadyExists pe -> handleSameProfileAlreadyExists(pe);
             case InvalidToken(var hint) -> throwInvalidToken(hint);
             case ExplainAutocomplete _ -> explainAutocomplete();
+            case ShowDocsLink _ -> showDocsLink();
         };
     }
 
@@ -165,6 +166,14 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         """);
     }
 
+    private OutputHuman showDocsLink() {
+        return OutputHuman.response("""
+          @|bold You can find more information about the Astra CLI in the docs.|@
+        
+          Visit @|code %s|@ for more information.
+        """.formatted(ctx.properties().cliDocsUrl()));
+    }
+
     @Override
     protected Operation<SetupResult> mkOperation() {
         return new SetupOperation(
@@ -218,6 +227,8 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             if (System.getenv(ConstEnvVars.COMPLETIONS_SETUP) == null && ctx.isNotWindows()) {
                 add(Pair.create("Set up shell autocomplete", act.explainAutocomplete()));
             }
+
+            add(Pair.create("View the docs", act.viewDocs()));
 
             add(Pair.create("Cancel", act.cancel()));
         }}).orElseThrow();

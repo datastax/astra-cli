@@ -85,6 +85,8 @@ public interface CliProperties {
 
     String cliGithubApiReposUrl();
 
+    String cliDocsUrl();
+
     PathLocations rcFileLocations(boolean isWindows);
 
     PathLocations homeFolderLocations(boolean isWindows);
