@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
@@ -21,6 +22,7 @@ import com.dtsx.astra.cli.utils.CollectionUtils;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -29,13 +31,22 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<DataAPIExecResult> {
-    @Option(
-        names = { "-l", "--lang" },
-        description = "The client language to use (one of: ${COMPLETION-CANDIDATES})",
-        paramLabel = "LANG",
-        defaultValue = "js"
-    )
-    public Language $language;
+    @ArgGroup
+    public LanguageSelector $language = new LanguageSelector() {{ $node = true; }};
+
+    public static class LanguageSelector {
+        @Option(
+            names = { "--node" },
+            description = "Use astra-db-ts with Node.js (default)"
+        )
+        public boolean $node;
+
+        @Option(
+            names = { "--python" },
+            description = "Use astrapy with Python"
+        )
+        public boolean $python;
+    }
 
     @Option(
         names = { "-a", "--artifacts" },
@@ -160,7 +171,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
         val regionRef = RegionRef.mustParse($dbRef, $regionName);
 
         return new DbDataAPIExecOperation(ctx, dbGateway, new DbDataAPIExecRequest(
-            $language,
+            resolveLanguage(),
             $dbRef,
             regionRef,
             $keyspaceRef,
@@ -173,6 +184,27 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             isRepl(),
             !isRepl() && ctx.outputIsNotHuman()
         ));
+    }
+
+    private Language resolveLanguage() {
+        var language = Language.js;
+        var count = 0;
+
+        if ($language.$python) {
+            language = Language.python;
+            count++;
+        }
+
+        if ($language.$node) {
+            language = Language.js;
+            count++;
+        }
+
+        return switch (count) {
+            case 1 -> language;
+            case 0 -> throw new OptionValidationException("language", "neither --node nor --python were set to true");
+            default -> throw new OptionValidationException("language", "both --node and --python were set to true");
+        };
     }
 
     @Override
