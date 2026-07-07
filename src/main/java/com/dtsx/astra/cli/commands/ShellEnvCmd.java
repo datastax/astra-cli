@@ -51,8 +51,8 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "eval \"$(${cli.path} shellenv --no-update-notifier)\""
 )
 @Example(
-    comment = "Ignore warnings about multiple astra home folders or astrarc files",
-    command = "eval \"$(${cli.path} shellenv --ignore-multiple-paths)\""
+    comment = "Check the helptext for plenty more options",
+    command = "eval \"$(${cli.path} shellenv -h)\""
 )
 public class ShellEnvCmd implements Runnable {
     @Spec
@@ -80,10 +80,22 @@ public class ShellEnvCmd implements Runnable {
     public boolean $ignoreMultiplePaths;
 
     @Option(
+        names = { "--ignore-beta-warnings" },
+        description = "Ignore warnings about commands being in beta. Sets @|code " + ConstEnvVars.IGNORE_BETA_WARNINGS + "=true|@ under the hood."
+    )
+    public boolean $ignoreBetaWarnings;
+
+    @Option(
         names = { "--no-update-notifier" },
         description = "Disables background update checks notifications. Sets @|code " + ConstEnvVars.NO_UPDATE_NOTIFIER + "=true|@ under the hood."
     )
     public boolean $noUpdateNotifier;
+
+    @Option(
+        names = { "--default-args" },
+        description = "Sets the default args used for every CLI command (e.g. --no-spinner or --no-color). Sets @|code " + ConstEnvVars.DEFAULT_ARGS + "|@ under the hood."
+    )
+    public Optional<String> $defaultArgs;
 
     @Override
     public void run() {
@@ -104,6 +116,10 @@ public class ShellEnvCmd implements Runnable {
             sb.append("export ").append(ConstEnvVars.IGNORE_MULTIPLE_PATHS).append("=true").append(NL);
         }
 
+        if ($ignoreBetaWarnings) {
+            sb.append("export ").append(ConstEnvVars.IGNORE_BETA_WARNINGS).append("=true").append(NL);
+        }
+
         if ($noUpdateNotifier) {
             sb.append("export ").append(ConstEnvVars.NO_UPDATE_NOTIFIER).append("=true").append(NL);
         }
@@ -114,6 +130,10 @@ public class ShellEnvCmd implements Runnable {
 
         $rc.ifPresent((path) -> {
             sb.append("export ASTRARC=").append(path.toAbsolutePath()).append(NL);
+        });
+
+        $defaultArgs.ifPresent((args) -> {
+            sb.append("export ").append(ConstEnvVars.DEFAULT_ARGS).append("='").append(args).append("'").append(NL);
         });
 
         spec.commandLine().getOut().println(sb);
