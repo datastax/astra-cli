@@ -2,6 +2,7 @@
 command: astra dotenv list-keys -o csv
 exit_code: 0
 ---- output ----
+stderr: [WARNING] astra dotenv commands are still in beta and may change without notice.
 stdout: code,message,key
 stdout: OK,,ASTRA_ORG_ID
 stdout: OK,,ASTRA_ORG_NAME

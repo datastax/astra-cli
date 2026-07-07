@@ -2,6 +2,7 @@
 command: astra dotenv print -k ASTRA_ORG_ID=ORG_ID,ASTRA_ORG_NAME -k ASTRA_DB_ID --db two_regions_db
 exit_code: 0
 ---- output ----
+stderr: [WARNING] astra dotenv commands are still in beta and may change without notice.
 stdout: # astra: ASTRA_ORG_ID - Created by Astra CLI
 stdout: ORG_ID=123e4567-e89b-12d3-a456-426614174000
 stdout: 

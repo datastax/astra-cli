@@ -2,6 +2,7 @@
 command: astra dotenv print -f .env
 exit_code: 0
 ---- output ----
+stderr: [WARNING] astra dotenv commands are still in beta and may change without notice.
 stdout: ASTRA_ORG_ID=123e4567-e89b-12d3-a456-426614174000
 stdout: 
 stdout: KEY1="double quote: \" single quote: '"
