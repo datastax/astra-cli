@@ -165,8 +165,6 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
             ), mkData("no_change", false, outputFile), List.of(
                 new Hint("View the env file", "cat " + outputFile)
             ));
-
-
         };
     }
 
