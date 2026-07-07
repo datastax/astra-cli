@@ -29,8 +29,8 @@ dependencies {
     implementation("org.slf4j:slf4j-nop:2.0.17")
 
     // for underlying api calls
-    implementation("com.datastax.astra:astra-db-java:2.3.0")
-    implementation("com.datastax.astra:astra-sdk-devops:2.3.0")
+    implementation("com.datastax.astra:astra-db-java:2.3.1")
+    implementation("com.datastax.astra:astra-sdk-devops:2.3.1")
 
     // unzip downloaded external programs (cqlsh, dsbulk, etc.)
     implementation("org.apache.commons:commons-compress:1.28.0")
