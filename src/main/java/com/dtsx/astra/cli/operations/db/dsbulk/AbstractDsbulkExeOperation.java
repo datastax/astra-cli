@@ -2,11 +2,9 @@ package com.dtsx.astra.cli.operations.db.dsbulk;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
-import com.dtsx.astra.cli.core.exceptions.internal.db.ScbDownloadException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -16,7 +14,10 @@ import lombok.val;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.dtsx.astra.cli.operations.db.dsbulk.AbstractDsbulkExeOperation.DsbulkExecResult;
@@ -41,9 +42,9 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         String maxConcurrentQueries();
         String logDir();
         Optional<Path> dsBulkConfigPath();
-        Map<String, String> dsBulkConfigMap();
+        List<String> extraArgs();
         AstraToken token();
-        Optional<RegionName> region();
+        Optional<RegionRef> region();
     }
 
     protected abstract List<String> buildCommandLine();
@@ -87,7 +88,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
         );
     }
 
-    protected Path downloadSCB(DbRef dbRef, Optional<RegionName> regionName) {
+    protected Path downloadSCB(DbRef dbRef, Optional<RegionRef> regionName) {
         val db = dbGateway.findOne(dbRef);
 
         val scbPaths = downloadsGateway.downloadCloudSecureBundles(
@@ -141,20 +142,7 @@ public abstract class AbstractDsbulkExeOperation<Req> implements Operation<Dsbul
                 flags.add(configPath.toString());
             });
 
-            if (options.dsBulkConfigMap() != null) {
-                options.dsBulkConfigMap().forEach((key, value) -> {
-                    if (!key.startsWith("-")) {
-                        throw new OptionValidationException("custom dsbulk flag '" + key + "'", "flag must start with '-' or '--'");
-                    }
-
-                    flags.add(key);
-
-                    if (value != null) {
-                        flags.add(value);
-                    }
-                });
-            }
-
+            flags.addAll(options.extraArgs());
             return flags;
     }
 

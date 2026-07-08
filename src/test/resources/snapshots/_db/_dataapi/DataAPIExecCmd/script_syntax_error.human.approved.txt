@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db data-api exec two_regions_db -k default_keyspace -e console.log(!!client
+exit_code: 1
+---- output ----
+stderr: [WARNING] astra db data-api commands are still in beta and may change without notice.
+---- end ----

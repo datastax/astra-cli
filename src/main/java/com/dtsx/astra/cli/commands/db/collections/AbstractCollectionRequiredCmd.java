@@ -1,7 +1,6 @@
 package com.dtsx.astra.cli.commands.db.collections;
 
 import com.dtsx.astra.cli.core.CliConstants.$Collection;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.models.CollectionRef;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
@@ -21,9 +20,6 @@ public abstract class AbstractCollectionRequiredCmd<OpRes> extends AbstractColle
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-
-        this.$collRef = CollectionRef.parse($keyspaceRef, actualCollectionRefOption).getRight((msg) -> {
-            throw new OptionValidationException("collection name", msg);
-        });
+        this.$collRef = CollectionRef.mustParse($keyspaceRef, actualCollectionRefOption);
     }
 }

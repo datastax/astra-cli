@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkUnloadOperation.UnloadRequest;
@@ -13,7 +12,6 @@ import lombok.val;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRequest> {
@@ -26,7 +24,7 @@ public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRe
         String maxConcurrentQueries,
         String logDir,
         Optional<Path> dsBulkConfigPath,
-        Map<String, String> dsBulkConfigMap,
+        List<String> extraArgs,
         AstraToken token,
         String url,
         String delimiter,
@@ -34,7 +32,7 @@ public class DbDsbulkUnloadOperation extends AbstractDsbulkExeOperation<UnloadRe
         boolean header,
         int skipRecords,
         int maxErrors,
-        Optional<RegionName> region
+        Optional<RegionRef> region
     ) implements CoreDsbulkOptions {}
 
     public DbDsbulkUnloadOperation(CliContext ctx, DbGateway dbGateway, DownloadsGateway downloadsGateway, UnloadRequest request) {

@@ -20,12 +20,12 @@ public class PcuAssocTarget implements Highlightable {
     private final Either<DatacenterId, DbRef> ref;
 
     public static Either<String, PcuAssocTarget> parse(@NonNull String ref) {
-        return ModelUtils.trimAndValidateBasics("Database name/id or datacenter id", ref).flatMap((trimmed) -> {
+        return ModelUtils.trimAndValidateBasics("Database name/id/endpoint or datacenter id", ref).flatMap((trimmed) -> {
             return DatacenterId.parse(trimmed)
                 .map(PcuAssocTarget::fromDatacenterId)
                 .flatMapLeft((e1) -> DbRef.parse(trimmed)
                     .map(PcuAssocTarget::fromDbRef)
-                    .mapLeft((e2) -> "Errors parsing database name/id or datacenter id: '" + e1 + "' and '" + e2 + "'"));
+                    .mapLeft((e2) -> "Errors parsing database name/id/endpoint or datacenter id: '" + e1 + "' and '" + e2 + "'"));
         });
     }
 

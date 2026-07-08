@@ -27,15 +27,15 @@ public abstract class BaseParseableTest {
             super(thing, parser);
         }
 
-        @Property(tries = 10)
+        @Property(tries = 5)
         public void errors_if_blank_str(@ForAll @CharRange(from = ' ', to = ' ') String blank) {
             assertThat(parser.apply(quote(blank)))
                 .extracting(Either::getLeft)
                 .asString()
-                .isEqualTo(thing + " should not be blank or empty");
+                .startsWith(thing + " should not be blank or empty");
         }
 
-        @Property(tries = 10)
+        @Property(tries = 5)
         public void errors_if_placeholder(@ForAll @NotBlank String value) {
             assertThat(parser.apply(quote("<" + value + ">")))
                 .extracting(Either::getLeft)

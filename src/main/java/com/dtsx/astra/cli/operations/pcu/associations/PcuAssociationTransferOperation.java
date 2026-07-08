@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.gateways.pcu.associations.PcuAssociationsGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.associations.PcuAssociationTransferOperation.AssociationTransferResult;
 import com.dtsx.astra.cli.utils.DbUtils;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -51,12 +52,8 @@ public class PcuAssociationTransferOperation implements Operation<AssociationTra
 
         val toPcuId = pcuGateway.findOne(request.to).getId();
 
-//        val fromPcuId = associationsGateway.tryFindByDatacenter(dcId)
-//            .map(PCUGroupDatacenterAssociation::getPcuGroupUUID)
-//            .map(UUID::fromString);
-
-        Optional<UUID> fromPcuId = switch (request.sourceBehavior) {
-            case AutodetectAndRequireSource(), AutodetectSourceOrCreate() -> Optional.empty();
+        val fromPcuId = switch (request.sourceBehavior) {
+            case AutodetectAndRequireSource(), AutodetectSourceOrCreate() -> associationsGateway.tryFindByDatacenter(dcId).map(PCUGroup::getId);
             case UseSource(var ref) -> Optional.of(pcuGateway.findOne(ref).getId());
         };
 

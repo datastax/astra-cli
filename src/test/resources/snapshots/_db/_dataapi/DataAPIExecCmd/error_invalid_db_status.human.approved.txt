@@ -1,0 +1,7 @@
+---- meta ----
+command: astra db data-api exec two_regions_db -k default_keyspace -e ""
+exit_code: 2
+---- output ----
+stderr: [WARNING] astra db data-api commands are still in beta and may change without notice.
+stderr: Cannot start execution: database is in status HIBERNATED
+---- end ----

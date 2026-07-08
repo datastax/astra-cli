@@ -8,7 +8,7 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
 import com.dtsx.astra.cli.operations.dotenv.DotEnvOperation;
@@ -16,6 +16,7 @@ import com.dtsx.astra.cli.operations.dotenv.DotEnvOperation.DotEnvRequest;
 import com.dtsx.astra.cli.operations.dotenv.DotEnvOperation.DotEnvResult;
 import com.dtsx.astra.cli.operations.dotenv.EnvKey;
 import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Option;
 
@@ -60,34 +61,39 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
         description = "The keyspace to use.",
         paramLabel = $Keyspace.LABEL
     )
-    protected Optional<String> $keyspace;
+    protected Optional<String> $keyspaceName;
 
     @Option(
         names = { $Regions.LONG },
         description = "The region to use.",
         paramLabel = $Regions.LABEL
     )
-    protected Optional<RegionName> $region;
+    protected Optional<String> $regionName;
 
     protected abstract boolean isPrint();
 
     @Override
-    protected DotEnvOperation mkOperation() {
-        val ksRef = $keyspace.map(ks -> KeyspaceRef.parse($dbRef, ks).fold(
-            err -> {
-                throw new AstraCliException(ExitCode.VALIDATION_ISSUE, "keyspace " + err);
-            },
-            Function.identity()
-        ));
+    @MustBeInvokedByOverriders
+    public void prelude() {
+        super.prelude();
+        if (!ctx.properties().disableBetaWarnings()) {
+            ctx.log().warn("${cli.name} dotenv commands are still in beta and may change without notice.");
+        }
+    }
 
+    @Override
+    protected DotEnvOperation mkOperation() {
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
         val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
+
+        Function<DbRef, Optional<KeyspaceRef>> mkKsRef = (dbRef) -> $keyspaceName.map(ks -> KeyspaceRef.mustParse(dbRef, ks));
+        Function<DbRef, Optional<RegionRef>> mkRegionRef = (dbRef) -> RegionRef.mustParse(dbRef, $regionName);
 
         return new DotEnvOperation(ctx, dbGateway, orgGateway, downloadsGateway, new DotEnvRequest(
             profile(),
             $dbRef,
-            ksRef,
-            $region,
+            mkKsRef,
+            mkRegionRef,
             $file,
             isPrint(),
             $keys,

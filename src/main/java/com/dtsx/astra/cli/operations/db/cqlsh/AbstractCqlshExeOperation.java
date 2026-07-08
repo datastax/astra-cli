@@ -3,9 +3,8 @@ package com.dtsx.astra.cli.operations.db.cqlsh;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.internal.db.ScbDownloadException;
-import com.dtsx.astra.cli.core.exceptions.internal.db.UnexpectedDbStatusException;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -120,7 +119,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
             .mapLeft(CqlshInstallFailed::new);
     }
 
-    protected Path getScb(Either<DbRef, Path> dbOrScb, Optional<RegionName> regionName) {
+    protected Path getScb(Either<DbRef, Path> dbOrScb, Optional<RegionRef> regionName) {
         if (dbOrScb.isRight()) {
             return validateScbPath(dbOrScb);
         }
@@ -141,7 +140,7 @@ public abstract class AbstractCqlshExeOperation<Req extends CoreCqlshOptions> im
         return path;
     }
 
-    private Path downloadScb(Either<DbRef, Path> dbRef, Optional<RegionName> regionName) {
+    private Path downloadScb(Either<DbRef, Path> dbRef, Optional<RegionRef> regionName) {
         val db = dbGateway.findOne(dbRef.getLeft());
 
         if (db.getStatus() != DatabaseStatusType.ACTIVE) {

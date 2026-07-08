@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.pcu;
 
 import com.dtsx.astra.cli.commands.pcu.associations.PcuAssociateCmd;
+import com.dtsx.astra.cli.commands.pcu.associations.PcuAssociationFindCmd;
 import com.dtsx.astra.cli.commands.pcu.associations.PcuAssociationListCmd;
 import com.dtsx.astra.cli.commands.pcu.associations.PcuAssociationTransferCmd;
 import com.dtsx.astra.cli.commands.pcu.associations.PcuDisassociateCmd;
@@ -23,6 +24,7 @@ import picocli.CommandLine.Command;
         PcuAssociateCmd.class,
         PcuDisassociateCmd.class,
         PcuAssociationListCmd.class,
+        PcuAssociationFindCmd.class,
         PcuAssociationTransferCmd.class,
         PcuListTypesCmd.class,
     }

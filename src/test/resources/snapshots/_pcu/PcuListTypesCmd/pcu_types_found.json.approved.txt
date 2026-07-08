@@ -1,0 +1,329 @@
+---- meta ----
+command: astra pcu list-types -o json
+exit_code: 0
+---- output ----
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : [ {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-east-1",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-east-2",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-west-2",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "canadacentral",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "centralindia",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "eastus",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "europe-west4",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "northamerica-northeast2",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-central1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-east1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-east4",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "generalPurpose",
+stdout:     "region" : "us-west1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "64GB",
+stdout:       "disk_cache" : "500GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-east-1",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-east-2",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-west-2",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "canadacentral",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "centralindia",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "eastus",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "europe-west4",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "northamerica-northeast2",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-central1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-east1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-east4",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "cacheOptimized",
+stdout:     "region" : "us-west1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 16,
+stdout:       "memory" : "115GB",
+stdout:       "disk_cache" : "2.2TB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "small",
+stdout:     "region" : "us-west-2",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 4,
+stdout:       "memory" : "16GB",
+stdout:       "disk_cache" : "125GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "medium",
+stdout:     "region" : "us-west-2",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 8,
+stdout:       "memory" : "32GB",
+stdout:       "disk_cache" : "250GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "small",
+stdout:     "region" : "us-east-1",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 4,
+stdout:       "memory" : "16GB",
+stdout:       "disk_cache" : "125GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "medium",
+stdout:     "region" : "us-east-1",
+stdout:     "provider" : "aws",
+stdout:     "details" : {
+stdout:       "vCPU" : 8,
+stdout:       "memory" : "32GB",
+stdout:       "disk_cache" : "250GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "small",
+stdout:     "region" : "westus2",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 4,
+stdout:       "memory" : "16GB",
+stdout:       "disk_cache" : "125GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "medium",
+stdout:     "region" : "westus2",
+stdout:     "provider" : "azure",
+stdout:     "details" : {
+stdout:       "vCPU" : 8,
+stdout:       "memory" : "32GB",
+stdout:       "disk_cache" : "250GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "small",
+stdout:     "region" : "us-east1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 4,
+stdout:       "memory" : "16GB",
+stdout:       "disk_cache" : "125GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   }, {
+stdout:     "type" : "medium",
+stdout:     "region" : "us-east1",
+stdout:     "provider" : "gcp",
+stdout:     "details" : {
+stdout:       "vCPU" : 8,
+stdout:       "memory" : "32GB",
+stdout:       "disk_cache" : "250GB"
+stdout:     },
+stdout:     "enabled" : true
+stdout:   } ]
+stdout: }
+---- end ----

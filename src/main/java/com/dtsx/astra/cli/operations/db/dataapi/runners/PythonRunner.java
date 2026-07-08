@@ -9,10 +9,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dtsx.astra.cli.utils.CollectionUtils.windowed;
 import static java.util.stream.Collectors.joining;
 
 @RequiredArgsConstructor
 public final class PythonRunner implements DataAPIClientRunner {
+    public enum Mode {
+        PYTHON, IPYTHON
+    }
+
+    private final Mode mode;
+
     @Override
     @SneakyThrows
     public void installDeps(Path cacheDir, List<String> packages) {
@@ -20,6 +27,9 @@ public final class PythonRunner implements DataAPIClientRunner {
 
         val pipPath = cacheDir.resolve("bin").resolve("pip").toString();
         val pipCmd = new ArrayList<>(List.of(pipPath, "install", "-U", "astrapy")) {{
+            if (mode == Mode.IPYTHON) {
+                add("ipython");
+            }
             addAll(packages);
         }};
 
@@ -52,17 +62,24 @@ public final class PythonRunner implements DataAPIClientRunner {
     }
 
     @Override
-    public List<String> createInitVars(ExecContext ctx) {
-        return new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
+    public List<List<String>> createInitVars(ExecContext ctx) {
+        val vars = new ArrayList<>(List.of("client", "db", "admin", "db_admin")) {{
             addAll(ctx.collections());
             addAll(ctx.tables());
         }};
+
+        return windowed(vars, 2);
     }
 
     @Override
     public ProcessBuilder executeCmd(Path cacheDir, String initScript, List<String> extraArgs, boolean isRepl) {
         return new ProcessBuilder(new ArrayList<>() {{
-            add(cacheDir.resolve("bin").resolve("python").toString());
+            val exe = switch (mode) {
+                case PYTHON -> "python";
+                case IPYTHON -> "ipython";
+            };
+
+            add(cacheDir.resolve("bin").resolve(exe).toString());
             if (isRepl) {
                 add("-i");
             }

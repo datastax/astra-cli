@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
@@ -29,7 +29,7 @@ public class DbCqlshStartOperation extends AbstractCqlshExeOperation<CqlshReques
         Optional<ExecSource> execSource,
         int connectTimeout,
         int requestTimeout,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         Profile profile,
         Supplier<String> readStdin,
         boolean captureOutput

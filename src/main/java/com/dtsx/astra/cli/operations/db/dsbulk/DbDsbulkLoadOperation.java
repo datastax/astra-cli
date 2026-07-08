@@ -1,10 +1,9 @@
 package com.dtsx.astra.cli.operations.db.dsbulk;
 
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.downloads.DownloadsGateway;
 import com.dtsx.astra.cli.operations.db.dsbulk.DbDsbulkLoadOperation.LoadRequest;
@@ -13,7 +12,6 @@ import lombok.val;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadRequest> {
@@ -25,7 +23,7 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
         String maxConcurrentQueries,
         String logDir,
         Optional<Path> dsBulkConfigPath,
-        Map<String, String> dsBulkConfigMap,
+        List<String> extraArgs,
         AstraToken token,
         String url,
         String delimiter,
@@ -35,7 +33,7 @@ public class DbDsbulkLoadOperation extends AbstractDsbulkExeOperation<LoadReques
         int maxErrors,
         boolean dryRun,
         boolean allowMissingFields,
-        Optional<RegionName> region
+        Optional<RegionRef> region
     ) implements CoreDsbulkOptions {}
 
     public DbDsbulkLoadOperation(CliContext ctx, DbGateway dbGateway, DownloadsGateway downloadsGateway, LoadRequest request) {

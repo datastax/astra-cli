@@ -2,15 +2,12 @@ package com.dtsx.astra.cli.commands.db;
 
 import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -24,11 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DOWNLOAD_ISSUE;
 import static com.dtsx.astra.cli.operations.db.DbCreateDotEnvOperation.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -44,7 +39,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Create a .env file specifying the keys to include",
-    command = "${cli.name} db create-dotenv --keys ASTRA_DB_APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT"
+    command = "${cli.name} db create-dotenv --keys ASTRA_DB_TOKEN,ASTRA_DB_API_ENDPOINT"
 )
 @Example(
     comment = "Create a .env file with a preset specifying the keys to include",
@@ -91,14 +86,14 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
         description = "The keyspace to use. Uses the db's default keyspace if not specified.",
         paramLabel = $Keyspace.LABEL
     )
-    private Optional<String> $keyspace;
+    private Optional<String> $keyspaceName;
 
     @Option(
         names = { $Regions.LONG, $Regions.SHORT },
         description = "The region to use. Uses the db's default region if not specified.",
         paramLabel = $Regions.LABEL
     )
-    private Optional<RegionName> $region;
+    private Optional<String> $regionName;
 
     @ArgGroup
     private @Nullable Keys $keysGroup;
@@ -122,7 +117,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
         @RequiredArgsConstructor
         enum Preset {
-            data_api_client(Set.of(EnvKey.ASTRA_DB_APPLICATION_TOKEN, EnvKey.ASTRA_DB_API_ENDPOINT, EnvKey.ASTRA_DB_ENVIRONMENT));
+            data_api_client(Set.of(EnvKey.ASTRA_DB_TOKEN, EnvKey.ASTRA_DB_API_ENDPOINT, EnvKey.ASTRA_DB_ENVIRONMENT));
 
             @Getter
             private final Set<EnvKey> keys;
@@ -170,8 +165,6 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
             ), mkData("no_change", false, outputFile), List.of(
                 new Hint("View the env file", "cat " + outputFile)
             ));
-
-
         };
     }
 
@@ -185,10 +178,8 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
 
     @Override
     protected DbCreateDotEnvOperation mkOperation() {
-        val ksRef = $keyspace.map(ks -> KeyspaceRef.parse($dbRef, ks).fold(
-            err -> { throw new OptionValidationException("keyspace", err); },
-            Function.identity()
-        ));
+        val ksRef = $keyspaceName.map(ks -> KeyspaceRef.mustParse($dbRef, ks));
+        val regionRef = RegionRef.mustParse($dbRef, $regionName);
 
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
         val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
@@ -197,7 +188,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
             profile(),
             $dbRef,
             ksRef,
-            $region,
+            regionRef,
             $file,
             $print,
             resolveKeys(),

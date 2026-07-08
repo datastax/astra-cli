@@ -1,7 +1,7 @@
 package com.dtsx.astra.cli.commands.config;
 
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
-import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
+import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesNoDefaultCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
@@ -42,7 +42,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     @Parameters(
         arity = "0..1",
         description = "Profile to set as default",
-        completionCandidates = AvailableProfilesCompletion.class,
+        completionCandidates = AvailableProfilesNoDefaultCompletion.class,
         paramLabel = $Profile.LABEL
     )
     public Optional<ProfileName> $profileName;

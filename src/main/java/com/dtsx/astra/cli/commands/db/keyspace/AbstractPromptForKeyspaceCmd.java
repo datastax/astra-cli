@@ -2,7 +2,6 @@ package com.dtsx.astra.cli.commands.db.keyspace;
 
 import com.dtsx.astra.cli.core.CliConstants.$Keyspace;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.output.prompters.specific.KeyspacePrompter;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Option;
@@ -37,9 +36,7 @@ public abstract class AbstractPromptForKeyspaceCmd<OpRes> extends AbstractKeyspa
         }
 
         if (this.$keyspaceRef == null) {
-            this.$keyspaceRef = KeyspaceRef.parse($dbRef, keyspaceName).getRight((msg) -> {
-                throw new OptionValidationException("keyspace name", msg);
-            });
+            this.$keyspaceRef = KeyspaceRef.mustParse($dbRef, keyspaceName);
         }
     }
 

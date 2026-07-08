@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 
+import static com.dtsx.astra.cli.utils.StringUtils.NL;
+
 public abstract class ParsedFile {
     public abstract String render(AstraColors colors);
 
@@ -35,8 +37,15 @@ public abstract class ParsedFile {
             throw new FileNotFoundException("Expected a file but found a directory: " + path);
         }
 
-        try (val scanner = new Scanner(path)) {
-            return parse.parse(scanner);
+        try {
+            // because of how scanner drops the last, trailing newline if it exists, we can mitigate that by just
+            // adding another newline that'll always be dropped, allowing the actual last newline to be preserved if it exists,
+            // or if there's no trailing newline, then nothing changes anyway
+            val content = Files.readString(path) + NL;
+
+            try (val scanner = new Scanner(content)) {
+                return parse.parse(scanner);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

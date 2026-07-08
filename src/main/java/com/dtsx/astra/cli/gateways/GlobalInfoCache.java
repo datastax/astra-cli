@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.gateways;
 
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.PcuRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbCache;
 import com.dtsx.astra.cli.gateways.pcu.PcuCache;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ public enum GlobalInfoCache implements DbCache, PcuCache {
     INSTANCE;
 
     private final Map<String, @NotNull UUID> dbIdCache = new HashMap<>();
-    private final Map<UUID, @NotNull RegionName> dbRegionCache = new HashMap<>();
+    private final Map<UUID, @NotNull RegionRef> dbRegionCache = new HashMap<>();
     private final Map<UUID, @NotNull String> dbOnlyKsCache = new HashMap<>();
     private final Map<String, @NotNull UUID> pcuGroupIdCache = new HashMap<>();
 
@@ -26,7 +26,7 @@ public enum GlobalInfoCache implements DbCache, PcuCache {
     }
 
     @Override
-    public void cacheDbRegion(UUID id, RegionName region) {
+    public void cacheDbRegion(UUID id, RegionRef region) {
         dbRegionCache.put(id, region);
     }
 
@@ -46,7 +46,7 @@ public enum GlobalInfoCache implements DbCache, PcuCache {
     }
 
     @Override
-    public Optional<RegionName> lookupDbRegion(DbRef ref) {
+    public Optional<RegionRef> lookupDbRegion(DbRef ref) {
         return ref.fold(
             id -> Optional.ofNullable(dbRegionCache.get(id)),
             name -> Optional.ofNullable(dbIdCache.get(name)).map(dbRegionCache::get)

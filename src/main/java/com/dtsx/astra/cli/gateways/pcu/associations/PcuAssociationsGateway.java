@@ -5,6 +5,7 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DatacenterId;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupDatacenterAssociation;
 
 import java.util.Optional;
@@ -14,7 +15,7 @@ import java.util.stream.Stream;
 public interface PcuAssociationsGateway extends SomeGateway {
     boolean exists(PcuRef group, DatacenterId datacenter);
 
-    Optional<PCUGroupDatacenterAssociation> tryFindByDatacenter(DatacenterId datacenter);
+    Optional<PCUGroup> tryFindByDatacenter(DatacenterId datacenter);
 
     Stream<PCUGroupDatacenterAssociation> findAll(PcuRef group);
 

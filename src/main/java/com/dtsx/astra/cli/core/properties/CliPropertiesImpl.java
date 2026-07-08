@@ -93,6 +93,11 @@ public class CliPropertiesImpl implements CliProperties {
     }
 
     @Override
+    public String cliDocsUrl() {
+        return requireProperty("cli.docs.url");
+    }
+
+    @Override
     public PathLocations rcFileLocations(boolean isWindows) {
         val locations = new ArrayList<PathLocation>();
 

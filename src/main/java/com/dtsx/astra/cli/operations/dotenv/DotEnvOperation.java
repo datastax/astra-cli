@@ -6,7 +6,7 @@ import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.db.KeyspaceNotFoundException;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.parsers.env.EnvFile;
 import com.dtsx.astra.cli.core.parsers.env.EnvParseException;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -44,8 +44,8 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
     public record DotEnvRequest(
         Profile profile,
         @Nullable DbRef dbRef,
-        Optional<KeyspaceRef> ksRef,
-        Optional<RegionName> region,
+        Function<DbRef, Optional<KeyspaceRef>> mkKsRef,
+        Function<DbRef, Optional<RegionRef>> region,
         Optional<Path> file,
         boolean print,
         Map<EnvKey, String> keys,
@@ -140,7 +140,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
             case ASTRA_DB_NAME -> db(dbRef).getInfo().getName();
             case ASTRA_DB_REGION -> resolveRegion(request, dbRef).unwrap();
             case ASTRA_DB_KEYSPACE -> resolveKeyspace(request, dbRef);
-            case ASTRA_DB_APPLICATION_TOKEN -> request.profile.token().unsafeUnwrap();
+            case ASTRA_DB_TOKEN -> request.profile.token().unsafeUnwrap();
             case ASTRA_DB_ENVIRONMENT -> request.profile.env().name().toLowerCase();
 
             case ASTRA_DB_SECURE_BUNDLE_PATH -> Optional.ofNullable(scbPath).map(Path::toString).orElse(null);
@@ -214,7 +214,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
 
     private @Nullable Organization cachedOrg;
     private @Nullable Database cachedDb;
-    private @Nullable RegionName cachedRegion;
+    private @Nullable RegionRef cachedRegion;
     private @Nullable String cachedKeyspace;
 
     private Organization org() {
@@ -231,16 +231,16 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
         return cachedDb;
     }
 
-    private RegionName resolveRegion(DotEnvRequest request, DbRef dbRef) {
+    private RegionRef resolveRegion(DotEnvRequest request, DbRef dbRef) {
         if (cachedRegion == null) {
-            cachedRegion = DbUtils.resolveRegionName(db(dbRef), request.region);
+            cachedRegion = DbUtils.resolveRegionName(db(dbRef), request.region.apply(dbRef));
         }
         return cachedRegion;
     }
 
     private String resolveKeyspace(DotEnvRequest request, DbRef dbRef) {
         if (cachedKeyspace == null) {
-            cachedKeyspace = request.ksRef
+            cachedKeyspace = request.mkKsRef.apply(dbRef)
                 .map(ks -> Optional.ofNullable(db(dbRef).getInfo().getKeyspaces()).orElse(Set.of()).stream()
                     .filter(ks.name()::equalsIgnoreCase)
                     .findFirst()
@@ -282,7 +282,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
     }
 
     private Datacenter resolveDatacenter(DotEnvRequest request, DbRef dbRef) {
-        return DbUtils.resolveDatacenter(db(dbRef), request.region);
+        return DbUtils.resolveDatacenter(db(dbRef), request.region.apply(dbRef));
     }
 
     public static class EnvParseExceptionWrapper extends AstraCliException {

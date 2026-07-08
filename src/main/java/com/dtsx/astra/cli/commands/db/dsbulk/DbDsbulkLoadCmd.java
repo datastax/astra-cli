@@ -132,7 +132,7 @@ public class DbDsbulkLoadCmd extends AbstractDsbulkExecWithCoreOptsCmd {
             $maxErrors,
             $dryRun,
             $allowMissingFields,
-            $region
+            $region()
         ));
     }
 }

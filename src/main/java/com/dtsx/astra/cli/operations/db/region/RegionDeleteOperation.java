@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.operations.db.region;
 
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -29,7 +29,7 @@ public class RegionDeleteOperation implements Operation<RegionDeleteResult> {
 
     public record RegionDeleteRequest(
         DbRef dbRef,
-        RegionName region,
+        RegionRef region,
         boolean ifExists,
         LongRunningOptions lrOptions
     ) {}

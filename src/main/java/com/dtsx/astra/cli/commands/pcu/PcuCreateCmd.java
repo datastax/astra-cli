@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuStatus;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.Operation;
@@ -80,7 +80,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             description = "Cloud region this PCU will work in. @|bold Use one of the `${cli.name} db list-regions-*` commands to see available regions.|@",
             paramLabel = $Regions.LABEL
         )
-        public RegionName region;
+        public String regionName;
 
         @Option(
             names = { "--description", "-d" },
@@ -137,7 +137,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             name -> name
         );
 
-        if ($pcuCreationOptions == null || $pcuCreationOptions.region == null) {
+        if ($pcuCreationOptions == null || $pcuCreationOptions.regionName == null) {
             throw new ParameterException(spec.commandLine(), "Must provide a region (via --region) when creating a new pcu group. Use the `${cli.name} db list-regions-*` commands to see available regions.");
         }
 
@@ -152,7 +152,7 @@ public class PcuCreateCmd extends AbstractPcuRequiredCmd<PcuCreateResult> {
             pcuTitle,
             $pcuCreationOptions.description,
             $pcuCreationOptions.cloud,
-            $pcuCreationOptions.region,
+            RegionRef.mustParse($pcuCreationOptions.regionName),
             $pcuCreationOptions.instanceType,
             $pcuCreationOptions.provisionType,
             $pcuCreationOptions.min,

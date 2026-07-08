@@ -5,7 +5,7 @@ import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.models.KeyspaceRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.BoxDrawer;
 import com.dtsx.astra.cli.core.output.BoxDrawer.Alignment;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
@@ -13,6 +13,7 @@ import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation.DataAPIExecResult;
 import com.dtsx.astra.cli.operations.db.dataapi.runners.JavaScriptRunner;
 import com.dtsx.astra.cli.operations.db.dataapi.runners.PythonRunner;
+import com.dtsx.astra.cli.operations.db.dataapi.runners.PythonRunner.Mode;
 import com.dtsx.astra.cli.utils.DbUtils;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
@@ -30,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.utils.CollectionUtils.windowed;
-
 @RequiredArgsConstructor
 public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
     private final CliContext ctx;
@@ -41,14 +40,14 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
     @Getter
     @RequiredArgsConstructor
     public enum Language {
-        js("JS"), python("Python");
+        NODE("Node"), PYTHON("Python"), IPYTHON("IPython");
         private final String displayName;
     }
 
     public record DbDataAPIExecRequest(
         Language language,
         DbRef dbRef,
-        Optional<RegionName> region,
+        Optional<RegionRef> region,
         KeyspaceRef ksRef,
         List<String> collectionNames,
         List<String> tableNames,
@@ -84,8 +83,9 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         }
 
         val runner = switch (request.language()) {
-            case js -> new JavaScriptRunner();
-            case python -> new PythonRunner();
+            case NODE -> new JavaScriptRunner();
+            case PYTHON -> new PythonRunner(Mode.PYTHON);
+            case IPYTHON -> new PythonRunner(Mode.IPYTHON);
         };
 
         try {
@@ -118,7 +118,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
                 return new Executed(exit);
             }
         } catch (Exception e) {
-            return new OperationFailed(e.getMessage());
+            return new OperationFailed("(" + e.getClass().getSimpleName() + ") " + e.getMessage());
         }
     }
 
@@ -141,12 +141,12 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
         return cacheDir;
     }
 
-    private void printHeader(List<String> initVars) {
+    private void printHeader(List<List<String>> initVars) {
         val lines = new ArrayList<String>() {{
             add(ctx.colors().format("Welcome to the @!%s Data API REPL!@".formatted(request.language().displayName)));
             add("");
             add("The following variables are available:");
-            windowed(initVars, 2).forEach(pair -> add(ctx.colors().format(" @!*!@ " + String.join(", ", pair))));
+            initVars.forEach(pair -> add(ctx.colors().format(" @!*!@ " + String.join(", ", pair))));
         }};
 
         ctx.console().error(BoxDrawer.drawBox(3, ctx.colors().BLUE_300, lines, Alignment.LEFT));

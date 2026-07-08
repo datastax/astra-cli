@@ -126,12 +126,12 @@ public class GatewayProviderMock implements GatewayProvider {
 
     @Override
     public PcuGateway mkPcuGateway(AstraToken token, AstraEnvironment env, CompletionsCache pcuCompletionsCache) {
-        return null;
+        return pcuGateway();
     }
 
     @Override
     public PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env) {
-        return null;
+        return pcuAssociationsGateway();
     }
 
     @Override

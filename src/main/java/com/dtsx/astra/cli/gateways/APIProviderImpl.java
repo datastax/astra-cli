@@ -99,7 +99,7 @@ public class APIProviderImpl implements APIProvider {
         val cachedRegion = dbCache.lookupDbRegion(ref);
 
         return cachedRegion
-            .map(RegionName::unwrap)
+            .map(RegionRef::unwrap)
             .orElseGet(() -> ctx.log().loading("Resolving region for database " + ctx.highlight(ref), (_) ->
                 tryResolveDb(ref)
                     .map(com.dtsx.astra.sdk.db.domain.Database::getInfo)

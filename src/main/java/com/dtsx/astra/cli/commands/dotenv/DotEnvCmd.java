@@ -6,7 +6,7 @@ import picocli.CommandLine.Mixin;
 
 @Command(
     name = "dotenv",
-    description = "Easily create and update your .env files",
+    description = "Easily create and update your .env files @|italic (beta)|@",
     subcommands = {
         DotEnvWriteCmd.class,
         DotEnvPrintCmd.class,

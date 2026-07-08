@@ -1,0 +1,38 @@
+---- meta ----
+command: astra pcu list-types -o csv
+exit_code: 0
+---- output ----
+stdout: code,message,type,cloud_provider,region,enabled
+stdout: OK,,generalPurpose,aws,us-east-1,■
+stdout: OK,,generalPurpose,aws,us-east-2,■
+stdout: OK,,generalPurpose,aws,us-west-2,■
+stdout: OK,,generalPurpose,azure,canadacentral,■
+stdout: OK,,generalPurpose,azure,centralindia,■
+stdout: OK,,generalPurpose,azure,eastus,■
+stdout: OK,,generalPurpose,gcp,europe-west4,■
+stdout: OK,,generalPurpose,gcp,northamerica-northeast2,■
+stdout: OK,,generalPurpose,gcp,us-central1,■
+stdout: OK,,generalPurpose,gcp,us-east1,■
+stdout: OK,,generalPurpose,gcp,us-east4,■
+stdout: OK,,generalPurpose,gcp,us-west1,■
+stdout: OK,,cacheOptimized,aws,us-east-1,■
+stdout: OK,,cacheOptimized,aws,us-east-2,■
+stdout: OK,,cacheOptimized,aws,us-west-2,■
+stdout: OK,,cacheOptimized,azure,canadacentral,■
+stdout: OK,,cacheOptimized,azure,centralindia,■
+stdout: OK,,cacheOptimized,azure,eastus,■
+stdout: OK,,cacheOptimized,gcp,europe-west4,■
+stdout: OK,,cacheOptimized,gcp,northamerica-northeast2,■
+stdout: OK,,cacheOptimized,gcp,us-central1,■
+stdout: OK,,cacheOptimized,gcp,us-east1,■
+stdout: OK,,cacheOptimized,gcp,us-east4,■
+stdout: OK,,cacheOptimized,gcp,us-west1,■
+stdout: OK,,small,aws,us-west-2,■
+stdout: OK,,medium,aws,us-west-2,■
+stdout: OK,,small,aws,us-east-1,■
+stdout: OK,,medium,aws,us-east-1,■
+stdout: OK,,small,azure,westus2,■
+stdout: OK,,medium,azure,westus2,■
+stdout: OK,,small,gcp,us-east1,■
+stdout: OK,,medium,gcp,us-east1,■
+---- end ----

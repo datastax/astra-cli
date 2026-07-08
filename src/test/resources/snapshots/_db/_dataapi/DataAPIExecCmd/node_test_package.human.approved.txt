@@ -1,0 +1,6 @@
+---- meta ----
+command: astra db data-api exec two_regions_db -k default_keyspace -a lodash -e 'console.log(require('lodash').camelCase('hello world'))'
+exit_code: 0
+---- output ----
+stderr: [WARNING] astra db data-api commands are still in beta and may change without notice.
+---- end ----

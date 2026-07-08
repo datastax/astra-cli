@@ -7,13 +7,14 @@ import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.cqlsh.AbstractCqlshExeOperation.CqlshExecResult;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.CqlshRequest;
 import com.dtsx.astra.cli.operations.db.cqlsh.DbCqlshStartOperation.ExecSource;
+import com.dtsx.astra.cli.utils.CliUtils;
 import lombok.val;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
@@ -23,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.IO_ISSUE;
@@ -32,7 +34,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     @Parameters(
         arity = "0..1",
         completionCandidates = DbNamesCompletion.class,
-        description = "The name/ID of the Astra database to connect to",
+        description = "The name/ID/endpoint of the Astra database to connect to",
         paramLabel = $Db.LABEL
     )
     public Optional<DbRef> $dbRef;
@@ -64,7 +66,13 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
         description = "The region to use. Uses the db's default region if not specified.",
         paramLabel = $Regions.LABEL
     )
-    private Optional<RegionName> $region;
+    private Optional<String> $regionName;
+
+    @Parameters(
+        paramLabel = "ARGS",
+        description = "Verbatim arguments to pass to cqlsh directly (anything after '--' is passed through)"
+    )
+    public List<String> $extraArgs = List.of();
 
     protected abstract Optional<ExecSource> execSource();
 
@@ -72,13 +80,17 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     protected void prelude() {
         super.prelude();
 
+        $extraArgs = CliUtils.removeDbFromExtraArgs($extraArgs, "astra db cqlsh start my_db -- --key1 value1 --key2");
+
         if ($dbRef.isPresent() && $scb.isPresent()) {
-            throw new ParameterException(spec.commandLine(), "Cannot use both a database name/ID and a secure connect bundle. Please choose one method of authentication.");
+            throw new ParameterException(spec.commandLine(), "Cannot use both a database name/ID/endpoint and a secure connect bundle. Please choose one method of authentication.");
         }
     }
 
     @Override
     protected Operation<CqlshExecResult> mkOperation(boolean captureOutput) {
+        val regionRef = RegionRef.mustParse($dbRef.orElse(null), $regionName);
+
         return new DbCqlshStartOperation(ctx, dbGateway, downloadsGateway, new CqlshRequest(
             Either.fromOptional($scb, () -> $dbRef.orElseGet(this::promptForDb)),
             $debug,
@@ -87,7 +99,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
             execSource(),
             $connectTimeout,
             $requestTimeout,
-            $region,
+            regionRef,
             profile(),
             this::readStdin,
             captureOutput

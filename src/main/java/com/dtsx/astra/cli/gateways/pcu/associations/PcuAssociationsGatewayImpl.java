@@ -6,9 +6,14 @@ import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.models.DatacenterId;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
+import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupDatacenterAssociation;
+import com.dtsx.astra.sdk.utils.JsonUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -27,8 +32,24 @@ public class PcuAssociationsGatewayImpl implements PcuAssociationsGateway {
     }
 
     @Override
-    public Optional<PCUGroupDatacenterAssociation> tryFindByDatacenter(DatacenterId datacenter) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public Optional<PCUGroup> tryFindByDatacenter(DatacenterId datacenter) {
+        return ctx.log().loading("Finding association for datacenter @!%s!@".formatted(datacenter), (_) -> {
+            // TODO use the client's impl when it's fixed
+            val client = api.pcuGroupsClient();
+            val res = client.GET(client.getEndpointPcus() + "/actions/get/" + datacenter.unwrap(), client.getServiceName() + ".find");
+
+            try {
+                // PCU endpoint throws 404 if no association is found instead of returning an empty list, so this is fine
+                return Optional.of(
+                    JsonUtils.unmarshallType(res.getBody(), new TypeReference<List<PCUGroup>>() {}).getFirst()
+                );
+            } catch (Exception e) {
+                if (res.getCode() == 404) {
+                    return Optional.empty();
+                }
+                throw e;
+            }
+        });
     }
 
     @Override

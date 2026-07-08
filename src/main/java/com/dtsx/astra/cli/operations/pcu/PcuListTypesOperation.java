@@ -1,10 +1,10 @@
 package com.dtsx.astra.cli.operations.pcu;
 
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
-import com.dtsx.astra.sdk.pcu.domain.PCUType;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.sdk.pcu.domain.PCUType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
@@ -17,11 +17,11 @@ public class PcuListTypesOperation implements Operation<Stream<PCUType>> {
 
     public record PcuListTypesRequest(
         Optional<CloudProvider> cloud,
-        Optional<RegionName> region
+        Optional<RegionRef> region
     ) {}
 
     @Override
     public Stream<PCUType> execute() {
-        return pcuGateway.listPcuTypes(request.cloud(), request.region());
+        return pcuGateway.findPcuTypes(request.cloud(), request.region());
     }
 }

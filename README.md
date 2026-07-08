@@ -438,7 +438,7 @@ This improvement comes in three forms:
   astra user list --config '~/my_astrarc' --token 'AstraCS:...'
   
   # Can't provide specific keys and a preset at the same time
-  astra db create-dotenv --keys ASTRA_DB_APPLICATION_TOKEN,ASTRA_DB_API_ENDPOINT --preset data_api_client
+  astra db create-dotenv --keys ASTRA_DB_TOKEN,ASTRA_DB_API_ENDPOINT --preset data_api_client
   ```
 </details>
 

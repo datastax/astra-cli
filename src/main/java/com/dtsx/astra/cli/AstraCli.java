@@ -4,15 +4,14 @@ import com.dtsx.astra.cli.AstraCli.SetupExampleProvider;
 import com.dtsx.astra.cli.commands.*;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
+import com.dtsx.astra.cli.commands.dotenv.DotEnvCmd;
 import com.dtsx.astra.cli.commands.org.OrgCmd;
 import com.dtsx.astra.cli.commands.pcu.PcuCmd;
 import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
-import com.dtsx.astra.cli.commands.dotenv.DotEnvCmd;
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.commands.dotenv.DotEnvCmd;
 import com.dtsx.astra.cli.core.TypeConverters;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.AstraHome;
@@ -115,7 +114,7 @@ public class AstraCli extends AbstractCmd<Void> {
 
         val sj = new StringJoiner(NL);
 
-        sj.add("Documentation: @!https://docs.datastax.com/en/astra-cli!@");
+        sj.add("Documentation: @!" + ctx.properties().cliDocsUrl() + "!@");
         sj.add("");
         sj.add(spec.commandLine().getUsageMessage());
 

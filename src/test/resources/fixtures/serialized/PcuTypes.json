@@ -1,0 +1,354 @@
+[
+  {
+    "type": "generalPurpose",
+    "region": "us-east-1",
+    "provider": "aws",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "us-east-2",
+    "provider": "aws",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "us-west-2",
+    "provider": "aws",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "canadacentral",
+    "provider": "azure",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "centralindia",
+    "provider": "azure",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "eastus",
+    "provider": "azure",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "europe-west4",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "northamerica-northeast2",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "us-central1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "us-east1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "us-east4",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "generalPurpose",
+    "region": "us-west1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "64GB",
+      "disk_cache": "500GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-east-1",
+    "provider": "aws",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-east-2",
+    "provider": "aws",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-west-2",
+    "provider": "aws",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "canadacentral",
+    "provider": "azure",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "centralindia",
+    "provider": "azure",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "eastus",
+    "provider": "azure",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "europe-west4",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "northamerica-northeast2",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-central1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-east1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-east4",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "cacheOptimized",
+    "region": "us-west1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 16,
+      "memory": "115GB",
+      "disk_cache": "2.2TB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "small",
+    "region": "us-west-2",
+    "provider": "aws",
+    "details": {
+      "vCPU": 4,
+      "memory": "16GB",
+      "disk_cache": "125GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "medium",
+    "region": "us-west-2",
+    "provider": "aws",
+    "details": {
+      "vCPU": 8,
+      "memory": "32GB",
+      "disk_cache": "250GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "small",
+    "region": "us-east-1",
+    "provider": "aws",
+    "details": {
+      "vCPU": 4,
+      "memory": "16GB",
+      "disk_cache": "125GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "medium",
+    "region": "us-east-1",
+    "provider": "aws",
+    "details": {
+      "vCPU": 8,
+      "memory": "32GB",
+      "disk_cache": "250GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "small",
+    "region": "westus2",
+    "provider": "azure",
+    "details": {
+      "vCPU": 4,
+      "memory": "16GB",
+      "disk_cache": "125GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "medium",
+    "region": "westus2",
+    "provider": "azure",
+    "details": {
+      "vCPU": 8,
+      "memory": "32GB",
+      "disk_cache": "250GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "small",
+    "region": "us-east1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 4,
+      "memory": "16GB",
+      "disk_cache": "125GB"
+    },
+    "enabled": true
+  },
+  {
+    "type": "medium",
+    "region": "us-east1",
+    "provider": "gcp",
+    "details": {
+      "vCPU": 8,
+      "memory": "32GB",
+      "disk_cache": "250GB"
+    },
+    "enabled": true
+  }
+]

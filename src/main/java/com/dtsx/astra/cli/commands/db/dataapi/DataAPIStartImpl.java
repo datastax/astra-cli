@@ -7,9 +7,9 @@ import com.dtsx.astra.cli.core.CliConstants.$Regions;
 import com.dtsx.astra.cli.core.CliConstants.$Table;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.ExitCode;
-import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.prompters.specific.CollectionNamePrompter;
@@ -17,10 +17,12 @@ import com.dtsx.astra.cli.core.output.prompters.specific.TableNamePrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation;
 import com.dtsx.astra.cli.operations.db.dataapi.DbDataAPIExecOperation.*;
+import com.dtsx.astra.cli.utils.CliUtils;
 import com.dtsx.astra.cli.utils.CollectionUtils;
 import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -29,13 +31,28 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<DataAPIExecResult> {
-    @Option(
-        names = { "-l", "--lang" },
-        description = "The client language to use (one of: ${COMPLETION-CANDIDATES})",
-        paramLabel = "LANG",
-        defaultValue = "js"
-    )
-    public Language $language;
+    @ArgGroup(heading = "%nLanguage selectors:%n")
+    public LanguageSelector $language = new LanguageSelector() {{ $node = true; }};
+
+    public static class LanguageSelector {
+        @Option(
+            names = { "--node" },
+            description = "Use astra-db-ts with Node.js @|faint (default)|@"
+        )
+        public boolean $node;
+
+        @Option(
+            names = { "--python" },
+            description = "Use astrapy with Python"
+        )
+        public boolean $python;
+
+        @Option(
+            names = { "--ipython" },
+            description = "Use astrapy with IPython"
+        )
+        public boolean $ipython;
+    }
 
     @Option(
         names = { "-a", "--artifacts" },
@@ -50,7 +67,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
         description = "The region to use",
         paramLabel = $Regions.LABEL
     )
-    protected Optional<RegionName> $region;
+    protected Optional<String> $regionName;
 
     @Option(
         names = { $Collection.LONG, $Collection.SHORT },
@@ -74,7 +91,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
     @Parameters(
         paramLabel = "ARGS",
-        description = "Verbatim arguments to pass to the underlying node/python (anything after '--' is passed through)"
+        description = "Verbatim arguments to pass to the underlying node/python directly (anything after '--' is passed through)"
     )
     public List<String> $extraArgs = List.of();
 
@@ -91,19 +108,7 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             ctx.log().warn("${cli.name} db data-api commands are still in beta and may change without notice.");
         }
 
-        if (!$extraArgs.isEmpty()) {
-            if ($extraArgs.getFirst().trim().startsWith("-")) {
-                throw new AstraCliException(ExitCode.VALIDATION_ISSUE, """
-                  @|bold,red Database must explicitly be passed as the first positional argument when using extra flags after '--'|@
-            
-                  @|italic Note: if you really have a database name that starts with a dash which triggered this check, pass the db's ID instead (which you can get with @!${cli.name} db list!@).|@
-                """, List.of(
-                    new Hint("Example usage", "${cli.name} db data-api repl my_db -- -p --trace-warnings")
-                ));
-            }
-
-            $extraArgs.removeFirst();
-        }
+        $extraArgs = CliUtils.removeDbFromExtraArgs($extraArgs, "db data-api repl my_db -- -p --trace-warnings");
 
         val numPromptForColls = $collectionNames.stream().filter("__prompt__"::equals).count();
         val numPromptForTables = $tableNames.stream().filter("__prompt__"::equals).count();
@@ -169,10 +174,12 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
     @Override
     protected Operation<DataAPIExecResult> mkOperation() {
+        val regionRef = RegionRef.mustParse($dbRef, $regionName);
+
         return new DbDataAPIExecOperation(ctx, dbGateway, new DbDataAPIExecRequest(
-            $language,
+            resolveLanguage(),
             $dbRef,
-            $region,
+            regionRef,
             $keyspaceRef,
             $collectionNames,
             $tableNames,
@@ -183,6 +190,32 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
             isRepl(),
             !isRepl() && ctx.outputIsNotHuman()
         ));
+    }
+
+    private Language resolveLanguage() {
+        var language = Language.NODE;
+        var count = 0;
+
+        if ($language.$python) {
+            language = Language.PYTHON;
+            count++;
+        }
+
+        if ($language.$ipython) {
+            language = Language.IPYTHON;
+            count++;
+        }
+
+        if ($language.$node) {
+            language = Language.NODE;
+            count++;
+        }
+
+        return switch (count) {
+            case 1 -> language;
+            case 0 -> throw new OptionValidationException("language", "no language was selected");
+            default -> throw new OptionValidationException("language", "more than one langauge was selected");
+        };
     }
 
     @Override

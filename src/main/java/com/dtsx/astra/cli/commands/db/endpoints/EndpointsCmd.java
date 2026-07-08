@@ -1,12 +1,12 @@
 package com.dtsx.astra.cli.commands.db.endpoints;
 
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "endpoints",
-    description = "Get various endpoints for your database",
+    description = "Get the various endpoints for your database",
     subcommands = {
         EndpointsListCmd.class,
         EndpointsApiCmd.class,
@@ -15,7 +15,13 @@ import picocli.CommandLine.Mixin;
         EndpointsPlaygroundCmd.class,
     }
 )
-public class EndpointsCmd {
-    @Mixin
-    public HelpMixin help;
-}
+@Example(
+    comment = "List the various endpoints for the specified database",
+    command = "${cli.name} db endpoints my_db"
+)
+@Example(
+    comment = "Get a specific endpoint for the specified database",
+    command = "${cli.name} db endpoints data-api-client my_db"
+)
+@AliasForSubcommand(EndpointsListCmd.class)
+public class EndpointsCmd extends EndpointsListImpl {}

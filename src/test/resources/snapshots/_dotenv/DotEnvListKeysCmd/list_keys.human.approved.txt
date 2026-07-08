@@ -2,6 +2,7 @@
 command: astra dotenv list-keys
 exit_code: 0
 ---- output ----
+stderr: [WARNING] astra dotenv commands are still in beta and may change without notice.
 stdout: ┌─────────────────────────────────┐
 stdout: │ Key                             │
 stdout: ├─────────────────────────────────┤
@@ -12,7 +13,7 @@ stdout: │ ASTRA_DB_ID                     │
 stdout: │ ASTRA_DB_NAME                   │
 stdout: │ ASTRA_DB_REGION                 │
 stdout: │ ASTRA_DB_KEYSPACE               │
-stdout: │ ASTRA_DB_APPLICATION_TOKEN      │
+stdout: │ ASTRA_DB_TOKEN                  │
 stdout: │ ASTRA_DB_ENVIRONMENT            │
 stdout: │ ASTRA_DB_SECURE_BUNDLE_PATH     │
 stdout: │ ASTRA_DB_SECURE_BUNDLE_URL      │

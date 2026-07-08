@@ -3,9 +3,11 @@ package com.dtsx.astra.cli.operations.db;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.DbRef;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.PcuRef;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
+import com.dtsx.astra.cli.gateways.pcu.PcuGateway;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
 public class DbCreateOperation implements Operation<DbCreateResult> {
     private final DbGateway dbGateway;
     private final RegionGateway regionGateway;
+    private final PcuGateway pcuGateway;
     private final CreateDbRequest request;
 
     public enum ExistingBehavior {
@@ -33,12 +36,13 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
 
     public record CreateDbRequest(
         String dbName,
-        RegionName region,
+        RegionRef region,
         Optional<CloudProvider> cloud,
         String db,
         String tier,
         Integer capacityUnits,
         boolean nonVector,
+        Optional<PcuRef> pcuGroup,
         ExistingBehavior existingBehavior,
         LongRunningOptions lrOptions,
         boolean skipRegionVerification
@@ -61,6 +65,11 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
                 !request.nonVector
             );
 
+        val pcuId = request.pcuGroup.map((ref) -> ref.fold(
+            id -> id,
+            _ -> pcuGateway.findOne(ref).getId()
+        ));
+
         val status = dbGateway.create(
             request.dbName,
             request.db,
@@ -69,6 +78,7 @@ public class DbCreateOperation implements Operation<DbCreateResult> {
             request.tier,
             request.capacityUnits,
             !request.nonVector,
+            pcuId,
             request.existingBehavior == ExistingBehavior.ALLOW_DUPLICATES
         );
 

@@ -6,21 +6,21 @@ import com.dtsx.astra.cli.core.exceptions.internal.pcu.PcuGroupNotFoundException
 import com.dtsx.astra.cli.core.models.CloudProvider;
 import com.dtsx.astra.cli.core.models.PcuRef;
 import com.dtsx.astra.cli.core.models.PcuStatus;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupCreationRequest;
 import com.dtsx.astra.sdk.pcu.domain.PCUGroupUpdateRequest;
+import com.dtsx.astra.sdk.pcu.domain.PCUType;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.stream.Stream;
-import com.dtsx.astra.cli.core.models.RegionName;
-import com.dtsx.astra.sdk.pcu.domain.PCUType;
 
 public interface PcuGateway extends SomeGateway {
     Stream<PCUGroup> findAll();
 
-    Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionName> region);
+    Stream<PCUType> findPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region);
 
     Optional<PCUGroup> tryFindOne(PcuRef ref);
 

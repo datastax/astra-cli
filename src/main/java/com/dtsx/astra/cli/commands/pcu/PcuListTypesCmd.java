@@ -2,7 +2,7 @@ package com.dtsx.astra.cli.commands.pcu;
 
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.output.PlatformChars;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
@@ -35,13 +35,13 @@ public class PcuListTypesCmd extends AbstractPcuCmd<Stream<PCUType>> {
         names = { $Cloud.LONG, $Cloud.SHORT },
         description = "Cloud provider filter"
     )
-    public CloudProvider $cloudProvider;
+    public Optional<CloudProvider> $cloudProvider;
 
     @Option(
         names = { $Regions.LONG, $Regions.SHORT },
         description = "Region filter"
     )
-    public RegionName $region;
+    public Optional<String> $regionName;
 
     @Override
     protected final OutputJson executeJson(Supplier<Stream<PCUType>> result) {
@@ -54,19 +54,19 @@ public class PcuListTypesCmd extends AbstractPcuCmd<Stream<PCUType>> {
             .map((pcuType) -> sequencedMapOf(
                 "Type", pcuType.getType(),
                 "Region", pcuType.getRegion(),
-                "Provider", pcuType.getProvider(),
+                "Cloud Provider", pcuType.getProvider(),
                 "Enabled", pcuType.isEnabled() ? PlatformChars.presenceIndicator(ctx.isWindows()) : ""
             ))
             .toList();
 
-        return new ShellTable(data).withColumns("Type", "Region", "Provider", "Enabled");
+        return new ShellTable(data).withColumns("Type", "Cloud Provider", "Region", "Enabled");
     }
 
     @Override
     protected PcuListTypesOperation mkOperation() {
         val req = new PcuListTypesRequest(
-            Optional.ofNullable($cloudProvider),
-            Optional.ofNullable($region)
+            $cloudProvider,
+            $regionName.map(RegionRef::mustParse)
         );
         return new PcuListTypesOperation(pcuGateway, req);
     }

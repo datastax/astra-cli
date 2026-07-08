@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.models;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.output.Highlightable;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
@@ -20,6 +21,12 @@ public class KeyspaceRef implements Highlightable {
     public static Either<String, KeyspaceRef> parse(@NonNull DbRef dbRef, @NonNull String name) {
         return ModelUtils.trimAndValidateBasics("Keyspace name", name)
             .map((trimmed) -> mkUnsafe(dbRef, trimmed));
+    }
+
+    public static KeyspaceRef mustParse(@NonNull DbRef dbRef, @NonNull String name) {
+        return parse(dbRef, name).getRight((err) -> {
+            throw new OptionValidationException("keyspace", err);
+        });
     }
 
     public static KeyspaceRef mkUnsafe(@NonNull DbRef dbRef, @NonNull String name) {

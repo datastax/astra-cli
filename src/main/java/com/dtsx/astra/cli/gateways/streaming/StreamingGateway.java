@@ -4,7 +4,7 @@ import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.models.CloudProvider;
-import com.dtsx.astra.cli.core.models.RegionName;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.cli.core.models.TenantName;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
@@ -22,9 +22,9 @@ public interface StreamingGateway extends SomeGateway {
 
     boolean exists(TenantName tenantName);
 
-    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionName region);
+    CloudProvider findCloudForRegion(Optional<CloudProvider> cloud, RegionRef region);
 
-    CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionName>> clusterOrCloud, String plan, String userEmail);
+    CreationStatus<Tenant> create(TenantName tenantName, Either<String, Pair<CloudProvider, RegionRef>> clusterOrCloud, String plan, String userEmail);
 
     DeletionStatus<TenantName> delete(TenantName tenantName);
 

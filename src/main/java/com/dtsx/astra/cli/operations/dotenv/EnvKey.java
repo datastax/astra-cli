@@ -12,7 +12,7 @@ public enum EnvKey {
     ASTRA_DB_NAME(true),
     ASTRA_DB_REGION(true),
     ASTRA_DB_KEYSPACE(true),
-    ASTRA_DB_APPLICATION_TOKEN(false),
+    ASTRA_DB_TOKEN(false),
     ASTRA_DB_ENVIRONMENT(true),
 
     ASTRA_DB_SECURE_BUNDLE_PATH(true),

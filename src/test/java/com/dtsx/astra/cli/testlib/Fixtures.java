@@ -12,7 +12,7 @@ import com.dtsx.astra.cli.utils.JsonUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.org.domain.*;
-import com.dtsx.astra.sdk.streaming.domain.CdcDefinition;
+import com.dtsx.astra.sdk.pcu.domain.PCUType;
 import com.dtsx.astra.sdk.streaming.domain.Tenant;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -66,15 +66,8 @@ public abstract class Fixtures {
         public static final RoleRef NameRef = RoleRef.fromNameUnsafe(One.getName());
     }
 
-    public static class Cdc {
-        public static final List<CdcDefinition> Many = load("CdcDefinitions.json", new TypeReference<>() {});
-
-        public static final CdcDefinition One = Many.getFirst();
-
-        public static final CdcRef Ref = CdcRef.fromDefinition(
-            TableRef.mkUnsafe(KeyspaceRef.mkUnsafe(DbRef.fromNameUnsafe(One.getDatabaseName()), One.getKeyspace()), One.getDatabaseTable()),
-            TenantName.mkUnsafe(One.getTenant())
-        );
+    public static class Pcu {
+        public static final List<PCUType> Types = load("PcuTypes.json", new TypeReference<>() {});
     }
 
     public static class Collections {
@@ -98,7 +91,7 @@ public abstract class Fixtures {
 
         public static final Datacenter ONE = DATACENTERS.getFirst();
 
-        public static final RegionName NAME = RegionName.mkUnsafe(ONE.getRegion());
+        public static final RegionRef NAME = RegionRef.mkUnsafe(ONE.getRegion());
     }
 
     public static final CreateTokenResponse CreateTokenResponse = load("CreateTokenResponse.json", new TypeReference<>() {});
