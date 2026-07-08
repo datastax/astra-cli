@@ -52,7 +52,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
 )
 @Example(
     comment = "Check the helptext for plenty more options",
-    command = "eval \"$(${cli.path} shellenv -h)\""
+    command = "${cli.name} shellenv -h"
 )
 public class ShellEnvCmd implements Runnable {
     @Spec

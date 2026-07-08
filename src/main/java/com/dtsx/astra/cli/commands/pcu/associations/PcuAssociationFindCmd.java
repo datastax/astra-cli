@@ -43,8 +43,7 @@ public class PcuAssociationFindCmd extends AbstractPcuAssociationCmd<Optional<PC
 
     @Override
     protected final OutputJson executeJson(Supplier<Optional<PCUGroup>> result) {
-        val pcu = result.get().orElse(null);
-        return OutputJson.serializeValue(pcu);
+        return OutputJson.serializeValue(result);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class AuthenticationExceptionMapper implements ExternalExceptionMapper<Au
             (profile != null && profile.isReconstructedFromCreds())
                 ? "token provided via the command line" :
             (profile != null)
-                ? "token provided in the configuration file for profile '" + ctx.highlight(profile.nameOrDefault()) + "'"
+                ? "token provided in the configuration file for profile @'!" + profile.nameOrDefault() + "!@"
                 : "used token";
 
         return new AstraCliException(INVALID_TOKEN, """
