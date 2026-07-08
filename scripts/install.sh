@@ -46,7 +46,7 @@ renderCommand() {
 }
 
 # Constants
-ASTRA_CLI_VERSION="1.0.4"
+ASTRA_CLI_VERSION="1.1.0"
 
 # Checksum constants (updated automatically by CI)
 LINUX_X86_64_CHECKSUM="f9b70a89cd510c042f47272ab08c126c2556ed469def22967d812ebdab655cc9"
