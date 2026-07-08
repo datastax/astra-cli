@@ -1,0 +1,16 @@
+---- meta ----
+command: astra db data-api exec two_regions_db -k default_keyspace -c test_coll -t test_table -e 'console.log(!!client, !!db, !!test_coll, !!test_table)' -o json
+exit_code: 0
+---- output ----
+stderr: [WARNING] astra db data-api commands are still in beta and may change without notice.
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "message" : "Data API executed with exit code 0, with 1 lines in stdout and 0 lines in stderr.",
+stdout:   "data" : {
+stdout:     "exitCode" : 0,
+stdout:     "stdout" : "true true true true",
+stdout:     "stderr" : ""
+stdout:   },
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 public interface PcuGateway extends SomeGateway {
     Stream<PCUGroup> findAll();
 
-    Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region);
+    Stream<PCUType> findPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region);
 
     Optional<PCUGroup> tryFindOne(PcuRef ref);
 

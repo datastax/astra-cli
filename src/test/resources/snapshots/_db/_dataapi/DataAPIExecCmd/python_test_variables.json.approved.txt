@@ -1,0 +1,12 @@
+---- meta ----
+command: astra db data-api exec two_regions_db -k default_keyspace -c test_coll -t test_table --python -e 'print(client is not None, db is not None, test_coll is not None, test_table is not None)' -o json
+exit_code: 2
+---- output ----
+stderr: [WARNING] astra db data-api commands are still in beta and may change without notice.
+stdout: {
+stdout:   "code" : "IO_ISSUE",
+stdout:   "message" : "Failed to start execution: (IOException) Cannot run program \"python\": error=2, No such file or directory",
+stdout:   "data" : null,
+stdout:   "nextSteps" : null
+stdout: }
+---- end ----

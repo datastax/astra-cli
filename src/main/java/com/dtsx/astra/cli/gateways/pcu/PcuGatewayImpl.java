@@ -29,7 +29,7 @@ public class PcuGatewayImpl implements PcuGateway {
     }
 
     @Override
-    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region) {
+    public Stream<PCUType> findPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region) {
         return ctx.log().loading("Fetching PCU types", (_) -> {
             val filter = new PCUTypeLocationFilter(
                 provider.map(CloudProvider::name).orElse(null),

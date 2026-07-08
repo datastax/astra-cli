@@ -1,0 +1,12 @@
+---- meta ----
+command: astra db data-api exec *nonexistent* -k default_keyspace -e "" -o csv
+exit_code: 2
+---- output ----
+stderr: [WARNING] astra db data-api commands are still in beta and may change without notice.
+stdout: code,message
+stdout: DATABASE_NOT_FOUND,"Error: A database named '*nonexistent*' could not be found.
+stdout: 
+stdout: Please ensure that:
+stdout:   - You are using the correct token/organization.
+stdout:   - You are using the correct database name."
+---- end ----

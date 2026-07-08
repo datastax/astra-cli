@@ -1,0 +1,41 @@
+---- meta ----
+command: astra pcu list-types
+exit_code: 0
+---- output ----
+stdout: ┌────────────────┬─────────────────┬─────────────────────────┬──────────┐
+stdout: │ Type           │ Cloud Provider  │ Region                  │ Enabled  │
+stdout: ├────────────────┼─────────────────┼─────────────────────────┼──────────┤
+stdout: │ generalPurpose │ aws             │ us-east-1               │ ■        │
+stdout: │ generalPurpose │ aws             │ us-east-2               │ ■        │
+stdout: │ generalPurpose │ aws             │ us-west-2               │ ■        │
+stdout: │ generalPurpose │ azure           │ canadacentral           │ ■        │
+stdout: │ generalPurpose │ azure           │ centralindia            │ ■        │
+stdout: │ generalPurpose │ azure           │ eastus                  │ ■        │
+stdout: │ generalPurpose │ gcp             │ europe-west4            │ ■        │
+stdout: │ generalPurpose │ gcp             │ northamerica-northeast2 │ ■        │
+stdout: │ generalPurpose │ gcp             │ us-central1             │ ■        │
+stdout: │ generalPurpose │ gcp             │ us-east1                │ ■        │
+stdout: │ generalPurpose │ gcp             │ us-east4                │ ■        │
+stdout: │ generalPurpose │ gcp             │ us-west1                │ ■        │
+stdout: │ cacheOptimized │ aws             │ us-east-1               │ ■        │
+stdout: │ cacheOptimized │ aws             │ us-east-2               │ ■        │
+stdout: │ cacheOptimized │ aws             │ us-west-2               │ ■        │
+stdout: │ cacheOptimized │ azure           │ canadacentral           │ ■        │
+stdout: │ cacheOptimized │ azure           │ centralindia            │ ■        │
+stdout: │ cacheOptimized │ azure           │ eastus                  │ ■        │
+stdout: │ cacheOptimized │ gcp             │ europe-west4            │ ■        │
+stdout: │ cacheOptimized │ gcp             │ northamerica-northeast2 │ ■        │
+stdout: │ cacheOptimized │ gcp             │ us-central1             │ ■        │
+stdout: │ cacheOptimized │ gcp             │ us-east1                │ ■        │
+stdout: │ cacheOptimized │ gcp             │ us-east4                │ ■        │
+stdout: │ cacheOptimized │ gcp             │ us-west1                │ ■        │
+stdout: │ small          │ aws             │ us-west-2               │ ■        │
+stdout: │ medium         │ aws             │ us-west-2               │ ■        │
+stdout: │ small          │ aws             │ us-east-1               │ ■        │
+stdout: │ medium         │ aws             │ us-east-1               │ ■        │
+stdout: │ small          │ azure           │ westus2                 │ ■        │
+stdout: │ medium         │ azure           │ westus2                 │ ■        │
+stdout: │ small          │ gcp             │ us-east1                │ ■        │
+stdout: │ medium         │ gcp             │ us-east1                │ ■        │
+stdout: └────────────────┴─────────────────┴─────────────────────────┴──────────┘
+---- end ----

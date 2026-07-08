@@ -30,8 +30,8 @@ public class PcuGatewayCompletionsCacheWrapper implements PcuGateway {
     }
 
     @Override
-    public Stream<PCUType> listPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region) {
-        return delegate.listPcuTypes(provider, region);
+    public Stream<PCUType> findPcuTypes(Optional<CloudProvider> provider, Optional<RegionRef> region) {
+        return delegate.findPcuTypes(provider, region);
     }
 
     @Override

@@ -213,8 +213,8 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
         return switch (count) {
             case 1 -> language;
-            case 0 -> throw new OptionValidationException("language", "neither --node nor --python were set to true");
-            default -> throw new OptionValidationException("language", "both --node and --python were set to true");
+            case 0 -> throw new OptionValidationException("language", "no language was selected");
+            default -> throw new OptionValidationException("language", "more than one langauge was selected");
         };
     }
 

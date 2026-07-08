@@ -4,6 +4,7 @@ import com.datastax.astra.internal.api.AstraApiEndpoint;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.output.Highlightable;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 
@@ -25,7 +26,7 @@ public class DbRef implements Highlightable {
     public static Either<String, DbRef> parse(@NonNull String ref) {
         return ModelUtils.trimAndValidateBasics("Database name/id/endpoint", ref).flatMap((trimmed) -> {
             try {
-                val endpoint = AstraApiEndpoint.parse(trimmed);
+                val endpoint = parseEndpoint(trimmed);
 
                 val id = endpoint.getDatabaseId();
                 val region = RegionRef.mkUnsafe(endpoint.getDatabaseRegion());
@@ -79,5 +80,29 @@ public class DbRef implements Highlightable {
     @Override
     public String highlight(CliContext ctx) {
         return ctx.highlight(toString());
+    }
+
+    // astra-sdk-java's builtin one has issues if the url has paths at the end
+    private static AstraApiEndpoint parseEndpoint(String endpointUrl) {
+        var tmpUrl = endpointUrl.replace("https://", "");
+        AstraEnvironment env = null;
+
+        for (val e : AstraEnvironment.values()) {
+            if (tmpUrl.contains(e.getAppsSuffix())) {
+                env = e;
+                tmpUrl = tmpUrl.substring(0, tmpUrl.indexOf(e.getAppsSuffix()));
+                break;
+            }
+        }
+
+        if (env == null) {
+            throw new IllegalArgumentException("Unable to detect environment from endpoint");
+        }
+
+        return new AstraApiEndpoint(
+            UUID.fromString(tmpUrl.substring(0, 36)),
+            tmpUrl.substring(37),
+            env
+        );
     }
 }

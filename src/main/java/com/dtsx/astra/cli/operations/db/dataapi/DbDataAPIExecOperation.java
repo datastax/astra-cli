@@ -118,7 +118,7 @@ public class DbDataAPIExecOperation implements Operation<DataAPIExecResult> {
                 return new Executed(exit);
             }
         } catch (Exception e) {
-            return new OperationFailed(e.getMessage());
+            return new OperationFailed("(" + e.getClass().getSimpleName() + ") " + e.getMessage());
         }
     }
 

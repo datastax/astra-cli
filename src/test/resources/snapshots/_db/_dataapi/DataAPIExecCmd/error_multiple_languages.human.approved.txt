@@ -1,0 +1,78 @@
+---- meta ----
+command: astra db data-api exec two_regions_db --node --python -e ""
+exit_code: 2
+---- output ----
+stderr: Error: --node, --python are mutually exclusive (specify only one)
+stderr: Usage: astra db data-api exec [-qV] [--no-input] [--[no-]spinner] [--color
+stderr:                               [=WHEN]] [--dump-logs[=FILE]] [-c[=COLLECTION[,
+stderr:                               COLLECTION...]]]... [-t[=TABLE[,TABLE...]]]...
+stderr:                               [-e=CODE] [-k=KEYSPACE] [-o=FORMAT] [-r=REGION]
+stderr:                               [-a=PACKAGES[,PACKAGES...]]... [[[-cf=PATH]
+stderr:                               [-p=NAME]] | [--token=TOKEN [--env=ENV]]] [--node
+stderr:                               | --python | --ipython] [DB] [ARGS...]
+stderr: 
+stderr: Execute Data API code against a database
+stderr: 
+stderr:       [DB]                  The name or ID of the Astra database to operate on
+stderr:       [ARGS...]             Verbatim arguments to pass to the underlying
+stderr:                               node/python directly (anything after '--' is
+stderr:                               passed through)
+stderr:                               (default: [])
+stderr:   -a, --artifacts=PACKAGES[,PACKAGES...]
+stderr:                             Additional packages to include (e.g., pandas,
+stderr:                               lodash)
+stderr:                               (default: [])
+stderr:   -c, --collection[=COLLECTION[,COLLECTION...]]
+stderr:                             The collections to use
+stderr:                               (default: [])
+stderr:   -e, --execute=CODE        Code to execute using the Data API
+stderr:                               (default: )
+stderr:   -k, --keyspace=KEYSPACE   The keyspace to use
+stderr:   -r, --region=REGION       The region to use
+stderr:   -t, --table[=TABLE[,TABLE...]]
+stderr:                             The tables to use
+stderr:                               (default: [])
+stderr: 
+stderr: Language selectors:
+stderr:       --ipython             Use astrapy with IPython
+stderr:       --node                Use astra-db-ts with Node.js (default)
+stderr:       --python              Use astrapy with Python
+stderr: 
+stderr: Common Options:
+stderr:       --color[=WHEN]        One of: auto, never, always
+stderr:                               (default: auto)
+stderr:       --dump-logs[=FILE]    Write all logs to an optionally specified file
+stderr:                               (default: ~/.astra-dev/logs/<file>.log)
+stderr:       --no-input            Don't ask for user input (e.g. confirmation prompts)
+stderr:   -o, --output=FORMAT       One of: human, json, csv
+stderr:                               (default: human)
+stderr:   -q, --quiet               Only output essential information
+stderr:       --[no-]spinner        Enable/disable loading spinners
+stderr:                               (default: enabled if tty and not quiet)
+stderr:   -V, --verbose             Enable verbose logging output
+stderr: 
+stderr: Connection Options:
+stderr:       -cf, --config-file=PATH
+stderr:                             The .astrarc file to use for this command
+stderr:                               (default: ~/.astrarc-dev)
+stderr:       --env=ENV             Astra environment the token belongs to: prod
+stderr:                               (default), dev, or test. Leave unset unless you
+stderr:                               were issued a non-prod token.
+stderr:   -p, --profile=NAME        The .astrarc profile to use for this command. Can
+stderr:                               be set via ASTRA_PROFILE.
+stderr:       --token=TOKEN         The astra token to use for this command. Use the
+stderr:                               --token @file syntax to read the token from a
+stderr:                               file, to avoid potential leaks.
+stderr: 
+stderr: Examples:
+stderr:   # Insert a document using astra-db-ts (passing the -p flag to node)
+stderr:   $ astra db data-api exec my_db -c my_coll -e "my_coll.insertOne({ name: 'Joe' })" -- -p
+stderr: 
+stderr:   # Find a row using python
+stderr:   $ astra db data-api exec my_db -l python -t my_table -e "print(my_table.find_one())"
+stderr: 
+stderr:   # Execute a file
+stderr:   $ astra db data-api exec my_db -e @code.js
+stderr: 
+stderr: See 'astra <command> <subcommand> --help' for help on a specific subcommand.
+---- end ----

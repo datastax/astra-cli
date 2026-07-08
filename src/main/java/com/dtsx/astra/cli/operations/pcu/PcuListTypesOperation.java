@@ -22,6 +22,6 @@ public class PcuListTypesOperation implements Operation<Stream<PCUType>> {
 
     @Override
     public Stream<PCUType> execute() {
-        return pcuGateway.listPcuTypes(request.cloud(), request.region());
+        return pcuGateway.findPcuTypes(request.cloud(), request.region());
     }
 }
