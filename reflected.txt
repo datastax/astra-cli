@@ -11,8 +11,8 @@ com.dtsx.astra.sdk.org.domain.[User,ResponseAllUsers,InviteUserRequest]
 com.dtsx.astra.sdk.org.domain.[Role,RolePolicy]
 
 # Db gateway
-# com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
-com.dtsx.astra.sdk.db.domain.*
+com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
+com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult
 
 # Token gateway
 com.dtsx.astra.sdk.org.domain.[CreateTokenResponse,ResponseAllIamTokens,IamToken]
