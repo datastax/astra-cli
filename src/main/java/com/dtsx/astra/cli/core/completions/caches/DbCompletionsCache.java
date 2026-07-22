@@ -7,7 +7,7 @@ import com.dtsx.astra.cli.core.config.Profile;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class DbCompletionsCache extends ProfileLinkedCompletionsCache {
-    public DbCompletionsCache(CliContext ctx,Pair<Profile, ProfileSource> profileAndSource) {
+    public DbCompletionsCache(CliContext ctx, Pair<Profile, ProfileSource> profileAndSource) {
         super(ctx, profileAndSource);
     }
 

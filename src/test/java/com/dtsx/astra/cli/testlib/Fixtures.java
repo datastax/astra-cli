@@ -10,6 +10,8 @@ import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.models.*;
 import com.dtsx.astra.cli.utils.JsonUtils;
 import com.dtsx.astra.sdk.db.domain.Database;
+import com.dtsx.astra.sdk.db.domain.DatabaseCloneStatus;
+import com.dtsx.astra.sdk.db.domain.DatabaseSnapshot;
 import com.dtsx.astra.sdk.db.domain.Datacenter;
 import com.dtsx.astra.sdk.org.domain.*;
 import com.dtsx.astra.sdk.pcu.domain.PCUType;
@@ -92,6 +94,12 @@ public abstract class Fixtures {
         public static final Datacenter ONE = DATACENTERS.getFirst();
 
         public static final RegionRef NAME = RegionRef.mkUnsafe(ONE.getRegion());
+    }
+
+    public static class Clone {
+        public static final DatabaseCloneStatus Status = load("DatabaseCloneStatus.json", new TypeReference<>() {});
+        public static final DatabaseCloneStatus StatusCompleted = load("DatabaseCloneStatusCompleted.json", new TypeReference<>() {});
+        public static final List<DatabaseSnapshot> Snapshots = load("DatabaseSnapshots.json", new TypeReference<>() {});
     }
 
     public static final CreateTokenResponse CreateTokenResponse = load("CreateTokenResponse.json", new TypeReference<>() {});

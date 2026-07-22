@@ -2,13 +2,14 @@ package com.dtsx.astra.cli.gateways;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
-import com.dtsx.astra.cli.core.completions.caches.RoleCompletionsCache;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.DbGatewayCompletionsCacheWrapper;
 import com.dtsx.astra.cli.gateways.db.DbGatewayImpl;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGateway;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGatewayImpl;
+import com.dtsx.astra.cli.gateways.db.clone.DbCloneGateway;
+import com.dtsx.astra.cli.gateways.db.clone.DbCloneGatewayImpl;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGatewayImpl;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
@@ -52,6 +53,11 @@ public class GatewayProviderImpl implements GatewayProvider {
     @Override
     public DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
         return new DbGatewayCompletionsCacheWrapper(new DbGatewayImpl(ctx(), apiProvider(token, env), token, env, GlobalInfoCache.INSTANCE), dbCompletionsCache);
+    }
+
+    @Override
+    public DbCloneGateway mkDbCloneGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
+        return new DbCloneGatewayImpl(ctx(), apiProvider(token, env), mkDbGateway(token, env, dbCompletionsCache));
     }
 
     @Override
@@ -115,8 +121,8 @@ public class GatewayProviderImpl implements GatewayProvider {
     }
 
     @Override
-    public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env) {
-        return new TokenGatewayImpl(ctx(), apiProvider(token, env), mkRoleGateway(token, env, new RoleCompletionsCache(ctx())), mkOrgGatewayStateless());
+    public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache) {
+        return new TokenGatewayImpl(ctx(), apiProvider(token, env), mkRoleGateway(token, env, roleCompletionsCache), mkOrgGatewayStateless());
     }
 
     @Override

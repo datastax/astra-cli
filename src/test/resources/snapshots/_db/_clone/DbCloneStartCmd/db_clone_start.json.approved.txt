@@ -1,0 +1,18 @@
+---- meta ----
+command: astra db clone start new_db -sd two_regions_db -s snap-789 -o json
+exit_code: 0
+---- output ----
+stderr: [WARNING] astra db clone commands are still in beta and may change without notice.
+stdout: {
+stdout:   "code" : "OK",
+stdout:   "data" : {
+stdout:     "operationId" : "c4d5e6f7-a8b9-4c5d-6e7f-8a9b0c1d2e3f",
+stdout:     "status" : "DONE",
+stdout:     "phase" : "DONE",
+stdout:     "sourceDbId" : "123e4567-e89b-12d3-a456-426614174000",
+stdout:     "targetDbId" : "987e6543-e21b-34d5-c678-426614174011",
+stdout:     "snapshotId" : "78901234-7890-1234-5678-789012345678",
+stdout:     "waitedSeconds" : 6
+stdout:   }
+stdout: }
+---- end ----

@@ -1,0 +1,14 @@
+---- meta ----
+command: astra db clone status two_regions_db --operation-id clone-op-12345 -o csv
+exit_code: 0
+---- output ----
+stderr: [WARNING] astra db clone commands are still in beta and may change without notice.
+stdout: code,message,attribute,value
+stdout: OK,,Operation ID,c4d5e6f7-a8b9-4c5d-6e7f-8a9b0c1d2e3f
+stdout: OK,,Status,RUNNING
+stdout: OK,,Source DB,123e4567-e89b-12d3-a456-426614174000
+stdout: OK,,Target DB,987e6543-e21b-34d5-c678-426614174011
+stdout: OK,,Snapshot ID,78901234-7890-1234-5678-789012345678
+stdout: OK,,Phase,COPYING_DATA
+stdout: OK,,Message,Clone is in progress
+---- end ----
