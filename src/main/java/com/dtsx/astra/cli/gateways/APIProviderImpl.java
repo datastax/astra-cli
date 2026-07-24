@@ -90,7 +90,7 @@ public class APIProviderImpl implements APIProvider {
     }
 
     private DataAPIDestination throwCantUseLocalWithDataApi() {
-        throw new AstraCliException(ILLEGAL_OPERATION, "Local environments are not supported for Data API operations. Please use a prod, dev, or test Astra environment.");
+        throw new AstraCliException(ILLEGAL_OPERATION, "@|bold,red Local environments are not supported for Data API operations. Please use a prod, dev, or test Astra environment.|@");
     }
 
     private UUID resolveDbId(DbRef ref) {
