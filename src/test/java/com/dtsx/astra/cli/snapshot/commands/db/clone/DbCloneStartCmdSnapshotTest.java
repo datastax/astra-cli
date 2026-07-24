@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.testlib.Fixtures.Clone;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -19,8 +20,8 @@ public class DbCloneStartCmdSnapshotTest extends BaseCmdSnapshotTest {
         return (o) -> o
             .gateway(DbCloneGateway.class, (mock) -> {
                 doReturn(Clone.Status).when(mock).cloneFrom(any(), any(), any(), any());
-                when(mock.waitUntilCloneStatus(any(), any(), any(), any())).thenReturn(Duration.ofMillis(6789));
-                when(mock.getCloneStatus(any(), any())).thenReturn(Clone.StatusCompleted);
+                when(mock.waitUntilClonePhase(any(), any(), any(), any())).thenReturn(Duration.ofMillis(6789));
+                when(mock.findClone(any(), any())).thenReturn(Clone.StatusCompleted);
             });
     }
 
@@ -28,8 +29,8 @@ public class DbCloneStartCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_clone_start(OutputType outputType) {
         verifyRun("db clone start new_db -sd ${DatabaseName} -s snap-789", outputType, o -> o.use(opts())
             .verify((mocks) -> {
-                verify(mocks.dbCloneGateway()).cloneFrom(DbRef.fromNameUnsafe("new_db"), Databases.NameRef, "snap-789", java.util.Optional.empty());
-                verify(mocks.dbCloneGateway()).waitUntilCloneStatus(DbRef.fromNameUnsafe("new_db"), Clone.Status.getOperationId(), "DONE", Duration.ofMinutes(30));
+                verify(mocks.dbCloneGateway()).cloneFrom(DbRef.fromNameUnsafe("new_db"), Databases.NameRef, "snap-789", Optional.empty());
+                verify(mocks.dbCloneGateway()).waitUntilClonePhase(DbRef.fromNameUnsafe("new_db"), Clone.OperationId, "Done", Duration.ofMinutes(30));
             }));
     }
 
@@ -37,8 +38,8 @@ public class DbCloneStartCmdSnapshotTest extends BaseCmdSnapshotTest {
     public void db_clone_start_async(OutputType outputType) {
         verifyRun("db clone start new_db -sd ${DatabaseName} -s snap-789 --async", outputType, o -> o.use(opts())
             .verify((mocks) -> {
-                verify(mocks.dbCloneGateway()).cloneFrom(DbRef.fromNameUnsafe("new_db"), Databases.NameRef, "snap-789", java.util.Optional.empty());
-                verify(mocks.dbCloneGateway(), never()).waitUntilCloneStatus(any(), any(), any(), any());
+                verify(mocks.dbCloneGateway()).cloneFrom(DbRef.fromNameUnsafe("new_db"), Databases.NameRef, "snap-789", Optional.empty());
+                verify(mocks.dbCloneGateway(), never()).waitUntilClonePhase(any(), any(), any(), any());
             }));
     }
 }

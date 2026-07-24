@@ -1,5 +1,5 @@
 ---- meta ----
-command: astra db clone status two_regions_db --operation-id clone-op-12345
+command: astra db clone status two_regions_db -id c4d5e6f7-a8b9-4c5d-6e7f-8a9b0c1d2e3f
 exit_code: 0
 ---- output ----
 stderr: [WARNING] astra db clone commands are still in beta and may change without notice.

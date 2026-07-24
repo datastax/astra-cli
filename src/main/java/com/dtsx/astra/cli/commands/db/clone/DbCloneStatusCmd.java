@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands.db.clone;
 
 import com.dtsx.astra.cli.core.help.Example;
+import com.dtsx.astra.cli.core.models.CloneOperationId;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
@@ -22,15 +23,16 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 )
 @Example(
     comment = "Check the status of a specific clone operation",
-    command = "${cli.name} db clone status my_db -o clone-op-12345"
+    command = "${cli.name} db clone status my_db -id 202d0d1b-14cf-43dc-89fe-efb23758ccef"
 )
 public class DbCloneStatusCmd extends AbstractDbCloneCmd<DatabaseCloneStatus> {
     @Option(
-        names = { "--operation-id" },
+        names = { "-id", "--operation-id" },
         description = "The ID of the clone operation",
-        paramLabel = "OPERATION_ID"
+        paramLabel = "OPERATION_ID",
+        required = true
     )
-    public String $operationId;
+    public CloneOperationId $operationId;
 
     @Override
     protected OutputJson executeJson(Supplier<DatabaseCloneStatus> result) {

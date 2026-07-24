@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.operations.db.clone;
 
+import com.dtsx.astra.cli.core.models.CloneOperationId;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.gateways.db.clone.DbCloneGateway;
 import com.dtsx.astra.cli.operations.Operation;
@@ -9,6 +10,7 @@ import lombok.val;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LongRunningOptions;
 import static com.dtsx.astra.cli.operations.db.clone.DbCloneStartOperation.DbCloneStartResult;
@@ -43,13 +45,15 @@ public class DbCloneStartOperation implements Operation<DbCloneStartResult> {
             return new CloneStarted(status);
         }
 
-        val waitTime = dbCloneGateway.waitUntilCloneStatus(
+        val operationId = CloneOperationId.mkUnsafe(UUID.fromString(status.getOperationId()));
+
+        val waitTime = dbCloneGateway.waitUntilClonePhase(
             request.targetDbRef,
-            status.getOperationId(),
-            "DONE",
+            operationId,
+            "Done",
             request.lrOptions.timeout()
         );
 
-        return new CloneCompleted(dbCloneGateway.getCloneStatus(request.targetDbRef, status.getOperationId()), waitTime);
+        return new CloneCompleted(dbCloneGateway.findClone(request.targetDbRef, operationId), waitTime);
     }
 }

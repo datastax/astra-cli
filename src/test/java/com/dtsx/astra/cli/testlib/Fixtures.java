@@ -98,7 +98,11 @@ public abstract class Fixtures {
 
     public static class Clone {
         public static final DatabaseCloneStatus Status = load("DatabaseCloneStatus.json", new TypeReference<>() {});
+
         public static final DatabaseCloneStatus StatusCompleted = load("DatabaseCloneStatusCompleted.json", new TypeReference<>() {});
+
+        public static final CloneOperationId OperationId = CloneOperationId.mkUnsafe(UUID.fromString(Status.getOperationId()));
+
         public static final List<DatabaseSnapshot> Snapshots = load("DatabaseSnapshots.json", new TypeReference<>() {});
     }
 
