@@ -141,7 +141,7 @@ public class AstraConfig {
                 );
             } catch (IllegalArgumentException e) {
                 return Either.left(
-                    new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(ENV_KEY) + ": Got '" + rawEnv + "', expected one of (prod|dev|test)")
+                    new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(ENV_KEY) + ": Got '" + rawEnv + "', expected one of (" + String.join("|", AstraEnvironment.allValuesLower()) + ")")
                 );
             }
         });

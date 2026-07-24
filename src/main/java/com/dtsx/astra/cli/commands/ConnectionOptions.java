@@ -46,7 +46,7 @@ public class ConnectionOptions {
         @Option(
             names = { $Env.LONG },
             completionCandidates = AstraEnvCompletion.class,
-            description = "Astra environment the token belongs to: prod (default), dev, or test. Leave unset unless you were issued a non-prod token.",
+            description = "Astra environment the token belongs to: prod (default), dev, test, or local. Leave unset unless you were issued a non-prod token.",
             paramLabel = $Env.LABEL
         )
         public Optional<AstraEnvironment> $env;

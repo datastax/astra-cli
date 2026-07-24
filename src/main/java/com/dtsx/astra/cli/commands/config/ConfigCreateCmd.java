@@ -74,7 +74,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = "Astra environment the token belongs to: prod (default), dev, or test. Leave unset unless you were issued a non-prod token.",
+        description = "Astra environment the token belongs to: prod (default), dev, test, or local. Leave unset unless you were issued a non-prod token.",
         completionCandidates = AstraEnvCompletion.class,
         defaultValue = $Env.DEFAULT,
         paramLabel = $Env.LABEL

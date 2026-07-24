@@ -60,7 +60,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = "Astra environment the token belongs to: prod (default), dev, or test. Leave unset unless you were issued a non-prod token.",
+        description = "Astra environment the token belongs to: prod (default), dev, test, or local. Leave unset unless you were issued a non-prod token.",
         completionCandidates = AstraEnvCompletion.class,
         paramLabel = $Env.LABEL
     )
@@ -316,7 +316,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             .defaultOption(defaultEnv)
             .mapper(e -> e.name().toLowerCase())
             .fallbackFlag("--env")
-            .fix(originalArgs(), "--env <prod|test|dev>")
+            .fix(originalArgs(), "--env <" + String.join("|", AstraEnvironment.allValuesLower()) + ">")
             .dontClearAfterSelection();
     }
 

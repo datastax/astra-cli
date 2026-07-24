@@ -1,4 +1,6 @@
 import java.net.URLClassLoader
+import java.util.zip.ZipFile
+import java.security.MessageDigest
 
 buildscript {
     repositories {
@@ -401,3 +403,53 @@ tasks.register<Jar>("fatJar") {
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
 }
+
+// -----------------------------------------------------------------
+// AstraEnvironment classpath patch
+//
+// src/main/java/com/dtsx/astra/sdk/utils/AstraEnvironment.java shadows
+// the upstream enum to add LOCAL support. The SHA below guards against
+// the upstream class changing without us noticing.
+//
+// If the build fails with a SHA mismatch:
+//   1. Check what changed in astra-sdk-devops
+//   2. Update src/main/java/com/dtsx/astra/sdk/utils/AstraEnvironment.java
+//   3. Run ./gradlew updateAstraEnvironmentPatchSha
+//   4. Commit both files
+// -----------------------------------------------------------------
+
+fun astraEnvClassSha(): String {
+    val jar = configurations.runtimeClasspath.get().first { it.name.contains("astra-sdk-devops") }
+    val bytes = ZipFile(jar).use { zip ->
+        zip.getInputStream(zip.getEntry("com/dtsx/astra/sdk/utils/AstraEnvironment.class")).readBytes()
+    }
+    return MessageDigest.getInstance("SHA-256")
+        .digest(bytes).joinToString("") { "%02x".format(it) }
+}
+
+tasks.register("verifyAstraEnvironmentPatch") {
+    inputs.files(configurations.runtimeClasspath)
+    inputs.file("assets/AstraEnvironment.class.sha256")
+    doLast {
+        val expected = file("assets/AstraEnvironment.class.sha256").readText().trim()
+        val actual = astraEnvClassSha()
+        if (actual != expected)
+            throw GradleException(
+                "Upstream AstraEnvironment has changed (SHA mismatch).\n" +
+                    "Update the patch then run: ./gradlew updateAstraEnvironmentPatchSha\n\n" +
+                    "Expected: $expected\nActual:   $actual"
+            )
+    }
+}
+
+tasks.register("updateAstraEnvironmentPatchSha") {
+    group = "build"
+    description = "Regenerates the AstraEnvironment patch SHA after an upstream change."
+    doLast {
+        val sha = astraEnvClassSha()
+        file("assets/AstraEnvironment.class.sha256").writeText(sha)
+        logger.lifecycle("SHA updated: $sha")
+    }
+}
+
+tasks.compileJava { dependsOn("verifyAstraEnvironmentPatch") }
