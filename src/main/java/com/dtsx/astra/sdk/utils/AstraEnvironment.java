@@ -1,7 +1,13 @@
 package com.dtsx.astra.sdk.utils;
 
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.util.Optional;
+
+import static com.dtsx.astra.cli.core.output.ExitCode.VALIDATION_ISSUE;
 
 @Getter
 @Accessors(fluent = false)
@@ -32,6 +38,8 @@ public final class AstraEnvironment {
         ".api.staging.streaming.datastax.com"
     );
 
+    public static final String LOCAL_NAME = "LOCAL";
+
     @Accessors(fluent = true)
     private final int ordinal;
 
@@ -42,8 +50,12 @@ public final class AstraEnvironment {
     private final String appsSuffix;
     private final String streamingV3Suffix;
 
+    public boolean isLocal() {
+        return this.ordinal == -1;
+    }
+
     public static AstraEnvironment local(String endpoint) {
-        return new AstraEnvironment(-1, "LOCAL", endpoint, "", "");
+        return new AstraEnvironment(-1, LOCAL_NAME, endpoint, "n/a", "n/a"); // TODO figure out what to do with these endpoints
     }
 
     public static AstraEnvironment[] values() {
@@ -51,16 +63,33 @@ public final class AstraEnvironment {
     }
 
     public static String[] allValuesLower() {
-        return new String[]{ PROD.name.toLowerCase(), DEV.name.toLowerCase(), TEST.name.toLowerCase(), "local" };
+        return new String[]{ PROD.name.toLowerCase(), DEV.name.toLowerCase(), TEST.name.toLowerCase(), LOCAL_NAME.toLowerCase() };
     }
 
     public static AstraEnvironment valueOf(String name) {
         for (val env : values()) {
-            if (env.name.equals(name)) {
+            if (env.name.equals(name.toUpperCase())) {
                 return env;
             }
         }
         throw new IllegalArgumentException("No AstraEnvironment constant with name: " + name);
+    }
+
+    public static AstraEnvironment resolve(Optional<String> envString, Optional<String> localEndpoint) {
+        val envName = envString.orElse(PROD.name()).toUpperCase();
+
+        if (envName.equalsIgnoreCase(LOCAL_NAME)) {
+            if (localEndpoint.isEmpty()) {
+                throw new AstraCliException(VALIDATION_ISSUE, "@|bold,red When using --env local, you must provide --local-endpoint with the URL of your local DevOps API instance.|@");
+            }
+            return AstraEnvironment.local(localEndpoint.get());
+        }
+
+        try {
+            return AstraEnvironment.valueOf(envName);
+        } catch (IllegalArgumentException e) {
+            throw new OptionValidationException("env", "Invalid environment: '" + envName + "'. Expected one of: " + String.join(", ", AstraEnvironment.allValuesLower()));
+        }
     }
 
     @Override

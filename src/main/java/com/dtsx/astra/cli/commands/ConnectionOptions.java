@@ -9,7 +9,7 @@ import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
-import com.dtsx.astra.sdk.utils.AstraEnvironment;
+
 import lombok.NoArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
@@ -49,16 +49,25 @@ public class ConnectionOptions {
             description = "Astra environment the token belongs to: prod (default), dev, test, or local. Leave unset unless you were issued a non-prod token.",
             paramLabel = $Env.LABEL
         )
-        public Optional<AstraEnvironment> $env;
+        public Optional<String> $env;
 
-        public CredsSpec(AstraToken $token, Optional<AstraEnvironment> $env) {
+        @Option(
+            names = { "--local-endpoint" },
+            description = "The endpoint URL for local Astra environments (required when --env local)",
+            paramLabel = "URL",
+            hidden = true
+        )
+        public Optional<String> $localEndpoint;
+
+        public CredsSpec(AstraToken $token, Optional<String> $env, Optional<String> $localEndpoint) {
             this.$token = $token;
             this.$env = $env;
+            this.$localEndpoint = $localEndpoint;
         }
 
-        @SuppressWarnings("unused") // it may be marked as unused but used by picocli
+        @SuppressWarnings("unused") // it may be marked as unused but is used by picocli
         public CredsSpec() {
-            this(null, Optional.empty());
+            this(null, Optional.empty(), Optional.empty());
         }
     }
 
@@ -121,9 +130,13 @@ public class ConnectionOptions {
 
             val env = (other.$creds != null && other.$creds.$env != null && other.$creds.$env.isPresent())
                 ? other.$creds.$env
-                : (this.$creds != null ? this.$creds.$env : Optional.<AstraEnvironment>empty());
+                : (this.$creds != null ? this.$creds.$env : Optional.<String>empty());
 
-            return new CredsSpec(token, env);
+            val localEndpoint = (other.$creds != null && other.$creds.$localEndpoint != null && other.$creds.$localEndpoint.isPresent())
+                ? other.$creds.$localEndpoint
+                : (this.$creds != null ? this.$creds.$localEndpoint : Optional.<String>empty());
+
+            return new CredsSpec(token, env, localEndpoint);
         }
         return null;
     }

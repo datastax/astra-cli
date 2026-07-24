@@ -28,6 +28,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
 
 @Command(
     name = "create",
@@ -79,7 +80,15 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         defaultValue = $Env.DEFAULT,
         paramLabel = $Env.LABEL
     )
-    public AstraEnvironment $env;
+    public Optional<String> $env;
+
+    @Option(
+        names = { "--local-endpoint" },
+        description = "The endpoint URL for local Astra environments (required when --env local)",
+        paramLabel = "URL",
+        hidden = true
+    )
+    public Optional<String> $localEndpoint;
 
     @Option(
         names = { "-d", "--default" },
@@ -168,10 +177,10 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
         if (hint.isPresent()) {
-            val currentEnvName = $env.name().toLowerCase();
+            val currentEnvName = $env.orElse(PROD.name()).toLowerCase();
             val validEnvName = hint.get().name().toLowerCase();
 
-            val fixAction = hint.get() == AstraEnvironment.PROD
+            val fixAction = hint.get() == PROD
                 ? "drop @'!--env!@ (prod is the default) or pass @'!--env prod!@"
                 : "pass @'!--env " + validEnvName + "!@";
 
@@ -193,12 +202,15 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
-        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway($token, $env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
+        val env = AstraEnvironment.resolve($env, $localEndpoint);
+
+        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway($token, env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
             $profileName,
             $token,
-            $env,
+            env,
             $overwrite,
             $setDefault,
+            $localEndpoint,
             this::assertCanOverwriteProfile
         ));
     }

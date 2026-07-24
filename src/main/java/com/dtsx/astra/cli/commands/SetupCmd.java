@@ -8,6 +8,7 @@ import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.ExecutionCancelledException;
+import com.dtsx.astra.cli.core.exceptions.internal.cli.OptionValidationException;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.AstraToken;
@@ -37,6 +38,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.INVALID_TOKEN;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
 
 @Command(
     name = "setup",
@@ -64,7 +66,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
         completionCandidates = AstraEnvCompletion.class,
         paramLabel = $Env.LABEL
     )
-    public Optional<AstraEnvironment> $env;
+    public Optional<String> $env;
 
     @Option(
         names = { "--name" },
@@ -129,10 +131,10 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
     private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
         if (hint.isPresent()) {
-            val currentEnvName = $env.orElse(AstraEnvironment.PROD).name().toLowerCase();
+            val currentEnvName = $env.orElse(PROD.name()).toLowerCase();
             val validEnvName = hint.get().name().toLowerCase();
 
-            val fixAction = hint.get() == AstraEnvironment.PROD
+            val fixAction = hint.get() == PROD
                 ? "drop @'!--env!@ (prod is the default) or pass @'!--env prod!@"
                 : "pass @'!--env " + validEnvName + "!@";
 
@@ -176,13 +178,32 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
 
     @Override
     protected Operation<SetupResult> mkOperation() {
+        // TODO not sure if this should be here
+        if ($env.isPresent() && $env.get().equalsIgnoreCase("LOCAL")) {
+            throw new AstraCliException(UNSUPPORTED_EXECUTION, """
+              @|bold,red Error: LOCAL environments cannot be configured via interactive setup.|@
+            
+              Please use @'!${cli.name} config create!@ with @'!--env local!@ and @'!--local-endpoint!@ to create a LOCAL profile.
+            """, List.of(
+                new Hint("Create a LOCAL profile", "${cli.name} config create <name> --token <token> --env local --local-endpoint <url>")
+            ));
+        }
+
+        val resolvedEnv = $env.map(envStr -> {
+            try {
+                return AstraEnvironment.valueOf(envStr);
+            } catch (IllegalArgumentException e) {
+                throw new OptionValidationException("env", "Invalid environment: '" + envStr + "'. Expected one of: " + String.join(", ", AstraEnvironment.allValuesLower()));
+            }
+        });
+
         return new SetupOperation(
             ctx,
             ctx.gateways()::mkOrgGateway,
             ctx.gateways().mkOrgGatewayStateless(),
             new SetupRequest(
                 $token,
-                $env,
+                resolvedEnv,
                 $name,
                 this::assertShouldSetup,
                 this::promptForNextActionIfExistingUser,
@@ -213,7 +234,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
             $name.map(n -> "Profile '" + n + "'").orElse("The profile"),
             Stream.concat(
                 $token.map(t -> " with token " + t).stream(),
-                $env.map(e -> " in env '" + e.name().toLowerCase() + "'").stream()
+                $env.map(e -> " in env '" + e.toLowerCase() + "'").stream()
             ).collect(Collectors.joining(""))
         );
     }
@@ -321,7 +342,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
     }
 
     private ProfileName promptForName(String defaultName, AstraEnvironment env) {
-        val envAddendum = (env != AstraEnvironment.PROD)
+        val envAddendum = (env != PROD)
             ? " " + ctx.highlight(env.name().toLowerCase())
             : "";
 

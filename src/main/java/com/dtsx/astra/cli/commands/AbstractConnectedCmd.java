@@ -44,6 +44,10 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
     protected void prelude() {
         super.prelude();
         $connOpts = mergeConnectionOptions();
+        
+        if (!ctx.properties().disableBetaWarnings() && profile().env().isLocal()) {
+            ctx.log().warn("Local environments are still in beta and may change without notice.");
+        }
     }
 
     private ConnectionOptions mergeConnectionOptions() {
@@ -85,7 +89,8 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
         }
 
         if ($connOpts.$creds != null) {
-            return new FromArgs($connOpts.$creds.$token, $connOpts.$creds.$env.orElse(AstraEnvironment.PROD));
+            val env = AstraEnvironment.resolve($connOpts.$creds.$env, $connOpts.$creds.$localEndpoint);
+            return new FromArgs($connOpts.$creds.$token, env);
         }
 
         val defaultFilePath = AstraConfig.resolveDefaultAstraConfigFile(ctx);

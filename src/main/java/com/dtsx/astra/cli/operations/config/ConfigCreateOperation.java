@@ -31,6 +31,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
         AstraEnvironment env,
         Optional<Boolean> overwrite,
         boolean setDefault,
+        Optional<String> localEndpoint,
         Consumer<ProfileName> assertCanOverwriteProfile
     ) {}
 
@@ -66,12 +67,12 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
 
         config.modify((ctx) -> {
             ctx.deleteProfile(profileName);
-            ctx.createProfile(profileName, request.token, request.env);
+            ctx.createProfile(profileName, request.token, request.env, request.localEndpoint);
 
 
             if (request.setDefault) {
                 ctx.deleteProfile(ProfileName.DEFAULT);
-                ctx.createProfile(ProfileName.DEFAULT, request.token, request.env);
+                ctx.createProfile(ProfileName.DEFAULT, request.token, request.env, request.localEndpoint);
             }
         });
 
