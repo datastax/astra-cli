@@ -9,21 +9,22 @@ import com.dtsx.astra.cli.testlib.Fixtures.Clone;
 import com.dtsx.astra.cli.testlib.Fixtures.Databases;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 public class DbCloneStatusCmdSnapshotTest extends BaseCmdSnapshotTest {
     private SnapshotTestOptionsModifier opts() {
         return (o) -> o
             .gateway(DbCloneGateway.class, (mock) -> {
-                doReturn(Clone.Status).when(mock).getCloneStatus(any(), any());
+                doReturn(Clone.Status).when(mock).findClone(any(), any());
             });
     }
 
     @TestForAllOutputs
     public void db_clone_status(OutputType outputType) {
-        verifyRun("db clone status ${DatabaseName} --operation-id clone-op-12345", outputType, o -> o.use(opts())
+        verifyRun("db clone status ${DatabaseName} -id ${CloneOperationId}", outputType, o -> o.use(opts())
             .verify((mocks) -> {
-                verify(mocks.dbCloneGateway()).getCloneStatus(Databases.NameRef, "clone-op-12345");
+                verify(mocks.dbCloneGateway()).findClone(Databases.NameRef, Clone.OperationId);
             }));
     }
 }
