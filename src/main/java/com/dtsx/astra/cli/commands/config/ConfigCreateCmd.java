@@ -103,6 +103,15 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     )
     private Optional<Boolean> $overwrite;
 
+    @Option(
+        names = { "--validate" },
+        description = "Validate the token by making a request to the Astra",
+        defaultValue = "true",
+        fallbackValue = "true",
+        negatable = true
+    )
+    public boolean $validate;
+
     @Override
     public final OutputAll execute(Supplier<ConfigCreateResult> resultSupplier) {
         val result = resultSupplier.get();
@@ -112,6 +121,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             case ProfileIllegallyExists(var profileName) -> throwProfileAlreadyExists(profileName);
             case ViolatedFailIfExists() -> throwAttemptedToSetDefault();
             case InvalidToken(var hint) -> throwInvalidToken(hint);
+            case NameRequiredIfNotValidated _ -> throwNameRequiredIfNotValidated();
         };
     }
 
@@ -200,6 +210,12 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         """);
     }
 
+    private <T> T throwNameRequiredIfNotValidated() {
+        throw new AstraCliException(VALIDATION_ISSUE, """
+          @|bold,red An explicit profile name must be provided if @|italic --validate=false|@.|@
+        """);
+    }
+
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
         val env = AstraEnvironment.resolve($env, $localEndpoint);
@@ -210,6 +226,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             env,
             $overwrite,
             $setDefault,
+            $validate,
             $localEndpoint,
             this::assertCanOverwriteProfile
         ));

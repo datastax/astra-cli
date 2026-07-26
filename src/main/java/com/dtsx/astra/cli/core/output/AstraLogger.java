@@ -110,7 +110,7 @@ public class AstraLogger {
     }
 
     public void hint(String... msg) {
-        log("@|green [HINT]|@ " + String.join("", msg), Level.REGULAR, true);
+        log("@![HINT]!@ " + String.join("", msg), Level.REGULAR, true);
     }
 
     public void warn(String... msg) {
