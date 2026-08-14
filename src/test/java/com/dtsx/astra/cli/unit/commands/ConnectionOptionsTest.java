@@ -111,11 +111,11 @@ public class ConnectionOptionsTest {
         void other_takes_precedence_for_token(@ForAll AstraToken thisToken, @ForAll AstraToken otherToken) {
             val thisOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(thisToken, Optional.empty())
+                new CredsSpec(thisToken, Optional.empty(), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(otherToken, Optional.empty())
+                new CredsSpec(otherToken, Optional.empty(), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
@@ -128,11 +128,11 @@ public class ConnectionOptionsTest {
         void uses_this_when_other_token_is_null(@ForAll AstraToken thisToken) {
             val thisOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(thisToken, Optional.empty())
+                new CredsSpec(thisToken, Optional.empty(), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(null, Optional.empty())
+                new CredsSpec(null, Optional.empty(), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
@@ -145,34 +145,34 @@ public class ConnectionOptionsTest {
         void other_takes_precedence_for_env(@ForAll AstraEnvironment thisEnv, @ForAll AstraEnvironment otherEnv) {
             val thisOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(null, Optional.of(thisEnv))
+                new CredsSpec(null, Optional.of(thisEnv.toString()), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(null, Optional.of(otherEnv))
+                new CredsSpec(null, Optional.of(otherEnv.toString()), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
 
             assertThat(result.$creds).isNotNull();
-            assertThat(result.$creds.$env).contains(otherEnv);
+            assertThat(result.$creds.$env).contains(otherEnv.toString());
         }
 
         @Property
         void uses_this_when_other_env_is_empty(@ForAll AstraEnvironment thisEnv) {
             val thisOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(null, Optional.of(thisEnv))
+                new CredsSpec(null, Optional.of(thisEnv.toString()), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(null, Optional.empty())
+                new CredsSpec(null, Optional.empty(), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
 
             assertThat(result.$creds).isNotNull();
-            assertThat(result.$creds.$env).contains(thisEnv);
+            assertThat(result.$creds.$env).contains(thisEnv.toString());
         }
 
         @Property
@@ -200,18 +200,18 @@ public class ConnectionOptionsTest {
         void all_creds_fields_present_in_other_returns_other_values(@ForAll AstraToken thisToken, @ForAll AstraToken otherToken, @ForAll AstraEnvironment thisEnv, @ForAll AstraEnvironment otherEnv) {
             val thisOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(thisToken, Optional.of(thisEnv))
+                new CredsSpec(thisToken, Optional.of(thisEnv.toString()), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(otherToken, Optional.of(otherEnv))
+                new CredsSpec(otherToken, Optional.of(otherEnv.toString()), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
 
             assertThat(result.$creds).isNotNull();
             assertThat(result.$creds.$token).isEqualTo(otherToken);
-            assertThat(result.$creds.$env).contains(otherEnv);
+            assertThat(result.$creds.$env).contains(otherEnv.toString());
         }
 
         @Property
@@ -220,11 +220,11 @@ public class ConnectionOptionsTest {
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.of(thisProfile)),
-                new CredsSpec(thisToken, Optional.of(thisEnv))
+                new CredsSpec(thisToken, Optional.of(thisEnv.toString()), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.empty(), Optional.empty()),
-                new CredsSpec(null, Optional.empty())
+                new CredsSpec(null, Optional.empty(), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
@@ -234,7 +234,7 @@ public class ConnectionOptionsTest {
             assertThat(result.$config.$profileName).contains(thisProfile);
             assertThat(result.$creds).isNotNull();
             assertThat(result.$creds.$token).isEqualTo(thisToken);
-            assertThat(result.$creds.$env).contains(thisEnv);
+            assertThat(result.$creds.$env).contains(thisEnv.toString());
         }
 
         @Example
@@ -265,7 +265,7 @@ public class ConnectionOptionsTest {
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.empty()),
-                new CredsSpec(thisToken, Optional.empty())
+                new CredsSpec(thisToken, Optional.empty(), Optional.empty())
             );
 
             val result = thisOpt.merge(ConnectionOptions.EMPTY);
@@ -282,7 +282,7 @@ public class ConnectionOptionsTest {
 
             val otherOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(otherPath), Optional.empty()),
-                new CredsSpec(otherToken, Optional.of(otherEnv))
+                new CredsSpec(otherToken, Optional.of(otherEnv.toString()), Optional.empty())
             );
 
             val result = ConnectionOptions.EMPTY.merge(otherOpt);
@@ -291,7 +291,7 @@ public class ConnectionOptionsTest {
             assertThat(result.$config.$configFile).contains(otherPath);
             assertThat(result.$creds).isNotNull();
             assertThat(result.$creds.$token).isEqualTo(otherToken);
-            assertThat(result.$creds.$env).contains(otherEnv);
+            assertThat(result.$creds.$env).contains(otherEnv.toString());
         }
 
         @Property
@@ -300,11 +300,11 @@ public class ConnectionOptionsTest {
 
             val thisOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.of(thisPath), Optional.empty()),
-                new CredsSpec(thisToken, Optional.empty())
+                new CredsSpec(thisToken, Optional.empty(), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(
                 new ConfigSpec(Optional.empty(), Optional.of(otherProfile)),
-                new CredsSpec(null, Optional.of(otherEnv))
+                new CredsSpec(null, Optional.of(otherEnv.toString()), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
@@ -317,7 +317,7 @@ public class ConnectionOptionsTest {
 
             // From other
             assertThat(result.$config.$profileName).contains(otherProfile);
-            assertThat(result.$creds.$env).contains(otherEnv);
+            assertThat(result.$creds.$env).contains(otherEnv.toString());
         }
 
         @Property
@@ -342,14 +342,14 @@ public class ConnectionOptionsTest {
             val thisOpt = new ConnectionOptions(null, null);
             val otherOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(otherToken, Optional.of(otherEnv))
+                new CredsSpec(otherToken, Optional.of(otherEnv.toString()), Optional.empty())
             );
 
             val result = thisOpt.merge(otherOpt);
 
             assertThat(result.$creds).isNotNull();
             assertThat(result.$creds.$token).isEqualTo(otherToken);
-            assertThat(result.$creds.$env).contains(otherEnv);
+            assertThat(result.$creds.$env).contains(otherEnv.toString());
         }
 
         @Property
@@ -373,7 +373,7 @@ public class ConnectionOptionsTest {
         void null_creds_in_other_uses_this_creds(@ForAll AstraToken thisToken, @ForAll AstraEnvironment thisEnv) {
             val thisOpt = new ConnectionOptions(
                 null,
-                new CredsSpec(thisToken, Optional.of(thisEnv))
+                new CredsSpec(thisToken, Optional.of(thisEnv.toString()), Optional.empty())
             );
             val otherOpt = new ConnectionOptions(null, null);
 
@@ -381,7 +381,7 @@ public class ConnectionOptionsTest {
 
             assertThat(result.$creds).isNotNull();
             assertThat(result.$creds.$token).isEqualTo(thisToken);
-            assertThat(result.$creds.$env).contains(thisEnv);
+            assertThat(result.$creds.$env).contains(thisEnv.toString());
         }
     }
 }

@@ -203,7 +203,7 @@ public class AstraConfigTest {
                 .extracting(Either::getLeft)
                 .satisfies((ip) -> {
                     assertThat(ip.section().name()).isEqualTo("invalid/bad-env");
-                    assertThat(ip.issue()).contains("Error parsing 'ASTRA_ENV': Got 'not-a-valid-env', expected one of (prod|dev|test)");
+                    assertThat(ip.issue()).contains("Error parsing 'ASTRA_ENV': Got 'not-a-valid-env', expected one of (prod|dev|test|local)");
                 });
 
             // invalid profile (invalid name)

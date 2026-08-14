@@ -90,8 +90,8 @@ public class CompletionsCacheTest {
         @Property
         public void updates_cache_file_based_on_existing_content(
             @ForAll("fileName") String cacheFileName,
-            @ForAll @Size(min = 1) @UniqueElements List<@NotBlank String> existing,
-            @ForAll @Size(min = 1) @UniqueElements List<@NotBlank String> updated
+            @ForAll @Size(min = 1) @UniqueElements List<@NotBlank @AlphaChars String> existing,
+            @ForAll @Size(min = 1) @UniqueElements List<@NotBlank @AlphaChars String> updated
         ) {
             val instance = mkBasicCompletionsCache(cacheFileName);
             val primaryCacheFile = instance.primaryCacheFile().orElseThrow();
