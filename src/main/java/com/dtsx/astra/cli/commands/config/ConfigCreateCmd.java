@@ -68,10 +68,9 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Option(
         names = { $Token.LONG, $Token.SHORT },
         description = "Astra token (@|code AstraCS:...|@) or @|code @<file>|@ to read from file",
-        paramLabel = $Token.LABEL,
-        required = true
+        paramLabel = $Token.LABEL
     )
-    public AstraToken $token;
+    public Optional<AstraToken> $token;
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
@@ -120,6 +119,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             case ProfileIllegallyExists(var profileName) -> throwProfileAlreadyExists(profileName);
             case ViolatedFailIfExists() -> throwAttemptedToSetDefault();
             case InvalidToken(var hint) -> throwInvalidToken(hint);
+            case MissingToken _ -> throwMissingToken();
             case NameRequiredIfNotValidated _ -> throwNameRequiredIfNotValidated();
         };
     }
@@ -209,9 +209,15 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         """);
     }
 
+    private <T> T throwMissingToken() {
+        throw new AstraCliException(VALIDATION_ISSUE, """
+          @|bold,red An explicit astra token must be provided if '--env' is not 'local'|@
+        """);
+    }
+
     private <T> T throwNameRequiredIfNotValidated() {
         throw new AstraCliException(VALIDATION_ISSUE, """
-          @|bold,red An explicit profile name must be provided if @|italic --validate=false|@.|@
+          @|bold,red An explicit profile name must be provided if --validate=false.|@
         """);
     }
 
@@ -219,7 +225,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     public Operation<ConfigCreateResult> mkOperation() {
         val env = AstraEnvironment.resolve($env, $localEndpoint);
 
-        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway($token, env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
+        return new ConfigCreateOperation(ctx, config(true), t -> ctx.gateways().mkOrgGateway(t, env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
             $profileName,
             $token,
             env,
