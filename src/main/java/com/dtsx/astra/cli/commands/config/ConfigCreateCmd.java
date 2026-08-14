@@ -28,6 +28,7 @@ import static com.dtsx.astra.cli.core.output.ExitCode.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
 
 @Command(
     name = "create",
@@ -67,19 +68,25 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Option(
         names = { $Token.LONG, $Token.SHORT },
         description = "Astra token (@|code AstraCS:...|@) or @|code @<file>|@ to read from file",
-        paramLabel = $Token.LABEL,
-        required = true
+        paramLabel = $Token.LABEL
     )
-    public AstraToken $token;
+    public Optional<AstraToken> $token;
 
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = "Astra environment the token belongs to: prod (default), dev, or test. Leave unset unless you were issued a non-prod token.",
+        description = "Astra environment the token belongs to: prod (default), dev, test, or local. Leave unset unless you were issued a non-prod token.",
         completionCandidates = AstraEnvCompletion.class,
         defaultValue = $Env.DEFAULT,
         paramLabel = $Env.LABEL
     )
-    public AstraEnvironment $env;
+    public Optional<String> $env;
+
+    @Option(
+        names = { "--local-endpoint" },
+        description = "The endpoint URL for local Astra environments (required when --env local)",
+        paramLabel = "URL"
+    )
+    public Optional<String> $localEndpoint;
 
     @Option(
         names = { "-d", "--default" },
@@ -94,6 +101,15 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     )
     private Optional<Boolean> $overwrite;
 
+    @Option(
+        names = { "--validate" },
+        description = "Validate the token by making a request to the Astra",
+        defaultValue = "true",
+        fallbackValue = "true",
+        negatable = true
+    )
+    public boolean $validate;
+
     @Override
     public final OutputAll execute(Supplier<ConfigCreateResult> resultSupplier) {
         val result = resultSupplier.get();
@@ -103,6 +119,8 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
             case ProfileIllegallyExists(var profileName) -> throwProfileAlreadyExists(profileName);
             case ViolatedFailIfExists() -> throwAttemptedToSetDefault();
             case InvalidToken(var hint) -> throwInvalidToken(hint);
+            case MissingToken _ -> throwMissingToken();
+            case NameRequiredIfNotValidated _ -> throwNameRequiredIfNotValidated();
         };
     }
 
@@ -168,10 +186,10 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
 
     private <T> T throwInvalidToken(Optional<AstraEnvironment> hint) {
         if (hint.isPresent()) {
-            val currentEnvName = $env.name().toLowerCase();
+            val currentEnvName = $env.orElse(PROD.name()).toLowerCase();
             val validEnvName = hint.get().name().toLowerCase();
 
-            val fixAction = hint.get() == AstraEnvironment.PROD
+            val fixAction = hint.get() == PROD
                 ? "drop @'!--env!@ (prod is the default) or pass @'!--env prod!@"
                 : "pass @'!--env " + validEnvName + "!@";
 
@@ -191,14 +209,30 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
         """);
     }
 
+    private <T> T throwMissingToken() {
+        throw new AstraCliException(VALIDATION_ISSUE, """
+          @|bold,red An explicit astra token must be provided if '--env' is not 'local'|@
+        """);
+    }
+
+    private <T> T throwNameRequiredIfNotValidated() {
+        throw new AstraCliException(VALIDATION_ISSUE, """
+          @|bold,red An explicit profile name must be provided if --validate=false.|@
+        """);
+    }
+
     @Override
     public Operation<ConfigCreateResult> mkOperation() {
-        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway($token, $env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
+        val env = AstraEnvironment.resolve($env, $localEndpoint);
+
+        return new ConfigCreateOperation(ctx, config(true), t -> ctx.gateways().mkOrgGateway(t, env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
             $profileName,
             $token,
-            $env,
+            env,
             $overwrite,
             $setDefault,
+            $validate,
+            $localEndpoint,
             this::assertCanOverwriteProfile
         ));
     }

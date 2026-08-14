@@ -1,3 +1,4 @@
+com.dtsx.astra.cli.testlib.arbitraries.AstraEnvironmentProvider
 com.dtsx.astra.cli.testlib.arbitraries.AstraTokenProvider
 com.dtsx.astra.cli.testlib.arbitraries.DatabaseProvider
 com.dtsx.astra.cli.testlib.arbitraries.DataclassProvider

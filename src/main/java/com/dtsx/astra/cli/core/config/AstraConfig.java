@@ -34,11 +34,14 @@ import java.util.function.Predicate;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
+import static com.dtsx.astra.sdk.utils.AstraEnvironment.LOCAL_NAME;
+import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
+    public static final String LOCAL_ENDPOINT_KEY = "ASTRA_LOCAL_ENDPOINT";
     public static final String SOURCE_KEY = "PROFILE_SOURCE";
 
     private final CliContext ctx;
@@ -124,27 +127,45 @@ public class AstraConfig {
                 );
             }
 
-            val rawEnv = section.lookupKey(ENV_KEY).orElse("PROD");
+            val env = lookupEnvironment(ctx, section);
 
-            try {
-                val env = AstraEnvironment.valueOf(rawEnv.toUpperCase());
-
-                val sourceForDefault = section.lookupKey(SOURCE_KEY)
-                    .filter(s -> profileName.isDefault() && !s.isBlank() && !s.equals(ProfileName.DEFAULT.unwrap()))
-                    .map(ProfileName::parse)
-                    .filter(Either::isRight)
-                    .map(Either::getRight);
-
-                return AstraToken.parse(token.get()).bimap(
-                    (msg) -> new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY) + ": " + msg),
-                    (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env, sourceForDefault)
-                );
-            } catch (IllegalArgumentException e) {
+            if (env.isLeft()) {
                 return Either.left(
-                    new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(ENV_KEY) + ": Got '" + rawEnv + "', expected one of (prod|dev|test)")
+                    new InvalidProfile(section, env.getLeft())
                 );
             }
+
+            val sourceForDefault = section.lookupKey(SOURCE_KEY)
+                .filter(s -> profileName.isDefault() && !s.isBlank() && !s.equals(ProfileName.DEFAULT.unwrap()))
+                .map(ProfileName::parse)
+                .filter(Either::isRight)
+                .map(Either::getRight);
+
+            return AstraToken.parse(token.get()).bimap(
+                (msg) -> new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY) + ": " + msg),
+                (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env.getRight(), sourceForDefault)
+            );
         });
+    }
+
+    private static Either<String, AstraEnvironment> lookupEnvironment(CliContext ctx, IniSection section) {
+        val rawEnv = section.lookupKey(ENV_KEY).orElse(PROD.name());
+
+        if (!rawEnv.equalsIgnoreCase(LOCAL_NAME)) {
+            try {
+                return Either.pure(AstraEnvironment.valueOf(rawEnv));
+            } catch (IllegalArgumentException e) {
+                return Either.left("Error parsing " + ctx.colors().PURPLE_300.useOrQuote(ENV_KEY) + ": Got '" + rawEnv + "', expected one of (" + String.join("|", AstraEnvironment.allValuesLower()) + ")");
+            }
+        }
+
+        val endpoint = section.lookupKey(LOCAL_ENDPOINT_KEY);
+
+        if (endpoint.isEmpty()) {
+            return Either.left("Using a LOCAL environment requires " + ctx.colors().PURPLE_300.useOrQuote(LOCAL_ENDPOINT_KEY) + " to be set");
+        }
+
+        return Either.pure(AstraEnvironment.local(endpoint.get()));
     }
 
     public List<Profile> profilesValidated() {
@@ -210,14 +231,22 @@ public class AstraConfig {
                 private final List<Runnable> actions = new ArrayList<>();
 
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
+            createProfile(name, token, env, Optional.empty());
+        }
+
+        public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env, Optional<String> localEndpoint) {
             actions.add(() -> {
                 profiles.add(Either.pure(new Profile(Optional.of(name), token, env, Optional.empty())));
 
                 backingIniFile.addSection(name.unwrap(), new TreeMap<>() {{
                     put(TOKEN_KEY, token.unsafeUnwrap());
 
-                    if (env != AstraEnvironment.PROD) {
+                    if (env != PROD) {
                         put(ENV_KEY, env.name());
+                    }
+
+                    if (env.name().equalsIgnoreCase(LOCAL_NAME) && localEndpoint.isPresent()) {
+                        put(LOCAL_ENDPOINT_KEY, localEndpoint.get());
                     }
                 }});
             });
@@ -253,7 +282,6 @@ public class AstraConfig {
                 profiles.removeIf(isProfileName(target));
                 backingIniFile.deleteSection(target.unwrap());
 
-                // TODO is src workign?
                 profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name())));
                 backingIniFile.addSection(target.unwrap(), srcSection);
             });

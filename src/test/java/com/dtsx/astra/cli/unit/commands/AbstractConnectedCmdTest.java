@@ -24,6 +24,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -64,7 +65,9 @@ public class AbstractConnectedCmdTest {
             }
 
             private void test_reconstructs_profile_from_args(AstraToken token, Optional<AstraEnvironment> givenEnv, AstraEnvironment expectedEnv) {
-                val opts = mkOpts(o -> o.$creds = new CredsSpec(token, givenEnv));
+                val endpoint = givenEnv.map(AstraEnvironment::getEndPoint);
+
+                val opts = mkOpts(o -> o.$creds = new CredsSpec(token, givenEnv.map(Objects::toString), endpoint));
                 val cmd = mkCmdWithOpts(opts);
 
                 val expectedProfile = new Profile(Optional.empty(), token, expectedEnv, Optional.empty());
@@ -120,21 +123,26 @@ public class AbstractConnectedCmdTest {
 
     @SneakyThrows
     private Path initRcFile(String pathStr, Profile profile) {
-        return initRcFile(pathStr, """
+        var content = """
           [%s]
           ASTRA_DB_APPLICATION_TOKEN=%s
-          %s
-          %s
         """.formatted(
             profile.name().orElseThrow(),
-            profile.token().unsafeUnwrap(),
-            profile.env() == AstraEnvironment.PROD ? "" : "ASTRA_ENV=" + profile.env().name(),
-            profile.sourceForDefault().map(s -> "PROFILE_SOURCE=" + s.unwrap()).orElse("")
-        ));
-    }
+            profile.token().unsafeUnwrap()
+        );
 
-    @SneakyThrows
-    private Path initRcFile(String pathStr, String content) {
+        if (profile.env() != AstraEnvironment.PROD) {
+            content += "\nASTRA_ENV=" + profile.env().name();
+        }
+
+        if (profile.env().isLocal()) {
+            content += "\nASTRA_LOCAL_ENDPOINT=" + profile.env().getEndPoint();
+        }
+
+        if (profile.sourceForDefault().isPresent()) {
+            content += "\nPROFILE_SOURCE=" + profile.sourceForDefault().get().unwrap();
+        }
+
         val path = ctx.get().path(pathStr);
         Files.createDirectories(path.getParent());
         Files.writeString(path, trimIndent(content));

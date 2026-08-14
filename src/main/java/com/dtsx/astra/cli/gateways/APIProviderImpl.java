@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNIQUENESS_ISSUE;
 
 @RequiredArgsConstructor
@@ -76,12 +77,20 @@ public class APIProviderImpl implements APIProvider {
     }
 
     private DataAPIClient dataApiClient() {
-        val destination = switch (env) {
-            case PROD -> DataAPIDestination.ASTRA;
-            case DEV -> DataAPIDestination.ASTRA_DEV;
-            case TEST -> DataAPIDestination.ASTRA_TEST;
-        };
+        val destination =
+            (env == AstraEnvironment.PROD)
+                ? DataAPIDestination.ASTRA :
+            (env == AstraEnvironment.DEV)
+                ? DataAPIDestination.ASTRA_DEV :
+            (env == AstraEnvironment.TEST)
+                ? DataAPIDestination.ASTRA_TEST
+                : throwCantUseLocalWithDataApi();
+
         return new DataAPIClient(token.unsafeUnwrap(), new DataAPIClientOptions().destination(destination));
+    }
+
+    private DataAPIDestination throwCantUseLocalWithDataApi() {
+        throw new AstraCliException(ILLEGAL_OPERATION, "@|bold,red Local environments are not supported for Data API operations. Please use a prod, dev, or test Astra environment.|@");
     }
 
     private UUID resolveDbId(DbRef ref) {

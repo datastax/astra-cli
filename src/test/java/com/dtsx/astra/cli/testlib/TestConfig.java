@@ -24,7 +24,7 @@ public class TestConfig {
     }
 
     public static AstraEnvironment env() {
-        return AstraEnvironment.valueOf(env("ASTRA_ENV", "prod").toUpperCase());
+        return AstraEnvironment.valueOf(env("ASTRA_ENV", "prod"));
     }
 
     public static String apiEndpoint() {

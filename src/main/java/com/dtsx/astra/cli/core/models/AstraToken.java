@@ -10,6 +10,8 @@ import lombok.*;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraToken implements Highlightable {
+    public static final AstraToken FAKE = AstraToken.parse("AstraCS:fakefakefakefakefakefake:fakefakefakefakefakefakefakefakefakefakefakefakefakefakefakefake").getRight();
+
     private final String token;
 
     public static Either<String, AstraToken> parse(@NonNull String token) {

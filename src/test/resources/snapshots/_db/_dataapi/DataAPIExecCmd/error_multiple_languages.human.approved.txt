@@ -56,8 +56,8 @@ stderr:       -cf, --config-file=PATH
 stderr:                             The .astrarc file to use for this command
 stderr:                               (default: ~/.astrarc-dev)
 stderr:       --env=ENV             Astra environment the token belongs to: prod
-stderr:                               (default), dev, or test. Leave unset unless you
-stderr:                               were issued a non-prod token.
+stderr:                               (default), dev, test, or local. Leave unset
+stderr:                               unless you were issued a non-prod token.
 stderr:   -p, --profile=NAME        The .astrarc profile to use for this command. Can
 stderr:                               be set via ASTRA_PROFILE.
 stderr:       --token=TOKEN         The astra token to use for this command. Use the
