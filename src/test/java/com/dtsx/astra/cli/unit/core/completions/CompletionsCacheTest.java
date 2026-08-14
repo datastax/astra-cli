@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.unit.core.completions;
 
+import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
 import com.dtsx.astra.cli.testlib.extensions.context.UseTestCtx;
@@ -10,6 +11,7 @@ import net.jqwik.api.constraints.*;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import static com.dtsx.astra.cli.utils.CollectionUtils.listConcat;
@@ -165,14 +167,14 @@ public class CompletionsCacheTest {
     private static class BasicCompletionsCache extends CompletionsCache {
         private final Path primaryCacheFile;
 
-        BasicCompletionsCache(com.dtsx.astra.cli.core.CliContext ctx, String cacheFileName) {
+        BasicCompletionsCache(CliContext ctx, String cacheFileName) {
             super(ctx);
             this.primaryCacheFile = defaultCacheDir(ctx).resolve(cacheFileName);
         }
 
         @Override
-        protected java.util.Optional<Path> primaryCacheFile() {
-            return java.util.Optional.of(primaryCacheFile);
+        protected Optional<Path> primaryCacheFile() {
+            return Optional.of(primaryCacheFile);
         }
 
         @Override
