@@ -85,8 +85,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     @Option(
         names = { "--local-endpoint" },
         description = "The endpoint URL for local Astra environments (required when --env local)",
-        paramLabel = "URL",
-        hidden = true
+        paramLabel = "URL"
     )
     public Optional<String> $localEndpoint;
 
