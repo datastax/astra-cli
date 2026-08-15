@@ -1,10 +1,14 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
+import com.datastax.astra.client.databases.commands.results.FindRerankingProvidersResult;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
-import com.dtsx.astra.cli.core.models.*;
+import com.dtsx.astra.cli.core.models.CloudProvider;
+import com.dtsx.astra.cli.core.models.DbRef;
+import com.dtsx.astra.cli.core.models.KeyspaceRef;
+import com.dtsx.astra.cli.core.models.RegionRef;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.RequiredArgsConstructor;
@@ -94,6 +98,11 @@ public class DbGatewayCompletionsCacheWrapper implements DbGateway {
     @Override
     public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
         return delegate.findEmbeddingProviders(dbRef);
+    }
+
+    @Override
+    public FindRerankingProvidersResult findRerankingProviders(DbRef dbRef) {
+        return delegate.findRerankingProviders(dbRef);
     }
 
     private void addRefToCache(DbRef ref) {
