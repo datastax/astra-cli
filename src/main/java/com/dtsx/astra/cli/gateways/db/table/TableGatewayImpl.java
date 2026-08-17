@@ -19,10 +19,16 @@ public class TableGatewayImpl implements TableGateway {
     private final APIProvider api;
 
     @Override
-    public List<TableDescriptor> findAll(KeyspaceRef ksRef) {
-        return ctx.log().loading("Listing tables for keyspace " + ctx.highlight(ksRef), (_) ->
-            api.dataApiDatabase(ksRef).listTables()
-        );
+    public List<TableDescriptor> findAll(KeyspaceRef ksRef, boolean nameOnly) {
+        return ctx.log().loading("Listing tables for keyspace " + ctx.highlight(ksRef), (_) -> {
+            if (nameOnly) {
+                return api.dataApiDatabase(ksRef).listTableNames().stream()
+                    .map(TableDescriptor::new)
+                    .toList();
+            }
+
+            return api.dataApiDatabase(ksRef).listTables();
+        });
     }
 
     @Override

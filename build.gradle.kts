@@ -213,7 +213,7 @@ tasks.register("generateGraalReflectionConfig") {
         val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray())
 
         val inputLines = inputFile.readLines().map(String::trim).filter { it.isNotBlank() && !it.startsWith("#") }
-        val defaultReflectionKeys = listOf("allPublicConstructors", "allDeclaredMethods")
+        val defaultReflectionKeys = listOf("allPublicConstructors", "allDeclaredMethods", "allDeclaredFields")
 
         val scanResult = io.github.classgraph.ClassGraph()
             .overrideClassLoaders(classLoader)

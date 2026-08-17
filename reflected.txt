@@ -39,5 +39,5 @@ com.datastax.astra.internal.api.[DataAPI.+]
 com.datastax.astra.client.core.vectorize.*
 com.datastax.astra.client.core.vector.*
 com.datastax.astra.client.core.rerank.*
-com.datastax.astra.client.core.lexical.LexicalOptions
+com.datastax.astra.client.core.lexical.*
 com.datastax.astra.client.core.commands.Command$CommandSerializer

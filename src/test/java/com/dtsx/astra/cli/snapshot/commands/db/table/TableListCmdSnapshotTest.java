@@ -17,13 +17,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class TableListCmdSnapshotTest extends BaseCmdSnapshotTest {
-
     private final SnapshotTestOptionsModifier foundWithKeyspace = (o) -> o
         .gateway(TableGateway.class, (mock) -> {
-            when(mock.findAll(any())).thenReturn(Tables.Many);
+            when(mock.findAll(any(), anyBoolean())).thenReturn(Tables.Many);
         })
         .verify((mocks) -> {
-            verify(mocks.tableGateway()).findAll(Databases.Keyspace);
+            verify(mocks.tableGateway()).findAll(eq(Databases.Keyspace), anyBoolean());
         });
 
     private final SnapshotTestOptionsModifier foundWithAll = (o) -> o
@@ -31,11 +30,11 @@ public class TableListCmdSnapshotTest extends BaseCmdSnapshotTest {
             when(mock.findAll(any())).thenReturn(new FoundKeyspaces("default_keyspace", List.of("ks1", "ks2")));
         })
         .gateway(TableGateway.class, (mock) -> {
-            when(mock.findAll(any())).thenReturn(Tables.Many);
+            when(mock.findAll(any(), anyBoolean())).thenReturn(Tables.Many);
         })
         .verify((mocks) -> {
             verify(mocks.keyspaceGateway()).findAll(Databases.NameRef);
-            verify(mocks.tableGateway(), times(2)).findAll(any());
+            verify(mocks.tableGateway(), times(2)).findAll(any(), anyBoolean());
         });
 
     @TestForAllOutputs

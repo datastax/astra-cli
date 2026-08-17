@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.commands.db.table;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
+import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.table.TableListOperation;
@@ -94,7 +95,8 @@ public class TableListCmd extends AbstractTableCmd<Stream<TableListResult>> {
     protected Operation<Stream<TableListResult>> mkOperation() {
         return new TableListOperation(tableGateway, keyspaceGateway, new TableListRequest(
             $dbRef,
-            Optional.ofNullable($keyspaceRef)
+            Optional.ofNullable($keyspaceRef),
+            ctx.outputType() != OutputType.JSON
         ));
     }
 }

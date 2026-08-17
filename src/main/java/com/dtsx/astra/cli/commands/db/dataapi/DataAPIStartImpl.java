@@ -123,12 +123,12 @@ public abstract class DataAPIStartImpl extends AbstractPromptForKeyspaceCmd<Data
 
         if (numPromptForColls > 0) {
             val collectionGateway = ctx.gateways().mkCollectionGateway(profile().token(), profile().env());
-            $collectionNames = CollectionNamePrompter.multiPrompt(ctx, collectionGateway, $keyspaceRef, "Select the collection to use", originalArgs());
+            $collectionNames = CollectionNamePrompter.multiPrompt(ctx, collectionGateway, $keyspaceRef, "Select the collection(s) to use", originalArgs());
         }
 
         if (numPromptForTables > 0) {
             val tableGateway = ctx.gateways().mkTableGateway(profile().token(), profile().env());
-            $tableNames = TableNamePrompter.multiPrompt(ctx, tableGateway, $keyspaceRef, "Select the table to use", originalArgs());
+            $tableNames = TableNamePrompter.multiPrompt(ctx, tableGateway, $keyspaceRef, "Select the table(s) to use", originalArgs());
         }
     }
 
