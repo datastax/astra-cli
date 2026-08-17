@@ -18,7 +18,7 @@ plugins {
 }
 
 group = "com.dtsx.astra.cli"
-version = "1.1.0"
+version = "1.1.1"
 
 val mockitoAgent = configurations.create("mockitoAgent")
 
@@ -213,7 +213,7 @@ tasks.register("generateGraalReflectionConfig") {
         val classLoader = URLClassLoader(classpath.map { it.toURI().toURL() }.toTypedArray())
 
         val inputLines = inputFile.readLines().map(String::trim).filter { it.isNotBlank() && !it.startsWith("#") }
-        val defaultReflectionKeys = listOf("allPublicConstructors", "allDeclaredMethods")
+        val defaultReflectionKeys = listOf("allPublicConstructors", "allDeclaredMethods", "allDeclaredFields")
 
         val scanResult = io.github.classgraph.ClassGraph()
             .overrideClassLoaders(classLoader)

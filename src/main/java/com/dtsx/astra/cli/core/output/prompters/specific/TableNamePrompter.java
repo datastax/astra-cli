@@ -18,18 +18,17 @@ public class TableNamePrompter {
             .thing("table")
             .prompt(prompt)
             .thingNotFoundCode(TABLE_NOT_FOUND)
-            .thingsSupplier(() -> gateway.findAll(ks))
+            .thingsSupplier(() -> gateway.findAll(ks, true))
             .getThingIdentifier(TableDescriptor::getName)
             .fix(f -> f.fallbackFlag("-t").fix(originalArgs, "-t <table>"))
             .mapSingleFound(TableDescriptor::getName)
         );
     }
 
-
     public static List<String> multiPrompt(CliContext ctx, TableGateway gateway, KeyspaceRef ks, String prompt, List<String> originalArgs) {
-        val colls = gateway.findAll(ks).stream().map(TableDescriptor::getName).toList();
+        val tables = gateway.findAll(ks, true).stream().map(TableDescriptor::getName).toList();
 
-        val options = NEList.parse(colls).orElseThrow(() -> new AstraCliException(TABLE_NOT_FOUND, "@|bold,red Error: no tables found to select from|@"));
+        val options = NEList.parse(tables).orElseThrow(() -> new AstraCliException(TABLE_NOT_FOUND, "@|bold,red Error: no tables found to select from|@"));
 
         return ctx.console().select(prompt)
             .multiOptions(options)

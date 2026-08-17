@@ -19,10 +19,10 @@ import static org.mockito.Mockito.*;
 public class CollectionListCmdSnapshotTest extends BaseCmdSnapshotTest {
     private final SnapshotTestOptionsModifier foundWithKeyspace = (o) -> o
         .gateway(CollectionGateway.class, (mock) -> {
-            when(mock.findAll(any())).thenReturn(Collections.Many);
+            when(mock.findAll(any(), anyBoolean())).thenReturn(Collections.Many);
         })
         .verify((mocks) -> {
-            verify(mocks.collectionGateway()).findAll(Databases.Keyspace);
+            verify(mocks.collectionGateway()).findAll(eq(Databases.Keyspace), anyBoolean());
         });
 
     private final SnapshotTestOptionsModifier foundWithAll = (o) -> o
@@ -30,11 +30,11 @@ public class CollectionListCmdSnapshotTest extends BaseCmdSnapshotTest {
             when(mock.findAll(any())).thenReturn(new FoundKeyspaces("default_keyspace", List.of("ks1", "ks2")));
         })
         .gateway(CollectionGateway.class, (mock) -> {
-            when(mock.findAll(any())).thenReturn(Collections.Many);
+            when(mock.findAll(any(), anyBoolean())).thenReturn(Collections.Many);
         })
         .verify((mocks) -> {
             verify(mocks.keyspaceGateway()).findAll(Databases.NameRef);
-            verify(mocks.collectionGateway(), times(2)).findAll(any());
+            verify(mocks.collectionGateway(), times(2)).findAll(any(), anyBoolean());
         });
 
     @TestForAllOutputs

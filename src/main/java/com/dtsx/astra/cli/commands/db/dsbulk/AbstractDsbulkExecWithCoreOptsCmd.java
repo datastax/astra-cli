@@ -103,7 +103,7 @@ public abstract class AbstractDsbulkExecWithCoreOptsCmd extends AbstractDsbulkEx
         super.prelude();
 
         $dbRef = $maybeDbRef.orElseGet(() -> (
-            DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"))
+            DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", db -> db, (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"))
         ));
     }
 

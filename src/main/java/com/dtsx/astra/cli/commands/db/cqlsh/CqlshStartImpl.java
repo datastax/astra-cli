@@ -107,7 +107,7 @@ public abstract class CqlshStartImpl extends AbstractCqlshExecCmd {
     }
 
     private DbRef promptForDb() {
-        return DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"));
+        return DbRefPrompter.prompt(ctx, dbGateway, "Select the database to work with:", db -> db, (b) -> b.fallbackIndex(0).fix(originalArgs(), "<db>"));
     }
 
     private String readStdin() {

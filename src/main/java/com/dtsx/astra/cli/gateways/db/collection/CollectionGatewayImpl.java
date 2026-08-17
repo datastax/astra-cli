@@ -24,10 +24,22 @@ public class CollectionGatewayImpl implements CollectionGateway {
     private final APIProvider api;
 
     @Override
-    public List<CollectionDescriptor> findAll(KeyspaceRef ksRef) {
-        return ctx.log().loading("Listing collections for keyspace " + ctx.highlight(ksRef), (_) ->
-            api.dataApiDatabase(ksRef).listCollections()
-        );
+    public List<CollectionDescriptor> findAll(KeyspaceRef ksRef, boolean nameOnly) {
+        return ctx.log().loading("Listing collections for keyspace " + ctx.highlight(ksRef), (_) -> {
+            if (nameOnly) {
+                return api.dataApiDatabase(ksRef).listCollectionNames().stream()
+                    .map(this::newCollectionDescriptor)
+                    .toList();
+            }
+
+            return api.dataApiDatabase(ksRef).listCollections();
+        });
+    }
+
+    private CollectionDescriptor newCollectionDescriptor(String name) {
+        val desc = new CollectionDescriptor();
+        desc.setName(name);
+        return desc;
     }
 
     @Override

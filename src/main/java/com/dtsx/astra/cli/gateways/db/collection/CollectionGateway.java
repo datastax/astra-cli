@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface CollectionGateway extends SomeGateway {
     Optional<CollectionDefinition> findOne(CollectionRef collRef);
 
-    List<CollectionDescriptor> findAll(KeyspaceRef ksRef);
+    List<CollectionDescriptor> findAll(KeyspaceRef ksRef, boolean nameOnly);
 
     long estimatedDocumentCount(CollectionRef collRef);
 

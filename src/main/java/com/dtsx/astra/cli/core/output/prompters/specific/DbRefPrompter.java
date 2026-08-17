@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.core.output.prompters.specific;
 
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.DbRef;
 import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder.NeedsClearAfterSelection;
 import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder.NeedsFallback;
@@ -12,7 +13,7 @@ import java.util.function.Function;
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 
 public class DbRefPrompter {
-    public static DbRef prompt(CliContext ctx, DbGateway gateway, String prompt, Function<NeedsFallback<Database>, NeedsClearAfterSelection<Database>> fix) {
+    public static DbRef prompt(CliContext ctx, DbGateway gateway, String prompt, Function<NEList<Database>, NEList<Database>> modifier, Function<NeedsFallback<Database>, NeedsClearAfterSelection<Database>> fix) {
         return SpecificPrompter.<Database, DbRef>run(ctx, (b) -> b
             .thing("database")
             .prompt(prompt)
@@ -25,6 +26,7 @@ public class DbRefPrompter {
                     : db.getId()
 
             ))
+            .modifier(modifier)
             .fix(fix)
             .mapSingleFound(db -> DbRef.fromNameUnsafe(db.getInfo().getName()))
             .mapMultipleFound(db -> DbRef.fromId(java.util.UUID.fromString(db.getId())))

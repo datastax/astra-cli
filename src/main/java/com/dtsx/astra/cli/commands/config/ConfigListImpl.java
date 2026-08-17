@@ -30,7 +30,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 public abstract class ConfigListImpl extends AbstractConfigCmd<ListConfigResult> {
     @Option(
         names = { $Env.LONG, $Env.SHORT },
-        description = "Filter by Astra environment",
+        description = "Filter by Astra environment (one of prod|test|dev|local)",
         completionCandidates = AstraEnvCompletion.class,
         paramLabel = $Env.LABEL
     )

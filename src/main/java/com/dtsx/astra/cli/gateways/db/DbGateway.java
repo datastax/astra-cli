@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
+import com.datastax.astra.client.databases.commands.results.FindRerankingProvidersResult;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
 import com.dtsx.astra.cli.core.exceptions.internal.db.DbNotFoundException;
@@ -37,4 +38,6 @@ public interface DbGateway extends SomeGateway {
     DeletionStatus<DbRef> delete(DbRef ref);
 
     FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef);
+
+    FindRerankingProvidersResult findRerankingProviders(DbRef dbRef);
 }

@@ -23,7 +23,7 @@ import java.util.Optional;
 )
 public class CqlshExecCmd extends CqlshStartImpl {
     @ArgGroup
-    public RawExecSource $execSource;
+    public RawExecSource $execSource = new RawExecSource();
 
     public static class RawExecSource {
         @Option(

@@ -18,7 +18,7 @@ public class CollectionNamePrompter {
             .thing("collection")
             .prompt(prompt)
             .thingNotFoundCode(COLLECTION_NOT_FOUND)
-            .thingsSupplier(() -> gateway.findAll(ks))
+            .thingsSupplier(() -> gateway.findAll(ks, true))
             .getThingIdentifier(CollectionDescriptor::getName)
             .fix(f -> f.fallbackFlag("-c").fix(originalArgs, "-c <collection>"))
             .mapSingleFound(CollectionDescriptor::getName)
@@ -26,7 +26,7 @@ public class CollectionNamePrompter {
     }
 
     public static List<String> multiPrompt(CliContext ctx, CollectionGateway gateway, KeyspaceRef ks, String prompt, List<String> originalArgs) {
-        val colls = gateway.findAll(ks).stream().map(CollectionDescriptor::getName).toList();
+        val colls = gateway.findAll(ks, true).stream().map(CollectionDescriptor::getName).toList();
 
         val options = NEList.parse(colls).orElseThrow(() -> new AstraCliException(COLLECTION_NOT_FOUND, "@|bold,red Error: no collections found to select from|@"));
 

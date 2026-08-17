@@ -20,7 +20,11 @@ public class CollectionListOperation implements Operation<Stream<CollectionListR
     private final KeyspaceGateway ksGateway;
     private final CollectionListRequest request;
 
-    public record CollectionListRequest(DbRef dbRef, Optional<KeyspaceRef> keyspaceRef) {}
+    public record CollectionListRequest(
+        DbRef dbRef,
+        Optional<KeyspaceRef> keyspaceRef,
+        boolean nameOnly
+    ) {}
 
     public record CollectionListResult(
         String keyspace,
@@ -37,7 +41,7 @@ public class CollectionListOperation implements Operation<Stream<CollectionListR
             .map(ks -> KeyspaceRef.mkUnsafe(request.dbRef, ks))
             .map(ref -> new CollectionListResult(
                 ref.name(),
-                collectionGateway.findAll(ref)
+                collectionGateway.findAll(ref, request.nameOnly)
             ));
     }
 }

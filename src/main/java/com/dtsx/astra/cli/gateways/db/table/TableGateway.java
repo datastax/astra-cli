@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface TableGateway extends SomeGateway {
     Optional<TableDefinition> findOne(TableRef collRef);
 
-    List<TableDescriptor> findAll(KeyspaceRef ksRef);
+    List<TableDescriptor> findAll(KeyspaceRef ksRef, boolean nameOnly);
 
     DeletionStatus<TableRef> delete(TableRef collRef);
 

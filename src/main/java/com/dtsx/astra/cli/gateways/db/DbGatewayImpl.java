@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.db;
 
 import com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult;
+import com.datastax.astra.client.databases.commands.results.FindRerankingProvidersResult;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
@@ -183,8 +184,14 @@ public class DbGatewayImpl implements DbGateway {
     @Override
     public FindEmbeddingProvidersResult findEmbeddingProviders(DbRef dbRef) {
         return ctx.log().loading("Fetching embedding providers for database " + ctx.highlight(dbRef), (_) -> {
-            val admin = api.dataApiDatabaseAdmin(dbRef);
-            return admin.findEmbeddingProviders();
+            return api.dataApiDatabaseAdmin(dbRef).findEmbeddingProviders();
+        });
+    }
+
+    @Override
+    public FindRerankingProvidersResult findRerankingProviders(DbRef dbRef) {
+        return ctx.log().loading("Fetching reranking providers for database " + ctx.highlight(dbRef), (_) -> {
+            return api.dataApiDatabaseAdmin(dbRef).findRerankingProviders();
         });
     }
 }

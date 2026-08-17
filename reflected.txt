@@ -12,7 +12,7 @@ com.dtsx.astra.sdk.org.domain.[Role,RolePolicy]
 
 # Db gateway
 com.dtsx.astra.sdk.db.domain.^[.+\$Database.+Builder,AccessList.*]
-com.datastax.astra.client.databases.commands.results.FindEmbeddingProvidersResult
+com.datastax.astra.client.databases.commands.results.*
 
 # Token gateway
 com.dtsx.astra.sdk.org.domain.[CreateTokenResponse,ResponseAllIamTokens,IamToken]
@@ -39,5 +39,5 @@ com.datastax.astra.internal.api.[DataAPI.+]
 com.datastax.astra.client.core.vectorize.*
 com.datastax.astra.client.core.vector.*
 com.datastax.astra.client.core.rerank.*
-com.datastax.astra.client.core.lexical.LexicalOptions
+com.datastax.astra.client.core.lexical.*
 com.datastax.astra.client.core.commands.Command$CommandSerializer

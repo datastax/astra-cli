@@ -20,12 +20,16 @@ public class TableListOperation implements Operation<Stream<TableListResult>> {
     private final KeyspaceGateway ksGateway;
     private final TableListRequest request;
 
+    public record TableListRequest(
+        DbRef dbRef,
+        Optional<KeyspaceRef> keyspaceRef,
+        boolean nameOnly
+    ) {}
+
     public record TableListResult(
         String keyspace,
         List<TableDescriptor> tables
     ) {}
-
-    public record TableListRequest(DbRef dbRef, Optional<KeyspaceRef> keyspaceRef) {}
 
     @Override
     public Stream<TableListResult> execute() {
@@ -37,7 +41,7 @@ public class TableListOperation implements Operation<Stream<TableListResult>> {
             .map(ks -> KeyspaceRef.mkUnsafe(request.dbRef, ks))
             .map(ref -> new TableListResult(
                 ref.name(),
-                tableGateway.findAll(ref)
+                tableGateway.findAll(ref, request.nameOnly)
             ));
     }
 }
