@@ -9,6 +9,7 @@ import com.dtsx.astra.cli.operations.db.DbResumeOperation;
 import com.dtsx.astra.sdk.db.domain.Database;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -18,13 +19,14 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DB_ACTIVE_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
 import static com.dtsx.astra.cli.operations.db.DbResumeOperation.*;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
-import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.ACTIVE;
+import static com.dtsx.astra.sdk.db.domain.DatabaseStatusType.*;
 
 @Command(
     name = "resume",
@@ -54,6 +56,11 @@ public class DbResumeCmd extends AbstractPromptForDbCmd<DbResumeResult> implemen
     @Override
     protected String dbRefPrompt() {
         return "Select the database to resume";
+    }
+
+    @Override
+    protected Pair<String, Predicate<DatabaseStatusType>> dbRefPromptFilter() {
+        return Pair.of("hibernated", s -> s.equals(HIBERNATED));
     }
 
     @Override

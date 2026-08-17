@@ -105,7 +105,7 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
     }
 
     private DbRef askForDbRef() {
-        return DbRefPrompter.prompt(ctx, dbGateway, "Select database to bind to", f -> f.fallbackFlag("--db").fix(originalArgs(), "--db"));
+        return DbRefPrompter.prompt(ctx, dbGateway, "Select database to bind to", db -> db, f -> f.fallbackFlag("--db").fix(originalArgs(), "--db"));
     }
 
     private Set<EnvKey> askForKeys() {

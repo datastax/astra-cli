@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.operations.db.DbDeleteOperation;
 import com.dtsx.astra.sdk.db.domain.DatabaseStatusType;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
@@ -209,5 +211,10 @@ public class DbDeleteCmd extends AbstractPromptForDbCmd<DbDeleteResult> implemen
     @Override
     protected String dbRefPrompt() {
         return "Select the database to delete";
+    }
+
+    @Override
+    protected Pair<String, Predicate<DatabaseStatusType>> dbRefPromptFilter() {
+        return Pair.of("unterminated", s -> !s.equals(TERMINATING) && !s.equals(TERMINATED));
     }
 }

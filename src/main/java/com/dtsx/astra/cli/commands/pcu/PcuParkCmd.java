@@ -1,18 +1,16 @@
 package com.dtsx.astra.cli.commands.pcu;
 
-import com.dtsx.astra.cli.core.datatypes.NEList;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
 import com.dtsx.astra.cli.core.models.PcuStatus;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
-import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.pcu.PcuParkOperation;
 import com.dtsx.astra.cli.operations.pcu.PcuParkOperation.*;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
@@ -22,11 +20,11 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_DB_ACTIVE_DESC;
 import static com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.LR_OPTS_TIMEOUT_NAME;
-import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_NOT_FOUND;
 import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
@@ -121,14 +119,7 @@ public class PcuParkCmd extends AbstractPromptForPcuCmd<PcuParkResult> implement
     }
 
     @Override
-    protected NEList<PCUGroup> modifyPcusPromptList(NEList<PCUGroup> pcus) {
-        return NEList.parse(
-            pcus.stream().filter((pcu) -> {
-                val status = new PcuStatus(pcu);
-                return !status.equals(PcuStatus.PARKED) && !status.equals(PcuStatus.PARKING);
-            }).toList()
-        ).orElseThrow(
-            () -> new AstraCliException(PCU_GROUP_NOT_FOUND, "@|bold,red No unparked PCU groups found to select from|@")
-        );
+    protected Pair<String, Predicate<PcuStatus>> pcuRefPromptFilter() {
+        return Pair.of("unparked", p -> !p.equals(PcuStatus.PARKING) && !p.equals(PcuStatus.PARKED));
     }
 }
