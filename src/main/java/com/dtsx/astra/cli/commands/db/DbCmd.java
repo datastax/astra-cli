@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.commands.db;
 
+import com.dtsx.astra.cli.commands.db.clone.DbCloneCmd;
+
 import com.dtsx.astra.cli.commands.db.cdc.CdcCreateCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcDeleteCmd;
 import com.dtsx.astra.cli.commands.db.cdc.CdcListCmd;
@@ -38,6 +40,7 @@ import picocli.CommandLine.Command;
         DbCreateCmd.class,
         DbDeleteCmd.class,
         DbStatusCmd.class,
+        DbCloneCmd.class,
         CqlshCmd.class,
         DataAPICmd.class,
         DbDsbulkCmd.class,

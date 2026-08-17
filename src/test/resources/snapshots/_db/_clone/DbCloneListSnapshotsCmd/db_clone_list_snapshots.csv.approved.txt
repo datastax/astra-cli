@@ -1,0 +1,9 @@
+---- meta ----
+command: astra db clone list-snapshots two_regions_db -o csv
+exit_code: 0
+---- output ----
+stderr: [WARNING] astra db clone commands are still in beta and may change without notice.
+stdout: code,message,id,time
+stdout: OK,,11111111-1111-1111-1111-111111111111,2023-10-20T10:00:00Z
+stdout: OK,,22222222-2222-2222-2222-222222222222,2023-10-21T10:00:00Z
+---- end ----

@@ -1,0 +1,9 @@
+{
+  "operationId": "c4d5e6f7-a8b9-4c5d-6e7f-8a9b0c1d2e3f",
+  "status": "RUNNING",
+  "sourceDbId": "123e4567-e89b-12d3-a456-426614174000",
+  "targetDbId": "987e6543-e21b-34d5-c678-426614174011",
+  "snapshotId": "78901234-7890-1234-5678-789012345678",
+  "phase": "COPYING_DATA",
+  "message": "Clone is in progress"
+}

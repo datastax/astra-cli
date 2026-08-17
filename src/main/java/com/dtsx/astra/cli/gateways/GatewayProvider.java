@@ -4,6 +4,7 @@ import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGateway;
+import com.dtsx.astra.cli.gateways.db.clone.DbCloneGateway;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -21,6 +22,8 @@ import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 public interface GatewayProvider {
     DbGateway mkDbGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache);
+
+    DbCloneGateway mkDbCloneGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache);
 
     PcuGateway mkPcuGateway(AstraToken token, AstraEnvironment env, CompletionsCache pcuCompletionsCache);
 
@@ -46,7 +49,7 @@ public interface GatewayProvider {
     
     TableGateway mkTableGateway(AstraToken token, AstraEnvironment env);
     
-    TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env);
+    TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache);
 
     UserGateway mkUserGateway(AstraToken token, AstraEnvironment env, CompletionsCache userCompletionsCache);
 

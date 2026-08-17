@@ -6,6 +6,7 @@ import com.dtsx.astra.cli.gateways.GatewayProvider;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.cli.gateways.db.cdc.CdcGateway;
+import com.dtsx.astra.cli.gateways.db.clone.DbCloneGateway;
 import com.dtsx.astra.cli.gateways.db.collection.CollectionGateway;
 import com.dtsx.astra.cli.gateways.db.keyspace.KeyspaceGateway;
 import com.dtsx.astra.cli.gateways.db.region.RegionGateway;
@@ -52,8 +53,13 @@ public class GatewayProviderMock implements GatewayProvider {
         RoleGateway.class,
         TableGateway.class,
         TokenGateway.class,
-        UserGateway.class
+        UserGateway.class,
+        DbCloneGateway.class
     );
+
+    public DbCloneGateway dbCloneGateway() {
+        return returnIfEnabled(DbCloneGateway.class);
+    }
 
     public DbGateway dbGateway() {
         return returnIfEnabled(DbGateway.class);
@@ -125,6 +131,11 @@ public class GatewayProviderMock implements GatewayProvider {
     }
 
     @Override
+    public DbCloneGateway mkDbCloneGateway(AstraToken token, AstraEnvironment env, CompletionsCache dbCompletionsCache) {
+        return dbCloneGateway();
+    }
+
+    @Override
     public PcuGateway mkPcuGateway(AstraToken token, AstraEnvironment env, CompletionsCache pcuCompletionsCache) {
         return pcuGateway();
     }
@@ -185,7 +196,7 @@ public class GatewayProviderMock implements GatewayProvider {
     }
 
     @Override
-    public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env) {
+    public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env, CompletionsCache roleCompletionsCache) {
         return tokenGateway();
     }
 
