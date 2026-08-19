@@ -24,6 +24,13 @@ public class RoleGatewayCompletionsCacheWrapper implements RoleGateway {
     }
 
     @Override
+    public Stream<Role> findAll(List<RoleRef> refs) {
+        val roles = delegate.findAll(refs).toList();
+        cache.setCache(roles.stream().map(Role::getName).toList());
+        return roles.stream();
+    }
+
+    @Override
     public Optional<Role> tryFindOne(RoleRef ref) {
         val res = delegate.tryFindOne(ref);
 

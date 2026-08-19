@@ -35,6 +35,19 @@ public class RoleGatewayPersistentCacheWrapper implements RoleGateway {
     }
 
     @Override
+    public Stream<Role> findAll(List<RoleRef> refs) {
+        val roles = delegate.findAll(refs).toList();
+        val newMappings = new HashMap<String, String>();
+
+        for (val role : roles) {
+            newMappings.put(role.getId(), role.getName());
+        }
+
+        saveCache(loadCache(), newMappings);
+        return roles.stream();
+    }
+
+    @Override
     public Optional<Role> tryFindOne(RoleRef ref) {
         val maybeRole = delegate.tryFindOne(ref);
 

@@ -144,7 +144,7 @@ public class SetupOperation implements Operation<SetupResult> {
                     val p = ctx.createProfile(details.profileName, details.token, details.env);
 
                     if (shouldSetDefault) {
-                        ctx.copyProfile(p, ProfileName.DEFAULT);
+                        ctx.setDefault(p);
                     }
                 });
 

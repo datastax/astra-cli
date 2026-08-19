@@ -1,19 +1,29 @@
 package com.dtsx.astra.cli.commands.token;
 
+import com.dtsx.astra.cli.core.completions.caches.RoleCompletionsCache;
 import com.dtsx.astra.cli.core.completions.impls.RoleNamesCompletion;
+import com.dtsx.astra.cli.core.datatypes.NEList;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RoleRef;
+import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
+import com.dtsx.astra.cli.core.output.prompters.specific.RoleNamePrompter;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.token.TokenCreateOperation;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
+import lombok.val;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCreateRequest;
@@ -29,12 +39,12 @@ import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCrea
 public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     @Option(
         names = { "-r", "--role" },
-        description = "The role for this token",
+        description = "List of roles to assign the user",
         completionCandidates = RoleNamesCompletion.class,
         paramLabel = "ROLE",
-        required = true
+        split = ","
     )
-    public RoleRef $role;
+    public List<RoleRef> $roles = List.of();
 
     @Option(
         names = { "-d", "--description" },
@@ -43,9 +53,34 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     )
     public Optional<String> $description;
 
+    @Option(
+        names = { "--org" },
+        description = "Optional UUID of the organization under which the token will be created. If not provided, the token is created under the organization/enterprise of the authorization token.",
+        paramLabel = "ORG"
+    )
+    public Optional<UUID> $org;
+
+    @Option(
+        names = { "-x", "--expiry" },
+        description = "Optional expiration date for the token in ISO-8601 format (e.g., 2024-12-31T23:59:59Z). If not provided, the org's max expiry will be used (potentially infinite).",
+        paramLabel = "EXPIRY"
+    )
+    public Optional<Instant> $expiry;
+
+    @Override
+    @MustBeInvokedByOverriders
+    protected void prelude() {
+        super.prelude();
+
+        if ($roles.isEmpty()) {
+            val gateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx));
+            $roles = RoleNamePrompter.multiPrompt(ctx, gateway, "Select roles for the new token (does not include all possible roles):", originalArgs());
+        }
+    }
+
     @Override
     public final OutputJson executeJson(Supplier<CreateTokenResponse> tokenResponse) {
-        return OutputJson.serializeValue(tokenResponse.get());
+        return OutputJson.serializeValue(tokenResponse);
     }
 
     @Override
@@ -59,6 +94,15 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
 
     @Override
     protected Operation<CreateTokenResponse> mkOperation() {
-        return new TokenCreateOperation(tokenGateway, new TokenCreateRequest($role, $description));
+        val roles = NEList.parse($roles).orElseThrow(() ->
+            new AstraCliException(ExitCode.ROLE_NOT_FOUND, "@|bold,red At least one role must be provided to create the token|@")
+        );
+
+        return new TokenCreateOperation(tokenGateway, new TokenCreateRequest(
+            roles,
+            $description,
+            $org,
+            $expiry
+        ));
     }
 }

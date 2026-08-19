@@ -8,10 +8,7 @@ import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
@@ -24,6 +21,17 @@ public class RoleGatewayImpl implements RoleGateway {
     @Override
     public Stream<Role> findAll() {
         return ctx.log().loading("Finding all roles", (_) -> apiProvider.astraOpsClient().roles().findAll());
+    }
+
+    @Override
+    public Stream<Role> findAll(List<RoleRef> refs) {
+        return findAll()
+            .filter((r) -> {
+                return refs.stream().anyMatch(ref -> ref.fold(
+                    id -> r.getId().equals(id.toString()),
+                    name -> r.getName().equals(name)
+                ));
+            });
     }
 
     @Override

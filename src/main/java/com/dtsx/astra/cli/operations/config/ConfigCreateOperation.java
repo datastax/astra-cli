@@ -73,7 +73,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
             val p = ctx.createProfile(profileName, maybeToken.getRight(), request.env, request.localEndpoint);
 
             if (request.setDefault) {
-                ctx.copyProfile(p, ProfileName.DEFAULT);
+                ctx.setDefault(p);
             }
         });
 

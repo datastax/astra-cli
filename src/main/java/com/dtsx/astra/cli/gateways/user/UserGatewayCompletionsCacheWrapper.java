@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.user;
 import com.dtsx.astra.cli.core.completions.CompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.sdk.org.domain.User;
@@ -35,8 +36,8 @@ public class UserGatewayCompletionsCacheWrapper implements UserGateway {
     }
 
     @Override
-    public CreationStatus<List<UUID>> invite(UserRef user, List<RoleRef> roles) {
-        val roleIds = delegate.invite(user, roles);
+    public CreationStatus<List<UUID>> invite(UserRef user, NEList<RoleRef> refs) {
+        val roleIds = delegate.invite(user, refs);
         addRefToCache(user);
         return roleIds;
     }

@@ -1,19 +1,22 @@
 package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.core.completions.caches.RoleCompletionsCache;
 import com.dtsx.astra.cli.core.completions.impls.UserEmailsCompletion;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
+import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
+import com.dtsx.astra.cli.core.output.prompters.specific.RoleNamePrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.user.UserInviteOperation;
 import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
 import java.util.LinkedHashMap;
@@ -52,12 +55,12 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
     public UserRef $user;
 
     @Option(
-        names = { "-r", "--roles" },
+        names = { "-r", "--role" },
         description = "List of roles to assign the user",
         defaultValue = "Database Administrator",
         split = ","
     )
-    public List<RoleRef> $roles;
+    public List<RoleRef> $roles = List.of();
 
     @Option(
         names = { "--if-not-exists" },
@@ -71,13 +74,18 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
         super.prelude();
 
         if ($roles.isEmpty()) {
-            throw new ParameterException(spec.commandLine(), "At least one role must be specified for the user via the --roles option.");
+            val gateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx));
+            $roles = RoleNamePrompter.multiPrompt(ctx, gateway, "Select roles for the new token (does not include all possible roles):", originalArgs());
         }
     }
 
     @Override
     protected Operation<UserInviteResult> mkOperation() {
-        return new UserInviteOperation(userGateway, new UserInviteRequest($user, $roles, $ifNotExists));
+        val roles = NEList.parse($roles).orElseThrow(() ->
+            new AstraCliException(ExitCode.ROLE_NOT_FOUND, "@|bold,red At least one role must be specified for the user|@")
+        );
+
+        return new UserInviteOperation(userGateway, new UserInviteRequest($user, roles, $ifNotExists));
     }
 
     @Override

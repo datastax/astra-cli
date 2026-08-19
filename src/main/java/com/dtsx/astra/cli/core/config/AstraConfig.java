@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.parsers.ini.IniFile;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
+import com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair;
 import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -257,6 +258,14 @@ public class AstraConfig {
         }
 
         public void copyProfile(Profile src, ProfileName target) {
+            copyProfile(src, target, false);
+        }
+
+        public void setDefault(Profile src) {
+            copyProfile(src, ProfileName.DEFAULT, true);
+        }
+
+        private void copyProfile(Profile src, ProfileName target, boolean persistSrc) {
             actions.add(() -> {
                 val srcSection = backingIniFile.getSections().stream()
                     .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
@@ -286,7 +295,10 @@ public class AstraConfig {
                 profiles.removeIf(isProfileName(target));
                 backingIniFile.deleteSection(target.unwrap());
 
-                profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name())));
+                profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name().filter(_ -> persistSrc))));
+                if (persistSrc) {
+                    srcSection.pairs().add(new IniKVPair(List.of(), SOURCE_KEY, src.nameOrDefault().unwrap()));
+                }
                 backingIniFile.addSection(target.unwrap(), srcSection);
             });
         }

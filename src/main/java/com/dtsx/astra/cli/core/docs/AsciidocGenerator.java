@@ -69,7 +69,7 @@ public class AsciidocGenerator {
                     subcommands
                 );
             })
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private NavPage mkNavPage(List<DocsPage> topLevelDocsPages) {

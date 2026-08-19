@@ -31,7 +31,7 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
         val profile = retrievedProfile.get();
 
         config.modify((ctx) -> {
-            ctx.copyProfile(profile, ProfileName.DEFAULT);
+            ctx.setDefault(profile);
         });
 
         return new ProfileSetAsDefault(request.profileName);
