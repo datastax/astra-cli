@@ -228,15 +228,17 @@ public class AstraConfig {
 
     public class ProfileModificationCtx {
         @Getter
-                private final List<Runnable> actions = new ArrayList<>();
+        private final List<Runnable> actions = new ArrayList<>();
 
-        public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
-            createProfile(name, token, env, Optional.empty());
+        public Profile createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
+            return createProfile(name, token, env, Optional.empty());
         }
 
-        public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env, Optional<String> localEndpoint) {
+        public Profile createProfile(ProfileName name, AstraToken token, AstraEnvironment env, Optional<String> localEndpoint) {
+            val profile = new Profile(Optional.of(name), token, env, Optional.empty());
+
             actions.add(() -> {
-                profiles.add(Either.pure(new Profile(Optional.of(name), token, env, Optional.empty())));
+                profiles.add(Either.pure(profile));
 
                 backingIniFile.addSection(name.unwrap(), new TreeMap<>() {{
                     put(TOKEN_KEY, token.unsafeUnwrap());
@@ -250,6 +252,8 @@ public class AstraConfig {
                     }
                 }});
             });
+
+            return profile;
         }
 
         public void copyProfile(Profile src, ProfileName target) {

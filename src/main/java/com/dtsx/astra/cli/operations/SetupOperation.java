@@ -141,10 +141,10 @@ public class SetupOperation implements Operation<SetupResult> {
 
                 config().modify((ctx) -> {
                     ctx.deleteProfile(details.profileName);
-                    ctx.createProfile(details.profileName, details.token, details.env);
+                    val p = ctx.createProfile(details.profileName, details.token, details.env);
 
                     if (shouldSetDefault) {
-                        ctx.copyProfile(config().lookupProfile(details.profileName).orElseThrow(), ProfileName.DEFAULT);
+                        ctx.copyProfile(p, ProfileName.DEFAULT);
                     }
                 });
 
