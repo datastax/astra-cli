@@ -5,8 +5,13 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public record RenderableShellTable(List<? extends Map<String, ?>> raw, List<String> columns) implements OutputAll {
+public record RenderableShellTable(
+    List<? extends Map<String, ?>> raw,
+    List<String> columns,
+    Optional<String> varLenColumn
+) implements OutputAll {
     @Override
     public String renderAsCsv() {
         return new ShellTableRendererCsv(this).renderAsCsv();
