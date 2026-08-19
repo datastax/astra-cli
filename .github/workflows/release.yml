@@ -23,6 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate tag format
+        run: |
+          if [[ ! "${{ inputs.tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-.+)?$ ]]; then
+            echo "ERROR: Tag '$tag' does not match the required vX.Y.Z format (e.g., v1.0.0)."
+            exit 1
+          fi
+
       - name: Verify versions are up to date
         run: |
           files=(

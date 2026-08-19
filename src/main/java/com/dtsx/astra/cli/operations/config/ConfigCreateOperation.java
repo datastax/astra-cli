@@ -93,8 +93,8 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
 
         return ctx.log().loading("Validating your Astra token", (_) -> {
             try {
-                val name = ProfileName.mkUnsafe(orgGateway.apply(token).current().getName());
-                return Either.pure(name);
+                val orgName = ProfileName.mkUnsafe(orgGateway.apply(token).current().getName());
+                return Either.pure(request.profileName.orElse(orgName));
             } catch (AuthenticationException e) {
                 val validEnv = statelessOrgGateway.resolveOrganizationEnvironment(token).map(Pair::getLeft);
                 return Either.left(new InvalidToken(validEnv));
