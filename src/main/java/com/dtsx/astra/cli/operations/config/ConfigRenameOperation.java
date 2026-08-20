@@ -36,11 +36,8 @@ public class ConfigRenameOperation implements Operation<ConfigRenameResult> {
             return new NewProfileAlreadyExists(request.oldProfileName, request.newProfileName);
         }
 
-        val profile = oldProfile.get();
-
         config.modify((ctx) -> {
-            ctx.copyProfile(profile, request.newProfileName);
-            ctx.deleteProfile(request.oldProfileName);
+            ctx.renameProfile(request.oldProfileName, request.newProfileName);
         });
 
         return new ProfileRenamed(request.oldProfileName, request.newProfileName);

@@ -141,10 +141,10 @@ public class SetupOperation implements Operation<SetupResult> {
 
                 config().modify((ctx) -> {
                     ctx.deleteProfile(details.profileName);
-                    val p = ctx.createProfile(details.profileName, details.token, details.env);
+                    ctx.createProfile(details.profileName, details.token, details.env);
 
                     if (shouldSetDefault) {
-                        ctx.setDefault(p);
+                        ctx.setDefault(details.profileName);
                     }
                 });
 

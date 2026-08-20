@@ -3,7 +3,6 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesNoDefaultCompletion;
 import com.dtsx.astra.cli.core.config.ProfileName;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -71,15 +70,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
     private ProfileName promptForProfileName() {
         val selected = ProfileNamePrompter.prompt(ctx, config(false).profiles(), "Select a profile to set as default",
             (list) -> {
-                val onlyValid = NEList.parse(list.stream().filter(Either::isRight).toList());
-
-                if (onlyValid.isEmpty()) {
-                    throw new AstraCliException(PROFILE_NOT_FOUND, """
-                      @|bold,red No valid profiles found to select from|@
-                    """);
-                }
-
-                val notDefault = NEList.parse(onlyValid.get().stream().filter(e -> !e.getRight().isDefault()).toList());
+                val notDefault = NEList.parse(list.stream().filter(p -> !p.isDefault()).toList());
 
                 if (notDefault.isEmpty()) {
                     throw new AstraCliException(PROFILE_NOT_FOUND, """

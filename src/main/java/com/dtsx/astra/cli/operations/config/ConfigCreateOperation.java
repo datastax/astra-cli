@@ -70,10 +70,10 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
 
         config.modify((ctx) -> {
             ctx.deleteProfile(profileName);
-            val p = ctx.createProfile(profileName, maybeToken.getRight(), request.env, request.localEndpoint);
+            ctx.createProfile(profileName, maybeToken.getRight(), request.env, request.localEndpoint);
 
             if (request.setDefault) {
-                ctx.setDefault(p);
+                ctx.setDefault(profileName);
             }
         });
 

@@ -30,8 +30,16 @@ public class IniFile extends ParsedFile {
         nodes.add(new IniSection(name, new ArrayList<>(base.pairs())));
     }
 
+    public void addSection(IniSection section) {
+        nodes.add(section);
+    }
+
     public void deleteSection(String name) {
         nodes.removeIf((n) -> (n instanceof IniSection s) && s.name().equals(name));
+    }
+
+    public IniFile copy() {
+        return new IniFile(new ArrayList<>(nodes));
     }
 
     public List<IniSection> getSections() {

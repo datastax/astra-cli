@@ -111,7 +111,7 @@ public class ProfileLinkedCompletionsCacheTest {
         val target = ProfileName.mkUnsafe("copied-profile");
 
         config.astraConfig.modify((ctx) -> {
-            ctx.copyProfile(config.profileAndSource.getLeft(), target);
+            ctx.copyProfile(config.profileAndSource.getLeft().nameOrDefault(), target);
         });
 
         val created = config.astraConfig.lookupProfile(target).orElseThrow();

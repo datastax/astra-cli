@@ -3,9 +3,7 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
-import com.dtsx.astra.cli.core.config.InvalidProfile;
 import com.dtsx.astra.cli.core.config.Profile;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
@@ -163,16 +161,9 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     }
 
     private String promptForProfileName() {
-        val profileFirst = Comparator.<Either<InvalidProfile, Profile>, Integer>comparing((p) -> {
-            val name = p.fold(
-                (invalid) -> invalid.section().name(),
-                (valid) -> valid.nameOrDefault().unwrap()
-            );
-
-            return name.equalsIgnoreCase("default")
-                ? -1
-                : 0;
-        });
+        val profileFirst = Comparator.<Profile, Integer>comparing((p) ->
+            p.nameOrDefault().unwrap().equalsIgnoreCase("default") ? -1 : 0
+        );
 
         return ProfileNamePrompter.prompt(ctx, config(false).profiles(), "Select a profile to look at",
             (list) -> NEList.parse(

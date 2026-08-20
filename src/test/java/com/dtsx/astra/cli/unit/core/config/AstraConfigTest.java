@@ -3,7 +3,6 @@ package com.dtsx.astra.cli.unit.core.config;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
-import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.config.AstraConfigFileException;
 import com.dtsx.astra.cli.testlib.Fixtures;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
-import java.util.List;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.PARSE_ISSUE;
@@ -62,6 +60,92 @@ public class AstraConfigTest {
                 .hasMessageContaining("Unknown syntax")
                 .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
         }
+
+        @Test
+        @SneakyThrows
+        public void invalid_profile_missing_token_fails_fast() {
+            val path = ctx.get().path(".astrarc");
+            Files.writeString(path, trimIndent("""
+              [default]
+            """));
+
+            assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
+                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
+                .hasMessageContaining("default")
+                .hasMessageContaining("Missing required key")
+                .hasMessageContaining("ASTRA_DB_APPLICATION_TOKEN")
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
+        }
+
+        @Test
+        @SneakyThrows
+        public void invalid_profile_bad_token_fails_fast() {
+            val path = ctx.get().path(".astrarc");
+            Files.writeString(path, trimIndent("""
+              [my-profile]
+              ASTRA_DB_APPLICATION_TOKEN=not-a-valid-token
+            """));
+
+            assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
+                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
+                .hasMessageContaining("my-profile")
+                .hasMessageContaining("ASTRA_DB_APPLICATION_TOKEN")
+                .hasMessageContaining("Astra token should start with 'AstraCS:'")
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
+        }
+
+        @Test
+        @SneakyThrows
+        public void invalid_profile_bad_env_fails_fast() {
+            val path = ctx.get().path(".astrarc");
+            Files.writeString(path, trimIndent("""
+              [my-profile]
+              ASTRA_DB_APPLICATION_TOKEN=${token}
+              ASTRA_ENV=not-a-valid-env
+            """.replace("${token}", Fixtures.Token.unsafeUnwrap())));
+
+            assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
+                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
+                .hasMessageContaining("my-profile")
+                .hasMessageContaining("ASTRA_ENV")
+                .hasMessageContaining("Got 'not-a-valid-env', expected one of (prod|dev|test|local)")
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
+        }
+
+        @Test
+        @SneakyThrows
+        public void invalid_profile_bad_name_fails_fast() {
+            val path = ctx.get().path(".astrarc");
+            Files.writeString(path, trimIndent("""
+              [<invalid-name>]
+              ASTRA_DB_APPLICATION_TOKEN=${token}
+            """.replace("${token}", Fixtures.Token.unsafeUnwrap())));
+
+            assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
+                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
+                .hasMessageContaining("<invalid-name>")
+                .hasMessageContaining("Error parsing profile name")
+                .hasMessageContaining("Profile name should not be enclosed in angle brackets... did you forget to replace a placeholder?")
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
+        }
+
+        @Test
+        @SneakyThrows
+        public void invalid_profile_bad_source_for_default_fails_fast() {
+            val path = ctx.get().path(".astrarc");
+            Files.writeString(path, trimIndent("""
+              [default]
+              ASTRA_DB_APPLICATION_TOKEN=${token}
+              DEFAULT_PROFILE_SOURCE=<invalid-source-name>
+            """.replace("${token}", Fixtures.Token.unsafeUnwrap())));
+
+            assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
+                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
+                .hasMessageContaining("default")
+                .hasMessageContaining("DEFAULT_PROFILE_SOURCE")
+                .hasMessageContaining("Profile name should not be enclosed in angle brackets")
+                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
+        }
     }
 
     @Nested
@@ -80,10 +164,8 @@ public class AstraConfigTest {
             });
 
             assertThat(config.profiles()).hasSize(1);
-            assertThat(config.profilesValidated()).hasSize(1);
 
             assertThat(config.profiles().getFirst())
-                .extracting(Either::getRight)
                 .satisfies((p) -> {
                     assertThat(p.name()).contains(ProfileName.mkUnsafe("my-profile"));
                     assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
@@ -92,14 +174,12 @@ public class AstraConfigTest {
 
             // set it as default
             config.modify((ctx) -> {
-                ctx.copyProfile(config.lookupProfile(ProfileName.mkUnsafe("my-profile")).orElseThrow(), ProfileName.DEFAULT);
+                ctx.copyProfile(ProfileName.mkUnsafe("my-profile"), ProfileName.DEFAULT);
             });
 
-            System.out.println(config.profiles());
+            assertThat(config.profiles()).hasSize(2);
 
-            assertThat(config.profilesValidated()).hasSize(2);
-
-            assertThat(config.profilesValidated().getLast())
+            assertThat(config.profiles().getLast())
                 .extracting(Profile::nameOrDefault)
                 .extracting(ProfileName::unwrap)
                 .isEqualTo("default");
@@ -110,7 +190,7 @@ public class AstraConfigTest {
                 ctx.createProfile(ProfileName.mkUnsafe("test"), Fixtures.Token, AstraEnvironment.TEST);
             });
 
-            assertThat(config.profilesValidated()).hasSize(4);
+            assertThat(config.profiles()).hasSize(4);
 
             config.modify((ctx) -> {
                 ctx.deleteProfile(ProfileName.mkUnsafe("dev"));
@@ -131,41 +211,28 @@ public class AstraConfigTest {
 
         @Test
         @SneakyThrows
-        public void from_existing_file() {
+        public void from_existing_valid_file() {
             val path = ctx.get().path("yay config yay");
 
             Files.writeString(path, trimIndent("""
-              # invalid profile (missing token key)
+              # default profile with source link
               [default]
-            
-              # invalid profile (invalid token)
-              [invalid/bad-token]
-              ASTRA_DB_APPLICATION_TOKEN=not-a-valid-token
-            
-              # invalid profile (invalid token)
-              [invalid/bad-env]
               ASTRA_DB_APPLICATION_TOKEN=${token}
-              # not a valid env (line comment)
-              ASTRA_ENV=not-a-valid-env
-            
-              # invalid profile (invalid name)
-              [<invalid/bad-name>]
-              ASTRA_DB_APPLICATION_TOKEN=${token}
-            
+              DEFAULT_PROFILE_SOURCE=valid/dev
+
               # valid profile w/ default env
               [valid/default]
               ASTRA_DB_APPLICATION_TOKEN=${token}
-            
+
               # valid profile w/ custom env
               [valid/dev]
               ASTRA_DB_APPLICATION_TOKEN=${token}
               ASTRA_ENV=dev
-           
+
               # duplicate profile
               [semi-invalid/duplicate]
-              # duplicate (line comment)
               ASTRA_DB_APPLICATION_TOKEN=${token}
-            
+
               # duplicate profile
               [semi-invalid/duplicate]
               ASTRA_DB_APPLICATION_TOKEN=${token}
@@ -173,85 +240,18 @@ public class AstraConfigTest {
 
             val config = AstraConfig.readAstraConfigFile(ctx.get(), path, false);
 
-            assertThat(config.profiles()).hasSize(8);
+            assertThat(config.profiles()).hasSize(5);
 
-            // only errors on one profile at a time, sequentially
-            assertThatThrownBy(config::profilesValidated)
-                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
-                .hasMessageContaining("default")
-                .hasMessageContaining("Missing the required key 'ASTRA_DB_APPLICATION_TOKEN'")
-                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
-
-            // invalid profile (missing token key)
+            // default profile with sourceForDefault
             assertThat(config.profiles().getFirst())
-                .extracting(Either::getLeft)
-                .satisfies((ip) -> {
-                    assertThat(ip.section().name()).isEqualTo("default");
-                    assertThat(ip.issue()).contains("Missing the required key 'ASTRA_DB_APPLICATION_TOKEN'");
-                });
-
-            // invalid profile (invalid token)
-            assertThat(config.profiles().get(1))
-                .extracting(Either::getLeft)
-                .satisfies((ip) -> {
-                    assertThat(ip.section().name()).isEqualTo("invalid/bad-token");
-                    assertThat(ip.issue()).contains("Error parsing 'ASTRA_DB_APPLICATION_TOKEN': Astra token should start with 'AstraCS:'");
-                });
-
-            // invalid profile (invalid env)
-            assertThat(config.profiles().get(2))
-                .extracting(Either::getLeft)
-                .satisfies((ip) -> {
-                    assertThat(ip.section().name()).isEqualTo("invalid/bad-env");
-                    assertThat(ip.issue()).contains("Error parsing 'ASTRA_ENV': Got 'not-a-valid-env', expected one of (prod|dev|test|local)");
-                });
-
-            // invalid profile (invalid name)
-            assertThat(config.profiles().get(3))
-                .extracting(Either::getLeft)
-                .satisfies((ip) -> {
-                    assertThat(ip.section().name()).isEqualTo("<invalid/bad-name>");
-                    assertThat(ip.issue()).contains("Error parsing profile name @'!<invalid/bad-name>!@: Profile name should not be enclosed in angle brackets... did you forget to replace a placeholder?");
-                });
-
-            // valid profile w/ default env
-            assertThat(config.profiles().get(4))
-                .extracting(Either::getRight)
                 .satisfies((p) -> {
-                    assertThat(p.name()).contains(ProfileName.mkUnsafe("valid/default"));
+                    assertThat(p.name()).contains(ProfileName.DEFAULT);
                     assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
                     assertThat(p.env()).isEqualTo(AstraEnvironment.PROD);
+                    assertThat(p.sourceForDefault()).contains(ProfileName.mkUnsafe("valid/dev"));
                 });
 
             // valid profile w/ custom env
-            assertThat(config.profiles().get(5))
-                .extracting(Either::getRight)
-                .satisfies((p) -> {
-                    assertThat(p.name()).contains(ProfileName.mkUnsafe("valid/dev"));
-                    assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
-                    assertThat(p.env()).isEqualTo(AstraEnvironment.DEV);
-                });
-
-            // duplicate profiles
-            val duplicateProfile = config.profiles().get(6);
-
-            for (val index : List.of(6, 7)) {
-                assertThat(config.profiles().get(index))
-                    .extracting(Either::getRight)
-                    .satisfies((p) -> {
-                        assertThat(p.name()).contains(ProfileName.mkUnsafe("semi-invalid/duplicate"));
-                        assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
-                        assertThat(p.env()).isEqualTo(AstraEnvironment.PROD);
-                    });
-            }
-
-            // lookup tests
-            assertThat(config.lookupProfile(ProfileName.mkUnsafe("non-existent"))).isEmpty();
-
-            assertThatThrownBy(() -> config.lookupProfile(ProfileName.mkUnsafe("semi-invalid/duplicate")))
-                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
-                .hasMessageContaining("Multiple profiles found for name @'!semi-invalid/duplicate!@");
-
             assertThat(config.lookupProfile(ProfileName.mkUnsafe("valid/dev")))
                 .isPresent()
                 .get()
@@ -261,85 +261,72 @@ public class AstraConfigTest {
                     assertThat(p.env()).isEqualTo(AstraEnvironment.DEV);
                 });
 
+            // lookup non-existent
+            assertThat(config.lookupProfile(ProfileName.mkUnsafe("non-existent"))).isEmpty();
+
+            // lookup duplicate throws exception
+            assertThatThrownBy(() -> config.lookupProfile(ProfileName.mkUnsafe("semi-invalid/duplicate")))
+                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
+                .hasMessageContaining("Multiple profiles found for name @'!semi-invalid/duplicate!@");
+
             // existence tests
             assertThat(config.profileExists(ProfileName.mkUnsafe("non-existent"))).isFalse();
-
             assertThat(config.profileExists(ProfileName.mkUnsafe("valid/default"))).isTrue();
-            assertThat(config.profileExists(ProfileName.mkUnsafe("semi-invalid/duplicate"))).isTrue();
             assertThat(config.profileExists(ProfileName.mkUnsafe("valid/dev"))).isTrue();
+            assertThat(config.profileExists(ProfileName.DEFAULT)).isTrue();
 
-            // getting a raw section
+            // lookupSection
             assertThat(config.lookupSection("non-existent")).isEmpty();
-
-            assertThat(config.lookupSection("invalid/bad-env"))
+            assertThat(config.lookupSection("valid/dev"))
                 .isPresent()
                 .get()
-                .satisfies((ip) -> {
-                    assertThat(ip.name()).isEqualTo("invalid/bad-env");
-                    assertThat(ip.lookupKey("ASTRA_DB_APPLICATION_TOKEN")).contains(Fixtures.Token.unsafeUnwrap());
-                    assertThat(ip.lookupKey("ASTRA_ENV")).contains("not-a-valid-env");
+                .satisfies((s) -> {
+                    assertThat(s.name()).isEqualTo("valid/dev");
+                    assertThat(s.lookupKey("ASTRA_DB_APPLICATION_TOKEN")).contains(Fixtures.Token.unsafeUnwrap());
+                    assertThat(s.lookupKey("ASTRA_ENV")).contains("dev");
                 });
 
-            // attempt to fix invalid profile
+            // modifying - delete and create
             config.modify((ctx) -> {
-                ctx.deleteProfile(ProfileName.mkUnsafe("invalid/bad-env"));
-                ctx.createProfile(ProfileName.mkUnsafe("invalid/bad-env"), Fixtures.Token, AstraEnvironment.TEST);
+                ctx.deleteProfile(ProfileName.mkUnsafe("valid/default"));
+                ctx.createProfile(ProfileName.mkUnsafe("new-profile"), Fixtures.Token, AstraEnvironment.TEST);
             });
 
-            assertThat(config.profiles().getLast())
-                .extracting(Either::getRight)
-                .satisfies((p) -> {
-                    assertThat(p.name().orElseThrow().unwrap()).isEqualTo("invalid/bad-env");
-                    assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
-                    assertThat(p.env()).isEqualTo(AstraEnvironment.TEST);
-                });
+            assertThat(config.profileExists(ProfileName.mkUnsafe("valid/default"))).isFalse();
+            assertThat(config.profileExists(ProfileName.mkUnsafe("new-profile"))).isTrue();
+        }
 
-            // attempt to fix duplicate profile
-            config.modify((ctx) -> {
-                ctx.copyProfile(duplicateProfile.getRight(), duplicateProfile.getRight().nameOrDefault());
-            });
+        @Test
+        @SneakyThrows
+        public void renaming_profile_updates_default_source() {
+            val path = ctx.get().path("rename_config");
 
-            assertThat(config.lookupProfile(ProfileName.mkUnsafe("semi-invalid/duplicate")))
-                .isPresent()
-                .get()
-                .satisfies((p) -> {
-                    assertThat(p.name()).contains(ProfileName.mkUnsafe("semi-invalid/duplicate"));
-                    assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
-                    assertThat(p.env()).isEqualTo(AstraEnvironment.PROD);
-                });
-
-            assertThat(config.backingFile()).hasContent(trimIndent("""
-              # invalid profile (missing token key)
+            Files.writeString(path, trimIndent("""
               [default]
-            
-              # invalid profile (invalid token)
-              [invalid/bad-token]
-              ASTRA_DB_APPLICATION_TOKEN=not-a-valid-token
-            
-              # invalid profile (invalid token)
-              # invalid profile (invalid name)
-              [<invalid/bad-name>]
               ASTRA_DB_APPLICATION_TOKEN=${token}
-            
-              # valid profile w/ default env
-              [valid/default]
-              ASTRA_DB_APPLICATION_TOKEN=${token}
-            
-              # valid profile w/ custom env
-              [valid/dev]
-              ASTRA_DB_APPLICATION_TOKEN=${token}
-              ASTRA_ENV=dev
-            
-              # duplicate profile
-              # duplicate profile
-              [invalid/bad-env]
-              ASTRA_DB_APPLICATION_TOKEN=${token}
-              ASTRA_ENV=TEST
-            
-              [semi-invalid/duplicate]
-              # duplicate (line comment)
+              DEFAULT_PROFILE_SOURCE=old-name
+
+              [old-name]
               ASTRA_DB_APPLICATION_TOKEN=${token}
             """.replace("${token}", Fixtures.Token.unsafeUnwrap())));
+
+            val config = AstraConfig.readAstraConfigFile(ctx.get(), path, false);
+
+            assertThat(config.lookupProfile(ProfileName.DEFAULT).orElseThrow().sourceForDefault())
+                .contains(ProfileName.mkUnsafe("old-name"));
+
+            config.modify((ctx) -> {
+                ctx.renameProfile(ProfileName.mkUnsafe("old-name"), ProfileName.mkUnsafe("new-name"));
+            });
+
+            assertThat(config.profileExists(ProfileName.mkUnsafe("old-name"))).isFalse();
+            assertThat(config.profileExists(ProfileName.mkUnsafe("new-name"))).isTrue();
+
+            assertThat(config.lookupProfile(ProfileName.DEFAULT).orElseThrow().sourceForDefault())
+                .contains(ProfileName.mkUnsafe("new-name"));
+
+            assertThat(config.lookupSection("default").orElseThrow().lookupKey(AstraConfig.SOURCE_KEY))
+                .contains("new-name");
         }
     }
 }

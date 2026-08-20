@@ -28,10 +28,8 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
             return new ProfileNotFound(request.profileName);
         }
 
-        val profile = retrievedProfile.get();
-
         config.modify((ctx) -> {
-            ctx.setDefault(profile);
+            ctx.setDefault(request.profileName);
         });
 
         return new ProfileSetAsDefault(request.profileName);
