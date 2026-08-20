@@ -104,7 +104,7 @@ public class TableDescribeOperation implements Operation<TableDescribeResult> {
         val clusteringColumns = primaryKey.getPartitionSort().entrySet()
             .stream()
             .map(entry -> entry.getKey() + "(" + (entry.getValue() == 1 ? "ASC" : "DESC") + ")")
-            .collect(Collectors.toList());
+            .toList();
         
         return new PrimaryKeyInfo(
             primaryKey.getPartitionBy(),

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.dtsx.astra.cli.utils.CollectionUtils.setAdd;
 import static com.dtsx.astra.cli.utils.CollectionUtils.setDel;
@@ -27,7 +27,7 @@ public abstract class CompletionsCache {
     private @Nullable Set<String> cachedCandidates;
 
     @SneakyThrows
-    private void update(Function<Set<String>, Set<String>> mkCandidates) {
+    private void update(UnaryOperator<Set<String>> mkCandidates) {
         val primaryCacheFile = primaryCacheFile();
 
         if (primaryCacheFile.isEmpty()) {

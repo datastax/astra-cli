@@ -3,5 +3,5 @@ command: astra token delete aBc123XyZ789LmnOpQrStUvW -o csv
 exit_code: 0
 ---- output ----
 stdout: code,message,was_deleted
-stdout: OK,Your token has been deleted.,true
+stdout: OK,Token aBc123XyZ789LmnOpQrStUvW has been deleted.,true
 ---- end ----

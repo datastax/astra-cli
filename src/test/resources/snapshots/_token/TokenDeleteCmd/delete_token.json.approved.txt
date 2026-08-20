@@ -4,7 +4,7 @@ exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Your token has been deleted.",
+stdout:   "message" : "Token aBc123XyZ789LmnOpQrStUvW has been deleted.",
 stdout:   "data" : {
 stdout:     "wasDeleted" : true
 stdout:   },

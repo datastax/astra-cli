@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.snapshot.commands.token;
 
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.token.TokenGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
@@ -16,10 +17,10 @@ import static org.mockito.Mockito.when;
 public class TokenCreateCmdSnapshotTest extends BaseCmdSnapshotTest {
     private final SnapshotTestOptionsModifier createTokenOpts = (o) -> o
         .gateway(TokenGateway.class, (mock) -> {
-            when(mock.create(any(), any())).thenReturn(Fixtures.CreateTokenResponse);
+            when(mock.create(any(), any(), any(), any())).thenReturn(Fixtures.CreateTokenResponse);
         })
         .verify((mocks) -> {
-            verify(mocks.tokenGateway()).create(Roles.NameRef, Optional.of("Test description"));
+            verify(mocks.tokenGateway()).create(NEList.of(Roles.NameRef), Optional.of("Test description"), Optional.empty(), Optional.empty());
         });
 
     @TestForDifferentOutputs

@@ -144,7 +144,7 @@ public class SetupOperation implements Operation<SetupResult> {
                     ctx.createProfile(details.profileName, details.token, details.env);
 
                     if (shouldSetDefault) {
-                        ctx.copyProfile(config().lookupProfile(details.profileName).orElseThrow(), ProfileName.DEFAULT);
+                        ctx.setDefault(details.profileName);
                     }
                 });
 

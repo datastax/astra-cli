@@ -60,6 +60,8 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
             case ProfileRenamed(var oldName, var newName) -> handleProfileRenamed(oldName, newName);
             case OldProfileNotFound(var oldName) -> throwOldProfileNotFound(oldName);
             case NewProfileAlreadyExists(var oldName, var newName) -> throwNewProfileAlreadyExists(oldName, newName);
+            case CantRenameToDefault(var oldName) -> throwCantRenameToDefault(oldName);
+            case CantRenameFromDefault() -> throwCantRenameFromDefault();
         };
     }
 
@@ -95,6 +97,25 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
         ));
     }
 
+    private <T> T throwCantRenameToDefault(ProfileName oldName) {
+        throw new AstraCliException(PROFILE_ALREADY_EXISTS, """
+          @|bold,red Error: Cannot rename a profile to 'default'.|@
+
+          Use @'!${cli.name} config use <old_profile>!@ instead to switch to the default profile.
+        """, List.of(
+            new Hint("Switch to the default profile:", "${cli.name} config use '" + oldName + "'")
+        ));
+    }
+
+    private <T> T throwCantRenameFromDefault() {
+        throw new AstraCliException(PROFILE_ALREADY_EXISTS, """
+          @|bold,red Error: Cannot rename a profile from 'default'.|@
+        """, List.of(
+            new Hint("Delete the default profile:", "${cli.name} config delete default"),
+            new Hint("Switch to the default profile:", "${cli.name} config use <profile_name>")
+        ));
+    }
+
     private LinkedHashMap<String, Object> mkData(ProfileName oldName, ProfileName newName) {
         return sequencedMapOf(
             "oldProfileName", oldName,
@@ -105,7 +126,6 @@ public class ConfigRenameCmd extends AbstractConfigCmd<ConfigRenameResult> {
     @Override
     protected Operation<ConfigRenameResult> mkOperation() {
         val oldName = $oldProfileName.orElseGet(this::promptForOldProfileName);
-
         return new ConfigRenameOperation(config(false), new RenameConfigRequest(oldName, $newProfileName));
     }
 

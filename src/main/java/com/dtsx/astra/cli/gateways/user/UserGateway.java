@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.gateways.user;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
@@ -16,7 +17,7 @@ public interface UserGateway extends SomeGateway {
 
     Stream<User> findAll();
 
-    CreationStatus<List<UUID>> invite(UserRef user, List<RoleRef> roles);
+    CreationStatus<List<UUID>> invite(UserRef user, NEList<RoleRef> refs);
 
     DeletionStatus<Void> delete(UserRef user);
 }

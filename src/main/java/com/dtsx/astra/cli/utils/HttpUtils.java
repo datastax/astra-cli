@@ -12,12 +12,12 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 @UtilityClass
 public class HttpUtils {
     @SneakyThrows
-    public static HttpResponse<String> GET(String url, Function<HttpClient.Builder, HttpClient.Builder> clientBuilderFn, Function<HttpRequest.Builder, HttpRequest.Builder> reqBuilderFn) {
+    public static HttpResponse<String> GET(String url, UnaryOperator<HttpClient.Builder> clientBuilderFn, UnaryOperator<HttpRequest.Builder> reqBuilderFn) {
         try {
             @Cleanup val client = clientBuilderFn.apply(
                 HttpClient.newBuilder()

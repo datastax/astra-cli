@@ -41,7 +41,7 @@ public class ConfigListOperation implements Operation<ListConfigResult> {
             .map(Profile::token)
             .orElse(null);
 
-        val profiles = config.profilesValidated().stream()
+        val profiles = config.profiles().stream()
             .filter(p -> request.env().map(e -> p.env() == e).orElse(true))
             .map(p -> new ProfileInfo(
                 p.nameOrDefault().unwrap(),

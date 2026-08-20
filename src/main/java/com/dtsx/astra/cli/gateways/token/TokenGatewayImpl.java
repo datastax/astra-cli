@@ -2,21 +2,27 @@ package com.dtsx.astra.cli.gateways.token;
 
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.internal.misc.InvalidTokenException;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.gateways.org.OrgGateway;
 import com.dtsx.astra.cli.gateways.role.RoleGateway;
-import com.dtsx.astra.cli.utils.JsonUtils;
 import com.dtsx.astra.sdk.exception.AuthenticationException;
+import com.dtsx.astra.sdk.org.domain.CreateTokenRequest;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
+import com.dtsx.astra.sdk.org.domain.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
 public class TokenGatewayImpl implements TokenGateway {
@@ -27,8 +33,7 @@ public class TokenGatewayImpl implements TokenGateway {
 
     @Override
     public Stream<IamToken> findAll() {
-        return ctx.log().loading("Fetching tokens for the current org", (_) -> 
-            apiProvider.astraOpsClient().tokens().findAll());
+        return ctx.log().loading("Fetching tokens for the current org", (_) -> apiProvider.astraOpsClient().tokens().findAll());
     }
 
     @Override
@@ -37,25 +42,20 @@ public class TokenGatewayImpl implements TokenGateway {
     }
 
     @Override
-    public CreateTokenResponse create(RoleRef roleRef, Optional<String> description) {
-        val role = roleGateway.findOne(roleRef);
+    public CreateTokenResponse create(NEList<RoleRef> refs, Optional<String> description, Optional<UUID> orgId, Optional<Instant> expiration) {
+        val roles = roleGateway.findAll(refs).toList();
 
-        return ctx.log().loading("Creating token with role " + ctx.highlight(role.getName()), (_) -> {
-            val client = apiProvider.astraOpsClient().tokens();
+        val roleDesc = (roles.size() == 1)
+            ? "role " + ctx.highlight(roles.getFirst().getName())
+            : ctx.highlight(roles.size()) + " roles";
 
-            val body = """
-              {
-                "roles": ["%s"],
-                "description": %s
-              }
-            """.formatted(
-                JsonUtils.escapeJson(role.getId()),
-                description.map(d -> '"' + JsonUtils.escapeJson(d) + '"').orElse("null")
-            );
-
-            val res = client.POST(client.getEndpointTokens(), body, "tokens.create");
-
-            return JsonUtils.readValue(res.getBody(), CreateTokenResponse.class);
+        return ctx.log().loading("Creating token with " + roleDesc, (_) -> {
+            val req = new CreateTokenRequest();
+            req.setRoles(roles.stream().map(Role::getId).collect(toSet()));
+            req.setDescription(description.orElse(null));
+            req.setOrgId(orgId.orElse(null));
+            req.setExpirationDate(expiration.orElse(null));
+            return apiProvider.astraOpsClient().tokens().create(req);
         });
     }
 

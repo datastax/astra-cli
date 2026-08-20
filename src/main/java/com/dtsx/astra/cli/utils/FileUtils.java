@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -40,6 +38,14 @@ public class FileUtils {
         return (isNative)
             ? new AstraBinary(resolveCurrentBinaryPath())
             : new AstraJar(resolveCurrentJarPath());
+    }
+
+    public void atomicMove(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException ignored) {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     private Path resolveCurrentBinaryPath() {

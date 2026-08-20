@@ -3,6 +3,7 @@ package com.dtsx.astra.cli.gateways.user;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
 import com.dtsx.astra.cli.core.datatypes.DeletionStatus;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.internal.user.UserNotFoundException;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
@@ -13,10 +14,10 @@ import com.dtsx.astra.sdk.org.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class UserGatewayImpl implements UserGateway {
     }
 
     @Override
-    public CreationStatus<List<UUID>> invite(UserRef user, List<RoleRef> roles) {
+    public CreationStatus<List<UUID>> invite(UserRef user, NEList<RoleRef> refs) {
         val userOpt = tryFindOne(user);
 
         if (userOpt.isPresent()) {
@@ -56,20 +57,17 @@ public class UserGatewayImpl implements UserGateway {
             emailStr -> emailStr
         );
 
-        val roleIds = roles.stream()
-            .map((r) -> r.fold(
-                UUID::toString,
-                name -> roleGateway.findOne(RoleRef.fromNameUnsafe(name)).getId()
-            ))
-            .toList();
+        val roleIds = roleGateway.findAll(refs)
+            .map(Role::getId)
+            .toArray(String[]::new);
 
         ctx.log().loading("Inviting user " + ctx.highlight(user), (_) -> {
-            apiProvider.astraOpsClient().users().invite(email, roleIds.toArray(new String[0]));
+            apiProvider.astraOpsClient().users().invite(email, roleIds);
             return null;
         });
 
         return CreationStatus.created(
-            roleIds.stream().map(UUID::fromString).collect(Collectors.toList())
+            Arrays.stream(roleIds).map(UUID::fromString).toList()
         );
     }
 

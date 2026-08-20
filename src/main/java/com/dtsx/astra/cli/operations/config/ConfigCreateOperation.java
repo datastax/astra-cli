@@ -73,7 +73,7 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
             ctx.createProfile(profileName, maybeToken.getRight(), request.env, request.localEndpoint);
 
             if (request.setDefault) {
-                ctx.copyProfile(config.lookupProfile(profileName).orElseThrow(), ProfileName.DEFAULT);
+                ctx.setDefault(profileName);
             }
         });
 

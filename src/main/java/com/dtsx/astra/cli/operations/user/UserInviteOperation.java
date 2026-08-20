@@ -1,8 +1,7 @@
 package com.dtsx.astra.cli.operations.user;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
-import com.dtsx.astra.cli.core.datatypes.CreationStatus.AlreadyExists;
-import com.dtsx.astra.cli.core.datatypes.CreationStatus.Created;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.core.models.UserRef;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
@@ -19,7 +18,7 @@ public class UserInviteOperation implements Operation<UserInviteResult> {
     private final UserGateway userGateway;
     private final UserInviteRequest request;
 
-    public record UserInviteRequest(UserRef user, List<RoleRef> roles, boolean ifNotExists) {}
+    public record UserInviteRequest(UserRef user, NEList<RoleRef> roles, boolean ifNotExists) {}
 
     public sealed interface UserInviteResult {}
     public record UserAlreadyExists() implements UserInviteResult {}

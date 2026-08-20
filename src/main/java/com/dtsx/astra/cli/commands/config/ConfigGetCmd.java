@@ -3,6 +3,8 @@ package com.dtsx.astra.cli.commands.config;
 import com.dtsx.astra.cli.core.CliConstants.$Profile;
 import com.dtsx.astra.cli.core.completions.impls.AvailableProfilesCompletion;
 import com.dtsx.astra.cli.core.completions.impls.ProfileKeysCompletion;
+import com.dtsx.astra.cli.core.config.Profile;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.Hint;
@@ -20,6 +22,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -158,8 +161,14 @@ public class ConfigGetCmd extends AbstractConfigCmd<GetConfigResult> {
     }
 
     private String promptForProfileName() {
+        val profileFirst = Comparator.<Profile, Integer>comparing((p) ->
+            p.nameOrDefault().unwrap().equalsIgnoreCase("default") ? -1 : 0
+        );
+
         return ProfileNamePrompter.prompt(ctx, config(false).profiles(), "Select a profile to look at",
-            (list) -> list,
+            (list) -> NEList.parse(
+                list.stream().sorted(profileFirst).toList()
+            ).orElseThrow(),
             (b) -> b.fallbackIndex(0).fix(originalArgs(), "<profile>")
         );
     }

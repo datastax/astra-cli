@@ -9,11 +9,12 @@ import com.dtsx.astra.cli.gateways.db.DbGateway;
 import com.dtsx.astra.sdk.db.domain.Database;
 
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
 
 public class DbRefPrompter {
-    public static DbRef prompt(CliContext ctx, DbGateway gateway, String prompt, Function<NEList<Database>, NEList<Database>> modifier, Function<NeedsFallback<Database>, NeedsClearAfterSelection<Database>> fix) {
+    public static DbRef prompt(CliContext ctx, DbGateway gateway, String prompt, UnaryOperator<NEList<Database>> modifier, Function<NeedsFallback<Database>, NeedsClearAfterSelection<Database>> fix) {
         return SpecificPrompter.<Database, DbRef>run(ctx, (b) -> b
             .thing("database")
             .prompt(prompt)

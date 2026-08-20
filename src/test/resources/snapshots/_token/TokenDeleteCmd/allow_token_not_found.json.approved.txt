@@ -4,7 +4,7 @@ exit_code: 0
 ---- output ----
 stdout: {
 stdout:   "code" : "OK",
-stdout:   "message" : "Token '*nonexistent*' does not exist; nothing to delete.",
+stdout:   "message" : "Token *nonexistent* does not exist; nothing to delete.",
 stdout:   "data" : {
 stdout:     "wasDeleted" : false
 stdout:   },

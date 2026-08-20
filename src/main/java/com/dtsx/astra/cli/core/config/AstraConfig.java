@@ -10,13 +10,11 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.parsers.ini.IniFile;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
+import com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair;
 import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
+import lombok.*;
 import org.apache.commons.io.file.PathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,9 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
+import static com.dtsx.astra.cli.core.config.ProfileName.DEFAULT;
 import static com.dtsx.astra.cli.core.output.ExitCode.FILE_ISSUE;
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 import static com.dtsx.astra.sdk.utils.AstraEnvironment.LOCAL_NAME;
@@ -42,14 +39,10 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
     public static final String LOCAL_ENDPOINT_KEY = "ASTRA_LOCAL_ENDPOINT";
-    public static final String SOURCE_KEY = "PROFILE_SOURCE";
+    public static final String SOURCE_KEY = "DEFAULT_PROFILE_SOURCE";
 
     private final CliContext ctx;
-
-    @Getter
-    private final ArrayList<Either<InvalidProfile, Profile>> profiles;
-
-    private final IniFile backingIniFile;
+    @NonNull private IniFile backingIniFile;
 
     @Getter
     private final Path backingFile;
@@ -63,12 +56,9 @@ public class AstraConfig {
 
         try {
             val iniFile = IniFile.readFile(path);
-
-            val profiles = iniFile.getSections().stream()
-                .map((section) -> mkProfileFromSection(ctx, section))
-                .toList();
-
-            return new AstraConfig(ctx, new ArrayList<>(profiles), iniFile, path);
+            val config = new AstraConfig(ctx, iniFile, path);
+            config.profiles(); // validate all sections eagerly and populate cache
+            return config;
         } catch (IniParseException e) {
             throw new AstraConfigFileException(e.getMessage(), path);
         } catch (IOException e) {
@@ -112,77 +102,88 @@ public class AstraConfig {
         return path;
     }
 
-    private static Either<InvalidProfile, Profile> mkProfileFromSection(CliContext ctx, IniSection section) {
-        val maybeProfileName = ProfileName.parse(section.name()).bimap(
-            (msg) -> new InvalidProfile(section, "Error parsing profile name @'!" + section.name() + "!@: " + msg),
-            Function.identity()
-        );
-
-        return maybeProfileName.flatMap((profileName) -> {
-            val token = section.lookupKey(TOKEN_KEY);
-
-            if (token.isEmpty()) {
-                return Either.left(
-                    new InvalidProfile(section, "Missing the required key " + ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY))
-                );
-            }
-
-            val env = lookupEnvironment(ctx, section);
-
-            if (env.isLeft()) {
-                return Either.left(
-                    new InvalidProfile(section, env.getLeft())
-                );
-            }
-
-            val sourceForDefault = section.lookupKey(SOURCE_KEY)
-                .filter(s -> profileName.isDefault() && !s.isBlank() && !s.equals(ProfileName.DEFAULT.unwrap()))
-                .map(ProfileName::parse)
-                .filter(Either::isRight)
-                .map(Either::getRight);
-
-            return AstraToken.parse(token.get()).bimap(
-                (msg) -> new InvalidProfile(section, "Error parsing " + ctx.colors().PURPLE_300.useOrQuote(TOKEN_KEY) + ": " + msg),
-                (tokenValue) -> new Profile(Optional.of(profileName), tokenValue, env.getRight(), sourceForDefault)
+    private static Profile mkProfileFromSection(IniSection section, Path configFile) {
+        val profileName = ProfileName.parse(section.name())
+            .getRight(msg ->
+                new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing profile name: " + msg), configFile)
             );
-        });
+
+        val tokenStr = section.lookupKey(TOKEN_KEY)
+            .orElseThrow(() ->
+                new AstraConfigFileException(invalidProfileMsg(section.name(), "Missing required key @'!" + TOKEN_KEY + "!@"), configFile)
+            );
+
+        val token = AstraToken.parse(tokenStr)
+            .getRight(msg ->
+                new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing @'!" + TOKEN_KEY + "!@: " + msg), configFile)
+            );
+
+        val env = lookupEnvironment(section)
+            .getRight(msg ->
+                new AstraConfigFileException(invalidProfileMsg(section.name(), msg), configFile)
+            );
+
+        val sourceForDefault = section.lookupKey(SOURCE_KEY)
+            .filter(_ -> profileName.isDefault())
+            .map(s -> ProfileName.parse(s).getRight(
+                msg -> new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing @'!" + SOURCE_KEY + "!@: " + msg), configFile)
+            ));
+
+        return new Profile(Optional.of(profileName), token, env, sourceForDefault);
     }
 
-    private static Either<String, AstraEnvironment> lookupEnvironment(CliContext ctx, IniSection section) {
+    private static String invalidProfileMsg(String profileName, String issue) {
+        return trimIndent("""
+          Failed to parse the profile @'!%s!@:
+        
+          "%s"
+        
+          You can fix this by manually editing the configuration file to resolve the issue.
+        
+          Use @'!${cli.name} config path!@ to get the path to the configuration file.
+        """.formatted(profileName, issue));
+    }
+
+    private static Either<String, AstraEnvironment> lookupEnvironment(IniSection section) {
         val rawEnv = section.lookupKey(ENV_KEY).orElse(PROD.name());
 
         if (!rawEnv.equalsIgnoreCase(LOCAL_NAME)) {
             try {
                 return Either.pure(AstraEnvironment.valueOf(rawEnv));
             } catch (IllegalArgumentException e) {
-                return Either.left("Error parsing " + ctx.colors().PURPLE_300.useOrQuote(ENV_KEY) + ": Got '" + rawEnv + "', expected one of (" + String.join("|", AstraEnvironment.allValuesLower()) + ")");
+                return Either.left("Error parsing @'!" + ENV_KEY + "!@: Got '" + rawEnv + "', expected one of (" + String.join("|", AstraEnvironment.allValuesLower()) + ")");
             }
         }
 
         val endpoint = section.lookupKey(LOCAL_ENDPOINT_KEY);
 
         if (endpoint.isEmpty()) {
-            return Either.left("Using a LOCAL environment requires " + ctx.colors().PURPLE_300.useOrQuote(LOCAL_ENDPOINT_KEY) + " to be set");
+            return Either.left("Using a LOCAL environment requires @'!" + LOCAL_ENDPOINT_KEY + "!@ to be set");
         }
 
         return Either.pure(AstraEnvironment.local(endpoint.get()));
     }
 
-    public List<Profile> profilesValidated() {
-        return profiles.stream().map((e) -> e.fold(
-            (invalid) -> {
-                throw new AstraConfigFileException(invalid.message(), backingFile);
-            },
-            Function.identity()
-        )).toList();
+    private List<Profile> cachedProfiles;
+
+    public List<Profile> profiles() {
+        if (cachedProfiles == null) {
+            cachedProfiles = backingIniFile.getSections().stream()
+                .map(section -> mkProfileFromSection(section, backingFile))
+                .toList();
+        }
+        return cachedProfiles;
     }
 
     public boolean profileExists(ProfileName profileName) {
-        return profiles.stream().anyMatch(isProfileName(profileName));
+        return profiles().stream()
+            .anyMatch(p -> p.nameOrDefault().equals(profileName));
     }
 
     public Optional<Profile> lookupProfile(ProfileName profileName) {
-        val matching = profiles.stream().filter(isProfileName(profileName)).toList();
+        val matching = profiles().stream()
+            .filter(p -> p.nameOrDefault().equals(profileName))
+            .toList();
 
         if (matching.isEmpty()) {
             return Optional.empty();
@@ -201,12 +202,7 @@ public class AstraConfig {
             )), backingFile);
         }
 
-        return matching.getFirst().fold(
-            (invalid) -> {
-                throw new AstraConfigFileException(invalid.message(), backingFile);
-            },
-            Optional::of
-        );
+        return Optional.of(matching.getFirst());
     }
 
     public Optional<IniSection> lookupSection(String sectionName) {
@@ -216,96 +212,145 @@ public class AstraConfig {
     }
 
     public void modify(Consumer<ProfileModificationCtx> consumer) {
-        val ctx = new ProfileModificationCtx();
-        consumer.accept(ctx);
+        val modCtx = new ProfileModificationCtx();
+        consumer.accept(modCtx);
 
-        for (val action : ctx.actions()) {
-            action.run();
+        // apply all transforms to a working copy of the ini so the original stays untouched until write succeeds
+        val newIni = backingIniFile.copy();
+        for (val transform : modCtx.iniTransforms) {
+            transform.accept(newIni);
         }
 
-        backingIniFile.writeToFile(backingFile);
+        Path tempFile = null;
+        try {
+            tempFile = Files.createTempFile(".astrarc_tmp", null);
+            newIni.writeToFile(tempFile);
+            FileUtils.atomicMove(tempFile, backingFile);
+            tempFile = null;
+        } catch (IOException e) {
+            throw new AstraConfigFileException("Error writing config file: " + e.getMessage(), backingFile);
+        } finally {
+            if (tempFile != null) {
+                try { Files.deleteIfExists(tempFile); } catch (IOException ignored) {}
+            }
+        }
+
+        backingIniFile = newIni;
+        cachedProfiles = null;
+
+        for (val cacheOp : modCtx.cacheOps) {
+            cacheOp.run();
+        }
     }
 
     public class ProfileModificationCtx {
-        @Getter
-                private final List<Runnable> actions = new ArrayList<>();
+        private final List<Consumer<IniFile>> iniTransforms = new ArrayList<>();
+        private final List<Runnable> cacheOps = new ArrayList<>();
 
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
             createProfile(name, token, env, Optional.empty());
         }
 
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env, Optional<String> localEndpoint) {
-            actions.add(() -> {
-                profiles.add(Either.pure(new Profile(Optional.of(name), token, env, Optional.empty())));
+            if (env.name().equalsIgnoreCase(LOCAL_NAME) && localEndpoint.isEmpty()) {
+                throw new AstraCliException(FILE_ISSUE, "LOCAL environment requires @'!" + LOCAL_ENDPOINT_KEY + "!@ to be set");
+            }
 
-                backingIniFile.addSection(name.unwrap(), new TreeMap<>() {{
-                    put(TOKEN_KEY, token.unsafeUnwrap());
+            iniTransforms.add(ini -> ini.addSection(name.unwrap(), new TreeMap<>() {{
+                put(TOKEN_KEY, token.unsafeUnwrap());
+                if (env != PROD) {
+                    put(ENV_KEY, env.name());
+                }
+                if (env.name().equalsIgnoreCase(LOCAL_NAME) && localEndpoint.isPresent()) {
+                    put(LOCAL_ENDPOINT_KEY, localEndpoint.get());
+                }
+            }}));
+        }
 
-                    if (env != PROD) {
-                        put(ENV_KEY, env.name());
-                    }
+        public void copyProfile(ProfileName src, ProfileName target) {
+            iniTransforms.add((ini) -> {
+                copyProfile(ini, src, target, (_) -> {});
+            });
+            cacheOps.add(() -> copyCacheDir(src, target));
+        }
 
-                    if (env.name().equalsIgnoreCase(LOCAL_NAME) && localEndpoint.isPresent()) {
-                        put(LOCAL_ENDPOINT_KEY, localEndpoint.get());
-                    }
-                }});
+        public void setDefault(ProfileName src) {
+            iniTransforms.add((ini) -> {
+                copyProfile(ini, src, DEFAULT, p -> p.add(new IniKVPair(List.of(), SOURCE_KEY, src.unwrap())));
             });
         }
 
-        public void copyProfile(Profile src, ProfileName target) {
-            actions.add(() -> {
-                val srcSection = backingIniFile.getSections().stream()
-                    .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
+        public void renameProfile(ProfileName oldName, ProfileName newName) {
+            copyProfile(oldName, newName);
+            deleteProfile(oldName);
+
+            iniTransforms.add(ini -> {
+                ini.getSections().stream()
+                    .filter(s -> s.name().equals(DEFAULT.unwrap()))
                     .findFirst()
-                    .orElseThrow();
+                    .ifPresent((defaultSection) -> {
+                        val matchesOldSource = defaultSection.lookupKey(SOURCE_KEY)
+                            .filter(s -> s.equals(oldName.unwrap()))
+                            .isPresent();
 
-                val maybeCompletionsPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(src.nameOrDefault()));
-
-                maybeCompletionsPath.filter(Files::exists).ifPresent(((path) -> {
-                    val targetPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(target)).orElseThrow();
-
-                    try {
-                        if (Files.exists(targetPath)) {
-                            PathUtils.delete(targetPath);
+                        if (matchesOldSource) {
+                            copyProfile(ini, DEFAULT, DEFAULT, p -> p.add(new IniKVPair(List.of(), SOURCE_KEY, newName.unwrap())));
                         }
-                        PathUtils.copyDirectory(path, targetPath);
-                    } catch (IOException e) {
-                        ctx.log().exception("Error copying completion cache from " + path + " to new profile " + target, e);
-                        try {
-                            PathUtils.delete(path);
-                        } catch (IOException ex) {
-                            ctx.log().exception("Error cleaning up completion cache at " + path + " after failed copy for new profile " + target, ex);
-                        }
-                    }
-                }));
-
-                profiles.removeIf(isProfileName(target));
-                backingIniFile.deleteSection(target.unwrap());
-
-                profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name())));
-                backingIniFile.addSection(target.unwrap(), srcSection);
+                    });
             });
+        }
+
+        private void copyProfile(IniFile ini, ProfileName src, ProfileName target, Consumer<ArrayList<IniKVPair>> modifyPairs) {
+            val srcSection = ini.getSections().stream()
+                .filter(s -> s.name().equals(src.unwrap()))
+                .findFirst()
+                .orElseThrow(() -> new AstraConfigFileException("Source profile '" + src + "' not found", backingFile));
+
+            val targetPairs = new ArrayList<>(
+                srcSection.pairs().stream()
+                    .filter(p -> !p.key().equals(SOURCE_KEY))
+                    .toList()
+            );
+
+            modifyPairs.accept(targetPairs);
+
+            ini.deleteSection(target.unwrap());
+            ini.addSection(new IniSection(target.unwrap(), targetPairs));
         }
 
         public void deleteProfile(ProfileName profileName) {
-            actions.add(() -> {
-                profiles.removeIf(isProfileName(profileName));
-                backingIniFile.deleteSection(profileName.unwrap());
+            iniTransforms.add(ini -> ini.deleteSection(profileName.unwrap()));
 
-                val maybeCompletionsPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(profileName));
-
-                maybeCompletionsPath.ifPresent(((path) -> {
+            cacheOps.add(() ->
+                ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(profileName)).ifPresent(path -> {
                     try {
                         PathUtils.delete(path);
                     } catch (IOException e) {
                         ctx.log().exception("Error deleting completion cache at " + path, e);
                     }
-                }));
+                })
+            );
+        }
+
+        private void copyCacheDir(ProfileName src, ProfileName target) {
+            val maybeSrcPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(src));
+
+            maybeSrcPath.filter(Files::exists).ifPresent(srcPath -> {
+                val targetPath = ProfileLinkedCompletionsCache.pathForProfile(ctx, mkSource(target)).orElseThrow();
+
+                try {
+                    if (Files.exists(targetPath)) {
+                        PathUtils.delete(targetPath);
+                    }
+                    PathUtils.copyDirectory(srcPath, targetPath);
+                } catch (IOException e) {
+                    ctx.log().exception("Error copying completion cache from " + src + " to " + target, e);
+                }
             });
         }
 
         private ProfileSource mkSource(ProfileName profileName) {
-            return (usingDefaultFile())
+            return usingDefaultFile()
                 ? new ProfileSource.DefaultFile(profileName)
                 : new ProfileSource.CustomFile(backingFile, profileName);
         }
@@ -318,12 +363,5 @@ public class AstraConfig {
             ctx.log().exception("Error resolving real file paths for checking if config file is default", e);
             return false;
         }
-    }
-
-    private Predicate<Either<InvalidProfile, Profile>> isProfileName(ProfileName profileName) {
-        return (p) -> p.fold(
-            (invalid) -> invalid.section().name().equals(profileName.unwrap()),
-            (profile) -> profile.nameOrDefault().equals(profileName)
-        );
     }
 }

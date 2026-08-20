@@ -5,16 +5,23 @@ import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraColors.AstraColor;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.core.output.serializers.OutputSerializer;
+import com.dtsx.astra.cli.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.fusesource.jansi.AnsiConsole;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
 @RequiredArgsConstructor
 public final class ShellTableRendererHuman implements OutputHuman {
+    private static final int PADDING = 1;
+
     private final RenderableShellTable table;
 
     private AstraColor TABLE_COLOR;
@@ -61,16 +68,31 @@ public final class ShellTableRendererHuman implements OutputHuman {
 
     @SuppressWarnings("DataFlowIssue")
     private Map<String, Integer> computeColumnWidths(List<Map<String, List<String>>> data, List<String> columns) {
-        val colSizes = columns.stream().collect(Collectors.toMap(key -> key, val -> val.length() + 1, Integer::max, HashMap::new));
+        val colSizes = columns.stream().collect(Collectors.toMap(key -> key, val -> val.length() + PADDING, Integer::max, HashMap::new));
 
         data.forEach((row) -> table.columns().forEach((col) ->
-            colSizes.compute(col, (_, v) -> Math.max(v, maxStringWidth(row.get(col))))
+            colSizes.compute(col, (_, v) -> Math.max(v, maxStringWidth(col, row.get(col))))
         ));
+
+        if (table.varLenColumn().isPresent()) {
+            val varCol = table.varLenColumn().get();
+            val headerMinWidth = varCol.length() + PADDING;
+
+            val fixedWidth = colSizes.entrySet().stream()
+                .filter(e -> !e.getKey().equals(varCol))
+                .mapToInt(Map.Entry::getValue)
+                .sum();
+
+            val overhead = table.columns().size() * 3 + 1;
+            val availableWidth = AnsiConsole.getTerminalWidth() - fixedWidth - overhead;
+
+            colSizes.compute(varCol, (_, naturalWidth) -> Math.max(headerMinWidth, Math.min(naturalWidth, availableWidth)));
+        }
 
         return colSizes;
     }
 
-    private int maxStringWidth(List<String> text) {
+    private int maxStringWidth(String col, List<String> text) {
         return text.stream().map(AstraColors::stripAnsi).mapToInt(String::length).max().orElse(0);
     }
 
@@ -78,7 +100,7 @@ public final class ShellTableRendererHuman implements OutputHuman {
         val lineJoiner = new StringJoiner(m, l, r);
 
         for (val col : columns) {
-            lineJoiner.add("─".repeat(colSizes.get(col) + 2));
+            lineJoiner.add("─".repeat(colSizes.get(col) + PADDING * 2));
         }
 
         return TABLE_COLOR.use(lineJoiner.toString());
@@ -112,7 +134,11 @@ public final class ShellTableRendererHuman implements OutputHuman {
 
                 for (val column : columns) {
                     val lines = row.get(column);
-                    val text = (i < lines.size()) ? lines.get(i) : "";
+                    var text = (i < lines.size()) ? lines.get(i) : "";
+
+                    if (table.varLenColumn().isPresent() && column.equals(table.varLenColumn().get())) {
+                        text = StringUtils.truncate(text, colSizes.get(column));
+                    }
 
                     if (!text.isEmpty()) {
                         rowJoiner.add(DATA_COLOR.use(text) + " ".repeat(colSizes.get(column) - AstraColors.stripAnsi(text).length()));

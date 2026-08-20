@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 public interface RoleGateway extends SomeGateway {
     Stream<Role> findAll();
 
+    Stream<Role> findAll(List<RoleRef> refs);
+
     Optional<Role> tryFindOne(RoleRef ref);
 
     default Role findOne(RoleRef ref) {
