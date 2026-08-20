@@ -33,8 +33,7 @@ public class TokenGatewayImpl implements TokenGateway {
 
     @Override
     public Stream<IamToken> findAll() {
-        return ctx.log().loading("Fetching tokens for the current org", (_) -> 
-            apiProvider.astraOpsClient().tokens().findAll());
+        return ctx.log().loading("Fetching tokens for the current org", (_) -> apiProvider.astraOpsClient().tokens().findAll());
     }
 
     @Override

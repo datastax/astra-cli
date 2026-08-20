@@ -116,7 +116,7 @@ public class ProfileLinkedCompletionsCacheTest {
 
         val created = config.astraConfig.lookupProfile(target).orElseThrow();
 
-        assertThat(created.sourceForDefault()).isEqualTo(config.profileAndSource.getLeft().name());
+        assertThat(created.sourceForDefault()).isEmpty();
 
         forEachPath(cache, (path) -> {
             assertThat(expectedPath).exists().hasSameTextualContentAs(path);
@@ -171,7 +171,7 @@ public class ProfileLinkedCompletionsCacheTest {
         Files.writeString(cfgPath, """
           [default]
           ASTRA_DB_APPLICATION_TOKEN=%s
-          PROFILE_SOURCE=my-profile
+          DEFAULT_PROFILE_SOURCE=my-profile
         
           [my-profile]
           ASTRA_DB_APPLICATION_TOKEN=%s

@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.snapshot.commands.user;
 
 import com.dtsx.astra.cli.core.datatypes.CreationStatus;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import com.dtsx.astra.cli.gateways.user.UserGateway;
 import com.dtsx.astra.cli.snapshot.BaseCmdSnapshotTest;
@@ -20,7 +21,7 @@ public class UserInviteCmdSnapshotTest extends BaseCmdSnapshotTest {
             doReturn(CreationStatus.created(List.of(Roles.One.getId()))).when(mock).invite(any(), any());
         })
         .verify((mocks) -> {
-            verify(mocks.userGateway()).invite(Users.EmailRef, List.of(Roles.NameRef));
+            verify(mocks.userGateway()).invite(Users.EmailRef, NEList.of(Roles.NameRef));
         });
 
     private final SnapshotTestOptionsModifier userAlreadyExistsOpts = (o) -> o

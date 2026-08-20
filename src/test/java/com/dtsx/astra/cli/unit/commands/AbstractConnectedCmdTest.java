@@ -140,7 +140,7 @@ public class AbstractConnectedCmdTest {
         }
 
         if (profile.sourceForDefault().isPresent()) {
-            content += "\nPROFILE_SOURCE=" + profile.sourceForDefault().get().unwrap();
+            content += "\nDEFAULT_PROFILE_SOURCE=" + profile.sourceForDefault().get().unwrap();
         }
 
         val path = ctx.get().path(pathStr);

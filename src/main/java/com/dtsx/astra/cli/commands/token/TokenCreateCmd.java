@@ -33,8 +33,16 @@ import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCrea
     description = "Create a new token"
 )
 @Example(
+    comment = "Create a token and interactively select your roles",
+    command = "${cli.name} token create"
+)
+@Example(
     comment = "Create a token with a specific role",
     command = "${cli.name} token create --role \"Organization Administrator\""
+)
+@Example(
+    comment = "Create a token with multiple roles",
+    command = "${cli.name} token create --role \"RO User,Billing Admin\""
 )
 public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     @Option(
@@ -62,7 +70,7 @@ public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
 
     @Option(
         names = { "-x", "--expiry" },
-        description = "Optional expiration date for the token in ISO-8601 format (e.g., 2024-12-31T23:59:59Z). If not provided, the org's max expiry will be used (potentially infinite).",
+        description = "Optional expiration date for the token in ISO-8601 format (e.g., 2026-08-19T14:30:00Z). If not provided, the org's max expiry will be used (potentially infinite).",
         paramLabel = "EXPIRY"
     )
     public Optional<Instant> $expiry;

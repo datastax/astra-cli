@@ -43,7 +43,7 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
     public static final String LOCAL_ENDPOINT_KEY = "ASTRA_LOCAL_ENDPOINT";
-    public static final String SOURCE_KEY = "PROFILE_SOURCE";
+    public static final String SOURCE_KEY = "DEFAULT_PROFILE_SOURCE";
 
     private final CliContext ctx;
 
@@ -267,7 +267,7 @@ public class AstraConfig {
 
         private void copyProfile(Profile src, ProfileName target, boolean persistSrc) {
             actions.add(() -> {
-                val srcSection = backingIniFile.getSections().stream()
+                var srcSection = backingIniFile.getSections().stream()
                     .filter(s -> s.name().equals(src.nameOrDefault().unwrap()))
                     .findFirst()
                     .orElseThrow();
@@ -297,7 +297,9 @@ public class AstraConfig {
 
                 profiles.add(Either.pure(new Profile(Optional.of(target), src.token(), src.env(), src.name().filter(_ -> persistSrc))));
                 if (persistSrc) {
-                    srcSection.pairs().add(new IniKVPair(List.of(), SOURCE_KEY, src.nameOrDefault().unwrap()));
+                    srcSection = new IniSection(srcSection.name(), new ArrayList<>(srcSection.pairs()) {{
+                        add(new IniKVPair(List.of(), SOURCE_KEY, src.nameOrDefault().unwrap()));
+                    }});
                 }
                 backingIniFile.addSection(target.unwrap(), srcSection);
             });

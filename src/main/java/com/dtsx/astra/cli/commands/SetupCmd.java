@@ -94,7 +94,7 @@ public class SetupCmd extends AbstractCmd<SetupResult> {
           The @'!astra setup!@ command is an interactive setup command, meant to help guide you through the setup process.
         
           Use the @'!astra config create!@ command to programmatically create profiles instead.
-        """, List.of(
+        """.formatted(ctx.outputType()), List.of(
             new Hint("Programmatically create profiles", "${cli.name} config create [name] --token <token> [--env <env>] [--default]")
         ));
     }

@@ -86,16 +86,18 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         ));
     }
 
+    private static class UnsupportedOutputException extends RuntimeException {}
+
     protected OutputHuman executeHuman(Supplier<OpRes> _result) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOutputException();
     }
 
     protected OutputJson executeJson(Supplier<OpRes> _result) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOutputException();
     }
 
     protected OutputCsv executeCsv(Supplier<OpRes> _result) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOutputException();
     }
 
     protected abstract Operation<OpRes> mkOperation();
@@ -197,7 +199,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 case JSON -> executeJson(thunk).renderAsJson();
                 case CSV -> executeCsv(thunk).renderAsCsv();
             };
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOutputException e) {
             return execute(thunk).render(ctx);
         }
     }

@@ -55,7 +55,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
     public UserRef $user;
 
     @Option(
-        names = { "-r", "--role" },
+        names = { "-r", "--roles" },
         description = "List of roles to assign the user",
         defaultValue = "Database Administrator",
         split = ","
