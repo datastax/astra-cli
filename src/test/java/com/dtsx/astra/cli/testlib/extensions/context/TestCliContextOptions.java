@@ -10,7 +10,6 @@ import com.google.common.jimfs.Jimfs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.With;
-import lombok.experimental.Accessors;
 import lombok.val;
 
 import java.nio.file.FileSystem;
@@ -19,6 +18,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static org.mockito.Mockito.*;
 
@@ -35,7 +35,7 @@ public class TestCliContextOptions {
     private final Optional<Function<FileSystem, Path>> homeDir;
     private final Map<String, Object> extra;
 
-    public interface TestCliContextOptionsModifier extends Function<TestCliContextOptionsBuilder<?, TestCliContextOptions>, TestCliContextOptionsBuilder<?, TestCliContextOptions>> {}
+    public interface TestCliContextOptionsModifier extends UnaryOperator<TestCliContextOptionsBuilder<?, TestCliContextOptions>> {}
 
     @RequiredArgsConstructor
     public static class TestCliContextOptionsBuilder<Builder extends TestCliContextOptionsBuilder<Builder, Opts>, Opts extends TestCliContextOptions> {

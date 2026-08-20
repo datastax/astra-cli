@@ -13,6 +13,7 @@ import picocli.CommandLine.Help.ColorScheme.Builder;
 
 import java.util.HashMap;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Matcher.quoteReplacement;
@@ -25,10 +26,10 @@ public class AstraColors {
     @Getter
     private final Ansi ansi;
 
-    private final Function<Builder, Builder> colorSchemeCustomizer;
+    private final UnaryOperator<Builder> colorSchemeCustomizer;
 
     public AstraColors(Ansi ansi) {
-        this(ansi, Function.identity());
+        this(ansi, UnaryOperator.identity());
     }
 
     @RequiredArgsConstructor

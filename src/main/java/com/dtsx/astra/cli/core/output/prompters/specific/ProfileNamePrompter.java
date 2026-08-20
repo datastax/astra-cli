@@ -8,11 +8,12 @@ import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder.NeedsFa
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 public class ProfileNamePrompter {
-    public static String prompt(CliContext ctx, List<Profile> candidates, String prompt, Function<NEList<Profile>, NEList<Profile>> modifier, Function<NeedsFallback<Profile>, NeedsClearAfterSelection<Profile>> fix) {
+    public static String prompt(CliContext ctx, List<Profile> candidates, String prompt, UnaryOperator<NEList<Profile>> modifier, Function<NeedsFallback<Profile>, NeedsClearAfterSelection<Profile>> fix) {
         return SpecificPrompter.<Profile, String>run(ctx, (b) -> b
             .thing("profile")
             .prompt(prompt)

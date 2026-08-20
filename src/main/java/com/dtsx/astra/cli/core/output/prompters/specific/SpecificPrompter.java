@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugExcep
 import com.dtsx.astra.cli.core.output.ExitCode;
 import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder.NeedsClearAfterSelection;
 import com.dtsx.astra.cli.core.output.prompters.builders.SelectorBuilder.NeedsFallback;
+import com.dtsx.astra.cli.core.output.prompters.specific.SpecificPrompter.Options.OptionsBuilder;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.core.output.AstraColors.stripAnsi;
@@ -30,13 +32,13 @@ public class SpecificPrompter {
         @NonNull Supplier<List<T>> thingsSupplier;
         @NonNull Function<T, String> getThingIdentifier;
         BiFunction<T, Boolean, String> getThingDisplayExtra;
-        Function<NEList<T>, NEList<T>> modifier;
+        UnaryOperator<NEList<T>> modifier;
         @NonNull Function<NeedsFallback<T>, NeedsClearAfterSelection<T>> fix;
         @NonNull Function<T, R> mapSingleFound;
         Function<T, R> mapMultipleFound;
     }
 
-    public static <T, R> R run(CliContext ctx, Function<Options.OptionsBuilder<T, R>, Options.OptionsBuilder<T, R>> builderFn) {
+    public static <T, R> R run(CliContext ctx, UnaryOperator<Options.OptionsBuilder<T, R>> builderFn) {
         val options = builderFn.apply(Options.<T, R>builder()).build();
 
         if (options.modifier == null) {

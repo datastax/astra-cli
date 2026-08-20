@@ -10,12 +10,13 @@ import com.dtsx.astra.sdk.pcu.domain.PCUGroup;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.PCU_GROUP_NOT_FOUND;
 import static com.dtsx.astra.sdk.utils.IdUtils.isUUID;
 
 public class PcuRefPrompter {
-    public static PcuRef prompt(CliContext ctx, PcuGateway gateway, String prompt, Function<NEList<PCUGroup>, NEList<PCUGroup>> modifier, Function<NeedsFallback<PCUGroup>, NeedsClearAfterSelection<PCUGroup>> fix) {
+    public static PcuRef prompt(CliContext ctx, PcuGateway gateway, String prompt, UnaryOperator<NEList<PCUGroup>> modifier, Function<NeedsFallback<PCUGroup>, NeedsClearAfterSelection<PCUGroup>> fix) {
         return SpecificPrompter.<PCUGroup, PcuRef>run(ctx, (b) -> b
             .thing("PCU group")
             .prompt(prompt)
