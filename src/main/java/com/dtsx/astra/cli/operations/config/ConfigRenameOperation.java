@@ -31,7 +31,7 @@ public class ConfigRenameOperation implements Operation<ConfigRenameResult> {
         }
 
         if (request.newProfileName.equals(ProfileName.DEFAULT)) {
-            return new CantRenameToDefault(request.newProfileName);
+            return new CantRenameToDefault(request.oldProfileName);
         }
 
         val oldProfile = config.lookupProfile(request.oldProfileName);

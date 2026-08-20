@@ -10,6 +10,7 @@ import com.dtsx.astra.sdk.org.domain.IamToken;
 import java.util.function.Function;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
+import static java.util.Objects.requireNonNullElse;
 
 public class TokenPrompter {
     public static String prompt(CliContext ctx, TokenGateway gateway, String prompt, Function<NeedsFallback<IamToken>, NeedsClearAfterSelection<IamToken>> fix) {
@@ -19,7 +20,7 @@ public class TokenPrompter {
             .thingNotFoundCode(TOKEN_NOT_FOUND)
             .thingsSupplier(() -> gateway.findAll().toList())
             .getThingIdentifier(IamToken::getClientId)
-            .getThingDisplayExtra((token, _) -> StringUtils.truncate(token.getDescription().trim(), 30))
+            .getThingDisplayExtra((token, _) -> StringUtils.truncate(requireNonNullElse(token.getDescription().trim(), ""), 30))
             .fix(fix)
             .mapSingleFound(IamToken::getClientId)
         );

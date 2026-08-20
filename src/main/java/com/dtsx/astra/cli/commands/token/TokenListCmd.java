@@ -50,7 +50,9 @@ public class TokenListCmd extends AbstractTokenCmd<Stream<TokenInfo>> {
             .map((token) -> sequencedMapOf(
                 "Generated On", formatter.format(Instant.parse(token.raw().getGeneratedOn())),
                 "Client Id", token.raw().getClientId(),
-                "Roles", token.roleNames().getFirst() + (token.roleNames().size() > 1 ? " (+" + (token.roleNames().size() - 1) + ")" : ""),
+                "Roles", ctx.outputIsHuman()
+                    ? token.roleNames().getFirst() + (token.roleNames().size() > 1 ? " (+" + (token.roleNames().size() - 1) + ")" : "")
+                    : String.join(",", token.roleNames()),
                 "Desc", token.raw().getDescription()
             ))
             .toList();
