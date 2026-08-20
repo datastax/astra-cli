@@ -57,7 +57,6 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
     @Option(
         names = { "-r", "--roles" },
         description = "List of roles to assign the user",
-        defaultValue = "Database Administrator",
         split = ","
     )
     public List<RoleRef> $roles = List.of();
@@ -75,7 +74,7 @@ public class UserInviteCmd extends AbstractUserCmd<UserInviteResult> {
 
         if ($roles.isEmpty()) {
             val gateway = ctx.gateways().mkRoleGateway(profile().token(), profile().env(), new RoleCompletionsCache(ctx));
-            $roles = RoleNamePrompter.multiPrompt(ctx, gateway, "Select roles for the new token (does not include all possible roles):", originalArgs());
+            $roles = RoleNamePrompter.multiPrompt(ctx, gateway, "Select roles for the new user (does not include all possible roles):", originalArgs());
         }
     }
 

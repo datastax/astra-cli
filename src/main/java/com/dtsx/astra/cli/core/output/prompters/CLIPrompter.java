@@ -120,7 +120,7 @@ public class CLIPrompter {
         });
     }
 
-    // TODO potetnially filter --no-input from fix
+    // TODO potentially filter --no-input from fix
     private <M extends SelectionStrategy.Meta, T> T runPrompter(NEList<M> strategies, String prompt, String fallback, Pair<? extends Iterable<String>, String> fix, BiFunction<M, String, Optional<T>> run) {
         assertCanPrompt(fallback, fix);
 

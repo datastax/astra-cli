@@ -9,14 +9,14 @@ import com.dtsx.astra.sdk.org.domain.IamToken;
 
 import java.util.function.Function;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.DATABASE_NOT_FOUND;
+import static com.dtsx.astra.cli.core.output.ExitCode.TOKEN_NOT_FOUND;
 
 public class TokenPrompter {
     public static String prompt(CliContext ctx, TokenGateway gateway, String prompt, Function<NeedsFallback<IamToken>, NeedsClearAfterSelection<IamToken>> fix) {
         return SpecificPrompter.<IamToken, String>run(ctx, (b) -> b
-            .thing("database")
+            .thing("token")
             .prompt(prompt)
-            .thingNotFoundCode(DATABASE_NOT_FOUND)
+            .thingNotFoundCode(TOKEN_NOT_FOUND)
             .thingsSupplier(() -> gateway.findAll().toList())
             .getThingIdentifier(IamToken::getClientId)
             .getThingDisplayExtra((token, _) -> StringUtils.truncate(token.getDescription().trim(), 30))

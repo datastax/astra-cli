@@ -21,9 +21,19 @@ public class ConfigRenameOperation implements Operation<ConfigRenameResult> {
     public record ProfileRenamed(ProfileName oldProfileName, ProfileName newProfileName) implements ConfigRenameResult {}
     public record OldProfileNotFound(ProfileName oldProfileName) implements ConfigRenameResult {}
     public record NewProfileAlreadyExists(ProfileName oldProfileName, ProfileName newProfileName) implements ConfigRenameResult {}
+    public record CantRenameToDefault(ProfileName oldProfileName) implements ConfigRenameResult {}
+    public record CantRenameFromDefault() implements ConfigRenameResult {}
 
     @Override
     public ConfigRenameResult execute() {
+        if (request.oldProfileName.equals(ProfileName.DEFAULT)) {
+            return new CantRenameFromDefault();
+        }
+
+        if (request.newProfileName.equals(ProfileName.DEFAULT)) {
+            return new CantRenameToDefault(request.newProfileName);
+        }
+
         val oldProfile = config.lookupProfile(request.oldProfileName);
 
         if (oldProfile.isEmpty()) {

@@ -102,7 +102,7 @@ public class AstraConfig {
         return path;
     }
 
-    private static Profile mkProfileFromSection(CliContext ctx, IniSection section, Path configFile) {
+    private static Profile mkProfileFromSection(IniSection section, Path configFile) {
         val profileName = ProfileName.parse(section.name())
             .getRight(msg ->
                 new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing profile name: " + msg), configFile)
@@ -118,12 +118,13 @@ public class AstraConfig {
                 new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing @'!" + TOKEN_KEY + "!@: " + msg), configFile)
             );
 
-        val env = lookupEnvironment(ctx, section)
+        val env = lookupEnvironment(section)
             .getRight(msg ->
                 new AstraConfigFileException(invalidProfileMsg(section.name(), msg), configFile)
             );
 
         val sourceForDefault = section.lookupKey(SOURCE_KEY)
+            .filter(_ -> profileName.isDefault())
             .map(s -> ProfileName.parse(s).getRight(
                 msg -> new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing @'!" + SOURCE_KEY + "!@: " + msg), configFile)
             ));
@@ -137,13 +138,13 @@ public class AstraConfig {
         
           "%s"
         
-          You can fix this by either:
-          - Using @'!astra config (create|delete)!@ to recreate the profile, or
-          - Manually editing the configuration file to resolve the issue.
+          You can fix this by manually editing the configuration file to resolve the issue.
+        
+          Use @'!${cli.name} config path!@ to get the path to the configuration file.
         """.formatted(profileName, issue));
     }
 
-    private static Either<String, AstraEnvironment> lookupEnvironment(CliContext ctx, IniSection section) {
+    private static Either<String, AstraEnvironment> lookupEnvironment(IniSection section) {
         val rawEnv = section.lookupKey(ENV_KEY).orElse(PROD.name());
 
         if (!rawEnv.equalsIgnoreCase(LOCAL_NAME)) {
@@ -168,7 +169,7 @@ public class AstraConfig {
     public List<Profile> profiles() {
         if (cachedProfiles == null) {
             cachedProfiles = backingIniFile.getSections().stream()
-                .map(section -> mkProfileFromSection(ctx, section, backingFile))
+                .map(section -> mkProfileFromSection(section, backingFile))
                 .toList();
         }
         return cachedProfiles;

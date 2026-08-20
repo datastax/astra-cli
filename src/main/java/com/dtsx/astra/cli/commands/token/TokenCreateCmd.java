@@ -47,7 +47,7 @@ import static com.dtsx.astra.cli.operations.token.TokenCreateOperation.TokenCrea
 public class TokenCreateCmd extends AbstractTokenCmd<CreateTokenResponse> {
     @Option(
         names = { "-r", "--role" },
-        description = "List of roles to assign the user",
+        description = "List of roles for the token",
         completionCandidates = RoleNamesCompletion.class,
         paramLabel = "ROLE",
         split = ","

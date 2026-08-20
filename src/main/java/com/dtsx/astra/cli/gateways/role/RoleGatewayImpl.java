@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.gateways.role;
 
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.exceptions.internal.role.RoleNotFoundException;
 import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.APIProvider;
 import com.dtsx.astra.cli.utils.StringUtils;
@@ -25,13 +26,30 @@ public class RoleGatewayImpl implements RoleGateway {
 
     @Override
     public Stream<Role> findAll(List<RoleRef> refs) {
-        return findAll()
+        val usedRefs = new HashSet<RoleRef>();
+
+        val res = findAll()
             .filter((r) -> {
-                return refs.stream().anyMatch(ref -> ref.fold(
+                val found = refs.stream().filter(ref -> ref.fold(
                     id -> r.getId().equals(id.toString()),
                     name -> r.getName().equals(name)
-                ));
-            });
+                )).findFirst();
+
+                found.ifPresent(usedRefs::add);
+                return found.isPresent();
+            })
+            .toList();
+
+        if (!usedRefs.containsAll(refs)) {
+            val missingRef = refs.stream()
+                .filter(ref -> !usedRefs.contains(ref))
+                .findFirst()
+                .orElseThrow();
+
+            throw new RoleNotFoundException(missingRef);
+        }
+
+        return res.stream();
     }
 
     @Override

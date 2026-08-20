@@ -38,7 +38,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     command = "${cli.name} token delete <client_id> --if-exists"
 )
 @Example(
-    comment = "Delete a specific token without confirmation prompt",
+    comment = "Delete an interactively selected token without confirmation prompt",
     command = "${cli.name} token delete --yes"
 )
 public class TokenDeleteCmd extends AbstractTokenCmd<TokenDeleteResult> {
