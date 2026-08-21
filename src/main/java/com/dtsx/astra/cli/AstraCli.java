@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.commands.pcu.PcuCmd;
 import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.TypeConverters;
@@ -49,6 +50,7 @@ import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
+import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.IFactory;
 import picocli.CommandLine.Option;
 
@@ -66,7 +68,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     name = "astra",
     descriptionHeading = " ", // normally the description heading is "%n", but we don't want that here since we have no description
     subcommands = {
-        CommandLine.HelpCommand.class,
+        HelpCommand.class,
         SetupCmd.class,
         ConfigCmd.class,
         DbCmd.class,
@@ -96,7 +98,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "${cli.name} db create demo -r us-east1"
 )
 @AliasForSubcommand(None.class)
-public class AstraCli extends AbstractCmd<Void> {
+public class AstraCli extends AbstractOperationalCmd<Void> {
     @Option(
         names = { "-v", "--version" },
         description = "Print version information and exit.",
@@ -221,7 +223,7 @@ public class AstraCli extends AbstractCmd<Void> {
             public <K> K create(Class<K> cls) throws Exception { // I miss having proper rank2 type support for lambdas
                 val created = defaultFactory.create(cls);
 
-                if (created instanceof AbstractCmd<?> cmd) {
+                if (created instanceof AbstractCmd cmd) {
                     cmd.initCtx(ctxRef);
                 }
 

@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands.config.home;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
+import com.dtsx.astra.cli.commands.AbstractOperationalCmd;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.properties.CliProperties.PathLocationResolver;
@@ -44,7 +44,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     comment = "Force informational output even when piped or redirected",
     command = "${cli.name} config home path -i"
 )
-public class ConfigHomePathCmd extends AbstractCmd<ConfigPathResult> {
+public class ConfigHomePathCmd extends AbstractOperationalCmd<ConfigPathResult> {
     @ArgGroup
     public @Nullable OutputMode outputMode;
 

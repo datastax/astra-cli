@@ -1,11 +1,10 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.core.completions.impls.HelpAllCompletion;
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
@@ -13,12 +12,33 @@ import picocli.CommandLine.Option;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
+import static com.dtsx.astra.cli.commands.AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommonOptions extends HelpMixin { // I don't like extending here but mixins don't compose w/ arg groups :(
+public class CommonOptions {
     public static CommonOptions EMPTY = new CommonOptions();
+
+    public enum HelpLevel { NONE, STANDARD, ALL }
+
+    @Option(
+        names = { "-h", "--help" },
+        description = "Show this help message and exit.",
+        fallbackValue = "standard",
+        completionCandidates = HelpAllCompletion.class,
+        paramLabel = "all",
+        arity = "0..1",
+        help = true
+    )
+    private Optional<String> helpRequested = Optional.empty();
+
+    @Option(
+        names = { "--help-all" },
+        description = "Show this help message and exit.",
+        help = true,
+        hidden = true
+    )
+    private Optional<Boolean> helpAllRequested = Optional.empty();
 
     public enum ColorMode { auto, never, always }
 
@@ -151,6 +171,26 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
         return noInput.orElse(false);
     }
 
+    public HelpLevel helpLevel() {
+        if (helpAllRequested.isPresent() && helpAllRequested.get()) {
+            return HelpLevel.ALL;
+        }
+
+        if (helpRequested.isEmpty()) {
+            return HelpLevel.NONE;
+        }
+
+        if (helpRequested.get().equalsIgnoreCase(HelpLevel.ALL.name())) {
+            return HelpLevel.ALL;
+        }
+
+        return HelpLevel.STANDARD;
+    }
+
+    public boolean helpRequested() {
+        return helpLevel() != HelpLevel.NONE;
+    }
+
     public CommonOptions merge(CommonOptions other) {
         if (this == EMPTY) {
             return other;
@@ -159,6 +199,8 @@ public class CommonOptions extends HelpMixin { // I don't like extending here bu
             return this;
         }
         return new CommonOptions(
+            (this.helpRequested.isPresent() ? this.helpRequested : other.helpRequested),
+            (this.helpAllRequested.isPresent()) ? this.helpAllRequested : other.helpAllRequested,
             (this.ansi.isPresent()) ? this.ansi : other.ansi,
             (this.outputType.isPresent()) ? this.outputType : other.outputType,
             (this.verbose.isPresent()) ? this.verbose : other.verbose,

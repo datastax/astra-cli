@@ -29,7 +29,7 @@ import static com.dtsx.astra.cli.core.output.AstraColors.stripAnsi;
     description = "Generates asciidoc command reference. Meant for internal use.",
     hidden = true
 )
-public class DocsCmd extends AbstractCmd<Void> {
+public class DocsCmd extends AbstractOperationalCmd<Void> {
     @Option(
         names = { "--output-dir" },
         description = "Output directory for generated documentation",

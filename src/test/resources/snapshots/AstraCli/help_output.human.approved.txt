@@ -14,23 +14,12 @@ stderr:                        Version: 1.1.2
 stdout: Documentation: https://docs.datastax.com/en/astra-cli
 stdout: 
 stdout: Usage: astra [-qVv] [--no-input] [--[no-]spinner] [--color[=WHEN]] [--dump-logs
-stdout:              [=FILE]] [-o=FORMAT] [COMMAND]
+stdout:              [=FILE]] [-h[=all]] [-o=FORMAT] [COMMAND]
 stdout: 
 stdout:   -v, --version            Print version information and exit.
 stdout:                              (default: false)
 stdout: 
-stdout: Common Options:
-stdout:       --color[=WHEN]       One of: auto, never, always
-stdout:                              (default: auto)
-stdout:       --dump-logs[=FILE]   Write all logs to an optionally specified file
-stdout:                              (default: ~/.astra-dev/logs/<file>.log)
-stdout:       --no-input           Don't ask for user input (e.g. confirmation prompts)
-stdout:   -o, --output=FORMAT      One of: human, json, csv
-stdout:                              (default: human)
-stdout:   -q, --quiet              Only output essential information
-stdout:       --[no-]spinner       Enable/disable loading spinners
-stdout:                              (default: enabled if tty and not quiet)
-stdout:   -V, --verbose            Enable verbose logging output
+stdout: Use --help-all to get the full options list
 stdout: 
 stdout: Commands:
 stdout:   setup      Interactively set up the Astra CLI and create profiles

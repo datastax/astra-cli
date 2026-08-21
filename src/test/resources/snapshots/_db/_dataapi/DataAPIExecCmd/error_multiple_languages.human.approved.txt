@@ -4,12 +4,13 @@ exit_code: 2
 ---- output ----
 stderr: Error: --node, --python are mutually exclusive (specify only one)
 stderr: Usage: astra db data-api exec [-qV] [--no-input] [--[no-]spinner] [--color
-stderr:                               [=WHEN]] [--dump-logs[=FILE]] [-c[=COLLECTION[,
-stderr:                               COLLECTION...]]]... [-t[=TABLE[,TABLE...]]]...
-stderr:                               [-e=CODE] [-k=KEYSPACE] [-o=FORMAT] [-r=REGION]
-stderr:                               [-a=PACKAGES[,PACKAGES...]]... [[[-cf=PATH]
-stderr:                               [-p=NAME]] | [--token=TOKEN [--env=ENV]]] [--node
-stderr:                               | --python | --ipython] [DB] [ARGS...]
+stderr:                               [=WHEN]] [--dump-logs[=FILE]] [-h[=all]] [-c
+stderr:                               [=COLLECTION[,COLLECTION...]]]... [-t[=TABLE[,
+stderr:                               TABLE...]]]... [-e=CODE] [-k=KEYSPACE]
+stderr:                               [-o=FORMAT] [-r=REGION] [-a=PACKAGES[,
+stderr:                               PACKAGES...]]... [[[-cf=PATH] [-p=NAME]] |
+stderr:                               [--token=TOKEN [--env=ENV]]] [--node | --python |
+stderr:                               --ipython] [DB] [ARGS...]
 stderr: 
 stderr: Execute Data API code against a database
 stderr: 
@@ -38,31 +39,7 @@ stderr:       --ipython             Use astrapy with IPython
 stderr:       --node                Use astra-db-ts with Node.js (default)
 stderr:       --python              Use astrapy with Python
 stderr: 
-stderr: Common Options:
-stderr:       --color[=WHEN]        One of: auto, never, always
-stderr:                               (default: auto)
-stderr:       --dump-logs[=FILE]    Write all logs to an optionally specified file
-stderr:                               (default: ~/.astra-dev/logs/<file>.log)
-stderr:       --no-input            Don't ask for user input (e.g. confirmation prompts)
-stderr:   -o, --output=FORMAT       One of: human, json, csv
-stderr:                               (default: human)
-stderr:   -q, --quiet               Only output essential information
-stderr:       --[no-]spinner        Enable/disable loading spinners
-stderr:                               (default: enabled if tty and not quiet)
-stderr:   -V, --verbose             Enable verbose logging output
-stderr: 
-stderr: Connection Options:
-stderr:       -cf, --config-file=PATH
-stderr:                             The .astrarc file to use for this command
-stderr:                               (default: ~/.astrarc-dev)
-stderr:       --env=ENV             Astra environment the token belongs to: prod
-stderr:                               (default), dev, test, or local. Leave unset
-stderr:                               unless you were issued a non-prod token.
-stderr:   -p, --profile=NAME        The .astrarc profile to use for this command. Can
-stderr:                               be set via ASTRA_PROFILE.
-stderr:       --token=TOKEN         The astra token to use for this command. Use the
-stderr:                               --token @file syntax to read the token from a
-stderr:                               file, to avoid potential leaks.
+stderr: Use --help-all to get the full options list
 stderr: 
 stderr: Examples:
 stderr:   # Insert a document using astra-db-ts (passing the -p flag to node)

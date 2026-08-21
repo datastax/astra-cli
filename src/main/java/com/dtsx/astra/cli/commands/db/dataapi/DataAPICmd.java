@@ -1,8 +1,7 @@
 package com.dtsx.astra.cli.commands.db.dataapi;
 
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "data-api",
@@ -12,7 +11,4 @@ import picocli.CommandLine.Mixin;
         DataAPIExecCmd.class,
     }
 )
-public class DataAPICmd {
-    @Mixin
-    public HelpMixin help;
-}
+public class DataAPICmd extends AbstractCmd {}

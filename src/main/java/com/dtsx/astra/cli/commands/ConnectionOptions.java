@@ -74,7 +74,7 @@ public class ConnectionOptions {
     public static class ConfigSpec {
         @Option(
             names = { $ConfigFile.LONG, $ConfigFile.SHORT },
-            description = { "The @|code .astrarc|@ file to use for this command", AbstractCmd.SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" },
+            description = { "The @|code .astrarc|@ file to use for this command", AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT + "${cli.rc-file.path}" },
             paramLabel = $ConfigFile.LABEL
         )
         public Optional<Path> $configFile;

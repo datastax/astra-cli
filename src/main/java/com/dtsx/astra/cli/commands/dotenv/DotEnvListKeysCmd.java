@@ -1,6 +1,6 @@
 package com.dtsx.astra.cli.commands.dotenv;
 
-import com.dtsx.astra.cli.commands.AbstractCmd;
+import com.dtsx.astra.cli.commands.AbstractOperationalCmd;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.table.ShellTable;
 import com.dtsx.astra.cli.operations.Operation;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
     name = "list-keys",
     description = "List all available Astra keys (no values resolved)."
 )
-public class DotEnvListKeysCmd extends AbstractCmd<Void> {
+public class DotEnvListKeysCmd extends AbstractOperationalCmd<Void> {
     @Override
     @MustBeInvokedByOverriders
     public void prelude() {

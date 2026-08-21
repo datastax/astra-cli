@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
+import static com.dtsx.astra.cli.commands.AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT;
 import static com.dtsx.astra.cli.utils.CollectionUtils.listConcat;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 

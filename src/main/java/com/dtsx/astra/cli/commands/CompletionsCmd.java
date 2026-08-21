@@ -1,18 +1,15 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.core.completions.DynamicCompletion;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.properties.CliEnvironmentImpl;
 import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import lombok.val;
 import picocli.AutoComplete;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
-import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Spec;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -31,13 +28,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.withIndent;
     comment = "Put this in your shell profile (e.g. @|code ~/.zprofile|@) to generate completions and set your PATH",
     command = "eval \"$(${cli.path} shellenv)\""
 )
-public class CompletionsCmd implements Runnable {
-    @Spec
-    private CommandSpec spec;
-
-    @Mixin
-    private HelpMixin helpMixin;
-
+public class CompletionsCmd extends AbstractCmd {
     @Option(
         names = { "-n", "--cli-name" },
         description = "CLI name to use in the completion script",
@@ -46,7 +37,7 @@ public class CompletionsCmd implements Runnable {
     public String $cliName;
 
     @Override
-    public void run() {
+    public final void execute() {
         val script = AutoComplete.bash(
             $cliName,
             spec.root().commandLine()
