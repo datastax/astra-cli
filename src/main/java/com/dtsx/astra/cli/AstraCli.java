@@ -50,6 +50,7 @@ import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
+import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.IFactory;
 import picocli.CommandLine.Option;
 
@@ -67,7 +68,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     name = "astra",
     descriptionHeading = " ", // normally the description heading is "%n", but we don't want that here since we have no description
     subcommands = {
-        CommandLine.HelpCommand.class,
+        HelpCommand.class,
         SetupCmd.class,
         ConfigCmd.class,
         DbCmd.class,

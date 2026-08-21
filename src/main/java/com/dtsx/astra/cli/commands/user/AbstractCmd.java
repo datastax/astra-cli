@@ -1,5 +1,6 @@
 package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.AstraCli;
 import com.dtsx.astra.cli.commands.AbstractOperationalCmd;
 import com.dtsx.astra.cli.commands.CommonOptions;
 import com.dtsx.astra.cli.core.CliContext;
@@ -15,7 +16,6 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 import java.util.Collections;
@@ -29,14 +29,6 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
     footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
 )
 public abstract class AbstractCmd implements Runnable {
-    @Option(
-        names = { "-h", "--help" },
-        description = "Show this help message and exit.",
-        usageHelp = true,
-        hidden = true
-    )
-    private boolean helpRequested;
-
     @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)
     public CommonOptions common = CommonOptions.EMPTY;
 
@@ -119,6 +111,11 @@ public abstract class AbstractCmd implements Runnable {
 
         if (!disableDuplicateFilesCheck()) {
             ctx.properties().detectDuplicateFileLocations(ctx);
+        }
+
+        if (common.helpRequested()) {
+            spec.commandLine().usage(ctx.console().stdout());
+            AstraCli.exit(0);
         }
     }
 
