@@ -1,9 +1,13 @@
 package com.dtsx.astra.cli.unit.commands;
 
 import com.dtsx.astra.cli.commands.CommonOptions;
+import com.dtsx.astra.cli.commands.CommonOptions.HelpLevel;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.val;
-import net.jqwik.api.*;
+import net.jqwik.api.Example;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Group;
+import net.jqwik.api.Property;
 import picocli.CommandLine.Help.Ansi;
 
 import java.nio.file.Path;
@@ -32,11 +36,13 @@ public class CommonOptionsTest {
         @Property
         void this_takes_precedence_over_other_for_ansi(@ForAll Ansi thisAnsi, @ForAll Ansi otherAnsi) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(thisAnsi),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(otherAnsi),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
@@ -50,11 +56,13 @@ public class CommonOptionsTest {
         @Property
         void uses_other_when_this_is_empty_for_ansi(@ForAll Ansi otherAnsi) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(otherAnsi),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
@@ -68,12 +76,14 @@ public class CommonOptionsTest {
         @Property
         void this_takes_precedence_over_other_for_outputType(@ForAll OutputType thisType, @ForAll OutputType otherType) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.of(thisType),
                 Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.of(otherType),
                 Optional.empty(), Optional.empty(),
@@ -88,12 +98,14 @@ public class CommonOptionsTest {
         @Property
         void uses_other_when_this_is_empty_for_outputType(@ForAll OutputType otherType) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.of(otherType),
                 Optional.empty(), Optional.empty(),
@@ -109,11 +121,13 @@ public class CommonOptionsTest {
         void this_takes_precedence_over_other_for_verbose(@ForAll boolean thisVerbose, @ForAll boolean otherVerbose) {
             val thisOpt = new CommonOptions(
                 Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(),
                 Optional.of(thisVerbose),
                 Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.of(otherVerbose),
                 Optional.empty(),
@@ -129,11 +143,13 @@ public class CommonOptionsTest {
         void uses_other_when_this_is_empty_for_verbose(@ForAll boolean otherVerbose) {
             val thisOpt = new CommonOptions(
                 Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.of(otherVerbose),
                 Optional.empty(),
@@ -148,11 +164,13 @@ public class CommonOptionsTest {
         @Property
         void this_takes_precedence_over_other_for_quiet(@ForAll boolean thisQuiet, @ForAll boolean otherQuiet) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(thisQuiet),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(otherQuiet),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
@@ -166,11 +184,13 @@ public class CommonOptionsTest {
         @Property
         void uses_other_when_this_is_empty_for_quiet(@ForAll boolean otherQuiet) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(otherQuiet),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
@@ -184,11 +204,13 @@ public class CommonOptionsTest {
         @Property
         void this_takes_precedence_over_other_for_enableSpinner(@ForAll boolean thisSpinner, @ForAll boolean otherSpinner) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(thisSpinner),
                 Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(otherSpinner),
                 Optional.empty(), Optional.empty(), Optional.empty()
@@ -202,11 +224,13 @@ public class CommonOptionsTest {
         @Property
         void uses_other_when_this_is_empty_for_enableSpinner(@ForAll boolean otherSpinner) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(otherSpinner),
                 Optional.empty(), Optional.empty(), Optional.empty()
@@ -220,12 +244,14 @@ public class CommonOptionsTest {
         @Property
         void this_takes_precedence_over_other_for_shouldDumpLogs(@ForAll boolean thisDump, @ForAll boolean otherDump) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.of(thisDump),
                 Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.of(otherDump),
@@ -240,12 +266,14 @@ public class CommonOptionsTest {
         @Property
         void uses_other_when_this_is_empty_for_shouldDumpLogs(@ForAll boolean otherDump) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.of(otherDump),
@@ -263,12 +291,14 @@ public class CommonOptionsTest {
             val otherPath = Path.of("/other/logs");
             
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.of(thisPath),
                 Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.of(otherPath),
@@ -285,12 +315,14 @@ public class CommonOptionsTest {
             val otherPath = Path.of("/other/logs");
             
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.empty(),
                 Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(),
                 Optional.of(otherPath),
@@ -305,11 +337,13 @@ public class CommonOptionsTest {
         @Property
         void this_takes_precedence_over_other_for_noInput(@ForAll boolean thisNoInput, @ForAll boolean otherNoInput) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(thisNoInput)
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(otherNoInput)
@@ -323,11 +357,13 @@ public class CommonOptionsTest {
         @Property
         void uses_other_when_this_is_empty_for_noInput(@ForAll boolean otherNoInput) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.of(otherNoInput)
@@ -341,6 +377,8 @@ public class CommonOptionsTest {
         @Example
         void all_fields_present_in_this_returns_this_values() {
             val thisOpt = new CommonOptions(
+                Optional.of("all"),
+                Optional.of(true),
                 Optional.of(Ansi.ON),
                 Optional.of(OutputType.JSON),
                 Optional.of(true),
@@ -351,6 +389,8 @@ public class CommonOptionsTest {
                 Optional.of(false)
             );
             val otherOpt = new CommonOptions(
+                Optional.of(""),
+                Optional.of(false),
                 Optional.of(Ansi.OFF),
                 Optional.of(OutputType.CSV),
                 Optional.of(false),
@@ -363,6 +403,8 @@ public class CommonOptionsTest {
 
             val result = thisOpt.merge(otherOpt);
 
+            assertThat(result.helpLevel()).isEqualTo(HelpLevel.ALL);
+            assertThat(result.helpRequested()).isTrue();
             assertThat(result.ansi()).contains(Ansi.ON);
             assertThat(result.outputType()).isEqualTo(OutputType.JSON);
             assertThat(result.verbose()).isTrue();
@@ -377,6 +419,8 @@ public class CommonOptionsTest {
         void all_fields_empty_in_this_returns_other_values() {
             val thisOpt = new CommonOptions();
             val otherOpt = new CommonOptions(
+                Optional.of(""),
+                Optional.of(false),
                 Optional.of(Ansi.OFF),
                 Optional.of(OutputType.CSV),
                 Optional.of(false),
@@ -389,6 +433,8 @@ public class CommonOptionsTest {
 
             val result = thisOpt.merge(otherOpt);
 
+            assertThat(result.helpLevel()).isEqualTo(HelpLevel.STANDARD);
+            assertThat(result.helpRequested()).isTrue();
             assertThat(result.ansi()).contains(Ansi.OFF);
             assertThat(result.outputType()).isEqualTo(OutputType.CSV);
             assertThat(result.verbose()).isFalse();
@@ -402,11 +448,13 @@ public class CommonOptionsTest {
         @Property
         void merge_does_not_modify_original_instances(@ForAll Ansi thisAnsi, @ForAll Ansi otherAnsi) {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(thisAnsi),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(otherAnsi),
                 Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
@@ -423,6 +471,7 @@ public class CommonOptionsTest {
         @Example
         void merge_with_EMPTY_constant() {
             val thisOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(Ansi.ON),
                 Optional.of(OutputType.JSON),
                 Optional.empty(), Optional.empty(),
@@ -439,6 +488,7 @@ public class CommonOptionsTest {
         @Example
         void EMPTY_merge_with_other() {
             val otherOpt = new CommonOptions(
+                Optional.empty(), Optional.empty(),
                 Optional.of(Ansi.OFF),
                 Optional.of(OutputType.CSV),
                 Optional.of(true),
@@ -456,6 +506,8 @@ public class CommonOptionsTest {
         @Example
         void mixed_presence_selective_merge() {
             val thisOpt = new CommonOptions(
+                Optional.empty(),
+                Optional.empty(),
                 Optional.of(Ansi.ON),
                 Optional.empty(),
                 Optional.of(true),
@@ -466,6 +518,8 @@ public class CommonOptionsTest {
                 Optional.of(false)
             );
             val otherOpt = new CommonOptions(
+                Optional.empty(),
+                Optional.empty(),
                 Optional.empty(),
                 Optional.of(OutputType.CSV),
                 Optional.empty(),
