@@ -48,7 +48,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     comment = "Opt out of upgrade notifications permanently in your shell profile",
     command = "eval \"$(${cli.path} shellenv --no-update-notifier)\""
 )
-public class UpgradeCmd extends AbstractCmd<Unit> {
+public class UpgradeCmd extends AbstractOperationalCmd<Unit> {
     @ArgGroup
     public VersionMod $versionMod;
 

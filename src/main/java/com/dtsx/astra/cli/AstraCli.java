@@ -10,6 +10,7 @@ import com.dtsx.astra.cli.commands.pcu.PcuCmd;
 import com.dtsx.astra.cli.commands.role.RoleCmd;
 import com.dtsx.astra.cli.commands.streaming.StreamingCmd;
 import com.dtsx.astra.cli.commands.token.TokenCmd;
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.commands.user.UserCmd;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.TypeConverters;
@@ -96,7 +97,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     command = "${cli.name} db create demo -r us-east1"
 )
 @AliasForSubcommand(None.class)
-public class AstraCli extends AbstractCmd<Void> {
+public class AstraCli extends AbstractOperationalCmd<Void> {
     @Option(
         names = { "-v", "--version" },
         description = "Print version information and exit.",
@@ -221,7 +222,7 @@ public class AstraCli extends AbstractCmd<Void> {
             public <K> K create(Class<K> cls) throws Exception { // I miss having proper rank2 type support for lambdas
                 val created = defaultFactory.create(cls);
 
-                if (created instanceof AbstractCmd<?> cmd) {
+                if (created instanceof AbstractCmd cmd) {
                     cmd.initCtx(ctxRef);
                 }
 

@@ -1,8 +1,7 @@
 package com.dtsx.astra.cli.commands.dotenv;
 
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "dotenv",
@@ -13,7 +12,4 @@ import picocli.CommandLine.Mixin;
         DotEnvListKeysCmd.class,
     }
 )
-public class DotEnvCmd {
-    @Mixin
-    public HelpMixin help;
-}
+public class DotEnvCmd extends AbstractCmd {}

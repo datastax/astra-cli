@@ -1,33 +1,26 @@
-package com.dtsx.astra.cli.commands;
+package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.commands.AbstractOperationalCmd;
+import com.dtsx.astra.cli.commands.CommonOptions;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.datatypes.Ref;
-import com.dtsx.astra.cli.core.datatypes.Thunk;
-import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.exceptions.internal.cli.CongratsYouFoundABugException;
 import com.dtsx.astra.cli.core.output.AstraColors;
 import com.dtsx.astra.cli.core.output.AstraConsole;
 import com.dtsx.astra.cli.core.output.AstraLogger;
 import com.dtsx.astra.cli.core.output.AstraLogger.Level;
-import com.dtsx.astra.cli.core.output.Hint;
-import com.dtsx.astra.cli.core.output.formats.*;
-import com.dtsx.astra.cli.operations.Operation;
 import lombok.val;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.VisibleForTesting;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
-import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
 
 @Command(
@@ -35,8 +28,17 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
     descriptionHeading = "%n",
     footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
 )
-public abstract class AbstractCmd<OpRes> implements Runnable {
-    public static final String SHOW_CUSTOM_DEFAULT = "__show_custom_default__:";
+public abstract class AbstractCmd implements Runnable {
+    @Option(
+        names = { "-h", "--help" },
+        description = "Show this help message and exit.",
+        usageHelp = true,
+        hidden = true
+    )
+    private boolean helpRequested;
+
+    @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)
+    public CommonOptions common = CommonOptions.EMPTY;
 
     @Spec
     protected CommandSpec spec;
@@ -54,55 +56,8 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         ctxRef.onUpdate((ctx) -> this.ctx = ctx);
     }
 
-    @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)
-    public CommonOptions common = CommonOptions.EMPTY;
-
-    protected OutputAll execute(Supplier<OpRes> _result) {
-        val otherTypes = Arrays.stream(OutputType.values()).filter(o -> o != ctx.outputType()).map(o -> o.name().toLowerCase()).toList();
-        val otherTypesAsString = String.join("|", otherTypes);
-
-        val originalArgsWithoutOutput = new ArrayList<>(originalArgs());
-
-        for (val flag : List.of("-o", "--output")) {
-            while (originalArgsWithoutOutput.contains(flag)) {
-                int idx = originalArgsWithoutOutput.indexOf(flag);
-                originalArgsWithoutOutput.remove(idx);
-                originalArgsWithoutOutput.remove(idx);
-            }
-        }
-
-        throw new AstraCliException(UNSUPPORTED_EXECUTION, """
-          @|bold,red Error: This operation does not support outputting in the '|@@|bold,red,italic %s|@@|bold,red ' format.|@
-        
-          No operation was executed; no changes were made.
-        
-          Please retry with another output format using '--output <%s>' or '-o <%s>'.
-        """.formatted(
-            ctx.outputType().name().toLowerCase(),
-            otherTypesAsString,
-            otherTypesAsString
-        ), List.of(
-            new Hint("Example fix", originalArgsWithoutOutput, "-o " + otherTypes.getFirst())
-        ));
-    }
-
-    private static class UnsupportedOutputException extends RuntimeException {}
-
-    protected OutputHuman executeHuman(Supplier<OpRes> _result) {
-        throw new UnsupportedOutputException();
-    }
-
-    protected OutputJson executeJson(Supplier<OpRes> _result) {
-        throw new UnsupportedOutputException();
-    }
-
-    protected OutputCsv executeCsv(Supplier<OpRes> _result) {
-        throw new UnsupportedOutputException();
-    }
-
-    protected abstract Operation<OpRes> mkOperation();
-
     @Override
+    @MustBeInvokedByOverriders
     public final void run() {
         if (ctx == null) {
             throw new CongratsYouFoundABugException("initCtx(...) was not called before run()");
@@ -123,7 +78,7 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
                 ? Level.QUIET
                 : ctx.logLevel();
 
-        run(new CliContext(
+        ctxRef.modify((_) -> new CliContext(
             ctx.env(),
             ctx.properties(),
             common.outputType(),
@@ -136,26 +91,22 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
             ctx.upgradeNotifier(),
             ctx.forceProfileForTesting()
         ));
+
+        prelude();
+        execute();
+        postlude();
     }
 
     private CommonOptions mergeCommonOptions() {
         var common = this.common;
 
         for (var spec = this.spec.parent(); spec != null; spec = spec.parent()) {
-            if (spec.userObject() instanceof AbstractCmd<?> cmd) {
+            if (spec.userObject() instanceof AbstractOperationalCmd<?> cmd) {
                 common = common.merge(cmd.common);
             }
         }
 
         return common;
-    }
-
-    @VisibleForTesting
-    public final void run(CliContext ctx) {
-        ctxRef.modify((_) -> ctx);
-        this.prelude();
-        val result = evokeProperExecuteFunction(ctx);
-        this.postlude(result);
     }
 
     @MustBeInvokedByOverriders
@@ -171,12 +122,12 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
         }
     }
 
-    @MustBeInvokedByOverriders
-    protected void postlude(String result) {
-        if (!result.isEmpty()) {
-            ctx.console().unsafePrintln(result.stripTrailing());
-        }
+    protected void execute() {
+        // noop for now
+    }
 
+    @MustBeInvokedByOverriders
+    protected void postlude() {
         if (ctx.log().shouldDumpLogs()) {
             ctx.log().dumpLogsToFile();
         }
@@ -188,20 +139,6 @@ public abstract class AbstractCmd<OpRes> implements Runnable {
 
     protected boolean disableDuplicateFilesCheck() {
         return false;
-    }
-
-    private String evokeProperExecuteFunction(CliContext ctx) {
-        val thunk = new Thunk<>(() -> mkOperation().execute());
-
-        try {
-            return switch (ctx.outputType()) {
-                case HUMAN -> executeHuman(thunk).renderAsHuman(ctx);
-                case JSON -> executeJson(thunk).renderAsJson();
-                case CSV -> executeCsv(thunk).renderAsCsv();
-            };
-        } catch (UnsupportedOutputException e) {
-            return execute(thunk).render(ctx);
-        }
     }
 
     protected final List<String> originalArgs() {

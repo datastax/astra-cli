@@ -1,9 +1,8 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "dsbulk",
@@ -36,7 +35,4 @@ import picocli.CommandLine.Mixin;
     comment = "Get the path to the dsbulk executable",
     command = "astra db dsbulk path"
 )
-public class DbDsbulkCmd {
-    @Mixin
-    public HelpMixin help;
-}
+public class DbDsbulkCmd extends AbstractCmd {}

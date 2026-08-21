@@ -1,22 +1,19 @@
 package com.dtsx.astra.cli.commands;
 
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.properties.CliProperties.AstraBinary;
 import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.cli.utils.FileUtils;
 import lombok.val;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
-import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Spec;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
+import static com.dtsx.astra.cli.commands.AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT;
 import static com.dtsx.astra.cli.core.output.ExitCode.UNSUPPORTED_EXECUTION;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
 
@@ -54,13 +51,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     comment = "Check the helptext for plenty more options",
     command = "${cli.name} shellenv -h"
 )
-public class ShellEnvCmd implements Runnable {
-    @Spec
-    private CommandSpec spec;
-
-    @Mixin
-    private HelpMixin helpMixin;
-
+public class ShellEnvCmd extends AbstractCmd {
     @Option(
         names = { "--home" },
         description = { "Sets the @|code ASTRA_HOME|@ env var. See @|code astra config home path -h|@ for how this is resolved.", SHOW_CUSTOM_DEFAULT + "${cli.home-folder.path}" }
@@ -98,7 +89,7 @@ public class ShellEnvCmd implements Runnable {
     public Optional<String> $defaultArgs;
 
     @Override
-    public void run() {
+    public final void execute() {
         val binaryPath = FileUtils.resolvePathToAstra();
 
         if (!(binaryPath instanceof AstraBinary)) {

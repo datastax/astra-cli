@@ -1,11 +1,9 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.completions.impls.OutputTypeCompletion;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import com.dtsx.astra.cli.core.output.formats.OutputType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
@@ -13,11 +11,11 @@ import picocli.CommandLine.Option;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
+import static com.dtsx.astra.cli.commands.AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommonOptions extends HelpMixin { // I don't like extending here but mixins don't compose w/ arg groups :(
+public class CommonOptions { // I don't like extending here but mixins don't compose w/ arg groups :(
     public static CommonOptions EMPTY = new CommonOptions();
 
     public enum ColorMode { auto, never, always }

@@ -1,9 +1,8 @@
 package com.dtsx.astra.cli.commands.streaming.pulsar;
 
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "pulsar",
@@ -26,7 +25,4 @@ import picocli.CommandLine.Mixin;
     comment = "Get pulsar executable path",
     command = "${cli.name} streaming pulsar path"
 )
-public class StreamingPulsarCmd {
-    @Mixin
-    public HelpMixin help;
-}
+public class StreamingPulsarCmd extends AbstractCmd {}

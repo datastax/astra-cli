@@ -48,7 +48,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.*;
     comment = "Nuke Astra CLI but preserve the @|code .astrarc|@ file",
     command = "astra nuke --preserve-astrarc"
 )
-public class NukeCmd extends AbstractCmd<NukeResult> {
+public class NukeCmd extends AbstractOperationalCmd<NukeResult> {
     @Option(
         names = { "--dry-run" },
         description = "Simulate the nuke operation without deleting any files",

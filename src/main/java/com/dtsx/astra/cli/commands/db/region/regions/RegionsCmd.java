@@ -1,8 +1,7 @@
 package com.dtsx.astra.cli.commands.db.region.regions;
 
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "regions",
@@ -13,7 +12,4 @@ import picocli.CommandLine.Mixin;
         RegionsVectorCmd.class
     }
 )
-public class RegionsCmd {
-    @Mixin
-    public HelpMixin help;
-}
+public class RegionsCmd extends AbstractCmd {}

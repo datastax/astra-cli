@@ -1,9 +1,8 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
 import com.dtsx.astra.cli.core.help.Example;
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "cqlsh",
@@ -31,7 +30,4 @@ import picocli.CommandLine.Mixin;
     comment = "Execute a CQL file",
     command = "${cli.name} db cqlsh exec my_db -f script.cql"
 )
-public class CqlshCmd {
-    @Mixin
-    public HelpMixin help;
-}
+public class CqlshCmd extends AbstractCmd {}

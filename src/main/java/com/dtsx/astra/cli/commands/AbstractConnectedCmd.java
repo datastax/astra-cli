@@ -26,7 +26,7 @@ import java.util.Optional;
 import static com.dtsx.astra.cli.core.output.ExitCode.PARSE_ISSUE;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
-public abstract class AbstractConnectedCmd<OpRes> extends AbstractCmd<OpRes> {
+public abstract class AbstractConnectedCmd<OpRes> extends AbstractOperationalCmd<OpRes> {
     @ArgGroup(heading = "%nConnection Options:%n", order = 100)
     private ConnectionOptions $connOpts = ConnectionOptions.EMPTY;
 

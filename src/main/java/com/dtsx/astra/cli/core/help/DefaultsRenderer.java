@@ -12,7 +12,7 @@ import picocli.CommandLine.Model.CommandSpec;
 
 import java.util.Arrays;
 
-import static com.dtsx.astra.cli.commands.AbstractCmd.SHOW_CUSTOM_DEFAULT;
+import static com.dtsx.astra.cli.commands.AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT;
 
 @UtilityClass
 public class DefaultsRenderer {

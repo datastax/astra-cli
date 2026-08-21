@@ -52,7 +52,7 @@ import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
     comment = "Start the interactive setup process",
     command = "${cli.name} setup"
 )
-public class SetupCmd extends AbstractCmd<SetupResult> {
+public class SetupCmd extends AbstractOperationalCmd<SetupResult> {
     @Option(
         names = { $Token.LONG, $Token.SHORT },
         description = "Token to use authenticate each call. If not provided, you will be prompted for it",
