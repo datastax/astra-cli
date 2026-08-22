@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ public class Profile {
     private final Optional<ProfileName> name;
     private final AstraToken token;
     private final AstraEnvironment env;
-    private final Optional<ProfileName> sourceForDefault;
 
     public boolean isDefault() {
         return name.map(ProfileName::isDefault).orElse(false);
@@ -30,5 +28,9 @@ public class Profile {
 
     public ProfileName nameOrDefault() {
         return name.orElse(ProfileName.mkUnsafe("<args_provided>"));
+    }
+
+    public boolean equalsIgnoringName(Profile other) {
+        return this.token.equals(other.token) && this.env.equals(other.env);
     }
 }

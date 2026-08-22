@@ -13,7 +13,6 @@ import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.properties.CliProperties.ConstEnvVars;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.val;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine.ArgGroup;
@@ -30,8 +29,7 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractOperationalCmd
     @ArgGroup(heading = "%nConnection Options:%n", order = 100)
     private ConnectionOptions $connOpts = ConnectionOptions.EMPTY;
 
-    private @Nullable ProfileSource cachedProfileSource;
-    private @Nullable Profile cachedProfile;
+    private @Nullable ProfileContext cachedProfileCacheContext;
 
     public sealed interface ProfileSource {
         record Forced(Profile profile) implements ProfileSource {}
@@ -40,11 +38,13 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractOperationalCmd
         record DefaultFile(ProfileName profile) implements ProfileSource {}
     }
 
+    public record ProfileContext(Profile profile, ProfileSource source, List<ProfileName> mirrors) {}
+
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
         $connOpts = mergeConnectionOptions();
-        
+
         if (!ctx.properties().disableBetaWarnings() && profile().env().isLocal()) {
             ctx.log().warn("Local environments are still in beta and may change without notice.");
         }
@@ -63,27 +63,25 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractOperationalCmd
     }
 
     public final Profile profile() {
-        if (cachedProfile != null) {
-            return cachedProfile;
+        return profileContext().profile();
+    }
+
+    public final ProfileContext profileContext() {
+        if (cachedProfileCacheContext != null) {
+            return cachedProfileCacheContext;
         }
 
-        return cachedProfile = switch (cachedProfileSource = profileSource()) {
-            case Forced(var profile) -> profile;
-            case FromArgs(var token, var env) -> new Profile(Optional.empty(), token, env, Optional.empty());
-            case CustomFile(var path, var profileName) -> resolveProfileFromConfigFile(path, profileName);
-            case DefaultFile(var profileName) -> resolveProfileFromConfigFile(null, profileName);
+        val source = profileSource();
+
+        return cachedProfileCacheContext = switch (source) {
+            case Forced(var p) -> new ProfileContext(p, source, List.of());
+            case FromArgs(var token, var env) -> mkProfileContextFromArgs(source, token, env);
+            case CustomFile(var path, var profileName) -> mkProfileContextFromConfigFile(source, path, profileName);
+            case DefaultFile(var profileName) -> mkProfileContextFromConfigFile(source, null, profileName);
         };
     }
 
-    public final Pair<Profile, ProfileSource> profileAndSource() {
-        return Pair.of(profile(), profileSource());
-    }
-
     private ProfileSource profileSource() {
-        if (cachedProfileSource != null) {
-            return cachedProfileSource;
-        }
-
         if (ctx.forceProfileForTesting().isPresent()) {
             return new Forced(ctx.forceProfileForTesting().get());
         }
@@ -122,9 +120,21 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractOperationalCmd
         return new DefaultFile(defaultProfileName);
     }
 
-    private Profile resolveProfileFromConfigFile(@Nullable Path path, ProfileName targetProfileName) {
+    private ProfileContext mkProfileContextFromArgs(ProfileSource source, AstraToken token, AstraEnvironment env) {
+        val profile = new Profile(Optional.empty(), token, env);
+        return new ProfileContext(profile, source, List.of());
+    }
+
+    private ProfileContext mkProfileContextFromConfigFile(ProfileSource source, @Nullable Path path, ProfileName targetProfileName) {
         val config = AstraConfig.readAstraConfigFile(ctx, path, false);
 
+        val profile = resolveProfileFromConfig(config, targetProfileName);
+        val mirrors = resolveMirrorProfiles(config, profile);
+
+        return new ProfileContext(profile, source, mirrors);
+    }
+
+    private Profile resolveProfileFromConfig(AstraConfig config, ProfileName targetProfileName) {
         val profile = config.lookupProfile(targetProfileName);
 
         if (profile.isEmpty()) {
@@ -199,5 +209,13 @@ public abstract class AbstractConnectedCmd<OpRes> extends AbstractOperationalCmd
         }
 
         return profile.get();
+    }
+
+    private List<ProfileName> resolveMirrorProfiles(AstraConfig config, Profile primary) {
+        return config.profiles().stream()
+            .filter(p -> !primary.equals(p))
+            .filter(primary::equalsIgnoringName)
+            .map(Profile::nameOrDefault)
+            .toList();
     }
 }

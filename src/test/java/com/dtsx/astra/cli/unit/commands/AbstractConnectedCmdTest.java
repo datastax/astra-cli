@@ -1,15 +1,18 @@
 package com.dtsx.astra.cli.unit.commands;
 
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd;
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileContext;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.commands.ConnectionOptions;
 import com.dtsx.astra.cli.commands.ConnectionOptions.ConfigSpec;
 import com.dtsx.astra.cli.commands.ConnectionOptions.CredsSpec;
+import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
 import com.dtsx.astra.cli.testlib.extensions.context.UseTestCtx;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -20,13 +23,14 @@ import net.jqwik.api.Group;
 import net.jqwik.api.Property;
 import net.jqwik.api.PropertyDefaults;
 import net.jqwik.api.constraints.UseType;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +52,7 @@ public class AbstractConnectedCmdTest {
 
                 val cmd = mkCmdWithOpts(ctx, connOpts);
 
-                assertThat(cmd.profileAndSource()).isEqualTo(Pair.of(profile, new ProfileSource.Forced(profile)));
+                assertThat(cmd.profileContext()).isEqualTo(new ProfileContext(profile, new ProfileSource.Forced(profile), List.of()));
             }
         }
 
@@ -70,10 +74,9 @@ public class AbstractConnectedCmdTest {
                 val opts = mkOpts(o -> o.$creds = new CredsSpec(token, givenEnv.map(Objects::toString), endpoint));
                 val cmd = mkCmdWithOpts(opts);
 
-                val expectedProfile = new Profile(Optional.empty(), token, expectedEnv, Optional.empty());
+                val expectedProfile = new Profile(Optional.empty(), token, expectedEnv);
                 val expectedSource = new ProfileSource.FromArgs(token, expectedEnv);
-
-                assertThat(cmd.profileAndSource()).isEqualTo(Pair.of(expectedProfile, expectedSource));
+                assertThat(cmd.profileContext()).isEqualTo(new ProfileContext(expectedProfile, expectedSource, List.of()));
             }
         }
 
@@ -86,7 +89,7 @@ public class AbstractConnectedCmdTest {
 
             @Property
             public void loads_default_profile_from_custom_file(@ForAll Profile baseProfile) {
-                val defaultProfile = new Profile(Optional.of(ProfileName.DEFAULT), baseProfile.token(), baseProfile.env(), baseProfile.sourceForDefault());
+                val defaultProfile = new Profile(Optional.of(ProfileName.DEFAULT), baseProfile.token(), baseProfile.env());
                 test_loading_profile_from_custom_file(defaultProfile, "i/like/cars", Optional.empty());
             }
 
@@ -110,14 +113,40 @@ public class AbstractConnectedCmdTest {
                 val cmd = mkCmdWithOpts(opts);
 
                 val expectedSource = new ProfileSource.CustomFile(rcFilePath, profile.nameOrDefault());
-
-                assertThat(cmd.profileAndSource()).isEqualTo(Pair.of(profile, expectedSource));
+                assertThat(cmd.profileContext().source()).isEqualTo(expectedSource);
             }
         }
 
         @Group
         public class DefaultFile {
-            // TODO
+            @Property
+            @SneakyThrows
+            public void only_profiles_matching_token_and_env_become_mirrors(@ForAll List<Profile> candidates) {
+                val others = candidates.stream()
+                    .filter(p -> p.name().isPresent() && !p.isDefault())
+                    .collect(Collectors.toMap(Profile::nameOrDefault, p -> p, (a, b) -> a))
+                    .values();
+
+                val cfgPath = AstraConfig.resolveDefaultAstraConfigFile(ctx.get());
+                Files.createDirectories(cfgPath.getParent());
+
+                var ini = "[default]\nASTRA_DB_APPLICATION_TOKEN=" + Fixtures.Token.unsafeUnwrap() + "\n";
+                for (val p : others) {
+                    ini += "\n[" + p.nameOrDefault().unwrap() + "]\n";
+                    ini += "ASTRA_DB_APPLICATION_TOKEN=" + p.token().unsafeUnwrap() + "\n";
+                    if (p.env() != AstraEnvironment.PROD) ini += "ASTRA_ENV=" + p.env().name() + "\n";
+                    if (p.env().isLocal())                ini += "ASTRA_LOCAL_ENDPOINT=" + p.env().getEndPoint() + "\n";
+                }
+                Files.writeString(cfgPath, ini);
+
+                val expectedMirrors = others.stream()
+                    .filter(p -> p.token().equals(Fixtures.Token) && p.env().equals(AstraEnvironment.PROD))
+                    .map(Profile::nameOrDefault)
+                    .toList();
+
+                assertThat(mkCmdWithOpts(new ConnectionOptions()).profileContext().mirrors())
+                    .containsExactlyInAnyOrderElementsOf(expectedMirrors);
+            }
         }
     }
 
@@ -137,10 +166,6 @@ public class AbstractConnectedCmdTest {
 
         if (profile.env().isLocal()) {
             content += "\nASTRA_LOCAL_ENDPOINT=" + profile.env().getEndPoint();
-        }
-
-        if (profile.sourceForDefault().isPresent()) {
-            content += "\nDEFAULT_PROFILE_SOURCE=" + profile.sourceForDefault().get().unwrap();
         }
 
         val path = ctx.get().path(pathStr);

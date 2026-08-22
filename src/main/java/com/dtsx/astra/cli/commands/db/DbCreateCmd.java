@@ -164,7 +164,7 @@ public class DbCreateCmd extends AbstractDbRequiredCmd<DbCreateResult> implement
     protected void prelude() {
         super.prelude();
         regionGateway = ctx.gateways().mkRegionGateway(profile().token(), profile().env());
-        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profileAndSource()));
+        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profileContext()));
 
         if ($databaseCreationOptions.region == null) {
             val candidate = RegionNamePrompter.prompt(

@@ -1,11 +1,10 @@
 package com.dtsx.astra.cli.integration.core.completions;
 
-import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.DefaultFile;
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileContext;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.config.AstraConfig;
-import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
@@ -14,7 +13,6 @@ import com.dtsx.astra.cli.utils.JsonUtils;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.jqwik.api.*;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +29,7 @@ public class ProfileLinkedCompletionsCacheTest {
     @Property
     public void test_lifecycle(@ForAll("completions") List<String> completions) {
         val config = mkTestConfig();
-        val cache = new DynamicCompletionsCache(ctx.get(), config.profileAndSource);
+        val cache = new DynamicCompletionsCache(ctx.get(), config.profileCacheContext);
 
         forEachPath(cache, (path) -> {
             assertThat(path).doesNotExist();
@@ -39,7 +37,6 @@ public class ProfileLinkedCompletionsCacheTest {
 
         test_cache_still_does_not_exist_with_meaningless_updates(cache, completions);
         test_cache_creation_and_population(cache, completions);
-        test_copying_profile(cache, config);
         test_deleting_profile(cache, config);
     }
 
@@ -104,25 +101,6 @@ public class ProfileLinkedCompletionsCacheTest {
         }
     }
 
-    private void test_copying_profile(ProfileLinkedCompletionsCache cache, TestConfig config) {
-        val expectedPath = completionsDir().resolve("copied-profile").resolve("db_names");
-        assertThat(expectedPath).doesNotExist();
-
-        val target = ProfileName.mkUnsafe("copied-profile");
-
-        config.astraConfig.modify((ctx) -> {
-            ctx.copyProfile(config.profileAndSource.getLeft().nameOrDefault(), target);
-        });
-
-        val created = config.astraConfig.lookupProfile(target).orElseThrow();
-
-        assertThat(created.sourceForDefault()).isEmpty();
-
-        forEachPath(cache, (path) -> {
-            assertThat(expectedPath).exists().hasSameTextualContentAs(path);
-        });
-    }
-
     private void test_deleting_profile(ProfileLinkedCompletionsCache cache, TestConfig config) {
         val target = ProfileName.mkUnsafe("my-profile");
 
@@ -161,7 +139,7 @@ public class ProfileLinkedCompletionsCacheTest {
         }
     }
 
-    private record TestConfig(AstraConfig astraConfig, Pair<Profile, ProfileSource> profileAndSource) {}
+    private record TestConfig(AstraConfig astraConfig, ProfileContext profileCacheContext) {}
 
     @SneakyThrows
     private TestConfig mkTestConfig() {
@@ -171,7 +149,6 @@ public class ProfileLinkedCompletionsCacheTest {
         Files.writeString(cfgPath, """
           [default]
           ASTRA_DB_APPLICATION_TOKEN=%s
-          DEFAULT_PROFILE_SOURCE=my-profile
         
           [my-profile]
           ASTRA_DB_APPLICATION_TOKEN=%s
@@ -182,9 +159,10 @@ public class ProfileLinkedCompletionsCacheTest {
 
         return new TestConfig(
             config,
-            Pair.of(
+            new ProfileContext(
                 profile,
-                new DefaultFile(profile.name().orElseThrow())
+                new DefaultFile(profile.name().orElseThrow()),
+                List.of(ProfileName.mkUnsafe("my-profile"))
             )
         );
     }
@@ -195,8 +173,8 @@ public class ProfileLinkedCompletionsCacheTest {
     }
 
     private static class DynamicCompletionsCache extends ProfileLinkedCompletionsCache {
-        public DynamicCompletionsCache(CliContext ctx, Pair<Profile, ProfileSource> profileAndSource) {
-            super(ctx, profileAndSource);
+        public DynamicCompletionsCache(CliContext ctx, ProfileContext profileCacheContext) {
+            super(ctx, profileCacheContext);
         }
 
         @Override

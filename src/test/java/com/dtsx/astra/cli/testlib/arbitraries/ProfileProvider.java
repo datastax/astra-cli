@@ -31,7 +31,7 @@ public class ProfileProvider implements ArbitraryProvider {
         );
 
         val arb = arbs.as((name, token, env, source) -> {
-            return new Profile(name, token, env, source.filter(s -> name.isPresent() && name.get().isDefault() && !s.equals(ProfileName.DEFAULT))); // satisfies profile source invariants
+            return new Profile(name, token, env);
         });
 
         return Collections.singleton(arb);

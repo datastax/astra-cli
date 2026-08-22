@@ -10,7 +10,6 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.parsers.ini.IniFile;
 import com.dtsx.astra.cli.core.parsers.ini.IniParseException;
-import com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair;
 import com.dtsx.astra.cli.core.parsers.ini.ast.IniSection;
 import com.dtsx.astra.cli.utils.FileUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -39,7 +38,6 @@ public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
     public static final String LOCAL_ENDPOINT_KEY = "ASTRA_LOCAL_ENDPOINT";
-    public static final String SOURCE_KEY = "DEFAULT_PROFILE_SOURCE";
 
     private final CliContext ctx;
     @NonNull private IniFile backingIniFile;
@@ -123,13 +121,7 @@ public class AstraConfig {
                 new AstraConfigFileException(invalidProfileMsg(section.name(), msg), configFile)
             );
 
-        val sourceForDefault = section.lookupKey(SOURCE_KEY)
-            .filter(_ -> profileName.isDefault())
-            .map(s -> ProfileName.parse(s).getRight(
-                msg -> new AstraConfigFileException(invalidProfileMsg(section.name(), "Error parsing @'!" + SOURCE_KEY + "!@: " + msg), configFile)
-            ));
-
-        return new Profile(Optional.of(profileName), token, env, sourceForDefault);
+        return new Profile(Optional.of(profileName), token, env);
     }
 
     private static String invalidProfileMsg(String profileName, String issue) {
@@ -267,55 +259,26 @@ public class AstraConfig {
             }}));
         }
 
-        public void copyProfile(ProfileName src, ProfileName target) {
-            iniTransforms.add((ini) -> {
-                copyProfile(ini, src, target, (_) -> {});
-            });
-            cacheOps.add(() -> copyCacheDir(src, target));
-        }
-
         public void setDefault(ProfileName src) {
-            iniTransforms.add((ini) -> {
-                copyProfile(ini, src, DEFAULT, p -> p.add(new IniKVPair(List.of(), SOURCE_KEY, src.unwrap())));
-            });
+            copyProfile(src, DEFAULT);
         }
 
         public void renameProfile(ProfileName oldName, ProfileName newName) {
             copyProfile(oldName, newName);
             deleteProfile(oldName);
-
-            iniTransforms.add(ini -> {
-                ini.getSections().stream()
-                    .filter(s -> s.name().equals(DEFAULT.unwrap()))
-                    .findFirst()
-                    .ifPresent((defaultSection) -> {
-                        val matchesOldSource = defaultSection.lookupKey(SOURCE_KEY)
-                            .filter(s -> s.equals(oldName.unwrap()))
-                            .isPresent();
-
-                        if (matchesOldSource) {
-                            copyProfile(ini, DEFAULT, DEFAULT, p -> p.add(new IniKVPair(List.of(), SOURCE_KEY, newName.unwrap())));
-                        }
-                    });
-            });
         }
 
-        private void copyProfile(IniFile ini, ProfileName src, ProfileName target, Consumer<ArrayList<IniKVPair>> modifyPairs) {
-            val srcSection = ini.getSections().stream()
-                .filter(s -> s.name().equals(src.unwrap()))
-                .findFirst()
-                .orElseThrow(() -> new AstraConfigFileException("Source profile '" + src + "' not found", backingFile));
+        private void copyProfile(ProfileName src, ProfileName target) {
+            iniTransforms.add((ini) -> {
+                val srcSection = ini.getSections().stream()
+                    .filter(s -> s.name().equals(src.unwrap()))
+                    .findFirst()
+                    .orElseThrow(() -> new AstraConfigFileException("Source profile '" + src + "' not found", backingFile));
 
-            val targetPairs = new ArrayList<>(
-                srcSection.pairs().stream()
-                    .filter(p -> !p.key().equals(SOURCE_KEY))
-                    .toList()
-            );
-
-            modifyPairs.accept(targetPairs);
-
-            ini.deleteSection(target.unwrap());
-            ini.addSection(new IniSection(target.unwrap(), targetPairs));
+                ini.deleteSection(target.unwrap());
+                ini.addSection(target.unwrap(), srcSection);
+            });
+            cacheOps.add(() -> copyCacheDir(src, target));
         }
 
         public void deleteProfile(ProfileName profileName) {
