@@ -11,10 +11,7 @@ import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.prompters.specific.ProfileNamePrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.config.ConfigUseOperation;
-import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ConfigUseResult;
-import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ProfileNotFound;
-import com.dtsx.astra.cli.operations.config.ConfigUseOperation.ProfileSetAsDefault;
-import com.dtsx.astra.cli.operations.config.ConfigUseOperation.UseConfigRequest;
+import com.dtsx.astra.cli.operations.config.ConfigUseOperation.*;
 import lombok.val;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -23,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
 import static com.dtsx.astra.cli.core.output.ExitCode.PROFILE_NOT_FOUND;
 
 @Command(
@@ -51,6 +49,7 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
         return switch (result.get()) {
             case ProfileSetAsDefault(var profileName) -> OutputAll.response("Default profile set to " + ctx.highlight(profileName) + ".");
             case ProfileNotFound(var profileName) -> throwProfileNotFound(profileName);
+            case CantUseDefault() -> throwCantUseDefault();
         };
     }
 
@@ -58,6 +57,16 @@ public class ConfigUseCmd extends AbstractConfigCmd<ConfigUseResult> {
         throw new AstraCliException(PROFILE_NOT_FOUND, """
           @|bold,red Error: A profile with the name '%s' could not be found.|@
         """.formatted(profileName), List.of(
+            new Hint("See your existing profiles", "${cli.name} config list")
+        ));
+    }
+
+    private <T> T throwCantUseDefault() {
+        throw new AstraCliException(ILLEGAL_OPERATION, """
+          @|bold,red Error: Cannot set the default profile to 'default'.|@
+        
+          Please specify a named profile to set as the default.
+        """, List.of(
             new Hint("See your existing profiles", "${cli.name} config list")
         ));
     }

@@ -1,12 +1,11 @@
 package com.dtsx.astra.cli.core.completions;
 
+import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileContext;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource.DefaultFile;
 import com.dtsx.astra.cli.core.CliContext;
-import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import lombok.val;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import java.nio.file.Path;
@@ -15,23 +14,22 @@ import java.util.Optional;
 
 public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
     private final Path primaryCacheFile;
-    private final Optional<Path> mirrorCacheFile;
+    private final List<Path> mirrorCacheFiles;
 
-    public ProfileLinkedCompletionsCache(CliContext ctx, Pair<Profile, ProfileSource> profileAndSource) {
+    public ProfileLinkedCompletionsCache(CliContext ctx, ProfileContext profileCtx) {
         super(ctx);
 
-        val profile = profileAndSource.getLeft();
-        val source = profileAndSource.getRight();
+        val source = profileCtx.source();
+        val mirrors = profileCtx.mirrors();
 
         this.primaryCacheFile = pathForProfile(ctx, source)
             .map(p -> p.resolve(useCacheFileName()))
             .orElse(null);
 
-        this.mirrorCacheFile = profile.sourceForDefault()
-            .flatMap(defaultSource ->
-                pathForProfile(ctx, copySource(source, defaultSource))
-                    .map(p -> p.resolve(useCacheFileName()))
-            );
+        this.mirrorCacheFiles = mirrors.stream()
+            .flatMap(name -> pathForProfile(ctx, copySource(source, name)).stream())
+            .map(p -> p.resolve(useCacheFileName()))
+            .toList();
     }
 
     protected abstract String useCacheFileName();
@@ -59,7 +57,7 @@ public abstract class ProfileLinkedCompletionsCache extends CompletionsCache {
     @Override
     @VisibleForTesting
     public List<Path> mirrorCacheFiles() {
-        return mirrorCacheFile.map(List::of).orElse(List.of());
+        return mirrorCacheFiles;
     }
 
     private static String sanitizeFileName(String name) {

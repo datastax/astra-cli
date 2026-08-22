@@ -128,24 +128,6 @@ public class AstraConfigTest {
                 .hasMessageContaining("Profile name should not be enclosed in angle brackets... did you forget to replace a placeholder?")
                 .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
         }
-
-        @Test
-        @SneakyThrows
-        public void invalid_profile_bad_source_for_default_fails_fast() {
-            val path = ctx.get().path(".astrarc");
-            Files.writeString(path, trimIndent("""
-              [default]
-              ASTRA_DB_APPLICATION_TOKEN=${token}
-              DEFAULT_PROFILE_SOURCE=<invalid-source-name>
-            """.replace("${token}", Fixtures.Token.unsafeUnwrap())));
-
-            assertThatThrownBy(() -> AstraConfig.readAstraConfigFile(ctx.get(), path, false))
-                .asInstanceOf(InstanceOfAssertFactories.throwable(AstraConfigFileException.class))
-                .hasMessageContaining("default")
-                .hasMessageContaining("DEFAULT_PROFILE_SOURCE")
-                .hasMessageContaining("Profile name should not be enclosed in angle brackets")
-                .satisfies(ex -> assertThat(ex.code()).isEqualTo(PARSE_ISSUE));
-        }
     }
 
     @Nested
@@ -174,7 +156,7 @@ public class AstraConfigTest {
 
             // set it as default
             config.modify((ctx) -> {
-                ctx.copyProfile(ProfileName.mkUnsafe("my-profile"), ProfileName.DEFAULT);
+                ctx.setDefault(ProfileName.mkUnsafe("my-profile"));
             });
 
             assertThat(config.profiles()).hasSize(2);
@@ -218,7 +200,6 @@ public class AstraConfigTest {
               # default profile with source link
               [default]
               ASTRA_DB_APPLICATION_TOKEN=${token}
-              DEFAULT_PROFILE_SOURCE=valid/dev
 
               # valid profile w/ default env
               [valid/default]
@@ -248,7 +229,6 @@ public class AstraConfigTest {
                     assertThat(p.name()).contains(ProfileName.DEFAULT);
                     assertThat(p.token().unsafeUnwrap()).isEqualTo(Fixtures.Token.unsafeUnwrap());
                     assertThat(p.env()).isEqualTo(AstraEnvironment.PROD);
-                    assertThat(p.sourceForDefault()).contains(ProfileName.mkUnsafe("valid/dev"));
                 });
 
             // valid profile w/ custom env
@@ -304,7 +284,6 @@ public class AstraConfigTest {
             Files.writeString(path, trimIndent("""
               [default]
               ASTRA_DB_APPLICATION_TOKEN=${token}
-              DEFAULT_PROFILE_SOURCE=old-name
 
               [old-name]
               ASTRA_DB_APPLICATION_TOKEN=${token}
@@ -312,21 +291,12 @@ public class AstraConfigTest {
 
             val config = AstraConfig.readAstraConfigFile(ctx.get(), path, false);
 
-            assertThat(config.lookupProfile(ProfileName.DEFAULT).orElseThrow().sourceForDefault())
-                .contains(ProfileName.mkUnsafe("old-name"));
-
             config.modify((ctx) -> {
                 ctx.renameProfile(ProfileName.mkUnsafe("old-name"), ProfileName.mkUnsafe("new-name"));
             });
 
             assertThat(config.profileExists(ProfileName.mkUnsafe("old-name"))).isFalse();
             assertThat(config.profileExists(ProfileName.mkUnsafe("new-name"))).isTrue();
-
-            assertThat(config.lookupProfile(ProfileName.DEFAULT).orElseThrow().sourceForDefault())
-                .contains(ProfileName.mkUnsafe("new-name"));
-
-            assertThat(config.lookupSection("default").orElseThrow().lookupKey(AstraConfig.SOURCE_KEY))
-                .contains("new-name");
         }
     }
 }

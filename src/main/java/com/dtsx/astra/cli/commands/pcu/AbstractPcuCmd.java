@@ -12,6 +12,6 @@ public abstract class AbstractPcuCmd<OpRes> extends AbstractConnectedCmd<OpRes> 
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profileAndSource()));
+        pcuGateway = ctx.gateways().mkPcuGateway(profile().token(), profile().env(), new PcuGroupsCompletionsCache(ctx, profileContext()));
     }
 }

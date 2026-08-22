@@ -15,6 +15,7 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
     public sealed interface ConfigUseResult {}
     public record ProfileSetAsDefault(ProfileName profileName) implements ConfigUseResult {}
     public record ProfileNotFound(ProfileName profileName) implements ConfigUseResult {}
+    public record CantUseDefault() implements ConfigUseResult {}
 
     public record UseConfigRequest(
         ProfileName profileName
@@ -22,6 +23,10 @@ public class ConfigUseOperation implements Operation<ConfigUseResult> {
 
     @Override
     public ConfigUseResult execute() {
+        if (request.profileName.isDefault()) {
+            return new CantUseDefault();
+        }
+
         val retrievedProfile = config.lookupProfile(request.profileName);
 
         if (retrievedProfile.isEmpty()) {

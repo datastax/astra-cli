@@ -62,7 +62,7 @@ public class TestConfig {
     }
 
     public static Profile profile() {
-        return new Profile(Optional.empty(), token(), env(), Optional.empty());
+        return new Profile(Optional.empty(), token(), env());
     }
 
     private static String env(String key) {
