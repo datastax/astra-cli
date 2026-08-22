@@ -6,11 +6,13 @@ import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.commands.ConnectionOptions;
 import com.dtsx.astra.cli.commands.ConnectionOptions.ConfigSpec;
 import com.dtsx.astra.cli.commands.ConnectionOptions.CredsSpec;
+import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.Profile;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.core.properties.CliPropertiesImpl;
 import com.dtsx.astra.cli.operations.Operation;
+import com.dtsx.astra.cli.testlib.Fixtures;
 import com.dtsx.astra.cli.testlib.extensions.context.TestCliContext;
 import com.dtsx.astra.cli.testlib.extensions.context.UseTestCtx;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.dtsx.astra.cli.utils.StringUtils.trimIndent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -116,7 +119,34 @@ public class AbstractConnectedCmdTest {
 
         @Group
         public class DefaultFile {
-            // TODO
+            @Property
+            @SneakyThrows
+            public void only_profiles_matching_token_and_env_become_mirrors(@ForAll List<Profile> candidates) {
+                val others = candidates.stream()
+                    .filter(p -> p.name().isPresent() && !p.isDefault())
+                    .collect(Collectors.toMap(Profile::nameOrDefault, p -> p, (a, b) -> a))
+                    .values();
+
+                val cfgPath = AstraConfig.resolveDefaultAstraConfigFile(ctx.get());
+                Files.createDirectories(cfgPath.getParent());
+
+                var ini = "[default]\nASTRA_DB_APPLICATION_TOKEN=" + Fixtures.Token.unsafeUnwrap() + "\n";
+                for (val p : others) {
+                    ini += "\n[" + p.nameOrDefault().unwrap() + "]\n";
+                    ini += "ASTRA_DB_APPLICATION_TOKEN=" + p.token().unsafeUnwrap() + "\n";
+                    if (p.env() != AstraEnvironment.PROD) ini += "ASTRA_ENV=" + p.env().name() + "\n";
+                    if (p.env().isLocal())                ini += "ASTRA_LOCAL_ENDPOINT=" + p.env().getEndPoint() + "\n";
+                }
+                Files.writeString(cfgPath, ini);
+
+                val expectedMirrors = others.stream()
+                    .filter(p -> p.token().equals(Fixtures.Token) && p.env().equals(AstraEnvironment.PROD))
+                    .map(Profile::nameOrDefault)
+                    .toList();
+
+                assertThat(mkCmdWithOpts(new ConnectionOptions()).profileContext().mirrors())
+                    .containsExactlyInAnyOrderElementsOf(expectedMirrors);
+            }
         }
     }
 

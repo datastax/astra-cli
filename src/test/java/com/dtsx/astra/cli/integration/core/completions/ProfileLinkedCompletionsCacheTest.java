@@ -162,7 +162,7 @@ public class ProfileLinkedCompletionsCacheTest {
             new ProfileContext(
                 profile,
                 new DefaultFile(profile.name().orElseThrow()),
-                List.of()
+                List.of(ProfileName.mkUnsafe("my-profile"))
             )
         );
     }
