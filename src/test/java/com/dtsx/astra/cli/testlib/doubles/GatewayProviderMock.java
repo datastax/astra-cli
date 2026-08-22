@@ -42,7 +42,6 @@ public class GatewayProviderMock implements GatewayProvider {
         PcuGateway.class,
         PcuAssociationsGateway.class,
         OrgGateway.class,
-        OrgGateway.Stateless.class,
         CollectionGateway.class,
         KeyspaceGateway.class,
         CdcGateway.class,
@@ -69,10 +68,6 @@ public class GatewayProviderMock implements GatewayProvider {
 
     public OrgGateway orgGateway() {
         return returnIfEnabled(OrgGateway.class);
-    }
-
-    public OrgGateway.Stateless orgGatewayStateless() {
-        return returnIfEnabled(OrgGateway.Stateless.class);
     }
 
     public CollectionGateway collectionGateway() {
@@ -135,13 +130,8 @@ public class GatewayProviderMock implements GatewayProvider {
     }
 
     @Override
-    public OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env) {
+    public OrgGateway mkOrgGateway() {
         return orgGateway();
-    }
-
-    @Override
-    public OrgGateway.Stateless mkOrgGatewayStateless() {
-        return orgGatewayStateless();
     }
 
     @Override

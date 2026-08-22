@@ -24,6 +24,6 @@ public class OrgNameCmd extends AbstractOrgCmd<String> {
 
     @Override
     protected Operation<String> mkOperation() {
-        return new OrgNameOperation(orgGateway);
+        return new OrgNameOperation(orgGateway, profile());
     }
 }

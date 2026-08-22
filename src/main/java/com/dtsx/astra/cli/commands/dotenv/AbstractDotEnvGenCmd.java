@@ -84,7 +84,7 @@ public abstract class AbstractDotEnvGenCmd extends AbstractDbCmd<DotEnvResult> {
     @Override
     protected DotEnvOperation mkOperation() {
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
-        val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
+        val orgGateway = ctx.gateways().mkOrgGateway();
 
         Function<DbRef, Optional<KeyspaceRef>> mkKsRef = (dbRef) -> $keyspaceName.map(ks -> KeyspaceRef.mustParse(dbRef, ks));
         Function<DbRef, Optional<RegionRef>> mkRegionRef = (dbRef) -> RegionRef.mustParse(dbRef, $regionName);

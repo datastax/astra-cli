@@ -14,6 +14,7 @@ import com.dtsx.astra.sdk.org.domain.CreateTokenRequest;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
 import com.dtsx.astra.sdk.org.domain.Role;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -29,7 +30,7 @@ public class TokenGatewayImpl implements TokenGateway {
     private final CliContext ctx;
     private final APIProvider apiProvider;
     private final RoleGateway roleGateway;
-    private final OrgGateway.Stateless statelessOrgGateway;
+    private final OrgGateway orgGateway;
 
     @Override
     public Stream<IamToken> findAll() {
@@ -74,12 +75,12 @@ public class TokenGatewayImpl implements TokenGateway {
     }
 
     @Override
-    public void validate(AstraToken token) {
+    public void validate(AstraToken token, AstraEnvironment env) {
         ctx.log().loading("Validating your Astra token", (_) -> {
             try {
-                return statelessOrgGateway.resolveOrganizationEnvironment(token);
+                return orgGateway.find(token, env);
             } catch (AuthenticationException e) {
-                throw new InvalidTokenException("could not authenticate with the provided token");
+                throw new InvalidTokenException("could not validate the provided token");
             }
         });
     }

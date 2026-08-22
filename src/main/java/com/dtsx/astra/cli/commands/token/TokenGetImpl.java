@@ -20,7 +20,7 @@ public abstract class TokenGetImpl extends AbstractTokenCmd<AstraToken> {
     boolean $copyToClipboard;
 
     @Option(
-        names = { "--validate" },
+        names = { "-v", "--validate" },
         description = "Validates the token before returning it"
     )
     boolean $validate;

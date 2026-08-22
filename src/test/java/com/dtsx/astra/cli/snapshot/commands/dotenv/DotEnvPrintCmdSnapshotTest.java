@@ -19,8 +19,9 @@ import static org.mockito.Mockito.when;
 public class DotEnvPrintCmdSnapshotTest extends BaseCmdSnapshotTest {
     private final SnapshotTestOptionsModifier mockOrg = o -> o
         .gateway(OrgGateway.class, mock -> {
-            when(mock.current()).thenReturn(Fixtures.Organization);
+            when(mock.find(any(), any())).thenReturn(Fixtures.Organization);
         });
+
 
     private final SnapshotTestOptionsModifier mockDb = o -> o
         .gateway(DbGateway.class, mock -> {

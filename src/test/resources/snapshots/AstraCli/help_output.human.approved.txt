@@ -45,6 +45,4 @@ stdout:   $ astra db list
 stdout: 
 stdout:   # Create a vector database
 stdout:   $ astra db create demo -r us-east1
-stdout: 
-stdout: See 'astra <command> <subcommand> --help' for help on a specific subcommand.
 ---- end ----

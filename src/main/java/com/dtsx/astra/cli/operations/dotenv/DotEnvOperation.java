@@ -219,7 +219,7 @@ public class DotEnvOperation implements Operation<DotEnvResult> {
 
     private Organization org() {
         if (cachedOrg == null) {
-            cachedOrg = orgGateway.current();
+            cachedOrg = orgGateway.find(request.profile.token(), request.profile.env());
         }
         return cachedOrg;
     }

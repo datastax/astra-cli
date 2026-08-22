@@ -16,7 +16,7 @@ public class TokenGetOperation implements Operation<AstraToken> {
     @Override
     public AstraToken execute() {
         if (request.validate) {
-            tokenGateway.validate(request.profile.token());
+            tokenGateway.validate(request.profile.token(), request.profile.env());
         }
         return request.profile.token();
     }

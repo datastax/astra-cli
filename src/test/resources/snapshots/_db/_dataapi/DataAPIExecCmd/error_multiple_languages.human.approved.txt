@@ -50,6 +50,4 @@ stderr:   $ astra db data-api exec my_db -l python -t my_table -e "print(my_tabl
 stderr: 
 stderr:   # Execute a file
 stderr:   $ astra db data-api exec my_db -e @code.js
-stderr: 
-stderr: See 'astra <command> <subcommand> --help' for help on a specific subcommand.
 ---- end ----

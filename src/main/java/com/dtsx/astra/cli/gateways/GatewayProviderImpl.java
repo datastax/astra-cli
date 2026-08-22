@@ -65,13 +65,8 @@ public class GatewayProviderImpl implements GatewayProvider {
     }
 
     @Override
-    public OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env) {
-        return new OrgGatewayImpl(ctx(), apiProvider(token, env));
-    }
-
-    @Override
-    public OrgGateway.Stateless mkOrgGatewayStateless() {
-        return new OrgGatewayImpl.StatelessImpl(ctx());
+    public OrgGateway mkOrgGateway() {
+        return new OrgGatewayImpl(ctx());
     }
 
     @Override
@@ -116,7 +111,7 @@ public class GatewayProviderImpl implements GatewayProvider {
 
     @Override
     public TokenGateway mkTokenGateway(AstraToken token, AstraEnvironment env) {
-        return new TokenGatewayImpl(ctx(), apiProvider(token, env), mkRoleGateway(token, env, new RoleCompletionsCache(ctx())), mkOrgGatewayStateless());
+        return new TokenGatewayImpl(ctx(), apiProvider(token, env), mkRoleGateway(token, env, new RoleCompletionsCache(ctx())), mkOrgGateway());
     }
 
     @Override

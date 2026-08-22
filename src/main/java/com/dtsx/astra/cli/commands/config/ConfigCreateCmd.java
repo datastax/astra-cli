@@ -225,7 +225,7 @@ public class ConfigCreateCmd extends AbstractConfigCmd<ConfigCreateResult> {
     public Operation<ConfigCreateResult> mkOperation() {
         val env = AstraEnvironment.resolve($env, $localEndpoint);
 
-        return new ConfigCreateOperation(ctx, config(true), t -> ctx.gateways().mkOrgGateway(t, env), ctx.gateways().mkOrgGatewayStateless(), new CreateConfigRequest(
+        return new ConfigCreateOperation(ctx, config(true), ctx.gateways().mkOrgGateway(), new CreateConfigRequest(
             $profileName,
             $token,
             env,

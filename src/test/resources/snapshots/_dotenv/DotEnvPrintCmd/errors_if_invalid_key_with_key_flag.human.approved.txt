@@ -23,6 +23,4 @@ stderr:       --[no-]overwrite      Always overwrite non-empty values.
 stderr:       --region=REGION       The region to use.
 stderr: 
 stderr: Use --help-all to get the full options list
-stderr: 
-stderr: See 'astra <command> <subcommand> --help' for help on a specific subcommand.
 ---- end ----

@@ -182,7 +182,7 @@ public class DbCreateDotEnvCmd extends AbstractPromptForDbCmd<CreateDotEnvResult
         val regionRef = RegionRef.mustParse($dbRef, $regionName);
 
         val downloadsGateway = ctx.gateways().mkDownloadsGateway();
-        val orgGateway = ctx.gateways().mkOrgGateway(profile().token(), profile().env());
+        val orgGateway = ctx.gateways().mkOrgGateway();
 
         return new DbCreateDotEnvOperation(ctx, dbGateway, orgGateway, downloadsGateway, new CreateDotEnvRequest(
             profile(),

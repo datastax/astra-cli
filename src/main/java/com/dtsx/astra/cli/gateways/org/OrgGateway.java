@@ -9,9 +9,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Optional;
 
 public interface OrgGateway extends SomeGateway {
-    Organization current();
-
-    interface Stateless extends SomeGateway {
-        Optional<Pair<AstraEnvironment, Organization>> resolveOrganizationEnvironment(AstraToken token);
-    }
+    Organization find(AstraToken token, AstraEnvironment env);
+    Optional<Pair<AstraEnvironment, Organization>> findEnvHint(AstraToken token);
 }

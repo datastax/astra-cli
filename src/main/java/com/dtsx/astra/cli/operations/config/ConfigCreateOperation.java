@@ -16,14 +16,12 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
     private final CliContext ctx;
     private final AstraConfig config;
-    private final Function<AstraToken, OrgGateway> orgGateway;
-    private final OrgGateway.Stateless statelessOrgGateway;
+    private final OrgGateway orgGateway;
     private final CreateConfigRequest request;
 
     public record CreateConfigRequest(
@@ -93,10 +91,10 @@ public class ConfigCreateOperation implements Operation<ConfigCreateResult> {
 
         return ctx.log().loading("Validating your Astra token", (_) -> {
             try {
-                val orgName = ProfileName.mkUnsafe(orgGateway.apply(token).current().getName());
+                val orgName = ProfileName.mkUnsafe(orgGateway.find(token, request.env).getName());
                 return Either.pure(request.profileName.orElse(orgName));
             } catch (AuthenticationException e) {
-                val validEnv = statelessOrgGateway.resolveOrganizationEnvironment(token).map(Pair::getLeft);
+                val validEnv = orgGateway.findEnvHint(token).map(Pair::getLeft);
                 return Either.left(new InvalidToken(validEnv));
             } catch (Exception e) {
                 ctx.log().hint("You can use @!--no-validate!@ to skip token validation and create a profile with an explicit name.");

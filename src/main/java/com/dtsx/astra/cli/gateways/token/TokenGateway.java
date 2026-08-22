@@ -7,6 +7,7 @@ import com.dtsx.astra.cli.core.models.RoleRef;
 import com.dtsx.astra.cli.gateways.SomeGateway;
 import com.dtsx.astra.sdk.org.domain.CreateTokenResponse;
 import com.dtsx.astra.sdk.org.domain.IamToken;
+import com.dtsx.astra.sdk.utils.AstraEnvironment;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -22,5 +23,5 @@ public interface TokenGateway extends SomeGateway {
 
     DeletionStatus<Void> delete(String clientId);
 
-    void validate(AstraToken token);
+    void validate(AstraToken token, AstraEnvironment env);
 }

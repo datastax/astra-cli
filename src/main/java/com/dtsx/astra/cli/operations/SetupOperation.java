@@ -29,8 +29,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class SetupOperation implements Operation<SetupResult> {
     private final CliContext ctx;
-    private final BiFunction<AstraToken, AstraEnvironment, OrgGateway> createOrgGateway;
-    private final OrgGateway.Stateless statelessOrgGateway;
+    private final OrgGateway orgGateway;
     private final SetupRequest request;
 
     public record SetupRequest(
@@ -180,7 +179,7 @@ public class SetupOperation implements Operation<SetupResult> {
             var guessedEnv = Optional.<AstraEnvironment>empty();
 
             if (request.env().isEmpty()) {
-                val guessed = statelessOrgGateway.resolveOrganizationEnvironment(token);
+                val guessed = orgGateway.findEnvHint(token);
 
                 if (guessed.isPresent()) {
                     return Either.pure(guessed.get());
@@ -189,20 +188,11 @@ public class SetupOperation implements Operation<SetupResult> {
 
             val env = request.env().orElseGet(() -> request.promptForEnv.apply(AstraEnvironment.PROD));
 
-            val orgGateway = createOrgGateway.apply(token, env);
-            val org = validateTokenAndFetchOrg(orgGateway);
-
-            return (org.isPresent())
-                ? Either.pure(Pair.of(env, org.get()))
-                : Either.left(guessedEnv);
-        }
-
-        private Optional<Organization> validateTokenAndFetchOrg(OrgGateway orgGateway) {
             return ctx.log().loading("Validating your Astra token", (_) -> {
                 try {
-                    return Optional.of(orgGateway.current());
+                    return Either.pure(Pair.of(env, orgGateway.find(token, env)));
                 } catch (AuthenticationException e) {
-                    return Optional.empty();
+                    return Either.left(guessedEnv);
                 }
             });
         }

@@ -25,8 +25,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.listAdd;
 
 @Command(
     commandListHeading = "%nCommands:%n",
-    descriptionHeading = "%n",
-    footer = "%nSee '${cli.name} <command> <subcommand> --help' for help on a specific subcommand."
+    descriptionHeading = "%n"
 )
 public abstract class AbstractCmd implements Runnable {
     @ArgGroup(validate = false, heading = "%nCommon Options:%n", order = 99)

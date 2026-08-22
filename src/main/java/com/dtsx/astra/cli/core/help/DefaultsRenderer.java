@@ -11,9 +11,15 @@ import picocli.CommandLine.Help.Ansi.Text;
 import picocli.CommandLine.Help.ColorScheme;
 import picocli.CommandLine.Help.IParamLabelRenderer;
 import picocli.CommandLine.Help.Visibility;
-import picocli.CommandLine.Model.*;
+import picocli.CommandLine.Model.ArgGroupSpec;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Model.OptionSpec;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import static com.dtsx.astra.cli.commands.AbstractOperationalCmd.SHOW_CUSTOM_DEFAULT;
 import static com.dtsx.astra.cli.utils.StringUtils.NL;
@@ -56,7 +62,6 @@ public class DefaultsRenderer {
 
                     return reflectiveOptionListGroupSections(this, groups, createDefaultOptionSort(), parameterLabelRenderer()) + getFullDisclaimer;
                 }
-
                 return super.optionListGroupSections();
             }
         };

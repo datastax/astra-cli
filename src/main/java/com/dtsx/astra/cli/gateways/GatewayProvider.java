@@ -26,9 +26,7 @@ public interface GatewayProvider {
 
     PcuAssociationsGateway mkPcuAssociationsGateway(AstraToken token, AstraEnvironment env);
 
-    OrgGateway mkOrgGateway(AstraToken token, AstraEnvironment env);
-    
-    OrgGateway.Stateless mkOrgGatewayStateless();
+    OrgGateway mkOrgGateway();
     
     CollectionGateway mkCollectionGateway(AstraToken token, AstraEnvironment env);
     
