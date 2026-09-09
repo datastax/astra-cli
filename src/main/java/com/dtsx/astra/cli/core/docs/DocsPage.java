@@ -145,7 +145,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
         }
     }
 
-    public record CommandOptions(List<ArgGroupSpec> hiddenGroups, List<ArgGroupSpec> groupArgs, List<ArgSpec> nonGroupArgs) implements DocsPageSection {
+    public record CommandOptions(List<ArgGroupSpec> commonGroups, List<ArgGroupSpec> groupArgs, List<ArgSpec> nonGroupArgs) implements DocsPageSection {
         @Override
         public String render() {
             val sb = new StringBuilder("== Options").append(NL).append(NL);
@@ -167,15 +167,13 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
                 }
             }
 
-            for (val group : hiddenGroups) {
+            for (val group : commonGroups) {
                 sb.append(NL);
-                sb.append('.').append(group.heading().replaceAll("%n|:", "")).append(NL);
-                sb.append("[%collapsible").append("]").append(NL);
-                sb.append("====").append(NL);
+                sb.append("=== ").append(group.heading().replaceAll("%n|:", "")).append(NL);
                 for (val arg : allNestedArgs(group)) {
                     renderArg(sb, arg);
                 }
-                sb.append("====").append(NL);
+                sb.append("=== ").append(NL);
             }
 
             return sb.toString();

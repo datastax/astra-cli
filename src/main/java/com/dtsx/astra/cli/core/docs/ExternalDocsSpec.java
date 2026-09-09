@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public record ExternalDocsSpec(
-    @JsonProperty(required = true) List<String> collapsibleOptionGroups,
+    @JsonProperty(required = true) List<String> commonGroups,
     @JsonProperty(required = true) List<String> hideCommands,
     @JsonProperty(required = true) Map<String, List<String>> seeAlsoLinks
 ) {}

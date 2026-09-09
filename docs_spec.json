@@ -1,5 +1,5 @@
 {
-  "collapsibleOptionGroups" : [
+  "commonGroups" : [
     "Common Options",
     "Connection Options"
   ],

@@ -9,7 +9,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.dtsx.astra.cli.core.docs.AliasUtils.resolveAliasingInformation;
@@ -90,11 +89,11 @@ public class AsciidocGenerator {
     }
 
     private CommandOptions resolveCommandOptions(CommandSpec commandSpec) {
-        val collapsibleGroups = docsSpec.collapsibleOptionGroups();
+        val commonGroups = docsSpec.commonGroups();
 
         return new CommandOptions(
-            commandSpec.argGroups().stream().filter((g) -> g.heading() != null && collapsibleGroups.stream().anyMatch(g.heading()::contains)).toList(),
-            commandSpec.argGroups().stream().filter((g) -> g.heading() == null || collapsibleGroups.stream().noneMatch(g.heading()::contains)).toList(),
+            commandSpec.argGroups().stream().filter((g) -> g.heading() != null && commonGroups.stream().anyMatch(g.heading()::contains)).toList(),
+            commandSpec.argGroups().stream().filter((g) -> g.heading() == null || commonGroups.stream().noneMatch(g.heading()::contains)).toList(),
             commandSpec.args().stream().filter((a) -> a.group() == null).toList()
         );
     }
