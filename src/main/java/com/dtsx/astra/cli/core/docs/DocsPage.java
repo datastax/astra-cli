@@ -173,7 +173,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
                 for (val arg : allNestedArgs(group)) {
                     renderArg(sb, arg);
                 }
-                sb.append("=== ").append(NL);
+                sb.append(NL);
             }
 
             return sb.toString();
