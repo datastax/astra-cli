@@ -1,5 +1,7 @@
 package com.dtsx.astra.cli.commands.user;
 
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -17,4 +19,5 @@ import picocli.CommandLine.Command;
     comment = "List all your Astra users",
     command = "${cli.name} user list"
 )
+@AliasForSubcommand(None.class)
 public final class UserCmd extends AbstractCmd {}

@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.db.cqlsh;
 
 import com.dtsx.astra.cli.commands.user.AbstractCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -30,4 +32,5 @@ import picocli.CommandLine.Command;
     comment = "Execute a CQL file",
     command = "${cli.name} db cqlsh exec my_db -f script.cql"
 )
+@AliasForSubcommand(None.class)
 public class CqlshCmd extends AbstractCmd {}

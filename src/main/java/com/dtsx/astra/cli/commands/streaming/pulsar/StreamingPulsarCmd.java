@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.streaming.pulsar;
 
 import com.dtsx.astra.cli.commands.user.AbstractCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -25,4 +27,5 @@ import picocli.CommandLine.Command;
     comment = "Get pulsar executable path",
     command = "${cli.name} streaming pulsar path"
 )
+@AliasForSubcommand(None.class)
 public class StreamingPulsarCmd extends AbstractCmd {}
