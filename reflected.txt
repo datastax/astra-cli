@@ -3,6 +3,7 @@ com.dtsx.astra.cli.AstraCli$SetupExampleProvider = allPublicConstructors
 com.dtsx.astra.cli.core.output.Hint
 com.dtsx.astra.cli.core.output.AstraColors = allPublicFields
 com.dtsx.astra.cli.core.models.*
+com.dtsx.astra.cli.core.docs.ExternalDocsSpec
 
 # Org+User gateways
 com.dtsx.astra.sdk.org.domain.[User,ResponseAllUsers,InviteUserRequest]
