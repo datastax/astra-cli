@@ -208,6 +208,7 @@ public record DocsPage(List<String> command, DocsPageSections sections, List<Doc
         public String render() {
             return """
             == Examples
+            
             [source,bash]
             ----
             %s
