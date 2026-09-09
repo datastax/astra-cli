@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.db.dataapi;
 
 import com.dtsx.astra.cli.commands.user.AbstractCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import picocli.CommandLine.Command;
 
 @Command(
@@ -11,4 +13,5 @@ import picocli.CommandLine.Command;
         DataAPIExecCmd.class,
     }
 )
+@AliasForSubcommand(None.class)
 public class DataAPICmd extends AbstractCmd {}

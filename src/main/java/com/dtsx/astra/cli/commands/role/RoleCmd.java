@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.role;
 
 import com.dtsx.astra.cli.commands.user.AbstractCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -20,4 +22,5 @@ import picocli.CommandLine.Command;
     comment = "Get details for a specific role",
     command = "${cli.name} role get \"Database Administrator\""
 )
+@AliasForSubcommand(None.class)
 public class RoleCmd extends AbstractCmd {}

@@ -1,6 +1,8 @@
 package com.dtsx.astra.cli.commands.db.dsbulk;
 
 import com.dtsx.astra.cli.commands.user.AbstractCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import com.dtsx.astra.cli.core.help.Example;
 import picocli.CommandLine.Command;
 
@@ -35,4 +37,5 @@ import picocli.CommandLine.Command;
     comment = "Get the path to the dsbulk executable",
     command = "astra db dsbulk path"
 )
+@AliasForSubcommand(None.class)
 public class DbDsbulkCmd extends AbstractCmd {}
