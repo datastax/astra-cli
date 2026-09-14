@@ -94,7 +94,7 @@ public class DbCloneStartCmd extends AbstractDbCloneCmd<DbCloneStartResult> impl
         super.prelude();
 
         if ($sourceDbRef == null) {
-            $sourceDbRef = DbRefPrompter.prompt(ctx, dbGateway, "Select the source database to clone from:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "--source-db"));
+            $sourceDbRef = DbRefPrompter.prompt(ctx, dbGateway, "Select the source database to clone from:", db -> db, (b) -> b.fallbackIndex(0).fix(originalArgs(), "--source-db"));
         }
         
         if ($snapshotId == null) {

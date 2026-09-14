@@ -12,7 +12,7 @@ public abstract class AbstractDbCloneCmd<OpRes> extends AbstractPromptForDbCmd<O
     @MustBeInvokedByOverriders
     protected void prelude() {
         super.prelude();
-        dbCloneGateway = ctx.gateways().mkDbCloneGateway(profile().token(), profile().env(), new DbCompletionsCache(ctx, profileAndSource()));
+        dbCloneGateway = ctx.gateways().mkDbCloneGateway(profile().token(), profile().env(), new DbCompletionsCache(ctx, profileContext()));
 
         if (!ctx.properties().disableBetaWarnings()) {
             ctx.log().warn("${cli.name} db clone commands are still in beta and may change without notice.");

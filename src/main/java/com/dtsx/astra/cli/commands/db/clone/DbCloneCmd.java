@@ -1,8 +1,9 @@
 package com.dtsx.astra.cli.commands.db.clone;
 
-import com.dtsx.astra.cli.core.mixins.HelpMixin;
+import com.dtsx.astra.cli.commands.user.AbstractCmd;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand;
+import com.dtsx.astra.cli.core.docs.AliasForSubcommand.None;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 
 @Command(
     name = "clone",
@@ -13,7 +14,5 @@ import picocli.CommandLine.Mixin;
         DbCloneListSnapshotsCmd.class,
     }
 )
-public class DbCloneCmd {
-    @Mixin
-    public HelpMixin help;
-}
+@AliasForSubcommand(None.class)
+public class DbCloneCmd extends AbstractCmd {}
