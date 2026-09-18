@@ -156,6 +156,7 @@ public class BaseCmdSnapshotTest {
         put("${RegionName}", Regions.NAME.unwrap());
         put("${CollectionName}", Collections.Ref.name());
         put("${TableName}", Tables.Ref.name());
+        put("${CloneOperationId}", Clone.OperationId.toString());
     }};
 
     private String[] buildCmdParts(String cmd, OutputType outputType) {
