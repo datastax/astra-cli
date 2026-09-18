@@ -12,15 +12,15 @@ import java.util.function.Function;
 
 import static com.dtsx.astra.cli.core.output.ExitCode.SNAPSHOT_NOT_FOUND;
 
-public class SnapshotPrompter {
+public class DbSnapshotPrompter {
     public static String prompt(CliContext ctx, DbCloneGateway gateway, DbRef sourceDbRef, String prompt, Function<NeedsFallback<DatabaseSnapshot>, NeedsClearAfterSelection<DatabaseSnapshot>> fix) {
         return SpecificPrompter.<DatabaseSnapshot, String>run(ctx, (b) -> b
             .thing("snapshot")
             .prompt(prompt)
             .thingNotFoundCode(SNAPSHOT_NOT_FOUND)
             .thingsSupplier(() -> gateway.findSnapshots(sourceDbRef, Optional.empty(), Optional.empty(), Optional.empty()).toList())
-            .getThingIdentifier(DatabaseSnapshot::getId)
-            .getThingDisplayExtra((snapshot, _) -> snapshot.getTime())
+            .getThingIdentifier(DatabaseSnapshot::getTime)
+            .getThingDisplayExtra((snapshot, _) -> snapshot.getId())
             .fix(fix)
             .mapSingleFound(DatabaseSnapshot::getId)
             .mapMultipleFound(DatabaseSnapshot::getId)

@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.commands.db.clone;
 
 import com.dtsx.astra.cli.core.CliConstants.$Db;
 import com.dtsx.astra.cli.core.CliConstants.$Regions;
+import com.dtsx.astra.cli.core.completions.impls.DbNamesCompletion;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin;
 import com.dtsx.astra.cli.core.mixins.LongRunningOptionsMixin.WithSetTimeout;
@@ -10,7 +11,7 @@ import com.dtsx.astra.cli.core.output.Hint;
 import com.dtsx.astra.cli.core.output.formats.OutputAll;
 import com.dtsx.astra.cli.core.output.formats.OutputJson;
 import com.dtsx.astra.cli.core.output.prompters.specific.DbRefPrompter;
-import com.dtsx.astra.cli.core.output.prompters.specific.SnapshotPrompter;
+import com.dtsx.astra.cli.core.output.prompters.specific.DbSnapshotPrompter;
 import com.dtsx.astra.cli.operations.Operation;
 import com.dtsx.astra.cli.operations.db.clone.DbCloneStartOperation;
 import com.dtsx.astra.cli.operations.db.clone.DbCloneStartOperation.CloneCompleted;
@@ -35,7 +36,6 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 
 @Command(
     name = "start",
-    aliases = { "create" },
     description = "Start a clone operation from an existing database snapshot"
 )
 @Example(
@@ -56,21 +56,30 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
 )
 public class DbCloneStartCmd extends AbstractDbCloneCmd<DbCloneStartResult> implements WithSetTimeout {
     @Option(
-        names = { "-sd", "--source-db" },
-        description = "The source database to clone from",
+        names = { "-t", "--to" },
+        description = "The target database to clone to",
+        completionCandidates = DbNamesCompletion.class,
         paramLabel = $Db.LABEL
     )
-    public DbRef $sourceDbRef;
+    public DbRef $target;
 
     @Option(
-        names = { "-s", "--snapshot-id" },
+        names = { "-f", "--from" },
+        description = "The source database to clone from",
+        completionCandidates = DbNamesCompletion.class,
+        paramLabel = $Db.LABEL
+    )
+    public DbRef $source;
+
+    @Option(
+        names = { "-fs", "--from-snapshot" },
         description = "The snapshot ID to clone from",
         paramLabel = "SNAPSHOT_ID"
     )
     public String $snapshotId;
 
     @Option(
-        names = { "-sr", "--source-region" },
+        names = { "-fr", "--from-region" },
         description = "The region of the source database",
         paramLabel = $Regions.LABEL
     )
@@ -93,12 +102,16 @@ public class DbCloneStartCmd extends AbstractDbCloneCmd<DbCloneStartResult> impl
     protected void prelude() {
         super.prelude();
 
-        if ($sourceDbRef == null) {
-            $sourceDbRef = DbRefPrompter.prompt(ctx, dbGateway, "Select the source database to clone from:", db -> db, (b) -> b.fallbackIndex(0).fix(originalArgs(), "--source-db"));
+        if ($source == null) {
+            $source = DbRefPrompter.prompt(ctx, dbGateway, "Select the source database to clone from:", db -> db, (b) -> b.fallbackIndex(0).fix(originalArgs(), "--source-db"));
         }
-        
+
+        if ($target == null) {
+            $target = DbRefPrompter.prompt(ctx, dbGateway, "Select the target database to clone to:", db -> db, (b) -> b.fallbackIndex(0).fix(originalArgs(), "--source-db"));
+        }
+
         if ($snapshotId == null) {
-            $snapshotId = SnapshotPrompter.prompt(ctx, dbCloneGateway, $sourceDbRef, "Select the snapshot to clone from:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "--snapshot-id"));
+            $snapshotId = DbSnapshotPrompter.prompt(ctx, dbCloneGateway, $source, "Select the snapshot to clone from:", (b) -> b.fallbackIndex(0).fix(originalArgs(), "--snapshot-id"));
         }
     }
 
@@ -126,7 +139,7 @@ public class DbCloneStartCmd extends AbstractDbCloneCmd<DbCloneStartResult> impl
                     ctx.highlight(waitTime.toSeconds())
                 );
                 yield OutputAll.response(msg, mkData(status, waitTime), List.of(
-                    new Hint("Get database info", "${cli.name} db get %s".formatted($dbRef))
+                    new Hint("Get database info", "${cli.name} db get %s".formatted($target))
                 ));
             }
         };
@@ -135,13 +148,8 @@ public class DbCloneStartCmd extends AbstractDbCloneCmd<DbCloneStartResult> impl
     @Override
     protected Operation<DbCloneStartResult> mkOperation() {
         return new DbCloneStartOperation(dbCloneGateway, new DbCloneStartRequest(
-            $dbRef, $sourceDbRef, $snapshotId, $sourceRegion, lrMixin.options(ctx)
+            $target, $source, $snapshotId, $sourceRegion, lrMixin.options(ctx)
         ));
-    }
-
-    @Override
-    protected String dbRefPrompt() {
-        return "Select the target database";
     }
 
     private LinkedHashMap<String, Object> mkData(DatabaseCloneStatus status, Duration waitedDuration) {

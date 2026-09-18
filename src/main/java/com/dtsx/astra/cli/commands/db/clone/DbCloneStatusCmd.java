@@ -25,7 +25,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "Check the status of a specific clone operation",
     command = "${cli.name} db clone status my_db -id 202d0d1b-14cf-43dc-89fe-efb23758ccef"
 )
-public class DbCloneStatusCmd extends AbstractDbCloneCmd<DatabaseCloneStatus> {
+public class DbCloneStatusCmd extends AbstractPromptForDbCloneCmd<DatabaseCloneStatus> {
     @Option(
         names = { "-id", "--operation-id" },
         description = "The ID of the clone operation",

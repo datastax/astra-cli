@@ -30,7 +30,7 @@ import static com.dtsx.astra.cli.utils.CollectionUtils.sequencedMapOf;
     comment = "List available snapshots for a specific database",
     command = "${cli.name} db clone list-snapshots my_db"
 )
-public class DbCloneListSnapshotsCmd extends AbstractDbCloneCmd<Stream<DatabaseSnapshot>> {
+public class DbCloneListSnapshotsCmd extends AbstractPromptForDbCloneCmd<Stream<DatabaseSnapshot>> {
     @Option(
         names = { "-r", "--region" },
         description = "Filter snapshots by a specific region",

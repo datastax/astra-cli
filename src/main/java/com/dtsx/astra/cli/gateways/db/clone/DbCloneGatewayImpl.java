@@ -45,7 +45,7 @@ public class DbCloneGatewayImpl implements DbCloneGateway {
             "database clone",
             targetPhase.toUpperCase(),
             () -> findClone(targetDbRef, operationId).getPhase().toUpperCase(),
-            s -> s,
+            ctx::highlight,
             timeout
         );
     }
