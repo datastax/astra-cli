@@ -30,6 +30,14 @@ public class CliEnvironmentImpl implements CliEnvironment {
 
     @Override
     public boolean isTty() {
-        return System.console() != null && System.console().isTerminal();
+        var console = System.console();
+        if (console == null) return false;
+        try {
+            // Console.isTerminal() is Java 22+; fall back gracefully on Java 21
+            var m = console.getClass().getMethod("isTerminal");
+            return (boolean) m.invoke(console);
+        } catch (ReflectiveOperationException ignored) {
+            return true; // pre-22: if console != null, assume TTY
+        }
     }
 }

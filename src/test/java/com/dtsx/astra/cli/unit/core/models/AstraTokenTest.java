@@ -44,6 +44,7 @@ public class AstraTokenTest extends BaseParseableTest.WithTrimAndBasicValidation
         @Property
         public void errors_if_token_does_not_start_with_astra_cs(@ForAll @NotBlank @AlphaChars String token) {
             assumeThat(token).doesNotStartWith("AstraCS:");
+            assumeThat(token).doesNotStartWith("eyJ"); // JWT tokens are accepted as-is
 
             assertThat((parser.apply(token)))
                 .extracting(Either::getLeft)
@@ -64,8 +65,15 @@ public class AstraTokenTest extends BaseParseableTest.WithTrimAndBasicValidation
 
     @Property
     public void to_string_does_not_leak_token(@ForAll AstraToken token) {
+        // AstraCS: tokens always produce exactly "AstraCS:" + 4 visible + "****" + 4 visible = 20 chars
         assertThat(token.toString())
             .hasSize("AstraCS:".length() + 12)
             .contains("****");
+    }
+
+    @Example
+    public void to_string_does_not_throw_for_jwt_token() {
+        val jwt = AstraToken.mkUnsafe("eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIn0.signature");
+        assertThat(jwt.toString()).contains("****");
     }
 }

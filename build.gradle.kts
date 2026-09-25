@@ -27,6 +27,10 @@ repositories {
 }
 
 dependencies {
+    // GraalVM SDK stubs — needed to compile SetupCmd (uses org.graalvm.collections.Pair).
+    // At runtime this class is provided by the GraalVM JDK / native-image substrate.
+    compileOnly("org.graalvm.sdk:graal-sdk:21.3.0")
+
     // shuts up some errors about missing SLF4J implementations
     implementation("org.slf4j:slf4j-nop:2.0.17")
 
@@ -88,6 +92,8 @@ dependencies {
 
 tasks.compileJava {
     options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
+    options.compilerArgs.add("--enable-preview")
+    options.release.set(21)
 }
 
 application {
@@ -150,6 +156,7 @@ tasks.test {
     }
 
     jvmArgs = listOf(
+        "--enable-preview",
         "--enable-native-access=ALL-UNNAMED",
         "-javaagent:${mockitoAgent.asPath}",
         "-Duser.timezone=CST"
@@ -359,6 +366,8 @@ tasks.jar {
 tasks.compileTestJava {
     dependsOn("createDynamicProperties")
     options.compilerArgs.add("-parameters")
+    options.compilerArgs.add("--enable-preview")
+    options.release.set(21)
 }
 
 tasks.run {

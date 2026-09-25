@@ -70,6 +70,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
     subcommands = {
         HelpCommand.class,
         SetupCmd.class,
+        LoginCmd.class,
         ConfigCmd.class,
         DbCmd.class,
         DotEnvCmd.class,
