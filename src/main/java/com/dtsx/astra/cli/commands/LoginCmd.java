@@ -3,6 +3,8 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
+import com.dtsx.astra.cli.operations.DeviceLoginOperation;
+import com.dtsx.astra.cli.operations.DeviceLoginOperation.DeviceLoginRequest;
 import com.dtsx.astra.cli.operations.LoginOperation;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginRequest;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginResult;
@@ -18,16 +20,22 @@ import java.util.function.Supplier;
 @Command(
     name = "login",
     description = {
-        "Log in to Astra via the browser using OAuth2",
+        "Log in to Astra via OAuth2",
         "",
-        "Opens a browser window to complete authentication, then writes the resulting",
-        "token to @|code ~/.astrarc|@. The local callback server listens on a randomly-chosen",
-        "port and is torn down immediately after the token is received."
+        "By default, opens a browser window to complete authentication (PKCE flow).",
+        "Use @|code --device|@ for headless / SSH environments where no browser is available:",
+        "a short code is displayed that you enter at the verification URL from any device.",
+        "",
+        "The resulting token is written to @|code ~/.astrarc|@."
     }
 )
 @Example(
-    comment = "Log in and save as the default profile",
+    comment = "Log in via browser (default)",
     command = "${cli.name} login"
+)
+@Example(
+    comment = "Log in via device code (headless / SSH)",
+    command = "${cli.name} login --device"
 )
 @Example(
     comment = "Log in and save under a named profile",
@@ -48,6 +56,16 @@ public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
     public boolean $noDefault = false;
 
     @Option(
+        names = { "--device" },
+        description = {
+            "Use the RFC 8628 Device Authorization Grant instead of the browser PKCE flow.",
+            "Displays a short code to enter at a URL — no local port or browser required.",
+            "Ideal for SSH sessions, Docker containers, and headless cloud environments."
+        }
+    )
+    public boolean $device = false;
+
+    @Option(
         names = { "--login-url" },
         description = "Override the Astra login URL (for internal/testing use).",
         paramLabel = "URL",
@@ -66,6 +84,9 @@ public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
 
     @Override
     protected Operation<LoginResult> mkOperation() {
+        if ($device) {
+            return new DeviceLoginOperation(ctx, new DeviceLoginRequest($loginUrl, $name, !$noDefault));
+        }
         return new LoginOperation(ctx, new LoginRequest($loginUrl, $name, !$noDefault));
     }
 

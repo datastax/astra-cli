@@ -218,6 +218,7 @@ public class AstraConfig {
             tempFile = Files.createTempFile(".astrarc_tmp", null);
             newIni.writeToFile(tempFile);
             FileUtils.atomicMove(tempFile, backingFile);
+            FileUtils.setOwnerReadWrite(backingFile);
             tempFile = null;
         } catch (IOException e) {
             throw new AstraConfigFileException("Error writing config file: " + e.getMessage(), backingFile);
