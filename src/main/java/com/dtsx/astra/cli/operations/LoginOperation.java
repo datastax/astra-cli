@@ -11,13 +11,24 @@ import com.sun.net.httpserver.HttpServer;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -152,7 +163,72 @@ public class LoginOperation implements Operation<LoginResult> {
             }
         });
 
+        // Provision AstraCS long-lived token via POST /v2/oauth/client-token
+        try {
+            val jwtPayload = decodeJwtPayload(rawToken);
+            val orgId = (String) jwtPayload.get("org");
+            @SuppressWarnings("unchecked")
+            val roles = (List<String>) (List<?>) (jwtPayload.get("grp") instanceof List<?> l ? l : List.of());
+
+            if (orgId != null && !orgId.isBlank() && !roles.isEmpty()) {
+                val loginBaseUrl = request.loginBaseUrl()
+                    .or(() -> Optional.ofNullable(System.getenv("ASTRA_LOGIN_URL")))
+                    .orElse("https://astra.datastax.com/v1/login");
+                val sessionBase = loginBaseUrl.replaceFirst("/v?[0-9]+/.*$", "");
+
+                val mapper = new ObjectMapper();
+                val bodyMap = Map.of("orgId", orgId, "roles", roles);
+                val bodyJson = mapper.writeValueAsString(bodyMap);
+
+                val httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+                val httpReq = HttpRequest.newBuilder()
+                    .uri(URI.create(sessionBase + "/v2/oauth/client-token"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer " + rawToken)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
+                    .build();
+                val httpResp = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofString());
+
+                if (httpResp.statusCode() == 200) {
+                    val respNode = mapper.readTree(httpResp.body());
+                    val csTokenValue = respNode.path("token").asText(null);
+                    if (csTokenValue != null && !csTokenValue.isBlank()) {
+                        val csToken = AstraToken.mkUnsafe(csTokenValue);
+                        config.modify(modCtx -> {
+                            modCtx.setCsToken(profileName, csToken);
+                            if (request.setAsDefault()) {
+                                modCtx.setCsToken(ProfileName.mkUnsafe("default"), csToken);
+                            }
+                        });
+                    } else {
+                        ctx.console().println("Warning: AstraCS token provisioning returned no token field.");
+                    }
+                } else {
+                    ctx.console().println("Warning: AstraCS token provisioning failed (HTTP " + httpResp.statusCode() + ").");
+                }
+            }
+        } catch (Exception e) {
+            ctx.console().println("Warning: AstraCS token provisioning failed: " + e.getMessage());
+        }
+
         return new LoginSuccess(profileName, request.setAsDefault());
+    }
+
+    private static Map<String, Object> decodeJwtPayload(String jwt) {
+        try {
+            var parts = jwt.split("\\.");
+            if (parts.length < 2) return Map.of();
+            var segment = parts[1];
+            // Restore standard Base64 padding
+            var padded = segment + "==".substring(0, (4 - segment.length() % 4) % 4);
+            var payload = Base64.getUrlDecoder().decode(padded);
+            return new ObjectMapper().readValue(payload, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            return Map.of();
+        }
     }
 
     private static int findFreePort() throws IOException {

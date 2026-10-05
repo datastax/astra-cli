@@ -13,8 +13,14 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.sun.net.httpserver.HttpServer;
+
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.net.URLDecoder;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -33,6 +39,11 @@ public class LoginCmdTest {
     // -------------------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------------------
+
+    /** URL-decode a raw output line so encoded redirect_uri params become readable. */
+    private static String decodeOutputLine(String line) {
+        try { return URLDecoder.decode(line, StandardCharsets.UTF_8); } catch (Exception e) { return line; }
+    }
 
     /** Send a GET to {@code http://localhost:{port}/callback?token={token}} */
     @SneakyThrows
@@ -134,7 +145,8 @@ public class LoginCmdTest {
             for (int i = 0; i < 100; i++) {
                 Thread.sleep(50);
                 loginLine = ctx.rawOutput().stream()
-                    .map(Object::toString)
+                    .map(TestCliContext.OutputLine::unwrap)
+                    .map(LoginCmdTest::decodeOutputLine)
                     .filter(s -> s.contains("localhost:"))
                     .findFirst()
                     .orElse(null);
@@ -195,7 +207,8 @@ public class LoginCmdTest {
             for (int i = 0; i < 100; i++) {
                 Thread.sleep(50);
                 loginLine = ctx.rawOutput().stream()
-                    .map(Object::toString)
+                    .map(TestCliContext.OutputLine::unwrap)
+                    .map(LoginCmdTest::decodeOutputLine)
                     .filter(s -> s.contains("localhost:"))
                     .findFirst()
                     .orElse(null);
@@ -240,7 +253,8 @@ public class LoginCmdTest {
             for (int i = 0; i < 100; i++) {
                 Thread.sleep(50);
                 loginLine = ctx.rawOutput().stream()
-                    .map(Object::toString)
+                    .map(TestCliContext.OutputLine::unwrap)
+                    .map(LoginCmdTest::decodeOutputLine)
                     .filter(s -> s.contains("localhost:"))
                     .findFirst()
                     .orElse(null);
@@ -267,6 +281,85 @@ public class LoginCmdTest {
             assertThat(config.profiles()).hasSize(1);
             assertThat(config.profiles().getFirst().nameOrDefault())
                 .isEqualTo(ProfileName.mkUnsafe("named-profile"));
+        }
+    }
+
+    @Nested
+    class astra_cs_token_provisioning {
+        @Test
+        @SneakyThrows
+        void provisions_cs_token_and_writes_to_profile() {
+            // Build a minimal fake JWT with org and grp claims
+            String payloadJson = "{\"sub\":\"test\",\"org\":\"test-org-uuid\",\"grp\":[\"test-role-uuid\"]}";
+            String b64Header  = Base64.getUrlEncoder().withoutPadding().encodeToString("{\"alg\":\"RS256\"}".getBytes(StandardCharsets.UTF_8));
+            String b64Payload = Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
+            String fakeJwt = b64Header + "." + b64Payload + ".fakesig";
+
+            // Spin up a mock server for POST /v2/oauth/client-token
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            mockServer.createContext("/v2/oauth/client-token", exchange -> {
+                val responseBody = "{\"token\":\"AstraCS:testclient:abc123\",\"clientId\":\"testclient\",\"orgId\":\"test-org-uuid\"}";
+                val bytes = responseBody.getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, bytes.length);
+                try (val os = exchange.getResponseBody()) {
+                    os.write(bytes);
+                }
+            });
+            mockServer.start();
+            int mockPort = mockServer.getAddress().getPort();
+
+            try {
+                // LoginOperation derives sessionBase by stripping the path from loginBaseUrl,
+                // then calls <sessionBase>/v2/oauth/client-token
+                val loginBaseUrl = "http://localhost:" + mockPort + "/v1/login";
+
+                val request = new LoginRequest(
+                    Optional.of(loginBaseUrl),
+                    Optional.of(ProfileName.mkUnsafe("cs-profile")),
+                    true
+                );
+
+                val future = Executors.newSingleThreadExecutor()
+                    .submit(() -> new LoginOperation(ctx.get(), request).execute());
+
+                // Wait for the callback server URL to appear in stdout
+                String loginLine = null;
+                for (int i = 0; i < 100; i++) {
+                    Thread.sleep(50);
+                    loginLine = ctx.rawOutput().stream()
+                        .map(TestCliContext.OutputLine::unwrap)
+                        .map(LoginCmdTest::decodeOutputLine)
+                        .filter(s -> s.contains("localhost:"))
+                        .findFirst()
+                        .orElse(null);
+                    if (loginLine != null) break;
+                }
+
+                assertThat(loginLine).as("login URL must be printed to stdout").isNotNull();
+
+                // Extract the callback port from the redirect_uri in the printed login URL
+                val portStr = loginLine.replaceAll(".*localhost:(\\d+)/callback.*", "$1");
+                val callbackPort = Integer.parseInt(portStr.trim());
+                assertThat(callbackPort).isGreaterThan(0);
+
+                // Deliver the fake JWT via the callback
+                val httpStatus = sendCallback(callbackPort, fakeJwt);
+                assertThat(httpStatus).isEqualTo(200);
+
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                // Verify ASTRA_CS_TOKEN was written to the profile
+                val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+                val section = config.lookupSection("cs-profile");
+                assertThat(section).as("cs-profile section must exist").isPresent();
+                val csToken = section.get().lookupKey("ASTRA_CS_TOKEN");
+                assertThat(csToken).as("ASTRA_CS_TOKEN must be present").isPresent();
+                assertThat(csToken.get()).isEqualTo("AstraCS:testclient:abc123");
+            } finally {
+                mockServer.stop(0);
+            }
         }
     }
 }
