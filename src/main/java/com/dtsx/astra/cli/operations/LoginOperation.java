@@ -7,12 +7,11 @@ import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginResult;
 import com.dtsx.astra.cli.utils.ShellUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,9 +23,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,12 +36,25 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
+/**
+ * Browser login using the OAuth 2.0 Authorization Code flow with PKCE (RFC 7636, S256) and a
+ * loopback redirect (RFC 8252).
+ *
+ * <ol>
+ *   <li>Generate a random {@code code_verifier}; derive {@code code_challenge = BASE64URL(SHA256(verifier))}.</li>
+ *   <li>Open {@code <session>/v2/oauth/authorize} in the browser with the challenge and a random {@code state}.</li>
+ *   <li>Receive {@code ?code=&state=} on {@code http://localhost:<port>/callback}.</li>
+ *   <li>Exchange the code + verifier at {@code POST <session>/v2/oauth/token} (back channel) for a JWT.</li>
+ * </ol>
+ */
 @RequiredArgsConstructor
 public class LoginOperation implements Operation<LoginResult> {
     private static final int TIMEOUT_SECONDS = 120;
     private static final String CALLBACK_PATH = "/callback";
+    private static final String CLIENT_ID = "astra-cli";
+    private static final String DEFAULT_LOGIN_URL = "https://astra.datastax.com/v1/login";
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private static final String SUCCESS_HTML = """
         <!doctype html>
@@ -55,7 +70,7 @@ public class LoginOperation implements Operation<LoginResult> {
         <html><head><title>Astra CLI Login</title></head>
         <body style="font-family:sans-serif;text-align:center;padding-top:80px">
           <h2>✗ Login failed</h2>
-          <p>No token was received. Please try again.</p>
+          <p>The login response was invalid or was rejected. Return to the terminal for details.</p>
         </body></html>
         """;
 
@@ -73,6 +88,9 @@ public class LoginOperation implements Operation<LoginResult> {
     public record LoginCancelled() implements LoginResult {}
     public record LoginError(String message) implements LoginResult {}
 
+    /** What the loopback server captured from the browser redirect. */
+    private record CallbackParams(Optional<String> code, Optional<String> state, Optional<String> error, Optional<String> errorDescription) {}
+
     @Override
     public LoginResult execute() {
         int port;
@@ -82,7 +100,12 @@ public class LoginOperation implements Operation<LoginResult> {
             return new LoginError("Could not find a free local port: " + e.getMessage());
         }
 
-        val tokenHolder = new AtomicReference<String>();
+        val codeVerifier = generateCodeVerifier();
+        val codeChallenge = computeCodeChallenge(codeVerifier);
+        val expectedState = randomUrlSafe(32);
+        val redirectUri = "http://localhost:" + port + CALLBACK_PATH;
+
+        val callbackHolder = new AtomicReference<CallbackParams>();
         val latch = new CountDownLatch(1);
 
         HttpServer server;
@@ -93,23 +116,30 @@ public class LoginOperation implements Operation<LoginResult> {
         }
 
         server.createContext(CALLBACK_PATH, exchange -> {
-            val query = Optional.ofNullable(exchange.getRequestURI().getQuery()).orElse("");
-            val params = parseQueryParams(query);
-            val token = params.get("token");
+            val params = parseQueryParams(Optional.ofNullable(exchange.getRequestURI().getRawQuery()).orElse(""));
+            val callback = new CallbackParams(
+                nonBlank(params.get("code")),
+                nonBlank(params.get("state")),
+                nonBlank(params.get("error")),
+                nonBlank(params.get("error_description"))
+            );
 
-            val html = (token != null && !token.isBlank()) ? SUCCESS_HTML : ERROR_HTML;
-            val bytes = html.getBytes(StandardCharsets.UTF_8);
+            val ok = callback.error().isEmpty()
+                && callback.code().isPresent()
+                && callback.state().map(s -> constantTimeEquals(s, expectedState)).orElse(false);
 
+            val bytes = (ok ? SUCCESS_HTML : ERROR_HTML).getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
+            exchange.getResponseHeaders().set("Cache-Control", "no-store");
             exchange.sendResponseHeaders(200, bytes.length);
             try (val os = exchange.getResponseBody()) {
                 os.write(bytes);
             }
 
-            if (token != null && !token.isBlank()) {
-                tokenHolder.set(token);
+            // Only the first callback counts; a stray request must not overwrite a valid one.
+            if (callbackHolder.compareAndSet(null, callback)) {
+                latch.countDown();
             }
-            latch.countDown();
         });
 
         server.setExecutor(Executors.newSingleThreadExecutor(r -> {
@@ -119,37 +149,52 @@ public class LoginOperation implements Operation<LoginResult> {
         }));
         server.start();
 
+        val sessionBase = sessionBase();
+
         try {
-            val baseUrl = request.loginBaseUrl()
-                .or(() -> Optional.ofNullable(System.getenv("ASTRA_LOGIN_URL")))
-                .orElse("https://astra.datastax.com/v1/login");
-            val redirectUri = "http://localhost:" + port + CALLBACK_PATH;
-            val loginUrl = baseUrl + "?redirect_uri="
-                + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
-                + "&cli=true";
+            val authorizeUrl = sessionBase + "/v2/oauth/authorize"
+                + "?response_type=code"
+                + "&client_id=" + enc(CLIENT_ID)
+                + "&redirect_uri=" + enc(redirectUri)
+                + "&state=" + enc(expectedState)
+                + "&code_challenge=" + enc(codeChallenge)
+                + "&code_challenge_method=S256";
 
             ctx.console().println("Opening browser to complete login...");
             ctx.console().println("If a browser window does not open, visit:");
-            ctx.console().println("  " + loginUrl);
+            ctx.console().println("  " + authorizeUrl);
             ctx.console().println();
 
-            ShellUtils.openURL(loginUrl);
+            ShellUtils.openURL(authorizeUrl);
 
-            val received = latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            if (!received) {
+            if (!latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 return new LoginCancelled();
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return new LoginCancelled();
         } finally {
-            server.stop(0);
+            server.stop(1);
         }
 
-        val rawToken = tokenHolder.get();
-        if (rawToken == null || rawToken.isBlank()) {
-            return new LoginError("No token was received in the callback.");
+        val callback = callbackHolder.get();
+
+        if (callback.error().isPresent()) {
+            return new LoginError("Login was rejected: " + callback.error().get()
+                + callback.errorDescription().map(d -> " (" + d + ")").orElse(""));
         }
+        if (callback.state().isEmpty() || !constantTimeEquals(callback.state().get(), expectedState)) {
+            return new LoginError("Login callback state did not match; aborting to prevent a forged callback.");
+        }
+        if (callback.code().isEmpty()) {
+            return new LoginError("No authorization code was received in the callback.");
+        }
+
+        val exchange = doExchange(sessionBase, callback.code().get(), codeVerifier, redirectUri);
+        if (exchange.error() != null) {
+            return new LoginError(exchange.error());
+        }
+        val rawToken = exchange.accessToken();
 
         val token = AstraToken.mkUnsafe(rawToken);
         val profileName = request.profileName().orElse(ProfileName.mkUnsafe("default"));
@@ -163,72 +208,187 @@ public class LoginOperation implements Operation<LoginResult> {
             }
         });
 
-        // Provision AstraCS long-lived token via POST /v2/oauth/client-token
-        try {
-            val jwtPayload = decodeJwtPayload(rawToken);
-            val orgId = (String) jwtPayload.get("org");
-            @SuppressWarnings("unchecked")
-            val roles = (List<String>) (List<?>) (jwtPayload.get("grp") instanceof List<?> l ? l : List.of());
-
-            if (orgId != null && !orgId.isBlank() && !roles.isEmpty()) {
-                val loginBaseUrl = request.loginBaseUrl()
-                    .or(() -> Optional.ofNullable(System.getenv("ASTRA_LOGIN_URL")))
-                    .orElse("https://astra.datastax.com/v1/login");
-                val sessionBase = loginBaseUrl.replaceFirst("/v?[0-9]+/.*$", "");
-
-                val mapper = new ObjectMapper();
-                val bodyMap = Map.of("orgId", orgId, "roles", roles);
-                val bodyJson = mapper.writeValueAsString(bodyMap);
-
-                val httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(10))
-                    .build();
-                val httpReq = HttpRequest.newBuilder()
-                    .uri(URI.create(sessionBase + "/v2/oauth/client-token"))
-                    .timeout(Duration.ofSeconds(15))
-                    .header("Authorization", "Bearer " + rawToken)
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
-                    .build();
-                val httpResp = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofString());
-
-                if (httpResp.statusCode() == 200) {
-                    val respNode = mapper.readTree(httpResp.body());
-                    val csTokenValue = respNode.path("token").asText(null);
-                    if (csTokenValue != null && !csTokenValue.isBlank()) {
-                        val csToken = AstraToken.mkUnsafe(csTokenValue);
-                        config.modify(modCtx -> {
-                            modCtx.setCsToken(profileName, csToken);
-                            if (request.setAsDefault()) {
-                                modCtx.setCsToken(ProfileName.mkUnsafe("default"), csToken);
-                            }
-                        });
-                    } else {
-                        ctx.console().println("Warning: AstraCS token provisioning returned no token field.");
-                    }
-                } else {
-                    ctx.console().println("Warning: AstraCS token provisioning failed (HTTP " + httpResp.statusCode() + ").");
-                }
-            }
-        } catch (Exception e) {
-            ctx.console().println("Warning: AstraCS token provisioning failed: " + e.getMessage());
-        }
+        provisionCsToken(config, sessionBase, rawToken, profileName);
 
         return new LoginSuccess(profileName, request.setAsDefault());
     }
 
+    // -----------------------------------------------------------------------------------------
+    // PKCE primitives (RFC 7636)
+    // -----------------------------------------------------------------------------------------
+
+    /** 32 random bytes → 43 base64url chars, within the RFC 7636 §4.1 range of 43–128. */
+    static String generateCodeVerifier() {
+        return randomUrlSafe(32);
+    }
+
+    /** {@code BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))}, no padding (RFC 7636 §4.2). */
+    static String computeCodeChallenge(String codeVerifier) {
+        try {
+            val digest = MessageDigest.getInstance("SHA-256").digest(codeVerifier.getBytes(StandardCharsets.US_ASCII));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is required by every Java platform", e);
+        }
+    }
+
+    private static String randomUrlSafe(int byteCount) {
+        val bytes = new byte[byteCount];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private static boolean constantTimeEquals(String a, String b) {
+        return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Back-channel token exchange
+    // -----------------------------------------------------------------------------------------
+
+    /** Exactly one of {@code accessToken} / {@code error} is non-null. */
+    private record ExchangeOutcome(String accessToken, String error) {
+        static ExchangeOutcome ok(String accessToken) { return new ExchangeOutcome(accessToken, null); }
+        static ExchangeOutcome failure(String error) { return new ExchangeOutcome(null, error); }
+    }
+
+    private ExchangeOutcome doExchange(String sessionBase, String code, String codeVerifier, String redirectUri) {
+        val form = "grant_type=authorization_code"
+            + "&code=" + enc(code)
+            + "&code_verifier=" + enc(codeVerifier)
+            + "&client_id=" + enc(CLIENT_ID)
+            + "&redirect_uri=" + enc(redirectUri);
+
+        try {
+            val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+            val httpReq = HttpRequest.newBuilder()
+                .uri(URI.create(sessionBase + "/v2/oauth/token"))
+                .timeout(Duration.ofSeconds(15))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(form))
+                .build();
+            val httpResp = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofString());
+
+            val mapper = new ObjectMapper();
+            if (httpResp.statusCode() != 200) {
+                String detail = "HTTP " + httpResp.statusCode();
+                try {
+                    val node = mapper.readTree(httpResp.body());
+                    val err = node.path("error").asText("");
+                    val desc = node.path("error_description").asText("");
+                    if (!err.isEmpty()) {
+                        detail = err + (desc.isEmpty() ? "" : ": " + desc) + " (HTTP " + httpResp.statusCode() + ")";
+                    }
+                } catch (IOException ignored) {
+                    // Non-JSON error body: the HTTP status is the best detail available and is reported below.
+                }
+                return ExchangeOutcome.failure("Token exchange failed: " + detail);
+            }
+
+            val accessToken = mapper.readTree(httpResp.body()).path("access_token").asText("");
+            if (accessToken.isBlank()) {
+                return ExchangeOutcome.failure("Token exchange succeeded but the response had no access_token.");
+            }
+            return ExchangeOutcome.ok(accessToken);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return ExchangeOutcome.failure("Token exchange was interrupted.");
+        } catch (IOException | IllegalArgumentException e) {
+            return ExchangeOutcome.failure("Token exchange failed: " + e.getMessage());
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // AstraCS provisioning (non-fatal: the JWT login itself already succeeded)
+    // -----------------------------------------------------------------------------------------
+
+    private void provisionCsToken(AstraConfig config, String sessionBase, String rawToken, ProfileName profileName) {
+        val payload = decodeJwtPayload(rawToken);
+        if (payload.isEmpty()) {
+            ctx.console().println("Warning: could not decode the access token; skipping AstraCS token provisioning.");
+            return;
+        }
+
+        val orgId = payload.get("org") instanceof String s ? s : null;
+        val roles = payload.get("grp") instanceof List<?> l ? l : List.of();
+        if (orgId == null || orgId.isBlank() || roles.isEmpty()) {
+            return;
+        }
+
+        try {
+            val mapper = new ObjectMapper();
+            val bodyJson = mapper.writeValueAsString(Map.of("orgId", orgId, "roles", roles));
+
+            val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+            val httpReq = HttpRequest.newBuilder()
+                .uri(URI.create(sessionBase + "/v2/oauth/client-token"))
+                .timeout(Duration.ofSeconds(15))
+                .header("Authorization", "Bearer " + rawToken)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(bodyJson))
+                .build();
+            val httpResp = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofString());
+
+            if (httpResp.statusCode() != 200) {
+                ctx.console().println("Warning: AstraCS token provisioning failed (HTTP " + httpResp.statusCode() + ").");
+                return;
+            }
+
+            val csTokenValue = mapper.readTree(httpResp.body()).path("token").asText(null);
+            if (csTokenValue == null || csTokenValue.isBlank()) {
+                ctx.console().println("Warning: AstraCS token provisioning returned no token field.");
+                return;
+            }
+
+            val csToken = AstraToken.mkUnsafe(csTokenValue);
+            config.modify(modCtx -> {
+                modCtx.setCsToken(profileName, csToken);
+                if (request.setAsDefault()) {
+                    modCtx.setCsToken(ProfileName.mkUnsafe("default"), csToken);
+                }
+            });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            ctx.console().println("Warning: AstraCS token provisioning was interrupted.");
+        } catch (IOException | IllegalArgumentException e) {
+            ctx.console().println("Warning: AstraCS token provisioning failed: " + e.getMessage());
+        }
+    }
+
     private static Map<String, Object> decodeJwtPayload(String jwt) {
         try {
-            var parts = jwt.split("\\.");
+            val parts = jwt.split("\\.");
             if (parts.length < 2) return Map.of();
-            var segment = parts[1];
-            // Restore standard Base64 padding
-            var padded = segment + "==".substring(0, (4 - segment.length() % 4) % 4);
-            var payload = Base64.getUrlDecoder().decode(padded);
+            // Base64 URL decoder accepts unpadded input.
+            val payload = Base64.getUrlDecoder().decode(parts[1]);
             return new ObjectMapper().readValue(payload, new TypeReference<Map<String, Object>>() {});
-        } catch (Exception e) {
+        } catch (IOException | IllegalArgumentException e) {
             return Map.of();
         }
+    }
+
+    // -----------------------------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------------------------
+
+    /**
+     * Session-service base URL. {@code --login-url} / {@code ASTRA_LOGIN_URL} historically point at
+     * {@code .../v1/login}; strip the versioned path so we can address {@code /v2/oauth/*}.
+     */
+    private String sessionBase() {
+        val configured = request.loginBaseUrl()
+            .or(() -> Optional.ofNullable(System.getenv("ASTRA_LOGIN_URL")))
+            .orElse(DEFAULT_LOGIN_URL);
+        return configured.replaceFirst("/v?[0-9]+/.*$", "");
+    }
+
+    private static Optional<String> nonBlank(String s) {
+        return (s == null || s.isBlank()) ? Optional.empty() : Optional.of(s);
+    }
+
+    private static String enc(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8);
     }
 
     private static int findFreePort() throws IOException {
@@ -238,16 +398,20 @@ public class LoginOperation implements Operation<LoginResult> {
         }
     }
 
-    private static java.util.Map<String, String> parseQueryParams(String query) {
-        if (query == null || query.isBlank()) {
-            return java.util.Map.of();
+    private static Map<String, String> parseQueryParams(String rawQuery) {
+        val result = new HashMap<String, String>();
+        if (rawQuery == null || rawQuery.isBlank()) {
+            return result;
         }
-        return Arrays.stream(query.split("&"))
-            .map(pair -> pair.split("=", 2))
-            .filter(parts -> parts.length == 2)
-            .collect(Collectors.toMap(
-                parts -> URLDecoder.decode(parts[0], StandardCharsets.UTF_8),
-                parts -> URLDecoder.decode(parts[1], StandardCharsets.UTF_8)
-            ));
+        for (val pair : rawQuery.split("&")) {
+            val kv = pair.split("=", 2);
+            if (kv.length == 2) {
+                result.putIfAbsent(
+                    URLDecoder.decode(kv[0], StandardCharsets.UTF_8),
+                    URLDecoder.decode(kv[1], StandardCharsets.UTF_8)
+                );
+            }
+        }
+        return result;
     }
 }
