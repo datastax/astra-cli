@@ -36,6 +36,7 @@ import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
+    public static final String CS_TOKEN_KEY = "ASTRA_CS_TOKEN";
     public static final String ENV_KEY = "ASTRA_ENV";
     public static final String LOCAL_ENDPOINT_KEY = "ASTRA_LOCAL_ENDPOINT";
 
@@ -218,6 +219,7 @@ public class AstraConfig {
             tempFile = Files.createTempFile(".astrarc_tmp", null);
             newIni.writeToFile(tempFile);
             FileUtils.atomicMove(tempFile, backingFile);
+            FileUtils.setOwnerReadWrite(backingFile);
             tempFile = null;
         } catch (IOException e) {
             throw new AstraConfigFileException("Error writing config file: " + e.getMessage(), backingFile);
@@ -240,10 +242,14 @@ public class AstraConfig {
         private final List<Runnable> cacheOps = new ArrayList<>();
 
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env) {
-            createProfile(name, token, env, Optional.empty());
+            createProfile(name, token, env, Optional.empty(), Optional.empty());
         }
 
         public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env, Optional<String> localEndpoint) {
+            createProfile(name, token, env, localEndpoint, Optional.empty());
+        }
+
+        public void createProfile(ProfileName name, AstraToken token, AstraEnvironment env, Optional<String> localEndpoint, Optional<AstraToken> csToken) {
             if (env.name().equalsIgnoreCase(LOCAL_NAME) && localEndpoint.isEmpty()) {
                 throw new AstraCliException(FILE_ISSUE, "LOCAL environment requires @'!" + LOCAL_ENDPOINT_KEY + "!@ to be set");
             }
@@ -256,7 +262,30 @@ public class AstraConfig {
                 if (env.name().equalsIgnoreCase(LOCAL_NAME) && localEndpoint.isPresent()) {
                     put(LOCAL_ENDPOINT_KEY, localEndpoint.get());
                 }
+                csToken.ifPresent(cs -> put(CS_TOKEN_KEY, cs.unsafeUnwrap()));
             }}));
+        }
+
+        /**
+         * Adds or updates the {@code ASTRA_CS_TOKEN} key in an existing profile section.
+         * Call this after {@link #createProfile} to store the AstraCS token provisioned
+         * by the headless-agent flow.  If the profile does not exist this is a no-op.
+         */
+        public void setCsToken(ProfileName name, AstraToken csToken) {
+            iniTransforms.add(ini -> {
+                val existing = ini.getSections().stream()
+                    .filter(s -> s.name().equals(name.unwrap()))
+                    .findFirst();
+                if (existing.isEmpty()) return;
+
+                val oldPairs = new java.util.ArrayList<>(existing.get().pairs());
+                // Remove any prior ASTRA_CS_TOKEN entry so we don't accumulate duplicates.
+                oldPairs.removeIf(p -> CS_TOKEN_KEY.equals(p.key()));
+                oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_TOKEN_KEY, csToken.unsafeUnwrap()));
+
+                ini.deleteSection(name.unwrap());
+                ini.addSection(new com.dtsx.astra.cli.core.parsers.ini.ast.IniSection(name.unwrap(), oldPairs));
+            });
         }
 
         public void setDefault(ProfileName src) {

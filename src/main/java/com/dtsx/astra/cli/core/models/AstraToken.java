@@ -20,6 +20,12 @@ public class AstraToken implements Highlightable {
                 return Either.left("Astra token should not be passed as JSON; it should be a plain string");
             }
 
+            // JWT tokens (from OIDC login) start with "eyJ" — accept them as-is,
+            // bypassing the AstraCS: format checks which only apply to Astra service tokens.
+            if (t.startsWith("eyJ")) {
+                return Either.pure(mkUnsafe(t));
+            }
+
             if (token.matches(".*\\.\\w+")) {
                 return Either.left("Astra token looks like a file name; use the @file syntax to pass the token from a file, where the file contains only the token as a plain string (e.g. `--token @token.txt`)");
             }
@@ -62,6 +68,8 @@ public class AstraToken implements Highlightable {
 
     @Override
     public String toString() {
-        return token.substring(0, "AstraCS:".length() + 4) + "****" + token.substring(token.length() - 4);
+        int prefixLen = Math.min("AstraCS:".length() + 4, token.length());
+        int suffixStart = Math.max(token.length() - 4, prefixLen);
+        return token.substring(0, prefixLen) + "****" + token.substring(suffixStart);
     }
 }

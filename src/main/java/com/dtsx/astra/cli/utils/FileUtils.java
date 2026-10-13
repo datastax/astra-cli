@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @UtilityClass
@@ -107,10 +109,26 @@ public class FileUtils {
         try {
             Files.createDirectories(path.getParent());
             Files.createFile(path);
+            setOwnerReadWrite(path);
         } catch (FileAlreadyExistsException _) {
            // whatever
         } catch (Exception e) {
             throw new CannotCreateFileException(path, extra, e);
+        }
+    }
+
+    /**
+     * Restrict a file to owner-read + owner-write (POSIX 0600).
+     * Silently ignored on non-POSIX file systems (Windows, jimfs in tests).
+     */
+    public void setOwnerReadWrite(Path path) {
+        try {
+            Files.setPosixFilePermissions(path, Set.of(
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE
+            ));
+        } catch (UnsupportedOperationException | IOException _) {
+            // Non-POSIX filesystem (Windows, jimfs) — best effort only
         }
     }
 
