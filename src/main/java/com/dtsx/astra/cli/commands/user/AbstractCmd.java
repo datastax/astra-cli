@@ -80,7 +80,8 @@ public abstract class AbstractCmd implements Runnable {
             ctx.fs(),
             ctx.gateways(),
             ctx.upgradeNotifier(),
-            ctx.forceProfileForTesting()
+            ctx.forceProfileForTesting(),
+            originalArgs()
         ));
 
         prelude();

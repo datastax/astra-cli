@@ -33,6 +33,7 @@ public class CheckboxSelectionStrategy<T> extends AbstractTtySelectionStrategy<L
 
         buildAllItems();
         this.filteredItems = new ArrayList<>(allItems);
+        adjustWindow();
     }
 
     public static class Meta implements SelectionStrategy.Meta.MultiClosed {
@@ -91,6 +92,8 @@ public class CheckboxSelectionStrategy<T> extends AbstractTtySelectionStrategy<L
         } else if (selectedIndex >= filteredItems.size()) {
             selectedIndex = filteredItems.size() - 1;
         }
+        windowStart = 0;
+        adjustWindow();
 
         redraw();
     }
@@ -100,11 +103,20 @@ public class CheckboxSelectionStrategy<T> extends AbstractTtySelectionStrategy<L
         if (filteredItems.isEmpty()) {
             ctx.console().errorf("\r%s%s%n", ctx.colors().NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
             ctx.console().errorf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
+            lastDrawnLines = 3;
         } else {
-            for (int i = 0; i < filteredItems.size(); i++) {
+            val count = filteredItems.size();
+            val end = Math.min(windowStart + PAGE_SIZE, count);
+
+            for (int i = windowStart; i < end; i++) {
                 drawItem(i);
             }
-            ctx.console().errorf("%n\r@!↑↓!@ navigate, @!Space!@ toggle, @!Ctrl+A!@ select all, @!Enter!@ confirm, @!type!@ to filter%n");
+            if (count > PAGE_SIZE) {
+                ctx.console().errorf("%n\r@!↑↓!@ navigate (%d/%d), @!Space!@ toggle, @!Ctrl+A!@ select all, @!Enter!@ confirm, @!type!@ to filter%n", selectedIndex + 1, count);
+            } else {
+                ctx.console().errorf("%n\r@!↑↓!@ navigate, @!Space!@ toggle, @!Ctrl+A!@ select all, @!Enter!@ confirm, @!type!@ to filter%n");
+            }
+            lastDrawnLines = (end - windowStart) + 2;
         }
     }
 

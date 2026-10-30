@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class TestConfig {
-    private static final Dotenv dotenv = Dotenv.load();
+    private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
     private static final Pattern DB_COMPONENTS_REGEX = Pattern.compile("^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-([a-z0-9_-]+)\\.apps\\.astra(?:-(dev|test))?\\.datastax\\.com", Pattern.CASE_INSENSITIVE);
 
     public static AstraToken token() {

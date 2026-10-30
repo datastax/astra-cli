@@ -31,8 +31,12 @@ abstract class AbstractTtySelectionStrategy<R> implements SelectionStrategy<R> {
     protected final CliContext ctx;
     protected final String fixedPrompt;
 
+    protected static final int PAGE_SIZE = 10;
+
     protected String filterText = "";
     protected int selectedIndex = 0;
+    protected int windowStart = 0;
+    protected int lastDrawnLines = 0;
 
     private volatile boolean rawModeEnabled;
 
@@ -139,10 +143,24 @@ abstract class AbstractTtySelectionStrategy<R> implements SelectionStrategy<R> {
         updateFilter();
     }
 
+    protected void adjustWindow() {
+        val count = filteredItemCount();
+        if (count <= PAGE_SIZE) {
+            windowStart = 0;
+            return;
+        }
+        if (selectedIndex < windowStart) {
+            windowStart = selectedIndex;
+        } else if (selectedIndex >= windowStart + PAGE_SIZE) {
+            windowStart = selectedIndex - PAGE_SIZE + 1;
+        }
+    }
+
     protected void moveSelectionUp() {
         val count = filteredItemCount();
         if (count > 0) {
             selectedIndex = (selectedIndex - 1 + count) % count;
+            adjustWindow();
             clearSelector();
             redraw();
         }
@@ -152,6 +170,7 @@ abstract class AbstractTtySelectionStrategy<R> implements SelectionStrategy<R> {
         val count = filteredItemCount();
         if (count > 0) {
             selectedIndex = (selectedIndex + 1) % count;
+            adjustWindow();
             clearSelector();
             redraw();
         }
@@ -164,10 +183,10 @@ abstract class AbstractTtySelectionStrategy<R> implements SelectionStrategy<R> {
     }
 
     protected void clearSelector() {
-        val lastDrawnLines = Math.max(filteredItemCount(), 1) + 2;
         for (int i = 0; i < lastDrawnLines; i++) {
             ctx.console().error(MOVE_UP_CLEAR);
         }
+        lastDrawnLines = 0;
     }
 
     protected void clearPrompt() {

@@ -20,6 +20,8 @@ import lombok.val;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -40,6 +42,9 @@ public class CliContext {
 
     // necessary for testing purpose only
     Optional<Profile> forceProfileForTesting;
+
+    /** Original CLI args for the current command invocation (used by operations for hints/fix suggestions). */
+    List<String> originalArgs;
 
     public Path path(String first, String... more) {
         return FileUtils.expandTilde(this, fs.getPath(first, more));

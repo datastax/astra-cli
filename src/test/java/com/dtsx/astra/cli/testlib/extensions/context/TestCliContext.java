@@ -72,7 +72,8 @@ public class TestCliContext implements AutoCloseable {
             options.fs(),
             options.gateways(),
             (_) -> { /* no upgrade notifier in tests for obvious reasons */ },
-            options.forceProfile()
+            options.forceProfile(),
+            Collections.emptyList()
         ));
     }
 

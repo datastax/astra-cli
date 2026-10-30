@@ -2,6 +2,7 @@ package com.dtsx.astra.cli;
 
 import com.dtsx.astra.cli.AstraCli.SetupExampleProvider;
 import com.dtsx.astra.cli.commands.*;
+import com.dtsx.astra.cli.commands.AuthSwitchCmd;
 import com.dtsx.astra.cli.commands.config.ConfigCmd;
 import com.dtsx.astra.cli.commands.db.DbCmd;
 import com.dtsx.astra.cli.commands.dotenv.DotEnvCmd;
@@ -57,6 +58,7 @@ import picocli.CommandLine.Option;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
@@ -71,6 +73,7 @@ import static com.dtsx.astra.cli.utils.StringUtils.NL;
         HelpCommand.class,
         SetupCmd.class,
         LoginCmd.class,
+        AuthSwitchCmd.class,
         ConfigCmd.class,
         DbCmd.class,
         DotEnvCmd.class,
@@ -152,7 +155,8 @@ public class AstraCli extends AbstractOperationalCmd<Void> {
             FileSystems.getDefault(),
             new GatewayProviderImpl(getCtx),
             UpgradeNotifier::run,
-            Optional.empty()
+            Optional.empty(),
+            List.of(args)
         ));
 
         System.exit(run(ctxRef, args));

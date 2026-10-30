@@ -1,0 +1,51 @@
+---- meta ----
+command: astra 
+exit_code: 0
+---- output ----
+stderr: 
+stderr:      _____            __
+stderr:     /  _  \   _______/  |_____________
+stderr:    /  /_\  \ /  ___/\   __\_  __ \__  \
+stderr:   /    |    \\___ \  |  |  |  | \ //__ \_
+stderr:   \____|__  /____  > |__|  |__|  (____  /
+stderr:           \/     \/                   \/
+stderr: 
+stderr:                        Version: 1.1.3
+stdout: Documentation: https://docs.datastax.com/en/astra-cli
+stdout: 
+stdout: Usage: astra [-qVv] [--no-input] [--[no-]spinner] [--color[=WHEN]] [--dump-logs
+stdout:              [=FILE]] [-h[=all]] [-o=FORMAT] [COMMAND]
+stdout: 
+stdout:   -v, --version            Print version information and exit.
+stdout:                              (default: false)
+stdout: 
+stdout: Use --help-all to get the full options list
+stdout: 
+stdout: Commands:
+stdout:   setup        Interactively set up the Astra CLI and create profiles
+stdout:   login        Log in to Astra via OAuth2
+stdout:   auth-switch  Switch the active AstraCS token to a different organization or
+stdout:                  role.
+stdout:   config       Manage your Astra CLI configuration profiles
+stdout:   db           Manage your Astra databases
+stdout:   dotenv       Easily create and update your .env files (beta)
+stdout:   pcu          Manage your PCU groups and associations
+stdout:   org          Get organization information
+stdout:   role         Discover Astra roles
+stdout:   streaming    Manage Astra streaming tenants
+stdout:   token        Manage your Astra tokens
+stdout:   user         Manage users in your organization
+stdout:   upgrade      Upgrade your Astra CLI installation
+stdout:   shellenv     Completions, configuration, and more
+stdout:   nuke         Entirely delete Astra CLI from your system
+stdout: 
+stdout: Examples:
+stdout:   # Create a new profile
+stdout:   $ astra setup
+stdout: 
+stdout:   # List databases
+stdout:   $ astra db list
+stdout: 
+stdout:   # Create a vector database
+stdout:   $ astra db create demo -r us-east1
+---- end ----

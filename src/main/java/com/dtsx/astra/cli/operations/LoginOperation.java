@@ -3,11 +3,13 @@ package com.dtsx.astra.cli.operations;
 import com.dtsx.astra.cli.core.CliContext;
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.ProfileName;
+import com.dtsx.astra.cli.core.credentials.CredentialStorageFactory;
+import com.dtsx.astra.cli.core.credentials.FileFallbackStorage;
 import com.dtsx.astra.cli.core.models.AstraToken;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginResult;
 import com.dtsx.astra.cli.utils.ShellUtils;
 import com.dtsx.astra.sdk.utils.AstraEnvironment;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.dtsx.astra.cli.core.datatypes.NEList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +56,8 @@ public class LoginOperation implements Operation<LoginResult> {
     private static final String CALLBACK_PATH = "/callback";
     private static final String CLIENT_ID = "astra-cli";
     private static final String DEFAULT_LOGIN_URL = "https://astra.datastax.com/v1/login";
+    /** Default RFC 8707 resource indicator path, appended to the session base URL. */
+    private static final String DEFAULT_RESOURCE_PATH = "/v1/mcp";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private static final String SUCCESS_HTML = """
@@ -77,11 +81,46 @@ public class LoginOperation implements Operation<LoginResult> {
     private final CliContext ctx;
     private final LoginRequest request;
 
+    /**
+     * An org+role pair chosen by the user (or passed via flags) after the PKCE login.
+     * {@code orgId}/{@code roleId} are the UUIDs that go to POST /v2/oauth/client-token.
+     * {@code orgName}/{@code roleName} are the display names stored in the profile for
+     * {@code auth switch} to use without a network call.
+     */
+    public record OrgRoleSelection(String orgId, String orgName, String roleId, String roleName) {}
+
+    /** One org entry returned by GET /v2/oauth/userinfo. */
+    public record OrgInfo(String id, String name, List<RoleInfo> roles) {}
+
+    /** One role entry within an org returned by GET /v2/oauth/userinfo. */
+    public record RoleInfo(String id, String name) {}
+
+    public record StorageChoice(String label, boolean useKeychain) {}
+
     public record LoginRequest(
         Optional<String> loginBaseUrl,
         Optional<ProfileName> profileName,
-        boolean setAsDefault
-    ) {}
+        boolean setAsDefault,
+        Optional<String> orgFlag,
+        Optional<String> roleFlag,
+        Optional<String> resource,
+        Optional<Boolean> useKeychain
+    ) {
+        /** Back-compat constructor for callers that supply resource indicator without storage choice. */
+        public LoginRequest(Optional<String> loginBaseUrl, Optional<ProfileName> profileName, boolean setAsDefault, Optional<String> orgFlag, Optional<String> roleFlag, Optional<String> resource) {
+            this(loginBaseUrl, profileName, setAsDefault, orgFlag, roleFlag, resource, Optional.empty());
+        }
+
+        /** Back-compat constructor for callers that don't supply a resource indicator (RFC 8707). */
+        public LoginRequest(Optional<String> loginBaseUrl, Optional<ProfileName> profileName, boolean setAsDefault, Optional<String> orgFlag, Optional<String> roleFlag) {
+            this(loginBaseUrl, profileName, setAsDefault, orgFlag, roleFlag, Optional.empty(), Optional.empty());
+        }
+
+        /** Back-compat constructor for tests that don't supply org/role flags yet. */
+        public LoginRequest(Optional<String> loginBaseUrl, Optional<ProfileName> profileName, boolean setAsDefault) {
+            this(loginBaseUrl, profileName, setAsDefault, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        }
+    }
 
     public sealed interface LoginResult {}
     public record LoginSuccess(ProfileName profileName, boolean isDefault) implements LoginResult {}
@@ -150,6 +189,7 @@ public class LoginOperation implements Operation<LoginResult> {
         server.start();
 
         val sessionBase = sessionBase();
+        val resource = request.resource().orElse(sessionBase + DEFAULT_RESOURCE_PATH);
 
         try {
             val authorizeUrl = sessionBase + "/v2/oauth/authorize"
@@ -158,7 +198,8 @@ public class LoginOperation implements Operation<LoginResult> {
                 + "&redirect_uri=" + enc(redirectUri)
                 + "&state=" + enc(expectedState)
                 + "&code_challenge=" + enc(codeChallenge)
-                + "&code_challenge_method=S256";
+                + "&code_challenge_method=S256"
+                + "&resource=" + enc(resource);
 
             ctx.console().println("Opening browser to complete login...");
             ctx.console().println("If a browser window does not open, visit:");
@@ -190,11 +231,14 @@ public class LoginOperation implements Operation<LoginResult> {
             return new LoginError("No authorization code was received in the callback.");
         }
 
-        val exchange = doExchange(sessionBase, callback.code().get(), codeVerifier, redirectUri);
+        val exchange = doExchange(sessionBase, callback.code().get(), codeVerifier, redirectUri, resource);
         if (exchange.error() != null) {
             return new LoginError(exchange.error());
         }
         val rawToken = exchange.accessToken();
+
+        // Fetch org+role list and prompt (or use flags). Non-fatal on failure.
+        val orgRole = promptOrgRole(sessionBase, rawToken);
 
         val token = AstraToken.mkUnsafe(rawToken);
         val profileName = request.profileName().orElse(ProfileName.mkUnsafe("default"));
@@ -208,7 +252,7 @@ public class LoginOperation implements Operation<LoginResult> {
             }
         });
 
-        provisionCsToken(config, sessionBase, rawToken, profileName);
+        provisionCsToken(config, sessionBase, rawToken, profileName, orgRole);
 
         return new LoginSuccess(profileName, request.setAsDefault());
     }
@@ -252,12 +296,13 @@ public class LoginOperation implements Operation<LoginResult> {
         static ExchangeOutcome failure(String error) { return new ExchangeOutcome(null, error); }
     }
 
-    private ExchangeOutcome doExchange(String sessionBase, String code, String codeVerifier, String redirectUri) {
+    private ExchangeOutcome doExchange(String sessionBase, String code, String codeVerifier, String redirectUri, String resource) {
         val form = "grant_type=authorization_code"
             + "&code=" + enc(code)
             + "&code_verifier=" + enc(codeVerifier)
             + "&client_id=" + enc(CLIENT_ID)
-            + "&redirect_uri=" + enc(redirectUri);
+            + "&redirect_uri=" + enc(redirectUri)
+            + "&resource=" + enc(resource);
 
         try {
             val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
@@ -300,25 +345,139 @@ public class LoginOperation implements Operation<LoginResult> {
     }
 
     // -----------------------------------------------------------------------------------------
+    // Org+role selection (PKCE-02)
+    // -----------------------------------------------------------------------------------------
+
+    /**
+     * Fetches the user's available orgs+roles from GET /v2/oauth/userinfo, then
+     * either uses the {@code --org}/{@code --role} flags or prompts interactively.
+     * Returns {@code null} if the org list cannot be fetched or selection fails
+     * (provisionCsToken skips gracefully in that case).
+     */
+    private OrgRoleSelection promptOrgRole(String sessionBase, String rawToken) {
+        val orgs = fetchOrgs(sessionBase, rawToken);
+        if (orgs == null || orgs.isEmpty()) {
+            return null;
+        }
+
+        // Resolve org: flag → single-org auto-select → interactive prompt.
+        OrgInfo chosenOrg;
+        if (request.orgFlag().isPresent()) {
+            val orgFlagVal = request.orgFlag().get();
+            chosenOrg = orgs.stream()
+                .filter(o -> o.id().equals(orgFlagVal) || o.name().equalsIgnoreCase(orgFlagVal))
+                .findFirst().orElse(null);
+            if (chosenOrg == null) {
+                ctx.console().println("Warning: --org '" + orgFlagVal + "' did not match any available org; skipping AstraCS provisioning.");
+                return null;
+            }
+        } else if (orgs.size() == 1) {
+            chosenOrg = orgs.getFirst();
+        } else {
+            val orgOptions = NEList.parse(orgs).orElse(null);
+            if (orgOptions == null) return null;
+            chosenOrg = ctx.console().select("Select an organization:")
+                .options(orgOptions)
+                .requireAnswer()
+                .mapper(OrgInfo::name)
+                .fallbackFlag("--org")
+                .fix(ctx.originalArgs(), "--org <org>")
+                .clearAfterSelection();
+        }
+
+        // Resolve role: flag → single-role auto-select → interactive prompt.
+        val roles = chosenOrg.roles();
+        if (roles.isEmpty()) {
+            ctx.console().println("Warning: org '" + chosenOrg.name() + "' has no roles; skipping AstraCS provisioning.");
+            return null;
+        }
+
+        RoleInfo chosenRole;
+        if (request.roleFlag().isPresent()) {
+            val roleFlagVal = request.roleFlag().get();
+            chosenRole = roles.stream()
+                .filter(r -> r.id().equals(roleFlagVal) || r.name().equalsIgnoreCase(roleFlagVal))
+                .findFirst().orElse(null);
+            if (chosenRole == null) {
+                ctx.console().println("Warning: --role '" + roleFlagVal + "' did not match any available role; skipping AstraCS provisioning.");
+                return null;
+            }
+        } else if (roles.size() == 1) {
+            chosenRole = roles.getFirst();
+        } else {
+            val roleOptions = NEList.parse(roles).orElse(null);
+            if (roleOptions == null) return null;
+            chosenRole = ctx.console().select("Select a role for " + chosenOrg.name() + ":")
+                .options(roleOptions)
+                .requireAnswer()
+                .mapper(RoleInfo::name)
+                .fallbackFlag("--role")
+                .fix(ctx.originalArgs(), "--role <role>")
+                .clearAfterSelection();
+        }
+
+        return new OrgRoleSelection(chosenOrg.id(), chosenOrg.name(), chosenRole.id(), chosenRole.name());
+    }
+
+    /**
+     * Calls GET /v2/oauth/userinfo to retrieve the user's available orgs+roles.
+     * Returns null on any error (caller treats null as "skip provisioning").
+     */
+    private List<OrgInfo> fetchOrgs(String sessionBase, String rawToken) {
+        try {
+            val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+            val httpReq = HttpRequest.newBuilder()
+                .uri(URI.create(sessionBase + "/v2/oauth/userinfo"))
+                .timeout(Duration.ofSeconds(15))
+                .header("Authorization", "Bearer " + rawToken)
+                .GET()
+                .build();
+            val httpResp = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofString());
+
+            if (httpResp.statusCode() != 200) {
+                ctx.console().println("Warning: could not fetch org list (HTTP " + httpResp.statusCode() + "); skipping org/role selection.");
+                return null;
+            }
+
+            val mapper = new ObjectMapper();
+            val root = mapper.readTree(httpResp.body());
+            val orgsNode = root.path("orgs");
+            if (!orgsNode.isArray()) return List.of();
+
+            val result = new java.util.ArrayList<OrgInfo>();
+            for (val orgNode : orgsNode) {
+                val orgId = orgNode.path("id").asText("");
+                val orgName = orgNode.path("name").asText("");
+                val rolesList = new java.util.ArrayList<RoleInfo>();
+                for (val roleNode : orgNode.path("roles")) {
+                    rolesList.add(new RoleInfo(roleNode.path("id").asText(""), roleNode.path("name").asText("")));
+                }
+                result.add(new OrgInfo(orgId, orgName, List.copyOf(rolesList)));
+            }
+            return List.copyOf(result);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (IOException | IllegalArgumentException e) {
+            ctx.console().println("Warning: failed to fetch org list: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
     // AstraCS provisioning (non-fatal: the JWT login itself already succeeded)
     // -----------------------------------------------------------------------------------------
 
-    private void provisionCsToken(AstraConfig config, String sessionBase, String rawToken, ProfileName profileName) {
-        val payload = decodeJwtPayload(rawToken);
-        if (payload.isEmpty()) {
-            ctx.console().println("Warning: could not decode the access token; skipping AstraCS token provisioning.");
-            return;
-        }
-
-        val orgId = payload.get("org") instanceof String s ? s : null;
-        val roles = payload.get("grp") instanceof List<?> l ? l : List.of();
-        if (orgId == null || orgId.isBlank() || roles.isEmpty()) {
+    private void provisionCsToken(AstraConfig config, String sessionBase, String rawToken,
+                                  ProfileName profileName, OrgRoleSelection orgRole) {
+        if (orgRole == null) {
             return;
         }
 
         try {
             val mapper = new ObjectMapper();
-            val bodyJson = mapper.writeValueAsString(Map.of("orgId", orgId, "roles", roles));
+            val bodyJson = mapper.writeValueAsString(
+                Map.of("orgId", orgRole.orgId(), "roles", List.of(orgRole.roleId())));
 
             val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
             val httpReq = HttpRequest.newBuilder()
@@ -342,10 +501,13 @@ public class LoginOperation implements Operation<LoginResult> {
             }
 
             val csToken = AstraToken.mkUnsafe(csTokenValue);
+            val useKeychain = promptStorageChoice();
             config.modify(modCtx -> {
-                modCtx.setCsToken(profileName, csToken);
+                modCtx.setCsToken(profileName, csToken, useKeychain);
+                modCtx.setOrgRoleMeta(profileName, orgRole.orgId(), orgRole.orgName(), orgRole.roleId(), orgRole.roleName());
                 if (request.setAsDefault()) {
-                    modCtx.setCsToken(ProfileName.mkUnsafe("default"), csToken);
+                    modCtx.setCsToken(ProfileName.mkUnsafe("default"), csToken, useKeychain);
+                    modCtx.setOrgRoleMeta(ProfileName.mkUnsafe("default"), orgRole.orgId(), orgRole.orgName(), orgRole.roleId(), orgRole.roleName());
                 }
             });
         } catch (InterruptedException e) {
@@ -356,16 +518,40 @@ public class LoginOperation implements Operation<LoginResult> {
         }
     }
 
-    private static Map<String, Object> decodeJwtPayload(String jwt) {
-        try {
-            val parts = jwt.split("\\.");
-            if (parts.length < 2) return Map.of();
-            // Base64 URL decoder accepts unpadded input.
-            val payload = Base64.getUrlDecoder().decode(parts[1]);
-            return new ObjectMapper().readValue(payload, new TypeReference<Map<String, Object>>() {});
-        } catch (IOException | IllegalArgumentException e) {
-            return Map.of();
+    // -----------------------------------------------------------------------------------------
+    // Credential Storage Selection
+    // -----------------------------------------------------------------------------------------
+
+    private boolean promptStorageChoice() {
+        val manager = CredentialStorageFactory.get();
+        if (manager instanceof FileFallbackStorage) {
+            return false;
         }
+        if (request.useKeychain().isPresent()) {
+            return request.useKeychain().get();
+        }
+        if (ctx.isNotTty()) {
+            return true;
+        }
+
+        val optionsList = List.of(
+            new StorageChoice(manager.name() + " (Secure OS storage)", true),
+            new StorageChoice("Configuration file (~/.astrarc)", false)
+        );
+        val options = NEList.parse(optionsList).orElse(null);
+        if (options == null) {
+            return true;
+        }
+
+        val chosen = ctx.console().select("Where would you like to save your credentials?")
+            .options(options)
+            .defaultOption(options.getFirst())
+            .mapper(StorageChoice::label)
+            .fallbackFlag("--keychain")
+            .fix(ctx.originalArgs(), "--keychain")
+            .clearAfterSelection();
+
+        return chosen != null && chosen.useKeychain();
     }
 
     // -----------------------------------------------------------------------------------------

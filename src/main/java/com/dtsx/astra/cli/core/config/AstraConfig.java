@@ -2,6 +2,7 @@ package com.dtsx.astra.cli.core.config;
 
 import com.dtsx.astra.cli.commands.AbstractConnectedCmd.ProfileSource;
 import com.dtsx.astra.cli.core.CliContext;
+import com.dtsx.astra.cli.core.credentials.CredentialStorageFactory;
 import com.dtsx.astra.cli.core.completions.ProfileLinkedCompletionsCache;
 import com.dtsx.astra.cli.core.datatypes.Either;
 import com.dtsx.astra.cli.core.exceptions.AstraCliException;
@@ -37,8 +38,13 @@ import static com.dtsx.astra.sdk.utils.AstraEnvironment.PROD;
 public class AstraConfig {
     public static final String TOKEN_KEY = "ASTRA_DB_APPLICATION_TOKEN";
     public static final String CS_TOKEN_KEY = "ASTRA_CS_TOKEN";
+    public static final String CS_ORG_ID_KEY = "ASTRA_CS_ORG_ID";
+    public static final String CS_ORG_NAME_KEY = "ASTRA_CS_ORG_NAME";
+    public static final String CS_ROLE_ID_KEY = "ASTRA_CS_ROLE_ID";
+    public static final String CS_ROLE_NAME_KEY = "ASTRA_CS_ROLE_NAME";
     public static final String ENV_KEY = "ASTRA_ENV";
     public static final String LOCAL_ENDPOINT_KEY = "ASTRA_LOCAL_ENDPOINT";
+    public static final String CS_STORAGE_KEY = "ASTRA_CS_STORAGE";
 
     private final CliContext ctx;
     @NonNull private IniFile backingIniFile;
@@ -272,6 +278,15 @@ public class AstraConfig {
          * by the headless-agent flow.  If the profile does not exist this is a no-op.
          */
         public void setCsToken(ProfileName name, AstraToken csToken) {
+            setCsToken(name, csToken, !(CredentialStorageFactory.get() instanceof com.dtsx.astra.cli.core.credentials.FileFallbackStorage));
+        }
+
+        public void setCsToken(ProfileName name, AstraToken csToken, boolean useKeychain) {
+            var manager = useKeychain ? CredentialStorageFactory.get() : new com.dtsx.astra.cli.core.credentials.FileFallbackStorage();
+            String account = name.unwrap() + "." + CS_TOKEN_KEY;
+            boolean storedInKeychain = useKeychain && !(manager instanceof com.dtsx.astra.cli.core.credentials.FileFallbackStorage)
+                && manager.store(CredentialStorageFactory.SERVICE_NAME, account, csToken.unsafeUnwrap());
+
             iniTransforms.add(ini -> {
                 val existing = ini.getSections().stream()
                     .filter(s -> s.name().equals(name.unwrap()))
@@ -279,9 +294,45 @@ public class AstraConfig {
                 if (existing.isEmpty()) return;
 
                 val oldPairs = new java.util.ArrayList<>(existing.get().pairs());
-                // Remove any prior ASTRA_CS_TOKEN entry so we don't accumulate duplicates.
-                oldPairs.removeIf(p -> CS_TOKEN_KEY.equals(p.key()));
-                oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_TOKEN_KEY, csToken.unsafeUnwrap()));
+                // Remove any prior ASTRA_CS_TOKEN and ASTRA_CS_STORAGE entries.
+                oldPairs.removeIf(p -> CS_TOKEN_KEY.equals(p.key()) || CS_STORAGE_KEY.equals(p.key()));
+
+                if (storedInKeychain) {
+                    // Store a marker instead of the raw secret
+                    oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_STORAGE_KEY, "keychain"));
+                    System.out.println("[astra] Token stored securely in " + manager.name());
+                } else {
+                    // Fallback: write plaintext (existing behavior)
+                    oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_TOKEN_KEY, csToken.unsafeUnwrap()));
+                }
+
+                ini.deleteSection(name.unwrap());
+                ini.addSection(new com.dtsx.astra.cli.core.parsers.ini.ast.IniSection(name.unwrap(), oldPairs));
+            });
+        }
+
+        /**
+         * Adds or updates the four org/role metadata keys in an existing profile section.
+         * Call this after {@link #setCsToken} to persist the display names and IDs used
+         * when minting the CS token — needed by {@code auth switch} to list existing tokens.
+         * If the profile does not exist this is a no-op.
+         */
+        public void setOrgRoleMeta(ProfileName name,
+                                   String orgId, String orgName,
+                                   String roleId, String roleName) {
+            iniTransforms.add(ini -> {
+                val existing = ini.getSections().stream()
+                    .filter(s -> s.name().equals(name.unwrap()))
+                    .findFirst();
+                if (existing.isEmpty()) return;
+
+                val oldPairs = new java.util.ArrayList<>(existing.get().pairs());
+                val metaKeys = java.util.Set.of(CS_ORG_ID_KEY, CS_ORG_NAME_KEY, CS_ROLE_ID_KEY, CS_ROLE_NAME_KEY);
+                oldPairs.removeIf(p -> metaKeys.contains(p.key()));
+                oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_ORG_ID_KEY, orgId));
+                oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_ORG_NAME_KEY, orgName));
+                oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_ROLE_ID_KEY, roleId));
+                oldPairs.add(new com.dtsx.astra.cli.core.parsers.ini.ast.IniKVPair(java.util.List.of(), CS_ROLE_NAME_KEY, roleName));
 
                 ini.deleteSection(name.unwrap());
                 ini.addSection(new com.dtsx.astra.cli.core.parsers.ini.ast.IniSection(name.unwrap(), oldPairs));
@@ -355,5 +406,57 @@ public class AstraConfig {
             ctx.log().exception("Error resolving real file paths for checking if config file is default", e);
             return false;
         }
+    }
+
+    /**
+     * Represents a stored CS token found in a profile, along with the org/role metadata
+     * that was saved when the token was minted.  Used by {@code auth switch} to present
+     * the user's existing tokens as selectable options without a network call.
+     */
+    public record StoredCsToken(
+        ProfileName profileName,
+        String csToken,
+        String orgId,
+        String orgName,
+        String roleId,
+        String roleName
+    ) {
+        /** Display label: "OrgName — RoleName  (profile: profileName)". */
+        public String label() {
+            return orgName + " \u2014 " + roleName + "  (profile: " + profileName.unwrap() + ")";
+        }
+    }
+
+    /**
+     * Returns every profile that has both an {@code ASTRA_CS_TOKEN} and the four org/role
+     * metadata keys.  Profiles that are missing any of the five keys are skipped silently —
+     * they were created before PKCE-02 and must go through a fresh {@code login} to populate
+     * the metadata before they appear here.
+     */
+    public List<StoredCsToken> readStoredCsTokens() {
+        val result = new java.util.ArrayList<StoredCsToken>();
+        for (val section : backingIniFile.getSections()) {
+            String csToken = section.lookupKey(CS_TOKEN_KEY).orElse(null);
+            val orgId   = section.lookupKey(CS_ORG_ID_KEY).orElse(null);
+            val orgName = section.lookupKey(CS_ORG_NAME_KEY).orElse(null);
+            val roleId  = section.lookupKey(CS_ROLE_ID_KEY).orElse(null);
+            val roleName = section.lookupKey(CS_ROLE_NAME_KEY).orElse(null);
+
+            // If the token was stored in the OS keychain, retrieve it from there.
+            String storageMode = section.lookupKey(CS_STORAGE_KEY).orElse(null);
+            if ("keychain".equals(storageMode)) {
+                String account = section.name() + "." + CS_TOKEN_KEY;
+                csToken = CredentialStorageFactory.get().retrieve(CredentialStorageFactory.SERVICE_NAME, account);
+            }
+
+            if (csToken == null || orgId == null || orgName == null || roleId == null || roleName == null) {
+                continue;
+            }
+            val profileName = ProfileName.parse(section.name()).fold(__ -> null, pn -> pn);
+            if (profileName == null) continue;
+
+            result.add(new StoredCsToken(profileName, csToken, orgId, orgName, roleId, roleName));
+        }
+        return List.copyOf(result);
     }
 }

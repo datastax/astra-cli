@@ -18,6 +18,7 @@ public class ArrowKeySelectionStrategy<T> extends AbstractTtySelectionStrategy<T
         this.req = req;
         this.filteredOptions = List.copyOf(req.options());
         this.selectedIndex = Math.max(req.defaultOption().map(filteredOptions::indexOf).orElse(0), 0);
+        adjustWindow();
     }
 
     public static class Meta implements SelectionStrategy.Meta.Closed {
@@ -51,6 +52,8 @@ public class ArrowKeySelectionStrategy<T> extends AbstractTtySelectionStrategy<T
             .toList();
 
         selectedIndex = filteredOptions.isEmpty() || selectedIndex >= filteredOptions.size() ? 0 : selectedIndex;
+        windowStart = 0;
+        adjustWindow();
 
         redraw();
     }
@@ -60,13 +63,21 @@ public class ArrowKeySelectionStrategy<T> extends AbstractTtySelectionStrategy<T
         if (filteredOptions.isEmpty()) {
             ctx.console().errorf("\r%s%s%n", ctx.colors().NEUTRAL_400.use("> Oops! No matches found for "), formatFilter(filterText));
             ctx.console().errorf("%n\r@!Esc!@ to cancel, @!Backspace!@ to remove filter%n");
+            lastDrawnLines = 3;
         } else {
             val defaultIndex = req.defaultOption().map(filteredOptions::indexOf);
+            val count = filteredOptions.size();
+            val end = Math.min(windowStart + PAGE_SIZE, count);
 
-            for (int i = 0; i < filteredOptions.size(); i++) {
+            for (int i = windowStart; i < end; i++) {
                 drawOption(i, defaultIndex.isPresent() && defaultIndex.get() == i);
             }
-            ctx.console().errorf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
+            if (count > PAGE_SIZE) {
+                ctx.console().errorf("%n\r@!↑↓!@ to navigate (%d/%d), @!Enter!@ to select, @!type!@ to filter%n", selectedIndex + 1, count);
+            } else {
+                ctx.console().errorf("%n\r@!↑↓!@ to navigate, @!Enter!@ to select, @!type!@ to filter%n");
+            }
+            lastDrawnLines = (end - windowStart) + 2;
         }
     }
 

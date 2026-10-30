@@ -2,6 +2,8 @@ package com.dtsx.astra.cli.unit.commands;
 
 import com.dtsx.astra.cli.core.config.AstraConfig;
 import com.dtsx.astra.cli.core.config.ProfileName;
+import com.dtsx.astra.cli.core.credentials.CredentialStorageFactory;
+import com.dtsx.astra.cli.core.credentials.FileFallbackStorage;
 import com.dtsx.astra.cli.operations.LoginOperation;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginRequest;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginResult;
@@ -11,6 +13,8 @@ import com.sun.net.httpserver.HttpServer;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -156,6 +160,7 @@ public class LoginCmdTest {
             val mockTokenServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
             val tokenEndpointCalled = new CountDownLatch(1);
             val receivedVerifier = new java.util.concurrent.atomic.AtomicReference<String>();
+            val mockPortHolder = new java.util.concurrent.atomic.AtomicInteger();
 
             mockTokenServer.createContext("/v2/oauth/token", exchange -> {
                 val bodyBytes = exchange.getRequestBody().readAllBytes();
@@ -168,6 +173,8 @@ public class LoginCmdTest {
                 assertThat(params).containsKey("code_verifier");
                 assertThat(params).containsKey("redirect_uri");
 
+                assertThat(params).containsEntry("resource", "http://localhost:" + mockPortHolder.get() + "/v1/mcp");
+
                 receivedVerifier.set(params.get("code_verifier"));
 
                 val resp = ("{\"access_token\":\"" + fakeJwt + "\",\"token_type\":\"Bearer\",\"expires_in\":3600}").getBytes(StandardCharsets.UTF_8);
@@ -178,6 +185,7 @@ public class LoginCmdTest {
             });
             mockTokenServer.start();
             int mockPort = mockTokenServer.getAddress().getPort();
+            mockPortHolder.set(mockPort);
 
             try {
                 // Use http://localhost:<mockPort>/v1/login so sessionBase = http://localhost:<mockPort>
@@ -196,6 +204,7 @@ public class LoginCmdTest {
                 assertThat(queryParam(authorizeUrl, "response_type")).isEqualTo("code");
                 assertThat(queryParam(authorizeUrl, "client_id")).isEqualTo("astra-cli");
                 assertThat(queryParam(authorizeUrl, "code_challenge_method")).isEqualTo("S256");
+                assertThat(queryParam(authorizeUrl, "resource")).isEqualTo("http://localhost:" + mockPort + "/v1/mcp");
 
                 val printedChallenge = queryParam(authorizeUrl, "code_challenge");
                 val state = queryParam(authorizeUrl, "state");
@@ -464,19 +473,23 @@ public class LoginCmdTest {
     @Nested
     class astra_cs_token_provisioning {
 
-        @Test
-        @SneakyThrows
-        void provisions_cs_token_and_writes_to_profile() {
-            // JWT with org + grp claims
-            val payloadJson = "{\"sub\":\"test\",\"org\":\"test-org-uuid\",\"grp\":[\"test-role-uuid\"]}";
-            val b64Header  = Base64.getUrlEncoder().withoutPadding().encodeToString("{\"alg\":\"RS256\"}".getBytes(StandardCharsets.UTF_8));
-            val b64Payload = Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
-            val fakeJwt = b64Header + "." + b64Payload + ".fakesig";
-            val fakeCode = "auth-code-cs";
+        /** Shared userinfo JSON for org 'test-org-uuid' with one role 'test-role-uuid'. */
+        private static final String USERINFO_RESP = """
+            {"orgs":[{"id":"test-org-uuid","name":"Test Org","roles":[{"id":"test-role-uuid","name":"Database Administrator"}]}]}
+            """;
 
-            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        @BeforeEach
+        void useFileStorage() {
+            CredentialStorageFactory.setOverrideForTest(new FileFallbackStorage());
+        }
 
-            // Token endpoint
+        @AfterEach
+        void clearStorageOverride() {
+            CredentialStorageFactory.clearOverrideForTest();
+        }
+
+        /** Registers the three mock endpoints (token, userinfo, client-token) on {@code mockServer}. */
+        private static void registerMockEndpoints(HttpServer mockServer, String fakeJwt) {
             mockServer.createContext("/v2/oauth/token", exchange -> {
                 val resp = ("{\"access_token\":\"" + fakeJwt + "\",\"token_type\":\"Bearer\",\"expires_in\":3600}").getBytes(StandardCharsets.UTF_8);
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -484,18 +497,34 @@ public class LoginCmdTest {
                 try (val os = exchange.getResponseBody()) { os.write(resp); }
             });
 
-            // CS-token endpoint
+            mockServer.createContext("/v2/oauth/userinfo", exchange -> {
+                val resp = USERINFO_RESP.strip().getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, resp.length);
+                try (val os = exchange.getResponseBody()) { os.write(resp); }
+            });
+
             mockServer.createContext("/v2/oauth/client-token", exchange -> {
                 val resp = "{\"token\":\"AstraCS:testclient:abc123\",\"clientId\":\"testclient\",\"orgId\":\"test-org-uuid\"}".getBytes(StandardCharsets.UTF_8);
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, resp.length);
                 try (val os = exchange.getResponseBody()) { os.write(resp); }
             });
+        }
 
+        @Test
+        @SneakyThrows
+        void provisions_cs_token_and_writes_to_profile() {
+            val fakeJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+            val fakeCode = "auth-code-cs";
+
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            registerMockEndpoints(mockServer, fakeJwt);
             mockServer.start();
             int mockPort = mockServer.getAddress().getPort();
 
             try {
+                // Single org + single role → auto-selected; no interactive prompt needed.
                 val future = startOperation(new LoginRequest(
                     Optional.of("http://localhost:" + mockPort + "/v1/login"),
                     Optional.of(ProfileName.mkUnsafe("cs-profile")),
@@ -518,6 +547,271 @@ public class LoginCmdTest {
                 val csToken = section.get().lookupKey("ASTRA_CS_TOKEN");
                 assertThat(csToken).as("ASTRA_CS_TOKEN must be present").isPresent();
                 assertThat(csToken.get()).isEqualTo("AstraCS:testclient:abc123");
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void provisions_cs_token_when_org_and_role_supplied_as_flags() {
+            val fakeJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+            val fakeCode = "auth-code-flags";
+
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            registerMockEndpoints(mockServer, fakeJwt);
+            mockServer.start();
+            int mockPort = mockServer.getAddress().getPort();
+
+            try {
+                // Org + role supplied via flags — no prompt needed even if multiple existed.
+                val future = startOperation(new LoginRequest(
+                    Optional.of("http://localhost:" + mockPort + "/v1/login"),
+                    Optional.of(ProfileName.mkUnsafe("flag-profile")),
+                    true,
+                    Optional.of("Test Org"),            // --org by display name
+                    Optional.of("Database Administrator") // --role by display name
+                ));
+
+                val authorizeUrl = waitForAuthorizeUrl();
+                assertThat(authorizeUrl).isNotNull();
+                val state = queryParam(authorizeUrl, "state");
+                val callbackPort = portFrom(authorizeUrl);
+
+                sendCallback(callbackPort, fakeCode, state);
+
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+                val section = config.lookupSection("flag-profile");
+                assertThat(section).as("flag-profile section must exist").isPresent();
+                val csToken = section.get().lookupKey("ASTRA_CS_TOKEN");
+                assertThat(csToken).as("ASTRA_CS_TOKEN must be written with flags").isPresent();
+                assertThat(csToken.get()).isEqualTo("AstraCS:testclient:abc123");
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void skips_cs_provisioning_when_userinfo_endpoint_unavailable() {
+            val fakeJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+            val fakeCode = "auth-code-noinfo";
+
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+
+            // Token endpoint only — no /v2/oauth/userinfo → fetchOrgs returns null → skip
+            mockServer.createContext("/v2/oauth/token", exchange -> {
+                val resp = ("{\"access_token\":\"" + fakeJwt + "\",\"token_type\":\"Bearer\",\"expires_in\":3600}").getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, resp.length);
+                try (val os = exchange.getResponseBody()) { os.write(resp); }
+            });
+
+            mockServer.start();
+            int mockPort = mockServer.getAddress().getPort();
+
+            try {
+                val future = startOperation(new LoginRequest(
+                    Optional.of("http://localhost:" + mockPort + "/v1/login"),
+                    Optional.of(ProfileName.mkUnsafe("nocs-profile")),
+                    false
+                ));
+
+                val authorizeUrl = waitForAuthorizeUrl();
+                assertThat(authorizeUrl).isNotNull();
+                val state = queryParam(authorizeUrl, "state");
+                val callbackPort = portFrom(authorizeUrl);
+
+                sendCallback(callbackPort, fakeCode, state);
+
+                // Login must still succeed — CS provisioning is non-fatal
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                // No ASTRA_CS_TOKEN expected
+                val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+                val section = config.lookupSection("nocs-profile");
+                assertThat(section).as("nocs-profile section must exist").isPresent();
+                assertThat(section.get().lookupKey("ASTRA_CS_TOKEN"))
+                    .as("ASTRA_CS_TOKEN must be absent when userinfo is unavailable")
+                    .isEmpty();
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void skips_cs_provisioning_when_org_flag_does_not_match() {
+            val fakeJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+            val fakeCode = "auth-code-badorg";
+
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            registerMockEndpoints(mockServer, fakeJwt);
+            mockServer.start();
+            int mockPort = mockServer.getAddress().getPort();
+
+            try {
+                val future = startOperation(new LoginRequest(
+                    Optional.of("http://localhost:" + mockPort + "/v1/login"),
+                    Optional.of(ProfileName.mkUnsafe("badorg-profile")),
+                    false,
+                    Optional.of("Nonexistent Org"),   // --org that matches nothing
+                    Optional.empty()
+                ));
+
+                val authorizeUrl = waitForAuthorizeUrl();
+                assertThat(authorizeUrl).isNotNull();
+                val state = queryParam(authorizeUrl, "state");
+                val callbackPort = portFrom(authorizeUrl);
+
+                sendCallback(callbackPort, fakeCode, state);
+
+                // Login still succeeds — CS provisioning is non-fatal
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+                val section = config.lookupSection("badorg-profile");
+                assertThat(section).isPresent();
+                assertThat(section.get().lookupKey("ASTRA_CS_TOKEN"))
+                    .as("ASTRA_CS_TOKEN must be absent when --org flag is unrecognised")
+                    .isEmpty();
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void provisions_cs_token_to_keychain_when_keychain_flag_is_true() {
+            val fakeJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+            val fakeCode = "auth-code-kc";
+
+            class MockKeychain implements com.dtsx.astra.cli.core.credentials.CredentialStorageManager {
+                final Map<String, String> storage = new ConcurrentHashMap<>();
+                @Override public String name() { return "Mock Keychain"; }
+                @Override public boolean store(String service, String account, String secret) {
+                    storage.put(service + "/" + account, secret);
+                    return true;
+                }
+                @Override public String retrieve(String service, String account) {
+                    return storage.get(service + "/" + account);
+                }
+                @Override public boolean delete(String service, String account) {
+                    return storage.remove(service + "/" + account) != null;
+                }
+            }
+
+            val mockKeychain = new MockKeychain();
+            CredentialStorageFactory.setOverrideForTest(mockKeychain);
+
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            registerMockEndpoints(mockServer, fakeJwt);
+            mockServer.start();
+            int mockPort = mockServer.getAddress().getPort();
+
+            try {
+                val future = startOperation(new LoginRequest(
+                    Optional.of("http://localhost:" + mockPort + "/v1/login"),
+                    Optional.of(ProfileName.mkUnsafe("kc-profile")),
+                    true,
+                    Optional.of("Test Org"),
+                    Optional.of("Database Administrator"),
+                    Optional.empty(),
+                    Optional.of(true) // explicit keychain storage
+                ));
+
+                val authorizeUrl = waitForAuthorizeUrl();
+                assertThat(authorizeUrl).isNotNull();
+                val state = queryParam(authorizeUrl, "state");
+                val callbackPort = portFrom(authorizeUrl);
+
+                sendCallback(callbackPort, fakeCode, state);
+
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+                val section = config.lookupSection("kc-profile");
+                assertThat(section).isPresent();
+                assertThat(section.get().lookupKey("ASTRA_CS_STORAGE")).hasValue("keychain");
+                assertThat(section.get().lookupKey("ASTRA_CS_TOKEN")).isEmpty();
+
+                val storedSecret = mockKeychain.retrieve(
+                    CredentialStorageFactory.SERVICE_NAME,
+                    "kc-profile.ASTRA_CS_TOKEN"
+                );
+                assertThat(storedSecret).isEqualTo("AstraCS:testclient:abc123");
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void provisions_cs_token_to_file_when_no_keychain_flag_is_true() {
+            val fakeJwt = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+            val fakeCode = "auth-code-nokc";
+
+            class MockKeychain implements com.dtsx.astra.cli.core.credentials.CredentialStorageManager {
+                final Map<String, String> storage = new ConcurrentHashMap<>();
+                @Override public String name() { return "Mock Keychain"; }
+                @Override public boolean store(String service, String account, String secret) {
+                    storage.put(service + "/" + account, secret);
+                    return true;
+                }
+                @Override public String retrieve(String service, String account) {
+                    return storage.get(service + "/" + account);
+                }
+                @Override public boolean delete(String service, String account) {
+                    return storage.remove(service + "/" + account) != null;
+                }
+            }
+
+            val mockKeychain = new MockKeychain();
+            CredentialStorageFactory.setOverrideForTest(mockKeychain);
+
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            registerMockEndpoints(mockServer, fakeJwt);
+            mockServer.start();
+            int mockPort = mockServer.getAddress().getPort();
+
+            try {
+                val future = startOperation(new LoginRequest(
+                    Optional.of("http://localhost:" + mockPort + "/v1/login"),
+                    Optional.of(ProfileName.mkUnsafe("file-profile")),
+                    true,
+                    Optional.of("Test Org"),
+                    Optional.of("Database Administrator"),
+                    Optional.empty(),
+                    Optional.of(false) // explicit file storage
+                ));
+
+                val authorizeUrl = waitForAuthorizeUrl();
+                assertThat(authorizeUrl).isNotNull();
+                val state = queryParam(authorizeUrl, "state");
+                val callbackPort = portFrom(authorizeUrl);
+
+                sendCallback(callbackPort, fakeCode, state);
+
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+                val section = config.lookupSection("file-profile");
+                assertThat(section).isPresent();
+                assertThat(section.get().lookupKey("ASTRA_CS_STORAGE")).isEmpty();
+                assertThat(section.get().lookupKey("ASTRA_CS_TOKEN")).hasValue("AstraCS:testclient:abc123");
+
+                val storedSecret = mockKeychain.retrieve(
+                    CredentialStorageFactory.SERVICE_NAME,
+                    "file-profile.ASTRA_CS_TOKEN"
+                );
+                assertThat(storedSecret).isNull();
             } finally {
                 mockServer.stop(0);
             }

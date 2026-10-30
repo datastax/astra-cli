@@ -3,8 +3,6 @@ package com.dtsx.astra.cli.commands;
 import com.dtsx.astra.cli.core.config.ProfileName;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
-import com.dtsx.astra.cli.operations.DeviceLoginOperation;
-import com.dtsx.astra.cli.operations.DeviceLoginOperation.DeviceLoginRequest;
 import com.dtsx.astra.cli.operations.LoginOperation;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginRequest;
 import com.dtsx.astra.cli.operations.LoginOperation.LoginResult;
@@ -22,9 +20,7 @@ import java.util.function.Supplier;
     description = {
         "Log in to Astra via OAuth2",
         "",
-        "By default, opens a browser window to complete authentication (PKCE flow).",
-        "Use @|code --device|@ for headless / SSH environments where no browser is available:",
-        "a short code is displayed that you enter at the verification URL from any device.",
+        "Opens a browser window to complete authentication (PKCE flow).",
         "",
         "The resulting token is written to @|code ~/.astrarc|@."
     }
@@ -34,12 +30,16 @@ import java.util.function.Supplier;
     command = "${cli.name} login"
 )
 @Example(
-    comment = "Log in via device code (headless / SSH)",
-    command = "${cli.name} login --device"
-)
-@Example(
     comment = "Log in and save under a named profile",
     command = "${cli.name} login --name my-org"
+)
+@Example(
+    comment = "Log in and select a specific organization",
+    command = "${cli.name} login --org my-org-name"
+)
+@Example(
+    comment = "Log in and select a specific role within an organization",
+    command = "${cli.name} login --org my-org-name --role Database Administrator"
 )
 public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
     @Option(
@@ -56,14 +56,38 @@ public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
     public boolean $noDefault = false;
 
     @Option(
-        names = { "--device" },
-        description = {
-            "Use the RFC 8628 Device Authorization Grant instead of the browser PKCE flow.",
-            "Displays a short code to enter at a URL — no local port or browser required.",
-            "Ideal for SSH sessions, Docker containers, and headless cloud environments."
-        }
+        names = { "--org" },
+        description = "Organization name or ID to use. Prompted interactively if omitted and multiple orgs are available.",
+        paramLabel = "ORG"
     )
-    public boolean $device = false;
+    public Optional<String> $org = Optional.empty();
+
+    @Option(
+        names = { "--role" },
+        description = "Role name or ID to use within the selected organization. Prompted interactively if omitted and multiple roles are available.",
+        paramLabel = "ROLE"
+    )
+    public Optional<String> $role = Optional.empty();
+
+    @Option(
+        names = { "--keychain", "--keyring" },
+        description = "Store credentials in the OS keychain without prompting."
+    )
+    public boolean $keychain = false;
+
+    @Option(
+        names = { "--no-keychain", "--no-keyring" },
+        description = "Store credentials in the configuration file (~/.astrarc) instead of the OS keychain."
+    )
+    public boolean $noKeychain = false;
+
+    @Option(
+        names = { "--resource" },
+        description = "RFC 8707 resource indicator sent in the authorize and token requests. Defaults to <login base URL>/v1/mcp.",
+        paramLabel = "URL",
+        hidden = true
+    )
+    public Optional<String> $resource = Optional.empty();
 
     @Option(
         names = { "--login-url" },
@@ -84,10 +108,13 @@ public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
 
     @Override
     protected Operation<LoginResult> mkOperation() {
-        if ($device) {
-            return new DeviceLoginOperation(ctx, new DeviceLoginRequest($loginUrl, $name, !$noDefault));
+        Optional<Boolean> useKeychain = Optional.empty();
+        if ($keychain) {
+            useKeychain = Optional.of(true);
+        } else if ($noKeychain) {
+            useKeychain = Optional.of(false);
         }
-        return new LoginOperation(ctx, new LoginRequest($loginUrl, $name, !$noDefault));
+        return new LoginOperation(ctx, new LoginRequest($loginUrl, $name, !$noDefault, $org, $role, $resource, useKeychain));
     }
 
     private OutputHuman handleSuccess(LoginOperation.LoginSuccess s) {
