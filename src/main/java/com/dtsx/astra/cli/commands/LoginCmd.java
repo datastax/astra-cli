@@ -1,6 +1,7 @@
 package com.dtsx.astra.cli.commands;
 
 import com.dtsx.astra.cli.core.config.ProfileName;
+import com.dtsx.astra.cli.core.exceptions.AstraCliException;
 import com.dtsx.astra.cli.core.help.Example;
 import com.dtsx.astra.cli.core.output.formats.OutputHuman;
 import com.dtsx.astra.cli.operations.LoginOperation;
@@ -14,6 +15,9 @@ import picocli.CommandLine.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import static com.dtsx.astra.cli.core.output.ExitCode.EXECUTION_CANCELLED;
+import static com.dtsx.astra.cli.core.output.ExitCode.ILLEGAL_OPERATION;
 
 @Command(
     name = "login",
@@ -57,14 +61,14 @@ public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
 
     @Option(
         names = { "--org" },
-        description = "Organization name or ID to use. Prompted interactively if omitted and multiple orgs are available.",
+        description = "Organization name or ID to use. Prompted interactively if omitted and multiple orgs are available. Ignored when the browser login already selected an organization.",
         paramLabel = "ORG"
     )
     public Optional<String> $org = Optional.empty();
 
     @Option(
         names = { "--role" },
-        description = "Role name or ID to use within the selected organization. Prompted interactively if omitted and multiple roles are available.",
+        description = "Role name or ID to use within the selected organization. Prompted interactively if omitted and multiple roles are available. Ignored when the browser login already selected a role.",
         paramLabel = "ROLE"
     )
     public Optional<String> $role = Optional.empty();
@@ -130,11 +134,12 @@ public class LoginCmd extends AbstractOperationalCmd<LoginResult> {
         ));
     }
 
+    // Thrown (not returned) so that the process exits non-zero; a returned OutputHuman exits 0.
     private OutputHuman handleCancelled() {
-        return OutputHuman.response("@|bold,yellow Login timed out or was cancelled.|@ No profile was saved.");
+        throw new AstraCliException(EXECUTION_CANCELLED, "@|bold,yellow Login timed out or was cancelled.|@ No profile was saved.");
     }
 
     private OutputHuman handleError(LoginOperation.LoginError e) {
-        return OutputHuman.response("@|bold,red Login error:|@ " + e.message());
+        throw new AstraCliException(ILLEGAL_OPERATION, "@|bold,red Login error:|@ " + e.message());
     }
 }

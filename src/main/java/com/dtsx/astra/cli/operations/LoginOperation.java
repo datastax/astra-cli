@@ -221,6 +221,10 @@ public class LoginOperation implements Operation<LoginResult> {
         val callback = callbackHolder.get();
 
         if (callback.error().isPresent()) {
+            if (callback.error().get().equals("access_denied")) {
+                return new LoginError("Login was cancelled, or the organization/role selection was rejected (access_denied)"
+                    + callback.errorDescription().map(d -> ": " + d).orElse("") + ". No profile was saved.");
+            }
             return new LoginError("Login was rejected: " + callback.error().get()
                 + callback.errorDescription().map(d -> " (" + d + ")").orElse(""));
         }
@@ -237,8 +241,11 @@ public class LoginOperation implements Operation<LoginResult> {
         }
         val rawToken = exchange.accessToken();
 
-        // Fetch org+role list and prompt (or use flags). Non-fatal on failure.
-        val orgRole = promptOrgRole(sessionBase, rawToken);
+        // Use the browser's org+role selection when the token response carries one; otherwise fetch the
+        // org+role list and prompt (or use flags). Non-fatal on failure.
+        val orgRole = (exchange.selection() != null)
+            ? warnIfFlagsConflict(exchange.selection())
+            : promptOrgRole(sessionBase, rawToken);
 
         val token = AstraToken.mkUnsafe(rawToken);
         val profileName = request.profileName().orElse(ProfileName.mkUnsafe("default"));
@@ -290,10 +297,13 @@ public class LoginOperation implements Operation<LoginResult> {
     // Back-channel token exchange
     // -----------------------------------------------------------------------------------------
 
-    /** Exactly one of {@code accessToken} / {@code error} is non-null. */
-    private record ExchangeOutcome(String accessToken, String error) {
-        static ExchangeOutcome ok(String accessToken) { return new ExchangeOutcome(accessToken, null); }
-        static ExchangeOutcome failure(String error) { return new ExchangeOutcome(null, error); }
+    /**
+     * Exactly one of {@code accessToken} / {@code error} is non-null. {@code selection} is the browser's
+     * org+role choice from the token response, or null when the response carries none.
+     */
+    private record ExchangeOutcome(String accessToken, String error, OrgRoleSelection selection) {
+        static ExchangeOutcome ok(String accessToken, OrgRoleSelection selection) { return new ExchangeOutcome(accessToken, null, selection); }
+        static ExchangeOutcome failure(String error) { return new ExchangeOutcome(null, error, null); }
     }
 
     private ExchangeOutcome doExchange(String sessionBase, String code, String codeVerifier, String redirectUri, String resource) {
@@ -331,11 +341,22 @@ public class LoginOperation implements Operation<LoginResult> {
                 return ExchangeOutcome.failure("Token exchange failed: " + detail);
             }
 
-            val accessToken = mapper.readTree(httpResp.body()).path("access_token").asText("");
+            val body = mapper.readTree(httpResp.body());
+            val accessToken = body.path("access_token").asText("");
             if (accessToken.isBlank()) {
                 return ExchangeOutcome.failure("Token exchange succeeded but the response had no access_token.");
             }
-            return ExchangeOutcome.ok(accessToken);
+
+            // Optional browser selection; a blank field counts as absent and names fall back to ids.
+            val orgId = body.path("org_id").asText("");
+            val roleId = body.path("role_id").asText("");
+            OrgRoleSelection selection = null;
+            if (!orgId.isBlank() && !roleId.isBlank()) {
+                val orgName = body.path("org_name").asText("");
+                val roleName = body.path("role_name").asText("");
+                selection = new OrgRoleSelection(orgId, orgName.isBlank() ? orgId : orgName, roleId, roleName.isBlank() ? roleId : roleName);
+            }
+            return ExchangeOutcome.ok(accessToken, selection);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return ExchangeOutcome.failure("Token exchange was interrupted.");
@@ -347,6 +368,17 @@ public class LoginOperation implements Operation<LoginResult> {
     // -----------------------------------------------------------------------------------------
     // Org+role selection (PKCE-02)
     // -----------------------------------------------------------------------------------------
+
+    /** The browser selection wins; a {@code --org}/{@code --role} flag that matches it by neither id nor name (case-insensitive) is ignored with a warning. */
+    private OrgRoleSelection warnIfFlagsConflict(OrgRoleSelection selection) {
+        request.orgFlag()
+            .filter(f -> !f.equalsIgnoreCase(selection.orgId()) && !f.equalsIgnoreCase(selection.orgName()))
+            .ifPresent(f -> ctx.console().println("Warning: --org '" + f + "' is ignored; using the organization selected in the browser."));
+        request.roleFlag()
+            .filter(f -> !f.equalsIgnoreCase(selection.roleId()) && !f.equalsIgnoreCase(selection.roleName()))
+            .ifPresent(f -> ctx.console().println("Warning: --role '" + f + "' is ignored; using the role selected in the browser."));
+        return selection;
+    }
 
     /**
      * Fetches the user's available orgs+roles from GET /v2/oauth/userinfo, then

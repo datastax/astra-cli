@@ -819,6 +819,203 @@ public class LoginCmdTest {
     }
 
     // -----------------------------------------------------------------------------------------
+    // Test – org/role selection made in the browser (carried in the token response)
+    // -----------------------------------------------------------------------------------------
+
+    @Nested
+    class browser_selection {
+
+        private static final String FAKE_JWT = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.sig";
+
+        private final java.util.concurrent.atomic.AtomicInteger userinfoCalls = new java.util.concurrent.atomic.AtomicInteger();
+        private final java.util.concurrent.atomic.AtomicReference<String> clientTokenBody = new java.util.concurrent.atomic.AtomicReference<>();
+
+        @BeforeEach
+        void useFileStorage() {
+            CredentialStorageFactory.setOverrideForTest(new FileFallbackStorage());
+        }
+
+        @AfterEach
+        void clearStorageOverride() {
+            CredentialStorageFactory.clearOverrideForTest();
+        }
+
+        /** Mock session-service whose token response body is {@code tokenResponseJson}; records userinfo calls and the client-token body. */
+        @SneakyThrows
+        private HttpServer startMockServer(String tokenResponseJson) {
+            val mockServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+
+            mockServer.createContext("/v2/oauth/token", exchange -> {
+                val resp = tokenResponseJson.getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, resp.length);
+                try (val os = exchange.getResponseBody()) { os.write(resp); }
+            });
+
+            mockServer.createContext("/v2/oauth/userinfo", exchange -> {
+                userinfoCalls.incrementAndGet();
+                val resp = "{\"orgs\":[{\"id\":\"userinfo-org\",\"name\":\"Userinfo Org\",\"roles\":[{\"id\":\"userinfo-role\",\"name\":\"Userinfo Role\"}]}]}".getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, resp.length);
+                try (val os = exchange.getResponseBody()) { os.write(resp); }
+            });
+
+            mockServer.createContext("/v2/oauth/client-token", exchange -> {
+                clientTokenBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+                val resp = "{\"token\":\"AstraCS:testclient:abc123\",\"clientId\":\"testclient\"}".getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, resp.length);
+                try (val os = exchange.getResponseBody()) { os.write(resp); }
+            });
+
+            mockServer.start();
+            return mockServer;
+        }
+
+        /** Starts the login, drives a successful code callback and returns the result. */
+        @SneakyThrows
+        private LoginResult loginWithCodeCallback(HttpServer mockServer, String profile, Optional<String> orgFlag, Optional<String> roleFlag) {
+            val future = startOperation(new LoginRequest(
+                Optional.of("http://localhost:" + mockServer.getAddress().getPort() + "/v1/login"),
+                Optional.of(ProfileName.mkUnsafe(profile)),
+                false,
+                orgFlag,
+                roleFlag
+            ));
+
+            val authorizeUrl = waitForAuthorizeUrl();
+            assertThat(authorizeUrl).isNotNull();
+            sendCallback(portFrom(authorizeUrl), "fake-code", queryParam(authorizeUrl, "state"));
+
+            return future.get(10, TimeUnit.SECONDS);
+        }
+
+        @SneakyThrows
+        private void assertStoredMeta(String profile, String orgId, String orgName, String roleId, String roleName) {
+            val config = AstraConfig.readAstraConfigFile(ctx.get(), null, false);
+            val section = config.lookupSection(profile);
+            assertThat(section).as(profile + " section must exist").isPresent();
+            assertThat(section.get().lookupKey("ASTRA_CS_TOKEN")).hasValue("AstraCS:testclient:abc123");
+            assertThat(section.get().lookupKey(AstraConfig.CS_ORG_ID_KEY)).hasValue(orgId);
+            assertThat(section.get().lookupKey(AstraConfig.CS_ORG_NAME_KEY)).hasValue(orgName);
+            assertThat(section.get().lookupKey(AstraConfig.CS_ROLE_ID_KEY)).hasValue(roleId);
+            assertThat(section.get().lookupKey(AstraConfig.CS_ROLE_NAME_KEY)).hasValue(roleName);
+        }
+
+        @Test
+        @SneakyThrows
+        void approve_uses_selection_from_token_response_without_calling_userinfo() {
+            val mockServer = startMockServer("{\"access_token\":\"" + FAKE_JWT + "\",\"token_type\":\"Bearer\",\"expires_in\":3600,"
+                + "\"org_id\":\"sel-org-uuid\",\"role_id\":\"sel-role-uuid\",\"org_name\":\"Selected Org\",\"role_name\":\"Selected Role\"}");
+
+            try {
+                val result = loginWithCodeCallback(mockServer, "sel-profile", Optional.empty(), Optional.empty());
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                assertThat(userinfoCalls.get()).as("userinfo must not be called when the token response carries a selection").isZero();
+
+                val body = new com.fasterxml.jackson.databind.ObjectMapper().readTree(clientTokenBody.get());
+                assertThat(body.path("orgId").asText()).isEqualTo("sel-org-uuid");
+                assertThat(body.path("roles")).hasSize(1);
+                assertThat(body.path("roles").get(0).asText()).isEqualTo("sel-role-uuid");
+
+                assertStoredMeta("sel-profile", "sel-org-uuid", "Selected Org", "sel-role-uuid", "Selected Role");
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void selection_without_names_stores_ids_as_names() {
+            val mockServer = startMockServer("{\"access_token\":\"" + FAKE_JWT + "\",\"token_type\":\"Bearer\",\"expires_in\":3600,"
+                + "\"org_id\":\"sel-org-uuid\",\"role_id\":\"sel-role-uuid\"}");
+
+            try {
+                val result = loginWithCodeCallback(mockServer, "noname-profile", Optional.empty(), Optional.empty());
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                assertThat(userinfoCalls.get()).isZero();
+                assertStoredMeta("noname-profile", "sel-org-uuid", "sel-org-uuid", "sel-role-uuid", "sel-role-uuid");
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void deny_callback_returns_cancellation_message_and_writes_no_profile() {
+            val mockServer = startMockServer("{\"access_token\":\"" + FAKE_JWT + "\"}");
+
+            try {
+                val future = startOperation(new LoginRequest(
+                    Optional.of("http://localhost:" + mockServer.getAddress().getPort() + "/v1/login"),
+                    Optional.of(ProfileName.mkUnsafe("denied-profile")),
+                    true
+                ));
+
+                val authorizeUrl = waitForAuthorizeUrl();
+                assertThat(authorizeUrl).isNotNull();
+                sendErrorCallback(portFrom(authorizeUrl), "access_denied", "User cancelled the selection");
+
+                val result = future.get(10, TimeUnit.SECONDS);
+                assertThat(result)
+                    .asInstanceOf(InstanceOfAssertFactories.type(LoginOperation.LoginError.class))
+                    .satisfies(e -> {
+                        assertThat(e.message()).containsIgnoringCase("cancelled");
+                        assertThat(e.message()).contains("User cancelled the selection");
+                        assertThat(e.message()).contains("No profile was saved");
+                    });
+
+                assertThat(userinfoCalls.get()).isZero();
+                assertThat(clientTokenBody.get()).isNull();
+                assertThat(java.nio.file.Files.exists(AstraConfig.resolveDefaultAstraConfigFile(ctx.get())))
+                    .as("no config file (and so no profile) must be written on deny").isFalse();
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void conflicting_flags_print_a_warning_and_the_selection_still_wins() {
+            val mockServer = startMockServer("{\"access_token\":\"" + FAKE_JWT + "\",\"token_type\":\"Bearer\",\"expires_in\":3600,"
+                + "\"org_id\":\"sel-org-uuid\",\"role_id\":\"sel-role-uuid\",\"org_name\":\"Selected Org\",\"role_name\":\"Selected Role\"}");
+
+            try {
+                val result = loginWithCodeCallback(mockServer, "conflict-profile", Optional.of("Other Org"), Optional.of("Other Role"));
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                val output = ctx.rawOutput().stream().map(TestCliContext.OutputLine::unwrap).toList();
+                assertThat(output).anyMatch(l -> l.contains("--org 'Other Org' is ignored"));
+                assertThat(output).anyMatch(l -> l.contains("--role 'Other Role' is ignored"));
+
+                assertThat(userinfoCalls.get()).isZero();
+                assertStoredMeta("conflict-profile", "sel-org-uuid", "Selected Org", "sel-role-uuid", "Selected Role");
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+
+        @Test
+        @SneakyThrows
+        void matching_flags_print_no_warning() {
+            val mockServer = startMockServer("{\"access_token\":\"" + FAKE_JWT + "\",\"token_type\":\"Bearer\",\"expires_in\":3600,"
+                + "\"org_id\":\"sel-org-uuid\",\"role_id\":\"sel-role-uuid\",\"org_name\":\"Selected Org\",\"role_name\":\"Selected Role\"}");
+
+            try {
+                val result = loginWithCodeCallback(mockServer, "match-profile", Optional.of("selected org"), Optional.of("SEL-ROLE-UUID"));
+                assertThat(result).isInstanceOf(LoginOperation.LoginSuccess.class);
+
+                val output = ctx.rawOutput().stream().map(TestCliContext.OutputLine::unwrap).toList();
+                assertThat(output).noneMatch(l -> l.contains("is ignored"));
+            } finally {
+                mockServer.stop(0);
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
     // Utility
     // -----------------------------------------------------------------------------------------
 
